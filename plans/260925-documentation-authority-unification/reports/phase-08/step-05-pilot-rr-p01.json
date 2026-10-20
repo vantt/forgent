@@ -190,9 +190,8 @@
         "target": null,
         "anchor": null,
         "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/history/",
-          "exists": true
+          "rule": "L12-71: retained docs/history external-project narrative convention / inline synthetic work-doc fixture. No relocation claimed.",
+          "expression": "docs/history/"
         },
         "timing": "none",
         "diffHunk": null,
@@ -1348,9 +1347,8 @@
         "target": null,
         "anchor": null,
         "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/history/",
-          "exists": true
+          "rule": "L12-71: retained docs/history external-project narrative convention / inline synthetic work-doc fixture. No relocation claimed.",
+          "expression": "docs/history/"
         },
         "timing": "none",
         "diffHunk": null,
@@ -2164,12 +2162,12 @@
         "inputs": [
           "path::Path"
         ],
-        "role": "non-document-operation",
+        "role": "type/import",
         "targetSetOrConstruction": null,
         "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'path::Path'. Pinned current passage: '}\\n\\nasync fn search_contract(root: &std::path::Path, query: Option<String>) -> Result<String, String> {\\n    let contract_path = root.join(\"docs/contracts/fgos-gateway-api-v1.yaml\");\\n    let raw = tokio::fs::read_to_string(&contract_path)'",
-        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'path::Path'. Pinned current passage: '}\\n\\nasync fn search_contract(root: &std::path::Path, query: Option<String>) -> Result<String, String> {\\n    let contract_path = root.join(\"docs/contracts/fgos-gateway-api-v1.yaml\");\\n    let raw = tokio::fs::read_to_string(&contract_path)'",
+        "rejectedAsUnrelatedReason": "Rust type token, not an operation",
+        "reason": "L12-71: type/import token 'path::Path' in root: &std::path::Path; actual read owned by 000767/000768.",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "gateway-contract-pilot"
@@ -2509,7 +2507,7 @@
             "expectedAfterSha256": "cc1c9e2280fb3b0dbb1aea4c48dd090d6d0edc1ee44be4f224b759bab6adc55f",
             "rollbackDiff": "--- a/test/runner/merge.test.mjs\n+++ b/test/runner/merge.test.mjs\n@@ -1260,9 +1260,9 @@\n   const detail = formatFgosWriteRejectedDetail('fgw/demo-item', ['.fgos/events.jsonl'], 'main');\n   assert.equal(\n     detail,\n-    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n+    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n   );\n-  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));\n+  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));\n });\n \n test('mergeRunnerItem merges normally when the branch touches ordinary files alongside an untouched .fgos/', async () => {\n",
             "timing": "phase9",
-            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance. L12-71: merge.test.mjs belongs to the shared atomic old-pointer co-cut with merge.mjs reference-003749; it does not assert hook output. Hook e2e basename proof stays unchanged.",
             "grepDecisions": [
               {
                 "match": {
@@ -2592,7 +2590,7 @@
             "expectedAfterSha256": "cc1c9e2280fb3b0dbb1aea4c48dd090d6d0edc1ee44be4f224b759bab6adc55f",
             "rollbackDiff": "--- a/test/runner/merge.test.mjs\n+++ b/test/runner/merge.test.mjs\n@@ -1260,9 +1260,9 @@\n   const detail = formatFgosWriteRejectedDetail('fgw/demo-item', ['.fgos/events.jsonl'], 'main');\n   assert.equal(\n     detail,\n-    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n+    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n   );\n-  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));\n+  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));\n });\n \n test('mergeRunnerItem merges normally when the branch touches ordinary files alongside an untouched .fgos/', async () => {\n",
             "timing": "phase9",
-            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance. L12-71: merge.test.mjs belongs to the shared atomic old-pointer co-cut with merge.mjs reference-003749; it does not assert hook output. Hook e2e basename proof stays unchanged.",
             "grepDecisions": [
               {
                 "match": {
@@ -2964,7 +2962,7 @@
             "expectedAfterSha256": "cc1c9e2280fb3b0dbb1aea4c48dd090d6d0edc1ee44be4f224b759bab6adc55f",
             "rollbackDiff": "--- a/test/runner/merge.test.mjs\n+++ b/test/runner/merge.test.mjs\n@@ -1260,9 +1260,9 @@\n   const detail = formatFgosWriteRejectedDetail('fgw/demo-item', ['.fgos/events.jsonl'], 'main');\n   assert.equal(\n     detail,\n-    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n+    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n   );\n-  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));\n+  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));\n });\n \n test('mergeRunnerItem merges normally when the branch touches ordinary files alongside an untouched .fgos/', async () => {\n",
             "timing": "phase9",
-            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance. L12-71: merge.test.mjs belongs to the shared atomic old-pointer co-cut with merge.mjs reference-003749; it does not assert hook output. Hook e2e basename proof stays unchanged.",
             "grepDecisions": [
               {
                 "match": {
@@ -3047,7 +3045,7 @@
             "expectedAfterSha256": "cc1c9e2280fb3b0dbb1aea4c48dd090d6d0edc1ee44be4f224b759bab6adc55f",
             "rollbackDiff": "--- a/test/runner/merge.test.mjs\n+++ b/test/runner/merge.test.mjs\n@@ -1260,9 +1260,9 @@\n   const detail = formatFgosWriteRejectedDetail('fgw/demo-item', ['.fgos/events.jsonl'], 'main');\n   assert.equal(\n     detail,\n-    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n+    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n   );\n-  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));\n+  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));\n });\n \n test('mergeRunnerItem merges normally when the branch touches ordinary files alongside an untouched .fgos/', async () => {\n",
             "timing": "phase9",
-            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance. L12-71: merge.test.mjs belongs to the shared atomic old-pointer co-cut with merge.mjs reference-003749; it does not assert hook output. Hook e2e basename proof stays unchanged.",
             "grepDecisions": [
               {
                 "match": {
@@ -3445,7 +3443,7 @@
             "expectedAfterSha256": "cc1c9e2280fb3b0dbb1aea4c48dd090d6d0edc1ee44be4f224b759bab6adc55f",
             "rollbackDiff": "--- a/test/runner/merge.test.mjs\n+++ b/test/runner/merge.test.mjs\n@@ -1260,9 +1260,9 @@\n   const detail = formatFgosWriteRejectedDetail('fgw/demo-item', ['.fgos/events.jsonl'], 'main');\n   assert.equal(\n     detail,\n-    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n+    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n   );\n-  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));\n+  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));\n });\n \n test('mergeRunnerItem merges normally when the branch touches ordinary files alongside an untouched .fgos/', async () => {\n",
             "timing": "phase9",
-            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance. L12-71: merge.test.mjs belongs to the shared atomic old-pointer co-cut with merge.mjs reference-003749; it does not assert hook output. Hook e2e basename proof stays unchanged.",
             "grepDecisions": [
               {
                 "match": {
@@ -3528,7 +3526,7 @@
             "expectedAfterSha256": "cc1c9e2280fb3b0dbb1aea4c48dd090d6d0edc1ee44be4f224b759bab6adc55f",
             "rollbackDiff": "--- a/test/runner/merge.test.mjs\n+++ b/test/runner/merge.test.mjs\n@@ -1260,9 +1260,9 @@\n   const detail = formatFgosWriteRejectedDetail('fgw/demo-item', ['.fgos/events.jsonl'], 'main');\n   assert.equal(\n     detail,\n-    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n+    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n   );\n-  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));\n+  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));\n });\n \n test('mergeRunnerItem merges normally when the branch touches ordinary files alongside an untouched .fgos/', async () => {\n",
             "timing": "phase9",
-            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance. L12-71: merge.test.mjs belongs to the shared atomic old-pointer co-cut with merge.mjs reference-003749; it does not assert hook output. Hook e2e basename proof stays unchanged.",
             "grepDecisions": [
               {
                 "match": {
@@ -3831,7 +3829,7 @@
             "expectedAfterSha256": "cc1c9e2280fb3b0dbb1aea4c48dd090d6d0edc1ee44be4f224b759bab6adc55f",
             "rollbackDiff": "--- a/test/runner/merge.test.mjs\n+++ b/test/runner/merge.test.mjs\n@@ -1260,9 +1260,9 @@\n   const detail = formatFgosWriteRejectedDetail('fgw/demo-item', ['.fgos/events.jsonl'], 'main');\n   assert.equal(\n     detail,\n-    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n+    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n   );\n-  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));\n+  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));\n });\n \n test('mergeRunnerItem merges normally when the branch touches ordinary files alongside an untouched .fgos/', async () => {\n",
             "timing": "phase9",
-            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance. L12-71: merge.test.mjs belongs to the shared atomic old-pointer co-cut with merge.mjs reference-003749; it does not assert hook output. Hook e2e basename proof stays unchanged.",
             "grepDecisions": [
               {
                 "match": {
@@ -3914,7 +3912,7 @@
             "expectedAfterSha256": "cc1c9e2280fb3b0dbb1aea4c48dd090d6d0edc1ee44be4f224b759bab6adc55f",
             "rollbackDiff": "--- a/test/runner/merge.test.mjs\n+++ b/test/runner/merge.test.mjs\n@@ -1260,9 +1260,9 @@\n   const detail = formatFgosWriteRejectedDetail('fgw/demo-item', ['.fgos/events.jsonl'], 'main');\n   assert.equal(\n     detail,\n-    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n+    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n   );\n-  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));\n+  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));\n });\n \n test('mergeRunnerItem merges normally when the branch touches ordinary files alongside an untouched .fgos/', async () => {\n",
             "timing": "phase9",
-            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance. L12-71: merge.test.mjs belongs to the shared atomic old-pointer co-cut with merge.mjs reference-003749; it does not assert hook output. Hook e2e basename proof stays unchanged.",
             "grepDecisions": [
               {
                 "match": {
@@ -4037,8 +4035,9 @@
         "target": null,
         "anchor": null,
         "resolverWitness": {
-          "rule": "Own quadrant description at pinned line 1760; not doc-sources example line 1746",
-          "pin": "aa8d343746a292d2cb476ab76e6489411fd59a62"
+          "rule": "L12-71: parked scope/quadrant generator construction; retained-path status cannot prove current/candidate semantics.",
+          "expression": "docs/how-to",
+          "blocker": "Example/scanner argument still describes quadrant layout. Need source construction, registered currentPath/alias-only semantics and same-input proof from generator/runtime seam before replacing it."
         },
         "timing": "phase9",
         "diffHunk": null,

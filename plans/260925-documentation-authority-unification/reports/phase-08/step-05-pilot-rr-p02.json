@@ -54,13 +54,13 @@
         "target": null,
         "anchor": null,
         "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/specs/<area>.md",
-          "exists": false
+          "rule": "L12-71: parked scope/quadrant generator construction; retained-path status cannot prove current/candidate semantics.",
+          "expression": "docs/specs/<area>.md",
+          "blocker": "Generic scope/quadrant help must co-cut its owning construction and generator/default contract; no generic root substitution. Exact text candidate awaits source/default receipt."
         },
         "timing": "phase9",
         "diffHunk": null,
-        "blockedCategory": "cutover-patch-only",
+        "blockedCategory": "step5-parity",
         "blockedReason": "Generic scope/quadrant help must co-cut its owning construction and generator/default contract; no generic root substitution. Exact text candidate awaits source/default receipt.",
         "dependency": "Generic scope/quadrant help must co-cut its owning construction and generator/default contract; no generic root substitution. Exact text candidate awaits source/default receipt.",
         "dependencyCategory": "step5-parity",
@@ -619,17 +619,24 @@
           "endLine": 2077
         },
         "role": "emitted-message",
-        "disposition": "preserve",
-        "reason": "Executable data/message/file operation in own passage: \"    name: 'doctor',\\n    invoke: 'fgos doctor',\\n    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\\n    parameters: {\\n      type: 'object',\" Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass.",
-        "target": null,
-        "anchor": null,
+        "disposition": "patch",
+        "reason": "L12-71: emitted doctor help cites RUL9/RUL11. docs/specs retires; the pinned live Business Rules holder states both rules, following Step 4 cli-006. Replace only this path.",
+        "target": "docs/platform/packaging-distribution/spec.md",
+        "anchor": "business-rules",
         "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/specs/distribution.md",
-          "exists": true
+          "rule": "L12-71: live RUL9/RUL11 doctor contract holder; Step 4 cli-006 precedent",
+          "target": "docs/platform/packaging-distribution/spec.md",
+          "targetSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+          "anchor": "business-rules",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "claim": "RUL9 default never writes; RUL11 --fix runs every registered fix",
+          "claimLines": [
+            644,
+            659
+          ]
         },
-        "timing": "none",
-        "diffHunk": null,
+        "timing": "phase9",
+        "diffHunk": "--- a/src/cli/command-registry.mjs\n+++ b/src/cli/command-registry.mjs\n@@ -1743,7 +1743,7 @@\n       positional: ['doc-path'],\n       required: ['doc-path'],\n     },\n-    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n+    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],\n     touchesState: false,\n     requiresExistingStore: false,\n     externalEffect: false,\n@@ -2072,7 +2072,7 @@\n   {\n     name: 'doctor',\n     invoke: 'fgos doctor',\n-    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n+    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/platform/packaging-distribution/spec.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n     parameters: {\n       type: 'object',\n       properties: {\n",
         "blockedCategory": null,
         "blockedReason": null,
         "dependency": null,
@@ -638,9 +645,9 @@
         "aliasWriteCheck": {
           "isWriter": false,
           "destinationIsAlias": false,
-          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
+          "evidence": "Emitted navigation string; no document destination is written."
         },
-        "proposedReplacement": null,
+        "proposedReplacement": "docs/platform/packaging-distribution/spec.md",
         "priorRecordRefs": [
           {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-011.jsonl",
@@ -655,9 +662,20 @@
         "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
         "parityObligation": {
           "current": "docs/specs/distribution.md",
-          "candidate": "docs/specs/distribution.md",
-          "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
+          "candidate": "docs/platform/packaging-distribution/spec.md",
+          "comparison": "Exact emitted doctor help bytes with only the path substitution; selectors, JSON shape and exits unchanged; runtime parity missing.",
           "blocker": null
+        },
+        "coCutTestGrep": {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/specs/distribution.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/specs/distribution.md",
+            "docs\\/specs\\/distribution.md",
+            "docs\\/specs\\/distribution\\.md"
+          ],
+          "matches": []
         }
       },
       "window": {
@@ -665,7 +683,307 @@
         "endLine": 2115,
         "text": "    name: 'setup',\n    invoke: 'fgos setup',\n    description: 'Legacy compatibility command: insert the fgos shell-integration source line into detected shell rc file(s), ensure shared config defaults, wire support hooks, and run registered fixes. Target workspace onboarding is fgctl init (it needs --from <source> when .fgos/distribution.json is absent), then local fgos doctor --fix and fgos doctor; doctor --fix runs only the registered fixes, so run fgos setup once in the project for the config defaults, git hook and Claude Code hook it does not write. Shell/global setup compatibility stays here until a compatibility-window decision retires it.',\n    parameters: {\n      type: 'object',\n      properties: {\n        pretty: { type: 'boolean', description: 'Render colored human-readable text instead of the JSON envelope.' },\n      },\n      required: [],\n    },\n    examples: ['fgos setup', 'fgos setup --pretty'],\n    touchesState: true,\n    requiresExistingStore: false,\n    externalEffect: false,\n    paginated: false,\n    deprecated: 'since 2026-09-14; target workspace onboarding starts with fgctl init (plain fgctl init downloads the latest release when .fgos/distribution.json is absent), then .fgos/installation/bin/fgos doctor --fix and .fgos/installation/bin/fgos doctor; doctor --fix runs only the registered fixes, so run fgos setup once in the project for the config defaults, git hook and Claude Code hook it does not write; shell/global integration stays here until a compatibility-window decision retires it',\n  },\n  {\n    name: 'uninstall',\n    invoke: 'fgos uninstall',\n    description: 'Reverse fgos setup\\'s own wiring: unwire core.hooksPath/.githooks (fill-only — only when still exactly .githooks, mirroring installGitHooks) and report (never delete) any fgos shell-rc source line found, since deletion stays a human act. Never touches .fgos/ data or config. Requires --yes; refuses with no side effects otherwise. --remove-package additionally shells out to \"npm uninstall -g forgent\" (npm global installs only, Linux/macOS only — an unproven spike, tsk-4iv-2); omitted, behavior is unchanged from wiring-only.',\n    parameters: {\n      type: 'object',\n      properties: {\n        pretty: { type: 'boolean', description: 'Render colored human-readable text instead of the JSON envelope.' },\n        yes: { type: 'boolean', description: 'Confirm the destructive steps (unwiring git hooks, and package removal if --remove-package is also given). Required — omitting it refuses before touching anything.' },\n        'remove-package': { type: 'boolean', description: 'Also attempt \"npm uninstall -g forgent\" after the wiring reversal. npm global installs only, Linux/macOS only (tsk-4iv-2 spike scope) — omit to keep the wiring-only default.' },\n      },\n      required: [],\n    },\n    examples: ['fgos uninstall --yes', 'fgos uninstall --yes --remove-package', 'fgos uninstall --yes --pretty'],\n    touchesState: true,\n    requiresExistingStore: false,\n    externalEffect: false,\n    paginated: false,\n    deprecated: null,\n  },\n  {\n    name: 'doctor',\n    invoke: 'fgos doctor',\n    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n    parameters: {\n      type: 'object',\n      properties: {\n        pretty: { type: 'boolean', description: 'Render colored human-readable text instead of the JSON envelope.' },\n        fix: { type: 'boolean', description: 'Run every registered fix against the current cwd before reporting checks. Omit to keep doctor read-only (default, unchanged behavior).' },\n        strict: { type: 'boolean', description: 'Exit 1 when any check fails (after the fixes ran, with --fix). Omit to keep the default exit 0 whatever the checks say.' },\n      },\n      required: [],\n    },\n    examples: ['fgos doctor', 'fgos doctor --pretty', 'fgos doctor --fix', 'fgos doctor --strict'],\n    touchesState: true,\n    requiresExistingStore: false,\n    externalEffect: false,\n    paginated: false,\n    deprecated: null,\n  },\n  {\n    name: 'unclaim',\n    invoke: 'fgos unclaim <id>',\n    description: 'Safely clears orphaned or stale runtime claim file for work item <id>. Clears unconditionally if durable status is not doing; checks liveness and refuses if genuinely live.',\n    parameters: {\n      type: 'object',\n      properties: {\n        id: { type: 'string', description: 'Work item ID' },\n      },\n      required: ['id'],\n    },\n    examples: ['fgos unclaim tsk-uio'],\n    touchesState: true,\n    requiresExistingStore: true,\n    externalEffect: false,\n    paginated: false,\n    deprecated: null,\n  },\n  {\n    name: 'preflight',\n    invoke: 'fgos preflight',\n    description: 'Runs fast preflight checks (mirror sync diff, decision citation drift, backlog reconciliation) against the current checkout to detect uncommitted drift before returning.',\n    parameters: {\n      type: 'object',"
       },
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl"
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+      "cutoverSpecification": {
+        "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+        "file": "src/cli/command-registry.mjs",
+        "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+        "mode": "100644",
+        "sourceSpans": [
+          {
+            "line": 2075,
+            "columnStart": 383,
+            "columnEndExclusive": 409,
+            "text": "docs/specs/distribution.md"
+          },
+          {
+            "line": 1746,
+            "columnStart": 34,
+            "columnEndExclusive": 70,
+            "text": "docs/how-to/check-rollup-progress.md"
+          },
+          {
+            "line": 2075,
+            "columnStart": 383,
+            "columnEndExclusive": 409,
+            "text": "docs/specs/distribution.md"
+          }
+        ],
+        "diff": "--- a/src/cli/command-registry.mjs\n+++ b/src/cli/command-registry.mjs\n@@ -1743,7 +1743,7 @@\n       positional: ['doc-path'],\n       required: ['doc-path'],\n     },\n-    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n+    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],\n     touchesState: false,\n     requiresExistingStore: false,\n     externalEffect: false,\n@@ -2072,7 +2072,7 @@\n   {\n     name: 'doctor',\n     invoke: 'fgos doctor',\n-    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n+    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/platform/packaging-distribution/spec.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n     parameters: {\n       type: 'object',\n       properties: {\n",
+        "expectedAfterSha256": "798526021edf0d526b694ca2d8ea0208e57a8ba2131fe14290de01044218b073",
+        "targetOwner": [
+          "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+          "docs/platform/packaging-distribution/spec.md"
+        ],
+        "claimAnchorProof": [
+          {
+            "rule": "L12-71: live RUL9/RUL11 doctor contract holder; Step 4 cli-006 precedent",
+            "target": "docs/platform/packaging-distribution/spec.md",
+            "targetSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+            "anchor": "business-rules",
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "claim": "RUL9 default never writes; RUL11 --fix runs every registered fix",
+            "claimLines": [
+              644,
+              659
+            ]
+          },
+          {
+            "target": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+            "docId": "how-to-check-a-root-item-s-progress-with-fgos-rollup:check-rollup-progress",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/check-rollup-progress.md",
+            "targetSha256": "bc0fb8b50f3958ddcebd76772ed49ea6bfcd69e7be820889900ea884ba69e5ab",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          },
+          {
+            "rule": "L12-71: live RUL9/RUL11 doctor contract holder; Step 4 cli-006 precedent",
+            "target": "docs/platform/packaging-distribution/spec.md",
+            "targetSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+            "anchor": "business-rules",
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "claim": "RUL9 default never writes; RUL11 --fix runs every registered fix",
+            "claimLines": [
+              644,
+              659
+            ]
+          }
+        ],
+        "receiptId": "cli-help-messages-pilot",
+        "coCutPaths": [
+          "CHANGELOG.md",
+          "test/report/enduser-index.test.mjs",
+          "test/report/helpers/docs-index-state-fixture.mjs"
+        ],
+        "testTargets": [
+          "env -u CLAUDE_CODE_SESSION_ID node --test test/report/enduser-index.test.mjs",
+          "env -u CLAUDE_CODE_SESSION_ID node --test test/report/helpers/docs-index-state-fixture.mjs",
+          "missing: same-input complete output/category/exit cutover parity; current owning proofs alone are not migration acceptance"
+        ],
+        "prerequisites": [
+          "Lead-started independent semantic review",
+          "Missing exact-output proof",
+          "User-visible CHANGELOG.md Unreleased co-edit in separately authorized Phase 9 packet",
+          "Same-package Step 0 rebind if the final patch touches a bound target",
+          "Step 7 composes and de-duplicates shared co-cut test diffs by file/content; do not apply the same pinned test diff twice. Recompute combined hashes after all seams are assembled."
+        ],
+        "order": "Phase 9 atomic consumer cutover; no apply-now action",
+        "rollbackDiff": "--- a/src/cli/command-registry.mjs\n+++ b/src/cli/command-registry.mjs\n@@ -1743,7 +1743,7 @@\n       positional: ['doc-path'],\n       required: ['doc-path'],\n     },\n-    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],\n+    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n     touchesState: false,\n     requiresExistingStore: false,\n     externalEffect: false,\n@@ -2072,7 +2072,7 @@\n   {\n     name: 'doctor',\n     invoke: 'fgos doctor',\n-    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/platform/packaging-distribution/spec.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n+    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n     parameters: {\n       type: 'object',\n       properties: {\n",
+        "timing": "phase9",
+        "readiness": "pending / cutover-patch-only; never execution-ready",
+        "coCutTestGreps": [
+          {
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "oldPointer": "docs/how-to/check-rollup-progress.md",
+            "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+            "needles": [
+              "docs/how-to/check-rollup-progress.md",
+              "docs\\/how-to\\/check-rollup-progress.md",
+              "docs\\/how-to\\/check-rollup-progress\\.md"
+            ],
+            "matches": [
+              {
+                "file": "test/report/enduser-index.test.mjs",
+                "line": 162,
+                "text": "  const demo = manifest.find((e) => e.docPath === 'docs/how-to/check-rollup-progress.md');",
+                "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+              },
+              {
+                "file": "test/report/enduser-index.test.mjs",
+                "line": 167,
+                "text": "  assert.equal(demo.docPath, 'docs/how-to/check-rollup-progress.md');",
+                "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+              },
+              {
+                "file": "test/report/enduser-index.test.mjs",
+                "line": 171,
+                "text": "  // --doc-type how-to --doc-path docs/how-to/check-rollup-progress.md` —",
+                "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+              },
+              {
+                "file": "test/report/enduser-index.test.mjs",
+                "line": 385,
+                "text": "test(\"docs/how-to/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto\", () => {",
+                "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+              },
+              {
+                "file": "test/report/helpers/docs-index-state-fixture.mjs",
+                "line": 14,
+                "text": "// (`doc-fgos-rollup-howto` -> docs/how-to/check-rollup-progress.md) is",
+                "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310"
+              },
+              {
+                "file": "test/report/helpers/docs-index-state-fixture.mjs",
+                "line": 35,
+                "text": "export const REAL_DEMO_DOC_PATH = 'docs/how-to/check-rollup-progress.md';",
+                "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310"
+              }
+            ]
+          },
+          {
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "oldPointer": "docs/specs/distribution.md",
+            "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+            "needles": [
+              "docs/specs/distribution.md",
+              "docs\\/specs\\/distribution.md",
+              "docs\\/specs\\/distribution\\.md"
+            ],
+            "matches": []
+          }
+        ],
+        "coCutTestEdits": [
+          {
+            "file": "test/report/enduser-index.test.mjs",
+            "referenceId": "reference-003655",
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+            "mode": "100644",
+            "grepMatches": [
+              {
+                "file": "test/report/enduser-index.test.mjs",
+                "line": 162,
+                "text": "  const demo = manifest.find((e) => e.docPath === 'docs/how-to/check-rollup-progress.md');",
+                "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+              },
+              {
+                "file": "test/report/enduser-index.test.mjs",
+                "line": 167,
+                "text": "  assert.equal(demo.docPath, 'docs/how-to/check-rollup-progress.md');",
+                "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+              },
+              {
+                "file": "test/report/enduser-index.test.mjs",
+                "line": 171,
+                "text": "  // --doc-type how-to --doc-path docs/how-to/check-rollup-progress.md` —",
+                "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+              },
+              {
+                "file": "test/report/enduser-index.test.mjs",
+                "line": 385,
+                "text": "test(\"docs/how-to/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto\", () => {",
+                "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+              }
+            ],
+            "oldPointer": "docs/how-to/check-rollup-progress.md",
+            "newPointer": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+            "substitutions": [],
+            "diff": null,
+            "expectedAfterSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+            "rollbackDiff": null,
+            "timing": "phase9",
+            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+            "grepDecisions": [
+              {
+                "match": {
+                  "file": "test/report/enduser-index.test.mjs",
+                  "line": 162,
+                  "text": "  const demo = manifest.find((e) => e.docPath === 'docs/how-to/check-rollup-progress.md');",
+                  "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+                },
+                "disposition": "preserve",
+                "reason": "L12-69: Retained real how-to demo/capture provenance; CLI doc-sources example changes no docs-index quadrant, real-file read or seeded outcome. Preserve all existing assertions and exact recorded capture path; later generator/test seam owns any independently justified change.",
+                "oldLine": "  const demo = manifest.find((e) => e.docPath === 'docs/how-to/check-rollup-progress.md');",
+                "newLine": "  const demo = manifest.find((e) => e.docPath === 'docs/how-to/check-rollup-progress.md');"
+              },
+              {
+                "match": {
+                  "file": "test/report/enduser-index.test.mjs",
+                  "line": 167,
+                  "text": "  assert.equal(demo.docPath, 'docs/how-to/check-rollup-progress.md');",
+                  "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+                },
+                "disposition": "preserve",
+                "reason": "L12-69: Retained real how-to demo/capture provenance; CLI doc-sources example changes no docs-index quadrant, real-file read or seeded outcome. Preserve all existing assertions and exact recorded capture path; later generator/test seam owns any independently justified change.",
+                "oldLine": "  assert.equal(demo.docPath, 'docs/how-to/check-rollup-progress.md');",
+                "newLine": "  assert.equal(demo.docPath, 'docs/how-to/check-rollup-progress.md');"
+              },
+              {
+                "match": {
+                  "file": "test/report/enduser-index.test.mjs",
+                  "line": 171,
+                  "text": "  // --doc-type how-to --doc-path docs/how-to/check-rollup-progress.md` —",
+                  "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+                },
+                "disposition": "preserve",
+                "reason": "L12-69: Retained real how-to demo/capture provenance; CLI doc-sources example changes no docs-index quadrant, real-file read or seeded outcome. Preserve all existing assertions and exact recorded capture path; later generator/test seam owns any independently justified change.",
+                "oldLine": "  // --doc-type how-to --doc-path docs/how-to/check-rollup-progress.md` —",
+                "newLine": "  // --doc-type how-to --doc-path docs/how-to/check-rollup-progress.md` —"
+              },
+              {
+                "match": {
+                  "file": "test/report/enduser-index.test.mjs",
+                  "line": 385,
+                  "text": "test(\"docs/how-to/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto\", () => {",
+                  "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+                },
+                "disposition": "preserve",
+                "reason": "L12-69: Retained real how-to demo/capture provenance; CLI doc-sources example changes no docs-index quadrant, real-file read or seeded outcome. Preserve all existing assertions and exact recorded capture path; later generator/test seam owns any independently justified change.",
+                "oldLine": "test(\"docs/how-to/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto\", () => {",
+                "newLine": "test(\"docs/how-to/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto\", () => {"
+              }
+            ],
+            "disposition": "preserve"
+          },
+          {
+            "file": "test/report/helpers/docs-index-state-fixture.mjs",
+            "referenceId": "reference-003655",
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310",
+            "mode": "100644",
+            "grepMatches": [
+              {
+                "file": "test/report/helpers/docs-index-state-fixture.mjs",
+                "line": 14,
+                "text": "// (`doc-fgos-rollup-howto` -> docs/how-to/check-rollup-progress.md) is",
+                "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310"
+              },
+              {
+                "file": "test/report/helpers/docs-index-state-fixture.mjs",
+                "line": 35,
+                "text": "export const REAL_DEMO_DOC_PATH = 'docs/how-to/check-rollup-progress.md';",
+                "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310"
+              }
+            ],
+            "oldPointer": "docs/how-to/check-rollup-progress.md",
+            "newPointer": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+            "substitutions": [],
+            "diff": null,
+            "expectedAfterSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310",
+            "rollbackDiff": null,
+            "timing": "phase9",
+            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+            "grepDecisions": [
+              {
+                "match": {
+                  "file": "test/report/helpers/docs-index-state-fixture.mjs",
+                  "line": 14,
+                  "text": "// (`doc-fgos-rollup-howto` -> docs/how-to/check-rollup-progress.md) is",
+                  "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310"
+                },
+                "disposition": "preserve",
+                "reason": "L12-69: Retained real how-to demo/capture provenance; CLI doc-sources example changes no docs-index quadrant, real-file read or seeded outcome. Preserve all existing assertions and exact recorded capture path; later generator/test seam owns any independently justified change.",
+                "oldLine": "// (`doc-fgos-rollup-howto` -> docs/how-to/check-rollup-progress.md) is",
+                "newLine": "// (`doc-fgos-rollup-howto` -> docs/how-to/check-rollup-progress.md) is"
+              },
+              {
+                "match": {
+                  "file": "test/report/helpers/docs-index-state-fixture.mjs",
+                  "line": 35,
+                  "text": "export const REAL_DEMO_DOC_PATH = 'docs/how-to/check-rollup-progress.md';",
+                  "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310"
+                },
+                "disposition": "preserve",
+                "reason": "L12-69: Retained real how-to demo/capture provenance; CLI doc-sources example changes no docs-index quadrant, real-file read or seeded outcome. Preserve all existing assertions and exact recorded capture path; later generator/test seam owns any independently justified change.",
+                "oldLine": "export const REAL_DEMO_DOC_PATH = 'docs/how-to/check-rollup-progress.md';",
+                "newLine": "export const REAL_DEMO_DOC_PATH = 'docs/how-to/check-rollup-progress.md';"
+              }
+            ],
+            "disposition": "preserve"
+          }
+        ]
+      }
     },
     {
       "file": "src/cli/command-registry.mjs",
@@ -909,13 +1227,13 @@
         "target": null,
         "anchor": null,
         "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/how-to",
-          "exists": true
+          "rule": "L12-71: parked scope/quadrant generator construction; retained-path status cannot prove current/candidate semantics.",
+          "expression": "docs/how-to",
+          "blocker": "Example/scanner argument still describes quadrant layout. Need source construction, registered currentPath/alias-only semantics and same-input proof from generator/runtime seam before replacing it."
         },
         "timing": "phase9",
         "diffHunk": null,
-        "blockedCategory": "cutover-patch-only",
+        "blockedCategory": "step5-parity",
         "blockedReason": "Example/scanner argument still describes quadrant layout. Need source construction, registered currentPath/alias-only semantics and same-input proof from generator/runtime seam before replacing it.",
         "dependency": "Example/scanner argument still describes quadrant layout. Need source construction, registered currentPath/alias-only semantics and same-input proof from generator/runtime seam before replacing it.",
         "dependencyCategory": "step5-parity",
@@ -1004,13 +1322,13 @@
         "target": null,
         "anchor": null,
         "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/how-to",
-          "exists": true
+          "rule": "L12-71: parked scope/quadrant generator construction; retained-path status cannot prove current/candidate semantics.",
+          "expression": "docs/how-to",
+          "blocker": "Example/scanner argument still describes quadrant layout. Need source construction, registered currentPath/alias-only semantics and same-input proof from generator/runtime seam before replacing it."
         },
         "timing": "phase9",
         "diffHunk": null,
-        "blockedCategory": "cutover-patch-only",
+        "blockedCategory": "step5-parity",
         "blockedReason": "Example/scanner argument still describes quadrant layout. Need source construction, registered currentPath/alias-only semantics and same-input proof from generator/runtime seam before replacing it.",
         "dependency": "Example/scanner argument still describes quadrant layout. Need source construction, registered currentPath/alias-only semantics and same-input proof from generator/runtime seam before replacing it.",
         "dependencyCategory": "step5-parity",
@@ -1234,7 +1552,7 @@
           "claim": "live currentPath lookup; no writer destination adopts an alias"
         },
         "timing": "phase9",
-        "diffHunk": "--- a/src/cli/command-registry.mjs\n+++ b/src/cli/command-registry.mjs\n@@ -1743,7 +1743,7 @@\n       positional: ['doc-path'],\n       required: ['doc-path'],\n     },\n-    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n+    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],\n     touchesState: false,\n     requiresExistingStore: false,\n     externalEffect: false,\n",
+        "diffHunk": "--- a/src/cli/command-registry.mjs\n+++ b/src/cli/command-registry.mjs\n@@ -1743,7 +1743,7 @@\n       positional: ['doc-path'],\n       required: ['doc-path'],\n     },\n-    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n+    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],\n     touchesState: false,\n     requiresExistingStore: false,\n     externalEffect: false,\n@@ -2072,7 +2072,7 @@\n   {\n     name: 'doctor',\n     invoke: 'fgos doctor',\n-    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n+    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/platform/packaging-distribution/spec.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n     parameters: {\n       type: 'object',\n       properties: {\n",
         "blockedCategory": null,
         "blockedReason": null,
         "dependency": null,
@@ -1326,18 +1644,43 @@
         "mode": "100644",
         "sourceSpans": [
           {
+            "line": 2075,
+            "columnStart": 383,
+            "columnEndExclusive": 409,
+            "text": "docs/specs/distribution.md"
+          },
+          {
             "line": 1746,
             "columnStart": 34,
             "columnEndExclusive": 70,
             "text": "docs/how-to/check-rollup-progress.md"
+          },
+          {
+            "line": 2075,
+            "columnStart": 383,
+            "columnEndExclusive": 409,
+            "text": "docs/specs/distribution.md"
           }
         ],
-        "diff": "--- a/src/cli/command-registry.mjs\n+++ b/src/cli/command-registry.mjs\n@@ -1743,7 +1743,7 @@\n       positional: ['doc-path'],\n       required: ['doc-path'],\n     },\n-    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n+    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],\n     touchesState: false,\n     requiresExistingStore: false,\n     externalEffect: false,\n",
-        "expectedAfterSha256": "65aa9b2dc704b9998383c2929e3fee11377397a1c7ca3635e0e9e7e2446b8c02",
+        "diff": "--- a/src/cli/command-registry.mjs\n+++ b/src/cli/command-registry.mjs\n@@ -1743,7 +1743,7 @@\n       positional: ['doc-path'],\n       required: ['doc-path'],\n     },\n-    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n+    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],\n     touchesState: false,\n     requiresExistingStore: false,\n     externalEffect: false,\n@@ -2072,7 +2072,7 @@\n   {\n     name: 'doctor',\n     invoke: 'fgos doctor',\n-    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n+    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/platform/packaging-distribution/spec.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n     parameters: {\n       type: 'object',\n       properties: {\n",
+        "expectedAfterSha256": "798526021edf0d526b694ca2d8ea0208e57a8ba2131fe14290de01044218b073",
         "targetOwner": [
-          "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md"
+          "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+          "docs/platform/packaging-distribution/spec.md"
         ],
         "claimAnchorProof": [
+          {
+            "rule": "L12-71: live RUL9/RUL11 doctor contract holder; Step 4 cli-006 precedent",
+            "target": "docs/platform/packaging-distribution/spec.md",
+            "targetSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+            "anchor": "business-rules",
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "claim": "RUL9 default never writes; RUL11 --fix runs every registered fix",
+            "claimLines": [
+              644,
+              659
+            ]
+          },
           {
             "target": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
             "docId": "how-to-check-a-root-item-s-progress-with-fgos-rollup:check-rollup-progress",
@@ -1346,6 +1689,18 @@
             "alias": "docs/how-to/check-rollup-progress.md",
             "targetSha256": "bc0fb8b50f3958ddcebd76772ed49ea6bfcd69e7be820889900ea884ba69e5ab",
             "claim": "live currentPath lookup; no writer destination adopts an alias"
+          },
+          {
+            "rule": "L12-71: live RUL9/RUL11 doctor contract holder; Step 4 cli-006 precedent",
+            "target": "docs/platform/packaging-distribution/spec.md",
+            "targetSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+            "anchor": "business-rules",
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "claim": "RUL9 default never writes; RUL11 --fix runs every registered fix",
+            "claimLines": [
+              644,
+              659
+            ]
           }
         ],
         "receiptId": "cli-help-messages-pilot",
@@ -1367,7 +1722,7 @@
           "Step 7 composes and de-duplicates shared co-cut test diffs by file/content; do not apply the same pinned test diff twice. Recompute combined hashes after all seams are assembled."
         ],
         "order": "Phase 9 atomic consumer cutover; no apply-now action",
-        "rollbackDiff": "--- a/src/cli/command-registry.mjs\n+++ b/src/cli/command-registry.mjs\n@@ -1743,7 +1743,7 @@\n       positional: ['doc-path'],\n       required: ['doc-path'],\n     },\n-    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],\n+    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n     touchesState: false,\n     requiresExistingStore: false,\n     externalEffect: false,\n",
+        "rollbackDiff": "--- a/src/cli/command-registry.mjs\n+++ b/src/cli/command-registry.mjs\n@@ -1743,7 +1743,7 @@\n       positional: ['doc-path'],\n       required: ['doc-path'],\n     },\n-    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],\n+    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n     touchesState: false,\n     requiresExistingStore: false,\n     externalEffect: false,\n@@ -2072,7 +2072,7 @@\n   {\n     name: 'doctor',\n     invoke: 'fgos doctor',\n-    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/platform/packaging-distribution/spec.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n+    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n     parameters: {\n       type: 'object',\n       properties: {\n",
         "timing": "phase9",
         "readiness": "pending / cutover-patch-only; never execution-ready",
         "coCutTestGreps": [
@@ -1418,6 +1773,17 @@
                 "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310"
               }
             ]
+          },
+          {
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "oldPointer": "docs/specs/distribution.md",
+            "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+            "needles": [
+              "docs/specs/distribution.md",
+              "docs\\/specs\\/distribution.md",
+              "docs\\/specs\\/distribution\\.md"
+            ],
+            "matches": []
           }
         ],
         "coCutTestEdits": [
@@ -1719,8 +2085,8 @@
         "target": null,
         "anchor": null,
         "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/history/tsk-19j/plan.md",
+          "rule": "L12-71: synthetic gate-check example item tsk-19j; path nonexistent by design, not live repository navigation.",
+          "expression": "docs/history/tsk-19j/plan.md",
           "exists": false
         },
         "timing": "none",
@@ -1814,13 +2180,13 @@
         "target": null,
         "anchor": null,
         "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/how-to/example.md",
-          "exists": false
+          "rule": "L12-71: parked scope/quadrant generator construction; retained-path status cannot prove current/candidate semantics.",
+          "expression": "docs/how-to/example.md",
+          "blocker": "Example/scanner argument still describes quadrant layout. Need source construction, registered currentPath/alias-only semantics and same-input proof from generator/runtime seam before replacing it."
         },
         "timing": "phase9",
         "diffHunk": null,
-        "blockedCategory": "cutover-patch-only",
+        "blockedCategory": "step5-parity",
         "blockedReason": "Example/scanner argument still describes quadrant layout. Need source construction, registered currentPath/alias-only semantics and same-input proof from generator/runtime seam before replacing it.",
         "dependency": "Example/scanner argument still describes quadrant layout. Need source construction, registered currentPath/alias-only semantics and same-input proof from generator/runtime seam before replacing it.",
         "dependencyCategory": "step5-parity",
@@ -2004,8 +2370,8 @@
         "target": null,
         "anchor": null,
         "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/history/tsk-19j/CONTEXT.md",
+          "rule": "L12-71: synthetic gate-check example item tsk-19j; path nonexistent by design, not live repository navigation.",
+          "expression": "docs/history/tsk-19j/CONTEXT.md",
           "exists": false
         },
         "timing": "none",
@@ -2099,8 +2465,8 @@
         "target": null,
         "anchor": null,
         "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": null,
+          "rule": "L12-71: synthetic gate-check example item tsk-19j; path nonexistent by design, not live repository navigation.",
+          "expression": "docs/history/tsk-19j/plan.md",
           "exists": false
         },
         "timing": "none",
@@ -2284,17 +2650,24 @@
           "endLine": 2077
         },
         "role": "emitted-message",
-        "disposition": "preserve",
-        "reason": "Executable data/message/file operation in own passage: \"    name: 'doctor',\\n    invoke: 'fgos doctor',\\n    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\\n    parameters: {\\n      type: 'object',\" Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass.",
-        "target": null,
-        "anchor": null,
+        "disposition": "patch",
+        "reason": "L12-71: emitted doctor help cites RUL9/RUL11. docs/specs retires; the pinned live Business Rules holder states both rules, following Step 4 cli-006. Replace only this path.",
+        "target": "docs/platform/packaging-distribution/spec.md",
+        "anchor": "business-rules",
         "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": null,
-          "exists": false
+          "rule": "L12-71: live RUL9/RUL11 doctor contract holder; Step 4 cli-006 precedent",
+          "target": "docs/platform/packaging-distribution/spec.md",
+          "targetSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+          "anchor": "business-rules",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "claim": "RUL9 default never writes; RUL11 --fix runs every registered fix",
+          "claimLines": [
+            644,
+            659
+          ]
         },
-        "timing": "none",
-        "diffHunk": null,
+        "timing": "phase9",
+        "diffHunk": "--- a/src/cli/command-registry.mjs\n+++ b/src/cli/command-registry.mjs\n@@ -1743,7 +1743,7 @@\n       positional: ['doc-path'],\n       required: ['doc-path'],\n     },\n-    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n+    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],\n     touchesState: false,\n     requiresExistingStore: false,\n     externalEffect: false,\n@@ -2072,7 +2072,7 @@\n   {\n     name: 'doctor',\n     invoke: 'fgos doctor',\n-    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n+    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/platform/packaging-distribution/spec.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n     parameters: {\n       type: 'object',\n       properties: {\n",
         "blockedCategory": null,
         "blockedReason": null,
         "dependency": null,
@@ -2303,9 +2676,9 @@
         "aliasWriteCheck": {
           "isWriter": false,
           "destinationIsAlias": false,
-          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
+          "evidence": "Emitted navigation string; no document destination is written."
         },
-        "proposedReplacement": null,
+        "proposedReplacement": "docs/platform/packaging-distribution/spec.md",
         "priorRecordRefs": [
           {
             "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-011.jsonl",
@@ -2320,9 +2693,20 @@
         "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
         "parityObligation": {
           "current": "docs/specs/distribution.md",
-          "candidate": "docs/specs/distribution.md",
-          "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
+          "candidate": "docs/platform/packaging-distribution/spec.md",
+          "comparison": "Exact emitted doctor help bytes with only the path substitution; selectors, JSON shape and exits unchanged; runtime parity missing.",
           "blocker": null
+        },
+        "coCutTestGrep": {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/specs/distribution.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/specs/distribution.md",
+            "docs\\/specs\\/distribution.md",
+            "docs\\/specs\\/distribution\\.md"
+          ],
+          "matches": []
         }
       },
       "window": {
@@ -2330,7 +2714,307 @@
         "endLine": 2115,
         "text": "    name: 'setup',\n    invoke: 'fgos setup',\n    description: 'Legacy compatibility command: insert the fgos shell-integration source line into detected shell rc file(s), ensure shared config defaults, wire support hooks, and run registered fixes. Target workspace onboarding is fgctl init (it needs --from <source> when .fgos/distribution.json is absent), then local fgos doctor --fix and fgos doctor; doctor --fix runs only the registered fixes, so run fgos setup once in the project for the config defaults, git hook and Claude Code hook it does not write. Shell/global setup compatibility stays here until a compatibility-window decision retires it.',\n    parameters: {\n      type: 'object',\n      properties: {\n        pretty: { type: 'boolean', description: 'Render colored human-readable text instead of the JSON envelope.' },\n      },\n      required: [],\n    },\n    examples: ['fgos setup', 'fgos setup --pretty'],\n    touchesState: true,\n    requiresExistingStore: false,\n    externalEffect: false,\n    paginated: false,\n    deprecated: 'since 2026-09-14; target workspace onboarding starts with fgctl init (plain fgctl init downloads the latest release when .fgos/distribution.json is absent), then .fgos/installation/bin/fgos doctor --fix and .fgos/installation/bin/fgos doctor; doctor --fix runs only the registered fixes, so run fgos setup once in the project for the config defaults, git hook and Claude Code hook it does not write; shell/global integration stays here until a compatibility-window decision retires it',\n  },\n  {\n    name: 'uninstall',\n    invoke: 'fgos uninstall',\n    description: 'Reverse fgos setup\\'s own wiring: unwire core.hooksPath/.githooks (fill-only — only when still exactly .githooks, mirroring installGitHooks) and report (never delete) any fgos shell-rc source line found, since deletion stays a human act. Never touches .fgos/ data or config. Requires --yes; refuses with no side effects otherwise. --remove-package additionally shells out to \"npm uninstall -g forgent\" (npm global installs only, Linux/macOS only — an unproven spike, tsk-4iv-2); omitted, behavior is unchanged from wiring-only.',\n    parameters: {\n      type: 'object',\n      properties: {\n        pretty: { type: 'boolean', description: 'Render colored human-readable text instead of the JSON envelope.' },\n        yes: { type: 'boolean', description: 'Confirm the destructive steps (unwiring git hooks, and package removal if --remove-package is also given). Required — omitting it refuses before touching anything.' },\n        'remove-package': { type: 'boolean', description: 'Also attempt \"npm uninstall -g forgent\" after the wiring reversal. npm global installs only, Linux/macOS only (tsk-4iv-2 spike scope) — omit to keep the wiring-only default.' },\n      },\n      required: [],\n    },\n    examples: ['fgos uninstall --yes', 'fgos uninstall --yes --remove-package', 'fgos uninstall --yes --pretty'],\n    touchesState: true,\n    requiresExistingStore: false,\n    externalEffect: false,\n    paginated: false,\n    deprecated: null,\n  },\n  {\n    name: 'doctor',\n    invoke: 'fgos doctor',\n    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n    parameters: {\n      type: 'object',\n      properties: {\n        pretty: { type: 'boolean', description: 'Render colored human-readable text instead of the JSON envelope.' },\n        fix: { type: 'boolean', description: 'Run every registered fix against the current cwd before reporting checks. Omit to keep doctor read-only (default, unchanged behavior).' },\n        strict: { type: 'boolean', description: 'Exit 1 when any check fails (after the fixes ran, with --fix). Omit to keep the default exit 0 whatever the checks say.' },\n      },\n      required: [],\n    },\n    examples: ['fgos doctor', 'fgos doctor --pretty', 'fgos doctor --fix', 'fgos doctor --strict'],\n    touchesState: true,\n    requiresExistingStore: false,\n    externalEffect: false,\n    paginated: false,\n    deprecated: null,\n  },\n  {\n    name: 'unclaim',\n    invoke: 'fgos unclaim <id>',\n    description: 'Safely clears orphaned or stale runtime claim file for work item <id>. Clears unconditionally if durable status is not doing; checks liveness and refuses if genuinely live.',\n    parameters: {\n      type: 'object',\n      properties: {\n        id: { type: 'string', description: 'Work item ID' },\n      },\n      required: ['id'],\n    },\n    examples: ['fgos unclaim tsk-uio'],\n    touchesState: true,\n    requiresExistingStore: true,\n    externalEffect: false,\n    paginated: false,\n    deprecated: null,\n  },\n  {\n    name: 'preflight',\n    invoke: 'fgos preflight',\n    description: 'Runs fast preflight checks (mirror sync diff, decision citation drift, backlog reconciliation) against the current checkout to detect uncommitted drift before returning.',\n    parameters: {\n      type: 'object',"
       },
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl"
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+      "cutoverSpecification": {
+        "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+        "file": "src/cli/command-registry.mjs",
+        "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+        "mode": "100644",
+        "sourceSpans": [
+          {
+            "line": 2075,
+            "columnStart": 383,
+            "columnEndExclusive": 409,
+            "text": "docs/specs/distribution.md"
+          },
+          {
+            "line": 1746,
+            "columnStart": 34,
+            "columnEndExclusive": 70,
+            "text": "docs/how-to/check-rollup-progress.md"
+          },
+          {
+            "line": 2075,
+            "columnStart": 383,
+            "columnEndExclusive": 409,
+            "text": "docs/specs/distribution.md"
+          }
+        ],
+        "diff": "--- a/src/cli/command-registry.mjs\n+++ b/src/cli/command-registry.mjs\n@@ -1743,7 +1743,7 @@\n       positional: ['doc-path'],\n       required: ['doc-path'],\n     },\n-    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n+    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],\n     touchesState: false,\n     requiresExistingStore: false,\n     externalEffect: false,\n@@ -2072,7 +2072,7 @@\n   {\n     name: 'doctor',\n     invoke: 'fgos doctor',\n-    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n+    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/platform/packaging-distribution/spec.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n     parameters: {\n       type: 'object',\n       properties: {\n",
+        "expectedAfterSha256": "798526021edf0d526b694ca2d8ea0208e57a8ba2131fe14290de01044218b073",
+        "targetOwner": [
+          "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+          "docs/platform/packaging-distribution/spec.md"
+        ],
+        "claimAnchorProof": [
+          {
+            "rule": "L12-71: live RUL9/RUL11 doctor contract holder; Step 4 cli-006 precedent",
+            "target": "docs/platform/packaging-distribution/spec.md",
+            "targetSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+            "anchor": "business-rules",
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "claim": "RUL9 default never writes; RUL11 --fix runs every registered fix",
+            "claimLines": [
+              644,
+              659
+            ]
+          },
+          {
+            "target": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+            "docId": "how-to-check-a-root-item-s-progress-with-fgos-rollup:check-rollup-progress",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/check-rollup-progress.md",
+            "targetSha256": "bc0fb8b50f3958ddcebd76772ed49ea6bfcd69e7be820889900ea884ba69e5ab",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          },
+          {
+            "rule": "L12-71: live RUL9/RUL11 doctor contract holder; Step 4 cli-006 precedent",
+            "target": "docs/platform/packaging-distribution/spec.md",
+            "targetSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+            "anchor": "business-rules",
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "claim": "RUL9 default never writes; RUL11 --fix runs every registered fix",
+            "claimLines": [
+              644,
+              659
+            ]
+          }
+        ],
+        "receiptId": "cli-help-messages-pilot",
+        "coCutPaths": [
+          "CHANGELOG.md",
+          "test/report/enduser-index.test.mjs",
+          "test/report/helpers/docs-index-state-fixture.mjs"
+        ],
+        "testTargets": [
+          "env -u CLAUDE_CODE_SESSION_ID node --test test/report/enduser-index.test.mjs",
+          "env -u CLAUDE_CODE_SESSION_ID node --test test/report/helpers/docs-index-state-fixture.mjs",
+          "missing: same-input complete output/category/exit cutover parity; current owning proofs alone are not migration acceptance"
+        ],
+        "prerequisites": [
+          "Lead-started independent semantic review",
+          "Missing exact-output proof",
+          "User-visible CHANGELOG.md Unreleased co-edit in separately authorized Phase 9 packet",
+          "Same-package Step 0 rebind if the final patch touches a bound target",
+          "Step 7 composes and de-duplicates shared co-cut test diffs by file/content; do not apply the same pinned test diff twice. Recompute combined hashes after all seams are assembled."
+        ],
+        "order": "Phase 9 atomic consumer cutover; no apply-now action",
+        "rollbackDiff": "--- a/src/cli/command-registry.mjs\n+++ b/src/cli/command-registry.mjs\n@@ -1743,7 +1743,7 @@\n       positional: ['doc-path'],\n       required: ['doc-path'],\n     },\n-    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],\n+    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n     touchesState: false,\n     requiresExistingStore: false,\n     externalEffect: false,\n@@ -2072,7 +2072,7 @@\n   {\n     name: 'doctor',\n     invoke: 'fgos doctor',\n-    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/platform/packaging-distribution/spec.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n+    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n     parameters: {\n       type: 'object',\n       properties: {\n",
+        "timing": "phase9",
+        "readiness": "pending / cutover-patch-only; never execution-ready",
+        "coCutTestGreps": [
+          {
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "oldPointer": "docs/how-to/check-rollup-progress.md",
+            "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+            "needles": [
+              "docs/how-to/check-rollup-progress.md",
+              "docs\\/how-to\\/check-rollup-progress.md",
+              "docs\\/how-to\\/check-rollup-progress\\.md"
+            ],
+            "matches": [
+              {
+                "file": "test/report/enduser-index.test.mjs",
+                "line": 162,
+                "text": "  const demo = manifest.find((e) => e.docPath === 'docs/how-to/check-rollup-progress.md');",
+                "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+              },
+              {
+                "file": "test/report/enduser-index.test.mjs",
+                "line": 167,
+                "text": "  assert.equal(demo.docPath, 'docs/how-to/check-rollup-progress.md');",
+                "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+              },
+              {
+                "file": "test/report/enduser-index.test.mjs",
+                "line": 171,
+                "text": "  // --doc-type how-to --doc-path docs/how-to/check-rollup-progress.md` —",
+                "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+              },
+              {
+                "file": "test/report/enduser-index.test.mjs",
+                "line": 385,
+                "text": "test(\"docs/how-to/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto\", () => {",
+                "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+              },
+              {
+                "file": "test/report/helpers/docs-index-state-fixture.mjs",
+                "line": 14,
+                "text": "// (`doc-fgos-rollup-howto` -> docs/how-to/check-rollup-progress.md) is",
+                "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310"
+              },
+              {
+                "file": "test/report/helpers/docs-index-state-fixture.mjs",
+                "line": 35,
+                "text": "export const REAL_DEMO_DOC_PATH = 'docs/how-to/check-rollup-progress.md';",
+                "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310"
+              }
+            ]
+          },
+          {
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "oldPointer": "docs/specs/distribution.md",
+            "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+            "needles": [
+              "docs/specs/distribution.md",
+              "docs\\/specs\\/distribution.md",
+              "docs\\/specs\\/distribution\\.md"
+            ],
+            "matches": []
+          }
+        ],
+        "coCutTestEdits": [
+          {
+            "file": "test/report/enduser-index.test.mjs",
+            "referenceId": "reference-003655",
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+            "mode": "100644",
+            "grepMatches": [
+              {
+                "file": "test/report/enduser-index.test.mjs",
+                "line": 162,
+                "text": "  const demo = manifest.find((e) => e.docPath === 'docs/how-to/check-rollup-progress.md');",
+                "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+              },
+              {
+                "file": "test/report/enduser-index.test.mjs",
+                "line": 167,
+                "text": "  assert.equal(demo.docPath, 'docs/how-to/check-rollup-progress.md');",
+                "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+              },
+              {
+                "file": "test/report/enduser-index.test.mjs",
+                "line": 171,
+                "text": "  // --doc-type how-to --doc-path docs/how-to/check-rollup-progress.md` —",
+                "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+              },
+              {
+                "file": "test/report/enduser-index.test.mjs",
+                "line": 385,
+                "text": "test(\"docs/how-to/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto\", () => {",
+                "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+              }
+            ],
+            "oldPointer": "docs/how-to/check-rollup-progress.md",
+            "newPointer": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+            "substitutions": [],
+            "diff": null,
+            "expectedAfterSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+            "rollbackDiff": null,
+            "timing": "phase9",
+            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+            "grepDecisions": [
+              {
+                "match": {
+                  "file": "test/report/enduser-index.test.mjs",
+                  "line": 162,
+                  "text": "  const demo = manifest.find((e) => e.docPath === 'docs/how-to/check-rollup-progress.md');",
+                  "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+                },
+                "disposition": "preserve",
+                "reason": "L12-69: Retained real how-to demo/capture provenance; CLI doc-sources example changes no docs-index quadrant, real-file read or seeded outcome. Preserve all existing assertions and exact recorded capture path; later generator/test seam owns any independently justified change.",
+                "oldLine": "  const demo = manifest.find((e) => e.docPath === 'docs/how-to/check-rollup-progress.md');",
+                "newLine": "  const demo = manifest.find((e) => e.docPath === 'docs/how-to/check-rollup-progress.md');"
+              },
+              {
+                "match": {
+                  "file": "test/report/enduser-index.test.mjs",
+                  "line": 167,
+                  "text": "  assert.equal(demo.docPath, 'docs/how-to/check-rollup-progress.md');",
+                  "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+                },
+                "disposition": "preserve",
+                "reason": "L12-69: Retained real how-to demo/capture provenance; CLI doc-sources example changes no docs-index quadrant, real-file read or seeded outcome. Preserve all existing assertions and exact recorded capture path; later generator/test seam owns any independently justified change.",
+                "oldLine": "  assert.equal(demo.docPath, 'docs/how-to/check-rollup-progress.md');",
+                "newLine": "  assert.equal(demo.docPath, 'docs/how-to/check-rollup-progress.md');"
+              },
+              {
+                "match": {
+                  "file": "test/report/enduser-index.test.mjs",
+                  "line": 171,
+                  "text": "  // --doc-type how-to --doc-path docs/how-to/check-rollup-progress.md` —",
+                  "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+                },
+                "disposition": "preserve",
+                "reason": "L12-69: Retained real how-to demo/capture provenance; CLI doc-sources example changes no docs-index quadrant, real-file read or seeded outcome. Preserve all existing assertions and exact recorded capture path; later generator/test seam owns any independently justified change.",
+                "oldLine": "  // --doc-type how-to --doc-path docs/how-to/check-rollup-progress.md` —",
+                "newLine": "  // --doc-type how-to --doc-path docs/how-to/check-rollup-progress.md` —"
+              },
+              {
+                "match": {
+                  "file": "test/report/enduser-index.test.mjs",
+                  "line": 385,
+                  "text": "test(\"docs/how-to/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto\", () => {",
+                  "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027"
+                },
+                "disposition": "preserve",
+                "reason": "L12-69: Retained real how-to demo/capture provenance; CLI doc-sources example changes no docs-index quadrant, real-file read or seeded outcome. Preserve all existing assertions and exact recorded capture path; later generator/test seam owns any independently justified change.",
+                "oldLine": "test(\"docs/how-to/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto\", () => {",
+                "newLine": "test(\"docs/how-to/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto\", () => {"
+              }
+            ],
+            "disposition": "preserve"
+          },
+          {
+            "file": "test/report/helpers/docs-index-state-fixture.mjs",
+            "referenceId": "reference-003655",
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310",
+            "mode": "100644",
+            "grepMatches": [
+              {
+                "file": "test/report/helpers/docs-index-state-fixture.mjs",
+                "line": 14,
+                "text": "// (`doc-fgos-rollup-howto` -> docs/how-to/check-rollup-progress.md) is",
+                "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310"
+              },
+              {
+                "file": "test/report/helpers/docs-index-state-fixture.mjs",
+                "line": 35,
+                "text": "export const REAL_DEMO_DOC_PATH = 'docs/how-to/check-rollup-progress.md';",
+                "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310"
+              }
+            ],
+            "oldPointer": "docs/how-to/check-rollup-progress.md",
+            "newPointer": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+            "substitutions": [],
+            "diff": null,
+            "expectedAfterSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310",
+            "rollbackDiff": null,
+            "timing": "phase9",
+            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+            "grepDecisions": [
+              {
+                "match": {
+                  "file": "test/report/helpers/docs-index-state-fixture.mjs",
+                  "line": 14,
+                  "text": "// (`doc-fgos-rollup-howto` -> docs/how-to/check-rollup-progress.md) is",
+                  "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310"
+                },
+                "disposition": "preserve",
+                "reason": "L12-69: Retained real how-to demo/capture provenance; CLI doc-sources example changes no docs-index quadrant, real-file read or seeded outcome. Preserve all existing assertions and exact recorded capture path; later generator/test seam owns any independently justified change.",
+                "oldLine": "// (`doc-fgos-rollup-howto` -> docs/how-to/check-rollup-progress.md) is",
+                "newLine": "// (`doc-fgos-rollup-howto` -> docs/how-to/check-rollup-progress.md) is"
+              },
+              {
+                "match": {
+                  "file": "test/report/helpers/docs-index-state-fixture.mjs",
+                  "line": 35,
+                  "text": "export const REAL_DEMO_DOC_PATH = 'docs/how-to/check-rollup-progress.md';",
+                  "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310"
+                },
+                "disposition": "preserve",
+                "reason": "L12-69: Retained real how-to demo/capture provenance; CLI doc-sources example changes no docs-index quadrant, real-file read or seeded outcome. Preserve all existing assertions and exact recorded capture path; later generator/test seam owns any independently justified change.",
+                "oldLine": "export const REAL_DEMO_DOC_PATH = 'docs/how-to/check-rollup-progress.md';",
+                "newLine": "export const REAL_DEMO_DOC_PATH = 'docs/how-to/check-rollup-progress.md';"
+              }
+            ],
+            "disposition": "preserve"
+          }
+        ]
+      }
     },
     {
       "file": "src/cli/command-registry.mjs",
@@ -2504,9 +3188,9 @@
         "target": null,
         "anchor": null,
         "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": null,
-          "exists": false
+          "rule": "L12-71: parked scope/quadrant generator construction; retained-path status cannot prove current/candidate semantics.",
+          "expression": "docs/specs/",
+          "blocker": "Generic scope/quadrant help must co-cut its owning construction and generator/default contract; no generic root substitution. Exact text candidate awaits source/default receipt."
         },
         "timing": "phase9",
         "diffHunk": null,
@@ -2554,18 +3238,43 @@
         "mode": "100644",
         "sourceSpans": [
           {
+            "line": 2075,
+            "columnStart": 383,
+            "columnEndExclusive": 409,
+            "text": "docs/specs/distribution.md"
+          },
+          {
             "line": 1746,
             "columnStart": 34,
             "columnEndExclusive": 70,
             "text": "docs/how-to/check-rollup-progress.md"
+          },
+          {
+            "line": 2075,
+            "columnStart": 383,
+            "columnEndExclusive": 409,
+            "text": "docs/specs/distribution.md"
           }
         ],
-        "diff": "--- a/src/cli/command-registry.mjs\n+++ b/src/cli/command-registry.mjs\n@@ -1743,7 +1743,7 @@\n       positional: ['doc-path'],\n       required: ['doc-path'],\n     },\n-    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n+    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],\n     touchesState: false,\n     requiresExistingStore: false,\n     externalEffect: false,\n",
-        "expectedAfterSha256": "65aa9b2dc704b9998383c2929e3fee11377397a1c7ca3635e0e9e7e2446b8c02",
+        "diff": "--- a/src/cli/command-registry.mjs\n+++ b/src/cli/command-registry.mjs\n@@ -1743,7 +1743,7 @@\n       positional: ['doc-path'],\n       required: ['doc-path'],\n     },\n-    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n+    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],\n     touchesState: false,\n     requiresExistingStore: false,\n     externalEffect: false,\n@@ -2072,7 +2072,7 @@\n   {\n     name: 'doctor',\n     invoke: 'fgos doctor',\n-    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n+    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/platform/packaging-distribution/spec.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n     parameters: {\n       type: 'object',\n       properties: {\n",
+        "expectedAfterSha256": "798526021edf0d526b694ca2d8ea0208e57a8ba2131fe14290de01044218b073",
         "targetOwner": [
-          "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md"
+          "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+          "docs/platform/packaging-distribution/spec.md"
         ],
         "claimAnchorProof": [
+          {
+            "rule": "L12-71: live RUL9/RUL11 doctor contract holder; Step 4 cli-006 precedent",
+            "target": "docs/platform/packaging-distribution/spec.md",
+            "targetSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+            "anchor": "business-rules",
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "claim": "RUL9 default never writes; RUL11 --fix runs every registered fix",
+            "claimLines": [
+              644,
+              659
+            ]
+          },
           {
             "target": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
             "docId": "how-to-check-a-root-item-s-progress-with-fgos-rollup:check-rollup-progress",
@@ -2574,6 +3283,18 @@
             "alias": "docs/how-to/check-rollup-progress.md",
             "targetSha256": "bc0fb8b50f3958ddcebd76772ed49ea6bfcd69e7be820889900ea884ba69e5ab",
             "claim": "live currentPath lookup; no writer destination adopts an alias"
+          },
+          {
+            "rule": "L12-71: live RUL9/RUL11 doctor contract holder; Step 4 cli-006 precedent",
+            "target": "docs/platform/packaging-distribution/spec.md",
+            "targetSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+            "anchor": "business-rules",
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "claim": "RUL9 default never writes; RUL11 --fix runs every registered fix",
+            "claimLines": [
+              644,
+              659
+            ]
           }
         ],
         "receiptId": "cli-help-messages-pilot",
@@ -2595,7 +3316,7 @@
           "Step 7 composes and de-duplicates shared co-cut test diffs by file/content; do not apply the same pinned test diff twice. Recompute combined hashes after all seams are assembled."
         ],
         "order": "Phase 9 atomic consumer cutover; no apply-now action",
-        "rollbackDiff": "--- a/src/cli/command-registry.mjs\n+++ b/src/cli/command-registry.mjs\n@@ -1743,7 +1743,7 @@\n       positional: ['doc-path'],\n       required: ['doc-path'],\n     },\n-    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],\n+    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n     touchesState: false,\n     requiresExistingStore: false,\n     externalEffect: false,\n",
+        "rollbackDiff": "--- a/src/cli/command-registry.mjs\n+++ b/src/cli/command-registry.mjs\n@@ -1743,7 +1743,7 @@\n       positional: ['doc-path'],\n       required: ['doc-path'],\n     },\n-    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],\n+    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n     touchesState: false,\n     requiresExistingStore: false,\n     externalEffect: false,\n@@ -2072,7 +2072,7 @@\n   {\n     name: 'doctor',\n     invoke: 'fgos doctor',\n-    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/platform/packaging-distribution/spec.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n+    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n     parameters: {\n       type: 'object',\n       properties: {\n",
         "timing": "phase9",
         "readiness": "pending / cutover-patch-only; never execution-ready",
         "coCutTestGreps": [
@@ -2646,6 +3367,17 @@
                 "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310"
               }
             ]
+          },
+          {
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "oldPointer": "docs/specs/distribution.md",
+            "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+            "needles": [
+              "docs/specs/distribution.md",
+              "docs\\/specs\\/distribution.md",
+              "docs\\/specs\\/distribution\\.md"
+            ],
+            "matches": []
           }
         ],
         "coCutTestEdits": [
@@ -3482,728 +4214,6 @@
           }
         ]
       }
-    },
-    {
-      "file": "src/state/events-jsonl-truncation-guard.mjs",
-      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-      "sourceSha256": "b4dd68558622a872395138a790bc63926ebdf60323b880c6f69b23ca3d7ee0ab",
-      "kind": "references",
-      "id": "reference-003868",
-      "change": {
-        "id": "reference-003868",
-        "oldOutcome": {
-          "admission": "ADMIT",
-          "disposition": "patch",
-          "sourceSpans": [
-            {
-              "line": 140,
-              "columnStart": 260,
-              "columnEndExclusive": 309,
-              "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
-            }
-          ],
-          "coCutPaths": [
-            "CHANGELOG.md"
-          ]
-        },
-        "newOutcome": {
-          "admission": "ADMIT",
-          "disposition": "patch",
-          "sourceSpans": [
-            {
-              "line": 140,
-              "columnStart": 260,
-              "columnEndExclusive": 309,
-              "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
-            }
-          ],
-          "coCutPaths": [
-            "CHANGELOG.md",
-            "test/setup/checks.test.mjs"
-          ]
-        }
-      },
-      "record": {
-        "referenceId": "reference-003868",
-        "admission": "ADMIT",
-        "inventory": "step-02l-census-class6.json",
-        "edgeId": "class6-l-000415",
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "inventoryOrigins": [
-          {
-            "inventory": "step-02l-census-class6.json",
-            "id": "class6-l-000415",
-            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
-          }
-        ],
-        "slotKey": null,
-        "sourceSpans": [
-          {
-            "line": 140,
-            "columnStart": 260,
-            "columnEndExclusive": 309,
-            "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
-          }
-        ],
-        "originalSourceSpans": [
-          {
-            "columnEndExclusive": 309,
-            "columnStart": 260,
-            "line": 140,
-            "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
-          }
-        ],
-        "matchedExpression": "docs/how-to/resolve-an-events-jsonl-truncation.md",
-        "passage": "      ok: false,\n      reason: \"content-mismatch\",\n      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/how-to/resolve-an-events-jsonl-truncation.md)`,\n      mark: currentMark,\n    };",
-        "passageSpan": {
-          "startLine": 138,
-          "endLine": 142
-        },
-        "role": "emitted-message",
-        "disposition": "patch",
-        "reason": "Executable data/message/file operation in own passage: '      ok: false,\\n      reason: \"content-mismatch\",\\n      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/how-to/resolve-an-events-jsonl-truncation.md)`,\\n      mark: currentMark,\\n    };' The exact registry alias names currentPath docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md; Phase 9 changes this emitted pointer only.",
-        "target": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
-        "anchor": null,
-        "resolverWitness": {
-          "target": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
-          "docId": "how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events-jsonl-truncation:resolve-an-events-jsonl-truncation",
-          "registryPath": "docs/doc-registry.json",
-          "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
-          "alias": "docs/how-to/resolve-an-events-jsonl-truncation.md",
-          "targetSha256": "da410923253f4bdf8219b75fae8176ce4e97b9114e4a2172dbb19adfea460862",
-          "claim": "live currentPath lookup; no writer destination adopts an alias"
-        },
-        "timing": "phase9",
-        "diffHunk": "--- a/src/state/events-jsonl-truncation-guard.mjs\n+++ b/src/state/events-jsonl-truncation-guard.mjs\n@@ -137,7 +137,7 @@\n     return {\n       ok: false,\n       reason: \"content-mismatch\",\n-      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/how-to/resolve-an-events-jsonl-truncation.md)`,\n+      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md)`,\n       mark: currentMark,\n     };\n   }\n",
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
-        "successorNote": null,
-        "aliasWriteCheck": {
-          "isWriter": false,
-          "destinationIsAlias": false,
-          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
-        },
-        "proposedReplacement": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
-        "priorRecordRefs": [
-          {
-            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
-            "recordSha256": "c1256c92c1e0cd9ffb5b45c132257e973180c8046369eb53a28d49feda3b0dbf",
-            "matchingSlots": []
-          }
-        ],
-        "fixtureProvenance": null,
-        "rejectionRule": null,
-        "receiptId": "cli-help-messages-pilot",
-        "proofCommand": "missing",
-        "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
-        "parityObligation": {
-          "current": "docs/how-to/resolve-an-events-jsonl-truncation.md",
-          "candidate": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
-          "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
-          "blocker": null
-        },
-        "coCutTestGrep": {
-          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-          "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
-          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
-          "needles": [
-            "docs/how-to/resolve-an-events-jsonl-truncation.md",
-            "docs\\/how-to\\/resolve-an-events-jsonl-truncation.md",
-            "docs\\/how-to\\/resolve-an-events-jsonl-truncation\\.md"
-          ],
-          "matches": [
-            {
-              "file": "test/setup/checks.test.mjs",
-              "line": 342,
-              "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
-              "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
-            }
-          ]
-        }
-      },
-      "window": {
-        "startLine": 100,
-        "endLine": 180,
-        "text": "    // Log went from having a marked seq tail to having none at all --\n    // as unambiguous a truncation as they come.\n    return { ok: false, reason: \"log-emptied\", message: `log no longer has a seq'd tail (was seq ${storedMark.seq})`, mark: currentMark };\n  }\n\n  if (currentMark.seq < storedMark.seq) {\n    return {\n      ok: false,\n      reason: \"regressed\",\n      message: `current tip seq ${currentMark.seq} is lower than the last recorded mark (seq ${storedMark.seq}) -- the log went backwards`,\n      mark: currentMark,\n    };\n  }\n\n  const entries = raw\n    .split(\"\\n\")\n    .filter((l) => l !== \"\")\n    .map((line) => {\n      try {\n        return { line, parsed: JSON.parse(line) };\n      } catch {\n        return { line, parsed: null };\n      }\n    });\n  const atMark = entries.find((e) => e.parsed && e.parsed.seq === storedMark.seq);\n\n  if (!atMark) {\n    return {\n      ok: false,\n      reason: \"mark-seq-missing\",\n      message: `no line in the current log carries seq ${storedMark.seq} (the last recorded mark) even though the tip has grown to seq ${currentMark.seq} -- the position was renumbered out from under the mark`,\n      mark: currentMark,\n    };\n  }\n\n  const atMarkHash = hashLine(atMark.line);\n  if (atMarkHash !== storedMark.hash) {\n    return {\n      ok: false,\n      reason: \"content-mismatch\",\n      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/how-to/resolve-an-events-jsonl-truncation.md)`,\n      mark: currentMark,\n    };\n  }\n\n  return { ok: true, reason: \"clean\", message: `mark still holds at seq ${storedMark.seq}, tip now at seq ${currentMark.seq}`, mark: currentMark };\n}\n\n/**\n * Tầng A/T5 (TA-D10): the sidecar now holds a MAP `{fileName -> {seq,\n * hash}}` instead of a single `{seq, hash}` object -- one entry per\n * tracked file (baseline-0's own basename `\"events.jsonl\"`, or\n * `\"events/<writer file name>\"` for a per-writer file), since a\n * truncation on one writer's file must never be confused with, or hide\n * behind, another writer's own mark. Still one gitignored sidecar per\n * `.fgos/` dir (unchanged path/name) -- only its on-disk SHAPE changed.\n * `readGuardMarks`/`writeGuardMarks` own that shape; every other function\n * below narrows to one entry by `fileKey`.\n */\nexport function readGuardMarks(guardPath) {\n  let raw;\n  try {\n    raw = fs.readFileSync(guardPath, \"utf8\");\n  } catch {\n    return {};\n  }\n  try {\n    const parsed = JSON.parse(raw);\n    return parsed && typeof parsed === \"object\" && !Array.isArray(parsed) ? parsed : {};\n  } catch {\n    return {};\n  }\n}\n\n/** Persist the WHOLE marks map to `guardPath`. */\nexport function writeGuardMarks(guardPath, marks) {\n  fs.mkdirSync(path.dirname(guardPath), { recursive: true });\n  fs.writeFileSync(guardPath, `${JSON.stringify(marks)}\\n`, \"utf8\");\n}\n\n/** Read one file's persisted mark from the shared sidecar map. Missing"
-      },
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
-      "cutoverSpecification": {
-        "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-        "file": "src/state/events-jsonl-truncation-guard.mjs",
-        "sourceSha256": "b4dd68558622a872395138a790bc63926ebdf60323b880c6f69b23ca3d7ee0ab",
-        "mode": "100644",
-        "sourceSpans": [
-          {
-            "line": 140,
-            "columnStart": 260,
-            "columnEndExclusive": 309,
-            "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
-          }
-        ],
-        "diff": "--- a/src/state/events-jsonl-truncation-guard.mjs\n+++ b/src/state/events-jsonl-truncation-guard.mjs\n@@ -137,7 +137,7 @@\n     return {\n       ok: false,\n       reason: \"content-mismatch\",\n-      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/how-to/resolve-an-events-jsonl-truncation.md)`,\n+      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md)`,\n       mark: currentMark,\n     };\n   }\n",
-        "expectedAfterSha256": "695215a9ab63d21a5eef2d314aa146e65269cc078efeb0462c7b252cb8c22c02",
-        "targetOwner": [
-          "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md"
-        ],
-        "claimAnchorProof": [
-          {
-            "target": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
-            "docId": "how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events-jsonl-truncation:resolve-an-events-jsonl-truncation",
-            "registryPath": "docs/doc-registry.json",
-            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
-            "alias": "docs/how-to/resolve-an-events-jsonl-truncation.md",
-            "targetSha256": "da410923253f4bdf8219b75fae8176ce4e97b9114e4a2172dbb19adfea460862",
-            "claim": "live currentPath lookup; no writer destination adopts an alias"
-          }
-        ],
-        "receiptId": "cli-help-messages-pilot",
-        "coCutPaths": [
-          "CHANGELOG.md",
-          "test/setup/checks.test.mjs"
-        ],
-        "testTargets": [
-          "env -u CLAUDE_CODE_SESSION_ID node --test test/setup/checks.test.mjs",
-          "missing: same-input complete output/category/exit cutover parity; current owning proofs alone are not migration acceptance"
-        ],
-        "prerequisites": [
-          "Lead-started independent semantic review",
-          "Missing exact-output proof",
-          "User-visible CHANGELOG.md Unreleased co-edit in separately authorized Phase 9 packet",
-          "Same-package Step 0 rebind if the final patch touches a bound target",
-          "Step 7 composes and de-duplicates shared co-cut test diffs by file/content; do not apply the same pinned test diff twice. Recompute combined hashes after all seams are assembled."
-        ],
-        "order": "Phase 9 atomic consumer cutover; no apply-now action",
-        "rollbackDiff": "--- a/src/state/events-jsonl-truncation-guard.mjs\n+++ b/src/state/events-jsonl-truncation-guard.mjs\n@@ -137,7 +137,7 @@\n     return {\n       ok: false,\n       reason: \"content-mismatch\",\n-      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md)`,\n+      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/how-to/resolve-an-events-jsonl-truncation.md)`,\n       mark: currentMark,\n     };\n   }\n",
-        "timing": "phase9",
-        "readiness": "pending / cutover-patch-only; never execution-ready",
-        "coCutTestGreps": [
-          {
-            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-            "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
-            "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
-            "needles": [
-              "docs/how-to/resolve-an-events-jsonl-truncation.md",
-              "docs\\/how-to\\/resolve-an-events-jsonl-truncation.md",
-              "docs\\/how-to\\/resolve-an-events-jsonl-truncation\\.md"
-            ],
-            "matches": [
-              {
-                "file": "test/setup/checks.test.mjs",
-                "line": 342,
-                "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
-                "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
-              }
-            ]
-          }
-        ],
-        "coCutTestEdits": [
-          {
-            "file": "test/setup/checks.test.mjs",
-            "referenceId": "reference-003868",
-            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-            "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55",
-            "mode": "100644",
-            "grepMatches": [
-              {
-                "file": "test/setup/checks.test.mjs",
-                "line": 342,
-                "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
-                "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
-              }
-            ],
-            "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
-            "newPointer": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
-            "substitutions": [
-              [
-                "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
-                "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {"
-              ]
-            ],
-            "diff": "--- a/test/setup/checks.test.mjs\n+++ b/test/setup/checks.test.mjs\n@@ -339,7 +339,7 @@\n \n // ─── events-jsonl-not-truncated (tsk-cgg) ──────────────────────────────────\n \n-test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n+test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n   assert.equal(\n     FIX_REGISTRATIONS.some((f) => f.id === 'events-jsonl-not-truncated'),\n     false,\n",
-            "expectedAfterSha256": "a19a4a3d2ee134974c4483b9e719df84bc13c045e835c3aa06949ee9f9a059f9",
-            "rollbackDiff": "--- a/test/setup/checks.test.mjs\n+++ b/test/setup/checks.test.mjs\n@@ -339,7 +339,7 @@\n \n // ─── events-jsonl-not-truncated (tsk-cgg) ──────────────────────────────────\n \n-test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n+test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n   assert.equal(\n     FIX_REGISTRATIONS.some((f) => f.id === 'events-jsonl-not-truncated'),\n     false,\n",
-            "timing": "phase9",
-            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
-            "grepDecisions": [
-              {
-                "match": {
-                  "file": "test/setup/checks.test.mjs",
-                  "line": 342,
-                  "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
-                  "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
-                },
-                "disposition": "patch",
-                "reason": "L12-69: Owning exact emitted-string assertion (or navigation title) follows the single pointer delta; assertion shape and all surrounding bytes stay identical.",
-                "oldLine": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
-                "newLine": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {"
-              }
-            ],
-            "disposition": "patch"
-          }
-        ]
-      }
-    },
-    {
-      "file": "src/setup/instruction-registry.mjs",
-      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
-      "kind": "references",
-      "id": "reference-003798",
-      "change": {
-        "id": "reference-003798",
-        "outcome": "unchanged admitted literal; final-state contextual check"
-      },
-      "record": {
-        "referenceId": "reference-003798",
-        "admission": "ADMIT",
-        "inventory": "step-02l-census-class6.json",
-        "edgeId": "class6-l-000344",
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "inventoryOrigins": [
-          {
-            "inventory": "step-02l-census-class6.json",
-            "id": "class6-l-000344",
-            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
-          }
-        ],
-        "slotKey": null,
-        "sourceSpans": [
-          {
-            "line": 361,
-            "columnStart": 80,
-            "columnEndExclusive": 103,
-            "text": "docs/decisions/index.md"
-          }
-        ],
-        "originalSourceSpans": [
-          {
-            "columnEndExclusive": 103,
-            "columnStart": 80,
-            "line": 361,
-            "text": "docs/decisions/index.md"
-          }
-        ],
-        "matchedExpression": "docs/decisions/index.md",
-        "passage": "    if (!knownDecisionIds.has(supersessionDecision)) {\n      throw new InstructionRegistryError(\n        `Law supersessionDecision \"${supersessionDecision}\" is not recorded in docs/decisions/index.md`,\n        { filePath: sourcePath, code: 'UNKNOWN_DECISION' },\n      );",
-        "passageSpan": {
-          "startLine": 359,
-          "endLine": 363
-        },
-        "role": "emitted-message",
-        "disposition": "preserve",
-        "reason": "Executable data/message/file operation in own passage: '    if (!knownDecisionIds.has(supersessionDecision)) {\\n      throw new InstructionRegistryError(\\n        `Law supersessionDecision \"${supersessionDecision}\" is not recorded in docs/decisions/index.md`,\\n        { filePath: sourcePath, code: \\'UNKNOWN_DECISION\\' },\\n      );' Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass.",
-        "target": null,
-        "anchor": null,
-        "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/decisions/index.md",
-          "exists": true
-        },
-        "timing": "none",
-        "diffHunk": null,
-        "blockedCategory": null,
-        "blockedReason": null,
-        "dependency": null,
-        "dependencyCategory": null,
-        "successorNote": null,
-        "aliasWriteCheck": {
-          "isWriter": false,
-          "destinationIsAlias": false,
-          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
-        },
-        "proposedReplacement": null,
-        "priorRecordRefs": [],
-        "fixtureProvenance": null,
-        "rejectionRule": null,
-        "receiptId": "setup-doctor-roots-pilot",
-        "proofCommand": "missing",
-        "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
-        "parityObligation": {
-          "current": "docs/decisions/index.md",
-          "candidate": "docs/decisions/index.md",
-          "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
-          "blocker": null
-        }
-      },
-      "window": {
-        "startLine": 321,
-        "endLine": 401,
-        "text": "    );\n  }\n\n  // 8. Normalise relationship arrays\n  const toArrayOfStrings = (val, fieldName) => {\n    if (!val) return [];\n    if (typeof val === 'string') return [val.trim()];\n    if (Array.isArray(val) && val.every((item) => typeof item === 'string')) {\n      return val.map((item) => item.trim());\n    }\n    throw new InstructionRegistryError(\n      `Invalid \"${fieldName}\": must be a string or array of strings`,\n      { filePath: sourcePath, code: 'INVALID_METADATA' },\n    );\n  };\n\n  const dependsOn = toArrayOfStrings(meta.dependsOn, 'dependsOn');\n  const refines = toArrayOfStrings(meta.refines, 'refines');\n  const supersedes = toArrayOfStrings(meta.supersedes, 'supersedes');\n  const conflictsWith = toArrayOfStrings(meta.conflictsWith, 'conflictsWith');\n  const supersessionDecision = meta.supersessionDecision === undefined\n    ? null\n    : String(meta.supersessionDecision).trim();\n  if (meta.supersessionDecision !== undefined && !supersessionDecision) {\n    throw new InstructionRegistryError(\n      'Invalid \"supersessionDecision\": must be a non-empty string when provided',\n      { filePath: sourcePath, code: 'INVALID_METADATA' },\n    );\n  }\n  let supersessionDecisionVerified = false;\n  if (kind === 'law' && supersedes.length > 0) {\n    if (!supersessionDecision || !DECISION_ID_PATTERN.test(supersessionDecision)) {\n      throw new InstructionRegistryError(\n        'Law supersession requires \"supersessionDecision\" naming an existing D-ADR#### decision',\n        { filePath: sourcePath, code: 'INVALID_METADATA' },\n      );\n    }\n    const knownDecisionIds = readDecisionIds(projectRoot, fgosDir);\n    if (!knownDecisionIds.has(supersessionDecision)) {\n      throw new InstructionRegistryError(\n        `Law supersessionDecision \"${supersessionDecision}\" is not recorded in docs/decisions/index.md`,\n        { filePath: sourcePath, code: 'UNKNOWN_DECISION' },\n      );\n    }\n    supersessionDecisionVerified = true;\n  }\n\n  const renderHints = meta.renderHints && typeof meta.renderHints === 'object' && !Array.isArray(meta.renderHints)\n    ? { ...meta.renderHints }\n    : {};\n\n  const unit = Object.freeze({\n    id,\n    owner: unitOwner,\n    authority,\n    sourcePath,\n    fullPath,\n    scope,\n    kind,\n    mode,\n    appliesTo,\n    applicability: appliesTo,\n    specificity,\n    dependsOn,\n    refines,\n    supersedes,\n    supersessionDecision,\n    supersessionDecisionVerified,\n    conflictsWith,\n    renderHints,\n    title: typeof meta.title === 'string' ? meta.title : '',\n    description: typeof meta.description === 'string' ? meta.description : '',\n    body: body.trim(),\n    rawContent,\n  });\n  if (supersessionDecisionVerified) VERIFIED_SUPERSESSION_UNITS.add(unit);\n  return unit;\n}\n\n/**\n * Scan directory recursively for markdown files (*.md)."
-      },
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl"
-    },
-    {
-      "file": "src/setup/instruction-registry.mjs",
-      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
-      "kind": "dynamicTraces",
-      "id": "dynamic-013969",
-      "change": {
-        "id": "dynamic-013969",
-        "oldOutcome": {
-          "admission": "REJECT",
-          "disposition": "preserve",
-          "sourceSpans": null,
-          "coCutPaths": null
-        },
-        "newOutcome": {
-          "admission": "ADMIT",
-          "disposition": "preserve",
-          "sourceSpans": null,
-          "coCutPaths": null
-        }
-      },
-      "record": {
-        "proofCommand": "missing",
-        "parityObligation": {
-          "currentTuple": [
-            361,
-            9,
-            361,
-            104,
-            "`Law supersessionDecision \"${supersessionDecision}\" is not recorded in docs/decisions/index.md`",
-            "template-string",
-            true,
-            "reader"
-          ],
-          "candidateConstruction": "docs/decisions/index.md",
-          "comparison": "Exact same-input emitted/read behavior; literal patch owner supplies one diff. No parity pass inferred.",
-          "blocker": null,
-          "literalOwner": "reference-003798"
-        },
-        "id": "dynamic-013969",
-        "originalTuple": [
-          361,
-          9,
-          361,
-          104,
-          "`Law supersessionDecision \"${supersessionDecision}\" is not recorded in docs/decisions/index.md`",
-          "template-string",
-          true,
-          "reader"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "ADMIT",
-        "disposition": "preserve",
-        "currentLine": 361,
-        "currentPassage": {
-          "startLine": 359,
-          "endLine": 363,
-          "text": "    if (!knownDecisionIds.has(supersessionDecision)) {\n      throw new InstructionRegistryError(\n        `Law supersessionDecision \"${supersessionDecision}\" is not recorded in docs/decisions/index.md`,\n        { filePath: sourcePath, code: 'UNKNOWN_DECISION' },\n      );"
-        },
-        "caller": {
-          "line": 325,
-          "declaration": "const toArrayOfStrings = (val, fieldName) => {"
-        },
-        "inputs": [
-          "`Law supersessionDecision \"${supersessionDecision}\" is not recorded in docs/decisions/index.md`"
-        ],
-        "role": "emitted-message",
-        "targetSetOrConstruction": "docs/decisions/index.md",
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": null,
-        "reason": "L12-69: Same passage as reference-003798; that literal record owns the single outcome and any Phase 9 pointer diff.",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot",
-        "samePassageOwner": "reference-003798"
-      },
-      "window": {
-        "startLine": 321,
-        "endLine": 401,
-        "text": "    );\n  }\n\n  // 8. Normalise relationship arrays\n  const toArrayOfStrings = (val, fieldName) => {\n    if (!val) return [];\n    if (typeof val === 'string') return [val.trim()];\n    if (Array.isArray(val) && val.every((item) => typeof item === 'string')) {\n      return val.map((item) => item.trim());\n    }\n    throw new InstructionRegistryError(\n      `Invalid \"${fieldName}\": must be a string or array of strings`,\n      { filePath: sourcePath, code: 'INVALID_METADATA' },\n    );\n  };\n\n  const dependsOn = toArrayOfStrings(meta.dependsOn, 'dependsOn');\n  const refines = toArrayOfStrings(meta.refines, 'refines');\n  const supersedes = toArrayOfStrings(meta.supersedes, 'supersedes');\n  const conflictsWith = toArrayOfStrings(meta.conflictsWith, 'conflictsWith');\n  const supersessionDecision = meta.supersessionDecision === undefined\n    ? null\n    : String(meta.supersessionDecision).trim();\n  if (meta.supersessionDecision !== undefined && !supersessionDecision) {\n    throw new InstructionRegistryError(\n      'Invalid \"supersessionDecision\": must be a non-empty string when provided',\n      { filePath: sourcePath, code: 'INVALID_METADATA' },\n    );\n  }\n  let supersessionDecisionVerified = false;\n  if (kind === 'law' && supersedes.length > 0) {\n    if (!supersessionDecision || !DECISION_ID_PATTERN.test(supersessionDecision)) {\n      throw new InstructionRegistryError(\n        'Law supersession requires \"supersessionDecision\" naming an existing D-ADR#### decision',\n        { filePath: sourcePath, code: 'INVALID_METADATA' },\n      );\n    }\n    const knownDecisionIds = readDecisionIds(projectRoot, fgosDir);\n    if (!knownDecisionIds.has(supersessionDecision)) {\n      throw new InstructionRegistryError(\n        `Law supersessionDecision \"${supersessionDecision}\" is not recorded in docs/decisions/index.md`,\n        { filePath: sourcePath, code: 'UNKNOWN_DECISION' },\n      );\n    }\n    supersessionDecisionVerified = true;\n  }\n\n  const renderHints = meta.renderHints && typeof meta.renderHints === 'object' && !Array.isArray(meta.renderHints)\n    ? { ...meta.renderHints }\n    : {};\n\n  const unit = Object.freeze({\n    id,\n    owner: unitOwner,\n    authority,\n    sourcePath,\n    fullPath,\n    scope,\n    kind,\n    mode,\n    appliesTo,\n    applicability: appliesTo,\n    specificity,\n    dependsOn,\n    refines,\n    supersedes,\n    supersessionDecision,\n    supersessionDecisionVerified,\n    conflictsWith,\n    renderHints,\n    title: typeof meta.title === 'string' ? meta.title : '',\n    description: typeof meta.description === 'string' ? meta.description : '',\n    body: body.trim(),\n    rawContent,\n  });\n  if (supersessionDecisionVerified) VERIFIED_SUPERSESSION_UNITS.add(unit);\n  return unit;\n}\n\n/**\n * Scan directory recursively for markdown files (*.md)."
-      },
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl"
-    },
-    {
-      "file": "src/setup/instruction-registry.mjs",
-      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
-      "kind": "dynamicTraces",
-      "id": "dynamic-013982",
-      "change": {
-        "id": "dynamic-013982",
-        "oldOutcome": {
-          "admission": "ADMIT",
-          "disposition": "preserve",
-          "sourceSpans": null,
-          "coCutPaths": null
-        },
-        "newOutcome": {
-          "admission": "REJECT",
-          "disposition": "preserve",
-          "sourceSpans": null,
-          "coCutPaths": null
-        }
-      },
-      "record": {
-        "proofCommand": null,
-        "parityObligation": null,
-        "id": "dynamic-013982",
-        "originalTuple": [
-          453,
-          8,
-          453,
-          79,
-          "manifestPath: custom path to architecture manifest (internal/test-only)",
-          "config/default-root",
-          true,
-          "comment"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "REJECT",
-        "disposition": "preserve",
-        "currentLine": 453,
-        "currentPassage": {
-          "startLine": 451,
-          "endLine": 455,
-          "text": " *\n * Options:\n *   - manifestPath: custom path to architecture manifest (internal/test-only)\n *   - allowedComponents: explicit array/set of allowed component names (internal/test-only)\n *   - allowedDomains: explicit array/set of allowed domain names (internal/test-only)"
-        },
-        "caller": {
-          "line": 404,
-          "declaration": "function scanMarkdownFiles(dir, containmentRoot = dir) {"
-        },
-        "inputs": [
-          "manifestPath: custom path to architecture manifest (internal/test-only)"
-        ],
-        "role": "non-document-operation",
-        "targetSetOrConstruction": null,
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'manifestPath: custom path to architecture manifest (internal/test-only)'. Pinned current passage: ' *\\n * Options:\\n *   - manifestPath: custom path to architecture manifest (internal/test-only)\\n *   - allowedComponents: explicit array/set of allowed component names (internal/test-only)\\n *   - allowedDomains: explicit array/set of allowed domain names (internal/test-only)'",
-        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'manifestPath: custom path to architecture manifest (internal/test-only)'. Pinned current passage: ' *\\n * Options:\\n *   - manifestPath: custom path to architecture manifest (internal/test-only)\\n *   - allowedComponents: explicit array/set of allowed component names (internal/test-only)\\n *   - allowedDomains: explicit array/set of allowed domain names (internal/test-only)'",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      },
-      "window": {
-        "startLine": 413,
-        "endLine": 493,
-        "text": "  }\n\n  const entries = fs.readdirSync(dir, { withFileTypes: true });\n  for (const entry of entries) {\n    if (entry.name.startsWith('.')) continue;\n    const fullPath = path.join(dir, entry.name);\n\n    // Verify containment (disallow symlinks escaping containmentRoot)\n    let realEntryPath;\n    try {\n      realEntryPath = fs.realpathSync(fullPath);\n    } catch {\n      continue;\n    }\n\n    const relToRoot = path.relative(realContainmentRoot, realEntryPath);\n    if (relToRoot.startsWith('..') || path.isAbsolute(relToRoot)) {\n      throw new InstructionRegistryError(\n        `Instruction source \"${toPosixPath(fullPath)}\" resolves outside containment root \"${toPosixPath(containmentRoot)}\" via symlink`,\n        { filePath: fullPath, code: 'CONTAINMENT_VIOLATION' },\n      );\n    }\n\n    if (entry.isDirectory()) {\n      results.push(...scanMarkdownFiles(fullPath, containmentRoot));\n    } else if (entry.isFile()) {\n      // Case policy: only lowercase .md extension is recognized\n      if (entry.name.endsWith('.md')) {\n        results.push(fullPath);\n      }\n    }\n  }\n  return results;\n}\n\n/**\n * Discover allowed components and domains under project root from the authoritative\n * architecture manifest (e.g. docs/architecture-manifest.json), rejecting unregistered roots.\n *\n * Options:\n *   - manifestPath: custom path to architecture manifest (internal/test-only)\n *   - allowedComponents: explicit array/set of allowed component names (internal/test-only)\n *   - allowedDomains: explicit array/set of allowed domain names (internal/test-only)\n */\nexport function discoverKnownOwners(projectRoot, options = {}) {\n  const manifestPath = options.manifestPath ?? path.join(projectRoot, 'docs', 'architecture-manifest.json');\n  const owners = new Set(['core', 'platform']);\n\n  if (fs.existsSync(manifestPath)) {\n    try {\n      const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));\n      if (Array.isArray(manifest.components)) {\n        for (const comp of manifest.components) {\n          if (typeof comp === 'string' && comp.trim()) {\n            owners.add(comp.trim());\n          }\n        }\n      }\n      if (Array.isArray(manifest.domains)) {\n        for (const dom of manifest.domains) {\n          if (typeof dom === 'string' && dom.trim()) {\n            owners.add(dom.trim());\n          }\n        }\n      }\n    } catch (err) {\n      throw new InstructionRegistryError(\n        `Failed to parse architecture manifest at ${manifestPath}: ${err.message}`,\n        { filePath: manifestPath, code: 'MANIFEST_ERROR', cause: err },\n      );\n    }\n  }\n\n  if (options.allowedComponents) {\n    for (const comp of options.allowedComponents) {\n      if (typeof comp === 'string' && comp.trim()) owners.add(comp.trim());\n    }\n  }\n  if (options.allowedDomains) {\n    for (const dom of options.allowedDomains) {\n      if (typeof dom === 'string' && dom.trim()) owners.add(dom.trim());"
-      },
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl"
-    },
-    {
-      "file": "src/setup/instruction-registry.mjs",
-      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
-      "kind": "dynamicTraces",
-      "id": "dynamic-013988",
-      "change": {
-        "id": "dynamic-013988",
-        "oldOutcome": {
-          "admission": "ADMIT",
-          "disposition": "preserve",
-          "sourceSpans": null,
-          "coCutPaths": null
-        },
-        "newOutcome": {
-          "admission": "REJECT",
-          "disposition": "preserve",
-          "sourceSpans": null,
-          "coCutPaths": null
-        }
-      },
-      "record": {
-        "proofCommand": null,
-        "parityObligation": null,
-        "id": "dynamic-013988",
-        "originalTuple": [
-          571,
-          33,
-          571,
-          49,
-          "scope === scope)",
-          "config/default-root",
-          true,
-          "default-root"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "REJECT",
-        "disposition": "preserve",
-        "currentLine": 571,
-        "currentPassage": {
-          "startLine": 569,
-          "endLine": 573,
-          "text": "\n  findByScope(scope) {\n    return this.filter((u) => u.scope === scope);\n  }\n}"
-        },
-        "caller": {
-          "line": 457,
-          "declaration": "export function discoverKnownOwners(projectRoot, options = {}) {"
-        },
-        "inputs": [
-          "scope === scope)"
-        ],
-        "role": "non-document-operation",
-        "targetSetOrConstruction": null,
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'scope === scope)'. Pinned current passage: '\\n  findByScope(scope) {\\n    return this.filter((u) => u.scope === scope);\\n  }\\n}'",
-        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'scope === scope)'. Pinned current passage: '\\n  findByScope(scope) {\\n    return this.filter((u) => u.scope === scope);\\n  }\\n}'",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      },
-      "window": {
-        "startLine": 531,
-        "endLine": 611,
-        "text": "  list() {\n    return [...this];\n  }\n\n  get units() {\n    return [...this];\n  }\n\n  get byId() {\n    return new Map(this.#byId);\n  }\n\n  filter(callback, thisArg) {\n    const results = Array.prototype.filter.call(this, callback, thisArg);\n    return new InstructionRegistry(...results);\n  }\n\n  slice(start, end) {\n    const results = Array.prototype.slice.call(this, start, end);\n    return new InstructionRegistry(...results);\n  }\n\n  concat(...items) {\n    const results = Array.prototype.concat.call(this, ...items);\n    return new InstructionRegistry(...results);\n  }\n\n  findByOwner(owner) {\n    return this.filter((u) => u.owner === owner);\n  }\n\n  findByKind(kind) {\n    return this.filter((u) => u.kind === kind);\n  }\n\n  findByAuthority(authorityType) {\n    return this.filter((u) => u.authority.type === authorityType);\n  }\n\n  findByScope(scope) {\n    return this.filter((u) => u.scope === scope);\n  }\n}\n\n/**\n * Discover canonical instruction sources from:\n *   - core/instructions/\n *   - components/<component>/instructions/\n *   - domains/<domain>/instructions/\n *\n * In production default discovery, instruction sources are strictly discovered\n * from within projectRoot. Allowed component and domain owners are authoritatively\n * resolved from docs/architecture-manifest.json. Unregistered default roots are rejected.\n *\n * Custom roots (coreRoot, componentsRoot, domainsRoot) are test-only/internal options\n * intended solely for test harness fixture isolation and cannot be used by production\n * default discovery.\n *\n * Options:\n *   - coreRoot: (internal/test-only) custom path to core/instructions/\n *   - componentsRoot: (internal/test-only) custom path to components/\n *   - domainsRoot: (internal/test-only) custom path to domains/\n *   - manifestPath: (internal/test-only) custom path to architecture manifest\n *   - knownOwners: Set or Array of valid owner names (internal/test-only override)\n *   - allowDuplicates: boolean (default false, throws on duplicate id)\n */\nexport function discoverInstructionSources(projectRoot, options = {}) {\n  const coreRoot = options.coreRoot ?? path.join(projectRoot, 'core', 'instructions');\n  const componentsRoot = options.componentsRoot ?? path.join(projectRoot, 'components');\n  const domainsRoot = options.domainsRoot ?? path.join(projectRoot, 'domains');\n\n  // Discover or use provided known owners\n  let knownOwners = null;\n  if (options.knownOwners) {\n    knownOwners = options.knownOwners instanceof Set\n      ? options.knownOwners\n      : new Set(options.knownOwners);\n  } else {\n    knownOwners = discoverKnownOwners(projectRoot, {\n      manifestPath: options.manifestPath,\n      allowedComponents: options.allowedComponents,"
-      },
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl"
-    },
-    {
-      "file": "src/setup/instruction-registry.mjs",
-      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
-      "kind": "dynamicTraces",
-      "id": "dynamic-013989",
-      "change": {
-        "id": "dynamic-013989",
-        "oldOutcome": {
-          "admission": "ADMIT",
-          "disposition": "preserve",
-          "sourceSpans": null,
-          "coCutPaths": null
-        },
-        "newOutcome": {
-          "admission": "REJECT",
-          "disposition": "preserve",
-          "sourceSpans": null,
-          "coCutPaths": null
-        }
-      },
-      "record": {
-        "proofCommand": null,
-        "parityObligation": null,
-        "id": "dynamic-013989",
-        "originalTuple": [
-          590,
-          8,
-          590,
-          72,
-          "coreRoot: (internal/test-only) custom path to core/instructions/",
-          "config/default-root",
-          true,
-          "comment"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "REJECT",
-        "disposition": "preserve",
-        "currentLine": 590,
-        "currentPassage": {
-          "startLine": 588,
-          "endLine": 592,
-          "text": " *\n * Options:\n *   - coreRoot: (internal/test-only) custom path to core/instructions/\n *   - componentsRoot: (internal/test-only) custom path to components/\n *   - domainsRoot: (internal/test-only) custom path to domains/"
-        },
-        "caller": {
-          "line": 457,
-          "declaration": "export function discoverKnownOwners(projectRoot, options = {}) {"
-        },
-        "inputs": [
-          "coreRoot: (internal/test-only) custom path to core/instructions/"
-        ],
-        "role": "non-document-operation",
-        "targetSetOrConstruction": null,
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'coreRoot: (internal/test-only) custom path to core/instructions/'. Pinned current passage: ' *\\n * Options:\\n *   - coreRoot: (internal/test-only) custom path to core/instructions/\\n *   - componentsRoot: (internal/test-only) custom path to components/\\n *   - domainsRoot: (internal/test-only) custom path to domains/'",
-        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'coreRoot: (internal/test-only) custom path to core/instructions/'. Pinned current passage: ' *\\n * Options:\\n *   - coreRoot: (internal/test-only) custom path to core/instructions/\\n *   - componentsRoot: (internal/test-only) custom path to components/\\n *   - domainsRoot: (internal/test-only) custom path to domains/'",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      },
-      "window": {
-        "startLine": 550,
-        "endLine": 630,
-        "text": "    return new InstructionRegistry(...results);\n  }\n\n  concat(...items) {\n    const results = Array.prototype.concat.call(this, ...items);\n    return new InstructionRegistry(...results);\n  }\n\n  findByOwner(owner) {\n    return this.filter((u) => u.owner === owner);\n  }\n\n  findByKind(kind) {\n    return this.filter((u) => u.kind === kind);\n  }\n\n  findByAuthority(authorityType) {\n    return this.filter((u) => u.authority.type === authorityType);\n  }\n\n  findByScope(scope) {\n    return this.filter((u) => u.scope === scope);\n  }\n}\n\n/**\n * Discover canonical instruction sources from:\n *   - core/instructions/\n *   - components/<component>/instructions/\n *   - domains/<domain>/instructions/\n *\n * In production default discovery, instruction sources are strictly discovered\n * from within projectRoot. Allowed component and domain owners are authoritatively\n * resolved from docs/architecture-manifest.json. Unregistered default roots are rejected.\n *\n * Custom roots (coreRoot, componentsRoot, domainsRoot) are test-only/internal options\n * intended solely for test harness fixture isolation and cannot be used by production\n * default discovery.\n *\n * Options:\n *   - coreRoot: (internal/test-only) custom path to core/instructions/\n *   - componentsRoot: (internal/test-only) custom path to components/\n *   - domainsRoot: (internal/test-only) custom path to domains/\n *   - manifestPath: (internal/test-only) custom path to architecture manifest\n *   - knownOwners: Set or Array of valid owner names (internal/test-only override)\n *   - allowDuplicates: boolean (default false, throws on duplicate id)\n */\nexport function discoverInstructionSources(projectRoot, options = {}) {\n  const coreRoot = options.coreRoot ?? path.join(projectRoot, 'core', 'instructions');\n  const componentsRoot = options.componentsRoot ?? path.join(projectRoot, 'components');\n  const domainsRoot = options.domainsRoot ?? path.join(projectRoot, 'domains');\n\n  // Discover or use provided known owners\n  let knownOwners = null;\n  if (options.knownOwners) {\n    knownOwners = options.knownOwners instanceof Set\n      ? options.knownOwners\n      : new Set(options.knownOwners);\n  } else {\n    knownOwners = discoverKnownOwners(projectRoot, {\n      manifestPath: options.manifestPath,\n      allowedComponents: options.allowedComponents,\n      allowedDomains: options.allowedDomains,\n    });\n  }\n\n  const collected = [];\n  const idToPaths = new Map();\n\n  // 1. Core / platform instructions\n  if (fs.existsSync(coreRoot)) {\n    const files = scanMarkdownFiles(coreRoot, options.coreRoot ? coreRoot : projectRoot);\n    for (const fullPath of files) {\n      const sourcePath = toPosixPath(path.relative(projectRoot, fullPath));\n      const content = fs.readFileSync(fullPath, 'utf8');\n      const { meta, body, rawContent } = extractInstructionFrontmatter(content, sourcePath);\n      const unit = compileInstructionUnit(meta, body, rawContent, {\n        projectRoot,\n        fullPath,\n        sourcePath,\n        rootType: 'platform',"
-      },
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl"
-    },
-    {
-      "file": "src/setup/instruction-registry.mjs",
-      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
-      "kind": "dynamicTraces",
-      "id": "dynamic-013990",
-      "change": {
-        "id": "dynamic-013990",
-        "oldOutcome": {
-          "admission": "ADMIT",
-          "disposition": "preserve",
-          "sourceSpans": null,
-          "coCutPaths": null
-        },
-        "newOutcome": {
-          "admission": "REJECT",
-          "disposition": "preserve",
-          "sourceSpans": null,
-          "coCutPaths": null
-        }
-      },
-      "record": {
-        "proofCommand": null,
-        "parityObligation": null,
-        "id": "dynamic-013990",
-        "originalTuple": [
-          591,
-          8,
-          591,
-          71,
-          "componentsRoot: (internal/test-only) custom path to components/",
-          "config/default-root",
-          true,
-          "comment"
-        ],
-        "inventoryOrigins": [
-          "step-02l-census-class6.json"
-        ],
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "admission": "REJECT",
-        "disposition": "preserve",
-        "currentLine": 591,
-        "currentPassage": {
-          "startLine": 589,
-          "endLine": 593,
-          "text": " * Options:\n *   - coreRoot: (internal/test-only) custom path to core/instructions/\n *   - componentsRoot: (internal/test-only) custom path to components/\n *   - domainsRoot: (internal/test-only) custom path to domains/\n *   - manifestPath: (internal/test-only) custom path to architecture manifest"
-        },
-        "caller": {
-          "line": 457,
-          "declaration": "export function discoverKnownOwners(projectRoot, options = {}) {"
-        },
-        "inputs": [
-          "componentsRoot: (internal/test-only) custom path to components/"
-        ],
-        "role": "non-document-operation",
-        "targetSetOrConstruction": null,
-        "stateExportDependency": null,
-        "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'componentsRoot: (internal/test-only) custom path to components/'. Pinned current passage: ' * Options:\\n *   - coreRoot: (internal/test-only) custom path to core/instructions/\\n *   - componentsRoot: (internal/test-only) custom path to components/\\n *   - domainsRoot: (internal/test-only) custom path to domains/\\n *   - manifestPath: (internal/test-only) custom path to architecture manifest'",
-        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'componentsRoot: (internal/test-only) custom path to components/'. Pinned current passage: ' * Options:\\n *   - coreRoot: (internal/test-only) custom path to core/instructions/\\n *   - componentsRoot: (internal/test-only) custom path to components/\\n *   - domainsRoot: (internal/test-only) custom path to domains/\\n *   - manifestPath: (internal/test-only) custom path to architecture manifest'",
-        "blockedSeams": [],
-        "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
-      },
-      "window": {
-        "startLine": 551,
-        "endLine": 631,
-        "text": "  }\n\n  concat(...items) {\n    const results = Array.prototype.concat.call(this, ...items);\n    return new InstructionRegistry(...results);\n  }\n\n  findByOwner(owner) {\n    return this.filter((u) => u.owner === owner);\n  }\n\n  findByKind(kind) {\n    return this.filter((u) => u.kind === kind);\n  }\n\n  findByAuthority(authorityType) {\n    return this.filter((u) => u.authority.type === authorityType);\n  }\n\n  findByScope(scope) {\n    return this.filter((u) => u.scope === scope);\n  }\n}\n\n/**\n * Discover canonical instruction sources from:\n *   - core/instructions/\n *   - components/<component>/instructions/\n *   - domains/<domain>/instructions/\n *\n * In production default discovery, instruction sources are strictly discovered\n * from within projectRoot. Allowed component and domain owners are authoritatively\n * resolved from docs/architecture-manifest.json. Unregistered default roots are rejected.\n *\n * Custom roots (coreRoot, componentsRoot, domainsRoot) are test-only/internal options\n * intended solely for test harness fixture isolation and cannot be used by production\n * default discovery.\n *\n * Options:\n *   - coreRoot: (internal/test-only) custom path to core/instructions/\n *   - componentsRoot: (internal/test-only) custom path to components/\n *   - domainsRoot: (internal/test-only) custom path to domains/\n *   - manifestPath: (internal/test-only) custom path to architecture manifest\n *   - knownOwners: Set or Array of valid owner names (internal/test-only override)\n *   - allowDuplicates: boolean (default false, throws on duplicate id)\n */\nexport function discoverInstructionSources(projectRoot, options = {}) {\n  const coreRoot = options.coreRoot ?? path.join(projectRoot, 'core', 'instructions');\n  const componentsRoot = options.componentsRoot ?? path.join(projectRoot, 'components');\n  const domainsRoot = options.domainsRoot ?? path.join(projectRoot, 'domains');\n\n  // Discover or use provided known owners\n  let knownOwners = null;\n  if (options.knownOwners) {\n    knownOwners = options.knownOwners instanceof Set\n      ? options.knownOwners\n      : new Set(options.knownOwners);\n  } else {\n    knownOwners = discoverKnownOwners(projectRoot, {\n      manifestPath: options.manifestPath,\n      allowedComponents: options.allowedComponents,\n      allowedDomains: options.allowedDomains,\n    });\n  }\n\n  const collected = [];\n  const idToPaths = new Map();\n\n  // 1. Core / platform instructions\n  if (fs.existsSync(coreRoot)) {\n    const files = scanMarkdownFiles(coreRoot, options.coreRoot ? coreRoot : projectRoot);\n    for (const fullPath of files) {\n      const sourcePath = toPosixPath(path.relative(projectRoot, fullPath));\n      const content = fs.readFileSync(fullPath, 'utf8');\n      const { meta, body, rawContent } = extractInstructionFrontmatter(content, sourcePath);\n      const unit = compileInstructionUnit(meta, body, rawContent, {\n        projectRoot,\n        fullPath,\n        sourcePath,\n        rootType: 'platform',\n        rootOwner: 'core',"
-      },
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl"
     }
   ]
 }

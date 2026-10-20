@@ -1,0 +1,3066 @@
+{
+  "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+  "part": 31,
+  "items": [
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 663,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014749",
+        "originalTuple": [
+          5870,
+          16,
+          5870,
+          86,
+          "`strict confinement not ready: ${[...missing, ...invalid].join('; ')}`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5889,
+        "currentPassage": {
+          "startLine": 5887,
+          "endLine": 5891,
+          "text": "    return {\n      passed: false,\n      message: `strict confinement not ready: ${[...missing, ...invalid].join('; ')}`,\n    };\n  }"
+        },
+        "caller": {
+          "line": 5851,
+          "declaration": "export function checkConfinementStrictReadiness(cwd) {"
+        },
+        "inputs": [
+          "`strict confinement not ready: ${[...missing, ...invalid].join('; ')}`"
+        ],
+        "role": "scalar/thread",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"`strict confinement not ready: ${[...missing, ...invalid].join('; ')}`\"",
+        "reason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"`strict confinement not ready: ${[...missing, ...invalid].join('; ')}`\"",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 664,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014750",
+        "originalTuple": [
+          5878,
+          18,
+          5878,
+          71,
+          "`strict confinement not ready: ${missing.join('; ')}`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5897,
+        "currentPassage": {
+          "startLine": 5895,
+          "endLine": 5899,
+          "text": "      return {\n        passed: false,\n        message: `strict confinement not ready: ${missing.join('; ')}`,\n      };\n    }"
+        },
+        "caller": {
+          "line": 5851,
+          "declaration": "export function checkConfinementStrictReadiness(cwd) {"
+        },
+        "inputs": [
+          "`strict confinement not ready: ${missing.join('; ')}`"
+        ],
+        "role": "scalar/thread",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"`strict confinement not ready: ${missing.join('; ')}`\"",
+        "reason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"`strict confinement not ready: ${missing.join('; ')}`\"",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 665,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014751",
+        "originalTuple": [
+          5883,
+          16,
+          5883,
+          78,
+          "`warning: strict confinement disabled (${missing.join('; ')})`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5902,
+        "currentPassage": {
+          "startLine": 5900,
+          "endLine": 5904,
+          "text": "    return {\n      passed: true,\n      message: `warning: strict confinement disabled (${missing.join('; ')})`,\n    };\n  }"
+        },
+        "caller": {
+          "line": 5851,
+          "declaration": "export function checkConfinementStrictReadiness(cwd) {"
+        },
+        "inputs": [
+          "`warning: strict confinement disabled (${missing.join('; ')})`"
+        ],
+        "role": "scalar/thread",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"`warning: strict confinement disabled (${missing.join('; ')})`\"",
+        "reason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"`warning: strict confinement disabled (${missing.join('; ')})`\"",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 666,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014752",
+        "originalTuple": [
+          5891,
+          18,
+          5891,
+          90,
+          "`strict confinement not ready: bwrap not ready (${bwrapResult.message})`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5910,
+        "currentPassage": {
+          "startLine": 5908,
+          "endLine": 5912,
+          "text": "      return {\n        passed: false,\n        message: `strict confinement not ready: bwrap not ready (${bwrapResult.message})`,\n      };\n    }"
+        },
+        "caller": {
+          "line": 5851,
+          "declaration": "export function checkConfinementStrictReadiness(cwd) {"
+        },
+        "inputs": [
+          "`strict confinement not ready: bwrap not ready (${bwrapResult.message})`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`strict confinement not ready: bwrap not ready (${bwrapResult.message})`'. It formats values at export function checkConfinementStrictReadiness(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`strict confinement not ready: bwrap not ready (${bwrapResult.message})`'. It formats values at export function checkConfinementStrictReadiness(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 667,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014753",
+        "originalTuple": [
+          5896,
+          16,
+          5896,
+          96,
+          "`warning: strict confinement disabled; bwrap not ready (${bwrapResult.message})`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5915,
+        "currentPassage": {
+          "startLine": 5913,
+          "endLine": 5917,
+          "text": "    return {\n      passed: true,\n      message: `warning: strict confinement disabled; bwrap not ready (${bwrapResult.message})`,\n    };\n  }"
+        },
+        "caller": {
+          "line": 5851,
+          "declaration": "export function checkConfinementStrictReadiness(cwd) {"
+        },
+        "inputs": [
+          "`warning: strict confinement disabled; bwrap not ready (${bwrapResult.message})`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`warning: strict confinement disabled; bwrap not ready (${bwrapResult.message})`'. It formats values at export function checkConfinementStrictReadiness(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`warning: strict confinement disabled; bwrap not ready (${bwrapResult.message})`'. It formats values at export function checkConfinementStrictReadiness(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 668,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014754",
+        "originalTuple": [
+          590,
+          31,
+          590,
+          111,
+          "`${level} runner.patterns.reviewed.checkersByRigor has unknown rigor \"${rigor}\"`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 594,
+        "currentPassage": {
+          "startLine": 592,
+          "endLine": 596,
+          "text": "            for (const [rigor, checkers] of Object.entries(cbr)) {\n              if (!RIGOR_VALUES.includes(rigor)) {\n                problems.push(`${level} runner.patterns.reviewed.checkersByRigor has unknown rigor \"${rigor}\"`);\n              }\n              if (!Array.isArray(checkers) || !checkers.every((c) => VALID_CHECKERS.has(c))) {"
+        },
+        "caller": {
+          "line": 547,
+          "declaration": "export function checkRunnerPatternsConfig(cwd) {"
+        },
+        "inputs": [
+          "`${level} runner.patterns.reviewed.checkersByRigor has unknown rigor \"${rigor}\"`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} runner.patterns.reviewed.checkersByRigor has unknown rigor \"${rigor}\"`'. It formats values at export function checkRunnerPatternsConfig(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} runner.patterns.reviewed.checkersByRigor has unknown rigor \"${rigor}\"`'. It formats values at export function checkRunnerPatternsConfig(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 669,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014755",
+        "originalTuple": [
+          5917,
+          37,
+          5917,
+          111,
+          "`runner config not readable, herdr maturity check skipped: ${err.message}`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5936,
+        "currentPassage": {
+          "startLine": 5934,
+          "endLine": 5938,
+          "text": "    runner = readSharedConfig(cwd)?.runner;\n  } catch (err) {\n    return { passed: true, message: `runner config not readable, herdr maturity check skipped: ${err.message}` };\n  }\n  const executors = runner?.executors || {};"
+        },
+        "caller": {
+          "line": 5931,
+          "declaration": "export function checkConfinementHerdrMaturity(cwd) {"
+        },
+        "inputs": [
+          "`runner config not readable, herdr maturity check skipped: ${err.message}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`runner config not readable, herdr maturity check skipped: ${err.message}`'. It formats values at export function checkConfinementHerdrMaturity(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`runner config not readable, herdr maturity check skipped: ${err.message}`'. It formats values at export function checkConfinementHerdrMaturity(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 670,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014756",
+        "originalTuple": [
+          593,
+          31,
+          593,
+          165,
+          "`${level} runner.patterns.reviewed.checkersByRigor.${rigor} must be an array of strings in [${Array.from(VALID_CHECKERS).join(', ')}]`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 597,
+        "currentPassage": {
+          "startLine": 595,
+          "endLine": 599,
+          "text": "              }\n              if (!Array.isArray(checkers) || !checkers.every((c) => VALID_CHECKERS.has(c))) {\n                problems.push(`${level} runner.patterns.reviewed.checkersByRigor.${rigor} must be an array of strings in [${Array.from(VALID_CHECKERS).join(', ')}]`);\n              }\n            }"
+        },
+        "caller": {
+          "line": 547,
+          "declaration": "export function checkRunnerPatternsConfig(cwd) {"
+        },
+        "inputs": [
+          "`${level} runner.patterns.reviewed.checkersByRigor.${rigor} must be an array of strings in [${Array.from(VALID_CHECKERS).join(', ')}]`"
+        ],
+        "role": "scalar/thread",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"`${level} runner.patterns.reviewed.checkersByRigor.${rigor} must be an array of strings in [${Array.from(VALID_CHECKERS).join(', ')}]`\"",
+        "reason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"`${level} runner.patterns.reviewed.checkersByRigor.${rigor} must be an array of strings in [${Array.from(VALID_CHECKERS).join(', ')}]`\"",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 671,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014757",
+        "originalTuple": [
+          5954,
+          16,
+          5954,
+          138,
+          "`herdr confinement maturity check failed: executors declare bypass without full confinement (${invalidBypass.join(', ')})`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5973,
+        "currentPassage": {
+          "startLine": 5971,
+          "endLine": 5975,
+          "text": "      passed: false,\n      maturity: 'invalid',\n      message: `herdr confinement maturity check failed: executors declare bypass without full confinement (${invalidBypass.join(', ')})`,\n    };\n  }"
+        },
+        "caller": {
+          "line": 5931,
+          "declaration": "export function checkConfinementHerdrMaturity(cwd) {"
+        },
+        "inputs": [
+          "`herdr confinement maturity check failed: executors declare bypass without full confinement (${invalidBypass.join(', ')})`"
+        ],
+        "role": "scalar/thread",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"`herdr confinement maturity check failed: executors declare bypass without full confinement (${invalidBypass.join(', ')})`\"",
+        "reason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"`herdr confinement maturity check failed: executors declare bypass without full confinement (${invalidBypass.join(', ')})`\"",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 672,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014758",
+        "originalTuple": [
+          5961,
+          14,
+          5961,
+          177,
+          "`herdr confinement maturity: partial (${herdrExecutors.length} herdr-spawn executor(s); pre-adapter validation under Authority, session/home lifecycle in adapter)`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5980,
+        "currentPassage": {
+          "startLine": 5978,
+          "endLine": 5982,
+          "text": "    passed: true,\n    maturity: 'partial',\n    message: `herdr confinement maturity: partial (${herdrExecutors.length} herdr-spawn executor(s); pre-adapter validation under Authority, session/home lifecycle in adapter)`,\n  };\n}"
+        },
+        "caller": {
+          "line": 5931,
+          "declaration": "export function checkConfinementHerdrMaturity(cwd) {"
+        },
+        "inputs": [
+          "`herdr confinement maturity: partial (${herdrExecutors.length} herdr-spawn executor(s); pre-adapter validation under Authority, session/home lifecycle in adapter)`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`herdr confinement maturity: partial (${herdrExecutors.length} herdr-spawn executor(s); pre-adapter validation under Authority, session/home lifecycle in adapter)`'. It formats values at export function checkConfinementHerdrMaturity(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`herdr confinement maturity: partial (${herdrExecutors.length} herdr-spawn executor(s); pre-adapter validation under Authority, session/home lifecycle in adapter)`'. It formats values at export function checkConfinementHerdrMaturity(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 673,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014759",
+        "originalTuple": [
+          5973,
+          23,
+          5973,
+          74,
+          "path.join(cwd, '.fgos', 'coordination', 'sessions')",
+          "path-call",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5992,
+        "currentPassage": {
+          "startLine": 5990,
+          "endLine": 5994,
+          "text": "// --- coordination session abandoned claims check ---\nfunction getAbandonedClaims(cwd) {\n  const sessionsDir = path.join(cwd, '.fgos', 'coordination', 'sessions');\n  if (!fs.existsSync(sessionsDir)) return { deadClaims: [], unknownStale: [], sessionsDir };\n"
+        },
+        "caller": {
+          "line": 5991,
+          "declaration": "function getAbandonedClaims(cwd) {"
+        },
+        "inputs": [
+          "path.join(cwd, '.fgos', 'coordination', 'sessions')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function getAbandonedClaims(cwd) { config/default/check operation \"path.join(cwd, '.fgos', 'coordination', 'sessions')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function getAbandonedClaims(cwd) { config/default/check operation \"path.join(cwd, '.fgos', 'coordination', 'sessions')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 674,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014760",
+        "originalTuple": [
+          5973,
+          9,
+          5973,
+          36,
+          "sessionsDir = path.join(cwd",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5992,
+        "currentPassage": {
+          "startLine": 5990,
+          "endLine": 5994,
+          "text": "// --- coordination session abandoned claims check ---\nfunction getAbandonedClaims(cwd) {\n  const sessionsDir = path.join(cwd, '.fgos', 'coordination', 'sessions');\n  if (!fs.existsSync(sessionsDir)) return { deadClaims: [], unknownStale: [], sessionsDir };\n"
+        },
+        "caller": {
+          "line": 5991,
+          "declaration": "function getAbandonedClaims(cwd) {"
+        },
+        "inputs": [
+          "sessionsDir = path.join(cwd"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function getAbandonedClaims(cwd) { config/default/check operation 'sessionsDir = path.join(cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function getAbandonedClaims(cwd) { config/default/check operation 'sessionsDir = path.join(cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 675,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014761",
+        "originalTuple": [
+          5985,
+          13,
+          5985,
+          45,
+          "fullPath = path.join(sessionsDir",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6004,
+        "currentPassage": {
+          "startLine": 6002,
+          "endLine": 6006,
+          "text": "    if (!entry.isDirectory()) continue;\n    if (entry.name.endsWith('.claim') || entry.name.startsWith('.staging-')) {\n      const fullPath = path.join(sessionsDir, entry.name);\n      try {\n        const stats = fs.statSync(fullPath);"
+        },
+        "caller": {
+          "line": 5991,
+          "declaration": "function getAbandonedClaims(cwd) {"
+        },
+        "inputs": [
+          "fullPath = path.join(sessionsDir"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function getAbandonedClaims(cwd) { config/default/check operation 'fullPath = path.join(sessionsDir' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function getAbandonedClaims(cwd) { config/default/check operation 'fullPath = path.join(sessionsDir' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 676,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014762",
+        "originalTuple": [
+          5985,
+          24,
+          5985,
+          58,
+          "path.join(sessionsDir, entry.name)",
+          "path-call",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6004,
+        "currentPassage": {
+          "startLine": 6002,
+          "endLine": 6006,
+          "text": "    if (!entry.isDirectory()) continue;\n    if (entry.name.endsWith('.claim') || entry.name.startsWith('.staging-')) {\n      const fullPath = path.join(sessionsDir, entry.name);\n      try {\n        const stats = fs.statSync(fullPath);"
+        },
+        "caller": {
+          "line": 5991,
+          "declaration": "function getAbandonedClaims(cwd) {"
+        },
+        "inputs": [
+          "path.join(sessionsDir, entry.name)"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function getAbandonedClaims(cwd) { config/default/check operation 'path.join(sessionsDir, entry.name)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function getAbandonedClaims(cwd) { config/default/check operation 'path.join(sessionsDir, entry.name)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 677,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014763",
+        "originalTuple": [
+          5993,
+          17,
+          5993,
+          51,
+          "claimJsonPath = path.join(fullPath",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6012,
+        "currentPassage": {
+          "startLine": 6010,
+          "endLine": 6014,
+          "text": "\n        if (entry.name.endsWith('.claim')) {\n          const claimJsonPath = path.join(fullPath, 'claim.json');\n          if (fs.existsSync(claimJsonPath)) {\n            try {"
+        },
+        "caller": {
+          "line": 5991,
+          "declaration": "function getAbandonedClaims(cwd) {"
+        },
+        "inputs": [
+          "claimJsonPath = path.join(fullPath"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function getAbandonedClaims(cwd) { config/default/check operation 'claimJsonPath = path.join(fullPath' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function getAbandonedClaims(cwd) { config/default/check operation 'claimJsonPath = path.join(fullPath' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 678,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014764",
+        "originalTuple": [
+          5993,
+          33,
+          5993,
+          66,
+          "path.join(fullPath, 'claim.json')",
+          "path-call",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6012,
+        "currentPassage": {
+          "startLine": 6010,
+          "endLine": 6014,
+          "text": "\n        if (entry.name.endsWith('.claim')) {\n          const claimJsonPath = path.join(fullPath, 'claim.json');\n          if (fs.existsSync(claimJsonPath)) {\n            try {"
+        },
+        "caller": {
+          "line": 5991,
+          "declaration": "function getAbandonedClaims(cwd) {"
+        },
+        "inputs": [
+          "path.join(fullPath, 'claim.json')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function getAbandonedClaims(cwd) { config/default/check operation \"path.join(fullPath, 'claim.json')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function getAbandonedClaims(cwd) { config/default/check operation \"path.join(fullPath, 'claim.json')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 679,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014765",
+        "originalTuple": [
+          604,
+          33,
+          604,
+          155,
+          "`${level} runner.patterns.reviewed.checkersByRigor is not cumulative: \"${stronger}\" missing \"${checker}\" from \"${weaker}\"`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 608,
+        "currentPassage": {
+          "startLine": 606,
+          "endLine": 610,
+          "text": "              for (const checker of weakerSet) {\n                if (!strongerSet.has(checker)) {\n                  problems.push(`${level} runner.patterns.reviewed.checkersByRigor is not cumulative: \"${stronger}\" missing \"${checker}\" from \"${weaker}\"`);\n                }\n              }"
+        },
+        "caller": {
+          "line": 600,
+          "declaration": "const orderedRigors = ['low', 'standard', 'high', 'critical'].filter((r) => r in cbr);"
+        },
+        "inputs": [
+          "`${level} runner.patterns.reviewed.checkersByRigor is not cumulative: \"${stronger}\" missing \"${checker}\" from \"${weaker}\"`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} runner.patterns.reviewed.checkersByRigor is not cumulative: \"${stronger}\" missing \"${checker}\" from \"${weaker}\"`'. It formats values at const orderedRigors = ['low', 'standard', 'high', 'critical'].filter((r) => r in cbr);; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} runner.patterns.reviewed.checkersByRigor is not cumulative: \"${stronger}\" missing \"${checker}\" from \"${weaker}\"`'. It formats values at const orderedRigors = ['low', 'standard', 'high', 'critical'].filter((r) => r in cbr);; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 680,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014766",
+        "originalTuple": [
+          6040,
+          24,
+          6040,
+          38,
+          "`/proc/${pid}`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6059,
+        "currentPassage": {
+          "startLine": 6057,
+          "endLine": 6061,
+          "text": "function processStartFingerprint(pid) {\n  try {\n    return fs.statSync(`/proc/${pid}`).mtimeMs;\n  } catch (err) {\n    if (err && err.code === 'ENOENT') {"
+        },
+        "caller": {
+          "line": 6057,
+          "declaration": "function processStartFingerprint(pid) {"
+        },
+        "inputs": [
+          "`/proc/${pid}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`/proc/${pid}`'. It formats values at function processStartFingerprint(pid) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`/proc/${pid}`'. It formats values at function processStartFingerprint(pid) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 681,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014767",
+        "originalTuple": [
+          6064,
+          18,
+          6064,
+          166,
+          "`Found ${deadClaims.length} demonstrably dead claims and ${unknownStale.length} stale unknown items. Run fgos doctor --fix to remove the dead ones.`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6083,
+        "currentPassage": {
+          "startLine": 6081,
+          "endLine": 6085,
+          "text": "      return {\n        passed: false,\n        message: `Found ${deadClaims.length} demonstrably dead claims and ${unknownStale.length} stale unknown items. Run fgos doctor --fix to remove the dead ones.`\n      };\n    } else if (unknownStale.length > 0) {"
+        },
+        "caller": {
+          "line": 6057,
+          "declaration": "function processStartFingerprint(pid) {"
+        },
+        "inputs": [
+          "`Found ${deadClaims.length} demonstrably dead claims and ${unknownStale.length} stale unknown items. Run fgos doctor --fix to remove the dead ones.`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`Found ${deadClaims.length} demonstrably dead claims and ${unknownStale.length} stale unknown items. Run fgos doctor --fix to remove the dead ones.`'. It formats values at function processStartFingerprint(pid) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`Found ${deadClaims.length} demonstrably dead claims and ${unknownStale.length} stale unknown items. Run fgos doctor --fix to remove the dead ones.`'. It formats values at function processStartFingerprint(pid) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 682,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014768",
+        "originalTuple": [
+          6069,
+          18,
+          6069,
+          159,
+          "`Found ${unknownStale.length} stale claim/staging items with unknown ownership (e.g. ${unknownStale[0]}). Leaving them intact (no auto-fix).`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6088,
+        "currentPassage": {
+          "startLine": 6086,
+          "endLine": 6090,
+          "text": "      return {\n        passed: false,\n        message: `Found ${unknownStale.length} stale claim/staging items with unknown ownership (e.g. ${unknownStale[0]}). Leaving them intact (no auto-fix).`\n      };\n    }"
+        },
+        "caller": {
+          "line": 6057,
+          "declaration": "function processStartFingerprint(pid) {"
+        },
+        "inputs": [
+          "`Found ${unknownStale.length} stale claim/staging items with unknown ownership (e.g. ${unknownStale[0]}). Leaving them intact (no auto-fix).`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`Found ${unknownStale.length} stale claim/staging items with unknown ownership (e.g. ${unknownStale[0]}). Leaving them intact (no auto-fix).`'. It formats values at function processStartFingerprint(pid) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`Found ${unknownStale.length} stale claim/staging items with unknown ownership (e.g. ${unknownStale[0]}). Leaving them intact (no auto-fix).`'. It formats values at function processStartFingerprint(pid) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 683,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014769",
+        "originalTuple": [
+          6086,
+          15,
+          6086,
+          47,
+          "fullPath = path.join(sessionsDir",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6105,
+        "currentPassage": {
+          "startLine": 6103,
+          "endLine": 6107,
+          "text": "    for (const claim of deadClaims) {\n      try {\n        const fullPath = path.join(sessionsDir, claim.name);\n        if (claim.name.endsWith('.claim')) {\n          const claimJsonPath = path.join(fullPath, 'claim.json');"
+        },
+        "caller": {
+          "line": 6057,
+          "declaration": "function processStartFingerprint(pid) {"
+        },
+        "inputs": [
+          "fullPath = path.join(sessionsDir"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function processStartFingerprint(pid) { config/default/check operation 'fullPath = path.join(sessionsDir' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function processStartFingerprint(pid) { config/default/check operation 'fullPath = path.join(sessionsDir' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 684,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014770",
+        "originalTuple": [
+          6086,
+          26,
+          6086,
+          60,
+          "path.join(sessionsDir, claim.name)",
+          "path-call",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6105,
+        "currentPassage": {
+          "startLine": 6103,
+          "endLine": 6107,
+          "text": "    for (const claim of deadClaims) {\n      try {\n        const fullPath = path.join(sessionsDir, claim.name);\n        if (claim.name.endsWith('.claim')) {\n          const claimJsonPath = path.join(fullPath, 'claim.json');"
+        },
+        "caller": {
+          "line": 6057,
+          "declaration": "function processStartFingerprint(pid) {"
+        },
+        "inputs": [
+          "path.join(sessionsDir, claim.name)"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function processStartFingerprint(pid) { config/default/check operation 'path.join(sessionsDir, claim.name)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function processStartFingerprint(pid) { config/default/check operation 'path.join(sessionsDir, claim.name)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 685,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014771",
+        "originalTuple": [
+          6088,
+          17,
+          6088,
+          51,
+          "claimJsonPath = path.join(fullPath",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6107,
+        "currentPassage": {
+          "startLine": 6105,
+          "endLine": 6109,
+          "text": "        const fullPath = path.join(sessionsDir, claim.name);\n        if (claim.name.endsWith('.claim')) {\n          const claimJsonPath = path.join(fullPath, 'claim.json');\n          if (fs.existsSync(claimJsonPath)) {\n            const claimData = JSON.parse(fs.readFileSync(claimJsonPath, 'utf8'));"
+        },
+        "caller": {
+          "line": 6057,
+          "declaration": "function processStartFingerprint(pid) {"
+        },
+        "inputs": [
+          "claimJsonPath = path.join(fullPath"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function processStartFingerprint(pid) { config/default/check operation 'claimJsonPath = path.join(fullPath' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function processStartFingerprint(pid) { config/default/check operation 'claimJsonPath = path.join(fullPath' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 686,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014772",
+        "originalTuple": [
+          6088,
+          33,
+          6088,
+          66,
+          "path.join(fullPath, 'claim.json')",
+          "path-call",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6107,
+        "currentPassage": {
+          "startLine": 6105,
+          "endLine": 6109,
+          "text": "        const fullPath = path.join(sessionsDir, claim.name);\n        if (claim.name.endsWith('.claim')) {\n          const claimJsonPath = path.join(fullPath, 'claim.json');\n          if (fs.existsSync(claimJsonPath)) {\n            const claimData = JSON.parse(fs.readFileSync(claimJsonPath, 'utf8'));"
+        },
+        "caller": {
+          "line": 6057,
+          "declaration": "function processStartFingerprint(pid) {"
+        },
+        "inputs": [
+          "path.join(fullPath, 'claim.json')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function processStartFingerprint(pid) { config/default/check operation \"path.join(fullPath, 'claim.json')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function processStartFingerprint(pid) { config/default/check operation \"path.join(fullPath, 'claim.json')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 687,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014773",
+        "originalTuple": [
+          6121,
+          9,
+          6121,
+          99,
+          "`Removed ${removed} dead claims. Note: ${unknownStale.length} stale unknown items remain.`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6140,
+        "currentPassage": {
+          "startLine": 6138,
+          "endLine": 6142,
+          "text": "    }\n    const msg = unknownStale.length > 0\n      ? `Removed ${removed} dead claims. Note: ${unknownStale.length} stale unknown items remain.`\n      : `Removed ${removed} dead claims`;\n    return { changed: removed > 0, message: msg };"
+        },
+        "caller": {
+          "line": 6057,
+          "declaration": "function processStartFingerprint(pid) {"
+        },
+        "inputs": [
+          "`Removed ${removed} dead claims. Note: ${unknownStale.length} stale unknown items remain.`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`Removed ${removed} dead claims. Note: ${unknownStale.length} stale unknown items remain.`'. It formats values at function processStartFingerprint(pid) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`Removed ${removed} dead claims. Note: ${unknownStale.length} stale unknown items remain.`'. It formats values at function processStartFingerprint(pid) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 688,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014774",
+        "originalTuple": [
+          6122,
+          9,
+          6122,
+          41,
+          "`Removed ${removed} dead claims`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6141,
+        "currentPassage": {
+          "startLine": 6139,
+          "endLine": 6143,
+          "text": "    const msg = unknownStale.length > 0\n      ? `Removed ${removed} dead claims. Note: ${unknownStale.length} stale unknown items remain.`\n      : `Removed ${removed} dead claims`;\n    return { changed: removed > 0, message: msg };\n  }"
+        },
+        "caller": {
+          "line": 6057,
+          "declaration": "function processStartFingerprint(pid) {"
+        },
+        "inputs": [
+          "`Removed ${removed} dead claims`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`Removed ${removed} dead claims`'. It formats values at function processStartFingerprint(pid) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`Removed ${removed} dead claims`'. It formats values at function processStartFingerprint(pid) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 689,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014775",
+        "originalTuple": [
+          6132,
+          11,
+          6132,
+          37,
+          "configPath = path.join(cwd",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6151,
+        "currentPassage": {
+          "startLine": 6149,
+          "endLine": 6153,
+          "text": "  description: 'runner.coordination.orgPolicy.dischargeOn is a valid array of strings if present',\n  check: (cwd) => {\n    const configPath = path.join(cwd, '.fgos', 'config.json');\n    if (!fs.existsSync(configPath)) return { passed: true };\n"
+        },
+        "caller": {
+          "line": 6057,
+          "declaration": "function processStartFingerprint(pid) {"
+        },
+        "inputs": [
+          "configPath = path.join(cwd"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function processStartFingerprint(pid) { config/default/check operation 'configPath = path.join(cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function processStartFingerprint(pid) { config/default/check operation 'configPath = path.join(cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 690,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014776",
+        "originalTuple": [
+          6132,
+          24,
+          6132,
+          62,
+          "path.join(cwd, '.fgos', 'config.json')",
+          "path-call",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6151,
+        "currentPassage": {
+          "startLine": 6149,
+          "endLine": 6153,
+          "text": "  description: 'runner.coordination.orgPolicy.dischargeOn is a valid array of strings if present',\n  check: (cwd) => {\n    const configPath = path.join(cwd, '.fgos', 'config.json');\n    if (!fs.existsSync(configPath)) return { passed: true };\n"
+        },
+        "caller": {
+          "line": 6057,
+          "declaration": "function processStartFingerprint(pid) {"
+        },
+        "inputs": [
+          "path.join(cwd, '.fgos', 'config.json')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function processStartFingerprint(pid) { config/default/check operation \"path.join(cwd, '.fgos', 'config.json')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function processStartFingerprint(pid) { config/default/check operation \"path.join(cwd, '.fgos', 'config.json')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 691,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014777",
+        "originalTuple": [
+          6146,
+          42,
+          6146,
+          221,
+          "`runner.coordination.orgPolicy.dischargeOn must be an array of non-empty strings. Run fgos doctor --fix to reset to ${JSON.stringify([...DEFAULT_COORDINATION_ORG_DISCHARGE_ON])}.`",
+          "template-string",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6165,
+        "currentPassage": {
+          "startLine": 6163,
+          "endLine": 6167,
+          "text": "      const orgDischargeOn = orgPolicy.dischargeOn;\n      if (!Array.isArray(orgDischargeOn) || !orgDischargeOn.every(d => typeof d === 'string' && d.length > 0)) {\n        return { passed: false, message: `runner.coordination.orgPolicy.dischargeOn must be an array of non-empty strings. Run fgos doctor --fix to reset to ${JSON.stringify([...DEFAULT_COORDINATION_ORG_DISCHARGE_ON])}.` };\n      }\n    }"
+        },
+        "caller": {
+          "line": 6057,
+          "declaration": "function processStartFingerprint(pid) {"
+        },
+        "inputs": [
+          "`runner.coordination.orgPolicy.dischargeOn must be an array of non-empty strings. Run fgos doctor --fix to reset to ${JSON.stringify([...DEFAULT_COORDINATION_ORG_DISCHARGE_ON])}.`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`runner.coordination.orgPolicy.dischargeOn must be an array of non-empty strings. Run fgos doctor --fix to reset to ${JSON.stringify([...DEFAULT_COORDINATION_ORG_DISCHARGE_ON])}.`'. It formats values at function processStartFingerprint(pid) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`runner.coordination.orgPolicy.dischargeOn must be an array of non-empty strings. Run fgos doctor --fix to reset to ${JSON.stringify([...DEFAULT_COORDINATION_ORG_DISCHARGE_ON])}.`'. It formats values at function processStartFingerprint(pid) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 692,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014778",
+        "originalTuple": [
+          615,
+          38,
+          615,
+          57,
+          "problems.join('; ')",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 619,
+        "currentPassage": {
+          "startLine": 617,
+          "endLine": 621,
+          "text": "\n  if (problems.length > 0) {\n    return { passed: false, message: problems.join('; ') };\n  }\n  if (warnings.length > 0) {"
+        },
+        "caller": {
+          "line": 600,
+          "declaration": "const orderedRigors = ['low', 'standard', 'high', 'critical'].filter((r) => r in cbr);"
+        },
+        "inputs": [
+          "problems.join('; ')"
+        ],
+        "role": "scalar/thread",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"problems.join('; ')\"",
+        "reason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"problems.join('; ')\"",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 693,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014779",
+        "originalTuple": [
+          6156,
+          11,
+          6156,
+          37,
+          "configPath = path.join(cwd",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6175,
+        "currentPassage": {
+          "startLine": 6173,
+          "endLine": 6177,
+          "text": "  id: 'runner-coordination-orgPolicy-shape',\n  fix: (cwd) => {\n    const configPath = path.join(cwd, '.fgos', 'config.json');\n    if (!fs.existsSync(configPath)) return { changed: false };\n"
+        },
+        "caller": {
+          "line": 6057,
+          "declaration": "function processStartFingerprint(pid) {"
+        },
+        "inputs": [
+          "configPath = path.join(cwd"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function processStartFingerprint(pid) { config/default/check operation 'configPath = path.join(cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function processStartFingerprint(pid) { config/default/check operation 'configPath = path.join(cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 694,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014780",
+        "originalTuple": [
+          6156,
+          24,
+          6156,
+          62,
+          "path.join(cwd, '.fgos', 'config.json')",
+          "path-call",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6175,
+        "currentPassage": {
+          "startLine": 6173,
+          "endLine": 6177,
+          "text": "  id: 'runner-coordination-orgPolicy-shape',\n  fix: (cwd) => {\n    const configPath = path.join(cwd, '.fgos', 'config.json');\n    if (!fs.existsSync(configPath)) return { changed: false };\n"
+        },
+        "caller": {
+          "line": 6057,
+          "declaration": "function processStartFingerprint(pid) {"
+        },
+        "inputs": [
+          "path.join(cwd, '.fgos', 'config.json')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function processStartFingerprint(pid) { config/default/check operation \"path.join(cwd, '.fgos', 'config.json')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function processStartFingerprint(pid) { config/default/check operation \"path.join(cwd, '.fgos', 'config.json')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 695,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014781",
+        "originalTuple": [
+          6172,
+          42,
+          6172,
+          164,
+          "`Reset runner.coordination.orgPolicy.dischargeOn to default ${JSON.stringify([...DEFAULT_COORDINATION_ORG_DISCHARGE_ON])}`",
+          "template-string",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6191,
+        "currentPassage": {
+          "startLine": 6189,
+          "endLine": 6193,
+          "text": "        config.runner.coordination.orgPolicy.dischargeOn = [...DEFAULT_COORDINATION_ORG_DISCHARGE_ON];\n        fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + '\\n');\n        return { changed: true, message: `Reset runner.coordination.orgPolicy.dischargeOn to default ${JSON.stringify([...DEFAULT_COORDINATION_ORG_DISCHARGE_ON])}` };\n      }\n    }"
+        },
+        "caller": {
+          "line": 6057,
+          "declaration": "function processStartFingerprint(pid) {"
+        },
+        "inputs": [
+          "`Reset runner.coordination.orgPolicy.dischargeOn to default ${JSON.stringify([...DEFAULT_COORDINATION_ORG_DISCHARGE_ON])}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`Reset runner.coordination.orgPolicy.dischargeOn to default ${JSON.stringify([...DEFAULT_COORDINATION_ORG_DISCHARGE_ON])}`'. It formats values at function processStartFingerprint(pid) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`Reset runner.coordination.orgPolicy.dischargeOn to default ${JSON.stringify([...DEFAULT_COORDINATION_ORG_DISCHARGE_ON])}`'. It formats values at function processStartFingerprint(pid) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 696,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014782",
+        "originalTuple": [
+          618,
+          37,
+          618,
+          70,
+          "`warning: ${warnings.join('; ')}`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 622,
+        "currentPassage": {
+          "startLine": 620,
+          "endLine": 624,
+          "text": "  }\n  if (warnings.length > 0) {\n    return { passed: true, message: `warning: ${warnings.join('; ')}` };\n  }\n  return { passed: true, message: 'runner patterns configuration is valid at every configured level' };"
+        },
+        "caller": {
+          "line": 600,
+          "declaration": "const orderedRigors = ['low', 'standard', 'high', 'critical'].filter((r) => r in cbr);"
+        },
+        "inputs": [
+          "`warning: ${warnings.join('; ')}`"
+        ],
+        "role": "scalar/thread",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"`warning: ${warnings.join('; ')}`\"",
+        "reason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"`warning: ${warnings.join('; ')}`\"",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 697,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014783",
+        "originalTuple": [
+          6189,
+          19,
+          6189,
+          88,
+          "path.join(cwd, '.fgos', 'dispatch', 'shadow-binder-divergence.jsonl')",
+          "path-call",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6208,
+        "currentPassage": {
+          "startLine": 6206,
+          "endLine": 6210,
+          "text": "// ~800 historical stderr.log files.\nfunction checkShadowBinderDivergence(cwd) {\n  const logPath = path.join(cwd, '.fgos', 'dispatch', 'shadow-binder-divergence.jsonl');\n  if (!fs.existsSync(logPath)) {\n    return { passed: true, message: 'no shadow-binder divergence recorded' };"
+        },
+        "caller": {
+          "line": 6207,
+          "declaration": "function checkShadowBinderDivergence(cwd) {"
+        },
+        "inputs": [
+          "path.join(cwd, '.fgos', 'dispatch', 'shadow-binder-divergence.jsonl')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkShadowBinderDivergence(cwd) { config/default/check operation \"path.join(cwd, '.fgos', 'dispatch', 'shadow-binder-divergence.jsonl')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkShadowBinderDivergence(cwd) { config/default/check operation \"path.join(cwd, '.fgos', 'dispatch', 'shadow-binder-divergence.jsonl')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 698,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014784",
+        "originalTuple": [
+          6189,
+          9,
+          6189,
+          32,
+          "logPath = path.join(cwd",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6208,
+        "currentPassage": {
+          "startLine": 6206,
+          "endLine": 6210,
+          "text": "// ~800 historical stderr.log files.\nfunction checkShadowBinderDivergence(cwd) {\n  const logPath = path.join(cwd, '.fgos', 'dispatch', 'shadow-binder-divergence.jsonl');\n  if (!fs.existsSync(logPath)) {\n    return { passed: true, message: 'no shadow-binder divergence recorded' };"
+        },
+        "caller": {
+          "line": 6207,
+          "declaration": "function checkShadowBinderDivergence(cwd) {"
+        },
+        "inputs": [
+          "logPath = path.join(cwd"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkShadowBinderDivergence(cwd) { config/default/check operation 'logPath = path.join(cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkShadowBinderDivergence(cwd) { config/default/check operation 'logPath = path.join(cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 699,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014785",
+        "originalTuple": [
+          6197,
+          37,
+          6197,
+          78,
+          "`${logPath} exists but could not be read`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6216,
+        "currentPassage": {
+          "startLine": 6214,
+          "endLine": 6218,
+          "text": "    lines = fs.readFileSync(logPath, 'utf8').split('\\n').filter((line) => line.trim());\n  } catch {\n    return { passed: true, message: `${logPath} exists but could not be read` };\n  }\n  if (lines.length === 0) {"
+        },
+        "caller": {
+          "line": 6207,
+          "declaration": "function checkShadowBinderDivergence(cwd) {"
+        },
+        "inputs": [
+          "`${logPath} exists but could not be read`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${logPath} exists but could not be read`'. It formats values at function checkShadowBinderDivergence(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${logPath} exists but could not be read`'. It formats values at function checkShadowBinderDivergence(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 700,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014786",
+        "originalTuple": [
+          6208,
+          27,
+          6208,
+          87,
+          "`${last.binder ?? '(unknown)'} at ${last.ts ?? '(unknown)'}`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6227,
+        "currentPassage": {
+          "startLine": 6225,
+          "endLine": 6229,
+          "text": "    last = null;\n  }\n  const lastDesc = last ? `${last.binder ?? '(unknown)'} at ${last.ts ?? '(unknown)'}` : '(last entry unreadable)';\n  return { passed: true, message: `${lines.length} shadow-binder divergence event(s) recorded — most recent: ${lastDesc}` };\n}"
+        },
+        "caller": {
+          "line": 6207,
+          "declaration": "function checkShadowBinderDivergence(cwd) {"
+        },
+        "inputs": [
+          "`${last.binder ?? '(unknown)'} at ${last.ts ?? '(unknown)'}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is \"`${last.binder ?? '(unknown)'} at ${last.ts ?? '(unknown)'}`\". It formats values at function checkShadowBinderDivergence(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is \"`${last.binder ?? '(unknown)'} at ${last.ts ?? '(unknown)'}`\". It formats values at function checkShadowBinderDivergence(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 701,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014787",
+        "originalTuple": [
+          6209,
+          35,
+          6209,
+          122,
+          "`${lines.length} shadow-binder divergence event(s) recorded — most recent: ${lastDesc}`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6228,
+        "currentPassage": {
+          "startLine": 6226,
+          "endLine": 6230,
+          "text": "  }\n  const lastDesc = last ? `${last.binder ?? '(unknown)'} at ${last.ts ?? '(unknown)'}` : '(last entry unreadable)';\n  return { passed: true, message: `${lines.length} shadow-binder divergence event(s) recorded — most recent: ${lastDesc}` };\n}\n"
+        },
+        "caller": {
+          "line": 6207,
+          "declaration": "function checkShadowBinderDivergence(cwd) {"
+        },
+        "inputs": [
+          "`${lines.length} shadow-binder divergence event(s) recorded — most recent: ${lastDesc}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${lines.length} shadow-binder divergence event(s) recorded — most recent: ${lastDesc}`'. It formats values at function checkShadowBinderDivergence(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${lines.length} shadow-binder divergence event(s) recorded — most recent: ${lastDesc}`'. It formats values at function checkShadowBinderDivergence(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 702,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014788",
+        "originalTuple": [
+          6221,
+          9,
+          6221,
+          51,
+          "root = resolveMainCheckoutRoot(cwd) ?? cwd",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6240,
+        "currentPassage": {
+          "startLine": 6238,
+          "endLine": 6242,
+          "text": "\nexport function checkObserveDirWritable(cwd) {\n  const root = resolveMainCheckoutRoot(cwd) ?? cwd;\n  const observeDir = path.join(root, '.fgos', 'observe');\n  try {"
+        },
+        "caller": {
+          "line": 6239,
+          "declaration": "export function checkObserveDirWritable(cwd) {"
+        },
+        "inputs": [
+          "root = resolveMainCheckoutRoot(cwd) ?? cwd"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor export function checkObserveDirWritable(cwd) { config/default/check operation 'root = resolveMainCheckoutRoot(cwd) ?? cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor export function checkObserveDirWritable(cwd) { config/default/check operation 'root = resolveMainCheckoutRoot(cwd) ?? cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 703,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014789",
+        "originalTuple": [
+          6222,
+          22,
+          6222,
+          57,
+          "path.join(root, '.fgos', 'observe')",
+          "path-call",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6241,
+        "currentPassage": {
+          "startLine": 6239,
+          "endLine": 6243,
+          "text": "export function checkObserveDirWritable(cwd) {\n  const root = resolveMainCheckoutRoot(cwd) ?? cwd;\n  const observeDir = path.join(root, '.fgos', 'observe');\n  try {\n    if (!fs.existsSync(observeDir)) {"
+        },
+        "caller": {
+          "line": 6239,
+          "declaration": "export function checkObserveDirWritable(cwd) {"
+        },
+        "inputs": [
+          "path.join(root, '.fgos', 'observe')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor export function checkObserveDirWritable(cwd) { config/default/check operation \"path.join(root, '.fgos', 'observe')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor export function checkObserveDirWritable(cwd) { config/default/check operation \"path.join(root, '.fgos', 'observe')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 704,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014790",
+        "originalTuple": [
+          6222,
+          9,
+          6222,
+          36,
+          "observeDir = path.join(root",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6241,
+        "currentPassage": {
+          "startLine": 6239,
+          "endLine": 6243,
+          "text": "export function checkObserveDirWritable(cwd) {\n  const root = resolveMainCheckoutRoot(cwd) ?? cwd;\n  const observeDir = path.join(root, '.fgos', 'observe');\n  try {\n    if (!fs.existsSync(observeDir)) {"
+        },
+        "caller": {
+          "line": 6239,
+          "declaration": "export function checkObserveDirWritable(cwd) {"
+        },
+        "inputs": [
+          "observeDir = path.join(root"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor export function checkObserveDirWritable(cwd) { config/default/check operation 'observeDir = path.join(root' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor export function checkObserveDirWritable(cwd) { config/default/check operation 'observeDir = path.join(root' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 705,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014791",
+        "originalTuple": [
+          6227,
+          23,
+          6227,
+          83,
+          "path.join(observeDir, `.probe-${process.pid}-${Date.now()}`)",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6246,
+        "currentPassage": {
+          "startLine": 6244,
+          "endLine": 6248,
+          "text": "      fs.mkdirSync(observeDir, { recursive: true });\n    }\n    const probeFile = path.join(observeDir, `.probe-${process.pid}-${Date.now()}`);\n    fs.writeFileSync(probeFile, 'ok', 'utf8');\n    fs.unlinkSync(probeFile);"
+        },
+        "caller": {
+          "line": 6239,
+          "declaration": "export function checkObserveDirWritable(cwd) {"
+        },
+        "inputs": [
+          "path.join(observeDir, `.probe-${process.pid}-${Date.now()}`)"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor export function checkObserveDirWritable(cwd) { config/default/check operation 'path.join(observeDir, `.probe-${process.pid}-${Date.now()}`)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor export function checkObserveDirWritable(cwd) { config/default/check operation 'path.join(observeDir, `.probe-${process.pid}-${Date.now()}`)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 706,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014792",
+        "originalTuple": [
+          6227,
+          45,
+          6227,
+          82,
+          "`.probe-${process.pid}-${Date.now()}`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6246,
+        "currentPassage": {
+          "startLine": 6244,
+          "endLine": 6248,
+          "text": "      fs.mkdirSync(observeDir, { recursive: true });\n    }\n    const probeFile = path.join(observeDir, `.probe-${process.pid}-${Date.now()}`);\n    fs.writeFileSync(probeFile, 'ok', 'utf8');\n    fs.unlinkSync(probeFile);"
+        },
+        "caller": {
+          "line": 6239,
+          "declaration": "export function checkObserveDirWritable(cwd) {"
+        },
+        "inputs": [
+          "`.probe-${process.pid}-${Date.now()}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`.probe-${process.pid}-${Date.now()}`'. It formats values at export function checkObserveDirWritable(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`.probe-${process.pid}-${Date.now()}`'. It formats values at export function checkObserveDirWritable(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 707,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014793",
+        "originalTuple": [
+          6232,
+          38,
+          6232,
+          85,
+          "`.fgos/observe is not writable: ${err.message}`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6251,
+        "currentPassage": {
+          "startLine": 6249,
+          "endLine": 6253,
+          "text": "    return { passed: true, message: '.fgos/observe is writable' };\n  } catch (err) {\n    return { passed: false, message: `.fgos/observe is not writable: ${err.message}` };\n  }\n}"
+        },
+        "caller": {
+          "line": 6239,
+          "declaration": "export function checkObserveDirWritable(cwd) {"
+        },
+        "inputs": [
+          "`.fgos/observe is not writable: ${err.message}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`.fgos/observe is not writable: ${err.message}`'. It formats values at export function checkObserveDirWritable(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`.fgos/observe is not writable: ${err.message}`'. It formats values at export function checkObserveDirWritable(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 708,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014794",
+        "originalTuple": [
+          6237,
+          9,
+          6237,
+          51,
+          "root = resolveMainCheckoutRoot(cwd) ?? cwd",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6256,
+        "currentPassage": {
+          "startLine": 6254,
+          "endLine": 6258,
+          "text": "\nexport function checkObserveFrictionMigrated(cwd) {\n  const root = resolveMainCheckoutRoot(cwd) ?? cwd;\n  // `friction` is a Rust host verb: the Node fgos entry refuses it, so the fix is named\n  // against the host binary when one resolves, and by its install location otherwise."
+        },
+        "caller": {
+          "line": 6255,
+          "declaration": "export function checkObserveFrictionMigrated(cwd) {"
+        },
+        "inputs": [
+          "root = resolveMainCheckoutRoot(cwd) ?? cwd"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor export function checkObserveFrictionMigrated(cwd) { config/default/check operation 'root = resolveMainCheckoutRoot(cwd) ?? cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor export function checkObserveFrictionMigrated(cwd) { config/default/check operation 'root = resolveMainCheckoutRoot(cwd) ?? cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 709,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014795",
+        "originalTuple": [
+          624,
+          9,
+          624,
+          36,
+          "root = cwd ?? process.cwd()",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 628,
+        "currentPassage": {
+          "startLine": 626,
+          "endLine": 630,
+          "text": "\nexport function checkMutatingAssignmentBindingSnapshot(cwd) {\n  const root = cwd ?? process.cwd();\n  const assignmentsDir = path.join(root, '.fgos', 'assignments');\n  if (!fs.existsSync(assignmentsDir)) {"
+        },
+        "caller": {
+          "line": 627,
+          "declaration": "export function checkMutatingAssignmentBindingSnapshot(cwd) {"
+        },
+        "inputs": [
+          "root = cwd ?? process.cwd()"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor export function checkMutatingAssignmentBindingSnapshot(cwd) { config/default/check operation 'root = cwd ?? process.cwd()' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor export function checkMutatingAssignmentBindingSnapshot(cwd) { config/default/check operation 'root = cwd ?? process.cwd()' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 710,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014796",
+        "originalTuple": [
+          6242,
+          7,
+          6242,
+          55,
+          "`run: ${hostBin} friction migrate --dir ${root}`",
+          "template-string",
+          true,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6261,
+        "currentPassage": {
+          "startLine": 6259,
+          "endLine": 6263,
+          "text": "  const hostBin = resolveHostBin(cwd);\n  const migrateFix = hostBin\n    ? `run: ${hostBin} friction migrate --dir ${root}`\n    : `run \\`fgos friction migrate --dir ${root}\\` with the Rust host binary (<project>/.fgos/installation/bin/fgos, or FGOS_HOST_BIN); the Node fgos entry has no friction verb and no host binary resolved here`;\n  const fgosDir = path.join(root, '.fgos');"
+        },
+        "caller": {
+          "line": 6255,
+          "declaration": "export function checkObserveFrictionMigrated(cwd) {"
+        },
+        "inputs": [
+          "`run: ${hostBin} friction migrate --dir ${root}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`run: ${hostBin} friction migrate --dir ${root}`'. It formats values at export function checkObserveFrictionMigrated(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`run: ${hostBin} friction migrate --dir ${root}`'. It formats values at export function checkObserveFrictionMigrated(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 711,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014797",
+        "originalTuple": [
+          6243,
+          13,
+          6243,
+          51,
+          "`fgos friction migrate --dir ${root}\\`",
+          "template-string",
+          true,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6262,
+        "currentPassage": {
+          "startLine": 6260,
+          "endLine": 6264,
+          "text": "  const migrateFix = hostBin\n    ? `run: ${hostBin} friction migrate --dir ${root}`\n    : `run \\`fgos friction migrate --dir ${root}\\` with the Rust host binary (<project>/.fgos/installation/bin/fgos, or FGOS_HOST_BIN); the Node fgos entry has no friction verb and no host binary resolved here`;\n  const fgosDir = path.join(root, '.fgos');\n  if (!fs.existsSync(fgosDir)) {"
+        },
+        "caller": {
+          "line": 6255,
+          "declaration": "export function checkObserveFrictionMigrated(cwd) {"
+        },
+        "inputs": [
+          "`fgos friction migrate --dir ${root}\\`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`fgos friction migrate --dir ${root}\\\\`'. It formats values at export function checkObserveFrictionMigrated(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`fgos friction migrate --dir ${root}\\\\`'. It formats values at export function checkObserveFrictionMigrated(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 712,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014798",
+        "originalTuple": [
+          6244,
+          19,
+          6244,
+          43,
+          "path.join(root, '.fgos')",
+          "path-call",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6263,
+        "currentPassage": {
+          "startLine": 6261,
+          "endLine": 6265,
+          "text": "    ? `run: ${hostBin} friction migrate --dir ${root}`\n    : `run \\`fgos friction migrate --dir ${root}\\` with the Rust host binary (<project>/.fgos/installation/bin/fgos, or FGOS_HOST_BIN); the Node fgos entry has no friction verb and no host binary resolved here`;\n  const fgosDir = path.join(root, '.fgos');\n  if (!fs.existsSync(fgosDir)) {\n    return { passed: true, message: 'no .fgos directory present' };"
+        },
+        "caller": {
+          "line": 6255,
+          "declaration": "export function checkObserveFrictionMigrated(cwd) {"
+        },
+        "inputs": [
+          "path.join(root, '.fgos')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor export function checkObserveFrictionMigrated(cwd) { config/default/check operation \"path.join(root, '.fgos')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor export function checkObserveFrictionMigrated(cwd) { config/default/check operation \"path.join(root, '.fgos')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 713,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014799",
+        "originalTuple": [
+          6244,
+          9,
+          6244,
+          33,
+          "fgosDir = path.join(root",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6263,
+        "currentPassage": {
+          "startLine": 6261,
+          "endLine": 6265,
+          "text": "    ? `run: ${hostBin} friction migrate --dir ${root}`\n    : `run \\`fgos friction migrate --dir ${root}\\` with the Rust host binary (<project>/.fgos/installation/bin/fgos, or FGOS_HOST_BIN); the Node fgos entry has no friction verb and no host binary resolved here`;\n  const fgosDir = path.join(root, '.fgos');\n  if (!fs.existsSync(fgosDir)) {\n    return { passed: true, message: 'no .fgos directory present' };"
+        },
+        "caller": {
+          "line": 6255,
+          "declaration": "export function checkObserveFrictionMigrated(cwd) {"
+        },
+        "inputs": [
+          "fgosDir = path.join(root"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor export function checkObserveFrictionMigrated(cwd) { config/default/check operation 'fgosDir = path.join(root' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor export function checkObserveFrictionMigrated(cwd) { config/default/check operation 'fgosDir = path.join(root' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 714,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014800",
+        "originalTuple": [
+          625,
+          26,
+          625,
+          65,
+          "path.join(root, '.fgos', 'assignments')",
+          "path-call",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 629,
+        "currentPassage": {
+          "startLine": 627,
+          "endLine": 631,
+          "text": "export function checkMutatingAssignmentBindingSnapshot(cwd) {\n  const root = cwd ?? process.cwd();\n  const assignmentsDir = path.join(root, '.fgos', 'assignments');\n  if (!fs.existsSync(assignmentsDir)) {\n    return { passed: true, message: 'no assignments directory present' };"
+        },
+        "caller": {
+          "line": 627,
+          "declaration": "export function checkMutatingAssignmentBindingSnapshot(cwd) {"
+        },
+        "inputs": [
+          "path.join(root, '.fgos', 'assignments')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor export function checkMutatingAssignmentBindingSnapshot(cwd) { config/default/check operation \"path.join(root, '.fgos', 'assignments')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor export function checkMutatingAssignmentBindingSnapshot(cwd) { config/default/check operation \"path.join(root, '.fgos', 'assignments')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 715,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014801",
+        "originalTuple": [
+          625,
+          9,
+          625,
+          40,
+          "assignmentsDir = path.join(root",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 629,
+        "currentPassage": {
+          "startLine": 627,
+          "endLine": 631,
+          "text": "export function checkMutatingAssignmentBindingSnapshot(cwd) {\n  const root = cwd ?? process.cwd();\n  const assignmentsDir = path.join(root, '.fgos', 'assignments');\n  if (!fs.existsSync(assignmentsDir)) {\n    return { passed: true, message: 'no assignments directory present' };"
+        },
+        "caller": {
+          "line": 627,
+          "declaration": "export function checkMutatingAssignmentBindingSnapshot(cwd) {"
+        },
+        "inputs": [
+          "assignmentsDir = path.join(root"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor export function checkMutatingAssignmentBindingSnapshot(cwd) { config/default/check operation 'assignmentsDir = path.join(root' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor export function checkMutatingAssignmentBindingSnapshot(cwd) { config/default/check operation 'assignmentsDir = path.join(root' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 716,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014802",
+        "originalTuple": [
+          6252,
+          26,
+          6252,
+          60,
+          "path.join(fgosDir, 'events.jsonl')",
+          "path-call",
+          true,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6271,
+        "currentPassage": {
+          "startLine": 6269,
+          "endLine": 6273,
+          "text": "  const legacyFrictions = [];\n  const filesToScan = [];\n  const baselineEvents = path.join(fgosDir, 'events.jsonl');\n  if (fs.existsSync(baselineEvents)) {\n    filesToScan.push({ src: 'events.jsonl', path: baselineEvents });"
+        },
+        "caller": {
+          "line": 6255,
+          "declaration": "export function checkObserveFrictionMigrated(cwd) {"
+        },
+        "inputs": [
+          "path.join(fgosDir, 'events.jsonl')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor export function checkObserveFrictionMigrated(cwd) { config/default/check operation \"path.join(fgosDir, 'events.jsonl')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor export function checkObserveFrictionMigrated(cwd) { config/default/check operation \"path.join(fgosDir, 'events.jsonl')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 717,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014803",
+        "originalTuple": [
+          6254,
+          45,
+          6254,
+          68,
+          "path: baselineEvents })",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6273,
+        "currentPassage": {
+          "startLine": 6271,
+          "endLine": 6275,
+          "text": "  const baselineEvents = path.join(fgosDir, 'events.jsonl');\n  if (fs.existsSync(baselineEvents)) {\n    filesToScan.push({ src: 'events.jsonl', path: baselineEvents });\n  }\n  const eventsDir = path.join(fgosDir, 'events');"
+        },
+        "caller": {
+          "line": 6255,
+          "declaration": "export function checkObserveFrictionMigrated(cwd) {"
+        },
+        "inputs": [
+          "path: baselineEvents })"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor export function checkObserveFrictionMigrated(cwd) { config/default/check operation 'path: baselineEvents })' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor export function checkObserveFrictionMigrated(cwd) { config/default/check operation 'path: baselineEvents })' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 718,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014804",
+        "originalTuple": [
+          6256,
+          21,
+          6256,
+          49,
+          "path.join(fgosDir, 'events')",
+          "path-call",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6275,
+        "currentPassage": {
+          "startLine": 6273,
+          "endLine": 6277,
+          "text": "    filesToScan.push({ src: 'events.jsonl', path: baselineEvents });\n  }\n  const eventsDir = path.join(fgosDir, 'events');\n  if (fs.existsSync(eventsDir) && fs.statSync(eventsDir).isDirectory()) {\n    try {"
+        },
+        "caller": {
+          "line": 6255,
+          "declaration": "export function checkObserveFrictionMigrated(cwd) {"
+        },
+        "inputs": [
+          "path.join(fgosDir, 'events')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor export function checkObserveFrictionMigrated(cwd) { config/default/check operation \"path.join(fgosDir, 'events')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor export function checkObserveFrictionMigrated(cwd) { config/default/check operation \"path.join(fgosDir, 'events')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 719,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014805",
+        "originalTuple": [
+          6256,
+          9,
+          6256,
+          38,
+          "eventsDir = path.join(fgosDir",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6275,
+        "currentPassage": {
+          "startLine": 6273,
+          "endLine": 6277,
+          "text": "    filesToScan.push({ src: 'events.jsonl', path: baselineEvents });\n  }\n  const eventsDir = path.join(fgosDir, 'events');\n  if (fs.existsSync(eventsDir) && fs.statSync(eventsDir).isDirectory()) {\n    try {"
+        },
+        "caller": {
+          "line": 6255,
+          "declaration": "export function checkObserveFrictionMigrated(cwd) {"
+        },
+        "inputs": [
+          "eventsDir = path.join(fgosDir"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor export function checkObserveFrictionMigrated(cwd) { config/default/check operation 'eventsDir = path.join(fgosDir' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor export function checkObserveFrictionMigrated(cwd) { config/default/check operation 'eventsDir = path.join(fgosDir' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 720,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014806",
+        "originalTuple": [
+          6262,
+          35,
+          6262,
+          52,
+          "`events/${entry}`",
+          "template-string",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6281,
+        "currentPassage": {
+          "startLine": 6279,
+          "endLine": 6283,
+          "text": "      for (const entry of entries) {\n        if (entry.endsWith('.jsonl')) {\n          filesToScan.push({ src: `events/${entry}`, path: path.join(eventsDir, entry) });\n        }\n      }"
+        },
+        "caller": {
+          "line": 6255,
+          "declaration": "export function checkObserveFrictionMigrated(cwd) {"
+        },
+        "inputs": [
+          "`events/${entry}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`events/${entry}`'. It formats values at export function checkObserveFrictionMigrated(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`events/${entry}`'. It formats values at export function checkObserveFrictionMigrated(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 721,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014807",
+        "originalTuple": [
+          6262,
+          54,
+          6262,
+          79,
+          "path: path.join(eventsDir",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6281,
+        "currentPassage": {
+          "startLine": 6279,
+          "endLine": 6283,
+          "text": "      for (const entry of entries) {\n        if (entry.endsWith('.jsonl')) {\n          filesToScan.push({ src: `events/${entry}`, path: path.join(eventsDir, entry) });\n        }\n      }"
+        },
+        "caller": {
+          "line": 6255,
+          "declaration": "export function checkObserveFrictionMigrated(cwd) {"
+        },
+        "inputs": [
+          "path: path.join(eventsDir"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor export function checkObserveFrictionMigrated(cwd) { config/default/check operation 'path: path.join(eventsDir' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor export function checkObserveFrictionMigrated(cwd) { config/default/check operation 'path: path.join(eventsDir' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 722,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014808",
+        "originalTuple": [
+          6262,
+          60,
+          6262,
+          87,
+          "path.join(eventsDir, entry)",
+          "path-call",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6281,
+        "currentPassage": {
+          "startLine": 6279,
+          "endLine": 6283,
+          "text": "      for (const entry of entries) {\n        if (entry.endsWith('.jsonl')) {\n          filesToScan.push({ src: `events/${entry}`, path: path.join(eventsDir, entry) });\n        }\n      }"
+        },
+        "caller": {
+          "line": 6255,
+          "declaration": "export function checkObserveFrictionMigrated(cwd) {"
+        },
+        "inputs": [
+          "path.join(eventsDir, entry)"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor export function checkObserveFrictionMigrated(cwd) { config/default/check operation 'path.join(eventsDir, entry)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor export function checkObserveFrictionMigrated(cwd) { config/default/check operation 'path.join(eventsDir, entry)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    }
+  ]
+}

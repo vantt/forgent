@@ -1,0 +1,1497 @@
+{
+  "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+  "checkedAt": "2026-10-20T18:45:09.810357+00:00",
+  "status": "records complete; independent semantic review and cutover proof pending",
+  "fullChecker": {
+    "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-full-check-result.json",
+    "sha256": "18c1bf3904a22e4bd76ba7aff1825b1a017d3a1658a35639be461955242be2ec",
+    "exit": 0,
+    "failures": 0,
+    "files": 291,
+    "references": 2419,
+    "dynamicTuples": 5654,
+    "command": "env -u CLAUDE_CODE_SESSION_ID python3 -B plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py --output step-05-full-check-result.json"
+  },
+  "probes": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-probes-result.json",
+      "sha256": "10f80e67f223a2e4fdab52e57e1c12f39146cd0dd28a5692ebb488227ceb1afa",
+      "exit": 0,
+      "passed": 37,
+      "total": 37
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes-result.json",
+      "sha256": "8f609e94959aa2cd4413a5483ea071649dc021bf74dfdc7b8f689a185c5c852c",
+      "exit": 0,
+      "passed": 22,
+      "total": 22
+    }
+  ],
+  "proofLimits": [
+    "Mechanical author evidence, not semantic acceptance.",
+    "No consumer code/docs/skills/baseline changes; no fgos CLI, build, gateway, cargo, full npm suite or live state/secrets access.",
+    "State/export parity, generated candidate/second-run output sets, empty-state/error runtime proof, final Step7 composition and Phase9 readiness remain missing."
+  ],
+  "diagnostics": {
+    "initialFullChecker": "step-05-seam4-initial-full-check-result.json: 8 selector failures, fixed by exact source consumer/slot/spans selection",
+    "initialProbeResult": "step-05-seam4-initial-probes-result.json: 19/20, missing dependency returned None through lambda; helper now rejects it",
+    "preFieldProbeResult": "step-05-seam4-pre-field-probes-result.json: 21/21 before final occurrence-specific role guard",
+    "earlyPilotLog": "step-05-seam4-pilot-check.log is an initial diagnostic, not final evidence"
+  },
+  "scope": {
+    "allowedPrefix": "plans/260925-documentation-authority-unification/reports/phase-08/",
+    "outsideScopePaths": [],
+    "changedTrackedOrUntrackedFiles": 286,
+    "whitespaceExit": 0,
+    "pythonBytecodeFiles": 0,
+    "gitWrites": 0,
+    "needsWrites": [],
+    "outboxException": "Only required ack/report/result files in the assigned outbox, written tmp-then-rename",
+    "artifactManifestExcludesSelf": true
+  },
+  "review": {
+    "index": "step-05-seam4-review-index.json",
+    "indexSha256": "2fcc670f8ae7031bd763ba539aa2a970439acaeddee3a48f9312f560552e7cd0",
+    "parts": 181,
+    "maxRecords": 60,
+    "maxUtf8Bytes": 389936,
+    "totalUtf8Bytes": 68814484,
+    "status": "pending; no reviewers launched"
+  },
+  "elapsedSeconds": 2914.284,
+  "artifacts": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+      "bytes": 209036,
+      "sha256": "1d2dbfa04e673819fae9fcf00b6e49ead4e812cdb2d5ac8a93bbb04fb7e0f31f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+      "bytes": 248489,
+      "sha256": "fc14d27c1ecaa680b34489448b310baec8f42429e64ce59b586ada527a7eeb5f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+      "bytes": 30977,
+      "sha256": "966d214c881b67f50e7a992b278b181940495890644c73c2b357aa62526e6114"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-full-check-result.json",
+      "bytes": 94646,
+      "sha256": "18c1bf3904a22e4bd76ba7aff1825b1a017d3a1658a35639be461955242be2ec"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-full-check.log",
+      "bytes": 69364,
+      "sha256": "ca52b202e3fc54668dc5994557e53127ce712dc0fef850c4717be966af221e55"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-check-result.json",
+      "bytes": 90445,
+      "sha256": "b743cff8be08aa728b1d31a3fa2f665c0cf0bf96c6d8432741f4d124e3d26d7e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-cutover-specs.json",
+      "bytes": 174103,
+      "sha256": "8a0f7ad517afdb92be65049afe9a940c858b9112f85991c90b44df56849ae37e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p01.json",
+      "bytes": 312588,
+      "sha256": "69bb8610f83ec75b5d4d629d3ebf725503e7f5a61925a2a4957d88551b95e2e7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p02.json",
+      "bytes": 164749,
+      "sha256": "3cf7789a29f60985d411eef10166e1fba718a2d04331504b19c72f62d595112a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p03.json",
+      "bytes": 221698,
+      "sha256": "4ac406f7b2063324afb8a687af2cb992f725f4eaa481d1e89fe6f6cd8ac32bc7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p04.json",
+      "bytes": 203229,
+      "sha256": "9bb1d2c16670dbd57f978742f2baa2b2452610e849c6d859299a564d14879a0f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p05.json",
+      "bytes": 385816,
+      "sha256": "2daebce884a572cf2d0069cd0ef21786082d2b9f95ba66697b366c73e31a2b24"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p06.json",
+      "bytes": 389880,
+      "sha256": "d920d7121e561886055185a808c58fa6a60b2db160ab0b3e34bbacb2d0abd4bb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p07.json",
+      "bytes": 383060,
+      "sha256": "44edabb6252980ba616d91849adf52387a061b5508e5cfb76b957495cbf543da"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p08.json",
+      "bytes": 167155,
+      "sha256": "9b568c4488b87b544aae13c5e2336d3b8134e88c8f965df8210da49e42659de8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p09.json",
+      "bytes": 149194,
+      "sha256": "16d9cc57d6482e1f98c32953cf4957a36d3d042b711c691186a4ebdb667d2b2b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p10.json",
+      "bytes": 165240,
+      "sha256": "a9595916e09697806000fbe0d983c4312310350f502d1774b9eed8a690f5e219"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p11.json",
+      "bytes": 197186,
+      "sha256": "cafcd342f96b8196af4e2834af505740a1b7a93e65380a9ad487621266e8029d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p12.json",
+      "bytes": 153673,
+      "sha256": "7234d5dbb9572a100c479b7c45e734b736d5a8add54213a027ce5b0ee5fb4178"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p13.json",
+      "bytes": 152995,
+      "sha256": "3588e999e0381274b1d66751459d08a6f997d2fbed879d0c8bf6587d7ff8c235"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p14.json",
+      "bytes": 172387,
+      "sha256": "9dd64c8642f706d44822973e51ef725ca627ec4e3ece9867eb4a98db1242918f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p15.json",
+      "bytes": 163081,
+      "sha256": "67a3a64b744c4f6c4377ed2994fd73d5b47c63c37f9e98d04878265382db2e18"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p16.json",
+      "bytes": 157543,
+      "sha256": "e206a5188cad70b655ba226c1c84e8254937240a868e88905a1f7f757caf93fb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p17.json",
+      "bytes": 164453,
+      "sha256": "b0ba05730eb71d307965ced74c41abe72ba8d4520e19b36749206cf179f81b6f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p18.json",
+      "bytes": 385681,
+      "sha256": "dff57a01ffea48271d813493b72d14db9218b000994dfea195facff7134fbafe"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p19.json",
+      "bytes": 219586,
+      "sha256": "bea9431c3d9b69c423bed9adc4e8bb8dc872a374215d6367feb3c0e15c375d10"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p20.json",
+      "bytes": 164742,
+      "sha256": "f6b6f615b2d55d27852f5fa2c485921781e550309cc3d5488159c2f7b2f092de"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p21.json",
+      "bytes": 143195,
+      "sha256": "702a5d5ccad549942cf0dfafe1beab03ae267733d9c90b8948a7710ba901a642"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p22.json",
+      "bytes": 146599,
+      "sha256": "63f56eec62d914b53d4f2522ec30de27a17afe6db95beedc400c742c8b3e8dd7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p23.json",
+      "bytes": 152053,
+      "sha256": "c64b1ba8d4db2981928f99b053a30ae8b608710aa3186c627bd8a61ca60d1f6f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p24.json",
+      "bytes": 169844,
+      "sha256": "4d7e3a6e75e96f05e21fc1ba2064ed2067c1522f8d7fbe26f994613ada9faf18"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p25.json",
+      "bytes": 172692,
+      "sha256": "e0671b48fda544638fb05b1857d5f932d688422f0d4ffb46b5f94697b7ef5a0b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p26.json",
+      "bytes": 151783,
+      "sha256": "46cfd22911476a7327d7be95ae029c02d2a96a6c1e7f7ca40775d85e08f37877"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p27.json",
+      "bytes": 152983,
+      "sha256": "c42881acf5b561d6faf914c2f3285e8013609420fb0a94db60dc13da67e16ca2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p28.json",
+      "bytes": 149594,
+      "sha256": "2f6f4c2343dcbb768d95889272a0fbb810c2fd80a446e24dc223b76739eed31b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p29.json",
+      "bytes": 145124,
+      "sha256": "e8febd91f6c4c759f6f674283af5d6783ba546e20f95139e466d991cb8d8df09"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p30.json",
+      "bytes": 163633,
+      "sha256": "38a45e412e30476ded5f2b37418892c705bfa0ee39da7c8126b8339389330820"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p31.json",
+      "bytes": 144186,
+      "sha256": "822e3ad80dde5ff6dc259fb5ce983d1fd03690767a0dd59fc0f73965f657f5fd"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p32.json",
+      "bytes": 150601,
+      "sha256": "fc918ed0cea03a39799c3a32012da41f032029586087691f06aa61d146e4a49a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p33.json",
+      "bytes": 144143,
+      "sha256": "86107ba8a1c42361f7aa0e43a2c75df01f98ea8c764bfe2351727d4e26f54a7b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p34.json",
+      "bytes": 176213,
+      "sha256": "fa03a77f479025e084bd08a0e511cc6d42558f0a5c306a4ab6e710d5d5fe1e41"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p35.json",
+      "bytes": 202496,
+      "sha256": "7c0557e784a5a9476322aefafe223642a11eb79e3373c6bd04cadaeda40b2764"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p36.json",
+      "bytes": 170104,
+      "sha256": "8299699fd93e64608e86d14d58bf514aa08204045e0b2e6e7a9d8e5a1f52dd11"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p37.json",
+      "bytes": 173190,
+      "sha256": "1f5b2194436ea4593a9ebd297a359536f5086b8419418a772e6cbd3ced6e5e1f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p38.json",
+      "bytes": 165203,
+      "sha256": "c1d3569051876567093b13f0c23ea906af045ce46562b14a0f760d81ed6e85f3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p39.json",
+      "bytes": 177252,
+      "sha256": "d976fc35a92252ee44111486f687bd0643ccdaf5878ef375af619e2dac75b839"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p40.json",
+      "bytes": 357953,
+      "sha256": "586830ff30de159e3c310bf32fee65ceb6132af18c2468c46dace3f3c23d97fe"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p41.json",
+      "bytes": 317992,
+      "sha256": "015352bc6703da1c7e21e86cc8274c10a7180c3ec091e32ccc39d440f94a94e2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-parity-receipts.json",
+      "bytes": 516162,
+      "sha256": "223146d6a81cbe939314599deb1524997f986a177ebaf5fb036fa2382b0b6ed2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-probes-result.json",
+      "bytes": 12900,
+      "sha256": "10f80e67f223a2e4fdab52e57e1c12f39146cd0dd28a5692ebb488227ceb1afa"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-probes.log",
+      "bytes": 440,
+      "sha256": "afbe4a5867f69a1f655e6448554d81aec5c43b71caa1a104705878e3bd36380c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-rereview-index.json",
+      "bytes": 2305,
+      "sha256": "577a74a2b3f9715ce64ddbbfbbf7ffb783c5c69fef78f1e34ecdb2a05f582127"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-review-index.json",
+      "bytes": 21611,
+      "sha256": "54f0c900cbd4601ba91b0d865b2dc62e631b5858b0d7dbef85e5bd57cc7d3827"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-rr-p01.json",
+      "bytes": 386891,
+      "sha256": "fd87e921318ba156f4c8f92507724cf169debeaa58f35cdfb7ed794bd59ad7a7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-rr-p02.json",
+      "bytes": 387811,
+      "sha256": "49b5efc8a58cd7bcc472b92cac599aea8e1043030916b90593cb3e80e129f84d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-rr-p03.json",
+      "bytes": 386705,
+      "sha256": "7bc6cae5dbec7f9898d66c2c241bdb820dac666821aa61b8d3e66071a33f2e57"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-rr-p04.json",
+      "bytes": 312984,
+      "sha256": "687abdc2b27608d1cc64103069482cf37ecc7ea334d04f466806951080b8d17a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py",
+      "bytes": 8314,
+      "sha256": "c4aee36132d8f16e1548b31a34d7b835eb0fc825a7c6df11a103e2a295cedc80"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+      "bytes": 367577,
+      "sha256": "9db3de086ae2cba310382ecf91633c303a758f9500328c351ba22f1ee33a052a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl",
+      "bytes": 391768,
+      "sha256": "5ca05e9680f30569937b762da14405ded2d36b98dafba6c2008fac38dcef1a2c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-decision-index.jsonl",
+      "bytes": 1309154,
+      "sha256": "ef9d818ad38885bc45c59de19731ddb4b3e59873d365c70642f68c9d14ed32f1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-doc-registry.jsonl",
+      "bytes": 14843498,
+      "sha256": "fa835d615aab1a906e89ad0d408850cd44017f27545507cc9b551440d3a2443d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-enduser-index.jsonl",
+      "bytes": 5615402,
+      "sha256": "67aa6101dce07a4a3e0c07b6f62989b617476854519ab9dfe0d551040c974b80"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-instructions.jsonl",
+      "bytes": 267179,
+      "sha256": "44bc3f59c898cc38229ff410fdf33d71650fab37c7eaaf1799a89a4de517af16"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+      "bytes": 16228943,
+      "sha256": "f58b03ff0571870e8c5733623a7bd57ebe1d0d7deadb5196a5d69c979ad6f730"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "bytes": 3384096,
+      "sha256": "00cea2713553a57e0be428b7f3965b40c978ac1ceb2ad438e8f3eba445f63c67"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-apply-rollback.json",
+      "bytes": 8326,
+      "sha256": "cc0baada41e50618e2314135b0ec5f580a63d5f5b35cc377196433a3e2fcd745"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-author.py",
+      "bytes": 25586,
+      "sha256": "1453dcfa6dfc3ef5d610a53b3d1aca0c47f1c78520c75e461753a163c2f48fee"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-caller-sweep.json",
+      "bytes": 105706,
+      "sha256": "b7ea79201d4a90c2f29232589f51fe87e7031a069a26ad9994076193048b2440"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-callers.py",
+      "bytes": 3605,
+      "sha256": "c74bb6c175c46374650f2bad083cf1d1a5011493997db3c68619340204444cd2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-check-result.json",
+      "bytes": 2113,
+      "sha256": "5332257c7697fde3d1c5c36dfbc870c393734efed79a9236d62c7ecbfa411daa"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-check.log",
+      "bytes": 1974,
+      "sha256": "e3dd78721bc1ac8805a930bb02d3b65c39d6399e630248fba15c38b380086963"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-check.py",
+      "bytes": 19320,
+      "sha256": "7874d70bdacd0a1b55ee2e29cd6fe7c0c2140e474539e04875807e91a654be6d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-closure-sweep.json",
+      "bytes": 2842,
+      "sha256": "959f5edddfa12d6c94ae438616af20c9bc0092dbb5b67aa00103278aaee9c3f5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-closure.py",
+      "bytes": 12470,
+      "sha256": "d6e9613e284fafdfab8eb22eddace334c3aa355befd55394c8aeb845572fb425"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-cutover-specs.json",
+      "bytes": 3096431,
+      "sha256": "4e3bf4b9e437c78fa0fb31a566ad1348b190c98ac0b8da2c3961c08e4a744f69"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-field-role-sweep.json",
+      "bytes": 137803,
+      "sha256": "9cf03b715899c56e1b7e3909f9a94764c780784ef1f3e4e1f7feb35b057fd699"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-field-roles.py",
+      "bytes": 2345,
+      "sha256": "698aa84fc6dc824f3735f164c0b294e257397f1545a0ac4f594e4bb5f1aa6cae"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-finalize.py",
+      "bytes": 18704,
+      "sha256": "630edd98983dc704bce579a55b27decf9a30796d66d0bcc219771a287b30a673"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-inherited-carries.json",
+      "bytes": 235956,
+      "sha256": "681e96b12c695ded5618985d2d50b8287cd3e71cc58e9935c4dff5b7759645d7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-initial-full-check-result.json",
+      "bytes": 97944,
+      "sha256": "a4b03bc6677787b6cf4ff8a7e68f3bea4b99908e7f96c77020457813d0b00b87"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-initial-probes-result.json",
+      "bytes": 6861,
+      "sha256": "0552a3a4ed75badbcb36ef8a5763a636f2b9a650efae6c97095788fde2e16bfa"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-input-role-result.json",
+      "bytes": 184,
+      "sha256": "df381cb48b0b6e8ed6bf95603a11434969a7dc180d33737ad15f39e2fbea3b62"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-input-roles.py",
+      "bytes": 3075,
+      "sha256": "2c469c6c033c19aae95bbaa63fc654c1e1cce221a4ef5d54b9e945d1e521332b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-joins.py",
+      "bytes": 2303,
+      "sha256": "2d329d6132483ce0a0fca5c87bb794acf4b5905c4134a7ac8e7001cc157d7270"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-measurements.json",
+      "bytes": 3678,
+      "sha256": "4a014dffafcfe33570c1bbe715c477a1ff7c080ac8dcc4927536674ae3de4f70"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-output-provenance.json",
+      "bytes": 115042,
+      "sha256": "310c7136e9f1226559ab30f5842954ee588131020bec6d9242bc4abda984a415"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-own-operand-sweep.json",
+      "bytes": 825941,
+      "sha256": "9f7a898968da22e063f38540b40f622f994edcb274e80e3fba807ef42404419c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p01.json",
+      "bytes": 363202,
+      "sha256": "a6dbacea9db7d061e0503826a8c02214badbb2e0ec40fe510e0926cfbfc78bba"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p02.json",
+      "bytes": 354827,
+      "sha256": "5e328e97ed26a78e87fd02071c09fc9520f88120b989a91bc842af30ed222758"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p03.json",
+      "bytes": 356707,
+      "sha256": "d414fa41b2fd5c528824d9cdf4e95dc6d39834d97d247a3e6bba0990475afde1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p04.json",
+      "bytes": 348983,
+      "sha256": "64f0d380f4ada6b4bd596fd260d499b2965bdb1bc51fdf35bd3b4e37c6c37b84"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p05.json",
+      "bytes": 366974,
+      "sha256": "17a71617dd6f7b955fc87e8b9bc96aa760a432f91d7b47b5b868d28404527b21"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p06.json",
+      "bytes": 368075,
+      "sha256": "b39cf503a5ac0bf2a5dcc4cfa70e52e85c9595ba1650a841927c57c565162696"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p07.json",
+      "bytes": 361980,
+      "sha256": "42036ff9262323b55e1651f96fe344eb1d2ae5d7229924a298f28d049da1153a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p08.json",
+      "bytes": 376065,
+      "sha256": "506ec851901dadef4e28b33d8459051b19ab6317b266518cf0ebb989d741b7e7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p09.json",
+      "bytes": 372606,
+      "sha256": "39afa4d5fb0266d624b5712045e23f262f779d63fd94fa3fb3417badc82fa912"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p10.json",
+      "bytes": 381115,
+      "sha256": "94338731366f37d7ae4cedd33d369e66cd72f6cb18ea726a97ec4a7a42311ef5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p100.json",
+      "bytes": 386626,
+      "sha256": "1e30fd9dd5714be047b2fba869f02ce41409299fed9dae14190d624b15a8ec6c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p101.json",
+      "bytes": 388610,
+      "sha256": "76fa002e1d0dbcbd2df934a9cc73a6acd63a0e83c0ec4d8f83ec47d7bcf544a6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p102.json",
+      "bytes": 389823,
+      "sha256": "cecca1300982e8dc257668f4aafe8510b7bf97a614c45c8f65be7c2ff00826f2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p103.json",
+      "bytes": 384905,
+      "sha256": "b8422f7bbb0b00bf470750c80f1d5dba945e8c5d84b4b20e5ccacc857b2672bc"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p104.json",
+      "bytes": 378901,
+      "sha256": "79bf306811b308ebfcb8e52fa829c6ed16658feca5efb021e80a2980902643dd"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p105.json",
+      "bytes": 385170,
+      "sha256": "418226cced95543bd6ce325abb8a13b68fa08df466f593d4650162977e872cf8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p106.json",
+      "bytes": 389805,
+      "sha256": "efc2022a96f96f1246087af9fc4cf12ed095828cb1104e9b34815e84b467c50f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p107.json",
+      "bytes": 382830,
+      "sha256": "be527f1149abcbe903e6a20521cc81e3b7013033ac7449a19a6b58bd1edda93a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p108.json",
+      "bytes": 382908,
+      "sha256": "398c259e6f26e11bf3f49271984681b4971b5af89e993d7f5b589445fe28c5b0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p109.json",
+      "bytes": 386036,
+      "sha256": "8919c1c901fcf6ce5446f192dee32720aa9d91b5ceddfc95479c24009d617f0e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p11.json",
+      "bytes": 382824,
+      "sha256": "972a9a1d59f7d101ea61d6aa52f7b9fa373473e2ea7b3c134c7f2da4e33e3dd5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p110.json",
+      "bytes": 384084,
+      "sha256": "b66657fd47fc9377fccc694603e0180bf2ef5fbe3ca101d4aad2c0f94d4c1daf"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p111.json",
+      "bytes": 379847,
+      "sha256": "e2e668e4578678496031fc62e013781a2d37702cbd26bb2c2dd58521899ddf24"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p112.json",
+      "bytes": 382092,
+      "sha256": "7daeb4cb8858838248518656b61a3105715625533aa9be63f2023f950cbe9dd8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p113.json",
+      "bytes": 389301,
+      "sha256": "9aa1e780b2a8f63afa1a5aa4e5b63522172009ec603b40b28a60e663d7cf38f9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p114.json",
+      "bytes": 379612,
+      "sha256": "9253310c4ad16026d6d4c2aa66874f23387575a5f467346aae6de4f9f8d68cde"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p115.json",
+      "bytes": 383882,
+      "sha256": "4550fd2d84b030e6d3aa28cfeed6e1449907d278423fc0277defd9787fcaaab1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p116.json",
+      "bytes": 385022,
+      "sha256": "b78a207953876b87770e4c92dc6f06f8fd468416b78dec57706cb2525fcfe708"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p117.json",
+      "bytes": 382009,
+      "sha256": "1e9abb0d6f47c0c967a1bf651ebe47752b7b39c0c48007f884ad4e735157940a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p118.json",
+      "bytes": 388761,
+      "sha256": "1d2d7c8075cab313c8c6ce364357ef6b7ae54cc3c26a31b54febc7494b2ba1d5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p119.json",
+      "bytes": 386509,
+      "sha256": "b9d450d7d8a87f6ad14ac7b4e6d99f6d9e01c073c9bb93bb0abe2b347a776f41"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p12.json",
+      "bytes": 389784,
+      "sha256": "3ee6a143d1c26bfa9fa50177be674f5f781c72dce0abf5ed6bc8e93192dafff2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p120.json",
+      "bytes": 387691,
+      "sha256": "2afc0ea40fb44b348b6cabd423a9d5f0ca8c729661428244bb875504fdf48b5b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p121.json",
+      "bytes": 384230,
+      "sha256": "ddfe0f7740d85d082c7d47ff5523815bc5e3211431ef1964bfdba4a7fab341e8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p122.json",
+      "bytes": 387198,
+      "sha256": "a84b0491f79e094fee52f8f3a47a38be31b3b4cc57ada4f667040050425ce7dd"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p123.json",
+      "bytes": 381818,
+      "sha256": "eff974207955de0785b0f70a39a798f39e81cc9e2c3dc3a607029e674f16b6cb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p124.json",
+      "bytes": 383444,
+      "sha256": "82e3f39637282ca62434e1ff5b2072228de280c2c838b264e0830507d9e2a753"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p125.json",
+      "bytes": 381192,
+      "sha256": "d845219b703a6fa7f3f828946ef9e3b5cdd72fb4e09a08a54f1366541cc45116"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p126.json",
+      "bytes": 381315,
+      "sha256": "30cd73456716a626694a5caf3388b69838168a12054ebbd836a4ab6411f0a963"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p127.json",
+      "bytes": 384125,
+      "sha256": "cbb9ff3a63edaa90e3a744742ab81ba249bc61594c18356a4c9a0dbeab5c9af0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p128.json",
+      "bytes": 389805,
+      "sha256": "3673618d73024a56268988d17c23dc6a210c49efbc2a20ca55444f230f3b719a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p129.json",
+      "bytes": 384674,
+      "sha256": "7b433c764978c824ffc32f3e00f535b8c17d01f8aec8a383061a63eb8e1b20c6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p13.json",
+      "bytes": 387313,
+      "sha256": "115216bf9d2f0fb94597eb876e576aca110219bb96dcbf28dd59487433512204"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p130.json",
+      "bytes": 383853,
+      "sha256": "60a65e38d71c15fb33673b17dff0ad05e823b0ed659e83f1c223f9b4e0980a72"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p131.json",
+      "bytes": 383979,
+      "sha256": "af9a67798234e65fd029b0e401f76171c478dcc9ce92a9d4fee377172a4812ab"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p132.json",
+      "bytes": 380190,
+      "sha256": "dee6f8601cb3b37617dc74f78826a799f4e30817948933ccbd67901420e0df2f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p133.json",
+      "bytes": 384014,
+      "sha256": "b23aca4f6e9a1539e60adeddf7336c65d0fdaaf1e3d23a7015a3ddd43be9ef1b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p134.json",
+      "bytes": 382900,
+      "sha256": "4a6951669e029e1e083372c350482df5a00a3b66ea2cec7af0e7e67d24ea4e72"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p135.json",
+      "bytes": 388355,
+      "sha256": "6770189666699495bab4fc7142a3b19c087dcf200818d62c751540f68b2ad42b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p136.json",
+      "bytes": 383763,
+      "sha256": "02ae48b6dbcae3e1e1d5e930c3ba7394ded47db4280c97cf9ddc4c7250e88553"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p137.json",
+      "bytes": 389647,
+      "sha256": "f0fe0d36e79367027de8f2dbaba5fab61238d460d8ccd455206c9e5d35de2705"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p138.json",
+      "bytes": 387372,
+      "sha256": "4971711812148bf5e72564165ad74fda928fbf810f39dbc99c3dffac3375fb92"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p139.json",
+      "bytes": 380115,
+      "sha256": "44fb03f0c8f46f562f2c5ce8451fbfcc6f80799c64fe95c6eb1d83b77773e64d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p14.json",
+      "bytes": 384562,
+      "sha256": "dc6b8f1bfe1ccc2f7fa4e1478a87aceb21a3a8cf32e3f19808488669b794bf43"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p140.json",
+      "bytes": 379430,
+      "sha256": "487d5bb16f0db0e96efa3952b4cb26626017cdf690a05616c2edf97f44f9ef09"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p141.json",
+      "bytes": 384374,
+      "sha256": "f77661243ed5ae8a4e80f4667dc63d48ff6301df19d79d461cdd04c526b73654"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p142.json",
+      "bytes": 385199,
+      "sha256": "a17c389f5ab6df8926e0f72ca9fadee1246fff0877b70e31cf702690cd51f2e5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p143.json",
+      "bytes": 381466,
+      "sha256": "e31f3beedaa25ac90780e3f55fffa516fa88e3a7c5cc41a117b21df39e0b6aaa"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p144.json",
+      "bytes": 388354,
+      "sha256": "03a22b703736b76988a01aefd60108e3d9690b09880f8bd1426e33bc685b23cf"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p145.json",
+      "bytes": 384501,
+      "sha256": "c94903c1d6979cc5b55f7004e3dfd2bc831a70a4f3f8becaefd58667dfeb8675"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p146.json",
+      "bytes": 382851,
+      "sha256": "e92db57f23be801eac367695dd5ab3b9eabbde17e361a075a8f995bad0c6a578"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p147.json",
+      "bytes": 385305,
+      "sha256": "8e3656600f807695f18225b4f84d3677f48b691e371f5d509bd17614b901b4a7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p148.json",
+      "bytes": 380482,
+      "sha256": "0bddfb14844a3f6df82776ba64346ada2621ad6fb20a60dfba54fb643dcc7e58"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p149.json",
+      "bytes": 382899,
+      "sha256": "30d433da864a2571fa91c46c862acdd2853f11e49049843c8cb44a9dca437bcf"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p15.json",
+      "bytes": 383139,
+      "sha256": "a9011ea0963619dbba03d61a72dee286d14ae4963a58762503e4082b5635aabd"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p150.json",
+      "bytes": 385926,
+      "sha256": "da19c50b0fe38cb02d7b364e83a76fdc3786bab7cdeb27679a1d70eab7ca1915"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p151.json",
+      "bytes": 378096,
+      "sha256": "3c93c451ca3db30ab79c4dc919d54d8e05c393e468dec5068d033878aef9acd0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p152.json",
+      "bytes": 385482,
+      "sha256": "c0c4f4e6b1c48f944f185d80f3522bf40776561fdf8cb335d6f17b36cedc369b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p153.json",
+      "bytes": 383036,
+      "sha256": "ef3736881b303478cd2453a6b587f1111c89d1fca587b3cfa9cb2384af6275bf"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p154.json",
+      "bytes": 383277,
+      "sha256": "8b6e80f21ce8d68a889af0d6ecf6f7602a6356794fd025831bb7c4af70e437ed"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p155.json",
+      "bytes": 382235,
+      "sha256": "59fa2d0a7b7674a54f01842d42929b91d598d57ac8c2b60d324e855e8524ebd9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p156.json",
+      "bytes": 384613,
+      "sha256": "dc8fc4349232e474ee44b975c5cdd456e003f20599c00dbae4c379d019796d1e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p157.json",
+      "bytes": 384181,
+      "sha256": "9a522d6a5328c9a804a763e3268f7fc9e26e864a3da980a4ac9d6ce0967d2514"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p158.json",
+      "bytes": 385751,
+      "sha256": "b698b288a036c327d0b1c8912eae8028e7a3b096263e2bb9173661d166b4e552"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p159.json",
+      "bytes": 389663,
+      "sha256": "b15af2910dc3538e1ec65e9315cc24316efd81818161519436239875ffc3f9fb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p16.json",
+      "bytes": 385120,
+      "sha256": "3de334653ccc6bffc1d85f8fe6dc59ff6d0baed8d7c47564c316504b984ecf3a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p160.json",
+      "bytes": 386487,
+      "sha256": "0d7dc3b3cf5a41944ddbeb768c61d210861229d8f23c448369b17c08e09239a6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p161.json",
+      "bytes": 384861,
+      "sha256": "a5c9bdc4e0d543fc73ae45dc6ce47abea4bab953e9f6cf2c419d9ea685453aab"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p162.json",
+      "bytes": 381250,
+      "sha256": "6288ec1e0a176a1bf0c1cf1f0bfd466a945cfc47a37414864f5d897674205ddb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p163.json",
+      "bytes": 382398,
+      "sha256": "01c36821f93808811304f7cf6e0f68593f338a06b5c7f87828425baadb2b6d70"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p164.json",
+      "bytes": 388877,
+      "sha256": "97627e9c6da06d9a7c8ea4e743077aec52de0b5bed912700c1d837953be35f73"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p165.json",
+      "bytes": 387589,
+      "sha256": "352c5031c074c9dadc2b5674c5a9f473ff3df99fea67a14f8f1d5f88ac425839"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p166.json",
+      "bytes": 382189,
+      "sha256": "bc6c15490b9f6dd27da98bb062574d35b398e3857e581565d998cbde1ef49c7c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p167.json",
+      "bytes": 375562,
+      "sha256": "2c941464372b69cd1e267fbb9c570de679e4822992fc18a0c93bc0170cab22c7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p168.json",
+      "bytes": 382569,
+      "sha256": "a49b8f0c6626b95b95b660b8bd749054e0ada0ee19418d7c002f403522c96297"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p169.json",
+      "bytes": 371134,
+      "sha256": "ebb898535be7a5d05d4fb7b9bc60b50235854fb414531b36211a757575f456a1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p17.json",
+      "bytes": 385065,
+      "sha256": "15565ba997856c50e8dccaf698a0b909a0c942eb5f43b9f9e7c1bdc7955f9996"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p170.json",
+      "bytes": 382838,
+      "sha256": "4b4975b5c1958c8379bad6296b06fa9268701f9624f295eee97a08441ca13ae9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p171.json",
+      "bytes": 352766,
+      "sha256": "cd052180f6d4972b2620adedb376cfe0f5e57d1af0472636e3def1144d0c5ee9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p172.json",
+      "bytes": 382894,
+      "sha256": "dc5a4a8b777960cf092ffcacf5accb7e0373de796461a19c03013b349da9d211"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p173.json",
+      "bytes": 365227,
+      "sha256": "df10aa90832997cc6e4474e0dcc1ce0bbe835b13773da077309f6d7f7ff6d6d5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p174.json",
+      "bytes": 382656,
+      "sha256": "6dfd39dcd3c81cb89c7e7273b303f219bd5099e713b540238f0bbb8b38affeac"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p175.json",
+      "bytes": 383652,
+      "sha256": "1da79c89289763fbb572b2532117a78ac12edffebe04b10128ca17ac1d2c2da9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p176.json",
+      "bytes": 376930,
+      "sha256": "1ed06526272b33a9cf924a4bf6cf10b22f8a1cbc5f5b2f7f5eddc30b6ec73e58"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p177.json",
+      "bytes": 383303,
+      "sha256": "2157d4a5b37f6ebb22bfb6f2cfe1d37fe984190f5a784c89630908304b1a6170"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p178.json",
+      "bytes": 382261,
+      "sha256": "b966ff7d6821bd21808aa3677c25fdc0f7fcdd386424b189d229386d4b2822a1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p179.json",
+      "bytes": 382480,
+      "sha256": "66152a50b0beef84c677c6284e5c6e941f39729b1be041e7600ceb0acae1db8d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p18.json",
+      "bytes": 379521,
+      "sha256": "1a326f85d8664772f2870ecb52bf89171bea01ec6dcb37b3ac5ea7c4da63cb0d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p180.json",
+      "bytes": 382059,
+      "sha256": "70371a91336a222e214d2352124a9e86f42780be332c650c3713e87e0a0978bd"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p181.json",
+      "bytes": 56837,
+      "sha256": "7f56d2c41ef97933324a75928aca5b0e38269fbd556b4355fd40f6077e76f9b6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p19.json",
+      "bytes": 388899,
+      "sha256": "4caf3fa000a558b0f51ee41e6d4b28429f678e1d8d7b48ccc7db7ca907fdf0c0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p20.json",
+      "bytes": 387247,
+      "sha256": "406e5439930e475f674e27510266abe68092426c3e049d8c15c99826aaaa87bb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p21.json",
+      "bytes": 388699,
+      "sha256": "926d09781ff6614a7f62b8a6128e51e692df6bfc1ade85f437b874af0410f090"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p22.json",
+      "bytes": 384382,
+      "sha256": "027f1640e922e9c772da46551571cf88e73f258dabdae3564f3a7eb056a9c78b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p23.json",
+      "bytes": 389931,
+      "sha256": "e5f252b5451c85116cb3ad91b41692f83962da805e67343ade247be2772cf8bb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p24.json",
+      "bytes": 381049,
+      "sha256": "a898a642ad215381195c027985fa99306084a16ae4eb4bbc0805e5e43dbb3bc3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p25.json",
+      "bytes": 388100,
+      "sha256": "31dbdf46f31a0b2cf3d31d3085feedb9bb2aa8c6bb44cebb7669ec483d9b6e72"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p26.json",
+      "bytes": 389024,
+      "sha256": "633d9a4cc530cd4c693c381ebdba46ea58f37f2a7f5eeb1c103172a9fbf58817"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p27.json",
+      "bytes": 388999,
+      "sha256": "c12c226ea5f35152a2cc1d6fe5ca931bf1ed5f624d89633a8b3baa4cae40b3c9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p28.json",
+      "bytes": 385668,
+      "sha256": "5d3440871754a962dee58e39ab2c5d120706e1c9e04b7c18565af5a216607611"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p29.json",
+      "bytes": 386556,
+      "sha256": "77f6a35e61068e172704850df0b942443914af9039ba8915f0036e44d8000a4d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p30.json",
+      "bytes": 380826,
+      "sha256": "823e99931e54e3c3e98bff38a4105311dd2631312e5c184c3702a6be85294947"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p31.json",
+      "bytes": 388357,
+      "sha256": "e2f93d50e5bf91cbc02464fb10ffe13f201e476040f7aaf674c941d8d7713db2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p32.json",
+      "bytes": 382431,
+      "sha256": "2b3b9502ae637c2d73649db1e709b700831dad38256eda4dfe74a62836869f68"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p33.json",
+      "bytes": 381102,
+      "sha256": "0a475cc832ed36697dad6062459bf40feffd84c1ee0871c8fdd7cc7cf2b2a3f4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p34.json",
+      "bytes": 381104,
+      "sha256": "0a1304660a1bafea1e6aa269aa4fe93c19c3f430397b33f397306c07b2d51d67"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p35.json",
+      "bytes": 380625,
+      "sha256": "261776d651b2f9677e85211ce664e6fe2af34f4edf30666d14640b58621099a3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p36.json",
+      "bytes": 379458,
+      "sha256": "66149c65647b2e78ae78cd50313b59c8f48dc522e64e35d19a4e271d495bd5e8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p37.json",
+      "bytes": 386953,
+      "sha256": "09f58e5a6ef4e6a4f83fe5f5f81167de71d8a109776e3c035d8735454de1e421"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p38.json",
+      "bytes": 376801,
+      "sha256": "ad3b7661e2f7784e7e6d778a0d57b2116786c929627673ffaea173abb4561eb7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p39.json",
+      "bytes": 389936,
+      "sha256": "90c7425cbad5e9750e936c30e512fcfe661324c6bbda559401c201f5c99ac1c4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p40.json",
+      "bytes": 389043,
+      "sha256": "af8fec4dad654ef8a0ce2a1dcc9ae3531928a21d43d705920683903d8cea5eb8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p41.json",
+      "bytes": 384415,
+      "sha256": "bac57b14f554883f99d45fc4ebbda4697784d17b761c8a7c24d4dd7628afe05d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p42.json",
+      "bytes": 380384,
+      "sha256": "45307753a2c12211c986962293b70d61c8a2fefebbda57f7efcf6a73cd0a0ff8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p43.json",
+      "bytes": 389471,
+      "sha256": "f6384935f37584b4ae8cf7e941bd93a8d4ad340f0afbe6f02622535234bedb0e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p44.json",
+      "bytes": 387600,
+      "sha256": "ff162d28f7f25991f61e65971b652799b59a56aec72818bc07f338be329b1f48"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p45.json",
+      "bytes": 386549,
+      "sha256": "b321bbfb835add675e25347f2683728431125df04940c6c9fc34984e520e2261"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p46.json",
+      "bytes": 388853,
+      "sha256": "79681d123219768cefb98a5ee31e3f9172e7eb5ebebb03b98e03e73380892399"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p47.json",
+      "bytes": 377451,
+      "sha256": "5169d3a9b8aca972ebe9b1ac249ae4ee313727dcfd5415eb8e07a5cb56b2f4e9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p48.json",
+      "bytes": 383098,
+      "sha256": "236033c29a99675e76b098bb992099d18fc1f45ab1bb012d8c07489c6652abf7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p49.json",
+      "bytes": 384482,
+      "sha256": "6f2867e5c14e92d981d6cc0fbcce713bc5e78e3405894cb4d3039c2462976dda"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p50.json",
+      "bytes": 385462,
+      "sha256": "e1ab7cf30c3eeb2d2ffa80950a83c1359011fcdc6b6e550334babdc05a8f85b1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p51.json",
+      "bytes": 388810,
+      "sha256": "0541081120edf5b30ac626639b63545de383f3154d39b7f496bf71a9b8dc7456"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p52.json",
+      "bytes": 388150,
+      "sha256": "8df68348c19db354115767746df488c49ad0d87c6293142c0a8bcf119c42a1e3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p53.json",
+      "bytes": 382749,
+      "sha256": "c28757b36c7b5b9d1b135fe525896e8b29ad84ab3780d1b227bd9a87d4d12157"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p54.json",
+      "bytes": 388206,
+      "sha256": "b883428a2f342f201237a5b8ebf2f1ebdab2dd68c21a3c6f8db690077a4ee3bb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p55.json",
+      "bytes": 387361,
+      "sha256": "a21b872cc0dd21198ea35b2ff6945b5c6ccdd01034efb71a4b348f9f48e9919b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p56.json",
+      "bytes": 383878,
+      "sha256": "45e80048bdd181e3ca127ca93a0920d1de5f8a8753adff5a610e5bc565ad653f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p57.json",
+      "bytes": 387653,
+      "sha256": "975f654f0f1547724caff114e9d6673466cbc244a1953eda010a0a6ea551f769"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p58.json",
+      "bytes": 386736,
+      "sha256": "c580a528f02312af4fc96c54e785f52bab3f327d9eb8cea667b0ad4a823cbe84"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p59.json",
+      "bytes": 384031,
+      "sha256": "d0e68c5395aedc25aa33813f84ca1c063dc2202c53690ff7880d98798d55deb3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p60.json",
+      "bytes": 386458,
+      "sha256": "d046d87fdf8fec1f79575b9d212b1a79f93ebd98e66aa9e62da835f2f272e994"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p61.json",
+      "bytes": 389771,
+      "sha256": "224f0ec8834e5611d03d08e9b8531c17b5232a2b05d0e509abbe7627f8263c79"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p62.json",
+      "bytes": 379897,
+      "sha256": "ae2136caa71672dbd5aa8674ab6301ab37f10b9f5ba78b47714a085152beb6c6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p63.json",
+      "bytes": 385160,
+      "sha256": "93141eeb89ea59f8e95a818c3be9544ce12291ef5f4cd7fa81708cc960b8e9db"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p64.json",
+      "bytes": 385326,
+      "sha256": "a8e2c5d0123d01f714a99ef83b3a80bf6eacfce935886c4472f09209815dd7b6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p65.json",
+      "bytes": 386214,
+      "sha256": "8416b2ccc7553e6454172faabe653a658da562c49f36a5bfa930d10d2a183538"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p66.json",
+      "bytes": 386157,
+      "sha256": "c2baa647e01439541ba606201c55224354bfedb1104999275a63518faada7076"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p67.json",
+      "bytes": 387521,
+      "sha256": "a2268d42d3d59588255ccbe4828c544511070ea4b4e88b66f5d38ef5c6546ed2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p68.json",
+      "bytes": 381998,
+      "sha256": "1380c83ad18d863bf7c3aeb075392b332dbd06d658b8c6997cf567bc5fad0ea5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p69.json",
+      "bytes": 384930,
+      "sha256": "19dbd10eb96997c23d06570b7c0705e2dfecfbc5b8ef3b601409b3313a199163"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p70.json",
+      "bytes": 385256,
+      "sha256": "4ddfa9bcb67c0f3c4ae63d26dec58794fc3470f2831e928177362aac1d4cc812"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p71.json",
+      "bytes": 382026,
+      "sha256": "314efc2e4dc95875b06784d044d338e716d1b486695e6c5d15bf71a28a430f8e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p72.json",
+      "bytes": 388290,
+      "sha256": "6b9b30eae4f98e1a00be9e994150d2db1868e7ec044abf876bc4c7ffd639a446"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p73.json",
+      "bytes": 386735,
+      "sha256": "6169484a60e5863b0a5c9c4279e6bc390421095bee323237f31b4cbcf7634207"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p74.json",
+      "bytes": 382912,
+      "sha256": "92e42f950eb3b75923909899c9b2487c233acd0088c1b6ea48f24922805e11bd"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p75.json",
+      "bytes": 382304,
+      "sha256": "752e687ecca9e4651167c3a95b892fca6185d4871dc436e54701c990c7c0fef5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p76.json",
+      "bytes": 388416,
+      "sha256": "2a76e50232fa29ffc11293a47960680ee31159003563fff2a3e6fc73911e1c1d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p77.json",
+      "bytes": 388738,
+      "sha256": "8b7da8fd774e4dd091c5eb1c54fa00b6c907ff3bffb9b805b4bdbb85383b0f4b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p78.json",
+      "bytes": 379863,
+      "sha256": "2d635a500cbe96ac4b69ae1ce9be7cada5dfbb12f9504c34fd1007cd1b2ab42e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p79.json",
+      "bytes": 385787,
+      "sha256": "6ebbedf8a26ae0081c5512bc8e5a666731eafbaa637ffb98ce8920c1d8e374df"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p80.json",
+      "bytes": 382281,
+      "sha256": "8fd423d349a3ca9d7dcda7f4865f06e0563e5fcab676f72059bf410c5cc8317b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p81.json",
+      "bytes": 387138,
+      "sha256": "b371aeef00623c9d34ff1c6294693834db19fda84a72e2018426e2979783d098"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p82.json",
+      "bytes": 385793,
+      "sha256": "374056168ed047667ff9a3e90d7943c0b60907995e90f1f5eb5a932c8387dd93"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p83.json",
+      "bytes": 336492,
+      "sha256": "3da0ec789ba7ff3f0b92fb2f90b3aad9d6b4d1c5b84742b2d5427c635ea2909b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p84.json",
+      "bytes": 334996,
+      "sha256": "097e38a4ec626fc6ff0ef0b7b009d50c033691fafeffa926af03e263f3e4b36c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p85.json",
+      "bytes": 342101,
+      "sha256": "9305990ba3b395e448047c2aa74813fb61441446c883f4b1dd2ffd3397047ea6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p86.json",
+      "bytes": 369283,
+      "sha256": "31e8ad79a3fe1955b60ac534b99315b69789c8cda7b4b2789e633c7173d1d8c6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p87.json",
+      "bytes": 364644,
+      "sha256": "21c55100e857901662b4a5711c1cca23f00d82bc413e042834c1a72292ff2430"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p88.json",
+      "bytes": 345528,
+      "sha256": "4806e94f0790ddb4df9c46d780b462292108167ca8b36c2385fb124b99ee9b8e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p89.json",
+      "bytes": 368371,
+      "sha256": "2e3acae0767a8dd3056681c4a5c5938e512d67ddcf766e2afef0f9ee6f7ab13f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p90.json",
+      "bytes": 386945,
+      "sha256": "563b5b9783cc0e8029e756d7cde398b7f4bcba4d315006c04c0d28c9b0b1164d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p91.json",
+      "bytes": 387898,
+      "sha256": "3a740525267756e28591998858dd1701291f6c0a28813445f2e9b2edf036d1eb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p92.json",
+      "bytes": 384741,
+      "sha256": "c4a49e0afced82cba1b326d8fcd9fdeac52b96441ea71224db0501b12913ebc9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p93.json",
+      "bytes": 388396,
+      "sha256": "941ef8423a196dfbb10e9c98b1a3d46a2e9412395dd904b4dfe4fba4ca64ebd2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p94.json",
+      "bytes": 379910,
+      "sha256": "0cb3cb092f5f80bd0dfbed6ff30a2327d9a32738af0852d23f3cf5d3c1746c64"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p95.json",
+      "bytes": 389792,
+      "sha256": "0403f4550425bef6612e6204ae7b0663c711cdd2bd8c88fa646de7220ad693d4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p96.json",
+      "bytes": 389080,
+      "sha256": "5c313970235e2f6785849e8d5f1ca23d51e881370e70b2e3cf20102e1e6711bb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p97.json",
+      "bytes": 386246,
+      "sha256": "758e8a77ea0462c7417479cc280b2a00ff7b8b23cce214fc82bf5f8bcaedf961"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p98.json",
+      "bytes": 386696,
+      "sha256": "ee6186734da4b067e266ab9d13214525b038c828cdd2b21b19da48286b62310e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-p99.json",
+      "bytes": 385650,
+      "sha256": "e51ed20c6bd594e36083f9da9e2d7380d9121cf69f224ad60c6e2c7e1bdcb8c9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-packet.py",
+      "bytes": 9621,
+      "sha256": "efefeaa094f76dee4509cd625c9bd93e076188d35e637ef71d16edf9fcd2f3a4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-parity-receipts.json",
+      "bytes": 1710935,
+      "sha256": "d993502475f64ecf600e8aa57d1ac243f9e9c623be2d8d0811372eaa4038ec6c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-parsed-current-sets.json",
+      "bytes": 380170,
+      "sha256": "8ae1736c57bb2e11bd9552d6764c1c8b0f92cd55181badb853607250602344a5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-pilot-changes.json",
+      "bytes": 8112,
+      "sha256": "cccf7955974fcd4b042998edb728538fb094c4b2079557f7b9027f6595ab9e05"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-pilot-check.log",
+      "bytes": 66600,
+      "sha256": "c0e6424e3471f72aa7a77c8f5febecce6ef239192694b871973ec3d75a8ed8d2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-pre-field-probes-result.json",
+      "bytes": 7258,
+      "sha256": "ce9a18c60ee4fdd50d5babd30bf776ee19d6a75c947b248dbe4f89c435f5e9d7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-prior-join-result.json",
+      "bytes": 65,
+      "sha256": "622f913defb75892a178d117f7bd72b907af95eed4d5f28c310a7e2e8275dff0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes-result.json",
+      "bytes": 7584,
+      "sha256": "8f609e94959aa2cd4413a5483ea071649dc021bf74dfdc7b8f689a185c5c852c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes.log",
+      "bytes": 330,
+      "sha256": "aa38f2ac246f76dbb79002fff0eb191a254ef5c5a6941567a9e9ea9278ec2d15"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes.py",
+      "bytes": 5925,
+      "sha256": "9bd167ca4994ff67843977210473a41ca81d247217502f835e442e056dde2ea7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-refine.py",
+      "bytes": 9116,
+      "sha256": "05fb866bec4a2b49cc2dfb4336f430a7d35ff4f4621779a9b8f60e4a2a2f9fd5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-review-index.json",
+      "bytes": 86839,
+      "sha256": "2fcc670f8ae7031bd763ba539aa2a970439acaeddee3a48f9312f560552e7cd0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-review-request.md",
+      "bytes": 6519,
+      "sha256": "b27cf41998b2a736c7bd6eec99c6a86531ab3228fec72922ab4cdf02b6f33c43"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-runtime-handoff.json",
+      "bytes": 6027,
+      "sha256": "2631e191ced4be925aac3fe6e782c2855e395c04713350b6f5de8812c016627a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-selection.json",
+      "bytes": 214864,
+      "sha256": "8878bf1d037eaa4ba2423adc1ea0e9b427e07abbd31af1d3a5069ff3e3db9604"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-target-pins.json",
+      "bytes": 32997,
+      "sha256": "28ba49d74cc2954aca621cde052b443005324f923a6c033b00df20a741496665"
+    }
+  ],
+  "nextCustody": [
+    "Lead independent review under option B",
+    "Actual runner-commit L12-11 accounting",
+    "Step7 final source/render/target composition and changed binding review",
+    "Authorized source-state exports and same-input generator/runtime proof",
+    "Phase9 owner gate"
+  ]
+}

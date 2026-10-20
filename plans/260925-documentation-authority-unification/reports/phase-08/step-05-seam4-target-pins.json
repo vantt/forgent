@@ -1,0 +1,554 @@
+{
+  "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+  "bindings": [
+    {
+      "sourceFile": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+      "edgeId": "skills-090",
+      "slotKey": "{\"edgeId\":\"skills-090\",\"file\":\"domains/coding/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-090\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":80}]}",
+      "target": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetSha256": "38b4c82e7ec19c98dddb438de7d76c989b96b2df17193676bec3c093b50c9202",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "anchor": "business-rules",
+      "anchorExists": true,
+      "headingEvidence": [
+        {
+          "anchor": "business-rules",
+          "githubSlug": "business-rules",
+          "kind": "heading",
+          "startLine": 25,
+          "endLine": 25,
+          "sample": "Business Rules"
+        }
+      ],
+      "provenance": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-001.jsonl",
+        "recordSha256": "24ba907fe73623624c3e218122b37905a29b1db436d08510dce3eb2c9ff8d8f6"
+      },
+      "status": "current target location verified; independent passage correspondence and final Step7 composition still pending"
+    },
+    {
+      "sourceFile": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "edgeId": null,
+      "slotKey": "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":74,\"columnStart\":21,\"file\":\"domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":19,\"text\":\"docs/how-to/preserve-shell-escapes-when-transcribing-\"}}",
+      "target": "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+      "targetSha256": "d66c20b09afe9e36a98239d55a1ef935763ebbbf6f9afb8b512a350109b14be0",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "anchor": null,
+      "anchorExists": true,
+      "headingEvidence": [],
+      "provenance": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-001.jsonl",
+        "recordSha256": "24ba907fe73623624c3e218122b37905a29b1db436d08510dce3eb2c9ff8d8f6"
+      },
+      "status": "current target location verified; independent passage correspondence and final Step7 composition still pending"
+    },
+    {
+      "sourceFile": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "edgeId": null,
+      "slotKey": "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":54,\"columnStart\":2,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":16,\"text\":\"docs/how-to/write-verify-for-a-skill-prose-change.md\"}}",
+      "target": "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md",
+      "targetSha256": "b9a68bd927266d032b15f8acd64c64ddb3939065fceb98831ad91e6da720dc97",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "anchor": null,
+      "anchorExists": true,
+      "headingEvidence": [],
+      "provenance": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-002.jsonl",
+        "recordSha256": "1485d12f7b332207b8cdc5de2662cc2be2bdcb1c62ae097c1378a63cfb36edf6"
+      },
+      "status": "current target location verified; independent passage correspondence and final Step7 composition still pending"
+    },
+    {
+      "sourceFile": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "edgeId": null,
+      "slotKey": "{\"edgeId\":null,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":69,\"columnStart\":48,\"file\":\"domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":49,\"text\":\"docs/how-to/preserve-\"}}",
+      "target": "docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+      "targetSha256": "d66c20b09afe9e36a98239d55a1ef935763ebbbf6f9afb8b512a350109b14be0",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "anchor": null,
+      "anchorExists": true,
+      "headingEvidence": [],
+      "provenance": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-002.jsonl",
+        "recordSha256": "1485d12f7b332207b8cdc5de2662cc2be2bdcb1c62ae097c1378a63cfb36edf6"
+      },
+      "status": "current target location verified; independent passage correspondence and final Step7 composition still pending"
+    },
+    {
+      "sourceFile": "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+      "edgeId": "skills-112",
+      "slotKey": "{\"edgeId\":\"skills-112\",\"file\":\"domains/coding/skills/fgos-coding-shaping/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-112\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":73}]}",
+      "target": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetSha256": "38b4c82e7ec19c98dddb438de7d76c989b96b2df17193676bec3c093b50c9202",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "anchor": "business-rules",
+      "anchorExists": true,
+      "headingEvidence": [
+        {
+          "anchor": "business-rules",
+          "githubSlug": "business-rules",
+          "kind": "heading",
+          "startLine": 25,
+          "endLine": 25,
+          "sample": "Business Rules"
+        }
+      ],
+      "provenance": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-002.jsonl",
+        "recordSha256": "1485d12f7b332207b8cdc5de2662cc2be2bdcb1c62ae097c1378a63cfb36edf6"
+      },
+      "status": "current target location verified; independent passage correspondence and final Step7 composition still pending"
+    },
+    {
+      "sourceFile": "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+      "edgeId": "class4-l-002026",
+      "slotKey": "{\"edgeId\":\"class4-l-002026\",\"file\":\"plugins/fgOS/skills/cleanup-loop/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-002026\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":31}]}",
+      "target": "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+      "targetSha256": "df972d749388feecaffe4d5298a6eecf7501ddac0ec01372d1fbd5a284921c92",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "anchor": null,
+      "anchorExists": true,
+      "headingEvidence": [],
+      "provenance": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-008.jsonl",
+        "recordSha256": "21bcb1f1819861811807d3b0001943b943d116ad26c04abec351618f78dc44db"
+      },
+      "status": "current target location verified; independent passage correspondence and final Step7 composition still pending"
+    },
+    {
+      "sourceFile": "plugins/fgOS/skills/retro-loop/SKILL.md",
+      "edgeId": "class4-l-002095",
+      "slotKey": "{\"edgeId\":\"class4-l-002095\",\"file\":\"plugins/fgOS/skills/retro-loop/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-002095\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":36}]}",
+      "target": "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+      "targetSha256": "df972d749388feecaffe4d5298a6eecf7501ddac0ec01372d1fbd5a284921c92",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "anchor": null,
+      "anchorExists": true,
+      "headingEvidence": [],
+      "provenance": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-008.jsonl",
+        "recordSha256": "21bcb1f1819861811807d3b0001943b943d116ad26c04abec351618f78dc44db"
+      },
+      "status": "current target location verified; independent passage correspondence and final Step7 composition still pending"
+    },
+    {
+      "sourceFile": "core/instructions/platform-laws.md",
+      "edgeId": "instructions-039",
+      "slotKey": "{\"edgeId\":\"instructions-039\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-039\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":15}]}",
+      "target": "docs/platform/platform-foundations.md",
+      "targetSha256": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "anchor": "luật-nền-platform-forgent-phase-0-compound-learning-stack",
+      "anchorExists": true,
+      "headingEvidence": [
+        {
+          "anchor": "luật-nền-platform-forgent-phase-0-compound-learning-stack",
+          "githubSlug": "luật-nền-platform-forgent-phase-0--compound-learning-stack",
+          "kind": "heading",
+          "startLine": 86,
+          "endLine": 86,
+          "sample": "Luật nền platform forgent (Phase 0 — compound-learning stack)"
+        }
+      ],
+      "provenance": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+        "recordSha256": "312030bb7345c15553065787f1fcfe6bf8c53bfac883dcffc87b5ca324a56c86"
+      },
+      "status": "current target location verified; independent passage correspondence and final Step7 composition still pending"
+    },
+    {
+      "sourceFile": "core/instructions/platform-laws.md",
+      "edgeId": "instructions-040",
+      "slotKey": "{\"edgeId\":\"instructions-040\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-040\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":17}]}",
+      "target": "docs/platform/platform-foundations.md",
+      "targetSha256": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "anchor": "l1-hai-vật-lý-của-tri-thức-log-vs-state",
+      "anchorExists": true,
+      "headingEvidence": [
+        {
+          "anchor": "l1-hai-vật-lý-của-tri-thức-log-vs-state",
+          "githubSlug": "l1--hai-vật-lý-của-tri-thức-log-vs-state",
+          "kind": "heading",
+          "startLine": 113,
+          "endLine": 113,
+          "sample": "L1 — Hai vật lý của tri thức: Log vs State"
+        }
+      ],
+      "provenance": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+        "recordSha256": "312030bb7345c15553065787f1fcfe6bf8c53bfac883dcffc87b5ca324a56c86"
+      },
+      "status": "current target location verified; independent passage correspondence and final Step7 composition still pending"
+    },
+    {
+      "sourceFile": "core/instructions/platform-laws.md",
+      "edgeId": "instructions-041",
+      "slotKey": "{\"edgeId\":\"instructions-041\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-041\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":18}]}",
+      "target": "docs/platform/platform-foundations.md",
+      "targetSha256": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "anchor": "l2-kiến-trúc-memory-hai-tầng",
+      "anchorExists": true,
+      "headingEvidence": [
+        {
+          "anchor": "l2-kiến-trúc-memory-hai-tầng",
+          "githubSlug": "l2--kiến-trúc-memory-hai-tầng",
+          "kind": "heading",
+          "startLine": 137,
+          "endLine": 137,
+          "sample": "L2 — Kiến trúc memory hai tầng"
+        }
+      ],
+      "provenance": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+        "recordSha256": "312030bb7345c15553065787f1fcfe6bf8c53bfac883dcffc87b5ca324a56c86"
+      },
+      "status": "current target location verified; independent passage correspondence and final Step7 composition still pending"
+    },
+    {
+      "sourceFile": "core/instructions/platform-laws.md",
+      "edgeId": "instructions-042",
+      "slotKey": "{\"edgeId\":\"instructions-042\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-042\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":19}]}",
+      "target": "docs/platform/platform-foundations.md",
+      "targetSha256": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "anchor": "l3-luật-store-truth-ở-jsonl-db-là-view",
+      "anchorExists": true,
+      "headingEvidence": [
+        {
+          "anchor": "l3-luật-store-truth-ở-jsonl-db-là-view",
+          "githubSlug": "l3--luật-store-truth-ở-jsonl-db-là-view",
+          "kind": "heading",
+          "startLine": 165,
+          "endLine": 165,
+          "sample": "L3 — Luật store: truth ở JSONL, db là view"
+        }
+      ],
+      "provenance": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+        "recordSha256": "312030bb7345c15553065787f1fcfe6bf8c53bfac883dcffc87b5ca324a56c86"
+      },
+      "status": "current target location verified; independent passage correspondence and final Step7 composition still pending"
+    },
+    {
+      "sourceFile": "core/instructions/platform-laws.md",
+      "edgeId": "instructions-043",
+      "slotKey": "{\"edgeId\":\"instructions-043\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-043\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":20}]}",
+      "target": "docs/platform/platform-foundations.md",
+      "targetSha256": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "anchor": "l4-routing-model-theo-audience-của-từng-interface",
+      "anchorExists": true,
+      "headingEvidence": [
+        {
+          "anchor": "l4-routing-model-theo-audience-của-từng-interface",
+          "githubSlug": "l4--routing-model-theo-audience-của-từng-interface",
+          "kind": "heading",
+          "startLine": 195,
+          "endLine": 195,
+          "sample": "L4 — Routing model theo audience của từng interface"
+        }
+      ],
+      "provenance": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+        "recordSha256": "312030bb7345c15553065787f1fcfe6bf8c53bfac883dcffc87b5ca324a56c86"
+      },
+      "status": "current target location verified; independent passage correspondence and final Step7 composition still pending"
+    },
+    {
+      "sourceFile": "core/instructions/platform-laws.md",
+      "edgeId": "instructions-044",
+      "slotKey": "{\"edgeId\":\"instructions-044\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-044\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":21}]}",
+      "target": "docs/platform/platform-foundations.md",
+      "targetSha256": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "anchor": "l5-definition-of-done-sáu-câu-hỏi",
+      "anchorExists": true,
+      "headingEvidence": [
+        {
+          "anchor": "l5-definition-of-done-sáu-câu-hỏi",
+          "githubSlug": "l5--definition-of-done-sáu-câu-hỏi",
+          "kind": "heading",
+          "startLine": 222,
+          "endLine": 222,
+          "sample": "L5 — Definition of done: sáu câu hỏi"
+        }
+      ],
+      "provenance": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+        "recordSha256": "312030bb7345c15553065787f1fcfe6bf8c53bfac883dcffc87b5ca324a56c86"
+      },
+      "status": "current target location verified; independent passage correspondence and final Step7 composition still pending"
+    },
+    {
+      "sourceFile": "core/instructions/platform-laws.md",
+      "edgeId": "instructions-045",
+      "slotKey": "{\"edgeId\":\"instructions-045\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-045\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":22}]}",
+      "target": "docs/platform/platform-foundations.md",
+      "targetSha256": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "anchor": "l6-maturity-ladder-f0f5",
+      "anchorExists": true,
+      "headingEvidence": [
+        {
+          "anchor": "l6-maturity-ladder-f0f5",
+          "githubSlug": "l6--maturity-ladder-f0f5",
+          "kind": "heading",
+          "startLine": 239,
+          "endLine": 239,
+          "sample": "L6 — Maturity ladder F0–F5"
+        }
+      ],
+      "provenance": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+        "recordSha256": "312030bb7345c15553065787f1fcfe6bf8c53bfac883dcffc87b5ca324a56c86"
+      },
+      "status": "current target location verified; independent passage correspondence and final Step7 composition still pending"
+    },
+    {
+      "sourceFile": "core/instructions/platform-laws.md",
+      "edgeId": "instructions-046",
+      "slotKey": "{\"edgeId\":\"instructions-046\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-046\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":23}]}",
+      "target": "docs/platform/platform-foundations.md",
+      "targetSha256": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "anchor": "l7-durability-ladder",
+      "anchorExists": true,
+      "headingEvidence": [
+        {
+          "anchor": "l7-durability-ladder",
+          "githubSlug": "l7--durability-ladder",
+          "kind": "heading",
+          "startLine": 267,
+          "endLine": 267,
+          "sample": "L7 — Durability ladder"
+        }
+      ],
+      "provenance": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+        "recordSha256": "312030bb7345c15553065787f1fcfe6bf8c53bfac883dcffc87b5ca324a56c86"
+      },
+      "status": "current target location verified; independent passage correspondence and final Step7 composition still pending"
+    },
+    {
+      "sourceFile": "core/instructions/platform-laws.md",
+      "edgeId": "instructions-047",
+      "slotKey": "{\"edgeId\":\"instructions-047\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-047\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":24}]}",
+      "target": "docs/platform/platform-foundations.md",
+      "targetSha256": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "anchor": "l8-doctrine-placement-rule-always-loaded-layer",
+      "anchorExists": true,
+      "headingEvidence": [
+        {
+          "anchor": "l8-doctrine-placement-rule-always-loaded-layer",
+          "githubSlug": "l8--doctrine-placement-rule-always-loaded-layer",
+          "kind": "heading",
+          "startLine": 285,
+          "endLine": 285,
+          "sample": "L8 — Doctrine placement rule (always-loaded layer)"
+        }
+      ],
+      "provenance": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+        "recordSha256": "312030bb7345c15553065787f1fcfe6bf8c53bfac883dcffc87b5ca324a56c86"
+      },
+      "status": "current target location verified; independent passage correspondence and final Step7 composition still pending"
+    },
+    {
+      "sourceFile": "core/instructions/platform-laws.md",
+      "edgeId": "instructions-048",
+      "slotKey": "{\"edgeId\":\"instructions-048\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-048\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":25}]}",
+      "target": "docs/platform/platform-foundations.md",
+      "targetSha256": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "anchor": "l9-thang-hoàn-tất-của-một-việc-run-merge-durable",
+      "anchorExists": true,
+      "headingEvidence": [
+        {
+          "anchor": "l9-thang-hoàn-tất-của-một-việc-run-merge-durable",
+          "githubSlug": "l9--thang-hoàn-tất-của-một-việc-run--merge--durable",
+          "kind": "heading",
+          "startLine": 309,
+          "endLine": 309,
+          "sample": "L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable"
+        }
+      ],
+      "provenance": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+        "recordSha256": "312030bb7345c15553065787f1fcfe6bf8c53bfac883dcffc87b5ca324a56c86"
+      },
+      "status": "current target location verified; independent passage correspondence and final Step7 composition still pending"
+    },
+    {
+      "sourceFile": "core/instructions/platform-laws.md",
+      "edgeId": "instructions-049",
+      "slotKey": "{\"edgeId\":\"instructions-049\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-049\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":26}]}",
+      "target": "docs/platform/platform-foundations.md",
+      "targetSha256": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "anchor": "l10-add-through-not-alongside-mở-rộng-qua-cửa-không-đắp-cạnh-cửa",
+      "anchorExists": true,
+      "headingEvidence": [
+        {
+          "anchor": "l10-add-through-not-alongside-mở-rộng-qua-cửa-không-đắp-cạnh-cửa",
+          "githubSlug": "l10--add-through-not-alongside-mở-rộng-qua-cửa-không-đắp-cạnh-cửa",
+          "kind": "heading",
+          "startLine": 339,
+          "endLine": 339,
+          "sample": "L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa"
+        }
+      ],
+      "provenance": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+        "recordSha256": "312030bb7345c15553065787f1fcfe6bf8c53bfac883dcffc87b5ca324a56c86"
+      },
+      "status": "current target location verified; independent passage correspondence and final Step7 composition still pending"
+    },
+    {
+      "sourceFile": "core/instructions/platform-laws.md",
+      "edgeId": "instructions-050",
+      "slotKey": "{\"edgeId\":\"instructions-050\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-050\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":28}]}",
+      "target": "docs/platform/platform-foundations.md",
+      "targetSha256": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "anchor": "luật-nền-platform-forgent-phase-0-compound-learning-stack",
+      "anchorExists": true,
+      "headingEvidence": [
+        {
+          "anchor": "luật-nền-platform-forgent-phase-0-compound-learning-stack",
+          "githubSlug": "luật-nền-platform-forgent-phase-0--compound-learning-stack",
+          "kind": "heading",
+          "startLine": 86,
+          "endLine": 86,
+          "sample": "Luật nền platform forgent (Phase 0 — compound-learning stack)"
+        }
+      ],
+      "provenance": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+        "recordSha256": "312030bb7345c15553065787f1fcfe6bf8c53bfac883dcffc87b5ca324a56c86"
+      },
+      "status": "current target location verified; independent passage correspondence and final Step7 composition still pending"
+    },
+    {
+      "sourceFile": "core/skills/fgos-clarifying/SKILL.md",
+      "edgeId": "skills-084",
+      "slotKey": "{\"edgeId\":\"skills-084\",\"file\":\"core/skills/fgos-clarifying/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-084\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":90}]}",
+      "target": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetSha256": "38b4c82e7ec19c98dddb438de7d76c989b96b2df17193676bec3c093b50c9202",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "anchor": "business-rules",
+      "anchorExists": true,
+      "headingEvidence": [
+        {
+          "anchor": "business-rules",
+          "githubSlug": "business-rules",
+          "kind": "heading",
+          "startLine": 25,
+          "endLine": 25,
+          "sample": "Business Rules"
+        }
+      ],
+      "provenance": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-030.jsonl",
+        "recordSha256": "86f224f89fa21220da7521aa4faa94369e5a53ce0235d5f7fe3e30e3227d9b34"
+      },
+      "status": "current target location verified; independent passage correspondence and final Step7 composition still pending"
+    },
+    {
+      "sourceFile": "core/skills/fgos-indexing/SKILL.md",
+      "edgeId": "skills-085",
+      "slotKey": "{\"edgeId\":\"skills-085\",\"file\":\"core/skills/fgos-indexing/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-085\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":62}]}",
+      "target": "docs/reading-map.md",
+      "targetSha256": "f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "anchor": "5-detailed-product-and-source-map",
+      "anchorExists": true,
+      "headingEvidence": [
+        {
+          "anchor": "5-detailed-product-and-source-map",
+          "githubSlug": "5-detailed-product-and-source-map",
+          "kind": "heading",
+          "startLine": 122,
+          "endLine": 122,
+          "sample": "5. Detailed Product And Source Map"
+        }
+      ],
+      "provenance": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-030.jsonl",
+        "recordSha256": "86f224f89fa21220da7521aa4faa94369e5a53ce0235d5f7fe3e30e3227d9b34"
+      },
+      "status": "current target location verified; independent passage correspondence and final Step7 composition still pending"
+    },
+    {
+      "sourceFile": "core/skills/_shared/executor-dispatch-fallback.md",
+      "edgeId": null,
+      "slotKey": "{\"edgeId\":null,\"file\":\"core/skills/_shared/executor-dispatch-fallback.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":81,\"columnStart\":4,\"file\":\"core/skills/_shared/executor-dispatch-fallback.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":292,\"text\":\"docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-executor.md\"}}",
+      "target": "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+      "targetSha256": "ab941bc9e9b8b531ebb4a7691b35a40d0a10d1a78f891b1c2f625cbbb9f3ed20",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "anchor": null,
+      "anchorExists": true,
+      "headingEvidence": [],
+      "provenance": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-030.jsonl",
+        "recordSha256": "86f224f89fa21220da7521aa4faa94369e5a53ce0235d5f7fe3e30e3227d9b34"
+      },
+      "status": "current target location verified; independent passage correspondence and final Step7 composition still pending"
+    },
+    {
+      "sourceFile": "core/skills/fgos-researching/SKILL.md",
+      "edgeId": "skills-087",
+      "slotKey": "{\"edgeId\":\"skills-087\",\"file\":\"core/skills/fgos-researching/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-087\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":90}]}",
+      "target": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "targetSha256": "38b4c82e7ec19c98dddb438de7d76c989b96b2df17193676bec3c093b50c9202",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "anchor": "business-rules",
+      "anchorExists": true,
+      "headingEvidence": [
+        {
+          "anchor": "business-rules",
+          "githubSlug": "business-rules",
+          "kind": "heading",
+          "startLine": 25,
+          "endLine": 25,
+          "sample": "Business Rules"
+        }
+      ],
+      "provenance": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-031.jsonl",
+        "recordSha256": "d8ee868a7739ae2e8f35d64a70d2f8b09f10e01f825346efa96478386651a726"
+      },
+      "status": "current target location verified; independent passage correspondence and final Step7 composition still pending"
+    },
+    {
+      "sourceFile": "core/task-specs/fgos-indexing.md",
+      "edgeId": "skills-088",
+      "slotKey": "{\"edgeId\":\"skills-088\",\"file\":\"core/task-specs/fgos-indexing.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-088\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":12}]}",
+      "target": "docs/reading-map.md",
+      "targetSha256": "f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "anchor": "5-detailed-product-and-source-map",
+      "anchorExists": true,
+      "headingEvidence": [
+        {
+          "anchor": "5-detailed-product-and-source-map",
+          "githubSlug": "5-detailed-product-and-source-map",
+          "kind": "heading",
+          "startLine": 122,
+          "endLine": 122,
+          "sample": "5. Detailed Product And Source Map"
+        }
+      ],
+      "provenance": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-031.jsonl",
+        "recordSha256": "d8ee868a7739ae2e8f35d64a70d2f8b09f10e01f825346efa96478386651a726"
+      },
+      "status": "current target location verified; independent passage correspondence and final Step7 composition still pending"
+    }
+  ],
+  "bindingsChecked": 24,
+  "missingAnchors": 0,
+  "approvalCarry": false
+}

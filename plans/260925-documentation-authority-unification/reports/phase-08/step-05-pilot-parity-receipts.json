@@ -547,8 +547,8 @@
           },
           {
             "file": "src/cli/command-registry.mjs",
-            "sourceSha256": "65aa9b2dc704b9998383c2929e3fee11377397a1c7ca3635e0e9e7e2446b8c02",
-            "diffSha256": "72db80e324f24c14a07714e6c0b6167182193b4e2d72cd6e2c32751c1d853156",
+            "sourceSha256": "798526021edf0d526b694ca2d8ea0208e57a8ba2131fe14290de01044218b073",
+            "diffSha256": "a30149277033de62478dd2eac07ee2b206eaf971313b5ee6ee8394c3c914c07e",
             "parked": [
               "reference-003641",
               "reference-003643",
@@ -779,6 +779,52 @@
               "alias": "docs/how-to/resolve-an-events-jsonl-truncation.md",
               "targetSha256": "da410923253f4bdf8219b75fae8176ce4e97b9114e4a2172dbb19adfea460862",
               "claim": "live currentPath lookup; no writer destination adopts an alias"
+            }
+          },
+          {
+            "file": "src/cli/command-registry.mjs",
+            "referenceId": "reference-003649",
+            "edgeId": "class6-l-000225",
+            "line": 2075,
+            "currentExpression": "    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',",
+            "candidateExpression": "    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/platform/packaging-distribution/spec.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',",
+            "oldPointer": "docs/specs/distribution.md",
+            "newPointer": "docs/platform/packaging-distribution/spec.md",
+            "intent": "L12-71: only doctor RUL9/RUL11 navigation path changes",
+            "evidence": {
+              "rule": "L12-71: live RUL9/RUL11 doctor contract holder; Step 4 cli-006 precedent",
+              "target": "docs/platform/packaging-distribution/spec.md",
+              "targetSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+              "anchor": "business-rules",
+              "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+              "claim": "RUL9 default never writes; RUL11 --fix runs every registered fix",
+              "claimLines": [
+                644,
+                659
+              ]
+            }
+          },
+          {
+            "file": "src/cli/command-registry.mjs",
+            "referenceId": "reference-003664",
+            "edgeId": "cli-011",
+            "line": 2075,
+            "currentExpression": "    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',",
+            "candidateExpression": "    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/platform/packaging-distribution/spec.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',",
+            "oldPointer": "docs/specs/distribution.md",
+            "newPointer": "docs/platform/packaging-distribution/spec.md",
+            "intent": "L12-71: only doctor RUL9/RUL11 navigation path changes",
+            "evidence": {
+              "rule": "L12-71: live RUL9/RUL11 doctor contract holder; Step 4 cli-006 precedent",
+              "target": "docs/platform/packaging-distribution/spec.md",
+              "targetSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+              "anchor": "business-rules",
+              "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+              "claim": "RUL9 default never writes; RUL11 --fix runs every registered fix",
+              "claimLines": [
+                644,
+                659
+              ]
             }
           }
         ],
@@ -1045,6 +1091,17 @@
               "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
             }
           ]
+        },
+        {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/specs/distribution.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/specs/distribution.md",
+            "docs\\/specs\\/distribution.md",
+            "docs\\/specs\\/distribution\\.md"
+          ],
+          "matches": []
         }
       ],
       "coCutTestEdits": [
@@ -1090,7 +1147,7 @@
           "expectedAfterSha256": "cc1c9e2280fb3b0dbb1aea4c48dd090d6d0edc1ee44be4f224b759bab6adc55f",
           "rollbackDiff": "--- a/test/runner/merge.test.mjs\n+++ b/test/runner/merge.test.mjs\n@@ -1260,9 +1260,9 @@\n   const detail = formatFgosWriteRejectedDetail('fgw/demo-item', ['.fgos/events.jsonl'], 'main');\n   assert.equal(\n     detail,\n-    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n+    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n   );\n-  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));\n+  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));\n });\n \n test('mergeRunnerItem merges normally when the branch touches ordinary files alongside an untouched .fgos/', async () => {\n",
           "timing": "phase9",
-          "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+          "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance. L12-71: merge.test.mjs belongs to the shared atomic old-pointer co-cut with merge.mjs reference-003749; it does not assert hook output. Hook e2e basename proof stays unchanged.",
           "grepDecisions": [
             {
               "match": {
@@ -1173,7 +1230,7 @@
           "expectedAfterSha256": "cc1c9e2280fb3b0dbb1aea4c48dd090d6d0edc1ee44be4f224b759bab6adc55f",
           "rollbackDiff": "--- a/test/runner/merge.test.mjs\n+++ b/test/runner/merge.test.mjs\n@@ -1260,9 +1260,9 @@\n   const detail = formatFgosWriteRejectedDetail('fgw/demo-item', ['.fgos/events.jsonl'], 'main');\n   assert.equal(\n     detail,\n-    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n+    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n   );\n-  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));\n+  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));\n });\n \n test('mergeRunnerItem merges normally when the branch touches ordinary files alongside an untouched .fgos/', async () => {\n",
           "timing": "phase9",
-          "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+          "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance. L12-71: merge.test.mjs belongs to the shared atomic old-pointer co-cut with merge.mjs reference-003749; it does not assert hook output. Hook e2e basename proof stays unchanged.",
           "grepDecisions": [
             {
               "match": {
@@ -6418,6 +6475,11 @@
           "status": "not-run",
           "scope": "Existing module behavior; not cutover acceptance."
         }
+      ],
+      "recordTextClarifications": [
+        "L12-71: emitted doc-registry messages preserve because docs/doc-registry.json and .md stay at docs root. A later projection rename must co-cut reference-003830/003846/003853/003857/003858 with parked readers/writers.",
+        "L12-71: root/mainCheckout state-path parks are coupled to their owning check; they are not document destinations. looksLikeDocPath at 4131-4133 remains a future source-conservation co-cut prerequisite.",
+        "L12-71: registrations L2045 preserved manual-command comment is stale before cutover; reference-003845 is comment provenance, not current-path guidance."
       ]
     }
   ]

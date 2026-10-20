@@ -1,0 +1,160 @@
+{
+  "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+  "proof": "scratch-only full-file forward and inverse patch, no git writes",
+  "files": [
+    {
+      "file": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+      "forward": "patching file domains/coding/skills/fgos-coding-discovering/SKILL.md\n",
+      "rollback": "patching file domains/coding/skills/fgos-coding-discovering/SKILL.md\n",
+      "forwardExit": 0,
+      "rollbackExit": 0,
+      "beforeSha256": "d4a473140d8dd360e446e288101fca3052a2e7aca6809fe1981b95947c7a7516",
+      "afterSha256": "40655c4105eb9a9e81b3d1e4db9a2b7a68d110bdb0d55fe049fd6f911d14fb2e",
+      "restoredSha256": "d4a473140d8dd360e446e288101fca3052a2e7aca6809fe1981b95947c7a7516",
+      "scratchOnly": true
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "forward": "patching file domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\n",
+      "rollback": "patching file domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md\n",
+      "forwardExit": 0,
+      "rollbackExit": 0,
+      "beforeSha256": "f0006cf1f33ab0c3e1dc40f6501e5da3825d1a8c2dcd67339dc4a29427fb1b59",
+      "afterSha256": "e2bed3b8d4f399bdfaf98bd507b8a7875866706564b4f301dc6a83f37964eda8",
+      "restoredSha256": "f0006cf1f33ab0c3e1dc40f6501e5da3825d1a8c2dcd67339dc4a29427fb1b59",
+      "scratchOnly": true
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "forward": "patching file domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\n",
+      "rollback": "patching file domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md\n",
+      "forwardExit": 0,
+      "rollbackExit": 0,
+      "beforeSha256": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+      "afterSha256": "6bb5b3300486467f8820ca60b0f90889e8d1d9f287e9b61031bbcb22ae7fdb02",
+      "restoredSha256": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+      "scratchOnly": true
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+      "forward": "patching file domains/coding/skills/fgos-coding-shaping/SKILL.md\n",
+      "rollback": "patching file domains/coding/skills/fgos-coding-shaping/SKILL.md\n",
+      "forwardExit": 0,
+      "rollbackExit": 0,
+      "beforeSha256": "04d749a7f036cf4f29caa8c82c5bd79426046508ef3cf8d71e47e0b5c72ea432",
+      "afterSha256": "e4c17844903280abcf34e24d6b41f7ce4dd16ba45a3a8cb346ab07196803d08c",
+      "restoredSha256": "04d749a7f036cf4f29caa8c82c5bd79426046508ef3cf8d71e47e0b5c72ea432",
+      "scratchOnly": true
+    },
+    {
+      "file": "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+      "forward": "patching file plugins/fgOS/skills/cleanup-loop/SKILL.md\n",
+      "rollback": "patching file plugins/fgOS/skills/cleanup-loop/SKILL.md\n",
+      "forwardExit": 0,
+      "rollbackExit": 0,
+      "beforeSha256": "952474402b90ec3582ad8b55e1c5a03cfc98c11630c3b7c522bb244a235ed871",
+      "afterSha256": "3c804273d8e62b2700228e20e8846d4ee36e61851af4080775f924f169095d5e",
+      "restoredSha256": "952474402b90ec3582ad8b55e1c5a03cfc98c11630c3b7c522bb244a235ed871",
+      "scratchOnly": true
+    },
+    {
+      "file": "plugins/fgOS/skills/retro-loop/SKILL.md",
+      "forward": "patching file plugins/fgOS/skills/retro-loop/SKILL.md\n",
+      "rollback": "patching file plugins/fgOS/skills/retro-loop/SKILL.md\n",
+      "forwardExit": 0,
+      "rollbackExit": 0,
+      "beforeSha256": "b134815fe10d13c4351a4d5f11b5e18db796b086afacc2767a062c218f7c892d",
+      "afterSha256": "ef6af0cff4fa9743fe4b95fb705ae309a05b5bf93ac7370c3f699150ce6b67b4",
+      "restoredSha256": "b134815fe10d13c4351a4d5f11b5e18db796b086afacc2767a062c218f7c892d",
+      "scratchOnly": true
+    },
+    {
+      "file": "core/instructions/platform-laws.md",
+      "forward": "patching file core/instructions/platform-laws.md\n",
+      "rollback": "patching file core/instructions/platform-laws.md\n",
+      "forwardExit": 0,
+      "rollbackExit": 0,
+      "beforeSha256": "4b834fa5ea7db1d9637a3126a7a96f7758be2f1650131411c4e69b3a91ac6f90",
+      "afterSha256": "931089f5f7f39782a47e67fb28dd4db5c102d0cdcfaf02b785e3ed3b674da095",
+      "restoredSha256": "4b834fa5ea7db1d9637a3126a7a96f7758be2f1650131411c4e69b3a91ac6f90",
+      "scratchOnly": true
+    },
+    {
+      "file": "core/skills/fgos-clarifying/SKILL.md",
+      "forward": "patching file core/skills/fgos-clarifying/SKILL.md\n",
+      "rollback": "patching file core/skills/fgos-clarifying/SKILL.md\n",
+      "forwardExit": 0,
+      "rollbackExit": 0,
+      "beforeSha256": "1eb6fe9cc19fa2e311b9f0a2a6eeb3810c12834f3c8bb59671b44b423be34bee",
+      "afterSha256": "0a404dea2c5f640b85f5b841060740a2da63a439f7c4be924fbdfde6ce852cec",
+      "restoredSha256": "1eb6fe9cc19fa2e311b9f0a2a6eeb3810c12834f3c8bb59671b44b423be34bee",
+      "scratchOnly": true
+    },
+    {
+      "file": "core/skills/fgos-indexing/SKILL.md",
+      "forward": "patching file core/skills/fgos-indexing/SKILL.md\n",
+      "rollback": "patching file core/skills/fgos-indexing/SKILL.md\n",
+      "forwardExit": 0,
+      "rollbackExit": 0,
+      "beforeSha256": "7356ec97cdc0532e3deb260faade56da41ea919cf704d2326e596a0f1f1c969e",
+      "afterSha256": "359f85a6d35c81cd241dac79c74ce13dc162043eadb8d668bbf5dd2c7546aaf0",
+      "restoredSha256": "7356ec97cdc0532e3deb260faade56da41ea919cf704d2326e596a0f1f1c969e",
+      "scratchOnly": true
+    },
+    {
+      "file": "core/skills/_shared/executor-dispatch-fallback.md",
+      "forward": "patching file core/skills/_shared/executor-dispatch-fallback.md\n",
+      "rollback": "patching file core/skills/_shared/executor-dispatch-fallback.md\n",
+      "forwardExit": 0,
+      "rollbackExit": 0,
+      "beforeSha256": "49e1fc021d5aa79b882ec8beb1669bf0a6b4a1ff1b15ee592a566483d10fb2c4",
+      "afterSha256": "43e5d60ba2e1e9e6023a43c7195bbee96004dd74d950769a6de0e8e9bea78e13",
+      "restoredSha256": "49e1fc021d5aa79b882ec8beb1669bf0a6b4a1ff1b15ee592a566483d10fb2c4",
+      "scratchOnly": true
+    },
+    {
+      "file": "core/skills/fgos-researching/SKILL.md",
+      "forward": "patching file core/skills/fgos-researching/SKILL.md\n",
+      "rollback": "patching file core/skills/fgos-researching/SKILL.md\n",
+      "forwardExit": 0,
+      "rollbackExit": 0,
+      "beforeSha256": "a08b3797131892f339e15b18aba9792ff3fc5d448261cafd59264b2d5ce2f9c8",
+      "afterSha256": "b3b6a1663bcc9e5030abbb90c5bc56d6948ba4dadd076e3d3d052df28d71f84c",
+      "restoredSha256": "a08b3797131892f339e15b18aba9792ff3fc5d448261cafd59264b2d5ce2f9c8",
+      "scratchOnly": true
+    },
+    {
+      "file": "core/task-specs/fgos-indexing.md",
+      "forward": "patching file core/task-specs/fgos-indexing.md\n",
+      "rollback": "patching file core/task-specs/fgos-indexing.md\n",
+      "forwardExit": 0,
+      "rollbackExit": 0,
+      "beforeSha256": "4a23450a73f61c2cc9bc63a5b7eee88eb44d07855a76a8d37c5943edc27e63fd",
+      "afterSha256": "9356db391c82d31a9a1edd4f390bf77770b619288f0f20f701f05e1ad38a1034",
+      "restoredSha256": "4a23450a73f61c2cc9bc63a5b7eee88eb44d07855a76a8d37c5943edc27e63fd",
+      "scratchOnly": true
+    },
+    {
+      "file": "docs/backlog.md",
+      "forward": "patching file docs/backlog.md\n",
+      "rollback": "patching file docs/backlog.md\n",
+      "forwardExit": 0,
+      "rollbackExit": 0,
+      "beforeSha256": "2e0cd5cd4e216a77ad108e187e109135571c0ca57e53bda77efcc2cef4e6331d",
+      "afterSha256": "79510b8fb12f2c8b5fc9f27d3617307a3b81a4dc5ca882f7a56c0dc292f0670a",
+      "restoredSha256": "2e0cd5cd4e216a77ad108e187e109135571c0ca57e53bda77efcc2cef4e6331d",
+      "scratchOnly": true
+    },
+    {
+      "file": "docs/transitional-switchboard.md",
+      "forward": "patching file docs/transitional-switchboard.md\n",
+      "rollback": "patching file docs/transitional-switchboard.md\n",
+      "forwardExit": 0,
+      "rollbackExit": 0,
+      "beforeSha256": "b058029179bae791d084a6881660adc3f64da7537d4880cd51421158f8e2b752",
+      "afterSha256": "b708c95f4c5a38b35ca031c3f25546c1c68bfb6080f53435d9c01dba99faec31",
+      "restoredSha256": "b058029179bae791d084a6881660adc3f64da7537d4880cd51421158f8e2b752",
+      "scratchOnly": true
+    }
+  ]
+}

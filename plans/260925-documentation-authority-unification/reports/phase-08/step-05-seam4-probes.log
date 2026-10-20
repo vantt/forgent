@@ -1,0 +1,1 @@
+{"kind": "Seam4 rejecting mutation probes", "baselineFailures": 0, "rulesCovered": ["s4-carries", "s4-coverage", "s4-greps", "s4-inheritance", "s4-lexical", "s4-operand", "s4-outputs", "s4-parks", "s4-patches", "s4-pins", "s4-receipts", "s4-retiring-retained", "s4-review", "s4-spans"], "passed": 22, "total": 22, "failures": []}

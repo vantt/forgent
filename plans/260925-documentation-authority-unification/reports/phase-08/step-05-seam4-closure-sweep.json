@@ -1,0 +1,84 @@
+{
+  "sweptFiles": 37,
+  "literalReferences": 149,
+  "dynamicTuples": 2017,
+  "retiringRetainedWitnessHits": [
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "reference-003649",
+      "oldWitness": {
+        "rule": "retained/external project or comment; no replacement claimed",
+        "currentPath": "docs/specs/distribution.md",
+        "exists": true
+      },
+      "action": "patch live doctor holder"
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "reference-003664",
+      "oldWitness": {
+        "rule": "retained/external project or comment; no replacement claimed",
+        "currentPath": null,
+        "exists": false
+      },
+      "action": "patch live doctor holder"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003819",
+      "oldWitness": {
+        "rule": "retained/external project or comment; no replacement claimed",
+        "currentPath": "docs/architect/knowledge-registry-redesign.md",
+        "exists": true
+      },
+      "action": "replace retained witness by explicit comment provenance"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003820",
+      "oldWitness": {
+        "rule": "retained/external project or comment; no replacement claimed",
+        "currentPath": "docs/architect/knowledge-registry-redesign.md",
+        "exists": true
+      },
+      "action": "replace retained witness by explicit comment provenance"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003821",
+      "oldWitness": {
+        "rule": "retained/external project or comment; no replacement claimed",
+        "currentPath": "docs/architect/knowledge-registry-redesign.md",
+        "exists": true
+      },
+      "action": "replace retained witness by explicit comment provenance"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003854",
+      "oldWitness": {
+        "rule": "retained/external project or comment; no replacement claimed",
+        "currentPath": "docs/architect/agent-coordination/contracts/flow-definition.md",
+        "exists": true
+      },
+      "action": "replace retained witness by explicit comment provenance"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003855",
+      "oldWitness": {
+        "rule": "retained/external project or comment; no replacement claimed",
+        "currentPath": "docs/specs/confinement-authority.md",
+        "exists": true
+      },
+      "action": "replace retained witness by explicit comment provenance"
+    }
+  ],
+  "hitCount": 7,
+  "patchIds": [
+    "reference-003649",
+    "reference-003664"
+  ],
+  "consumerWrites": 0,
+  "reviewReports": "Original independent reports immutable; this author closure supersedes record-text notes, not their historical verdicts."
+}

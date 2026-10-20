@@ -58,6 +58,7 @@ run('Patch cannot omit pinned old-string test grep','co-cut-grep',lambda rs,rc,i
 run('Receipt cannot omit a matching owning test from atomic co-cut set','co-cut-grep',lambda rs,rc,ix:rc[1]['coCutPaths'].remove('test/runner/merge.test.mjs'))
 run('Array-join warning template cannot masquerade as a path operation','dynamic-operand',lambda rs,rc,ix:find_dyn(rs,'dynamic-014072').update(admission='ADMIT',disposition='preserve'))
 run('Whole-file census grep cannot lose post-census comment custody','coverage',lambda rs,rc,ix:rc[2].__setitem__('postCensusCode',[e for e in rc[2]['postCensusCode'] if e.get('line')!=6659]))
+run('A retiring target cannot preserve on a retained witness','retiring-retained',lambda rs,rc,ix:find_ref(rs,'reference-003819').__setitem__('resolverWitness',{'rule':'retained target'}))
 base=m.check(BASE,RECEIPTS,INDEX)
 assert base['failureCount']==0,base['failures'][:3]
 covered={p['owningRule'] for p in probes};assert covered==set(m.RULES)

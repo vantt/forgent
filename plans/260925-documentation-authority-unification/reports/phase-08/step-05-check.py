@@ -107,6 +107,7 @@ RULES={
  'pinned-passage':'Every currentPassage exists at its exact line range in the pinned file, including relocation parks.',
  'dynamic-operand':'Every admitted dynamic operation constructs/carries an actual path or document operand, not neighbouring metadata or formatting.',
  'co-cut-grep':'Every emitted patch pins complete literal/escaped test grep results and joins every match to record, cutover spec and receipt.',
+ 'retiring-retained':'A preserve may not use a retained witness for a target under retiring docs/specs or docs/architect; provenance must be explicit.',
  'coverage':'Every selected file, literal, original origin and dynamic tuple is admitted or rejected exactly once.',
  'source-pins':'Whole-file bytes/mode/current pin are real; prior record hashes and protected pins stay equal.',
  'source-spans':'Current reference spans/passage and dynamic context match full source; unresolved relocation parks.',
@@ -220,6 +221,10 @@ def check(rs,receipts=None,index=None,check_packets=True):
 
   test('receipts',f,lambda:len(r['receiptIds'])==1 and all(x in rec for x in r['receiptIds']))
   for e in r['references']:
+   def retiring(e=e):
+    if e['disposition']=='preserve' and re.search(r'docs/(?:specs|architect)/',str(e.get('target') or e.get('matchedExpression'))):
+     assert not re.search(r'retained',str(e.get('resolverWitness',{})),re.I),'retiring tree cannot be a retained witness'
+   test('retiring-retained',f+':'+e['referenceId'],retiring)
    loc=f+':'+e['referenceId'];orig=expected.get(e['referenceId'],{})
    test('coverage',loc,lambda e=e,orig=orig:e['inventoryOrigins']==orig.get('origins') and e['originalSourceSpans']==orig.get('sourceSpans') and e['matchedExpression']==orig.get('expression') and e['admission'] in ['ADMIT','REJECT'])
    def spans(e=e):
@@ -247,7 +252,7 @@ def check(rs,receipts=None,index=None,check_packets=True):
       assert sha((ROOT/w['registryPath']).read_bytes())==w['registrySha256']
       docs=json.loads((ROOT/w['registryPath']).read_text())['docs'];hits=[d for d in docs if w['alias'] in d.get('aliases',[]) and d.get('docLifecycle')!='retired'];assert len(hits)==1 and hits[0]['currentPath']==e['target']
      if e['anchor']:
-      assert e['anchor'] in (ROOT/e['target']).read_text() or '## 0020' in (ROOT/e['target']).read_text()
+      assert any(e['anchor'] in (a['anchor'],a.get('githubSlug')) for a in m.anchors(r['authorInputCommit'],e['target']))
     test('targets',loc,target)
   for d in r['dynamicTraces']:
    loc=f+':'+d['id'];original=expected_dyn.get(d['id'],{})
@@ -382,5 +387,10 @@ def check(rs,receipts=None,index=None,check_packets=True):
  return {'kind':'Step 5 pilot full mechanical checker; semantic independent review pending','rules':RULES,'checks':dict(checks),'files':len(rs),'literalReferences':len(allrefs),'dynamicTuples':len(alldyn),'failures':errors,'failureCount':len(errors),'sourceCensusGrep':sourcegrep,'reviewStatus':'pending; checker success is not semantic acceptance or cutover readiness'}
 
 if __name__=='__main__':
- ap=argparse.ArgumentParser();ap.add_argument('--output',default='step-05-pilot-check-result.json');args=ap.parse_args()
- out=check(load());(P/args.output).write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n');print(json.dumps(out,ensure_ascii=False));sys.exit(bool(out['failures']))
+ ap=argparse.ArgumentParser();ap.add_argument('--output',default='step-05-full-check-result.json' if (P/'step-05-seam4-review-index.json').exists() else 'step-05-pilot-check-result.json');args=ap.parse_args()
+ out=check(load())
+ if (P/'step-05-seam4-review-index.json').exists():
+  (P/'step-05-pilot-check-result.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
+  extsp=importlib.util.spec_from_file_location('seam4check',P/'step-05-seam4-check.py');ext=importlib.util.module_from_spec(extsp);extsp.loader.exec_module(ext)
+  s4=ext.check();(P/'step-05-seam4-check-result.json').write_text(json.dumps(s4,ensure_ascii=False,indent=2)+'\n');out['extensions']={'generators-projections':s4};out['kind']='Step 5 full authored-seam checker; semantic review and cutover proof pending';out['files']+=s4['files'];out['literalReferences']+=s4['literalReferences'];out['dynamicTuples']+=s4['dynamicTuples'];out['failures']+=s4['failures'];out['failureCount']=len(out['failures']);out['checks'].update(s4['checks']);out['rules'].update(s4['rules'])
+ (P/args.output).write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n');print(json.dumps(out,ensure_ascii=False));sys.exit(bool(out['failures']))

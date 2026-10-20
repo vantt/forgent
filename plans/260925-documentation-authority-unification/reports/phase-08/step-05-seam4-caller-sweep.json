@@ -1,0 +1,3869 @@
+{
+  "changedCallers": 322,
+  "changes": [
+    {
+      "file": ".agents/skills/distill/scripts/distill.mjs",
+      "id": "dynamic-000028",
+      "old": {
+        "line": 168,
+        "declaration": "function deepDiveStaleness(root) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": ".agents/skills/distill/scripts/distill.mjs",
+      "id": "dynamic-000029",
+      "old": {
+        "line": 168,
+        "declaration": "function deepDiveStaleness(root) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": ".agents/skills/distill/scripts/distill.mjs",
+      "id": "dynamic-000030",
+      "old": {
+        "line": 168,
+        "declaration": "function deepDiveStaleness(root) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": ".agents/skills/distill/scripts/distill.mjs",
+      "id": "dynamic-000144",
+      "old": {
+        "line": 578,
+        "declaration": "async function cmdMove(args) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": ".agents/skills/distill/scripts/distill.mjs",
+      "id": "dynamic-000145",
+      "old": {
+        "line": 578,
+        "declaration": "async function cmdMove(args) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": ".claude/skills/distill/scripts/distill.mjs",
+      "id": "dynamic-000199",
+      "old": {
+        "line": 168,
+        "declaration": "function deepDiveStaleness(root) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": ".claude/skills/distill/scripts/distill.mjs",
+      "id": "dynamic-000200",
+      "old": {
+        "line": 168,
+        "declaration": "function deepDiveStaleness(root) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": ".claude/skills/distill/scripts/distill.mjs",
+      "id": "dynamic-000201",
+      "old": {
+        "line": 168,
+        "declaration": "function deepDiveStaleness(root) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": ".claude/skills/distill/scripts/distill.mjs",
+      "id": "dynamic-000315",
+      "old": {
+        "line": 578,
+        "declaration": "async function cmdMove(args) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": ".claude/skills/distill/scripts/distill.mjs",
+      "id": "dynamic-000316",
+      "old": {
+        "line": 578,
+        "declaration": "async function cmdMove(args) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "core/skills/distill/scripts/distill.mjs",
+      "id": "dynamic-001691",
+      "old": {
+        "line": 168,
+        "declaration": "function deepDiveStaleness(root) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "core/skills/distill/scripts/distill.mjs",
+      "id": "dynamic-001692",
+      "old": {
+        "line": 168,
+        "declaration": "function deepDiveStaleness(root) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "core/skills/distill/scripts/distill.mjs",
+      "id": "dynamic-001693",
+      "old": {
+        "line": 168,
+        "declaration": "function deepDiveStaleness(root) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "core/skills/distill/scripts/distill.mjs",
+      "id": "dynamic-001807",
+      "old": {
+        "line": 578,
+        "declaration": "async function cmdMove(args) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "core/skills/distill/scripts/distill.mjs",
+      "id": "dynamic-001808",
+      "old": {
+        "line": 578,
+        "declaration": "async function cmdMove(args) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+      "id": "dynamic-001848",
+      "old": {
+        "line": 31,
+        "declaration": "const opt = (name, fallback) => {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+      "id": "dynamic-001849",
+      "old": {
+        "line": 31,
+        "declaration": "const opt = (name, fallback) => {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+      "id": "dynamic-001868",
+      "old": {
+        "line": 58,
+        "declaration": "const listDir = (dir, re) => {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+      "id": "dynamic-001869",
+      "old": {
+        "line": 58,
+        "declaration": "const listDir = (dir, re) => {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "domains/coding/harness/enrich-and-validate-contract.mjs",
+      "id": "dynamic-002095",
+      "old": {
+        "line": 49,
+        "declaration": "function fail(reason) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "domains/coding/harness/enrich-and-validate-contract.mjs",
+      "id": "dynamic-002096",
+      "old": {
+        "line": 49,
+        "declaration": "function fail(reason) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/backfill-unit-summaries.mjs",
+      "id": "dynamic-006324",
+      "old": {
+        "line": 53,
+        "declaration": "export function backfillUnitSummaries({ repoRoot = process.cwd(), dryRun = false, regenerate = false } = {}) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/backfill-unit-summaries.mjs",
+      "id": "dynamic-006325",
+      "old": {
+        "line": 53,
+        "declaration": "export function backfillUnitSummaries({ repoRoot = process.cwd(), dryRun = false, regenerate = false } = {}) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/backfill-unit-summaries.mjs",
+      "id": "dynamic-006326",
+      "old": {
+        "line": 53,
+        "declaration": "export function backfillUnitSummaries({ repoRoot = process.cwd(), dryRun = false, regenerate = false } = {}) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/build-domain-registry.mjs",
+      "id": "dynamic-006354",
+      "old": {
+        "line": 56,
+        "declaration": "function render(compiled) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/build-domain-registry.mjs",
+      "id": "dynamic-006355",
+      "old": {
+        "line": 56,
+        "declaration": "function render(compiled) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/build-domain-registry.mjs",
+      "id": "dynamic-006356",
+      "old": {
+        "line": 56,
+        "declaration": "function render(compiled) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/build-rust-distribution.mjs",
+      "id": "dynamic-006415",
+      "old": {
+        "line": 277,
+        "declaration": "export function buildRustDistribution({"
+      },
+      "new": {
+        "line": 380,
+        "declaration": "function collectStagedFiles(dir, prefix) {"
+      }
+    },
+    {
+      "file": "scripts/build-rust-distribution.mjs",
+      "id": "dynamic-006416",
+      "old": {
+        "line": 277,
+        "declaration": "export function buildRustDistribution({"
+      },
+      "new": {
+        "line": 380,
+        "declaration": "function collectStagedFiles(dir, prefix) {"
+      }
+    },
+    {
+      "file": "scripts/build-rust-distribution.mjs",
+      "id": "dynamic-006417",
+      "old": {
+        "line": 277,
+        "declaration": "export function buildRustDistribution({"
+      },
+      "new": {
+        "line": 380,
+        "declaration": "function collectStagedFiles(dir, prefix) {"
+      }
+    },
+    {
+      "file": "scripts/build-rust-distribution.mjs",
+      "id": "dynamic-006430",
+      "old": {
+        "line": 277,
+        "declaration": "export function buildRustDistribution({"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/build-rust-distribution.mjs",
+      "id": "dynamic-006432",
+      "old": {
+        "line": 277,
+        "declaration": "export function buildRustDistribution({"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/build-rust-distribution.mjs",
+      "id": "dynamic-006433",
+      "old": {
+        "line": 277,
+        "declaration": "export function buildRustDistribution({"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/build-rust-distribution.mjs",
+      "id": "dynamic-006434",
+      "old": {
+        "line": 277,
+        "declaration": "export function buildRustDistribution({"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/build-rust-distribution.mjs",
+      "id": "dynamic-006435",
+      "old": {
+        "line": 277,
+        "declaration": "export function buildRustDistribution({"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/build-rust-distribution.mjs",
+      "id": "dynamic-006436",
+      "old": {
+        "line": 277,
+        "declaration": "export function buildRustDistribution({"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/build-rust-distribution.mjs",
+      "id": "dynamic-006437",
+      "old": {
+        "line": 277,
+        "declaration": "export function buildRustDistribution({"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/build-rust-distribution.mjs",
+      "id": "dynamic-006438",
+      "old": {
+        "line": 277,
+        "declaration": "export function buildRustDistribution({"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/build-rust-distribution.mjs",
+      "id": "dynamic-006439",
+      "old": {
+        "line": 277,
+        "declaration": "export function buildRustDistribution({"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/build-rust-distribution.mjs",
+      "id": "dynamic-006440",
+      "old": {
+        "line": 277,
+        "declaration": "export function buildRustDistribution({"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006461",
+      "old": {
+        "line": 88,
+        "declaration": "const dupes = proposed.filter((id, i) => proposed.indexOf(id) !== i);"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006462",
+      "old": {
+        "line": 88,
+        "declaration": "const dupes = proposed.filter((id, i) => proposed.indexOf(id) !== i);"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006463",
+      "old": {
+        "line": 88,
+        "declaration": "const dupes = proposed.filter((id, i) => proposed.indexOf(id) !== i);"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006464",
+      "old": {
+        "line": 88,
+        "declaration": "const dupes = proposed.filter((id, i) => proposed.indexOf(id) !== i);"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006465",
+      "old": {
+        "line": 88,
+        "declaration": "const dupes = proposed.filter((id, i) => proposed.indexOf(id) !== i);"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006466",
+      "old": {
+        "line": 88,
+        "declaration": "const dupes = proposed.filter((id, i) => proposed.indexOf(id) !== i);"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006467",
+      "old": {
+        "line": 88,
+        "declaration": "const dupes = proposed.filter((id, i) => proposed.indexOf(id) !== i);"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006468",
+      "old": {
+        "line": 88,
+        "declaration": "const dupes = proposed.filter((id, i) => proposed.indexOf(id) !== i);"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006469",
+      "old": {
+        "line": 88,
+        "declaration": "const dupes = proposed.filter((id, i) => proposed.indexOf(id) !== i);"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006470",
+      "old": {
+        "line": 88,
+        "declaration": "const dupes = proposed.filter((id, i) => proposed.indexOf(id) !== i);"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006476",
+      "old": {
+        "line": 50,
+        "declaration": "function proposedIdsFromBacklog(text) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006477",
+      "old": {
+        "line": 50,
+        "declaration": "function proposedIdsFromBacklog(text) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006478",
+      "old": {
+        "line": 50,
+        "declaration": "function proposedIdsFromBacklog(text) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006479",
+      "old": {
+        "line": 88,
+        "declaration": "const dupes = proposed.filter((id, i) => proposed.indexOf(id) !== i);"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006480",
+      "old": {
+        "line": 88,
+        "declaration": "const dupes = proposed.filter((id, i) => proposed.indexOf(id) !== i);"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-decision-codes.mjs",
+      "id": "dynamic-006546",
+      "old": {
+        "line": 82,
+        "declaration": "function collectTestFiles(dir, exclude) {"
+      },
+      "new": {
+        "line": 84,
+        "declaration": "function walk(current) {"
+      }
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006666",
+      "old": {
+        "line": 473,
+        "declaration": "export function createRowValidator(schema, vocabulary, constitution = null) {"
+      },
+      "new": {
+        "line": 484,
+        "declaration": "function walk(value, node, label, reasons) {"
+      }
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006667",
+      "old": {
+        "line": 473,
+        "declaration": "export function createRowValidator(schema, vocabulary, constitution = null) {"
+      },
+      "new": {
+        "line": 484,
+        "declaration": "function walk(value, node, label, reasons) {"
+      }
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006668",
+      "old": {
+        "line": 473,
+        "declaration": "export function createRowValidator(schema, vocabulary, constitution = null) {"
+      },
+      "new": {
+        "line": 484,
+        "declaration": "function walk(value, node, label, reasons) {"
+      }
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006669",
+      "old": {
+        "line": 473,
+        "declaration": "export function createRowValidator(schema, vocabulary, constitution = null) {"
+      },
+      "new": {
+        "line": 484,
+        "declaration": "function walk(value, node, label, reasons) {"
+      }
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006670",
+      "old": {
+        "line": 473,
+        "declaration": "export function createRowValidator(schema, vocabulary, constitution = null) {"
+      },
+      "new": {
+        "line": 484,
+        "declaration": "function walk(value, node, label, reasons) {"
+      }
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006671",
+      "old": {
+        "line": 473,
+        "declaration": "export function createRowValidator(schema, vocabulary, constitution = null) {"
+      },
+      "new": {
+        "line": 484,
+        "declaration": "function walk(value, node, label, reasons) {"
+      }
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006672",
+      "old": {
+        "line": 473,
+        "declaration": "export function createRowValidator(schema, vocabulary, constitution = null) {"
+      },
+      "new": {
+        "line": 484,
+        "declaration": "function walk(value, node, label, reasons) {"
+      }
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006673",
+      "old": {
+        "line": 473,
+        "declaration": "export function createRowValidator(schema, vocabulary, constitution = null) {"
+      },
+      "new": {
+        "line": 484,
+        "declaration": "function walk(value, node, label, reasons) {"
+      }
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006674",
+      "old": {
+        "line": 473,
+        "declaration": "export function createRowValidator(schema, vocabulary, constitution = null) {"
+      },
+      "new": {
+        "line": 484,
+        "declaration": "function walk(value, node, label, reasons) {"
+      }
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006675",
+      "old": {
+        "line": 473,
+        "declaration": "export function createRowValidator(schema, vocabulary, constitution = null) {"
+      },
+      "new": {
+        "line": 484,
+        "declaration": "function walk(value, node, label, reasons) {"
+      }
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006676",
+      "old": {
+        "line": 473,
+        "declaration": "export function createRowValidator(schema, vocabulary, constitution = null) {"
+      },
+      "new": {
+        "line": 510,
+        "declaration": "return function validateRow(row, { itemRationale = '' } = {}) {"
+      }
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006677",
+      "old": {
+        "line": 473,
+        "declaration": "export function createRowValidator(schema, vocabulary, constitution = null) {"
+      },
+      "new": {
+        "line": 510,
+        "declaration": "return function validateRow(row, { itemRationale = '' } = {}) {"
+      }
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006726",
+      "old": {
+        "line": 1009,
+        "declaration": "export function isEvidenceMirrorPath(p) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006791",
+      "old": {
+        "line": 1338,
+        "declaration": "export function loadInventory(filePath, context) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006792",
+      "old": {
+        "line": 1338,
+        "declaration": "export function loadInventory(filePath, context) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006793",
+      "old": {
+        "line": 1338,
+        "declaration": "export function loadInventory(filePath, context) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006794",
+      "old": {
+        "line": 1338,
+        "declaration": "export function loadInventory(filePath, context) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006796",
+      "old": {
+        "line": 1338,
+        "declaration": "export function loadInventory(filePath, context) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006801",
+      "old": {
+        "line": 1353,
+        "declaration": "export function loadRatchetResult(repoRoot, argv = []) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006974",
+      "old": {
+        "line": 619,
+        "declaration": "export const isCheckpointReviewReport = reportPath => typeof reportPath === 'string' && /\\/review-(?:3|6|10)-checkpoint(?:-[a-z0-9-]+)?\\.md$/.test(reportPath);"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006975",
+      "old": {
+        "line": 619,
+        "declaration": "export const isCheckpointReviewReport = reportPath => typeof reportPath === 'string' && /\\/review-(?:3|6|10)-checkpoint(?:-[a-z0-9-]+)?\\.md$/.test(reportPath);"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007088",
+      "old": {
+        "line": 124,
+        "declaration": "const countsOfCandidateStatus = (candidateStatus) => {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007089",
+      "old": {
+        "line": 124,
+        "declaration": "const countsOfCandidateStatus = (candidateStatus) => {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007090",
+      "old": {
+        "line": 124,
+        "declaration": "const countsOfCandidateStatus = (candidateStatus) => {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007091",
+      "old": {
+        "line": 124,
+        "declaration": "const countsOfCandidateStatus = (candidateStatus) => {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007092",
+      "old": {
+        "line": 124,
+        "declaration": "const countsOfCandidateStatus = (candidateStatus) => {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007093",
+      "old": {
+        "line": 124,
+        "declaration": "const countsOfCandidateStatus = (candidateStatus) => {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007094",
+      "old": {
+        "line": 124,
+        "declaration": "const countsOfCandidateStatus = (candidateStatus) => {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007095",
+      "old": {
+        "line": 124,
+        "declaration": "const countsOfCandidateStatus = (candidateStatus) => {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007123",
+      "old": {
+        "line": 50,
+        "declaration": "const isLegacyPath = (p) => typeof p === 'string' && LEGACY_ROOTS.some((root) => p.startsWith(root));"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007124",
+      "old": {
+        "line": 66,
+        "declaration": "const verdict = (count, describe) => (count === 0 ? pass(`none: ${describe}`) : blocked(`${count} ${describe}`));"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007125",
+      "old": {
+        "line": 66,
+        "declaration": "const verdict = (count, describe) => (count === 0 ? pass(`none: ${describe}`) : blocked(`${count} ${describe}`));"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-hook-registrations-guarded.mjs",
+      "id": "dynamic-007131",
+      "old": {
+        "line": 39,
+        "declaration": "const walk = (node) => {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-hook-registrations-guarded.mjs",
+      "id": "dynamic-007132",
+      "old": {
+        "line": 39,
+        "declaration": "const walk = (node) => {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/check-hook-registrations-guarded.mjs",
+      "id": "dynamic-007133",
+      "old": {
+        "line": 39,
+        "declaration": "const walk = (node) => {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/ci-asset-server.mjs",
+      "id": "dynamic-007245",
+      "old": {
+        "line": 39,
+        "declaration": "const server = http.createServer((req, res) => {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/ci-asset-server.mjs",
+      "id": "dynamic-007246",
+      "old": {
+        "line": 39,
+        "declaration": "const server = http.createServer((req, res) => {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/ci-asset-server.mjs",
+      "id": "dynamic-007247",
+      "old": {
+        "line": 39,
+        "declaration": "const server = http.createServer((req, res) => {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/decision-question-hook.mjs",
+      "id": "dynamic-007282",
+      "old": {
+        "line": 54,
+        "declaration": "function missingParts(data) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/decision-question-hook.mjs",
+      "id": "dynamic-007283",
+      "old": {
+        "line": 54,
+        "declaration": "function missingParts(data) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/dispatch-decide-hook.mjs",
+      "id": "dynamic-007284",
+      "old": {
+        "line": 32,
+        "declaration": "async function decideBlock() {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/dispatch-decide-hook.mjs",
+      "id": "dynamic-007285",
+      "old": {
+        "line": 32,
+        "declaration": "async function decideBlock() {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/dispatch-decide-hook.mjs",
+      "id": "dynamic-007286",
+      "old": {
+        "line": 32,
+        "declaration": "async function decideBlock() {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/doc-alias-resolver.mjs",
+      "id": "dynamic-007300",
+      "old": {
+        "line": 177,
+        "declaration": "function normalizeReference(ref, consumerPath) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/doc-alias-resolver.mjs",
+      "id": "dynamic-007301",
+      "old": {
+        "line": 177,
+        "declaration": "function normalizeReference(ref, consumerPath) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/event-store/v-spawn-bench.mjs",
+      "id": "dynamic-007442",
+      "old": {
+        "line": 83,
+        "declaration": "async function storeIncrementBenchmark({root,out,sessions,filesystem,checkout,strace,seedItems,seedHistory}) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/event-store/v-spawn-bench.mjs",
+      "id": "dynamic-007443",
+      "old": {
+        "line": 83,
+        "declaration": "async function storeIncrementBenchmark({root,out,sessions,filesystem,checkout,strace,seedItems,seedHistory}) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/explain-command-route.mjs",
+      "id": "dynamic-007457",
+      "old": {
+        "line": 12,
+        "declaration": "export function explainCommandRoute(selector, routesPath = DEFAULT_ROUTES_PATH) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/explain-command-route.mjs",
+      "id": "dynamic-007458",
+      "old": {
+        "line": 12,
+        "declaration": "export function explainCommandRoute(selector, routesPath = DEFAULT_ROUTES_PATH) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/explain-command-route.mjs",
+      "id": "dynamic-007459",
+      "old": {
+        "line": 12,
+        "declaration": "export function explainCommandRoute(selector, routesPath = DEFAULT_ROUTES_PATH) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/explain-command-route.mjs",
+      "id": "dynamic-007460",
+      "old": {
+        "line": 12,
+        "declaration": "export function explainCommandRoute(selector, routesPath = DEFAULT_ROUTES_PATH) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/explain-command-route.mjs",
+      "id": "dynamic-007461",
+      "old": {
+        "line": 12,
+        "declaration": "export function explainCommandRoute(selector, routesPath = DEFAULT_ROUTES_PATH) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/explain-command-route.mjs",
+      "id": "dynamic-007462",
+      "old": {
+        "line": 12,
+        "declaration": "export function explainCommandRoute(selector, routesPath = DEFAULT_ROUTES_PATH) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/explain-command-route.mjs",
+      "id": "dynamic-007463",
+      "old": {
+        "line": 12,
+        "declaration": "export function explainCommandRoute(selector, routesPath = DEFAULT_ROUTES_PATH) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/export-command-selectors.mjs",
+      "id": "dynamic-007502",
+      "old": {
+        "line": 367,
+        "declaration": "export function checkCommandRoutes({"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/export-command-selectors.mjs",
+      "id": "dynamic-007503",
+      "old": {
+        "line": 367,
+        "declaration": "export function checkCommandRoutes({"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/export-command-selectors.mjs",
+      "id": "dynamic-007504",
+      "old": {
+        "line": 367,
+        "declaration": "export function checkCommandRoutes({"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/export-command-selectors.mjs",
+      "id": "dynamic-007505",
+      "old": {
+        "line": 367,
+        "declaration": "export function checkCommandRoutes({"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/export-command-selectors.mjs",
+      "id": "dynamic-007506",
+      "old": {
+        "line": 367,
+        "declaration": "export function checkCommandRoutes({"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/export-command-selectors.mjs",
+      "id": "dynamic-007507",
+      "old": {
+        "line": 367,
+        "declaration": "export function checkCommandRoutes({"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/export-command-selectors.mjs",
+      "id": "dynamic-007508",
+      "old": {
+        "line": 367,
+        "declaration": "export function checkCommandRoutes({"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007580",
+      "old": {
+        "line": 1405,
+        "declaration": "export function carryForwardIdentityRegistry(repoRoot = process.cwd(), options = {}) {"
+      },
+      "new": {
+        "line": 1426,
+        "declaration": "function pickUniquePrevious(u, unitDigest) {"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007677",
+      "old": {
+        "line": 1831,
+        "declaration": "export function generateMarkdownReport(inventory) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007678",
+      "old": {
+        "line": 1831,
+        "declaration": "export function generateMarkdownReport(inventory) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007679",
+      "old": {
+        "line": 1831,
+        "declaration": "export function generateMarkdownReport(inventory) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007680",
+      "old": {
+        "line": 1831,
+        "declaration": "export function generateMarkdownReport(inventory) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007681",
+      "old": {
+        "line": 1831,
+        "declaration": "export function generateMarkdownReport(inventory) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007682",
+      "old": {
+        "line": 1831,
+        "declaration": "export function generateMarkdownReport(inventory) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007683",
+      "old": {
+        "line": 1831,
+        "declaration": "export function generateMarkdownReport(inventory) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007684",
+      "old": {
+        "line": 1831,
+        "declaration": "export function generateMarkdownReport(inventory) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007685",
+      "old": {
+        "line": 1831,
+        "declaration": "export function generateMarkdownReport(inventory) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007686",
+      "old": {
+        "line": 1831,
+        "declaration": "export function generateMarkdownReport(inventory) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007687",
+      "old": {
+        "line": 1831,
+        "declaration": "export function generateMarkdownReport(inventory) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007688",
+      "old": {
+        "line": 1831,
+        "declaration": "export function generateMarkdownReport(inventory) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007689",
+      "old": {
+        "line": 1831,
+        "declaration": "export function generateMarkdownReport(inventory) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007690",
+      "old": {
+        "line": 1831,
+        "declaration": "export function generateMarkdownReport(inventory) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007691",
+      "old": {
+        "line": 1831,
+        "declaration": "export function generateMarkdownReport(inventory) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007692",
+      "old": {
+        "line": 1831,
+        "declaration": "export function generateMarkdownReport(inventory) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007693",
+      "old": {
+        "line": 1831,
+        "declaration": "export function generateMarkdownReport(inventory) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007694",
+      "old": {
+        "line": 1831,
+        "declaration": "export function generateMarkdownReport(inventory) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007695",
+      "old": {
+        "line": 1831,
+        "declaration": "export function generateMarkdownReport(inventory) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007696",
+      "old": {
+        "line": 1894,
+        "declaration": "function runRefresh(argv, cwd, commit) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007697",
+      "old": {
+        "line": 1894,
+        "declaration": "function runRefresh(argv, cwd, commit) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007698",
+      "old": {
+        "line": 1894,
+        "declaration": "function runRefresh(argv, cwd, commit) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007699",
+      "old": {
+        "line": 1894,
+        "declaration": "function runRefresh(argv, cwd, commit) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007700",
+      "old": {
+        "line": 1894,
+        "declaration": "function runRefresh(argv, cwd, commit) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007701",
+      "old": {
+        "line": 1894,
+        "declaration": "function runRefresh(argv, cwd, commit) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007702",
+      "old": {
+        "line": 1894,
+        "declaration": "function runRefresh(argv, cwd, commit) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007703",
+      "old": {
+        "line": 1894,
+        "declaration": "function runRefresh(argv, cwd, commit) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007704",
+      "old": {
+        "line": 1894,
+        "declaration": "function runRefresh(argv, cwd, commit) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007705",
+      "old": {
+        "line": 1925,
+        "declaration": "export function runCli(argv, cwd = process.cwd()) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007706",
+      "old": {
+        "line": 1925,
+        "declaration": "export function runCli(argv, cwd = process.cwd()) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007707",
+      "old": {
+        "line": 1925,
+        "declaration": "export function runCli(argv, cwd = process.cwd()) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007708",
+      "old": {
+        "line": 1925,
+        "declaration": "export function runCli(argv, cwd = process.cwd()) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007709",
+      "old": {
+        "line": 1925,
+        "declaration": "export function runCli(argv, cwd = process.cwd()) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007710",
+      "old": {
+        "line": 1925,
+        "declaration": "export function runCli(argv, cwd = process.cwd()) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007711",
+      "old": {
+        "line": 1925,
+        "declaration": "export function runCli(argv, cwd = process.cwd()) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007712",
+      "old": {
+        "line": 1925,
+        "declaration": "export function runCli(argv, cwd = process.cwd()) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007713",
+      "old": {
+        "line": 1925,
+        "declaration": "export function runCli(argv, cwd = process.cwd()) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007714",
+      "old": {
+        "line": 1925,
+        "declaration": "export function runCli(argv, cwd = process.cwd()) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007715",
+      "old": {
+        "line": 1925,
+        "declaration": "export function runCli(argv, cwd = process.cwd()) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007716",
+      "old": {
+        "line": 1925,
+        "declaration": "export function runCli(argv, cwd = process.cwd()) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007717",
+      "old": {
+        "line": 1925,
+        "declaration": "export function runCli(argv, cwd = process.cwd()) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007725",
+      "old": {
+        "line": 234,
+        "declaration": "export function buildSwitchboardIndex(switchboard) {"
+      },
+      "new": {
+        "line": 247,
+        "declaration": "function addExact(pathStr, entry) {"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007737",
+      "old": {
+        "line": 308,
+        "declaration": "export function lookupSwitchboard(index, relPath) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007741",
+      "old": {
+        "line": 35,
+        "declaration": "const OUTPUT_REPORT_PATHS = OUTPUT_MANIFEST_PATHS.map((p) => p.replace(/\\.json$/, '.md'));"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007742",
+      "old": {
+        "line": 36,
+        "declaration": "const OUTPUT_PARTS_PREFIXES = OUTPUT_MANIFEST_PATHS.map((p) => `${p.replace(/\\.json$/, '')}.parts/`);"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007743",
+      "old": {
+        "line": 36,
+        "declaration": "const OUTPUT_PARTS_PREFIXES = OUTPUT_MANIFEST_PATHS.map((p) => `${p.replace(/\\.json$/, '')}.parts/`);"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007747",
+      "old": {
+        "line": 518,
+        "declaration": "export function extractMarkdownConservationUnits(content) {"
+      },
+      "new": {
+        "line": 533,
+        "declaration": "function flushUnheaded(endLine) {"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007778",
+      "old": {
+        "line": 789,
+        "declaration": "export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex = new Map(), options = {}) {"
+      },
+      "new": {
+        "line": 813,
+        "declaration": "function add(target, file, lineNo, kind, extra = {}) {"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007779",
+      "old": {
+        "line": 789,
+        "declaration": "export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex = new Map(), options = {}) {"
+      },
+      "new": {
+        "line": 817,
+        "declaration": "function addUnresolved(file, lineNo, kind, pattern, extra = {}) {"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007780",
+      "old": {
+        "line": 789,
+        "declaration": "export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex = new Map(), options = {}) {"
+      },
+      "new": {
+        "line": 817,
+        "declaration": "function addUnresolved(file, lineNo, kind, pattern, extra = {}) {"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007781",
+      "old": {
+        "line": 789,
+        "declaration": "export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex = new Map(), options = {}) {"
+      },
+      "new": {
+        "line": 817,
+        "declaration": "function addUnresolved(file, lineNo, kind, pattern, extra = {}) {"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007782",
+      "old": {
+        "line": 789,
+        "declaration": "export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex = new Map(), options = {}) {"
+      },
+      "new": {
+        "line": 925,
+        "declaration": "function collapseGlobStars(pattern) {"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007783",
+      "old": {
+        "line": 789,
+        "declaration": "export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex = new Map(), options = {}) {"
+      },
+      "new": {
+        "line": 935,
+        "declaration": "function dynamicPatternFromArgs(args, sourceFile, newUrl = false) {"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007784",
+      "old": {
+        "line": 789,
+        "declaration": "export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex = new Map(), options = {}) {"
+      },
+      "new": {
+        "line": 935,
+        "declaration": "function dynamicPatternFromArgs(args, sourceFile, newUrl = false) {"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007785",
+      "old": {
+        "line": 789,
+        "declaration": "export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex = new Map(), options = {}) {"
+      },
+      "new": {
+        "line": 935,
+        "declaration": "function dynamicPatternFromArgs(args, sourceFile, newUrl = false) {"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007786",
+      "old": {
+        "line": 789,
+        "declaration": "export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex = new Map(), options = {}) {"
+      },
+      "new": {
+        "line": 935,
+        "declaration": "function dynamicPatternFromArgs(args, sourceFile, newUrl = false) {"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007787",
+      "old": {
+        "line": 789,
+        "declaration": "export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex = new Map(), options = {}) {"
+      },
+      "new": {
+        "line": 935,
+        "declaration": "function dynamicPatternFromArgs(args, sourceFile, newUrl = false) {"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007788",
+      "old": {
+        "line": 789,
+        "declaration": "export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex = new Map(), options = {}) {"
+      },
+      "new": {
+        "line": 935,
+        "declaration": "function dynamicPatternFromArgs(args, sourceFile, newUrl = false) {"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007789",
+      "old": {
+        "line": 789,
+        "declaration": "export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex = new Map(), options = {}) {"
+      },
+      "new": {
+        "line": 935,
+        "declaration": "function dynamicPatternFromArgs(args, sourceFile, newUrl = false) {"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007790",
+      "old": {
+        "line": 789,
+        "declaration": "export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex = new Map(), options = {}) {"
+      },
+      "new": {
+        "line": 935,
+        "declaration": "function dynamicPatternFromArgs(args, sourceFile, newUrl = false) {"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007791",
+      "old": {
+        "line": 789,
+        "declaration": "export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex = new Map(), options = {}) {"
+      },
+      "new": {
+        "line": 935,
+        "declaration": "function dynamicPatternFromArgs(args, sourceFile, newUrl = false) {"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007792",
+      "old": {
+        "line": 789,
+        "declaration": "export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex = new Map(), options = {}) {"
+      },
+      "new": {
+        "line": 958,
+        "declaration": "function markdownCodePayloads(content) {"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007793",
+      "old": {
+        "line": 789,
+        "declaration": "export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex = new Map(), options = {}) {"
+      },
+      "new": {
+        "line": 985,
+        "declaration": "function scanDynamicCalls(content, file) {"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007794",
+      "old": {
+        "line": 789,
+        "declaration": "export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex = new Map(), options = {}) {"
+      },
+      "new": {
+        "line": 985,
+        "declaration": "function scanDynamicCalls(content, file) {"
+      }
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007795",
+      "old": {
+        "line": 789,
+        "declaration": "export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex = new Map(), options = {}) {"
+      },
+      "new": {
+        "line": 985,
+        "declaration": "function scanDynamicCalls(content, file) {"
+      }
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "dynamic-007797",
+      "old": {
+        "line": 99,
+        "declaration": "export function readBlobAtCommit(commitSha, fileRel, repoRoot = process.cwd()) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "dynamic-007815",
+      "old": {
+        "line": 164,
+        "declaration": "export function classifyContractScope(refPath) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/git/e3-bench.mjs",
+      "id": "dynamic-008033",
+      "old": {
+        "line": 753,
+        "declaration": "async function rollbackOnly(args) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/herdr-cockpit-notify.mjs",
+      "id": "dynamic-008042",
+      "old": {
+        "line": 94,
+        "declaration": "function parseIntervalSeconds(argv) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/herdr-cockpit-notify.mjs",
+      "id": "dynamic-008043",
+      "old": {
+        "line": 94,
+        "declaration": "function parseIntervalSeconds(argv) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/knowledge-bootstrap.mjs",
+      "id": "dynamic-008083",
+      "old": {
+        "line": 18,
+        "declaration": "export function bootstrapRegistry(dir, inventoryDataPath) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/knowledge-bootstrap.mjs",
+      "id": "dynamic-008084",
+      "old": {
+        "line": 18,
+        "declaration": "export function bootstrapRegistry(dir, inventoryDataPath) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/knowledge-bootstrap.mjs",
+      "id": "dynamic-008085",
+      "old": {
+        "line": 18,
+        "declaration": "export function bootstrapRegistry(dir, inventoryDataPath) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/knowledge-bootstrap.mjs",
+      "id": "dynamic-008086",
+      "old": {
+        "line": 18,
+        "declaration": "export function bootstrapRegistry(dir, inventoryDataPath) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/knowledge-bootstrap.mjs",
+      "id": "dynamic-008087",
+      "old": {
+        "line": 18,
+        "declaration": "export function bootstrapRegistry(dir, inventoryDataPath) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/knowledge-bootstrap.mjs",
+      "id": "dynamic-008088",
+      "old": {
+        "line": 18,
+        "declaration": "export function bootstrapRegistry(dir, inventoryDataPath) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/knowledge-bootstrap.mjs",
+      "id": "dynamic-008089",
+      "old": {
+        "line": 18,
+        "declaration": "export function bootstrapRegistry(dir, inventoryDataPath) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/knowledge-bootstrap.mjs",
+      "id": "dynamic-008090",
+      "old": {
+        "line": 18,
+        "declaration": "export function bootstrapRegistry(dir, inventoryDataPath) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008131",
+      "old": {
+        "line": 143,
+        "declaration": "export function generateReports(corpusResults, outputDir) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008132",
+      "old": {
+        "line": 143,
+        "declaration": "export function generateReports(corpusResults, outputDir) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008133",
+      "old": {
+        "line": 143,
+        "declaration": "export function generateReports(corpusResults, outputDir) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008134",
+      "old": {
+        "line": 143,
+        "declaration": "export function generateReports(corpusResults, outputDir) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008135",
+      "old": {
+        "line": 143,
+        "declaration": "export function generateReports(corpusResults, outputDir) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008136",
+      "old": {
+        "line": 143,
+        "declaration": "export function generateReports(corpusResults, outputDir) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008137",
+      "old": {
+        "line": 143,
+        "declaration": "export function generateReports(corpusResults, outputDir) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008138",
+      "old": {
+        "line": 143,
+        "declaration": "export function generateReports(corpusResults, outputDir) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008139",
+      "old": {
+        "line": 143,
+        "declaration": "export function generateReports(corpusResults, outputDir) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008140",
+      "old": {
+        "line": 143,
+        "declaration": "export function generateReports(corpusResults, outputDir) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008181",
+      "old": {
+        "line": 111,
+        "declaration": "export function runKnowledgeMigration(repoRoot, { dryRun = true, fgosRoot = repoRoot } = {}) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008182",
+      "old": {
+        "line": 111,
+        "declaration": "export function runKnowledgeMigration(repoRoot, { dryRun = true, fgosRoot = repoRoot } = {}) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008183",
+      "old": {
+        "line": 111,
+        "declaration": "export function runKnowledgeMigration(repoRoot, { dryRun = true, fgosRoot = repoRoot } = {}) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/lib/test-git-config-guard.mjs",
+      "id": "dynamic-008208",
+      "old": {
+        "line": 75,
+        "declaration": "export function createGitConfigGuard({ protectedCommonDir, rawExecFileSync, tempRoots = defaultTempRoots(), env = process.env }) {"
+      },
+      "new": {
+        "line": 103,
+        "declaration": "return function assertNotProtected(args, cwd) {"
+      }
+    },
+    {
+      "file": "scripts/lib/test-git-config-guard.mjs",
+      "id": "dynamic-008209",
+      "old": {
+        "line": 75,
+        "declaration": "export function createGitConfigGuard({ protectedCommonDir, rawExecFileSync, tempRoots = defaultTempRoots(), env = process.env }) {"
+      },
+      "new": {
+        "line": 103,
+        "declaration": "return function assertNotProtected(args, cwd) {"
+      }
+    },
+    {
+      "file": "scripts/lib/test-git-config-guard.mjs",
+      "id": "dynamic-008210",
+      "old": {
+        "line": 75,
+        "declaration": "export function createGitConfigGuard({ protectedCommonDir, rawExecFileSync, tempRoots = defaultTempRoots(), env = process.env }) {"
+      },
+      "new": {
+        "line": 103,
+        "declaration": "return function assertNotProtected(args, cwd) {"
+      }
+    },
+    {
+      "file": "scripts/lib/test-git-config-guard.mjs",
+      "id": "dynamic-008211",
+      "old": {
+        "line": 75,
+        "declaration": "export function createGitConfigGuard({ protectedCommonDir, rawExecFileSync, tempRoots = defaultTempRoots(), env = process.env }) {"
+      },
+      "new": {
+        "line": 103,
+        "declaration": "return function assertNotProtected(args, cwd) {"
+      }
+    },
+    {
+      "file": "scripts/lib/test-git-config-guard.mjs",
+      "id": "dynamic-008212",
+      "old": {
+        "line": 75,
+        "declaration": "export function createGitConfigGuard({ protectedCommonDir, rawExecFileSync, tempRoots = defaultTempRoots(), env = process.env }) {"
+      },
+      "new": {
+        "line": 103,
+        "declaration": "return function assertNotProtected(args, cwd) {"
+      }
+    },
+    {
+      "file": "scripts/lib/test-git-config-guard.mjs",
+      "id": "dynamic-008213",
+      "old": {
+        "line": 75,
+        "declaration": "export function createGitConfigGuard({ protectedCommonDir, rawExecFileSync, tempRoots = defaultTempRoots(), env = process.env }) {"
+      },
+      "new": {
+        "line": 103,
+        "declaration": "return function assertNotProtected(args, cwd) {"
+      }
+    },
+    {
+      "file": "scripts/lib/test-git-config-guard.mjs",
+      "id": "dynamic-008214",
+      "old": {
+        "line": 75,
+        "declaration": "export function createGitConfigGuard({ protectedCommonDir, rawExecFileSync, tempRoots = defaultTempRoots(), env = process.env }) {"
+      },
+      "new": {
+        "line": 103,
+        "declaration": "return function assertNotProtected(args, cwd) {"
+      }
+    },
+    {
+      "file": "scripts/lib/test-git-config-guard.mjs",
+      "id": "dynamic-008216",
+      "old": {
+        "line": 152,
+        "declaration": "function keepPromisify(wrapped, original, check) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/lib/test-git-config-guard.mjs",
+      "id": "dynamic-008217",
+      "old": {
+        "line": 152,
+        "declaration": "function keepPromisify(wrapped, original, check) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/lib/test-git-config-guard.mjs",
+      "id": "dynamic-008229",
+      "old": {
+        "line": 75,
+        "declaration": "export function createGitConfigGuard({ protectedCommonDir, rawExecFileSync, tempRoots = defaultTempRoots(), env = process.env }) {"
+      },
+      "new": {
+        "line": 84,
+        "declaration": "function lookupCommonDir(dir) {"
+      }
+    },
+    {
+      "file": "scripts/lib/test-git-config-guard.mjs",
+      "id": "dynamic-008230",
+      "old": {
+        "line": 75,
+        "declaration": "export function createGitConfigGuard({ protectedCommonDir, rawExecFileSync, tempRoots = defaultTempRoots(), env = process.env }) {"
+      },
+      "new": {
+        "line": 84,
+        "declaration": "function lookupCommonDir(dir) {"
+      }
+    },
+    {
+      "file": "scripts/lib/test-git-config-guard.mjs",
+      "id": "dynamic-008231",
+      "old": {
+        "line": 75,
+        "declaration": "export function createGitConfigGuard({ protectedCommonDir, rawExecFileSync, tempRoots = defaultTempRoots(), env = process.env }) {"
+      },
+      "new": {
+        "line": 97,
+        "declaration": "function globalConfigIsDisposable() {"
+      }
+    },
+    {
+      "file": "scripts/measure-coordination-baseline.mjs",
+      "id": "dynamic-008293",
+      "old": {
+        "line": 384,
+        "declaration": "export function formatMarkdownReport(report) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-coordination-baseline.mjs",
+      "id": "dynamic-008294",
+      "old": {
+        "line": 384,
+        "declaration": "export function formatMarkdownReport(report) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-coordination-baseline.mjs",
+      "id": "dynamic-008295",
+      "old": {
+        "line": 384,
+        "declaration": "export function formatMarkdownReport(report) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-coordination-baseline.mjs",
+      "id": "dynamic-008296",
+      "old": {
+        "line": 384,
+        "declaration": "export function formatMarkdownReport(report) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-coordination-baseline.mjs",
+      "id": "dynamic-008297",
+      "old": {
+        "line": 384,
+        "declaration": "export function formatMarkdownReport(report) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-coordination-baseline.mjs",
+      "id": "dynamic-008298",
+      "old": {
+        "line": 384,
+        "declaration": "export function formatMarkdownReport(report) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-coordination-baseline.mjs",
+      "id": "dynamic-008299",
+      "old": {
+        "line": 384,
+        "declaration": "export function formatMarkdownReport(report) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-coordination-baseline.mjs",
+      "id": "dynamic-008300",
+      "old": {
+        "line": 384,
+        "declaration": "export function formatMarkdownReport(report) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-coordination-baseline.mjs",
+      "id": "dynamic-008301",
+      "old": {
+        "line": 384,
+        "declaration": "export function formatMarkdownReport(report) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-coordination-baseline.mjs",
+      "id": "dynamic-008302",
+      "old": {
+        "line": 384,
+        "declaration": "export function formatMarkdownReport(report) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-coordination-baseline.mjs",
+      "id": "dynamic-008303",
+      "old": {
+        "line": 384,
+        "declaration": "export function formatMarkdownReport(report) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-coordination-baseline.mjs",
+      "id": "dynamic-008304",
+      "old": {
+        "line": 384,
+        "declaration": "export function formatMarkdownReport(report) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-coordination-baseline.mjs",
+      "id": "dynamic-008305",
+      "old": {
+        "line": 384,
+        "declaration": "export function formatMarkdownReport(report) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-p08-performance.mjs",
+      "id": "dynamic-008306",
+      "old": {
+        "line": 48,
+        "declaration": "function p50(samples) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-p08-performance.mjs",
+      "id": "dynamic-008307",
+      "old": {
+        "line": 48,
+        "declaration": "function p50(samples) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-p08-performance.mjs",
+      "id": "dynamic-008308",
+      "old": {
+        "line": 48,
+        "declaration": "function p50(samples) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-p08-performance.mjs",
+      "id": "dynamic-008309",
+      "old": {
+        "line": 48,
+        "declaration": "function p50(samples) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-p08-performance.mjs",
+      "id": "dynamic-008310",
+      "old": {
+        "line": 48,
+        "declaration": "function p50(samples) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-p08-performance.mjs",
+      "id": "dynamic-008323",
+      "old": {
+        "line": 48,
+        "declaration": "function p50(samples) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-verify-cost.mjs",
+      "id": "dynamic-008325",
+      "old": {
+        "line": 187,
+        "declaration": "function measureApproves(movesById) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-verify-cost.mjs",
+      "id": "dynamic-008344",
+      "old": {
+        "line": 266,
+        "declaration": "function buildReport({ totalEvents, picks, returns, approves, causes, fullVerify }) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-verify-cost.mjs",
+      "id": "dynamic-008345",
+      "old": {
+        "line": 266,
+        "declaration": "function buildReport({ totalEvents, picks, returns, approves, causes, fullVerify }) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-verify-cost.mjs",
+      "id": "dynamic-008346",
+      "old": {
+        "line": 266,
+        "declaration": "function buildReport({ totalEvents, picks, returns, approves, causes, fullVerify }) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-verify-cost.mjs",
+      "id": "dynamic-008347",
+      "old": {
+        "line": 266,
+        "declaration": "function buildReport({ totalEvents, picks, returns, approves, causes, fullVerify }) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-verify-cost.mjs",
+      "id": "dynamic-008348",
+      "old": {
+        "line": 266,
+        "declaration": "function buildReport({ totalEvents, picks, returns, approves, causes, fullVerify }) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-verify-cost.mjs",
+      "id": "dynamic-008349",
+      "old": {
+        "line": 266,
+        "declaration": "function buildReport({ totalEvents, picks, returns, approves, causes, fullVerify }) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-verify-cost.mjs",
+      "id": "dynamic-008350",
+      "old": {
+        "line": 266,
+        "declaration": "function buildReport({ totalEvents, picks, returns, approves, causes, fullVerify }) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-verify-cost.mjs",
+      "id": "dynamic-008351",
+      "old": {
+        "line": 266,
+        "declaration": "function buildReport({ totalEvents, picks, returns, approves, causes, fullVerify }) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-verify-cost.mjs",
+      "id": "dynamic-008352",
+      "old": {
+        "line": 266,
+        "declaration": "function buildReport({ totalEvents, picks, returns, approves, causes, fullVerify }) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-verify-cost.mjs",
+      "id": "dynamic-008353",
+      "old": {
+        "line": 266,
+        "declaration": "function buildReport({ totalEvents, picks, returns, approves, causes, fullVerify }) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/measure-verify-cost.mjs",
+      "id": "dynamic-008354",
+      "old": {
+        "line": 266,
+        "declaration": "function buildReport({ totalEvents, picks, returns, approves, causes, fullVerify }) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/package-release-assets.mjs",
+      "id": "dynamic-008416",
+      "old": {
+        "line": 77,
+        "declaration": "export function packageReleaseAssets({ version, outDir = path.join(REPO_ROOT, 'dist'), repoRoot = REPO_ROOT } = {}) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/package-release-assets.mjs",
+      "id": "dynamic-008417",
+      "old": {
+        "line": 77,
+        "declaration": "export function packageReleaseAssets({ version, outDir = path.join(REPO_ROOT, 'dist'), repoRoot = REPO_ROOT } = {}) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/package-release-assets.mjs",
+      "id": "dynamic-008418",
+      "old": {
+        "line": 77,
+        "declaration": "export function packageReleaseAssets({ version, outDir = path.join(REPO_ROOT, 'dist'), repoRoot = REPO_ROOT } = {}) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/package-release-assets.mjs",
+      "id": "dynamic-008419",
+      "old": {
+        "line": 77,
+        "declaration": "export function packageReleaseAssets({ version, outDir = path.join(REPO_ROOT, 'dist'), repoRoot = REPO_ROOT } = {}) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/package-release-assets.mjs",
+      "id": "dynamic-008420",
+      "old": {
+        "line": 77,
+        "declaration": "export function packageReleaseAssets({ version, outDir = path.join(REPO_ROOT, 'dist'), repoRoot = REPO_ROOT } = {}) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/package-release-assets.mjs",
+      "id": "dynamic-008421",
+      "old": {
+        "line": 77,
+        "declaration": "export function packageReleaseAssets({ version, outDir = path.join(REPO_ROOT, 'dist'), repoRoot = REPO_ROOT } = {}) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/prepare-release.mjs",
+      "id": "dynamic-008467",
+      "old": {
+        "line": 249,
+        "declaration": "function main() {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008578",
+      "old": {
+        "line": 280,
+        "declaration": "export function seedReviewPack(pack, { seed, reviewer, authorSession = pack.authorSession, nonce = randomBytes(32).toString('hex') }) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008579",
+      "old": {
+        "line": 280,
+        "declaration": "export function seedReviewPack(pack, { seed, reviewer, authorSession = pack.authorSession, nonce = randomBytes(32).toString('hex') }) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/run-rust-dev-host.mjs",
+      "id": "dynamic-008705",
+      "old": {
+        "line": 90,
+        "declaration": "function main() {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/run-test-canary.mjs",
+      "id": "dynamic-008735",
+      "old": {
+        "line": 59,
+        "declaration": "export function readCanaryFileList(filePath) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/run-tests.mjs",
+      "id": "dynamic-008745",
+      "old": {
+        "line": 137,
+        "declaration": "export function discoverTestFiles(root = DEFAULT_TEST_ROOT) {"
+      },
+      "new": {
+        "line": 140,
+        "declaration": "function walk(dir) {"
+      }
+    },
+    {
+      "file": "scripts/run-tests.mjs",
+      "id": "dynamic-008746",
+      "old": {
+        "line": 137,
+        "declaration": "export function discoverTestFiles(root = DEFAULT_TEST_ROOT) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/run-tests.mjs",
+      "id": "dynamic-008747",
+      "old": {
+        "line": 137,
+        "declaration": "export function discoverTestFiles(root = DEFAULT_TEST_ROOT) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/run-tests.mjs",
+      "id": "dynamic-008749",
+      "old": {
+        "line": 171,
+        "declaration": "export function buildTestArgv(files, forwardedArgs = []) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/run-tests.mjs",
+      "id": "dynamic-008756",
+      "old": {
+        "line": 189,
+        "declaration": "export function buildTestEnv(env = process.env) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/run-tests.mjs",
+      "id": "dynamic-008757",
+      "old": {
+        "line": 189,
+        "declaration": "export function buildTestEnv(env = process.env) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/run-tests.mjs",
+      "id": "dynamic-008766",
+      "old": {
+        "line": 240,
+        "declaration": "function startFileWatchdog({ files, env, fileTimeoutMs, pollMs, tempDir, log }) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/run-tests.mjs",
+      "id": "dynamic-008773",
+      "old": {
+        "line": 315,
+        "declaration": "export function leftoverTempPrefixes(root, readdir = fs.readdirSync) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/run-tests.mjs",
+      "id": "dynamic-008776",
+      "old": {
+        "line": 315,
+        "declaration": "export function leftoverTempPrefixes(root, readdir = fs.readdirSync) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/run-tests.mjs",
+      "id": "dynamic-008779",
+      "old": {
+        "line": 343,
+        "declaration": "export function snapshotFgos(repoRoot) {"
+      },
+      "new": {
+        "line": 348,
+        "declaration": "function walk(currentDir) {"
+      }
+    },
+    {
+      "file": "scripts/run-tests.mjs",
+      "id": "dynamic-008780",
+      "old": {
+        "line": 343,
+        "declaration": "export function snapshotFgos(repoRoot) {"
+      },
+      "new": {
+        "line": 348,
+        "declaration": "function walk(currentDir) {"
+      }
+    },
+    {
+      "file": "scripts/run-tests.mjs",
+      "id": "dynamic-008781",
+      "old": {
+        "line": 343,
+        "declaration": "export function snapshotFgos(repoRoot) {"
+      },
+      "new": {
+        "line": 348,
+        "declaration": "function walk(currentDir) {"
+      }
+    },
+    {
+      "file": "scripts/stress-test-files.mjs",
+      "id": "dynamic-008828",
+      "old": {
+        "line": 65,
+        "declaration": "function stopBurners() {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/stress-test-files.mjs",
+      "id": "dynamic-008829",
+      "old": {
+        "line": 65,
+        "declaration": "function stopBurners() {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/stress-test-files.mjs",
+      "id": "dynamic-008830",
+      "old": {
+        "line": 65,
+        "declaration": "function stopBurners() {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/stress-test-files.mjs",
+      "id": "dynamic-008831",
+      "old": {
+        "line": 65,
+        "declaration": "function stopBurners() {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/stress-test-files.mjs",
+      "id": "dynamic-008832",
+      "old": {
+        "line": 65,
+        "declaration": "function stopBurners() {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/stress-test-files.mjs",
+      "id": "dynamic-008833",
+      "old": {
+        "line": 65,
+        "declaration": "function stopBurners() {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/stress-test-files.mjs",
+      "id": "dynamic-008834",
+      "old": {
+        "line": 65,
+        "declaration": "function stopBurners() {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/stress-test-files.mjs",
+      "id": "dynamic-008839",
+      "old": {
+        "line": 56,
+        "declaration": "const burnerCommand = (i) => {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/stress-test-files.mjs",
+      "id": "dynamic-008840",
+      "old": {
+        "line": 56,
+        "declaration": "const burnerCommand = (i) => {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/stress-test-files.mjs",
+      "id": "dynamic-008841",
+      "old": {
+        "line": 56,
+        "declaration": "const burnerCommand = (i) => {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/stress-test-files.mjs",
+      "id": "dynamic-008842",
+      "old": {
+        "line": 56,
+        "declaration": "const burnerCommand = (i) => {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/stress-test-files.mjs",
+      "id": "dynamic-008843",
+      "old": {
+        "line": 65,
+        "declaration": "function stopBurners() {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/stress-test-files.mjs",
+      "id": "dynamic-008844",
+      "old": {
+        "line": 65,
+        "declaration": "function stopBurners() {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/stress-test-files.mjs",
+      "id": "dynamic-008845",
+      "old": {
+        "line": 65,
+        "declaration": "function stopBurners() {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/stress-test-files.mjs",
+      "id": "dynamic-008846",
+      "old": {
+        "line": 65,
+        "declaration": "function stopBurners() {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/test-proof-inventory.mjs",
+      "id": "dynamic-008859",
+      "old": {
+        "line": 129,
+        "declaration": "export function inventoryRunInitSites(files, { readFile = (f) => fs.readFileSync(f, 'utf8'), repoRoot = REPO_ROOT } = {}) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/test-proof-inventory.mjs",
+      "id": "dynamic-008860",
+      "old": {
+        "line": 129,
+        "declaration": "export function inventoryRunInitSites(files, { readFile = (f) => fs.readFileSync(f, 'utf8'), repoRoot = REPO_ROOT } = {}) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/test-proof-inventory.mjs",
+      "id": "dynamic-008871",
+      "old": {
+        "line": 509,
+        "declaration": "export function buildSuiteBaseline({ files, cwd = REPO_ROOT, sha, wallSeconds, previous = {}, readFile = (f) => fs.readFileSync(f, 'utf8') }) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/test-proof-inventory.mjs",
+      "id": "dynamic-008872",
+      "old": {
+        "line": 509,
+        "declaration": "export function buildSuiteBaseline({ files, cwd = REPO_ROOT, sha, wallSeconds, previous = {}, readFile = (f) => fs.readFileSync(f, 'utf8') }) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/test-proof-inventory.mjs",
+      "id": "dynamic-008873",
+      "old": {
+        "line": 509,
+        "declaration": "export function buildSuiteBaseline({ files, cwd = REPO_ROOT, sha, wallSeconds, previous = {}, readFile = (f) => fs.readFileSync(f, 'utf8') }) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/test-proof-inventory.mjs",
+      "id": "dynamic-008874",
+      "old": {
+        "line": 509,
+        "declaration": "export function buildSuiteBaseline({ files, cwd = REPO_ROOT, sha, wallSeconds, previous = {}, readFile = (f) => fs.readFileSync(f, 'utf8') }) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/test-proof-inventory.mjs",
+      "id": "dynamic-008875",
+      "old": {
+        "line": 509,
+        "declaration": "export function buildSuiteBaseline({ files, cwd = REPO_ROOT, sha, wallSeconds, previous = {}, readFile = (f) => fs.readFileSync(f, 'utf8') }) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/test-proof-inventory.mjs",
+      "id": "dynamic-008876",
+      "old": {
+        "line": 509,
+        "declaration": "export function buildSuiteBaseline({ files, cwd = REPO_ROOT, sha, wallSeconds, previous = {}, readFile = (f) => fs.readFileSync(f, 'utf8') }) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/test-proof-inventory.mjs",
+      "id": "dynamic-008877",
+      "old": {
+        "line": 48,
+        "declaration": "const CWD_CTOR_RE = (varName) =>"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/test-select-promote-report.mjs",
+      "id": "dynamic-008965",
+      "old": {
+        "line": 88,
+        "declaration": "export async function runPromoteReport({ repo, apply = false, manifestPath = path.resolve('test/test-ownership.mjs') } = {}) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/test-select-run-plan.mjs",
+      "id": "dynamic-009004",
+      "old": {
+        "line": 24,
+        "declaration": "const absSelected = plan.selectedFiles.map(f => path.resolve(process.cwd(), f));"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/test-select.mjs",
+      "id": "dynamic-009052",
+      "old": {
+        "line": 381,
+        "declaration": "export function runShadow({"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/test-select.mjs",
+      "id": "dynamic-009055",
+      "old": {
+        "line": 381,
+        "declaration": "export function runShadow({"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/test-select.mjs",
+      "id": "dynamic-009057",
+      "old": {
+        "line": 381,
+        "declaration": "export function runShadow({"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/test-select.mjs",
+      "id": "dynamic-009058",
+      "old": {
+        "line": 381,
+        "declaration": "export function runShadow({"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/test-select.mjs",
+      "id": "dynamic-009059",
+      "old": {
+        "line": 381,
+        "declaration": "export function runShadow({"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/test-timing.mjs",
+      "id": "dynamic-009101",
+      "old": {
+        "line": 311,
+        "declaration": "export function summarizeSamples(samples) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/test-timing.mjs",
+      "id": "dynamic-009102",
+      "old": {
+        "line": 311,
+        "declaration": "export function summarizeSamples(samples) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/test-timing.mjs",
+      "id": "dynamic-009103",
+      "old": {
+        "line": 311,
+        "declaration": "export function summarizeSamples(samples) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/test-timing.mjs",
+      "id": "dynamic-009104",
+      "old": {
+        "line": 311,
+        "declaration": "export function summarizeSamples(samples) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/test-timing.mjs",
+      "id": "dynamic-009105",
+      "old": {
+        "line": 311,
+        "declaration": "export function summarizeSamples(samples) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/test-timing.mjs",
+      "id": "dynamic-009106",
+      "old": {
+        "line": 311,
+        "declaration": "export function summarizeSamples(samples) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/test-timing.mjs",
+      "id": "dynamic-009107",
+      "old": {
+        "line": 311,
+        "declaration": "export function summarizeSamples(samples) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/verify-fanout-overlap.mjs",
+      "id": "dynamic-009108",
+      "old": {
+        "line": 90,
+        "declaration": "function intervalsOverlap(a, b) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/verify-fanout-overlap.mjs",
+      "id": "dynamic-009109",
+      "old": {
+        "line": 90,
+        "declaration": "function intervalsOverlap(a, b) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/verify-fanout-overlap.mjs",
+      "id": "dynamic-009111",
+      "old": {
+        "line": 31,
+        "declaration": "function resolveMainCheckoutRoot() {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/verify-fanout-overlap.mjs",
+      "id": "dynamic-009112",
+      "old": {
+        "line": 31,
+        "declaration": "function resolveMainCheckoutRoot() {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/verify-fanout-overlap.mjs",
+      "id": "dynamic-009113",
+      "old": {
+        "line": 31,
+        "declaration": "function resolveMainCheckoutRoot() {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "scripts/write-wrapper-script.mjs",
+      "id": "dynamic-009291",
+      "old": {
+        "line": 44,
+        "declaration": "export function runCli(argv = process.argv.slice(2), cwd = process.cwd()) {"
+      },
+      "new": {
+        "line": 1,
+        "declaration": "module data / top-level entry"
+      }
+    },
+    {
+      "file": "src/report/capability-plan-lint.mjs",
+      "id": "dynamic-009721",
+      "old": {
+        "line": 273,
+        "declaration": "export function lintPhaseUnits(contentOrPath, { config, phase, cellId } = {}) {"
+      },
+      "new": {
+        "line": 404,
+        "declaration": "function dfsCycle(nodeId, currentPath) {"
+      }
+    },
+    {
+      "file": "src/report/capability-plan-lint.mjs",
+      "id": "dynamic-009722",
+      "old": {
+        "line": 273,
+        "declaration": "export function lintPhaseUnits(contentOrPath, { config, phase, cellId } = {}) {"
+      },
+      "new": {
+        "line": 404,
+        "declaration": "function dfsCycle(nodeId, currentPath) {"
+      }
+    },
+    {
+      "file": "src/report/capability-plan-lint.mjs",
+      "id": "dynamic-009723",
+      "old": {
+        "line": 273,
+        "declaration": "export function lintPhaseUnits(contentOrPath, { config, phase, cellId } = {}) {"
+      },
+      "new": {
+        "line": 404,
+        "declaration": "function dfsCycle(nodeId, currentPath) {"
+      }
+    }
+  ]
+}

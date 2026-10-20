@@ -1,0 +1,2828 @@
+{
+  "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+  "method": "Owner option B, 100% admitted refs + every tuple/rejection + inherited source slots + all pilot closure changes; exact ±40 pinned source lines. Oversize evidence streams by digest-bound item fragments.",
+  "limits": {
+    "records": 60,
+    "utf8Bytes": 400000
+  },
+  "parts": [
+    {
+      "part": 1,
+      "payload": "step-05-seam4-p01.json",
+      "sha256": "a6dbacea9db7d061e0503826a8c02214badbb2e0ec40fe510e0926cfbfc78bba",
+      "bytes": 363202,
+      "records": 9,
+      "files": [
+        "docs/decisions/index.md"
+      ],
+      "report": "review-a38-step-05-s4-p01.md",
+      "status": "pending"
+    },
+    {
+      "part": 2,
+      "payload": "step-05-seam4-p02.json",
+      "sha256": "5e328e97ed26a78e87fd02071c09fc9520f88120b989a91bc842af30ed222758",
+      "bytes": 354827,
+      "records": 8,
+      "files": [
+        "docs/decisions/index.md"
+      ],
+      "report": "review-a38-step-05-s4-p02.md",
+      "status": "pending"
+    },
+    {
+      "part": 3,
+      "payload": "step-05-seam4-p03.json",
+      "sha256": "d414fa41b2fd5c528824d9cdf4e95dc6d39834d97d247a3e6bba0990475afde1",
+      "bytes": 356707,
+      "records": 8,
+      "files": [
+        "docs/decisions/index.md"
+      ],
+      "report": "review-a38-step-05-s4-p03.md",
+      "status": "pending"
+    },
+    {
+      "part": 4,
+      "payload": "step-05-seam4-p04.json",
+      "sha256": "64f0d380f4ada6b4bd596fd260d499b2965bdb1bc51fdf35bd3b4e37c6c37b84",
+      "bytes": 348983,
+      "records": 8,
+      "files": [
+        "docs/decisions/index.md"
+      ],
+      "report": "review-a38-step-05-s4-p04.md",
+      "status": "pending"
+    },
+    {
+      "part": 5,
+      "payload": "step-05-seam4-p05.json",
+      "sha256": "17a71617dd6f7b955fc87e8b9bc96aa760a432f91d7b47b5b868d28404527b21",
+      "bytes": 366974,
+      "records": 8,
+      "files": [
+        "docs/decisions/index.md"
+      ],
+      "report": "review-a38-step-05-s4-p05.md",
+      "status": "pending"
+    },
+    {
+      "part": 6,
+      "payload": "step-05-seam4-p06.json",
+      "sha256": "b39cf503a5ac0bf2a5dcc4cfa70e52e85c9595ba1650a841927c57c565162696",
+      "bytes": 368075,
+      "records": 8,
+      "files": [
+        "docs/decisions/index.md"
+      ],
+      "report": "review-a38-step-05-s4-p06.md",
+      "status": "pending"
+    },
+    {
+      "part": 7,
+      "payload": "step-05-seam4-p07.json",
+      "sha256": "42036ff9262323b55e1651f96fe344eb1d2ae5d7229924a298f28d049da1153a",
+      "bytes": 361980,
+      "records": 8,
+      "files": [
+        "docs/decisions/index.md"
+      ],
+      "report": "review-a38-step-05-s4-p07.md",
+      "status": "pending"
+    },
+    {
+      "part": 8,
+      "payload": "step-05-seam4-p08.json",
+      "sha256": "506ec851901dadef4e28b33d8459051b19ab6317b266518cf0ebb989d741b7e7",
+      "bytes": 376065,
+      "records": 8,
+      "files": [
+        "docs/decisions/index.md"
+      ],
+      "report": "review-a38-step-05-s4-p08.md",
+      "status": "pending"
+    },
+    {
+      "part": 9,
+      "payload": "step-05-seam4-p09.json",
+      "sha256": "39afa4d5fb0266d624b5712045e23f262f779d63fd94fa3fb3417badc82fa912",
+      "bytes": 372606,
+      "records": 8,
+      "files": [
+        "docs/decisions/index.md"
+      ],
+      "report": "review-a38-step-05-s4-p09.md",
+      "status": "pending"
+    },
+    {
+      "part": 10,
+      "payload": "step-05-seam4-p10.json",
+      "sha256": "94338731366f37d7ae4cedd33d369e66cd72f6cb18ea726a97ec4a7a42311ef5",
+      "bytes": 381115,
+      "records": 8,
+      "files": [
+        "docs/decisions/index.md"
+      ],
+      "report": "review-a38-step-05-s4-p10.md",
+      "status": "pending"
+    },
+    {
+      "part": 11,
+      "payload": "step-05-seam4-p11.json",
+      "sha256": "972a9a1d59f7d101ea61d6aa52f7b9fa373473e2ea7b3c134c7f2da4e33e3dd5",
+      "bytes": 382824,
+      "records": 37,
+      "files": [
+        "docs/decisions/index.md",
+        "docs/doc-registry.json",
+        "src/report/decision-index.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p11.md",
+      "status": "pending"
+    },
+    {
+      "part": 12,
+      "payload": "step-05-seam4-p12.json",
+      "sha256": "3ee6a143d1c26bfa9fa50177be674f5f781c72dce0abf5ed6bc8e93192dafff2",
+      "bytes": 389784,
+      "records": 34,
+      "files": [
+        "docs/doc-registry.json"
+      ],
+      "report": "review-a38-step-05-s4-p12.md",
+      "status": "pending"
+    },
+    {
+      "part": 13,
+      "payload": "step-05-seam4-p13.json",
+      "sha256": "115216bf9d2f0fb94597eb876e576aca110219bb96dcbf28dd59487433512204",
+      "bytes": 387313,
+      "records": 34,
+      "files": [
+        "docs/doc-registry.json"
+      ],
+      "report": "review-a38-step-05-s4-p13.md",
+      "status": "pending"
+    },
+    {
+      "part": 14,
+      "payload": "step-05-seam4-p14.json",
+      "sha256": "dc6b8f1bfe1ccc2f7fa4e1478a87aceb21a3a8cf32e3f19808488669b794bf43",
+      "bytes": 384562,
+      "records": 33,
+      "files": [
+        "docs/doc-registry.json"
+      ],
+      "report": "review-a38-step-05-s4-p14.md",
+      "status": "pending"
+    },
+    {
+      "part": 15,
+      "payload": "step-05-seam4-p15.json",
+      "sha256": "a9011ea0963619dbba03d61a72dee286d14ae4963a58762503e4082b5635aabd",
+      "bytes": 383139,
+      "records": 39,
+      "files": [
+        "docs/doc-registry.json"
+      ],
+      "report": "review-a38-step-05-s4-p15.md",
+      "status": "pending"
+    },
+    {
+      "part": 16,
+      "payload": "step-05-seam4-p16.json",
+      "sha256": "3de334653ccc6bffc1d85f8fe6dc59ff6d0baed8d7c47564c316504b984ecf3a",
+      "bytes": 385120,
+      "records": 39,
+      "files": [
+        "docs/doc-registry.json"
+      ],
+      "report": "review-a38-step-05-s4-p16.md",
+      "status": "pending"
+    },
+    {
+      "part": 17,
+      "payload": "step-05-seam4-p17.json",
+      "sha256": "15565ba997856c50e8dccaf698a0b909a0c942eb5f43b9f9e7c1bdc7955f9996",
+      "bytes": 385065,
+      "records": 38,
+      "files": [
+        "docs/doc-registry.json"
+      ],
+      "report": "review-a38-step-05-s4-p17.md",
+      "status": "pending"
+    },
+    {
+      "part": 18,
+      "payload": "step-05-seam4-p18.json",
+      "sha256": "1a326f85d8664772f2870ecb52bf89171bea01ec6dcb37b3ac5ea7c4da63cb0d",
+      "bytes": 379521,
+      "records": 38,
+      "files": [
+        "docs/doc-registry.json"
+      ],
+      "report": "review-a38-step-05-s4-p18.md",
+      "status": "pending"
+    },
+    {
+      "part": 19,
+      "payload": "step-05-seam4-p19.json",
+      "sha256": "4caf3fa000a558b0f51ee41e6d4b28429f678e1d8d7b48ccc7db7ca907fdf0c0",
+      "bytes": 388899,
+      "records": 38,
+      "files": [
+        "docs/doc-registry.json"
+      ],
+      "report": "review-a38-step-05-s4-p19.md",
+      "status": "pending"
+    },
+    {
+      "part": 20,
+      "payload": "step-05-seam4-p20.json",
+      "sha256": "406e5439930e475f674e27510266abe68092426c3e049d8c15c99826aaaa87bb",
+      "bytes": 387247,
+      "records": 38,
+      "files": [
+        "docs/doc-registry.json"
+      ],
+      "report": "review-a38-step-05-s4-p20.md",
+      "status": "pending"
+    },
+    {
+      "part": 21,
+      "payload": "step-05-seam4-p21.json",
+      "sha256": "926d09781ff6614a7f62b8a6128e51e692df6bfc1ade85f437b874af0410f090",
+      "bytes": 388699,
+      "records": 39,
+      "files": [
+        "docs/doc-registry.json"
+      ],
+      "report": "review-a38-step-05-s4-p21.md",
+      "status": "pending"
+    },
+    {
+      "part": 22,
+      "payload": "step-05-seam4-p22.json",
+      "sha256": "027f1640e922e9c772da46551571cf88e73f258dabdae3564f3a7eb056a9c78b",
+      "bytes": 384382,
+      "records": 39,
+      "files": [
+        "docs/doc-registry.json"
+      ],
+      "report": "review-a38-step-05-s4-p22.md",
+      "status": "pending"
+    },
+    {
+      "part": 23,
+      "payload": "step-05-seam4-p23.json",
+      "sha256": "e5f252b5451c85116cb3ad91b41692f83962da805e67343ade247be2772cf8bb",
+      "bytes": 389931,
+      "records": 39,
+      "files": [
+        "docs/doc-registry.json"
+      ],
+      "report": "review-a38-step-05-s4-p23.md",
+      "status": "pending"
+    },
+    {
+      "part": 24,
+      "payload": "step-05-seam4-p24.json",
+      "sha256": "a898a642ad215381195c027985fa99306084a16ae4eb4bbc0805e5e43dbb3bc3",
+      "bytes": 381049,
+      "records": 38,
+      "files": [
+        "docs/doc-registry.json"
+      ],
+      "report": "review-a38-step-05-s4-p24.md",
+      "status": "pending"
+    },
+    {
+      "part": 25,
+      "payload": "step-05-seam4-p25.json",
+      "sha256": "31dbdf46f31a0b2cf3d31d3085feedb9bb2aa8c6bb44cebb7669ec483d9b6e72",
+      "bytes": 388100,
+      "records": 38,
+      "files": [
+        "docs/doc-registry.json"
+      ],
+      "report": "review-a38-step-05-s4-p25.md",
+      "status": "pending"
+    },
+    {
+      "part": 26,
+      "payload": "step-05-seam4-p26.json",
+      "sha256": "633d9a4cc530cd4c693c381ebdba46ea58f37f2a7f5eeb1c103172a9fbf58817",
+      "bytes": 389024,
+      "records": 38,
+      "files": [
+        "docs/doc-registry.json"
+      ],
+      "report": "review-a38-step-05-s4-p26.md",
+      "status": "pending"
+    },
+    {
+      "part": 27,
+      "payload": "step-05-seam4-p27.json",
+      "sha256": "c12c226ea5f35152a2cc1d6fe5ca931bf1ed5f624d89633a8b3baa4cae40b3c9",
+      "bytes": 388999,
+      "records": 38,
+      "files": [
+        "docs/doc-registry.json"
+      ],
+      "report": "review-a38-step-05-s4-p27.md",
+      "status": "pending"
+    },
+    {
+      "part": 28,
+      "payload": "step-05-seam4-p28.json",
+      "sha256": "5d3440871754a962dee58e39ab2c5d120706e1c9e04b7c18565af5a216607611",
+      "bytes": 385668,
+      "records": 37,
+      "files": [
+        "docs/doc-registry.json"
+      ],
+      "report": "review-a38-step-05-s4-p28.md",
+      "status": "pending"
+    },
+    {
+      "part": 29,
+      "payload": "step-05-seam4-p29.json",
+      "sha256": "77f6a35e61068e172704850df0b942443914af9039ba8915f0036e44d8000a4d",
+      "bytes": 386556,
+      "records": 37,
+      "files": [
+        "docs/doc-registry.json"
+      ],
+      "report": "review-a38-step-05-s4-p29.md",
+      "status": "pending"
+    },
+    {
+      "part": 30,
+      "payload": "step-05-seam4-p30.json",
+      "sha256": "823e99931e54e3c3e98bff38a4105311dd2631312e5c184c3702a6be85294947",
+      "bytes": 380826,
+      "records": 35,
+      "files": [
+        "docs/doc-registry.json"
+      ],
+      "report": "review-a38-step-05-s4-p30.md",
+      "status": "pending"
+    },
+    {
+      "part": 31,
+      "payload": "step-05-seam4-p31.json",
+      "sha256": "e2f93d50e5bf91cbc02464fb10ffe13f201e476040f7aaf674c941d8d7713db2",
+      "bytes": 388357,
+      "records": 35,
+      "files": [
+        "docs/doc-registry.json"
+      ],
+      "report": "review-a38-step-05-s4-p31.md",
+      "status": "pending"
+    },
+    {
+      "part": 32,
+      "payload": "step-05-seam4-p32.json",
+      "sha256": "2b3b9502ae637c2d73649db1e709b700831dad38256eda4dfe74a62836869f68",
+      "bytes": 382431,
+      "records": 35,
+      "files": [
+        "docs/doc-registry.json"
+      ],
+      "report": "review-a38-step-05-s4-p32.md",
+      "status": "pending"
+    },
+    {
+      "part": 33,
+      "payload": "step-05-seam4-p33.json",
+      "sha256": "0a475cc832ed36697dad6062459bf40feffd84c1ee0871c8fdd7cc7cf2b2a3f4",
+      "bytes": 381102,
+      "records": 35,
+      "files": [
+        "docs/doc-registry.json"
+      ],
+      "report": "review-a38-step-05-s4-p33.md",
+      "status": "pending"
+    },
+    {
+      "part": 34,
+      "payload": "step-05-seam4-p34.json",
+      "sha256": "0a1304660a1bafea1e6aa269aa4fe93c19c3f430397b33f397306c07b2d51d67",
+      "bytes": 381104,
+      "records": 27,
+      "files": [
+        "docs/doc-registry.json",
+        "docs/doc-registry.md"
+      ],
+      "report": "review-a38-step-05-s4-p34.md",
+      "status": "pending"
+    },
+    {
+      "part": 35,
+      "payload": "step-05-seam4-p35.json",
+      "sha256": "261776d651b2f9677e85211ce664e6fe2af34f4edf30666d14640b58621099a3",
+      "bytes": 380625,
+      "records": 27,
+      "files": [
+        "docs/doc-registry.md"
+      ],
+      "report": "review-a38-step-05-s4-p35.md",
+      "status": "pending"
+    },
+    {
+      "part": 36,
+      "payload": "step-05-seam4-p36.json",
+      "sha256": "66149c65647b2e78ae78cd50313b59c8f48dc522e64e35d19a4e271d495bd5e8",
+      "bytes": 379458,
+      "records": 26,
+      "files": [
+        "docs/doc-registry.md"
+      ],
+      "report": "review-a38-step-05-s4-p36.md",
+      "status": "pending"
+    },
+    {
+      "part": 37,
+      "payload": "step-05-seam4-p37.json",
+      "sha256": "09f58e5a6ef4e6a4f83fe5f5f81167de71d8a109776e3c035d8735454de1e421",
+      "bytes": 386953,
+      "records": 26,
+      "files": [
+        "docs/doc-registry.md"
+      ],
+      "report": "review-a38-step-05-s4-p37.md",
+      "status": "pending"
+    },
+    {
+      "part": 38,
+      "payload": "step-05-seam4-p38.json",
+      "sha256": "ad3b7661e2f7784e7e6d778a0d57b2116786c929627673ffaea173abb4561eb7",
+      "bytes": 376801,
+      "records": 26,
+      "files": [
+        "docs/doc-registry.md"
+      ],
+      "report": "review-a38-step-05-s4-p38.md",
+      "status": "pending"
+    },
+    {
+      "part": 39,
+      "payload": "step-05-seam4-p39.json",
+      "sha256": "90c7425cbad5e9750e936c30e512fcfe661324c6bbda559401c201f5c99ac1c4",
+      "bytes": 389936,
+      "records": 28,
+      "files": [
+        "docs/doc-registry.md"
+      ],
+      "report": "review-a38-step-05-s4-p39.md",
+      "status": "pending"
+    },
+    {
+      "part": 40,
+      "payload": "step-05-seam4-p40.json",
+      "sha256": "af8fec4dad654ef8a0ce2a1dcc9ae3531928a21d43d705920683903d8cea5eb8",
+      "bytes": 389043,
+      "records": 31,
+      "files": [
+        "docs/doc-registry.md"
+      ],
+      "report": "review-a38-step-05-s4-p40.md",
+      "status": "pending"
+    },
+    {
+      "part": 41,
+      "payload": "step-05-seam4-p41.json",
+      "sha256": "bac57b14f554883f99d45fc4ebbda4697784d17b761c8a7c24d4dd7628afe05d",
+      "bytes": 384415,
+      "records": 29,
+      "files": [
+        "docs/doc-registry.md"
+      ],
+      "report": "review-a38-step-05-s4-p41.md",
+      "status": "pending"
+    },
+    {
+      "part": 42,
+      "payload": "step-05-seam4-p42.json",
+      "sha256": "45307753a2c12211c986962293b70d61c8a2fefebbda57f7efcf6a73cd0a0ff8",
+      "bytes": 380384,
+      "records": 31,
+      "files": [
+        "docs/doc-registry.md"
+      ],
+      "report": "review-a38-step-05-s4-p42.md",
+      "status": "pending"
+    },
+    {
+      "part": 43,
+      "payload": "step-05-seam4-p43.json",
+      "sha256": "f6384935f37584b4ae8cf7e941bd93a8d4ad340f0afbe6f02622535234bedb0e",
+      "bytes": 389471,
+      "records": 33,
+      "files": [
+        "docs/doc-registry.md"
+      ],
+      "report": "review-a38-step-05-s4-p43.md",
+      "status": "pending"
+    },
+    {
+      "part": 44,
+      "payload": "step-05-seam4-p44.json",
+      "sha256": "ff162d28f7f25991f61e65971b652799b59a56aec72818bc07f338be329b1f48",
+      "bytes": 387600,
+      "records": 33,
+      "files": [
+        "docs/doc-registry.md"
+      ],
+      "report": "review-a38-step-05-s4-p44.md",
+      "status": "pending"
+    },
+    {
+      "part": 45,
+      "payload": "step-05-seam4-p45.json",
+      "sha256": "b321bbfb835add675e25347f2683728431125df04940c6c9fc34984e520e2261",
+      "bytes": 386549,
+      "records": 35,
+      "files": [
+        "docs/doc-registry.md"
+      ],
+      "report": "review-a38-step-05-s4-p45.md",
+      "status": "pending"
+    },
+    {
+      "part": 46,
+      "payload": "step-05-seam4-p46.json",
+      "sha256": "79681d123219768cefb98a5ee31e3f9172e7eb5ebebb03b98e03e73380892399",
+      "bytes": 388853,
+      "records": 31,
+      "files": [
+        "docs/doc-registry.md"
+      ],
+      "report": "review-a38-step-05-s4-p46.md",
+      "status": "pending"
+    },
+    {
+      "part": 47,
+      "payload": "step-05-seam4-p47.json",
+      "sha256": "5169d3a9b8aca972ebe9b1ac249ae4ee313727dcfd5415eb8e07a5cb56b2f4e9",
+      "bytes": 377451,
+      "records": 31,
+      "files": [
+        "docs/doc-registry.md"
+      ],
+      "report": "review-a38-step-05-s4-p47.md",
+      "status": "pending"
+    },
+    {
+      "part": 48,
+      "payload": "step-05-seam4-p48.json",
+      "sha256": "236033c29a99675e76b098bb992099d18fc1f45ab1bb012d8c07489c6652abf7",
+      "bytes": 383098,
+      "records": 30,
+      "files": [
+        "docs/doc-registry.md"
+      ],
+      "report": "review-a38-step-05-s4-p48.md",
+      "status": "pending"
+    },
+    {
+      "part": 49,
+      "payload": "step-05-seam4-p49.json",
+      "sha256": "6f2867e5c14e92d981d6cc0fbcce713bc5e78e3405894cb4d3039c2462976dda",
+      "bytes": 384482,
+      "records": 30,
+      "files": [
+        "docs/doc-registry.md"
+      ],
+      "report": "review-a38-step-05-s4-p49.md",
+      "status": "pending"
+    },
+    {
+      "part": 50,
+      "payload": "step-05-seam4-p50.json",
+      "sha256": "e1ab7cf30c3eeb2d2ffa80950a83c1359011fcdc6b6e550334babdc05a8f85b1",
+      "bytes": 385462,
+      "records": 35,
+      "files": [
+        "docs/doc-registry.md",
+        "docs/enduser-docs-index.json",
+        "src/report/knowledge-projection.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p50.md",
+      "status": "pending"
+    },
+    {
+      "part": 51,
+      "payload": "step-05-seam4-p51.json",
+      "sha256": "0541081120edf5b30ac626639b63545de383f3154d39b7f496bf71a9b8dc7456",
+      "bytes": 388810,
+      "records": 35,
+      "files": [
+        "docs/enduser-docs-index.json"
+      ],
+      "report": "review-a38-step-05-s4-p51.md",
+      "status": "pending"
+    },
+    {
+      "part": 52,
+      "payload": "step-05-seam4-p52.json",
+      "sha256": "8df68348c19db354115767746df488c49ad0d87c6293142c0a8bcf119c42a1e3",
+      "bytes": 388150,
+      "records": 37,
+      "files": [
+        "docs/enduser-docs-index.json"
+      ],
+      "report": "review-a38-step-05-s4-p52.md",
+      "status": "pending"
+    },
+    {
+      "part": 53,
+      "payload": "step-05-seam4-p53.json",
+      "sha256": "c28757b36c7b5b9d1b135fe525896e8b29ad84ab3780d1b227bd9a87d4d12157",
+      "bytes": 382749,
+      "records": 38,
+      "files": [
+        "docs/enduser-docs-index.json"
+      ],
+      "report": "review-a38-step-05-s4-p53.md",
+      "status": "pending"
+    },
+    {
+      "part": 54,
+      "payload": "step-05-seam4-p54.json",
+      "sha256": "b883428a2f342f201237a5b8ebf2f1ebdab2dd68c21a3c6f8db690077a4ee3bb",
+      "bytes": 388206,
+      "records": 38,
+      "files": [
+        "docs/enduser-docs-index.json"
+      ],
+      "report": "review-a38-step-05-s4-p54.md",
+      "status": "pending"
+    },
+    {
+      "part": 55,
+      "payload": "step-05-seam4-p55.json",
+      "sha256": "a21b872cc0dd21198ea35b2ff6945b5c6ccdd01034efb71a4b348f9f48e9919b",
+      "bytes": 387361,
+      "records": 37,
+      "files": [
+        "docs/enduser-docs-index.json"
+      ],
+      "report": "review-a38-step-05-s4-p55.md",
+      "status": "pending"
+    },
+    {
+      "part": 56,
+      "payload": "step-05-seam4-p56.json",
+      "sha256": "45e80048bdd181e3ca127ca93a0920d1de5f8a8753adff5a610e5bc565ad653f",
+      "bytes": 383878,
+      "records": 36,
+      "files": [
+        "docs/enduser-docs-index.json"
+      ],
+      "report": "review-a38-step-05-s4-p56.md",
+      "status": "pending"
+    },
+    {
+      "part": 57,
+      "payload": "step-05-seam4-p57.json",
+      "sha256": "975f654f0f1547724caff114e9d6673466cbc244a1953eda010a0a6ea551f769",
+      "bytes": 387653,
+      "records": 37,
+      "files": [
+        "docs/enduser-docs-index.json"
+      ],
+      "report": "review-a38-step-05-s4-p57.md",
+      "status": "pending"
+    },
+    {
+      "part": 58,
+      "payload": "step-05-seam4-p58.json",
+      "sha256": "c580a528f02312af4fc96c54e785f52bab3f327d9eb8cea667b0ad4a823cbe84",
+      "bytes": 386736,
+      "records": 37,
+      "files": [
+        "docs/enduser-docs-index.json"
+      ],
+      "report": "review-a38-step-05-s4-p58.md",
+      "status": "pending"
+    },
+    {
+      "part": 59,
+      "payload": "step-05-seam4-p59.json",
+      "sha256": "d0e68c5395aedc25aa33813f84ca1c063dc2202c53690ff7880d98798d55deb3",
+      "bytes": 384031,
+      "records": 36,
+      "files": [
+        "docs/enduser-docs-index.json"
+      ],
+      "report": "review-a38-step-05-s4-p59.md",
+      "status": "pending"
+    },
+    {
+      "part": 60,
+      "payload": "step-05-seam4-p60.json",
+      "sha256": "d046d87fdf8fec1f79575b9d212b1a79f93ebd98e66aa9e62da835f2f272e994",
+      "bytes": 386458,
+      "records": 36,
+      "files": [
+        "docs/enduser-docs-index.json"
+      ],
+      "report": "review-a38-step-05-s4-p60.md",
+      "status": "pending"
+    },
+    {
+      "part": 61,
+      "payload": "step-05-seam4-p61.json",
+      "sha256": "224f0ec8834e5611d03d08e9b8531c17b5232a2b05d0e509abbe7627f8263c79",
+      "bytes": 389771,
+      "records": 36,
+      "files": [
+        "docs/enduser-docs-index.json"
+      ],
+      "report": "review-a38-step-05-s4-p61.md",
+      "status": "pending"
+    },
+    {
+      "part": 62,
+      "payload": "step-05-seam4-p62.json",
+      "sha256": "ae2136caa71672dbd5aa8674ab6301ab37f10b9f5ba78b47714a085152beb6c6",
+      "bytes": 379897,
+      "records": 35,
+      "files": [
+        "docs/enduser-docs-index.json"
+      ],
+      "report": "review-a38-step-05-s4-p62.md",
+      "status": "pending"
+    },
+    {
+      "part": 63,
+      "payload": "step-05-seam4-p63.json",
+      "sha256": "93141eeb89ea59f8e95a818c3be9544ce12291ef5f4cd7fa81708cc960b8e9db",
+      "bytes": 385160,
+      "records": 35,
+      "files": [
+        "docs/enduser-docs-index.json"
+      ],
+      "report": "review-a38-step-05-s4-p63.md",
+      "status": "pending"
+    },
+    {
+      "part": 64,
+      "payload": "step-05-seam4-p64.json",
+      "sha256": "a8e2c5d0123d01f714a99ef83b3a80bf6eacfce935886c4472f09209815dd7b6",
+      "bytes": 385326,
+      "records": 38,
+      "files": [
+        "docs/enduser-docs-index.json",
+        "src/report/authoritative-match.mjs",
+        "src/report/enduser-index-generate.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p64.md",
+      "status": "pending"
+    },
+    {
+      "part": 65,
+      "payload": "step-05-seam4-p65.json",
+      "sha256": "8416b2ccc7553e6454172faabe653a658da562c49f36a5bfa930d10d2a183538",
+      "bytes": 386214,
+      "records": 55,
+      "files": [
+        "core/instructions/platform-laws.md",
+        "src/report/enduser-index-generate.mjs",
+        "src/report/enduser-index.mjs",
+        "src/report/frontmatter.mjs",
+        "src/report/item-trace.mjs",
+        "src/report/knowledge-resolver.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p65.md",
+      "status": "pending"
+    },
+    {
+      "part": 66,
+      "payload": "step-05-seam4-p66.json",
+      "sha256": "c2baa647e01439541ba606201c55224354bfedb1104999275a63518faada7076",
+      "bytes": 386157,
+      "records": 46,
+      "files": [
+        "core/instructions/platform-laws.md",
+        "src/setup/instruction-projections.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p66.md",
+      "status": "pending"
+    },
+    {
+      "part": 67,
+      "payload": "step-05-seam4-p67.json",
+      "sha256": "a2268d42d3d59588255ccbe4828c544511070ea4b4e88b66f5d38ef5c6546ed2",
+      "bytes": 387521,
+      "records": 48,
+      "files": [
+        ".agents/skills/_shared/capability-catalog.md",
+        ".agents/skills/_shared/catchup-self-recovery.md",
+        ".agents/skills/_shared/coding-cell-policy.md",
+        ".agents/skills/_shared/coding-worker-contract.md",
+        ".agents/skills/_shared/executor-dispatch-fallback.md",
+        ".agents/skills/_shared/fgos-cli-fallback.md",
+        ".agents/skills/_shared/planning-capability-awareness.md",
+        ".agents/skills/distill/SKILL.md",
+        "src/setup/instruction-projections.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p67.md",
+      "status": "pending"
+    },
+    {
+      "part": 68,
+      "payload": "step-05-seam4-p68.json",
+      "sha256": "1380c83ad18d863bf7c3aeb075392b332dbd06d658b8c6997cf567bc5fad0ea5",
+      "bytes": 381998,
+      "records": 47,
+      "files": [
+        ".agents/skills/distill/SKILL.md",
+        ".agents/skills/distill/references/consult-protocol.md",
+        ".agents/skills/distill/references/deep-dive-protocol.md",
+        ".agents/skills/distill/references/extract-rules.md",
+        ".agents/skills/distill/scripts/distill.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p68.md",
+      "status": "pending"
+    },
+    {
+      "part": 69,
+      "payload": "step-05-seam4-p69.json",
+      "sha256": "19dbd10eb96997c23d06570b7c0705e2dfecfbc5b8ef3b601409b3313a199163",
+      "bytes": 384930,
+      "records": 37,
+      "files": [
+        ".agents/skills/distill/scripts/distill.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p69.md",
+      "status": "pending"
+    },
+    {
+      "part": 70,
+      "payload": "step-05-seam4-p70.json",
+      "sha256": "4ddfa9bcb67c0f3c4ae63d26dec58794fc3470f2831e928177362aac1d4cc812",
+      "bytes": 385256,
+      "records": 40,
+      "files": [
+        ".agents/skills/distill/scripts/distill.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p70.md",
+      "status": "pending"
+    },
+    {
+      "part": 71,
+      "payload": "step-05-seam4-p71.json",
+      "sha256": "314efc2e4dc95875b06784d044d338e716d1b486695e6c5d15bf71a28a430f8e",
+      "bytes": 382026,
+      "records": 44,
+      "files": [
+        ".agents/skills/distill/scripts/distill.mjs",
+        ".agents/skills/distill/scripts/migrate-porting-state-backfill.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p71.md",
+      "status": "pending"
+    },
+    {
+      "part": 72,
+      "payload": "step-05-seam4-p72.json",
+      "sha256": "6b9b30eae4f98e1a00be9e994150d2db1868e7ec044abf876bc4c7ffd639a446",
+      "bytes": 388290,
+      "records": 54,
+      "files": [
+        ".agents/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+        ".agents/skills/fgos-clarifying/SKILL.md",
+        ".agents/skills/fgos-coding-discovering/SKILL.md",
+        ".agents/skills/fgos-coding-exploring/SKILL.md",
+        ".agents/skills/fgos-coding-exploring/references/gate-mechanics.md",
+        ".agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+        ".agents/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+        ".agents/skills/fgos-coding-implement/SKILL.md",
+        ".agents/skills/fgos-coding-implement/references/implement-and-collaboration.md",
+        ".agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+        ".agents/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+        ".agents/skills/fgos-coding-knowledge/SKILL.md",
+        ".agents/skills/fgos-coding-planning/SKILL.md",
+        ".agents/skills/fgos-coding-planning/references/approach-and-shape.md",
+        ".agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md"
+      ],
+      "report": "review-a38-step-05-s4-p72.md",
+      "status": "pending"
+    },
+    {
+      "part": 73,
+      "payload": "step-05-seam4-p73.json",
+      "sha256": "6169484a60e5863b0a5c9c4279e6bc390421095bee323237f31b4cbcf7634207",
+      "bytes": 386735,
+      "records": 48,
+      "files": [
+        ".agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+        ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        ".agents/skills/fgos-coding-shaping/SKILL.md",
+        ".agents/skills/fgos-coding-validating/SKILL.md",
+        ".agents/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+        ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+        ".agents/skills/fgos-indexing/SKILL.md",
+        ".agents/skills/fgos-researching/SKILL.md",
+        ".agents/skills/fgos-routing/SKILL.md",
+        ".claude/skills/distill/scripts/distill.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p73.md",
+      "status": "pending"
+    },
+    {
+      "part": 74,
+      "payload": "step-05-seam4-p74.json",
+      "sha256": "92e42f950eb3b75923909899c9b2487c233acd0088c1b6ea48f24922805e11bd",
+      "bytes": 382912,
+      "records": 42,
+      "files": [
+        ".claude/skills/distill/scripts/distill.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p74.md",
+      "status": "pending"
+    },
+    {
+      "part": 75,
+      "payload": "step-05-seam4-p75.json",
+      "sha256": "752e687ecca9e4651167c3a95b892fca6185d4871dc436e54701c990c7c0fef5",
+      "bytes": 382304,
+      "records": 37,
+      "files": [
+        ".claude/skills/distill/scripts/distill.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p75.md",
+      "status": "pending"
+    },
+    {
+      "part": 76,
+      "payload": "step-05-seam4-p76.json",
+      "sha256": "2a76e50232fa29ffc11293a47960680ee31159003563fff2a3e6fc73911e1c1d",
+      "bytes": 388416,
+      "records": 40,
+      "files": [
+        ".claude/skills/distill/scripts/distill.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p76.md",
+      "status": "pending"
+    },
+    {
+      "part": 77,
+      "payload": "step-05-seam4-p77.json",
+      "sha256": "8b7da8fd774e4dd091c5eb1c54fa00b6c907ff3bffb9b805b4bdbb85383b0f4b",
+      "bytes": 388738,
+      "records": 55,
+      "files": [
+        ".claude/skills/distill/scripts/distill.mjs",
+        ".claude/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+        "core/agents/code-reviewer.yaml",
+        "core/agents/council-assumptions.yaml",
+        "core/agents/council-feedback-loops.yaml",
+        "core/agents/council-ship-maintain.yaml",
+        "core/agents/debugger.yaml",
+        "core/agents/docs-manager.yaml"
+      ],
+      "report": "review-a38-step-05-s4-p77.md",
+      "status": "pending"
+    },
+    {
+      "part": 78,
+      "payload": "step-05-seam4-p78.json",
+      "sha256": "2d635a500cbe96ac4b69ae1ce9be7cada5dfbb12f9504c34fd1007cd1b2ab42e",
+      "bytes": 379863,
+      "records": 60,
+      "files": [
+        "core/agents/docs-manager.yaml",
+        "core/agents/fgos-placeholder.yaml",
+        "core/agents/fullstack-developer.yaml",
+        "core/agents/planner.yaml",
+        "core/agents/researcher.yaml",
+        "core/skills/_shared/capability-catalog.md",
+        "core/skills/_shared/catchup-self-recovery.md",
+        "core/skills/_shared/coding-worker-contract.md",
+        "core/skills/_shared/executor-dispatch-fallback.md",
+        "core/skills/_shared/fgos-cli-fallback.md",
+        "core/skills/_shared/planning-capability-awareness.md",
+        "core/skills/distill/SKILL.md",
+        "core/skills/distill/references/consult-protocol.md",
+        "core/skills/distill/references/deep-dive-protocol.md",
+        "core/skills/distill/references/extract-rules.md",
+        "core/skills/distill/scripts/distill.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p78.md",
+      "status": "pending"
+    },
+    {
+      "part": 79,
+      "payload": "step-05-seam4-p79.json",
+      "sha256": "6ebbedf8a26ae0081c5512bc8e5a666731eafbaa637ffb98ce8920c1d8e374df",
+      "bytes": 385787,
+      "records": 37,
+      "files": [
+        "core/skills/distill/scripts/distill.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p79.md",
+      "status": "pending"
+    },
+    {
+      "part": 80,
+      "payload": "step-05-seam4-p80.json",
+      "sha256": "8fd423d349a3ca9d7dcda7f4865f06e0563e5fcab676f72059bf410c5cc8317b",
+      "bytes": 382281,
+      "records": 39,
+      "files": [
+        "core/skills/distill/scripts/distill.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p80.md",
+      "status": "pending"
+    },
+    {
+      "part": 81,
+      "payload": "step-05-seam4-p81.json",
+      "sha256": "b371aeef00623c9d34ff1c6294693834db19fda84a72e2018426e2979783d098",
+      "bytes": 387138,
+      "records": 42,
+      "files": [
+        "core/skills/distill/scripts/distill.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p81.md",
+      "status": "pending"
+    },
+    {
+      "part": 82,
+      "payload": "step-05-seam4-p82.json",
+      "sha256": "374056168ed047667ff9a3e90d7943c0b60907995e90f1f5eb5a932c8387dd93",
+      "bytes": 385793,
+      "records": 49,
+      "files": [
+        "core/skills/distill/scripts/distill.mjs",
+        "core/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+        "core/skills/fgos-clarifying/SKILL.md",
+        "core/skills/fgos-indexing/SKILL.md",
+        "core/skills/fgos-researching/SKILL.md",
+        "core/skills/fgos-routing/SKILL.md",
+        "core/skills/instruction-audit/scripts/instruction-audit.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p82.md",
+      "status": "pending"
+    },
+    {
+      "part": 83,
+      "payload": "step-05-seam4-p83.json",
+      "sha256": "3da0ec789ba7ff3f0b92fb2f90b3aad9d6b4d1c5b84742b2d5427c635ea2909b",
+      "bytes": 336492,
+      "records": 32,
+      "files": [
+        "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "core/task-specs/fgos-indexing.md",
+        "docs/backlog.md"
+      ],
+      "report": "review-a38-step-05-s4-p83.md",
+      "status": "pending"
+    },
+    {
+      "part": 84,
+      "payload": "step-05-seam4-p84.json",
+      "sha256": "097e38a4ec626fc6ff0ef0b7b009d50c033691fafeffa926af03e263f3e4b36c",
+      "bytes": 334996,
+      "records": 5,
+      "files": [
+        "docs/backlog.md"
+      ],
+      "report": "review-a38-step-05-s4-p84.md",
+      "status": "pending"
+    },
+    {
+      "part": 85,
+      "payload": "step-05-seam4-p85.json",
+      "sha256": "9305990ba3b395e448047c2aa74813fb61441446c883f4b1dd2ffd3397047ea6",
+      "bytes": 342101,
+      "records": 5,
+      "files": [
+        "docs/backlog.md"
+      ],
+      "report": "review-a38-step-05-s4-p85.md",
+      "status": "pending"
+    },
+    {
+      "part": 86,
+      "payload": "step-05-seam4-p86.json",
+      "sha256": "31e8ad79a3fe1955b60ac534b99315b69789c8cda7b4b2789e633c7173d1d8c6",
+      "bytes": 369283,
+      "records": 5,
+      "files": [
+        "docs/backlog.md"
+      ],
+      "report": "review-a38-step-05-s4-p86.md",
+      "status": "pending"
+    },
+    {
+      "part": 87,
+      "payload": "step-05-seam4-p87.json",
+      "sha256": "21c55100e857901662b4a5711c1cca23f00d82bc413e042834c1a72292ff2430",
+      "bytes": 364644,
+      "records": 5,
+      "files": [
+        "docs/backlog.md"
+      ],
+      "report": "review-a38-step-05-s4-p87.md",
+      "status": "pending"
+    },
+    {
+      "part": 88,
+      "payload": "step-05-seam4-p88.json",
+      "sha256": "4806e94f0790ddb4df9c46d780b462292108167ca8b36c2385fb124b99ee9b8e",
+      "bytes": 345528,
+      "records": 5,
+      "files": [
+        "docs/backlog.md"
+      ],
+      "report": "review-a38-step-05-s4-p88.md",
+      "status": "pending"
+    },
+    {
+      "part": 89,
+      "payload": "step-05-seam4-p89.json",
+      "sha256": "2e3acae0767a8dd3056681c4a5c5938e512d67ddcf766e2afef0f9ee6f7ab13f",
+      "bytes": 368371,
+      "records": 27,
+      "files": [
+        "docs/backlog.md",
+        "docs/transitional-switchboard.md",
+        "domains/coding/harness/enrich-and-validate-contract.mjs",
+        "domains/coding/skills/_shared/coding-cell-policy.md",
+        "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "domains/coding/skills/fgos-coding-exploring/SKILL.md",
+        "domains/coding/skills/fgos-coding-exploring/references/gate-mechanics.md",
+        "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+        "domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+        "domains/coding/skills/fgos-coding-implement/SKILL.md",
+        "domains/coding/skills/fgos-coding-implement/references/implement-and-collaboration.md",
+        "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+        "domains/coding/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+        "domains/coding/skills/fgos-coding-knowledge/SKILL.md"
+      ],
+      "report": "review-a38-step-05-s4-p89.md",
+      "status": "pending"
+    },
+    {
+      "part": 90,
+      "payload": "step-05-seam4-p90.json",
+      "sha256": "563b5b9783cc0e8029e756d7cde398b7f4bcba4d315006c04c0d28c9b0b1164d",
+      "bytes": 386945,
+      "records": 57,
+      "files": [
+        "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+        "domains/coding/skills/fgos-coding-planning/SKILL.md",
+        "domains/coding/skills/fgos-coding-planning/references/approach-and-shape.md",
+        "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+        "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+        "domains/coding/skills/fgos-coding-validating/SKILL.md",
+        "domains/coding/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+        "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+        "domains/coding/task-specs/shape-plan.md",
+        "domains/marketing/agents/buyer-channel-skeptic.yaml",
+        "domains/marketing/agents/offer-pricing-critic.yaml",
+        "domains/marketing/agents/solo-capacity-checker.yaml",
+        "domains/marketing/agents/value-chain-strategist.yaml",
+        "plugins/dogfood-fixture/skills/list/SKILL.md",
+        "plugins/fgOS/skills/_shared/capability-catalog.md",
+        "plugins/fgOS/skills/_shared/catchup-self-recovery.md",
+        "plugins/fgOS/skills/_shared/coding-cell-policy.md",
+        "plugins/fgOS/skills/_shared/coding-worker-contract.md",
+        "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+        "plugins/fgOS/skills/_shared/fgos-cli-fallback.md"
+      ],
+      "report": "review-a38-step-05-s4-p90.md",
+      "status": "pending"
+    },
+    {
+      "part": 91,
+      "payload": "step-05-seam4-p91.json",
+      "sha256": "3a740525267756e28591998858dd1701291f6c0a28813445f2e9b2edf036d1eb",
+      "bytes": 387898,
+      "records": 53,
+      "files": [
+        "plugins/fgOS/skills/_shared/fgos-cli-fallback.md",
+        "plugins/fgOS/skills/_shared/planning-capability-awareness.md",
+        "plugins/fgOS/skills/answer/SKILL.md",
+        "plugins/fgOS/skills/approve/SKILL.md",
+        "plugins/fgOS/skills/ask/SKILL.md",
+        "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+        "plugins/fgOS/skills/cleanup-next/SKILL.md",
+        "plugins/fgOS/skills/coding-shape-distill/SKILL.md",
+        "plugins/fgOS/skills/coding-shape/SKILL.md",
+        "plugins/fgOS/skills/conflicts/SKILL.md",
+        "plugins/fgOS/skills/deliver/SKILL.md",
+        "plugins/fgOS/skills/discover-next/SKILL.md",
+        "plugins/fgOS/skills/discover/SKILL.md",
+        "plugins/fgOS/skills/fgos-clarifying/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-exploring/SKILL.md"
+      ],
+      "report": "review-a38-step-05-s4-p91.md",
+      "status": "pending"
+    },
+    {
+      "part": 92,
+      "payload": "step-05-seam4-p92.json",
+      "sha256": "c4a49e0afced82cba1b326d8fcd9fdeac52b96441ea71224db0501b12913ebc9",
+      "bytes": 384741,
+      "records": 52,
+      "files": [
+        "plugins/fgOS/skills/fgos-coding-exploring/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-exploring/references/gate-mechanics.md",
+        "plugins/fgOS/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+        "plugins/fgOS/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+        "plugins/fgOS/skills/fgos-coding-implement/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-implement/references/implement-and-collaboration.md",
+        "plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+        "plugins/fgOS/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+        "plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-planning/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-planning/references/approach-and-shape.md",
+        "plugins/fgOS/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+        "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "plugins/fgOS/skills/fgos-coding-shaping/SKILL.md"
+      ],
+      "report": "review-a38-step-05-s4-p92.md",
+      "status": "pending"
+    },
+    {
+      "part": 93,
+      "payload": "step-05-seam4-p93.json",
+      "sha256": "941ef8423a196dfbb10e9c98b1a3d46a2e9412395dd904b4dfe4fba4ca64ebd2",
+      "bytes": 388396,
+      "records": 56,
+      "files": [
+        "plugins/fgOS/skills/fgos-coding-shaping/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-validating/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+        "plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+        "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+        "plugins/fgOS/skills/fgos-researching/SKILL.md",
+        "plugins/fgOS/skills/fgos-routing/SKILL.md",
+        "plugins/fgOS/skills/goal/SKILL.md",
+        "plugins/fgOS/skills/graph/SKILL.md",
+        "plugins/fgOS/skills/list/SKILL.md",
+        "plugins/fgOS/skills/merge-list/SKILL.md",
+        "plugins/fgOS/skills/merge-loop/SKILL.md",
+        "plugins/fgOS/skills/merge-next/SKILL.md",
+        "plugins/fgOS/skills/move/SKILL.md",
+        "plugins/fgOS/skills/pick/SKILL.md",
+        "plugins/fgOS/skills/plan-next/SKILL.md",
+        "plugins/fgOS/skills/plan/SKILL.md"
+      ],
+      "report": "review-a38-step-05-s4-p93.md",
+      "status": "pending"
+    },
+    {
+      "part": 94,
+      "payload": "step-05-seam4-p94.json",
+      "sha256": "0cb3cb092f5f80bd0dfbed6ff30a2327d9a32738af0852d23f3cf5d3c1746c64",
+      "bytes": 379910,
+      "records": 60,
+      "files": [
+        "plugins/fgOS/skills/plan/SKILL.md",
+        "plugins/fgOS/skills/ready/SKILL.md",
+        "plugins/fgOS/skills/retro-loop/SKILL.md",
+        "plugins/fgOS/skills/retro-next/SKILL.md",
+        "plugins/fgOS/skills/return/SKILL.md",
+        "plugins/fgOS/skills/rollup/SKILL.md",
+        "plugins/fgOS/skills/show/SKILL.md",
+        "plugins/fgOS/skills/stale/SKILL.md",
+        "plugins/fgOS/skills/submit/SKILL.md",
+        "plugins/fgOS/skills/terminal-close/SKILL.md",
+        "plugins/fgOS/skills/terminal-close/close.sh",
+        "plugins/fgOS/skills/terminal/SKILL.md",
+        "plugins/fgOS/skills/terminal/rename.sh",
+        "plugins/fgOS/skills/terminal/terminal-port.sh",
+        "plugins/fgOS/skills/triage/SKILL.md",
+        "scripts/backfill-status-category.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p94.md",
+      "status": "pending"
+    },
+    {
+      "part": 95,
+      "payload": "step-05-seam4-p95.json",
+      "sha256": "0403f4550425bef6612e6204ae7b0663c711cdd2bd8c88fa646de7220ad693d4",
+      "bytes": 389792,
+      "records": 53,
+      "files": [
+        "scripts/backfill-status-category.mjs",
+        "scripts/backfill-unit-summaries.mjs",
+        "scripts/build-domain-registry.mjs",
+        "scripts/build-rust-distribution.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p95.md",
+      "status": "pending"
+    },
+    {
+      "part": 96,
+      "payload": "step-05-seam4-p96.json",
+      "sha256": "5c313970235e2f6785849e8d5f1ca23d51e881370e70b2e3cf20102e1e6711bb",
+      "bytes": 389080,
+      "records": 49,
+      "files": [
+        "scripts/build-rust-distribution.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p96.md",
+      "status": "pending"
+    },
+    {
+      "part": 97,
+      "payload": "step-05-seam4-p97.json",
+      "sha256": "758e8a77ea0462c7417479cc280b2a00ff7b8b23cce214fc82bf5f8bcaedf961",
+      "bytes": 386246,
+      "records": 59,
+      "files": [
+        "scripts/build-rust-distribution.mjs",
+        "scripts/build-skill-wrappers.mjs",
+        "scripts/check-backlog-reconciliation.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p97.md",
+      "status": "pending"
+    },
+    {
+      "part": 98,
+      "payload": "step-05-seam4-p98.json",
+      "sha256": "ee6186734da4b067e266ab9d13214525b038c828cdd2b21b19da48286b62310e",
+      "bytes": 386696,
+      "records": 54,
+      "files": [
+        "scripts/check-backlog-reconciliation.mjs",
+        "scripts/check-decision-codes.baseline.json",
+        "scripts/check-decision-codes.mjs",
+        "scripts/check-decision-supersession.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p98.md",
+      "status": "pending"
+    },
+    {
+      "part": 99,
+      "payload": "step-05-seam4-p99.json",
+      "sha256": "e51ed20c6bd594e36083f9da9e2d7380d9121cf69f224ad60c6e2c7e1bdcb8c9",
+      "bytes": 385650,
+      "records": 45,
+      "files": [
+        "scripts/check-decision-supersession.mjs",
+        "scripts/check-doc-candidate-status.mjs",
+        "scripts/check-doc-constitution.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p99.md",
+      "status": "pending"
+    },
+    {
+      "part": 100,
+      "payload": "step-05-seam4-p100.json",
+      "sha256": "1e30fd9dd5714be047b2fba869f02ce41409299fed9dae14190d624b15a8ec6c",
+      "bytes": 386626,
+      "records": 38,
+      "files": [
+        "scripts/check-doc-constitution.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p100.md",
+      "status": "pending"
+    },
+    {
+      "part": 101,
+      "payload": "step-05-seam4-p101.json",
+      "sha256": "76fa002e1d0dbcbd2df934a9cc73a6acd63a0e83c0ec4d8f83ec47d7bcf544a6",
+      "bytes": 388610,
+      "records": 32,
+      "files": [
+        "scripts/check-doc-constitution.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p101.md",
+      "status": "pending"
+    },
+    {
+      "part": 102,
+      "payload": "step-05-seam4-p102.json",
+      "sha256": "cecca1300982e8dc257668f4aafe8510b7bf97a614c45c8f65be7c2ff00826f2",
+      "bytes": 389823,
+      "records": 40,
+      "files": [
+        "scripts/check-doc-constitution.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p102.md",
+      "status": "pending"
+    },
+    {
+      "part": 103,
+      "payload": "step-05-seam4-p103.json",
+      "sha256": "b8422f7bbb0b00bf470750c80f1d5dba945e8c5d84b4b20e5ccacc857b2672bc",
+      "bytes": 384905,
+      "records": 39,
+      "files": [
+        "scripts/check-doc-constitution.mjs",
+        "scripts/check-doc-inventory-gates.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p103.md",
+      "status": "pending"
+    },
+    {
+      "part": 104,
+      "payload": "step-05-seam4-p104.json",
+      "sha256": "79bf306811b308ebfcb8e52fa829c6ed16658feca5efb021e80a2980902643dd",
+      "bytes": 378901,
+      "records": 31,
+      "files": [
+        "scripts/check-doc-inventory-gates.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p104.md",
+      "status": "pending"
+    },
+    {
+      "part": 105,
+      "payload": "step-05-seam4-p105.json",
+      "sha256": "418226cced95543bd6ce325abb8a13b68fa08df466f593d4650162977e872cf8",
+      "bytes": 385170,
+      "records": 31,
+      "files": [
+        "scripts/check-doc-inventory-gates.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p105.md",
+      "status": "pending"
+    },
+    {
+      "part": 106,
+      "payload": "step-05-seam4-p106.json",
+      "sha256": "efc2022a96f96f1246087af9fc4cf12ed095828cb1104e9b34815e84b467c50f",
+      "bytes": 389805,
+      "records": 35,
+      "files": [
+        "scripts/check-doc-inventory-gates.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p106.md",
+      "status": "pending"
+    },
+    {
+      "part": 107,
+      "payload": "step-05-seam4-p107.json",
+      "sha256": "be527f1149abcbe903e6a20521cc81e3b7013033ac7449a19a6b58bd1edda93a",
+      "bytes": 382830,
+      "records": 34,
+      "files": [
+        "scripts/check-doc-inventory-gates.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p107.md",
+      "status": "pending"
+    },
+    {
+      "part": 108,
+      "payload": "step-05-seam4-p108.json",
+      "sha256": "398c259e6f26e11bf3f49271984681b4971b5af89e993d7f5b589445fe28c5b0",
+      "bytes": 382908,
+      "records": 34,
+      "files": [
+        "scripts/check-doc-inventory-gates.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p108.md",
+      "status": "pending"
+    },
+    {
+      "part": 109,
+      "payload": "step-05-seam4-p109.json",
+      "sha256": "8919c1c901fcf6ce5446f192dee32720aa9d91b5ceddfc95479c24009d617f0e",
+      "bytes": 386036,
+      "records": 35,
+      "files": [
+        "scripts/check-doc-inventory-gates.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p109.md",
+      "status": "pending"
+    },
+    {
+      "part": 110,
+      "payload": "step-05-seam4-p110.json",
+      "sha256": "b66657fd47fc9377fccc694603e0180bf2ef5fbe3ca101d4aad2c0f94d4c1daf",
+      "bytes": 384084,
+      "records": 28,
+      "files": [
+        "scripts/check-doc-inventory-gates.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p110.md",
+      "status": "pending"
+    },
+    {
+      "part": 111,
+      "payload": "step-05-seam4-p111.json",
+      "sha256": "e2e668e4578678496031fc62e013781a2d37702cbd26bb2c2dd58521899ddf24",
+      "bytes": 379847,
+      "records": 34,
+      "files": [
+        "scripts/check-doc-inventory-gates.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p111.md",
+      "status": "pending"
+    },
+    {
+      "part": 112,
+      "payload": "step-05-seam4-p112.json",
+      "sha256": "7daeb4cb8858838248518656b61a3105715625533aa9be63f2023f950cbe9dd8",
+      "bytes": 382092,
+      "records": 32,
+      "files": [
+        "scripts/check-doc-inventory-gates.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p112.md",
+      "status": "pending"
+    },
+    {
+      "part": 113,
+      "payload": "step-05-seam4-p113.json",
+      "sha256": "9aa1e780b2a8f63afa1a5aa4e5b63522172009ec603b40b28a60e663d7cf38f9",
+      "bytes": 389301,
+      "records": 24,
+      "files": [
+        "scripts/check-doc-inventory-gates.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p113.md",
+      "status": "pending"
+    },
+    {
+      "part": 114,
+      "payload": "step-05-seam4-p114.json",
+      "sha256": "9253310c4ad16026d6d4c2aa66874f23387575a5f467346aae6de4f9f8d68cde",
+      "bytes": 379612,
+      "records": 27,
+      "files": [
+        "scripts/check-doc-inventory-gates.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p114.md",
+      "status": "pending"
+    },
+    {
+      "part": 115,
+      "payload": "step-05-seam4-p115.json",
+      "sha256": "4550fd2d84b030e6d3aa28cfeed6e1449907d278423fc0277defd9787fcaaab1",
+      "bytes": 383882,
+      "records": 33,
+      "files": [
+        "scripts/check-doc-inventory-gates.mjs",
+        "scripts/check-doc-retirement.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p115.md",
+      "status": "pending"
+    },
+    {
+      "part": 116,
+      "payload": "step-05-seam4-p116.json",
+      "sha256": "b78a207953876b87770e4c92dc6f06f8fd468416b78dec57706cb2525fcfe708",
+      "bytes": 385022,
+      "records": 48,
+      "files": [
+        "scripts/check-doc-retirement.mjs",
+        "scripts/check-glibc-ceiling.sh",
+        "scripts/check-hook-registrations-guarded.mjs",
+        "scripts/check-locked-decisions-heading-drift.mjs",
+        "scripts/ci-asset-server.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p116.md",
+      "status": "pending"
+    },
+    {
+      "part": 117,
+      "payload": "step-05-seam4-p117.json",
+      "sha256": "1e9abb0d6f47c0c967a1bf651ebe47752b7b39c0c48007f884ad4e735157940a",
+      "bytes": 382009,
+      "records": 54,
+      "files": [
+        "scripts/ci-asset-server.mjs",
+        "scripts/ci-external-consumer.ps1",
+        "scripts/ci-external-consumer.sh",
+        "scripts/decision-question-hook.mjs",
+        "scripts/dispatch-decide-hook.mjs",
+        "scripts/doc-alias-resolver.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p117.md",
+      "status": "pending"
+    },
+    {
+      "part": 118,
+      "payload": "step-05-seam4-p118.json",
+      "sha256": "1d2d7c8075cab313c8c6ce364357ef6b7ae54cc3c26a31b54febc7494b2ba1d5",
+      "bytes": 388761,
+      "records": 42,
+      "files": [
+        "scripts/doc-alias-resolver.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p118.md",
+      "status": "pending"
+    },
+    {
+      "part": 119,
+      "payload": "step-05-seam4-p119.json",
+      "sha256": "b9d450d7d8a87f6ad14ac7b4e6d99f6d9e01c073c9bb93bb0abe2b347a776f41",
+      "bytes": 386509,
+      "records": 35,
+      "files": [
+        "scripts/doc-alias-resolver.mjs",
+        "scripts/doc-binding-repair.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p119.md",
+      "status": "pending"
+    },
+    {
+      "part": 120,
+      "payload": "step-05-seam4-p120.json",
+      "sha256": "2afc0ea40fb44b348b6cabd423a9d5f0ca8c729661428244bb875504fdf48b5b",
+      "bytes": 387691,
+      "records": 37,
+      "files": [
+        "scripts/doc-binding-repair.mjs",
+        "scripts/doc-inventory-artifact.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p120.md",
+      "status": "pending"
+    },
+    {
+      "part": 121,
+      "payload": "step-05-seam4-p121.json",
+      "sha256": "ddfe0f7740d85d082c7d47ff5523815bc5e3211431ef1964bfdba4a7fab341e8",
+      "bytes": 384230,
+      "records": 37,
+      "files": [
+        "scripts/doc-inventory-artifact.mjs",
+        "scripts/doc-link-pass.mjs",
+        "scripts/doc-rationale-facts.mjs",
+        "scripts/event-store/v-spawn-bench.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p121.md",
+      "status": "pending"
+    },
+    {
+      "part": 122,
+      "payload": "step-05-seam4-p122.json",
+      "sha256": "a84b0491f79e094fee52f8f3a47a38be31b3b4cc57ada4f667040050425ce7dd",
+      "bytes": 387198,
+      "records": 53,
+      "files": [
+        "scripts/event-store/v-spawn-bench.mjs",
+        "scripts/events-jsonl-truncation-guard.mjs",
+        "scripts/explain-command-route.mjs",
+        "scripts/export-command-selectors.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p122.md",
+      "status": "pending"
+    },
+    {
+      "part": 123,
+      "payload": "step-05-seam4-p123.json",
+      "sha256": "eff974207955de0785b0f70a39a798f39e81cc9e2c3dc3a607029e674f16b6cb",
+      "bytes": 381818,
+      "records": 57,
+      "files": [
+        "scripts/export-command-selectors.mjs",
+        "scripts/fgos-session-start-hook.mjs",
+        "scripts/fgos-shell-integration.sh",
+        "scripts/generate-doc-inventory.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p123.md",
+      "status": "pending"
+    },
+    {
+      "part": 124,
+      "payload": "step-05-seam4-p124.json",
+      "sha256": "82e3f39637282ca62434e1ff5b2072228de280c2c838b264e0830507d9e2a753",
+      "bytes": 383444,
+      "records": 40,
+      "files": [
+        "scripts/generate-doc-inventory.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p124.md",
+      "status": "pending"
+    },
+    {
+      "part": 125,
+      "payload": "step-05-seam4-p125.json",
+      "sha256": "d845219b703a6fa7f3f828946ef9e3b5cdd72fb4e09a08a54f1366541cc45116",
+      "bytes": 381192,
+      "records": 32,
+      "files": [
+        "scripts/generate-doc-inventory.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p125.md",
+      "status": "pending"
+    },
+    {
+      "part": 126,
+      "payload": "step-05-seam4-p126.json",
+      "sha256": "30cd73456716a626694a5caf3388b69838168a12054ebbd836a4ab6411f0a963",
+      "bytes": 381315,
+      "records": 36,
+      "files": [
+        "scripts/generate-doc-inventory.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p126.md",
+      "status": "pending"
+    },
+    {
+      "part": 127,
+      "payload": "step-05-seam4-p127.json",
+      "sha256": "cbb9ff3a63edaa90e3a744742ab81ba249bc61594c18356a4c9a0dbeab5c9af0",
+      "bytes": 384125,
+      "records": 39,
+      "files": [
+        "scripts/generate-doc-inventory.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p127.md",
+      "status": "pending"
+    },
+    {
+      "part": 128,
+      "payload": "step-05-seam4-p128.json",
+      "sha256": "3673618d73024a56268988d17c23dc6a210c49efbc2a20ca55444f230f3b719a",
+      "bytes": 389805,
+      "records": 36,
+      "files": [
+        "scripts/generate-doc-inventory.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p128.md",
+      "status": "pending"
+    },
+    {
+      "part": 129,
+      "payload": "step-05-seam4-p129.json",
+      "sha256": "7b433c764978c824ffc32f3e00f535b8c17d01f8aec8a383061a63eb8e1b20c6",
+      "bytes": 384674,
+      "records": 45,
+      "files": [
+        "scripts/generate-doc-inventory.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p129.md",
+      "status": "pending"
+    },
+    {
+      "part": 130,
+      "payload": "step-05-seam4-p130.json",
+      "sha256": "60a65e38d71c15fb33673b17dff0ad05e823b0ed659e83f1c223f9b4e0980a72",
+      "bytes": 383853,
+      "records": 45,
+      "files": [
+        "scripts/generate-doc-inventory.mjs",
+        "scripts/generate-shipped-path-inventory.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p130.md",
+      "status": "pending"
+    },
+    {
+      "part": 131,
+      "payload": "step-05-seam4-p131.json",
+      "sha256": "af9a67798234e65fd029b0e401f76171c478dcc9ce92a9d4fee377172a4812ab",
+      "bytes": 383979,
+      "records": 56,
+      "files": [
+        "scripts/generate-shipped-path-inventory.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p131.md",
+      "status": "pending"
+    },
+    {
+      "part": 132,
+      "payload": "step-05-seam4-p132.json",
+      "sha256": "dee6f8601cb3b37617dc74f78826a799f4e30817948933ccbd67901420e0df2f",
+      "bytes": 380190,
+      "records": 45,
+      "files": [
+        "scripts/generate-shipped-path-inventory.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p132.md",
+      "status": "pending"
+    },
+    {
+      "part": 133,
+      "payload": "step-05-seam4-p133.json",
+      "sha256": "b23aca4f6e9a1539e60adeddf7336c65d0fdaaf1e3d23a7015a3ddd43be9ef1b",
+      "bytes": 384014,
+      "records": 38,
+      "files": [
+        "scripts/generate-shipped-path-inventory.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p133.md",
+      "status": "pending"
+    },
+    {
+      "part": 134,
+      "payload": "step-05-seam4-p134.json",
+      "sha256": "4a6951669e029e1e083372c350482df5a00a3b66ea2cec7af0e7e67d24ea4e72",
+      "bytes": 382900,
+      "records": 42,
+      "files": [
+        "scripts/generate-shipped-path-inventory.mjs",
+        "scripts/git/e3-bench.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p134.md",
+      "status": "pending"
+    },
+    {
+      "part": 135,
+      "payload": "step-05-seam4-p135.json",
+      "sha256": "6770189666699495bab4fc7142a3b19c087dcf200818d62c751540f68b2ad42b",
+      "bytes": 388355,
+      "records": 40,
+      "files": [
+        "scripts/git/e3-bench.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p135.md",
+      "status": "pending"
+    },
+    {
+      "part": 136,
+      "payload": "step-05-seam4-p136.json",
+      "sha256": "02ae48b6dbcae3e1e1d5e930c3ba7394ded47db4280c97cf9ddc4c7250e88553",
+      "bytes": 383763,
+      "records": 34,
+      "files": [
+        "scripts/git/e3-bench.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p136.md",
+      "status": "pending"
+    },
+    {
+      "part": 137,
+      "payload": "step-05-seam4-p137.json",
+      "sha256": "f0fe0d36e79367027de8f2dbaba5fab61238d460d8ccd455206c9e5d35de2705",
+      "bytes": 389647,
+      "records": 52,
+      "files": [
+        "scripts/git/e3-bench.mjs",
+        "scripts/herdr-cockpit-notify.mjs",
+        "scripts/herdr-cockpit.sh",
+        "scripts/install-git-hooks.mjs",
+        "scripts/install.ps1"
+      ],
+      "report": "review-a38-step-05-s4-p137.md",
+      "status": "pending"
+    },
+    {
+      "part": 138,
+      "payload": "step-05-seam4-p138.json",
+      "sha256": "4971711812148bf5e72564165ad74fda928fbf810f39dbc99c3dffac3375fb92",
+      "bytes": 387372,
+      "records": 48,
+      "files": [
+        "scripts/install.ps1",
+        "scripts/knowledge-bootstrap.mjs",
+        "scripts/knowledge-canary.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p138.md",
+      "status": "pending"
+    },
+    {
+      "part": 139,
+      "payload": "step-05-seam4-p139.json",
+      "sha256": "44fb03f0c8f46f562f2c5ce8451fbfcc6f80799c64fe95c6eb1d83b77773e64d",
+      "bytes": 380115,
+      "records": 50,
+      "files": [
+        "scripts/knowledge-canary.mjs",
+        "scripts/knowledge-classifier.mjs",
+        "scripts/knowledge-migration.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p139.md",
+      "status": "pending"
+    },
+    {
+      "part": 140,
+      "payload": "step-05-seam4-p140.json",
+      "sha256": "487d5bb16f0db0e96efa3952b4cb26626017cdf690a05616c2edf97f44f9ef09",
+      "bytes": 379430,
+      "records": 35,
+      "files": [
+        "scripts/knowledge-migration.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p140.md",
+      "status": "pending"
+    },
+    {
+      "part": 141,
+      "payload": "step-05-seam4-p141.json",
+      "sha256": "f77661243ed5ae8a4e80f4667dc63d48ff6301df19d79d461cdd04c526b73654",
+      "bytes": 384374,
+      "records": 51,
+      "files": [
+        "scripts/knowledge-migration.mjs",
+        "scripts/lib/full-suite-queue.mjs",
+        "scripts/lib/is-main-module.mjs",
+        "scripts/lib/test-file-watchdog.mjs",
+        "scripts/lib/test-git-config-guard.mjs",
+        "scripts/list-doc-anchors.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p141.md",
+      "status": "pending"
+    },
+    {
+      "part": 142,
+      "payload": "step-05-seam4-p142.json",
+      "sha256": "a17c389f5ab6df8926e0f72ca9fadee1246fff0877b70e31cf702690cd51f2e5",
+      "bytes": 385199,
+      "records": 54,
+      "files": [
+        "scripts/list-doc-anchors.mjs",
+        "scripts/measure-coordination-baseline.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p142.md",
+      "status": "pending"
+    },
+    {
+      "part": 143,
+      "payload": "step-05-seam4-p143.json",
+      "sha256": "e31f3beedaa25ac90780e3f55fffa516fa88e3a7c5cc41a117b21df39e0b6aaa",
+      "bytes": 381466,
+      "records": 51,
+      "files": [
+        "scripts/measure-coordination-baseline.mjs",
+        "scripts/measure-p08-performance.mjs",
+        "scripts/measure-verify-cost.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p143.md",
+      "status": "pending"
+    },
+    {
+      "part": 144,
+      "payload": "step-05-seam4-p144.json",
+      "sha256": "03a22b703736b76988a01aefd60108e3d9690b09880f8bd1426e33bc685b23cf",
+      "bytes": 388354,
+      "records": 35,
+      "files": [
+        "scripts/measure-verify-cost.mjs",
+        "scripts/migrate-actor-to-role.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p144.md",
+      "status": "pending"
+    },
+    {
+      "part": 145,
+      "payload": "step-05-seam4-p145.json",
+      "sha256": "c94903c1d6979cc5b55f7004e3dfd2bc831a70a4f3f8becaefd58667dfeb8675",
+      "bytes": 384501,
+      "records": 57,
+      "files": [
+        "scripts/migrate-actor-to-role.mjs",
+        "scripts/migrate-status-proposed-to-awaiting-approval.mjs",
+        "scripts/migration-proof-2a.mjs",
+        "scripts/next-doc-id.mjs",
+        "scripts/package-release-assets.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p145.md",
+      "status": "pending"
+    },
+    {
+      "part": 146,
+      "payload": "step-05-seam4-p146.json",
+      "sha256": "e92db57f23be801eac367695dd5ab3b9eabbde17e361a075a8f995bad0c6a578",
+      "bytes": 382851,
+      "records": 56,
+      "files": [
+        "scripts/package-release-assets.mjs",
+        "scripts/prepare-release.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p146.md",
+      "status": "pending"
+    },
+    {
+      "part": 147,
+      "payload": "step-05-seam4-p147.json",
+      "sha256": "8e3656600f807695f18225b4f84d3677f48b691e371f5d509bd17614b901b4a7",
+      "bytes": 385305,
+      "records": 53,
+      "files": [
+        "scripts/prepare-release.mjs",
+        "scripts/probe-storytelling-material.mjs",
+        "scripts/project-agents.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p147.md",
+      "status": "pending"
+    },
+    {
+      "part": 148,
+      "payload": "step-05-seam4-p148.json",
+      "sha256": "0bddfb14844a3f6df82776ba64346ada2621ad6fb20a60dfba54fb643dcc7e58",
+      "bytes": 380482,
+      "records": 43,
+      "files": [
+        "scripts/project-agents.mjs",
+        "scripts/propose-doc-decisions.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p148.md",
+      "status": "pending"
+    },
+    {
+      "part": 149,
+      "payload": "step-05-seam4-p149.json",
+      "sha256": "30d433da864a2571fa91c46c862acdd2853f11e49049843c8cb44a9dca437bcf",
+      "bytes": 382899,
+      "records": 33,
+      "files": [
+        "scripts/propose-doc-decisions.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p149.md",
+      "status": "pending"
+    },
+    {
+      "part": 150,
+      "payload": "step-05-seam4-p150.json",
+      "sha256": "da19c50b0fe38cb02d7b364e83a76fdc3786bab7cdeb27679a1d70eab7ca1915",
+      "bytes": 385926,
+      "records": 32,
+      "files": [
+        "scripts/propose-doc-decisions.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p150.md",
+      "status": "pending"
+    },
+    {
+      "part": 151,
+      "payload": "step-05-seam4-p151.json",
+      "sha256": "3c93c451ca3db30ab79c4dc919d54d8e05c393e468dec5068d033878aef9acd0",
+      "bytes": 378096,
+      "records": 28,
+      "files": [
+        "scripts/propose-doc-decisions.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p151.md",
+      "status": "pending"
+    },
+    {
+      "part": 152,
+      "payload": "step-05-seam4-p152.json",
+      "sha256": "c0c4f4e6b1c48f944f185d80f3522bf40776561fdf8cb335d6f17b36cedc369b",
+      "bytes": 385482,
+      "records": 45,
+      "files": [
+        "scripts/propose-doc-decisions.mjs",
+        "scripts/regenerate-observe-fixtures.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p152.md",
+      "status": "pending"
+    },
+    {
+      "part": 153,
+      "payload": "step-05-seam4-p153.json",
+      "sha256": "ef3736881b303478cd2453a6b587f1111c89d1fca587b3cfa9cb2384af6275bf",
+      "bytes": 383036,
+      "records": 55,
+      "files": [
+        "scripts/regenerate-observe-fixtures.mjs",
+        "scripts/run-rust-dev-host.mjs",
+        "scripts/run-test-canary.mjs",
+        "scripts/run-tests.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p153.md",
+      "status": "pending"
+    },
+    {
+      "part": 154,
+      "payload": "step-05-seam4-p154.json",
+      "sha256": "8b6e80f21ce8d68a889af0d6ecf6f7602a6356794fd025831bb7c4af70e437ed",
+      "bytes": 383277,
+      "records": 48,
+      "files": [
+        "scripts/run-tests.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p154.md",
+      "status": "pending"
+    },
+    {
+      "part": 155,
+      "payload": "step-05-seam4-p155.json",
+      "sha256": "59fa2d0a7b7674a54f01842d42929b91d598d57ac8c2b60d324e855e8524ebd9",
+      "bytes": 382235,
+      "records": 49,
+      "files": [
+        "scripts/run-tests.mjs",
+        "scripts/stress-test-files.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p155.md",
+      "status": "pending"
+    },
+    {
+      "part": 156,
+      "payload": "step-05-seam4-p156.json",
+      "sha256": "dc8fc4349232e474ee44b975c5cdd456e003f20599c00dbae4c379d019796d1e",
+      "bytes": 384613,
+      "records": 53,
+      "files": [
+        "scripts/stress-test-files.mjs",
+        "scripts/test-ownership-lint.mjs",
+        "scripts/test-proof-inventory.mjs",
+        "scripts/test-select-compare.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p156.md",
+      "status": "pending"
+    },
+    {
+      "part": 157,
+      "payload": "step-05-seam4-p157.json",
+      "sha256": "9a522d6a5328c9a804a763e3268f7fc9e26e864a3da980a4ac9d6ce0967d2514",
+      "bytes": 384181,
+      "records": 51,
+      "files": [
+        "scripts/test-select-compare.mjs",
+        "scripts/test-select-coverage-map.mjs",
+        "scripts/test-select-mutate.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p157.md",
+      "status": "pending"
+    },
+    {
+      "part": 158,
+      "payload": "step-05-seam4-p158.json",
+      "sha256": "b698b288a036c327d0b1c8912eae8028e7a3b096263e2bb9173661d166b4e552",
+      "bytes": 385751,
+      "records": 49,
+      "files": [
+        "scripts/test-select-mutate.mjs",
+        "scripts/test-select-promote-report.mjs",
+        "scripts/test-select-promote.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p158.md",
+      "status": "pending"
+    },
+    {
+      "part": 159,
+      "payload": "step-05-seam4-p159.json",
+      "sha256": "b15af2910dc3538e1ec65e9315cc24316efd81818161519436239875ffc3f9fb",
+      "bytes": 389663,
+      "records": 54,
+      "files": [
+        "scripts/test-select-promote.mjs",
+        "scripts/test-select-run-plan.mjs",
+        "scripts/test-select.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p159.md",
+      "status": "pending"
+    },
+    {
+      "part": 160,
+      "payload": "step-05-seam4-p160.json",
+      "sha256": "0d7dc3b3cf5a41944ddbeb768c61d210861229d8f23c448369b17c08e09239a6",
+      "bytes": 386487,
+      "records": 51,
+      "files": [
+        "scripts/test-select.mjs",
+        "scripts/test-timing.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p160.md",
+      "status": "pending"
+    },
+    {
+      "part": 161,
+      "payload": "step-05-seam4-p161.json",
+      "sha256": "a5c9bdc4e0d543fc73ae45dc6ce47abea4bab953e9f6cf2c419d9ea685453aab",
+      "bytes": 384861,
+      "records": 52,
+      "files": [
+        "scripts/test-timing.mjs",
+        "scripts/verify-fanout-overlap.mjs",
+        "scripts/verify-phase-01.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p161.md",
+      "status": "pending"
+    },
+    {
+      "part": 162,
+      "payload": "step-05-seam4-p162.json",
+      "sha256": "6288ec1e0a176a1bf0c1cf1f0bfd466a945cfc47a37414864f5d897674205ddb",
+      "bytes": 381250,
+      "records": 46,
+      "files": [
+        "scripts/verify-phase-01.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p162.md",
+      "status": "pending"
+    },
+    {
+      "part": 163,
+      "payload": "step-05-seam4-p163.json",
+      "sha256": "01c36821f93808811304f7cf6e0f68593f338a06b5c7f87828425baadb2b6d70",
+      "bytes": 382398,
+      "records": 46,
+      "files": [
+        "scripts/verify-phase-01.mjs",
+        "scripts/verify-phase-02.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p163.md",
+      "status": "pending"
+    },
+    {
+      "part": 164,
+      "payload": "step-05-seam4-p164.json",
+      "sha256": "97627e9c6da06d9a7c8ea4e743077aec52de0b5bed912700c1d837953be35f73",
+      "bytes": 388877,
+      "records": 37,
+      "files": [
+        "scripts/verify-phase-02.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p164.md",
+      "status": "pending"
+    },
+    {
+      "part": 165,
+      "payload": "step-05-seam4-p165.json",
+      "sha256": "352c5031c074c9dadc2b5674c5a9f473ff3df99fea67a14f8f1d5f88ac425839",
+      "bytes": 387589,
+      "records": 58,
+      "files": [
+        "scripts/verify-phase-02.mjs",
+        "scripts/write-test-marker.mjs",
+        "scripts/write-wrapper-script.mjs",
+        "src/report/capability-plan-lint.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p165.md",
+      "status": "pending"
+    },
+    {
+      "part": 166,
+      "payload": "step-05-seam4-p166.json",
+      "sha256": "bc6c15490b9f6dd27da98bb062574d35b398e3857e581565d998cbde1ef49c7c",
+      "bytes": 382189,
+      "records": 47,
+      "files": [
+        "apps/fgos-gateway/src/gateway.rs",
+        "apps/fgos-gateway/src/mcp.rs",
+        "src/cli/command-registry.mjs",
+        "src/report/capability-plan-lint.mjs",
+        "src/report/context-render.mjs",
+        "src/report/knowledge-resolver.mjs; apps/fgos-gateway/web/src/lib/network.ts"
+      ],
+      "report": "review-a38-step-05-s4-p166.md",
+      "status": "pending"
+    },
+    {
+      "part": 167,
+      "payload": "step-05-seam4-p167.json",
+      "sha256": "2c941464372b69cd1e267fbb9c570de679e4822992fc18a0c93bc0170cab22c7",
+      "bytes": 375562,
+      "records": 31,
+      "files": [
+        "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "src/cli/command-registry.mjs",
+        "src/setup/instruction-registry.mjs",
+        "src/setup/model-pool-checks.mjs",
+        "src/setup/registrations.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p167.md",
+      "status": "pending"
+    },
+    {
+      "part": 168,
+      "payload": "step-05-seam4-p168.json",
+      "sha256": "a49b8f0c6626b95b95b660b8bd749054e0ada0ee19418d7c002f403522c96297",
+      "bytes": 382569,
+      "records": 9,
+      "files": [
+        "domains/coding/skills/fgos-coding-discovering/SKILL.md"
+      ],
+      "report": "review-a38-step-05-s4-p168.md",
+      "status": "pending"
+    },
+    {
+      "part": 169,
+      "payload": "step-05-seam4-p169.json",
+      "sha256": "ebb898535be7a5d05d4fb7b9bc60b50235854fb414531b36211a757575f456a1",
+      "bytes": 371134,
+      "records": 11,
+      "files": [
+        "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+        "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "domains/coding/skills/fgos-coding-shaping/SKILL.md"
+      ],
+      "report": "review-a38-step-05-s4-p169.md",
+      "status": "pending"
+    },
+    {
+      "part": 170,
+      "payload": "step-05-seam4-p170.json",
+      "sha256": "4b4975b5c1958c8379bad6296b06fa9268701f9624f295eee97a08441ca13ae9",
+      "bytes": 382838,
+      "records": 9,
+      "files": [
+        "domains/coding/skills/fgos-coding-shaping/SKILL.md"
+      ],
+      "report": "review-a38-step-05-s4-p170.md",
+      "status": "pending"
+    },
+    {
+      "part": 171,
+      "payload": "step-05-seam4-p171.json",
+      "sha256": "cd052180f6d4972b2620adedb376cfe0f5e57d1af0472636e3def1144d0c5ee9",
+      "bytes": 352766,
+      "records": 11,
+      "files": [
+        "core/instructions/platform-laws.md",
+        "core/skills/fgos-clarifying/SKILL.md",
+        "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+        "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+        "plugins/fgOS/skills/retro-loop/SKILL.md"
+      ],
+      "report": "review-a38-step-05-s4-p171.md",
+      "status": "pending"
+    },
+    {
+      "part": 172,
+      "payload": "step-05-seam4-p172.json",
+      "sha256": "dc5a4a8b777960cf092ffcacf5accb7e0373de796461a19c03013b349da9d211",
+      "bytes": 382894,
+      "records": 9,
+      "files": [
+        "core/skills/fgos-clarifying/SKILL.md"
+      ],
+      "report": "review-a38-step-05-s4-p172.md",
+      "status": "pending"
+    },
+    {
+      "part": 173,
+      "payload": "step-05-seam4-p173.json",
+      "sha256": "df10aa90832997cc6e4474e0dcc1ce0bbe835b13773da077309f6d7f7ff6d6d5",
+      "bytes": 365227,
+      "records": 11,
+      "files": [
+        "core/skills/_shared/executor-dispatch-fallback.md",
+        "core/skills/fgos-clarifying/SKILL.md",
+        "core/skills/fgos-indexing/SKILL.md"
+      ],
+      "report": "review-a38-step-05-s4-p173.md",
+      "status": "pending"
+    },
+    {
+      "part": 174,
+      "payload": "step-05-seam4-p174.json",
+      "sha256": "6dfd39dcd3c81cb89c7e7273b303f219bd5099e713b540238f0bbb8b38affeac",
+      "bytes": 382656,
+      "records": 9,
+      "files": [
+        "core/skills/fgos-researching/SKILL.md"
+      ],
+      "report": "review-a38-step-05-s4-p174.md",
+      "status": "pending"
+    },
+    {
+      "part": 175,
+      "payload": "step-05-seam4-p175.json",
+      "sha256": "1da79c89289763fbb572b2532117a78ac12edffebe04b10128ca17ac1d2c2da9",
+      "bytes": 383652,
+      "records": 9,
+      "files": [
+        "core/skills/fgos-researching/SKILL.md"
+      ],
+      "report": "review-a38-step-05-s4-p175.md",
+      "status": "pending"
+    },
+    {
+      "part": 176,
+      "payload": "step-05-seam4-p176.json",
+      "sha256": "1ed06526272b33a9cf924a4bf6cf10b22f8a1cbc5f5b2f7f5eddc30b6ec73e58",
+      "bytes": 376930,
+      "records": 14,
+      "files": [
+        "core/skills/fgos-researching/SKILL.md",
+        "core/task-specs/fgos-indexing.md",
+        "docs/backlog.md",
+        "docs/transitional-switchboard.md",
+        "src/cli/command-registry.mjs",
+        "src/setup/registrations.mjs"
+      ],
+      "report": "review-a38-step-05-s4-p176.md",
+      "status": "pending"
+    },
+    {
+      "part": 177,
+      "payload": "step-05-seam4-p177.json",
+      "sha256": "2157d4a5b37f6ebb22bfb6f2cfe1d37fe984190f5a784c89630908304b1a6170",
+      "bytes": 383303,
+      "records": 9,
+      "files": [],
+      "report": "review-a38-step-05-s4-p177.md",
+      "status": "pending"
+    },
+    {
+      "part": 178,
+      "payload": "step-05-seam4-p178.json",
+      "sha256": "b966ff7d6821bd21808aa3677c25fdc0f7fcdd386424b189d229386d4b2822a1",
+      "bytes": 382261,
+      "records": 9,
+      "files": [],
+      "report": "review-a38-step-05-s4-p178.md",
+      "status": "pending"
+    },
+    {
+      "part": 179,
+      "payload": "step-05-seam4-p179.json",
+      "sha256": "66152a50b0beef84c677c6284e5c6e941f39729b1be041e7600ceb0acae1db8d",
+      "bytes": 382480,
+      "records": 9,
+      "files": [],
+      "report": "review-a38-step-05-s4-p179.md",
+      "status": "pending"
+    },
+    {
+      "part": 180,
+      "payload": "step-05-seam4-p180.json",
+      "sha256": "70371a91336a222e214d2352124a9e86f42780be332c650c3713e87e0a0978bd",
+      "bytes": 382059,
+      "records": 9,
+      "files": [],
+      "report": "review-a38-step-05-s4-p180.md",
+      "status": "pending"
+    },
+    {
+      "part": 181,
+      "payload": "step-05-seam4-p181.json",
+      "sha256": "7f56d2c41ef97933324a75928aca5b0e38269fbd556b4355fd40f6077e76f9b6",
+      "bytes": 56837,
+      "records": 2,
+      "files": [],
+      "report": "review-a38-step-05-s4-p181.md",
+      "status": "pending"
+    }
+  ],
+  "logicalItems": 6279,
+  "streamedItems": 6392,
+  "pilotChanges": [
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "field": "references",
+      "id": "reference-000168",
+      "changedFields": [
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "field": "references",
+      "id": "reference-000189",
+      "changedFields": [
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "field": "dynamicTraces",
+      "id": "dynamic-000766",
+      "changedFields": [
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "field": "references",
+      "id": "reference-003641",
+      "changedFields": [
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "field": "references",
+      "id": "reference-003643",
+      "changedFields": [
+        "blockedCategory",
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "field": "references",
+      "id": "reference-003649",
+      "changedFields": [
+        "aliasWriteCheck",
+        "anchor",
+        "coCutTestGrep",
+        "diffHunk",
+        "disposition",
+        "parityObligation",
+        "proposedReplacement",
+        "reason",
+        "resolverWitness",
+        "target",
+        "timing"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "field": "references",
+      "id": "reference-003652",
+      "changedFields": [
+        "blockedCategory",
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "field": "references",
+      "id": "reference-003653",
+      "changedFields": [
+        "blockedCategory",
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "field": "references",
+      "id": "reference-003655",
+      "changedFields": [
+        "diffHunk"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "field": "references",
+      "id": "reference-003658",
+      "changedFields": [
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "field": "references",
+      "id": "reference-003659",
+      "changedFields": [
+        "blockedCategory",
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "field": "references",
+      "id": "reference-003661",
+      "changedFields": [
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "field": "references",
+      "id": "reference-003662",
+      "changedFields": [
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "field": "references",
+      "id": "reference-003664",
+      "changedFields": [
+        "aliasWriteCheck",
+        "anchor",
+        "coCutTestGrep",
+        "diffHunk",
+        "disposition",
+        "parityObligation",
+        "proposedReplacement",
+        "reason",
+        "resolverWitness",
+        "target",
+        "timing"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "field": "references",
+      "id": "reference-003666",
+      "changedFields": [
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-013969",
+      "changedFields": [
+        "caller"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-013982",
+      "changedFields": [
+        "caller",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-013989",
+      "changedFields": [
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-013990",
+      "changedFields": [
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-013991",
+      "changedFields": [
+        "caller",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-013992",
+      "changedFields": [
+        "caller",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-014008",
+      "changedFields": [
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-014018",
+      "changedFields": [
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-014028",
+      "changedFields": [
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/setup/model-pool-checks.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-014072",
+      "changedFields": [
+        "censusDriftNote"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "references",
+      "id": "reference-003804",
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "references",
+      "id": "reference-003806",
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "references",
+      "id": "reference-003811",
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "references",
+      "id": "reference-003819",
+      "changedFields": [
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "references",
+      "id": "reference-003820",
+      "changedFields": [
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "references",
+      "id": "reference-003821",
+      "changedFields": [
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "references",
+      "id": "reference-003854",
+      "changedFields": [
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "references",
+      "id": "reference-003855",
+      "changedFields": [
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-014207",
+      "changedFields": [
+        "caller"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-014299",
+      "changedFields": [
+        "parityObligation"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-014300",
+      "changedFields": [
+        "parityObligation"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-014301",
+      "changedFields": [
+        "parityObligation",
+        "reason"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-014302",
+      "changedFields": [
+        "parityObligation",
+        "reason"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-014338",
+      "changedFields": [
+        "caller"
+      ]
+    }
+  ],
+  "canonicalFiles": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-decision-index.jsonl",
+      "sha256": "ef9d818ad38885bc45c59de19731ddb4b3e59873d365c70642f68c9d14ed32f1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-doc-registry.jsonl",
+      "sha256": "fa835d615aab1a906e89ad0d408850cd44017f27545507cc9b551440d3a2443d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-enduser-index.jsonl",
+      "sha256": "67aa6101dce07a4a3e0c07b6f62989b617476854519ab9dfe0d551040c974b80"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-instructions.jsonl",
+      "sha256": "44bc3f59c898cc38229ff410fdf33d71650fab37c7eaaf1799a89a4de517af16"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+      "sha256": "f58b03ff0571870e8c5733623a7bd57ebe1d0d7deadb5196a5d69c979ad6f730"
+    }
+  ]
+}

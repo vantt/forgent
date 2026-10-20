@@ -1029,3 +1029,21 @@ Accounted two sequential local-main merges: `c8eec31a2` (6 main commits / 5 path
 Step 0: both extractors agree on 5 units of `docs/backlog.md`; 0 candidate files changed; 0 inbound targetOwner bindings, 0 drifted bindings, 0 rebindings applied, 0 remaining target drift. All decision shards and approvals untouched.
 
 Step 3/4/5 overlaps: Step 3 overlap in `batch-126.jsonl` (`docs/backlog.md`), Step 4 overlap in `step04-017.jsonl` (`CHANGELOG.md`), both deferred once to Step 7 under L12-58(1). Authored Step 5 records (37 records across gateway, CLI messages, setup/doctor) have 0 primary consumer overlaps; all 37 file hashes match disk, **0 `currentPassage` moved at the pin**. CHANGELOG.md noted in coCutPaths of 8 CLI records; 4 changed queue files (`docs/backlog.md`, `scripts/run-rust-dev-host.mjs`, `src/runner/execution/run.mjs`, `test/runner/execution/run.test.mjs`) have no authored Step 5 records or currentPassage pins yet. Artifacts: `step-00-l12-70-{ratchet.log,ratchet-tests.log,binding-check.json,merge-rebindings.json,step3-deferred-rebinds.json,consumer-overlaps.json}`. No code, docs or consumer bytes edited; needsWrites empty.
+
+
+## Pilot closure and generator authoring — in progress (2026-10-21)
+
+Records-only turn started. Reading all requested sources and bounded re-review reports; preparing L12-71 closure, complete generator admission, exact source-only cutover specifications and option B windows. No consumers, live state or generated outputs modified; no CLI, build or git writes.
+
+
+## Pilot closure and generator authoring — completed author handback (2026-10-21)
+
+L12-71 answers every rr Lead question and fixes all requested pilot notes. Retiring/retained witness sweep: **7 hits**, all corrected; doctor 003649/003664 share one new physical path-only hunk, with pinned empty test grep and rollback. Merge directory reads 536/638/640 are already runtime census refs 003747/003770/003748. Hook/merge shared co-cut and unchanged hook e2e proof are explicit.
+
+Seam4: **254 new records**, including 253 physical files and one composite locator; **2,270 literal refs** (all admitted), **3,637 tuples** (827 admitted / 2,810 rejected); 2,695 census parks plus six author-added parks. Four registry/index outputs promoted from advisory runtime ownership; all 137 old carry rows and original 165 pilot generator IDs kept (153 parks / 12 rejects). Five receipts, 12 inherited source specifications plus two exact Step3-custody header packet edits, 24 verified target/anchor bindings, no generated hand patches. Source-key roles are per occurrence; sourceCaptureIds and aliases remain distinct. Source-state export, candidate/second-run outputs and runtime parity remain missing.
+
+Full Step5 checker **291 records / 2,419 refs / 5,654 tuples / 0 failures**. **59/59 mutation probes** reject (37 pilot +22 seam4), covering 35 rule families. Initial checker/probe failures are retained and explained in verification. Source hashes/modes and protected files remain pinned; no code/docs/skills/baseline/CLI/state/git writes.
+
+Option-B request/index: **181 parts**, ≤60 records and ≤389,936 UTF-8 bytes each, total **68,814,484 bytes**; every admitted ref and every rejection/changed tuple has an exact ±40-line window. Large unchanged evidence streams by digest-bound fragments. 39 pilot changed IDs across six files join the same review packet. No reviewer started and no semantic acceptance claimed.
+
+Measured author elapsed **48.57 minutes** at final checks. Lead retains independent review, final Step7 assembly/binding and A34/A45/A47 carries, missing state/generator proof and ordinary L12-11 accounting once the runner commit exists. Markdown preview stays with Lead under the records-only boundary. `needsWrites: []`.

@@ -12,12 +12,12 @@
         "  if (fgosRegressed.regressedPaths.length > 0) {\n    const paths = fgosRegressed.regressedPaths.map((r) => r.path).join(', ');\n    refuse(`commit refused: this commit stages a modification under \".fgos/\" (${paths}) whose line count is lower than HEAD -- .fgos/ files must not regress in content on main, main is left unchanged. See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);\n    return;\n  }"
       ],
       "oldText": [
-        "    refuse(`commit refused: this commit on a worker branch stages changes under \".fgos/\" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);",
-        "    refuse(`commit refused: this commit stages a modification under \".fgos/\" (${paths}) whose line count is lower than HEAD -- .fgos/ files must not regress in content on main, main is left unchanged. See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);"
+        "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+        "docs/how-to/fix-fgos-write-rejected-merge-block.md"
       ],
       "newText": [
-        "    refuse(`commit refused: this commit on a worker branch stages changes under \".fgos/\" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);",
-        "    refuse(`commit refused: this commit stages a modification under \".fgos/\" (${paths}) whose line count is lower than HEAD -- .fgos/ files must not regress in content on main, main is left unchanged. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);"
+        "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+        "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md"
       ],
       "sourceSpans": [
         {
@@ -268,7 +268,7 @@
           "expectedAfterSha256": "cc1c9e2280fb3b0dbb1aea4c48dd090d6d0edc1ee44be4f224b759bab6adc55f",
           "rollbackDiff": "--- a/test/runner/merge.test.mjs\n+++ b/test/runner/merge.test.mjs\n@@ -1260,9 +1260,9 @@\n   const detail = formatFgosWriteRejectedDetail('fgw/demo-item', ['.fgos/events.jsonl'], 'main');\n   assert.equal(\n     detail,\n-    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n+    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n   );\n-  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));\n+  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));\n });\n \n test('mergeRunnerItem merges normally when the branch touches ordinary files alongside an untouched .fgos/', async () => {\n",
           "timing": "phase9",
-          "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+          "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance. L12-71: merge.test.mjs belongs to the shared atomic old-pointer co-cut with merge.mjs reference-003749; it does not assert hook output. Hook e2e basename proof stays unchanged.",
           "grepDecisions": [
             {
               "match": {
@@ -351,7 +351,7 @@
           "expectedAfterSha256": "cc1c9e2280fb3b0dbb1aea4c48dd090d6d0edc1ee44be4f224b759bab6adc55f",
           "rollbackDiff": "--- a/test/runner/merge.test.mjs\n+++ b/test/runner/merge.test.mjs\n@@ -1260,9 +1260,9 @@\n   const detail = formatFgosWriteRejectedDetail('fgw/demo-item', ['.fgos/events.jsonl'], 'main');\n   assert.equal(\n     detail,\n-    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n+    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n   );\n-  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));\n+  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));\n });\n \n test('mergeRunnerItem merges normally when the branch touches ordinary files alongside an untouched .fgos/', async () => {\n",
           "timing": "phase9",
-          "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+          "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance. L12-71: merge.test.mjs belongs to the shared atomic old-pointer co-cut with merge.mjs reference-003749; it does not assert hook output. Hook e2e basename proof stays unchanged.",
           "grepDecisions": [
             {
               "match": {
@@ -403,10 +403,10 @@
         "      throw new StoreError(\n        'validation',\n        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/decisions/0020-chan-fgos-khoi-worktree-worker.md).`,\n      );\n    }"
       ],
       "oldText": [
-        "        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/decisions/0020-chan-fgos-khoi-worktree-worker.md).`,"
+        "docs/decisions/0020-chan-fgos-khoi-worktree-worker.md"
       ],
       "newText": [
-        "        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập).`,"
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập"
       ],
       "sourceSpans": [
         {
@@ -506,28 +506,59 @@
       "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
       "mode": "100644",
       "symbolOrPassage": [
-        "      required: ['doc-path'],\n    },\n    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n    touchesState: false,\n    requiresExistingStore: false,"
+        "    name: 'doctor',\n    invoke: 'fgos doctor',\n    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n    parameters: {\n      type: 'object',",
+        "      required: ['doc-path'],\n    },\n    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n    touchesState: false,\n    requiresExistingStore: false,",
+        "    name: 'doctor',\n    invoke: 'fgos doctor',\n    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n    parameters: {\n      type: 'object',"
       ],
       "oldText": [
-        "    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],"
+        "docs/specs/distribution.md",
+        "docs/how-to/check-rollup-progress.md",
+        "docs/specs/distribution.md"
       ],
       "newText": [
-        "    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],"
+        "docs/platform/packaging-distribution/spec.md",
+        "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+        "docs/platform/packaging-distribution/spec.md"
       ],
       "sourceSpans": [
+        {
+          "line": 2075,
+          "columnStart": 383,
+          "columnEndExclusive": 409,
+          "text": "docs/specs/distribution.md"
+        },
         {
           "line": 1746,
           "columnStart": 34,
           "columnEndExclusive": 70,
           "text": "docs/how-to/check-rollup-progress.md"
+        },
+        {
+          "line": 2075,
+          "columnStart": 383,
+          "columnEndExclusive": 409,
+          "text": "docs/specs/distribution.md"
         }
       ],
-      "diff": "--- a/src/cli/command-registry.mjs\n+++ b/src/cli/command-registry.mjs\n@@ -1743,7 +1743,7 @@\n       positional: ['doc-path'],\n       required: ['doc-path'],\n     },\n-    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n+    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],\n     touchesState: false,\n     requiresExistingStore: false,\n     externalEffect: false,\n",
-      "expectedAfterSha256": "65aa9b2dc704b9998383c2929e3fee11377397a1c7ca3635e0e9e7e2446b8c02",
+      "diff": "--- a/src/cli/command-registry.mjs\n+++ b/src/cli/command-registry.mjs\n@@ -1743,7 +1743,7 @@\n       positional: ['doc-path'],\n       required: ['doc-path'],\n     },\n-    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n+    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],\n     touchesState: false,\n     requiresExistingStore: false,\n     externalEffect: false,\n@@ -2072,7 +2072,7 @@\n   {\n     name: 'doctor',\n     invoke: 'fgos doctor',\n-    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n+    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/platform/packaging-distribution/spec.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n     parameters: {\n       type: 'object',\n       properties: {\n",
+      "expectedAfterSha256": "798526021edf0d526b694ca2d8ea0208e57a8ba2131fe14290de01044218b073",
       "targetOwner": [
-        "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md"
+        "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+        "docs/platform/packaging-distribution/spec.md"
       ],
       "claimAnchorProof": [
+        {
+          "rule": "L12-71: live RUL9/RUL11 doctor contract holder; Step 4 cli-006 precedent",
+          "target": "docs/platform/packaging-distribution/spec.md",
+          "targetSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+          "anchor": "business-rules",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "claim": "RUL9 default never writes; RUL11 --fix runs every registered fix",
+          "claimLines": [
+            644,
+            659
+          ]
+        },
         {
           "target": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
           "docId": "how-to-check-a-root-item-s-progress-with-fgos-rollup:check-rollup-progress",
@@ -536,6 +567,18 @@
           "alias": "docs/how-to/check-rollup-progress.md",
           "targetSha256": "bc0fb8b50f3958ddcebd76772ed49ea6bfcd69e7be820889900ea884ba69e5ab",
           "claim": "live currentPath lookup; no writer destination adopts an alias"
+        },
+        {
+          "rule": "L12-71: live RUL9/RUL11 doctor contract holder; Step 4 cli-006 precedent",
+          "target": "docs/platform/packaging-distribution/spec.md",
+          "targetSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+          "anchor": "business-rules",
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "claim": "RUL9 default never writes; RUL11 --fix runs every registered fix",
+          "claimLines": [
+            644,
+            659
+          ]
         }
       ],
       "receiptId": "cli-help-messages-pilot",
@@ -564,6 +607,52 @@
             "targetSha256": "bc0fb8b50f3958ddcebd76772ed49ea6bfcd69e7be820889900ea884ba69e5ab",
             "claim": "live currentPath lookup; no writer destination adopts an alias"
           }
+        },
+        {
+          "file": "src/cli/command-registry.mjs",
+          "referenceId": "reference-003649",
+          "edgeId": "class6-l-000225",
+          "line": 2075,
+          "currentExpression": "    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',",
+          "candidateExpression": "    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/platform/packaging-distribution/spec.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',",
+          "oldPointer": "docs/specs/distribution.md",
+          "newPointer": "docs/platform/packaging-distribution/spec.md",
+          "intent": "L12-71: only doctor RUL9/RUL11 navigation path changes",
+          "evidence": {
+            "rule": "L12-71: live RUL9/RUL11 doctor contract holder; Step 4 cli-006 precedent",
+            "target": "docs/platform/packaging-distribution/spec.md",
+            "targetSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+            "anchor": "business-rules",
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "claim": "RUL9 default never writes; RUL11 --fix runs every registered fix",
+            "claimLines": [
+              644,
+              659
+            ]
+          }
+        },
+        {
+          "file": "src/cli/command-registry.mjs",
+          "referenceId": "reference-003664",
+          "edgeId": "cli-011",
+          "line": 2075,
+          "currentExpression": "    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',",
+          "candidateExpression": "    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/platform/packaging-distribution/spec.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',",
+          "oldPointer": "docs/specs/distribution.md",
+          "newPointer": "docs/platform/packaging-distribution/spec.md",
+          "intent": "L12-71: only doctor RUL9/RUL11 navigation path changes",
+          "evidence": {
+            "rule": "L12-71: live RUL9/RUL11 doctor contract holder; Step 4 cli-006 precedent",
+            "target": "docs/platform/packaging-distribution/spec.md",
+            "targetSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+            "anchor": "business-rules",
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "claim": "RUL9 default never writes; RUL11 --fix runs every registered fix",
+            "claimLines": [
+              644,
+              659
+            ]
+          }
         }
       ],
       "testTargets": [
@@ -591,6 +680,52 @@
             "targetSha256": "bc0fb8b50f3958ddcebd76772ed49ea6bfcd69e7be820889900ea884ba69e5ab",
             "claim": "live currentPath lookup; no writer destination adopts an alias"
           }
+        },
+        {
+          "file": "src/cli/command-registry.mjs",
+          "referenceId": "reference-003649",
+          "edgeId": "class6-l-000225",
+          "line": 2075,
+          "currentExpression": "    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',",
+          "candidateExpression": "    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/platform/packaging-distribution/spec.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',",
+          "oldPointer": "docs/specs/distribution.md",
+          "newPointer": "docs/platform/packaging-distribution/spec.md",
+          "intent": "L12-71: only doctor RUL9/RUL11 navigation path changes",
+          "evidence": {
+            "rule": "L12-71: live RUL9/RUL11 doctor contract holder; Step 4 cli-006 precedent",
+            "target": "docs/platform/packaging-distribution/spec.md",
+            "targetSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+            "anchor": "business-rules",
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "claim": "RUL9 default never writes; RUL11 --fix runs every registered fix",
+            "claimLines": [
+              644,
+              659
+            ]
+          }
+        },
+        {
+          "file": "src/cli/command-registry.mjs",
+          "referenceId": "reference-003664",
+          "edgeId": "cli-011",
+          "line": 2075,
+          "currentExpression": "    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',",
+          "candidateExpression": "    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/platform/packaging-distribution/spec.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',",
+          "oldPointer": "docs/specs/distribution.md",
+          "newPointer": "docs/platform/packaging-distribution/spec.md",
+          "intent": "L12-71: only doctor RUL9/RUL11 navigation path changes",
+          "evidence": {
+            "rule": "L12-71: live RUL9/RUL11 doctor contract holder; Step 4 cli-006 precedent",
+            "target": "docs/platform/packaging-distribution/spec.md",
+            "targetSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+            "anchor": "business-rules",
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "claim": "RUL9 default never writes; RUL11 --fix runs every registered fix",
+            "claimLines": [
+              644,
+              659
+            ]
+          }
         }
       ],
       "prerequisites": [
@@ -601,7 +736,7 @@
         "Step 7 composes and de-duplicates shared co-cut test diffs by file/content; do not apply the same pinned test diff twice. Recompute combined hashes after all seams are assembled."
       ],
       "order": "Phase 9 atomic consumer cutover; no apply-now action",
-      "rollbackDiff": "--- a/src/cli/command-registry.mjs\n+++ b/src/cli/command-registry.mjs\n@@ -1743,7 +1743,7 @@\n       positional: ['doc-path'],\n       required: ['doc-path'],\n     },\n-    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],\n+    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n     touchesState: false,\n     requiresExistingStore: false,\n     externalEffect: false,\n",
+      "rollbackDiff": "--- a/src/cli/command-registry.mjs\n+++ b/src/cli/command-registry.mjs\n@@ -1743,7 +1743,7 @@\n       positional: ['doc-path'],\n       required: ['doc-path'],\n     },\n-    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],\n+    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n     touchesState: false,\n     requiresExistingStore: false,\n     externalEffect: false,\n@@ -2072,7 +2072,7 @@\n   {\n     name: 'doctor',\n     invoke: 'fgos doctor',\n-    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/platform/packaging-distribution/spec.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n+    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',\n     parameters: {\n       type: 'object',\n       properties: {\n",
       "timing": "phase9",
       "readiness": "pending / cutover-patch-only; never execution-ready",
       "coCutTestGreps": [
@@ -652,6 +787,17 @@
               "sourceSha256": "bbbf2bdbf3b87789af4de17ff227e7cf63c5063965575e4980f9b6fe72b5a310"
             }
           ]
+        },
+        {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/specs/distribution.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/specs/distribution.md",
+            "docs\\/specs\\/distribution.md",
+            "docs\\/specs\\/distribution\\.md"
+          ],
+          "matches": []
         }
       ],
       "coCutTestEdits": [
@@ -814,10 +960,10 @@
         "        kind: 'engine',\n        rationale:\n          'tsk-1gr D1/D2: mechanical path-token check over CONTEXT.md\\'s Locked decisions section -- advisory only, never blocks; see docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md for the failure mode this catches',\n      });\n    }"
       ],
       "oldText": [
-        "          'tsk-1gr D1/D2: mechanical path-token check over CONTEXT.md\\'s Locked decisions section -- advisory only, never blocks; see docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md for the failure mode this catches',"
+        "docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md"
       ],
       "newText": [
-        "          'tsk-1gr D1/D2: mechanical path-token check over CONTEXT.md\\'s Locked decisions section -- advisory only, never blocks; see docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md for the failure mode this catches',"
+        "docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md"
       ],
       "sourceSpans": [
         {
@@ -929,10 +1075,10 @@
         "// scoped to the how-to doc's own documented trap, not a bare ban on any\n// TAP-style text.\nconst KNOWN_BAD_VERIFY_PATTERN_DOC = 'docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md';\nconst NODE_TEST_REFERENCE_RE = /node\\s+--test\\b|--test-name-pattern\\b/;\nconst WRONG_REPORTER_GREP_RE = /\\^#\\s*(pass|fail)\\b/;"
       ],
       "oldText": [
-        "const KNOWN_BAD_VERIFY_PATTERN_DOC = 'docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md';"
+        "docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md"
       ],
       "newText": [
-        "const KNOWN_BAD_VERIFY_PATTERN_DOC = 'docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md';"
+        "docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md"
       ],
       "sourceSpans": [
         {
@@ -1044,10 +1190,10 @@
         "\nexport function formatFgosWriteRejectedDetail(branch, paths, targetLabel) {\n  return `${branch} staged a change under .fgos/ (${paths.join(', ')}); merge aborted, ${targetLabel} unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.`;\n}\n"
       ],
       "oldText": [
-        "  return `${branch} staged a change under .fgos/ (${paths.join(', ')}); merge aborted, ${targetLabel} unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.`;"
+        "docs/how-to/fix-fgos-write-rejected-merge-block.md"
       ],
       "newText": [
-        "  return `${branch} staged a change under .fgos/ (${paths.join(', ')}); merge aborted, ${targetLabel} unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.`;"
+        "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md"
       ],
       "sourceSpans": [
         {
@@ -1264,10 +1410,10 @@
         "  if (isDirtyRelativeToSync(repoRoot, worktreePath, lastSynced)) {\n    throw new WorktreeError(\n      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,\n      { branch, worktreePath, lastSynced, branchTip },\n    );"
       ],
       "oldText": [
-        "      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,"
+        "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md"
       ],
       "newText": [
-        "      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,"
+        "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md"
       ],
       "sourceSpans": [
         {
@@ -1432,10 +1578,10 @@
         "      ok: false,\n      reason: \"content-mismatch\",\n      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/how-to/resolve-an-events-jsonl-truncation.md)`,\n      mark: currentMark,\n    };"
       ],
       "oldText": [
-        "      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/how-to/resolve-an-events-jsonl-truncation.md)`,"
+        "docs/how-to/resolve-an-events-jsonl-truncation.md"
       ],
       "newText": [
-        "      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md)`,"
+        "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md"
       ],
       "sourceSpans": [
         {
@@ -1602,14 +1748,14 @@
         "  }\n  if (missing.length > 0) {\n    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };\n  }\n  return { passed: true, message: 'every domain\\'s taskSpecMap entry and operation resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };"
       ],
       "oldText": [
-        "    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,",
-        "    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,",
-        "    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };"
+        "docs/how-to/cut-a-fgos-release-tag.md",
+        "docs/how-to/resolve-an-events-jsonl-truncation.md",
+        "docs/how-to/write-a-task-spec.md"
       ],
       "newText": [
-        "    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,",
-        "    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md`,",
-        "    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md` };"
+        "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
+        "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+        "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md"
       ],
       "sourceSpans": [
         {

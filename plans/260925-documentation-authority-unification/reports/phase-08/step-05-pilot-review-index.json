@@ -9,100 +9,139 @@
     {
       "part": 1,
       "payload": "step-05-pilot-p01.json",
-      "payloadSha256": "5ba1f21cc623a575ab580afdcd79f07acf5b2f0ad580f4eb0a185c94c2612728",
-      "bytes": 389984,
+      "payloadSha256": "69bb8610f83ec75b5d4d629d3ebf725503e7f5a61925a2a4957d88551b95e2e7",
+      "bytes": 312588,
       "files": [
         "apps/fgos-gateway/src/gateway.rs"
       ],
       "fileRecords": 1,
-      "items": 89,
+      "items": 60,
       "report": "review-a38-step-05-pilot-p01.md",
       "reviewStatus": "pending"
     },
     {
       "part": 2,
       "payload": "step-05-pilot-p02.json",
-      "payloadSha256": "0da77d5fb638288949d6f25b2325e90f6b27517a6dfda3e9933edd4d948573f2",
-      "bytes": 386821,
+      "payloadSha256": "3cf7789a29f60985d411eef10166e1fba718a2d04331504b19c72f62d595112a",
+      "bytes": 164749,
       "files": [
-        ".githooks/pre-commit",
-        "apps/fgos-gateway/src/gateway.rs",
-        "apps/fgos-gateway/src/mcp.rs"
+        "apps/fgos-gateway/src/gateway.rs"
       ],
-      "fileRecords": 3,
-      "items": 104,
+      "fileRecords": 1,
+      "items": 60,
       "report": "review-a38-step-05-pilot-p02.md",
       "reviewStatus": "pending"
     },
     {
       "part": 3,
       "payload": "step-05-pilot-p03.json",
-      "payloadSha256": "5e62df401445d90817bf9f48a809a88e1a208cb767a59fc085208053d55752ef",
-      "bytes": 381226,
+      "payloadSha256": "4ac406f7b2063324afb8a687af2cb992f725f4eaa481d1e89fe6f6cd8ac32bc7",
+      "bytes": 221698,
       "files": [
-        ".githooks/pre-commit",
-        "bin/fgos.mjs"
+        "apps/fgos-gateway/src/gateway.rs",
+        "apps/fgos-gateway/src/mcp.rs"
       ],
       "fileRecords": 2,
-      "items": 71,
+      "items": 60,
       "report": "review-a38-step-05-pilot-p03.md",
       "reviewStatus": "pending"
     },
     {
       "part": 4,
       "payload": "step-05-pilot-p04.json",
-      "payloadSha256": "d171c017477d9d77fb982a4ee90db017245a1b03ff9d7d30914ff7fd2d8e5353",
-      "bytes": 386670,
+      "payloadSha256": "9bb1d2c16670dbd57f978742f2baa2b2452610e849c6d859299a564d14879a0f",
+      "bytes": 203229,
       "files": [
-        "bin/fgos.mjs",
-        "src/cli/command-registry.mjs"
+        ".githooks/pre-commit",
+        "apps/fgos-gateway/src/mcp.rs"
       ],
       "fileRecords": 2,
-      "items": 45,
+      "items": 60,
       "report": "review-a38-step-05-pilot-p04.md",
       "reviewStatus": "pending"
     },
     {
       "part": 5,
       "payload": "step-05-pilot-p05.json",
-      "payloadSha256": "d5ca3aed2d37836c76afec4f15175f23afe40bd2e7c432f355473da25b24e812",
-      "bytes": 386024,
+      "payloadSha256": "2daebce884a572cf2d0069cd0ef21786082d2b9f95ba66697b366c73e31a2b24",
+      "bytes": 385816,
       "files": [
-        "src/cli/command-registry.mjs",
-        "src/intake/plan.mjs",
-        "src/intake/verify-pattern-check.mjs",
-        "src/runner/claim-port.mjs",
-        "src/runner/merge.mjs",
-        "src/runner/worktree.mjs"
+        ".githooks/pre-commit",
+        "bin/fgos.mjs"
       ],
-      "fileRecords": 6,
-      "items": 55,
+      "fileRecords": 2,
+      "items": 38,
       "report": "review-a38-step-05-pilot-p05.md",
       "reviewStatus": "pending"
     },
     {
       "part": 6,
       "payload": "step-05-pilot-p06.json",
-      "payloadSha256": "f1c20aa8c338668521a784675052c005b2d9278d075c2e8275dcb7dc80dedccb",
-      "bytes": 384008,
+      "payloadSha256": "d920d7121e561886055185a808c58fa6a60b2db160ab0b3e34bbacb2d0abd4bb",
+      "bytes": 389880,
       "files": [
-        "src/runner/worktree.mjs",
-        "src/setup/agent-cli-trust.mjs",
-        "src/setup/agent-hooks.mjs",
-        "src/setup/agy-permissions.mjs",
-        "src/setup/ansi.mjs",
-        "src/state/events-jsonl-truncation-guard.mjs"
+        "src/cli/command-registry.mjs",
+        "src/intake/plan.mjs"
       ],
-      "fileRecords": 6,
-      "items": 130,
+      "fileRecords": 2,
+      "items": 56,
       "report": "review-a38-step-05-pilot-p06.md",
       "reviewStatus": "pending"
     },
     {
       "part": 7,
       "payload": "step-05-pilot-p07.json",
-      "payloadSha256": "1094d278180a94b85dcbd3b9c13b834226032355666d2c365ea371c0e8d50c2c",
-      "bytes": 379099,
+      "payloadSha256": "44edabb6252980ba616d91849adf52387a061b5508e5cfb76b957495cbf543da",
+      "bytes": 383060,
+      "files": [
+        "src/intake/plan.mjs",
+        "src/intake/verify-pattern-check.mjs",
+        "src/runner/claim-port.mjs",
+        "src/runner/merge.mjs",
+        "src/runner/worktree.mjs",
+        "src/setup/agent-cli-trust.mjs",
+        "src/state/events-jsonl-truncation-guard.mjs"
+      ],
+      "fileRecords": 7,
+      "items": 60,
+      "report": "review-a38-step-05-pilot-p07.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "part": 8,
+      "payload": "step-05-pilot-p08.json",
+      "payloadSha256": "9b568c4488b87b544aae13c5e2336d3b8134e88c8f965df8210da49e42659de8",
+      "bytes": 167155,
+      "files": [
+        "src/setup/agent-cli-trust.mjs",
+        "src/setup/agent-hooks.mjs",
+        "src/setup/agy-permissions.mjs"
+      ],
+      "fileRecords": 3,
+      "items": 60,
+      "report": "review-a38-step-05-pilot-p08.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "part": 9,
+      "payload": "step-05-pilot-p09.json",
+      "payloadSha256": "16d9cc57d6482e1f98c32953cf4957a36d3d042b711c691186a4ebdb667d2b2b",
+      "bytes": 149194,
+      "files": [
+        "src/setup/agy-permissions.mjs",
+        "src/setup/ansi.mjs",
+        "src/setup/bin-discovery.mjs"
+      ],
+      "fileRecords": 3,
+      "items": 60,
+      "report": "review-a38-step-05-pilot-p09.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "part": 10,
+      "payload": "step-05-pilot-p10.json",
+      "payloadSha256": "a9595916e09697806000fbe0d983c4312310350f502d1774b9eed8a690f5e219",
+      "bytes": 165240,
       "files": [
         "src/setup/bin-discovery.mjs",
         "src/setup/blind-steps-proven-pools.mjs",
@@ -110,217 +149,427 @@
         "src/setup/config-merge.mjs",
         "src/setup/event-store-checks.mjs",
         "src/setup/event-store-fixes.mjs",
-        "src/setup/executor-posture-coverage.mjs",
-        "src/setup/executor-profile-warnings.mjs",
-        "src/setup/git-checks.mjs",
-        "src/setup/git-hooks.mjs",
-        "src/setup/holder-lock-checks.mjs"
+        "src/setup/executor-posture-coverage.mjs"
       ],
-      "fileRecords": 11,
-      "items": 134,
-      "report": "review-a38-step-05-pilot-p07.md",
-      "reviewStatus": "pending"
-    },
-    {
-      "part": 8,
-      "payload": "step-05-pilot-p08.json",
-      "payloadSha256": "6cf74c0cdbb5be6745af3862e978ecb16e3349662de1b05975b0dcd0a0692dd0",
-      "bytes": 387809,
-      "files": [
-        "src/setup/holder-lock-checks.mjs"
-      ],
-      "fileRecords": 1,
-      "items": 141,
-      "report": "review-a38-step-05-pilot-p08.md",
-      "reviewStatus": "pending"
-    },
-    {
-      "part": 9,
-      "payload": "step-05-pilot-p09.json",
-      "payloadSha256": "b898aa1b77b073514beadd002f75ab6cd873d9a6f3f56afa85606b181395d491",
-      "bytes": 387126,
-      "files": [
-        "src/setup/holder-lock-checks.mjs",
-        "src/setup/instruction-composition.mjs",
-        "src/setup/instruction-registry.mjs"
-      ],
-      "fileRecords": 3,
-      "items": 142,
-      "report": "review-a38-step-05-pilot-p09.md",
-      "reviewStatus": "pending"
-    },
-    {
-      "part": 10,
-      "payload": "step-05-pilot-p10.json",
-      "payloadSha256": "ffdf7dced721e30e6fc4ebbb1f7761ba3a97ee5b5c2c80308c8b3c41c444f245",
-      "bytes": 384513,
-      "files": [
-        "src/setup/instruction-registry.mjs",
-        "src/setup/lock-record-checks.mjs",
-        "src/setup/model-pool-checks.mjs",
-        "src/setup/project-launcher.mjs",
-        "src/setup/registrations.mjs"
-      ],
-      "fileRecords": 5,
-      "items": 108,
+      "fileRecords": 7,
+      "items": 60,
       "report": "review-a38-step-05-pilot-p10.md",
       "reviewStatus": "pending"
     },
     {
       "part": 11,
       "payload": "step-05-pilot-p11.json",
-      "payloadSha256": "cbd58db717a851ee641776d16deabb5e17277f2103ebce4fbe5060d1640d5694",
-      "bytes": 387920,
+      "payloadSha256": "cafcd342f96b8196af4e2834af505740a1b7a93e65380a9ad487621266e8029d",
+      "bytes": 197186,
       "files": [
-        "src/setup/registrations.mjs"
+        "src/setup/executor-posture-coverage.mjs",
+        "src/setup/executor-profile-warnings.mjs",
+        "src/setup/git-checks.mjs",
+        "src/setup/git-hooks.mjs",
+        "src/setup/holder-lock-checks.mjs"
       ],
-      "fileRecords": 1,
-      "items": 61,
+      "fileRecords": 5,
+      "items": 60,
       "report": "review-a38-step-05-pilot-p11.md",
       "reviewStatus": "pending"
     },
     {
       "part": 12,
       "payload": "step-05-pilot-p12.json",
-      "payloadSha256": "588721627ac76cd206f13a705cb34d60353a16ff614845f7b6b4b349e4b4cdfc",
-      "bytes": 389679,
+      "payloadSha256": "7234d5dbb9572a100c479b7c45e734b736d5a8add54213a027ce5b0ee5fb4178",
+      "bytes": 153673,
       "files": [
-        "src/setup/registrations.mjs"
+        "src/setup/holder-lock-checks.mjs"
       ],
       "fileRecords": 1,
-      "items": 147,
+      "items": 60,
       "report": "review-a38-step-05-pilot-p12.md",
       "reviewStatus": "pending"
     },
     {
       "part": 13,
       "payload": "step-05-pilot-p13.json",
-      "payloadSha256": "f25d149d33405917b6004c47fe22a773a3b464c309de0b161f70f3d131359421",
-      "bytes": 388103,
+      "payloadSha256": "3588e999e0381274b1d66751459d08a6f997d2fbed879d0c8bf6587d7ff8c235",
+      "bytes": 152995,
       "files": [
-        "src/setup/registrations.mjs"
+        "src/setup/holder-lock-checks.mjs"
       ],
       "fileRecords": 1,
-      "items": 151,
+      "items": 60,
       "report": "review-a38-step-05-pilot-p13.md",
       "reviewStatus": "pending"
     },
     {
       "part": 14,
       "payload": "step-05-pilot-p14.json",
-      "payloadSha256": "4ae260737f357b700536ad08b755ac97215fde31cad4d390cf3f275e1dbbdd17",
-      "bytes": 387891,
+      "payloadSha256": "9dd64c8642f706d44822973e51ef725ca627ec4e3ece9867eb4a98db1242918f",
+      "bytes": 172387,
       "files": [
-        "src/setup/registrations.mjs"
+        "src/setup/holder-lock-checks.mjs",
+        "src/setup/instruction-composition.mjs"
       ],
-      "fileRecords": 1,
-      "items": 142,
+      "fileRecords": 2,
+      "items": 60,
       "report": "review-a38-step-05-pilot-p14.md",
       "reviewStatus": "pending"
     },
     {
       "part": 15,
       "payload": "step-05-pilot-p15.json",
-      "payloadSha256": "8b7a801900848f4e83c79b83c068181e7c6c5434198f30e858b627ecd7bdadbf",
-      "bytes": 389804,
+      "payloadSha256": "67a3a64b744c4f6c4377ed2994fd73d5b47c63c37f9e98d04878265382db2e18",
+      "bytes": 163081,
       "files": [
-        "src/setup/registrations.mjs"
+        "src/setup/instruction-composition.mjs",
+        "src/setup/instruction-registry.mjs"
       ],
-      "fileRecords": 1,
-      "items": 156,
+      "fileRecords": 2,
+      "items": 60,
       "report": "review-a38-step-05-pilot-p15.md",
       "reviewStatus": "pending"
     },
     {
       "part": 16,
       "payload": "step-05-pilot-p16.json",
-      "payloadSha256": "231eee266b5b51e400e606aa07922aa2dad0f8f9970c2871e24e382971265e57",
-      "bytes": 389443,
+      "payloadSha256": "e206a5188cad70b655ba226c1c84e8254937240a868e88905a1f7f757caf93fb",
+      "bytes": 157543,
       "files": [
-        "src/setup/registrations.mjs"
+        "src/setup/instruction-registry.mjs"
       ],
       "fileRecords": 1,
-      "items": 154,
+      "items": 60,
       "report": "review-a38-step-05-pilot-p16.md",
       "reviewStatus": "pending"
     },
     {
       "part": 17,
       "payload": "step-05-pilot-p17.json",
-      "payloadSha256": "4b080c7687ae6c3d90e11f3913b77c413d132ee4e66bb3587324877e85c2b94f",
-      "bytes": 388278,
+      "payloadSha256": "b0ba05730eb71d307965ced74c41abe72ba8d4520e19b36749206cf179f81b6f",
+      "bytes": 164453,
       "files": [
-        "src/setup/registrations.mjs",
-        "src/setup/run-supervisor-checks.mjs"
+        "src/setup/instruction-registry.mjs",
+        "src/setup/lock-record-checks.mjs",
+        "src/setup/model-pool-checks.mjs"
       ],
-      "fileRecords": 2,
-      "items": 148,
+      "fileRecords": 3,
+      "items": 60,
       "report": "review-a38-step-05-pilot-p17.md",
       "reviewStatus": "pending"
     },
     {
       "part": 18,
       "payload": "step-05-pilot-p18.json",
-      "payloadSha256": "ba90b997659f6f245c5e22c103d298625b064f3a4abccb415f6a88875bdd23a6",
-      "bytes": 388084,
+      "payloadSha256": "dff57a01ffea48271d813493b72d14db9218b000994dfea195facff7134fbafe",
+      "bytes": 385681,
       "files": [
-        "src/setup/run-supervisor-checks.mjs",
-        "src/setup/shell-rc.mjs",
-        "src/setup/skill-wrappers.mjs"
+        "src/setup/model-pool-checks.mjs",
+        "src/setup/project-launcher.mjs",
+        "src/setup/registrations.mjs"
       ],
       "fileRecords": 3,
-      "items": 127,
+      "items": 45,
       "report": "review-a38-step-05-pilot-p18.md",
       "reviewStatus": "pending"
     },
     {
       "part": 19,
       "payload": "step-05-pilot-p19.json",
-      "payloadSha256": "f4578c2f38d88b67da8b4c1a6b8871dc02a78ccc79c68563854600a31713f5f2",
-      "bytes": 387212,
+      "payloadSha256": "bea9431c3d9b69c423bed9adc4e8bb8dc872a374215d6367feb3c0e15c375d10",
+      "bytes": 219586,
       "files": [
-        "src/setup/skill-wrappers.mjs"
+        "src/setup/registrations.mjs"
       ],
       "fileRecords": 1,
-      "items": 137,
+      "items": 60,
       "report": "review-a38-step-05-pilot-p19.md",
       "reviewStatus": "pending"
     },
     {
       "part": 20,
       "payload": "step-05-pilot-p20.json",
-      "payloadSha256": "08ad3837c3ba2e898b296a582566039b44fcec410d83e81a61493f72b5fb26d6",
-      "bytes": 325915,
+      "payloadSha256": "f6b6f615b2d55d27852f5fa2c485921781e550309cc3d5488159c2f7b2f092de",
+      "bytes": 164742,
       "files": [
-        "src/setup/skill-wrappers.mjs",
-        "src/setup/terminal-control-checks.mjs",
-        "src/setup/workflow-pool-independence.mjs"
+        "src/setup/registrations.mjs"
       ],
-      "fileRecords": 3,
-      "items": 114,
+      "fileRecords": 1,
+      "items": 60,
       "report": "review-a38-step-05-pilot-p20.md",
       "reviewStatus": "pending"
     },
     {
       "part": 21,
       "payload": "step-05-pilot-p21.json",
-      "payloadSha256": "3cd55a973ac0142a3d8ea48f5504518b8feb3e108015768e76ca24ed7b39b538",
-      "bytes": 372515,
-      "files": [],
-      "fileRecords": 0,
-      "items": 6,
+      "payloadSha256": "702a5d5ccad549942cf0dfafe1beab03ae267733d9c90b8948a7710ba901a642",
+      "bytes": 143195,
+      "files": [
+        "src/setup/registrations.mjs"
+      ],
+      "fileRecords": 1,
+      "items": 60,
       "report": "review-a38-step-05-pilot-p21.md",
       "reviewStatus": "pending"
     },
     {
       "part": 22,
       "payload": "step-05-pilot-p22.json",
-      "payloadSha256": "aa3ff53816ee39544f346bc256a573ee1be7f73cdb974947060d274ac14ee092",
-      "bytes": 139535,
+      "payloadSha256": "63f56eec62d914b53d4f2522ec30de27a17afe6db95beedc400c742c8b3e8dd7",
+      "bytes": 146599,
+      "files": [
+        "src/setup/registrations.mjs"
+      ],
+      "fileRecords": 1,
+      "items": 60,
+      "report": "review-a38-step-05-pilot-p22.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "part": 23,
+      "payload": "step-05-pilot-p23.json",
+      "payloadSha256": "c64b1ba8d4db2981928f99b053a30ae8b608710aa3186c627bd8a61ca60d1f6f",
+      "bytes": 152053,
+      "files": [
+        "src/setup/registrations.mjs"
+      ],
+      "fileRecords": 1,
+      "items": 60,
+      "report": "review-a38-step-05-pilot-p23.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "part": 24,
+      "payload": "step-05-pilot-p24.json",
+      "payloadSha256": "4d7e3a6e75e96f05e21fc1ba2064ed2067c1522f8d7fbe26f994613ada9faf18",
+      "bytes": 169844,
+      "files": [
+        "src/setup/registrations.mjs"
+      ],
+      "fileRecords": 1,
+      "items": 60,
+      "report": "review-a38-step-05-pilot-p24.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "part": 25,
+      "payload": "step-05-pilot-p25.json",
+      "payloadSha256": "e0671b48fda544638fb05b1857d5f932d688422f0d4ffb46b5f94697b7ef5a0b",
+      "bytes": 172692,
+      "files": [
+        "src/setup/registrations.mjs"
+      ],
+      "fileRecords": 1,
+      "items": 60,
+      "report": "review-a38-step-05-pilot-p25.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "part": 26,
+      "payload": "step-05-pilot-p26.json",
+      "payloadSha256": "46cfd22911476a7327d7be95ae029c02d2a96a6c1e7f7ca40775d85e08f37877",
+      "bytes": 151783,
+      "files": [
+        "src/setup/registrations.mjs"
+      ],
+      "fileRecords": 1,
+      "items": 60,
+      "report": "review-a38-step-05-pilot-p26.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "part": 27,
+      "payload": "step-05-pilot-p27.json",
+      "payloadSha256": "c42881acf5b561d6faf914c2f3285e8013609420fb0a94db60dc13da67e16ca2",
+      "bytes": 152983,
+      "files": [
+        "src/setup/registrations.mjs"
+      ],
+      "fileRecords": 1,
+      "items": 60,
+      "report": "review-a38-step-05-pilot-p27.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "part": 28,
+      "payload": "step-05-pilot-p28.json",
+      "payloadSha256": "2f6f4c2343dcbb768d95889272a0fbb810c2fd80a446e24dc223b76739eed31b",
+      "bytes": 149594,
+      "files": [
+        "src/setup/registrations.mjs"
+      ],
+      "fileRecords": 1,
+      "items": 60,
+      "report": "review-a38-step-05-pilot-p28.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "part": 29,
+      "payload": "step-05-pilot-p29.json",
+      "payloadSha256": "e8febd91f6c4c759f6f674283af5d6783ba546e20f95139e466d991cb8d8df09",
+      "bytes": 145124,
+      "files": [
+        "src/setup/registrations.mjs"
+      ],
+      "fileRecords": 1,
+      "items": 60,
+      "report": "review-a38-step-05-pilot-p29.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "part": 30,
+      "payload": "step-05-pilot-p30.json",
+      "payloadSha256": "38a45e412e30476ded5f2b37418892c705bfa0ee39da7c8126b8339389330820",
+      "bytes": 163633,
+      "files": [
+        "src/setup/registrations.mjs"
+      ],
+      "fileRecords": 1,
+      "items": 60,
+      "report": "review-a38-step-05-pilot-p30.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "part": 31,
+      "payload": "step-05-pilot-p31.json",
+      "payloadSha256": "822e3ad80dde5ff6dc259fb5ce983d1fd03690767a0dd59fc0f73965f657f5fd",
+      "bytes": 144186,
+      "files": [
+        "src/setup/registrations.mjs"
+      ],
+      "fileRecords": 1,
+      "items": 60,
+      "report": "review-a38-step-05-pilot-p31.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "part": 32,
+      "payload": "step-05-pilot-p32.json",
+      "payloadSha256": "fc918ed0cea03a39799c3a32012da41f032029586087691f06aa61d146e4a49a",
+      "bytes": 150601,
+      "files": [
+        "src/setup/registrations.mjs"
+      ],
+      "fileRecords": 1,
+      "items": 60,
+      "report": "review-a38-step-05-pilot-p32.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "part": 33,
+      "payload": "step-05-pilot-p33.json",
+      "payloadSha256": "86107ba8a1c42361f7aa0e43a2c75df01f98ea8c764bfe2351727d4e26f54a7b",
+      "bytes": 144143,
+      "files": [
+        "src/setup/registrations.mjs"
+      ],
+      "fileRecords": 1,
+      "items": 60,
+      "report": "review-a38-step-05-pilot-p33.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "part": 34,
+      "payload": "step-05-pilot-p34.json",
+      "payloadSha256": "fa03a77f479025e084bd08a0e511cc6d42558f0a5c306a4ab6e710d5d5fe1e41",
+      "bytes": 176213,
+      "files": [
+        "src/setup/registrations.mjs",
+        "src/setup/run-supervisor-checks.mjs"
+      ],
+      "fileRecords": 2,
+      "items": 60,
+      "report": "review-a38-step-05-pilot-p34.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "part": 35,
+      "payload": "step-05-pilot-p35.json",
+      "payloadSha256": "7c0557e784a5a9476322aefafe223642a11eb79e3373c6bd04cadaeda40b2764",
+      "bytes": 202496,
+      "files": [
+        "src/setup/run-supervisor-checks.mjs",
+        "src/setup/shell-rc.mjs",
+        "src/setup/skill-wrappers.mjs"
+      ],
+      "fileRecords": 3,
+      "items": 60,
+      "report": "review-a38-step-05-pilot-p35.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "part": 36,
+      "payload": "step-05-pilot-p36.json",
+      "payloadSha256": "8299699fd93e64608e86d14d58bf514aa08204045e0b2e6e7a9d8e5a1f52dd11",
+      "bytes": 170104,
+      "files": [
+        "src/setup/skill-wrappers.mjs"
+      ],
+      "fileRecords": 1,
+      "items": 60,
+      "report": "review-a38-step-05-pilot-p36.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "part": 37,
+      "payload": "step-05-pilot-p37.json",
+      "payloadSha256": "1f5b2194436ea4593a9ebd297a359536f5086b8419418a772e6cbd3ced6e5e1f",
+      "bytes": 173190,
+      "files": [
+        "src/setup/skill-wrappers.mjs"
+      ],
+      "fileRecords": 1,
+      "items": 60,
+      "report": "review-a38-step-05-pilot-p37.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "part": 38,
+      "payload": "step-05-pilot-p38.json",
+      "payloadSha256": "c1d3569051876567093b13f0c23ea906af045ce46562b14a0f760d81ed6e85f3",
+      "bytes": 165203,
+      "files": [
+        "src/setup/skill-wrappers.mjs"
+      ],
+      "fileRecords": 1,
+      "items": 60,
+      "report": "review-a38-step-05-pilot-p38.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "part": 39,
+      "payload": "step-05-pilot-p39.json",
+      "payloadSha256": "d976fc35a92252ee44111486f687bd0643ccdaf5878ef375af619e2dac75b839",
+      "bytes": 177252,
+      "files": [
+        "src/setup/skill-wrappers.mjs",
+        "src/setup/terminal-control-checks.mjs"
+      ],
+      "fileRecords": 2,
+      "items": 60,
+      "report": "review-a38-step-05-pilot-p39.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "part": 40,
+      "payload": "step-05-pilot-p40.json",
+      "payloadSha256": "586830ff30de159e3c310bf32fee65ceb6132af18c2468c46dace3f3c23d97fe",
+      "bytes": 357953,
+      "files": [
+        "src/setup/terminal-control-checks.mjs",
+        "src/setup/workflow-pool-independence.mjs"
+      ],
+      "fileRecords": 2,
+      "items": 60,
+      "report": "review-a38-step-05-pilot-p40.md",
+      "reviewStatus": "pending"
+    },
+    {
+      "part": 41,
+      "payload": "step-05-pilot-p41.json",
+      "payloadSha256": "015352bc6703da1c7e21e86cc8274c10a7180c3ec091e32ccc39d440f94a94e2",
+      "bytes": 317992,
       "files": [],
       "fileRecords": 0,
-      "items": 3,
-      "report": "review-a38-step-05-pilot-p22.md",
+      "items": 8,
+      "report": "review-a38-step-05-pilot-p41.md",
       "reviewStatus": "pending"
     }
   ],
@@ -399,5 +648,6 @@
     "remainingDynamicTuples": 37844
   },
   "reworkProjection": "Canonical full-population mechanical projection refreshed under L12-69. Prior reports remain tied to b9b245aea pre-rework payloads; only rr request is dispatched for re-review.",
-  "projectionStatus": "Historical L12-67 admission rates before L12-69 rework; not a current forecast or approved budget."
+  "projectionStatus": "Historical L12-67 admission rates before L12-69 rework; not a current forecast or approved budget.",
+  "closureNote": "L12-71 canonical refresh only; historical reviews remain attached to their original payload commit. Changed records reviewed in seam4 request."
 }

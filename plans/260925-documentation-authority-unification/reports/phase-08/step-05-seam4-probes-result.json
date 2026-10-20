@@ -1,0 +1,294 @@
+{
+  "kind": "Seam4 rejecting mutation probes",
+  "baselineFailures": 0,
+  "rulesCovered": [
+    "s4-carries",
+    "s4-coverage",
+    "s4-greps",
+    "s4-inheritance",
+    "s4-lexical",
+    "s4-operand",
+    "s4-outputs",
+    "s4-parks",
+    "s4-patches",
+    "s4-pins",
+    "s4-receipts",
+    "s4-retiring-retained",
+    "s4-review",
+    "s4-spans"
+  ],
+  "passed": 22,
+  "total": 22,
+  "probes": [
+    {
+      "name": "Dropping a promoted generated-output reference cannot shrink coverage",
+      "owningRule": "s4-coverage",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "s4-coverage",
+          "where": "reference set",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "False whole-file digest is rejected",
+      "owningRule": "s4-pins",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "s4-pins",
+          "where": "docs/decisions/index.md",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Forged current physical token is rejected",
+      "owningRule": "s4-spans",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "s4-spans",
+          "where": "docs/decisions/index.md:reference-000310",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Inherited source-slot identity is not a copied approval",
+      "owningRule": "s4-inheritance",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "s4-inheritance",
+          "where": ".agents/skills/_shared/capability-catalog.md:reference-000001",
+          "error": "list index out of range"
+        }
+      ]
+    },
+    {
+      "name": "Scalar glob guard cannot become an admitted path operation",
+      "owningRule": "s4-operand",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "s4-operand",
+          "where": "src/report/capability-plan-lint.mjs:dynamic-009709",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Document currentPath comparison cannot be discarded as unrelated scalar",
+      "owningRule": "s4-operand",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "s4-operand",
+          "where": "src/report/knowledge-resolver.mjs:dynamic-009810",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "A park must keep its own dependency",
+      "owningRule": "s4-parks",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "s4-parks",
+          "where": "docs/decisions/index.md:reference-000310",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Retiring-root target cannot use a retained witness",
+      "owningRule": "s4-retiring-retained",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "s4-retiring-retained",
+          "where": "scripts/check-doc-retirement.mjs:reference-002490",
+          "error": "retiring tree is not retained"
+        }
+      ]
+    },
+    {
+      "name": "Full-file after hash cannot be invented",
+      "owningRule": "s4-patches",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "s4-patches",
+          "where": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Inverse rollback must restore pinned bytes",
+      "owningRule": "s4-patches",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "s4-patches",
+          "where": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+          "error": "patch unexpectedly ends in middle of line\npatch: **** Only garbage was found in the patch input.\n"
+        }
+      ]
+    },
+    {
+      "name": "Test grep proof cannot disappear",
+      "owningRule": "s4-greps",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "s4-greps",
+          "where": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Generated output cannot receive a manual diff",
+      "owningRule": "s4-outputs",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "s4-outputs",
+          "where": "docs/decisions/index.md",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Sorted output set cannot claim an invented digest",
+      "owningRule": "s4-outputs",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "s4-outputs",
+          "where": "static output set",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Unrun generator parity cannot become a pass",
+      "owningRule": "s4-receipts",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "s4-receipts",
+          "where": "generators-decision-index",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "One of 165 inherited pilot ids cannot disappear",
+      "owningRule": "s4-carries",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "s4-carries",
+          "where": "original identities",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "One original unresolved carry cannot disappear",
+      "owningRule": "s4-carries",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "s4-carries",
+          "where": "original identities",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Whole-file lexical occurrence cannot disappear",
+      "owningRule": "s4-lexical",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "s4-lexical",
+          "where": "complete whole-file census versus grep",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Oversized review part metadata is rejected",
+      "owningRule": "s4-review",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "s4-review",
+          "where": "step-05-seam4-p01.json",
+          "error": "condition false"
+        },
+        {
+          "rule": "s4-review",
+          "where": "all source specifications, metadata, receipts and closure changes",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Missing source caller declaration is rejected",
+      "owningRule": "s4-spans",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "s4-spans",
+          "where": "src/report/decision-index.mjs:dynamic-009758",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "An invented owning test cannot count as proof",
+      "owningRule": "s4-receipts",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "s4-receipts",
+          "where": "generators-decision-index",
+          "error": "Owning test does not exist: test/invented-missing-proof.test.mjs"
+        }
+      ]
+    },
+    {
+      "name": "An uncomputed generated intermediate cannot claim a candidate hash",
+      "owningRule": "s4-receipts",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "s4-receipts",
+          "where": "generators-skills-and-support",
+          "error": "uncomputed generated intermediate cannot use current hash as candidate proof"
+        }
+      ]
+    },
+    {
+      "name": "Equal alias and capture strings cannot borrow each others field role",
+      "owningRule": "s4-spans",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "s4-spans",
+          "where": "docs/doc-registry.json:reference-000387",
+          "error": "condition false"
+        }
+      ]
+    }
+  ],
+  "failures": []
+}

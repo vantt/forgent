@@ -1,0 +1,5 @@
+{
+  "generatedCandidateInputsMarkedUnknown": 66,
+  "directIOEvidence": "Pinned source call lines only; no filesystem operation or generator executed",
+  "candidateParity": "missing"
+}

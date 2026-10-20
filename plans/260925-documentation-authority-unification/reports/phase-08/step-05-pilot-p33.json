@@ -1,0 +1,3082 @@
+{
+  "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+  "part": 33,
+  "items": [
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 783,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014869",
+        "originalTuple": [
+          6609,
+          69,
+          6609,
+          80,
+          "join(' | ')",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6628,
+        "currentPassage": {
+          "startLine": 6626,
+          "endLine": 6630,
+          "text": "    }\n  }\n  if (failure) return { passed: false, message: [failure, ...parts].join(' | ') };\n  return { passed: true, message: parts.join(' | ') };\n}"
+        },
+        "caller": {
+          "line": 6605,
+          "declaration": "export function checkWriterIdentityResolvable(cwd) {"
+        },
+        "inputs": [
+          "join(' | ')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor export function checkWriterIdentityResolvable(cwd) { config/default/check operation \"join(' | ')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor export function checkWriterIdentityResolvable(cwd) { config/default/check operation \"join(' | ')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 784,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014870",
+        "originalTuple": [
+          6610,
+          35,
+          6610,
+          52,
+          "parts.join(' | ')",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 6629,
+        "currentPassage": {
+          "startLine": 6627,
+          "endLine": 6631,
+          "text": "  }\n  if (failure) return { passed: false, message: [failure, ...parts].join(' | ') };\n  return { passed: true, message: parts.join(' | ') };\n}\n"
+        },
+        "caller": {
+          "line": 6605,
+          "declaration": "export function checkWriterIdentityResolvable(cwd) {"
+        },
+        "inputs": [
+          "parts.join(' | ')"
+        ],
+        "role": "scalar/thread",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"parts.join(' | ')\"",
+        "reason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"parts.join(' | ')\"",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 785,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014871",
+        "originalTuple": [
+          670,
+          27,
+          670,
+          144,
+          "`unit run \"${unitId}\" role \"${role}\" round \"${round}\" attempt \"${run.attempt}\" binding mismatches unit.json snapshot`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 677,
+        "currentPassage": {
+          "startLine": 675,
+          "endLine": 679,
+          "text": "          );\n          if (recomputed.refused || recomputed.executor !== resultData.binding.executor) {\n            problems.push(`unit run \"${unitId}\" role \"${role}\" round \"${round}\" attempt \"${run.attempt}\" binding mismatches unit.json snapshot`);\n          }\n        }"
+        },
+        "caller": {
+          "line": 627,
+          "declaration": "export function checkMutatingAssignmentBindingSnapshot(cwd) {"
+        },
+        "inputs": [
+          "`unit run \"${unitId}\" role \"${role}\" round \"${round}\" attempt \"${run.attempt}\" binding mismatches unit.json snapshot`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`unit run \"${unitId}\" role \"${role}\" round \"${round}\" attempt \"${run.attempt}\" binding mismatches unit.json snapshot`'. It formats values at export function checkMutatingAssignmentBindingSnapshot(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`unit run \"${unitId}\" role \"${role}\" round \"${round}\" attempt \"${run.attempt}\" binding mismatches unit.json snapshot`'. It formats values at export function checkMutatingAssignmentBindingSnapshot(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 786,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014872",
+        "originalTuple": [
+          678,
+          38,
+          678,
+          82,
+          "`error scanning assignments: ${err.message}`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 685,
+        "currentPassage": {
+          "startLine": 683,
+          "endLine": 687,
+          "text": "    }\n  } catch (err) {\n    return { passed: false, message: `error scanning assignments: ${err.message}` };\n  }\n"
+        },
+        "caller": {
+          "line": 627,
+          "declaration": "export function checkMutatingAssignmentBindingSnapshot(cwd) {"
+        },
+        "inputs": [
+          "`error scanning assignments: ${err.message}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`error scanning assignments: ${err.message}`'. It formats values at export function checkMutatingAssignmentBindingSnapshot(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`error scanning assignments: ${err.message}`'. It formats values at export function checkMutatingAssignmentBindingSnapshot(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 787,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014873",
+        "originalTuple": [
+          682,
+          33,
+          682,
+          52,
+          "problems.join('; ')",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 689,
+        "currentPassage": {
+          "startLine": 687,
+          "endLine": 691,
+          "text": "\n  return problems.length > 0\n    ? { passed: false, message: problems.join('; ') }\n    : { passed: true, message: 'every mutating assignment RunResult binding matches its unit.json snapshot' };\n}"
+        },
+        "caller": {
+          "line": 627,
+          "declaration": "export function checkMutatingAssignmentBindingSnapshot(cwd) {"
+        },
+        "inputs": [
+          "problems.join('; ')"
+        ],
+        "role": "scalar/thread",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"problems.join('; ')\"",
+        "reason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"problems.join('; ')\"",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 788,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014874",
+        "originalTuple": [
+          695,
+          21,
+          695,
+          109,
+          "`${level} config contains dead key \"runner.models\"; replace with \"runner.modelPolicies\"`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 702,
+        "currentPassage": {
+          "startLine": 700,
+          "endLine": 704,
+          "text": "    if (!runner || typeof runner !== 'object') continue;\n    if ('models' in runner) {\n      problems.push(`${level} config contains dead key \"runner.models\"; replace with \"runner.modelPolicies\"`);\n    }\n    if ('DEFAULT_TIER_TO_POLICY' in runner) {"
+        },
+        "caller": {
+          "line": 693,
+          "declaration": "export function checkTierVocabularyDeadKeys(cwd) {"
+        },
+        "inputs": [
+          "`${level} config contains dead key \"runner.models\"; replace with \"runner.modelPolicies\"`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.models\"; replace with \"runner.modelPolicies\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.models\"; replace with \"runner.modelPolicies\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 789,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014875",
+        "originalTuple": [
+          698,
+          21,
+          698,
+          88,
+          "`${level} config contains dead key \"runner.DEFAULT_TIER_TO_POLICY\"`",
+          "template-string",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 705,
+        "currentPassage": {
+          "startLine": 703,
+          "endLine": 707,
+          "text": "    }\n    if ('DEFAULT_TIER_TO_POLICY' in runner) {\n      problems.push(`${level} config contains dead key \"runner.DEFAULT_TIER_TO_POLICY\"`);\n    }\n    if ('QUALITY_TIER_BRIDGE' in runner) {"
+        },
+        "caller": {
+          "line": 693,
+          "declaration": "export function checkTierVocabularyDeadKeys(cwd) {"
+        },
+        "inputs": [
+          "`${level} config contains dead key \"runner.DEFAULT_TIER_TO_POLICY\"`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.DEFAULT_TIER_TO_POLICY\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.DEFAULT_TIER_TO_POLICY\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 790,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014876",
+        "originalTuple": [
+          701,
+          21,
+          701,
+          85,
+          "`${level} config contains dead key \"runner.QUALITY_TIER_BRIDGE\"`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 708,
+        "currentPassage": {
+          "startLine": 706,
+          "endLine": 710,
+          "text": "    }\n    if ('QUALITY_TIER_BRIDGE' in runner) {\n      problems.push(`${level} config contains dead key \"runner.QUALITY_TIER_BRIDGE\"`);\n    }\n    if ('QUALITY_MODE_VALUES' in runner) {"
+        },
+        "caller": {
+          "line": 693,
+          "declaration": "export function checkTierVocabularyDeadKeys(cwd) {"
+        },
+        "inputs": [
+          "`${level} config contains dead key \"runner.QUALITY_TIER_BRIDGE\"`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.QUALITY_TIER_BRIDGE\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.QUALITY_TIER_BRIDGE\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 791,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014877",
+        "originalTuple": [
+          704,
+          21,
+          704,
+          85,
+          "`${level} config contains dead key \"runner.QUALITY_MODE_VALUES\"`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 711,
+        "currentPassage": {
+          "startLine": 709,
+          "endLine": 713,
+          "text": "    }\n    if ('QUALITY_MODE_VALUES' in runner) {\n      problems.push(`${level} config contains dead key \"runner.QUALITY_MODE_VALUES\"`);\n    }\n    if ('minTier' in runner) {"
+        },
+        "caller": {
+          "line": 693,
+          "declaration": "export function checkTierVocabularyDeadKeys(cwd) {"
+        },
+        "inputs": [
+          "`${level} config contains dead key \"runner.QUALITY_MODE_VALUES\"`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.QUALITY_MODE_VALUES\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.QUALITY_MODE_VALUES\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 792,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014878",
+        "originalTuple": [
+          707,
+          21,
+          707,
+          95,
+          "`${level} config contains dead key \"runner.minTier\"; replace with \"rigor\"`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 714,
+        "currentPassage": {
+          "startLine": 712,
+          "endLine": 716,
+          "text": "    }\n    if ('minTier' in runner) {\n      problems.push(`${level} config contains dead key \"runner.minTier\"; replace with \"rigor\"`);\n    }\n    if ('minRigor' in runner) {"
+        },
+        "caller": {
+          "line": 693,
+          "declaration": "export function checkTierVocabularyDeadKeys(cwd) {"
+        },
+        "inputs": [
+          "`${level} config contains dead key \"runner.minTier\"; replace with \"rigor\"`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.minTier\"; replace with \"rigor\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.minTier\"; replace with \"rigor\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 793,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014879",
+        "originalTuple": [
+          710,
+          21,
+          710,
+          96,
+          "`${level} config contains dead key \"runner.minRigor\"; replace with \"rigor\"`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 717,
+        "currentPassage": {
+          "startLine": 715,
+          "endLine": 719,
+          "text": "    }\n    if ('minRigor' in runner) {\n      problems.push(`${level} config contains dead key \"runner.minRigor\"; replace with \"rigor\"`);\n    }\n    if ('rigorOverrides' in runner) {"
+        },
+        "caller": {
+          "line": 693,
+          "declaration": "export function checkTierVocabularyDeadKeys(cwd) {"
+        },
+        "inputs": [
+          "`${level} config contains dead key \"runner.minRigor\"; replace with \"rigor\"`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.minRigor\"; replace with \"rigor\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.minRigor\"; replace with \"rigor\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 794,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014880",
+        "originalTuple": [
+          713,
+          21,
+          713,
+          136,
+          "`${level} config contains dead key \"runner.rigorOverrides\"; replace by adjusting \"runner.modelPolicies.<provider>\"`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 720,
+        "currentPassage": {
+          "startLine": 718,
+          "endLine": 722,
+          "text": "    }\n    if ('rigorOverrides' in runner) {\n      problems.push(`${level} config contains dead key \"runner.rigorOverrides\"; replace by adjusting \"runner.modelPolicies.<provider>\"`);\n    }\n    if ('PLACEMENT_POLICY_SHADOW' in runner) {"
+        },
+        "caller": {
+          "line": 693,
+          "declaration": "export function checkTierVocabularyDeadKeys(cwd) {"
+        },
+        "inputs": [
+          "`${level} config contains dead key \"runner.rigorOverrides\"; replace by adjusting \"runner.modelPolicies.<provider>\"`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.rigorOverrides\"; replace by adjusting \"runner.modelPolicies.<provider>\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.rigorOverrides\"; replace by adjusting \"runner.modelPolicies.<provider>\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 795,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014881",
+        "originalTuple": [
+          716,
+          21,
+          716,
+          89,
+          "`${level} config contains dead key \"runner.PLACEMENT_POLICY_SHADOW\"`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 723,
+        "currentPassage": {
+          "startLine": 721,
+          "endLine": 725,
+          "text": "    }\n    if ('PLACEMENT_POLICY_SHADOW' in runner) {\n      problems.push(`${level} config contains dead key \"runner.PLACEMENT_POLICY_SHADOW\"`);\n    }\n    for (const [execId, exec] of Object.entries(runner.executors ?? {})) {"
+        },
+        "caller": {
+          "line": 693,
+          "declaration": "export function checkTierVocabularyDeadKeys(cwd) {"
+        },
+        "inputs": [
+          "`${level} config contains dead key \"runner.PLACEMENT_POLICY_SHADOW\"`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.PLACEMENT_POLICY_SHADOW\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.PLACEMENT_POLICY_SHADOW\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 796,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014882",
+        "originalTuple": [
+          721,
+          25,
+          721,
+          160,
+          "`${level} config contains dead key \"runner.executors.${execId}.rigorOverrides\"; replace by adjusting \"runner.modelPolicies.<provider>\"`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 728,
+        "currentPassage": {
+          "startLine": 726,
+          "endLine": 730,
+          "text": "      if (exec && typeof exec === 'object') {\n        if ('rigorOverrides' in exec) {\n          problems.push(`${level} config contains dead key \"runner.executors.${execId}.rigorOverrides\"; replace by adjusting \"runner.modelPolicies.<provider>\"`);\n        }\n        if ('models' in exec) {"
+        },
+        "caller": {
+          "line": 693,
+          "declaration": "export function checkTierVocabularyDeadKeys(cwd) {"
+        },
+        "inputs": [
+          "`${level} config contains dead key \"runner.executors.${execId}.rigorOverrides\"; replace by adjusting \"runner.modelPolicies.<provider>\"`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.executors.${execId}.rigorOverrides\"; replace by adjusting \"runner.modelPolicies.<provider>\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.executors.${execId}.rigorOverrides\"; replace by adjusting \"runner.modelPolicies.<provider>\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 797,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014883",
+        "originalTuple": [
+          724,
+          25,
+          724,
+          96,
+          "`${level} config contains dead key \"runner.executors.${execId}.models\"`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 731,
+        "currentPassage": {
+          "startLine": 729,
+          "endLine": 733,
+          "text": "        }\n        if ('models' in exec) {\n          problems.push(`${level} config contains dead key \"runner.executors.${execId}.models\"`);\n        }\n      }"
+        },
+        "caller": {
+          "line": 693,
+          "declaration": "export function checkTierVocabularyDeadKeys(cwd) {"
+        },
+        "inputs": [
+          "`${level} config contains dead key \"runner.executors.${execId}.models\"`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.executors.${execId}.models\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.executors.${execId}.models\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 798,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014884",
+        "originalTuple": [
+          731,
+          25,
+          731,
+          156,
+          "`${level} config contains dead key \"runner.capabilities.${capName}.overrides\"; replace with \"runner.capabilities.${capName}.rigor\"`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 738,
+        "currentPassage": {
+          "startLine": 736,
+          "endLine": 740,
+          "text": "      if (cap && typeof cap === 'object') {\n        if ('overrides' in cap) {\n          problems.push(`${level} config contains dead key \"runner.capabilities.${capName}.overrides\"; replace with \"runner.capabilities.${capName}.rigor\"`);\n        }\n        if ('rigorOverrides' in cap) {"
+        },
+        "caller": {
+          "line": 693,
+          "declaration": "export function checkTierVocabularyDeadKeys(cwd) {"
+        },
+        "inputs": [
+          "`${level} config contains dead key \"runner.capabilities.${capName}.overrides\"; replace with \"runner.capabilities.${capName}.rigor\"`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.capabilities.${capName}.overrides\"; replace with \"runner.capabilities.${capName}.rigor\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.capabilities.${capName}.overrides\"; replace with \"runner.capabilities.${capName}.rigor\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 799,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014885",
+        "originalTuple": [
+          734,
+          25,
+          734,
+          108,
+          "`${level} config contains dead key \"runner.capabilities.${capName}.rigorOverrides\"`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 741,
+        "currentPassage": {
+          "startLine": 739,
+          "endLine": 743,
+          "text": "        }\n        if ('rigorOverrides' in cap) {\n          problems.push(`${level} config contains dead key \"runner.capabilities.${capName}.rigorOverrides\"`);\n        }\n        if ('minTier' in cap) {"
+        },
+        "caller": {
+          "line": 693,
+          "declaration": "export function checkTierVocabularyDeadKeys(cwd) {"
+        },
+        "inputs": [
+          "`${level} config contains dead key \"runner.capabilities.${capName}.rigorOverrides\"`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.capabilities.${capName}.rigorOverrides\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.capabilities.${capName}.rigorOverrides\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 800,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014886",
+        "originalTuple": [
+          737,
+          25,
+          737,
+          123,
+          "`${level} config contains dead key \"runner.capabilities.${capName}.minTier\"; replace with \"rigor\"`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 744,
+        "currentPassage": {
+          "startLine": 742,
+          "endLine": 746,
+          "text": "        }\n        if ('minTier' in cap) {\n          problems.push(`${level} config contains dead key \"runner.capabilities.${capName}.minTier\"; replace with \"rigor\"`);\n        }\n        if ('minRigor' in cap) {"
+        },
+        "caller": {
+          "line": 693,
+          "declaration": "export function checkTierVocabularyDeadKeys(cwd) {"
+        },
+        "inputs": [
+          "`${level} config contains dead key \"runner.capabilities.${capName}.minTier\"; replace with \"rigor\"`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.capabilities.${capName}.minTier\"; replace with \"rigor\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.capabilities.${capName}.minTier\"; replace with \"rigor\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 801,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014887",
+        "originalTuple": [
+          740,
+          25,
+          740,
+          124,
+          "`${level} config contains dead key \"runner.capabilities.${capName}.minRigor\"; replace with \"rigor\"`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 747,
+        "currentPassage": {
+          "startLine": 745,
+          "endLine": 749,
+          "text": "        }\n        if ('minRigor' in cap) {\n          problems.push(`${level} config contains dead key \"runner.capabilities.${capName}.minRigor\"; replace with \"rigor\"`);\n        }\n      }"
+        },
+        "caller": {
+          "line": 693,
+          "declaration": "export function checkTierVocabularyDeadKeys(cwd) {"
+        },
+        "inputs": [
+          "`${level} config contains dead key \"runner.capabilities.${capName}.minRigor\"; replace with \"rigor\"`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.capabilities.${capName}.minRigor\"; replace with \"rigor\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} config contains dead key \"runner.capabilities.${capName}.minRigor\"; replace with \"rigor\"`'. It formats values at export function checkTierVocabularyDeadKeys(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 802,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014888",
+        "originalTuple": [
+          746,
+          33,
+          746,
+          52,
+          "problems.join('; ')",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 753,
+        "currentPassage": {
+          "startLine": 751,
+          "endLine": 755,
+          "text": "  }\n  return problems.length > 0\n    ? { passed: false, message: problems.join('; ') }\n    : { passed: true, message: 'no retired tier vocabulary keys in project or global config' };\n}"
+        },
+        "caller": {
+          "line": 693,
+          "declaration": "export function checkTierVocabularyDeadKeys(cwd) {"
+        },
+        "inputs": [
+          "problems.join('; ')"
+        ],
+        "role": "scalar/thread",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"problems.join('; ')\"",
+        "reason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"problems.join('; ')\"",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 803,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014889",
+        "originalTuple": [
+          770,
+          23,
+          770,
+          108,
+          "`${level} provider \"${provider}\" for executor \"${execId}\" has no modelPolicies entry`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 777,
+        "currentPassage": {
+          "startLine": 775,
+          "endLine": 779,
+          "text": "      const providerPolicies = runner.modelPolicies?.[provider];\n      if (!providerPolicies || typeof providerPolicies !== 'object') {\n        problems.push(`${level} provider \"${provider}\" for executor \"${execId}\" has no modelPolicies entry`);\n        continue;\n      }"
+        },
+        "caller": {
+          "line": 757,
+          "declaration": "export function checkModelPolicyTierCoverage(cwd) {"
+        },
+        "inputs": [
+          "`${level} provider \"${provider}\" for executor \"${execId}\" has no modelPolicies entry`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} provider \"${provider}\" for executor \"${execId}\" has no modelPolicies entry`'. It formats values at export function checkModelPolicyTierCoverage(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} provider \"${provider}\" for executor \"${execId}\" has no modelPolicies entry`'. It formats values at export function checkModelPolicyTierCoverage(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 804,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014890",
+        "originalTuple": [
+          775,
+          25,
+          775,
+          117,
+          "`${level} provider \"${provider}\" missing model for tier \"${tier}\" (required by rigorToTier)`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 782,
+        "currentPassage": {
+          "startLine": 780,
+          "endLine": 784,
+          "text": "      for (const tier of neededTiers) {\n        if (!providerPolicies[tier]) {\n          problems.push(`${level} provider \"${provider}\" missing model for tier \"${tier}\" (required by rigorToTier)`);\n        }\n      }"
+        },
+        "caller": {
+          "line": 757,
+          "declaration": "export function checkModelPolicyTierCoverage(cwd) {"
+        },
+        "inputs": [
+          "`${level} provider \"${provider}\" missing model for tier \"${tier}\" (required by rigorToTier)`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} provider \"${provider}\" missing model for tier \"${tier}\" (required by rigorToTier)`'. It formats values at export function checkModelPolicyTierCoverage(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} provider \"${provider}\" missing model for tier \"${tier}\" (required by rigorToTier)`'. It formats values at export function checkModelPolicyTierCoverage(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 805,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014891",
+        "originalTuple": [
+          781,
+          33,
+          781,
+          52,
+          "problems.join('; ')",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 788,
+        "currentPassage": {
+          "startLine": 786,
+          "endLine": 790,
+          "text": "  }\n  return problems.length > 0\n    ? { passed: false, message: problems.join('; ') }\n    : { passed: true, message: 'modelPolicies covers all tiers required by rigorToTier' };\n}"
+        },
+        "caller": {
+          "line": 757,
+          "declaration": "export function checkModelPolicyTierCoverage(cwd) {"
+        },
+        "inputs": [
+          "problems.join('; ')"
+        ],
+        "role": "scalar/thread",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"problems.join('; ')\"",
+        "reason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"problems.join('; ')\"",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 806,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014892",
+        "originalTuple": [
+          786,
+          9,
+          786,
+          21,
+          "scanDirs = [",
+          "config/default-root",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 793,
+        "currentPassage": {
+          "startLine": 791,
+          "endLine": 795,
+          "text": "\nexport function checkCoordinationProtocolDeadVocabulary(cwd) {\n  const scanDirs = [\n    path.join(cwd, '.fgos', 'coordination-protocols'),\n    path.join(cwd, 'core', 'coordination-protocols'),"
+        },
+        "caller": {
+          "line": 792,
+          "declaration": "export function checkCoordinationProtocolDeadVocabulary(cwd) {"
+        },
+        "inputs": [
+          "scanDirs = ["
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor export function checkCoordinationProtocolDeadVocabulary(cwd) { config/default/check operation 'scanDirs = [' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor export function checkCoordinationProtocolDeadVocabulary(cwd) { config/default/check operation 'scanDirs = [' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 807,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014893",
+        "originalTuple": [
+          787,
+          5,
+          787,
+          54,
+          "path.join(cwd, '.fgos', 'coordination-protocols')",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 794,
+        "currentPassage": {
+          "startLine": 792,
+          "endLine": 796,
+          "text": "export function checkCoordinationProtocolDeadVocabulary(cwd) {\n  const scanDirs = [\n    path.join(cwd, '.fgos', 'coordination-protocols'),\n    path.join(cwd, 'core', 'coordination-protocols'),\n    path.join(cwd, 'core', 'workflows'),"
+        },
+        "caller": {
+          "line": 792,
+          "declaration": "export function checkCoordinationProtocolDeadVocabulary(cwd) {"
+        },
+        "inputs": [
+          "path.join(cwd, '.fgos', 'coordination-protocols')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor export function checkCoordinationProtocolDeadVocabulary(cwd) { config/default/check operation \"path.join(cwd, '.fgos', 'coordination-protocols')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor export function checkCoordinationProtocolDeadVocabulary(cwd) { config/default/check operation \"path.join(cwd, '.fgos', 'coordination-protocols')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 808,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014894",
+        "originalTuple": [
+          788,
+          5,
+          788,
+          53,
+          "path.join(cwd, 'core', 'coordination-protocols')",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 795,
+        "currentPassage": {
+          "startLine": 793,
+          "endLine": 797,
+          "text": "  const scanDirs = [\n    path.join(cwd, '.fgos', 'coordination-protocols'),\n    path.join(cwd, 'core', 'coordination-protocols'),\n    path.join(cwd, 'core', 'workflows'),\n    path.join(cwd, 'domains'),"
+        },
+        "caller": {
+          "line": 792,
+          "declaration": "export function checkCoordinationProtocolDeadVocabulary(cwd) {"
+        },
+        "inputs": [
+          "path.join(cwd, 'core', 'coordination-protocols')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor export function checkCoordinationProtocolDeadVocabulary(cwd) { config/default/check operation \"path.join(cwd, 'core', 'coordination-protocols')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor export function checkCoordinationProtocolDeadVocabulary(cwd) { config/default/check operation \"path.join(cwd, 'core', 'coordination-protocols')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 809,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014895",
+        "originalTuple": [
+          789,
+          5,
+          789,
+          40,
+          "path.join(cwd, 'core', 'workflows')",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 796,
+        "currentPassage": {
+          "startLine": 794,
+          "endLine": 798,
+          "text": "    path.join(cwd, '.fgos', 'coordination-protocols'),\n    path.join(cwd, 'core', 'coordination-protocols'),\n    path.join(cwd, 'core', 'workflows'),\n    path.join(cwd, 'domains'),\n  ];"
+        },
+        "caller": {
+          "line": 792,
+          "declaration": "export function checkCoordinationProtocolDeadVocabulary(cwd) {"
+        },
+        "inputs": [
+          "path.join(cwd, 'core', 'workflows')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor export function checkCoordinationProtocolDeadVocabulary(cwd) { config/default/check operation \"path.join(cwd, 'core', 'workflows')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor export function checkCoordinationProtocolDeadVocabulary(cwd) { config/default/check operation \"path.join(cwd, 'core', 'workflows')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 810,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014896",
+        "originalTuple": [
+          790,
+          5,
+          790,
+          30,
+          "path.join(cwd, 'domains')",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 797,
+        "currentPassage": {
+          "startLine": 795,
+          "endLine": 799,
+          "text": "    path.join(cwd, 'core', 'coordination-protocols'),\n    path.join(cwd, 'core', 'workflows'),\n    path.join(cwd, 'domains'),\n  ];\n  const yamlFiles = [];"
+        },
+        "caller": {
+          "line": 792,
+          "declaration": "export function checkCoordinationProtocolDeadVocabulary(cwd) {"
+        },
+        "inputs": [
+          "path.join(cwd, 'domains')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor export function checkCoordinationProtocolDeadVocabulary(cwd) { config/default/check operation \"path.join(cwd, 'domains')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor export function checkCoordinationProtocolDeadVocabulary(cwd) { config/default/check operation \"path.join(cwd, 'domains')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 811,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014897",
+        "originalTuple": [
+          796,
+          20,
+          796,
+          46,
+          "path.join(dir, entry.name)",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 803,
+        "currentPassage": {
+          "startLine": 801,
+          "endLine": 805,
+          "text": "    if (!fs.existsSync(dir)) return;\n    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {\n      const full = path.join(dir, entry.name);\n      if (entry.isDirectory()) {\n        if (entry.name === 'node_modules' || entry.name === '.git') continue;"
+        },
+        "caller": {
+          "line": 800,
+          "declaration": "function scan(dir) {"
+        },
+        "inputs": [
+          "path.join(dir, entry.name)"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function scan(dir) { config/default/check operation 'path.join(dir, entry.name)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function scan(dir) { config/default/check operation 'path.join(dir, entry.name)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 812,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014898",
+        "originalTuple": [
+          814,
+          21,
+          814,
+          111,
+          "`${rel} contains retired \"${match[1]}\"; replace with \"rigor\" (low|standard|high|critical)`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 821,
+        "currentPassage": {
+          "startLine": 819,
+          "endLine": 823,
+          "text": "    if (match) {\n      const rel = path.relative(cwd, file);\n      problems.push(`${rel} contains retired \"${match[1]}\"; replace with \"rigor\" (low|standard|high|critical)`);\n    }\n  }"
+        },
+        "caller": {
+          "line": 800,
+          "declaration": "function scan(dir) {"
+        },
+        "inputs": [
+          "`${rel} contains retired \"${match[1]}\"; replace with \"rigor\" (low|standard|high|critical)`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${rel} contains retired \"${match[1]}\"; replace with \"rigor\" (low|standard|high|critical)`'. It formats values at function scan(dir) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${rel} contains retired \"${match[1]}\"; replace with \"rigor\" (low|standard|high|critical)`'. It formats values at function scan(dir) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 813,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014899",
+        "originalTuple": [
+          818,
+          33,
+          818,
+          52,
+          "problems.join('; ')",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 825,
+        "currentPassage": {
+          "startLine": 823,
+          "endLine": 827,
+          "text": "  }\n  return problems.length > 0\n    ? { passed: false, message: problems.join('; ') }\n    : { passed: true, message: 'no retired coordination protocol vocabulary in project' };\n}"
+        },
+        "caller": {
+          "line": 800,
+          "declaration": "function scan(dir) {"
+        },
+        "inputs": [
+          "problems.join('; ')"
+        ],
+        "role": "scalar/thread",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"problems.join('; ')\"",
+        "reason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"problems.join('; ')\"",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 814,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014900",
+        "originalTuple": [
+          834,
+          27,
+          834,
+          94,
+          "path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')",
+          "path-call",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 841,
+        "currentPassage": {
+          "startLine": 839,
+          "endLine": 843,
+          "text": "// against the install's own root, never the target project's tree -- a plain target\n// project carries no domains/ or core/ of its own.\nconst FGOS_INSTALL_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');\n\nexport function checkTaskSpecsResolve(root = FGOS_INSTALL_ROOT) {"
+        },
+        "caller": {
+          "line": 800,
+          "declaration": "function scan(dir) {"
+        },
+        "inputs": [
+          "path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function scan(dir) { config/default/check operation \"path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function scan(dir) { config/default/check operation \"path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 815,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014901",
+        "originalTuple": [
+          834,
+          7,
+          834,
+          84,
+          "FGOS_INSTALL_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url))",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 841,
+        "currentPassage": {
+          "startLine": 839,
+          "endLine": 843,
+          "text": "// against the install's own root, never the target project's tree -- a plain target\n// project carries no domains/ or core/ of its own.\nconst FGOS_INSTALL_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');\n\nexport function checkTaskSpecsResolve(root = FGOS_INSTALL_ROOT) {"
+        },
+        "caller": {
+          "line": 800,
+          "declaration": "function scan(dir) {"
+        },
+        "inputs": [
+          "FGOS_INSTALL_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url))"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function scan(dir) { config/default/check operation 'FGOS_INSTALL_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url))' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function scan(dir) { config/default/check operation 'FGOS_INSTALL_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url))' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 816,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014902",
+        "originalTuple": [
+          836,
+          39,
+          836,
+          66,
+          "root = FGOS_INSTALL_ROOT) {",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 843,
+        "currentPassage": {
+          "startLine": 841,
+          "endLine": 845,
+          "text": "const FGOS_INSTALL_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');\n\nexport function checkTaskSpecsResolve(root = FGOS_INSTALL_ROOT) {\n  const missing = [];\n  for (const [domainName, domain] of Object.entries(DOMAINS)) {"
+        },
+        "caller": {
+          "line": 843,
+          "declaration": "export function checkTaskSpecsResolve(root = FGOS_INSTALL_ROOT) {"
+        },
+        "inputs": [
+          "root = FGOS_INSTALL_ROOT) {"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor export function checkTaskSpecsResolve(root = FGOS_INSTALL_ROOT) { config/default/check operation 'root = FGOS_INSTALL_ROOT) {' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor export function checkTaskSpecsResolve(root = FGOS_INSTALL_ROOT) { config/default/check operation 'root = FGOS_INSTALL_ROOT) {' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 817,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014903",
+        "originalTuple": [
+          843,
+          17,
+          843,
+          58,
+          "specPath = resolveTaskSpecPath(domainName",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 850,
+        "currentPassage": {
+          "startLine": 848,
+          "endLine": 852,
+          "text": "        for (const op of step.operations ?? []) {\n          if (!op.taskSpec) continue;\n          const specPath = resolveTaskSpecPath(domainName, op.taskSpec, root);\n          if (!fs.existsSync(specPath)) {\n            missing.push(`${domainName}.operations.${step.id}[${op.id || op.taskSpec}] -> \"${op.taskSpec}\" (${path.relative(root, specPath)} not found)`);"
+        },
+        "caller": {
+          "line": 843,
+          "declaration": "export function checkTaskSpecsResolve(root = FGOS_INSTALL_ROOT) {"
+        },
+        "inputs": [
+          "specPath = resolveTaskSpecPath(domainName"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor export function checkTaskSpecsResolve(root = FGOS_INSTALL_ROOT) { config/default/check operation 'specPath = resolveTaskSpecPath(domainName' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor export function checkTaskSpecsResolve(root = FGOS_INSTALL_ROOT) { config/default/check operation 'specPath = resolveTaskSpecPath(domainName' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 818,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014904",
+        "originalTuple": [
+          845,
+          26,
+          845,
+          153,
+          "`${domainName}.operations.${step.id}[${op.id || op.taskSpec}] -> \"${op.taskSpec}\" (${path.relative(root, specPath)} not found)`",
+          "template-string",
+          true,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 852,
+        "currentPassage": {
+          "startLine": 850,
+          "endLine": 854,
+          "text": "          const specPath = resolveTaskSpecPath(domainName, op.taskSpec, root);\n          if (!fs.existsSync(specPath)) {\n            missing.push(`${domainName}.operations.${step.id}[${op.id || op.taskSpec}] -> \"${op.taskSpec}\" (${path.relative(root, specPath)} not found)`);\n          }\n        }"
+        },
+        "caller": {
+          "line": 843,
+          "declaration": "export function checkTaskSpecsResolve(root = FGOS_INSTALL_ROOT) {"
+        },
+        "inputs": [
+          "`${domainName}.operations.${step.id}[${op.id || op.taskSpec}] -> \"${op.taskSpec}\" (${path.relative(root, specPath)} not found)`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${domainName}.operations.${step.id}[${op.id || op.taskSpec}] -> \"${op.taskSpec}\" (${path.relative(root, specPath)} not found)`'. It formats values at export function checkTaskSpecsResolve(root = FGOS_INSTALL_ROOT) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${domainName}.operations.${step.id}[${op.id || op.taskSpec}] -> \"${op.taskSpec}\" (${path.relative(root, specPath)} not found)`'. It formats values at export function checkTaskSpecsResolve(root = FGOS_INSTALL_ROOT) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 819,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014905",
+        "originalTuple": [
+          861,
+          11,
+          861,
+          48,
+          "specPath = resolveTaskSpecPath('core'",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 868,
+        "currentPassage": {
+          "startLine": 866,
+          "endLine": 870,
+          "text": "  ];\n  for (const specId of CORE_TASK_SPECS) {\n    const specPath = resolveTaskSpecPath('core', specId, root);\n    if (!fs.existsSync(specPath)) {\n      missing.push(`core.taskSpec -> \"${specId}\" (${path.relative(root, specPath)} not found)`);"
+        },
+        "caller": {
+          "line": 843,
+          "declaration": "export function checkTaskSpecsResolve(root = FGOS_INSTALL_ROOT) {"
+        },
+        "inputs": [
+          "specPath = resolveTaskSpecPath('core'"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor export function checkTaskSpecsResolve(root = FGOS_INSTALL_ROOT) { config/default/check operation \"specPath = resolveTaskSpecPath('core'\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor export function checkTaskSpecsResolve(root = FGOS_INSTALL_ROOT) { config/default/check operation \"specPath = resolveTaskSpecPath('core'\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 820,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014906",
+        "originalTuple": [
+          863,
+          20,
+          863,
+          95,
+          "`core.taskSpec -> \"${specId}\" (${path.relative(root, specPath)} not found)`",
+          "template-string",
+          true,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 870,
+        "currentPassage": {
+          "startLine": 868,
+          "endLine": 872,
+          "text": "    const specPath = resolveTaskSpecPath('core', specId, root);\n    if (!fs.existsSync(specPath)) {\n      missing.push(`core.taskSpec -> \"${specId}\" (${path.relative(root, specPath)} not found)`);\n    }\n  }"
+        },
+        "caller": {
+          "line": 843,
+          "declaration": "export function checkTaskSpecsResolve(root = FGOS_INSTALL_ROOT) {"
+        },
+        "inputs": [
+          "`core.taskSpec -> \"${specId}\" (${path.relative(root, specPath)} not found)`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`core.taskSpec -> \"${specId}\" (${path.relative(root, specPath)} not found)`'. It formats values at export function checkTaskSpecsResolve(root = FGOS_INSTALL_ROOT) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`core.taskSpec -> \"${specId}\" (${path.relative(root, specPath)} not found)`'. It formats values at export function checkTaskSpecsResolve(root = FGOS_INSTALL_ROOT) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 821,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            867,
+            38,
+            867,
+            175,
+            "`missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md`",
+            "template-string",
+            true,
+            "writer"
+          ],
+          "candidateConstruction": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
+          "comparison": "Exact same-input emitted/read behavior; literal patch owner supplies one diff. No parity pass inferred.",
+          "blocker": null,
+          "literalOwner": "reference-003811"
+        },
+        "id": "dynamic-014907",
+        "originalTuple": [
+          867,
+          38,
+          867,
+          175,
+          "`missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md`",
+          "template-string",
+          true,
+          "writer"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "patch",
+        "currentLine": 874,
+        "currentPassage": {
+          "startLine": 872,
+          "endLine": 876,
+          "text": "  }\n  if (missing.length > 0) {\n    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };\n  }\n  return { passed: true, message: 'every domain\\'s taskSpecMap entry and operation resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };"
+        },
+        "caller": {
+          "line": 843,
+          "declaration": "export function checkTaskSpecsResolve(root = FGOS_INSTALL_ROOT) {"
+        },
+        "inputs": [
+          "`missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md`"
+        ],
+        "role": "emitted-message",
+        "targetSetOrConstruction": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "L12-69: Same passage as reference-003811; that literal record owns the single outcome and any Phase 9 pointer diff.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot",
+        "samePassageOwner": "reference-003811"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 822,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014908",
+        "originalTuple": [
+          874,
+          16,
+          874,
+          41,
+          "path.join(cwd, 'domains')",
+          "path-call",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 881,
+        "currentPassage": {
+          "startLine": 879,
+          "endLine": 883,
+          "text": "function allTaskSpecs(cwd) {\n  const specs = [];\n  const root = path.join(cwd, 'domains');\n  if (fs.existsSync(root)) {\n    for (const domainEntry of fs.readdirSync(root, { withFileTypes: true })) {"
+        },
+        "caller": {
+          "line": 879,
+          "declaration": "function allTaskSpecs(cwd) {"
+        },
+        "inputs": [
+          "path.join(cwd, 'domains')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function allTaskSpecs(cwd) { config/default/check operation \"path.join(cwd, 'domains')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function allTaskSpecs(cwd) { config/default/check operation \"path.join(cwd, 'domains')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 823,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014909",
+        "originalTuple": [
+          874,
+          9,
+          874,
+          29,
+          "root = path.join(cwd",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 881,
+        "currentPassage": {
+          "startLine": 879,
+          "endLine": 883,
+          "text": "function allTaskSpecs(cwd) {\n  const specs = [];\n  const root = path.join(cwd, 'domains');\n  if (fs.existsSync(root)) {\n    for (const domainEntry of fs.readdirSync(root, { withFileTypes: true })) {"
+        },
+        "caller": {
+          "line": 879,
+          "declaration": "function allTaskSpecs(cwd) {"
+        },
+        "inputs": [
+          "root = path.join(cwd"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function allTaskSpecs(cwd) { config/default/check operation 'root = path.join(cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function allTaskSpecs(cwd) { config/default/check operation 'root = path.join(cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 824,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014910",
+        "originalTuple": [
+          878,
+          13,
+          878,
+          42,
+          "taskSpecsDir = path.join(root",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 885,
+        "currentPassage": {
+          "startLine": 883,
+          "endLine": 887,
+          "text": "    for (const domainEntry of fs.readdirSync(root, { withFileTypes: true })) {\n      if (!domainEntry.isDirectory()) continue;\n      const taskSpecsDir = path.join(root, domainEntry.name, 'task-specs');\n      if (!fs.existsSync(taskSpecsDir)) continue;\n      for (const file of fs.readdirSync(taskSpecsDir)) {"
+        },
+        "caller": {
+          "line": 879,
+          "declaration": "function allTaskSpecs(cwd) {"
+        },
+        "inputs": [
+          "taskSpecsDir = path.join(root"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function allTaskSpecs(cwd) { config/default/check operation 'taskSpecsDir = path.join(root' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function allTaskSpecs(cwd) { config/default/check operation 'taskSpecsDir = path.join(root' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 825,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014911",
+        "originalTuple": [
+          878,
+          28,
+          878,
+          75,
+          "path.join(root, domainEntry.name, 'task-specs')",
+          "path-call",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 885,
+        "currentPassage": {
+          "startLine": 883,
+          "endLine": 887,
+          "text": "    for (const domainEntry of fs.readdirSync(root, { withFileTypes: true })) {\n      if (!domainEntry.isDirectory()) continue;\n      const taskSpecsDir = path.join(root, domainEntry.name, 'task-specs');\n      if (!fs.existsSync(taskSpecsDir)) continue;\n      for (const file of fs.readdirSync(taskSpecsDir)) {"
+        },
+        "caller": {
+          "line": 879,
+          "declaration": "function allTaskSpecs(cwd) {"
+        },
+        "inputs": [
+          "path.join(root, domainEntry.name, 'task-specs')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function allTaskSpecs(cwd) { config/default/check operation \"path.join(root, domainEntry.name, 'task-specs')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function allTaskSpecs(cwd) { config/default/check operation \"path.join(root, domainEntry.name, 'task-specs')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 826,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014912",
+        "originalTuple": [
+          885,
+          13,
+          885,
+          45,
+          "filePath: path.join(taskSpecsDir",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 892,
+        "currentPassage": {
+          "startLine": 890,
+          "endLine": 894,
+          "text": "            domain: domainEntry.name,\n            specId: file.slice(0, -'.md'.length),\n            filePath: path.join(taskSpecsDir, file),\n          });\n        }"
+        },
+        "caller": {
+          "line": 879,
+          "declaration": "function allTaskSpecs(cwd) {"
+        },
+        "inputs": [
+          "filePath: path.join(taskSpecsDir"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function allTaskSpecs(cwd) { config/default/check operation 'filePath: path.join(taskSpecsDir' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function allTaskSpecs(cwd) { config/default/check operation 'filePath: path.join(taskSpecsDir' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 827,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014913",
+        "originalTuple": [
+          885,
+          23,
+          885,
+          52,
+          "path.join(taskSpecsDir, file)",
+          "path-call",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 892,
+        "currentPassage": {
+          "startLine": 890,
+          "endLine": 894,
+          "text": "            domain: domainEntry.name,\n            specId: file.slice(0, -'.md'.length),\n            filePath: path.join(taskSpecsDir, file),\n          });\n        }"
+        },
+        "caller": {
+          "line": 879,
+          "declaration": "function allTaskSpecs(cwd) {"
+        },
+        "inputs": [
+          "path.join(taskSpecsDir, file)"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function allTaskSpecs(cwd) { config/default/check operation 'path.join(taskSpecsDir, file)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function allTaskSpecs(cwd) { config/default/check operation 'path.join(taskSpecsDir, file)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 828,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014914",
+        "originalTuple": [
+          891,
+          20,
+          891,
+          56,
+          "path.join(cwd, 'core', 'task-specs')",
+          "path-call",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 898,
+        "currentPassage": {
+          "startLine": 896,
+          "endLine": 900,
+          "text": "    }\n  }\n  const coreRoot = path.join(cwd, 'core', 'task-specs');\n  if (fs.existsSync(coreRoot)) {\n    for (const file of fs.readdirSync(coreRoot)) {"
+        },
+        "caller": {
+          "line": 879,
+          "declaration": "function allTaskSpecs(cwd) {"
+        },
+        "inputs": [
+          "path.join(cwd, 'core', 'task-specs')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function allTaskSpecs(cwd) { config/default/check operation \"path.join(cwd, 'core', 'task-specs')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function allTaskSpecs(cwd) { config/default/check operation \"path.join(cwd, 'core', 'task-specs')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 829,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014915",
+        "originalTuple": [
+          891,
+          9,
+          891,
+          33,
+          "coreRoot = path.join(cwd",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 898,
+        "currentPassage": {
+          "startLine": 896,
+          "endLine": 900,
+          "text": "    }\n  }\n  const coreRoot = path.join(cwd, 'core', 'task-specs');\n  if (fs.existsSync(coreRoot)) {\n    for (const file of fs.readdirSync(coreRoot)) {"
+        },
+        "caller": {
+          "line": 879,
+          "declaration": "function allTaskSpecs(cwd) {"
+        },
+        "inputs": [
+          "coreRoot = path.join(cwd"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function allTaskSpecs(cwd) { config/default/check operation 'coreRoot = path.join(cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function allTaskSpecs(cwd) { config/default/check operation 'coreRoot = path.join(cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 830,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014916",
+        "originalTuple": [
+          898,
+          11,
+          898,
+          39,
+          "filePath: path.join(coreRoot",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 905,
+        "currentPassage": {
+          "startLine": 903,
+          "endLine": 907,
+          "text": "          domain: 'core',\n          specId: file.slice(0, -'.md'.length),\n          filePath: path.join(coreRoot, file),\n        });\n      }"
+        },
+        "caller": {
+          "line": 879,
+          "declaration": "function allTaskSpecs(cwd) {"
+        },
+        "inputs": [
+          "filePath: path.join(coreRoot"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function allTaskSpecs(cwd) { config/default/check operation 'filePath: path.join(coreRoot' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function allTaskSpecs(cwd) { config/default/check operation 'filePath: path.join(coreRoot' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 831,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014917",
+        "originalTuple": [
+          898,
+          21,
+          898,
+          46,
+          "path.join(coreRoot, file)",
+          "path-call",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 905,
+        "currentPassage": {
+          "startLine": 903,
+          "endLine": 907,
+          "text": "          domain: 'core',\n          specId: file.slice(0, -'.md'.length),\n          filePath: path.join(coreRoot, file),\n        });\n      }"
+        },
+        "caller": {
+          "line": 879,
+          "declaration": "function allTaskSpecs(cwd) {"
+        },
+        "inputs": [
+          "path.join(coreRoot, file)"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function allTaskSpecs(cwd) { config/default/check operation 'path.join(coreRoot, file)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function allTaskSpecs(cwd) { config/default/check operation 'path.join(coreRoot, file)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 832,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014918",
+        "originalTuple": [
+          942,
+          19,
+          942,
+          51,
+          "path.join(cwd, 'core', 'agents')",
+          "path-call",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 949,
+        "currentPassage": {
+          "startLine": 947,
+          "endLine": 951,
+          "text": "function allAgentYamlFiles(cwd) {\n  const files = [];\n  const coreDir = path.join(cwd, 'core', 'agents');\n  if (fs.existsSync(coreDir)) {\n    for (const f of sortedReaddir(coreDir)) {"
+        },
+        "caller": {
+          "line": 947,
+          "declaration": "function allAgentYamlFiles(cwd) {"
+        },
+        "inputs": [
+          "path.join(cwd, 'core', 'agents')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function allAgentYamlFiles(cwd) { config/default/check operation \"path.join(cwd, 'core', 'agents')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function allAgentYamlFiles(cwd) { config/default/check operation \"path.join(cwd, 'core', 'agents')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 833,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014919",
+        "originalTuple": [
+          942,
+          9,
+          942,
+          32,
+          "coreDir = path.join(cwd",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 949,
+        "currentPassage": {
+          "startLine": 947,
+          "endLine": 951,
+          "text": "function allAgentYamlFiles(cwd) {\n  const files = [];\n  const coreDir = path.join(cwd, 'core', 'agents');\n  if (fs.existsSync(coreDir)) {\n    for (const f of sortedReaddir(coreDir)) {"
+        },
+        "caller": {
+          "line": 947,
+          "declaration": "function allAgentYamlFiles(cwd) {"
+        },
+        "inputs": [
+          "coreDir = path.join(cwd"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function allAgentYamlFiles(cwd) { config/default/check operation 'coreDir = path.join(cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function allAgentYamlFiles(cwd) { config/default/check operation 'coreDir = path.join(cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 834,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014920",
+        "originalTuple": [
+          946,
+          45,
+          946,
+          72,
+          "filePath: path.join(coreDir",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 953,
+        "currentPassage": {
+          "startLine": 951,
+          "endLine": 955,
+          "text": "    for (const f of sortedReaddir(coreDir)) {\n      if (f.endsWith('.yaml') || f.endsWith('.yml')) {\n        files.push({ source: 'core/agents', filePath: path.join(coreDir, f), fileName: f });\n      }\n    }"
+        },
+        "caller": {
+          "line": 947,
+          "declaration": "function allAgentYamlFiles(cwd) {"
+        },
+        "inputs": [
+          "filePath: path.join(coreDir"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function allAgentYamlFiles(cwd) { config/default/check operation 'filePath: path.join(coreDir' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function allAgentYamlFiles(cwd) { config/default/check operation 'filePath: path.join(coreDir' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 835,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014921",
+        "originalTuple": [
+          946,
+          55,
+          946,
+          76,
+          "path.join(coreDir, f)",
+          "path-call",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 953,
+        "currentPassage": {
+          "startLine": 951,
+          "endLine": 955,
+          "text": "    for (const f of sortedReaddir(coreDir)) {\n      if (f.endsWith('.yaml') || f.endsWith('.yml')) {\n        files.push({ source: 'core/agents', filePath: path.join(coreDir, f), fileName: f });\n      }\n    }"
+        },
+        "caller": {
+          "line": 947,
+          "declaration": "function allAgentYamlFiles(cwd) {"
+        },
+        "inputs": [
+          "path.join(coreDir, f)"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function allAgentYamlFiles(cwd) { config/default/check operation 'path.join(coreDir, f)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function allAgentYamlFiles(cwd) { config/default/check operation 'path.join(coreDir, f)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 836,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014922",
+        "originalTuple": [
+          950,
+          22,
+          950,
+          47,
+          "path.join(cwd, 'domains')",
+          "path-call",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 957,
+        "currentPassage": {
+          "startLine": 955,
+          "endLine": 959,
+          "text": "    }\n  }\n  const domainsDir = path.join(cwd, 'domains');\n  if (fs.existsSync(domainsDir)) {\n    const domainEntries = fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name));"
+        },
+        "caller": {
+          "line": 947,
+          "declaration": "function allAgentYamlFiles(cwd) {"
+        },
+        "inputs": [
+          "path.join(cwd, 'domains')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function allAgentYamlFiles(cwd) { config/default/check operation \"path.join(cwd, 'domains')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function allAgentYamlFiles(cwd) { config/default/check operation \"path.join(cwd, 'domains')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 837,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014923",
+        "originalTuple": [
+          950,
+          9,
+          950,
+          35,
+          "domainsDir = path.join(cwd",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 957,
+        "currentPassage": {
+          "startLine": 955,
+          "endLine": 959,
+          "text": "    }\n  }\n  const domainsDir = path.join(cwd, 'domains');\n  if (fs.existsSync(domainsDir)) {\n    const domainEntries = fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name));"
+        },
+        "caller": {
+          "line": 947,
+          "declaration": "function allAgentYamlFiles(cwd) {"
+        },
+        "inputs": [
+          "domainsDir = path.join(cwd"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function allAgentYamlFiles(cwd) { config/default/check operation 'domainsDir = path.join(cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function allAgentYamlFiles(cwd) { config/default/check operation 'domainsDir = path.join(cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 838,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014924",
+        "originalTuple": [
+          955,
+          15,
+          955,
+          53,
+          "domainAgentsDir = path.join(domainsDir",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 962,
+        "currentPassage": {
+          "startLine": 960,
+          "endLine": 964,
+          "text": "    for (const domainEntry of domainEntries) {\n      if (domainEntry.isDirectory()) {\n        const domainAgentsDir = path.join(domainsDir, domainEntry.name, 'agents');\n        if (fs.existsSync(domainAgentsDir)) {\n          for (const f of sortedReaddir(domainAgentsDir)) {"
+        },
+        "caller": {
+          "line": 959,
+          "declaration": "const domainEntries = fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name));"
+        },
+        "inputs": [
+          "domainAgentsDir = path.join(domainsDir"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor const domainEntries = fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name)); config/default/check operation 'domainAgentsDir = path.join(domainsDir' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor const domainEntries = fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name)); config/default/check operation 'domainAgentsDir = path.join(domainsDir' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 839,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014925",
+        "originalTuple": [
+          955,
+          33,
+          955,
+          82,
+          "path.join(domainsDir, domainEntry.name, 'agents')",
+          "path-call",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 962,
+        "currentPassage": {
+          "startLine": 960,
+          "endLine": 964,
+          "text": "    for (const domainEntry of domainEntries) {\n      if (domainEntry.isDirectory()) {\n        const domainAgentsDir = path.join(domainsDir, domainEntry.name, 'agents');\n        if (fs.existsSync(domainAgentsDir)) {\n          for (const f of sortedReaddir(domainAgentsDir)) {"
+        },
+        "caller": {
+          "line": 959,
+          "declaration": "const domainEntries = fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name));"
+        },
+        "inputs": [
+          "path.join(domainsDir, domainEntry.name, 'agents')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor const domainEntries = fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name)); config/default/check operation \"path.join(domainsDir, domainEntry.name, 'agents')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor const domainEntries = fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name)); config/default/check operation \"path.join(domainsDir, domainEntry.name, 'agents')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 840,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014926",
+        "originalTuple": [
+          959,
+          36,
+          959,
+          72,
+          "`domains/${domainEntry.name}/agents`",
+          "template-string",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 966,
+        "currentPassage": {
+          "startLine": 964,
+          "endLine": 968,
+          "text": "          for (const f of sortedReaddir(domainAgentsDir)) {\n            if (f.endsWith('.yaml') || f.endsWith('.yml')) {\n              files.push({ source: `domains/${domainEntry.name}/agents`, filePath: path.join(domainAgentsDir, f), fileName: f });\n            }\n          }"
+        },
+        "caller": {
+          "line": 959,
+          "declaration": "const domainEntries = fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name));"
+        },
+        "inputs": [
+          "`domains/${domainEntry.name}/agents`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`domains/${domainEntry.name}/agents`'. It formats values at const domainEntries = fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name));; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`domains/${domainEntry.name}/agents`'. It formats values at const domainEntries = fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name));; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 841,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014927",
+        "originalTuple": [
+          959,
+          74,
+          959,
+          109,
+          "filePath: path.join(domainAgentsDir",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 966,
+        "currentPassage": {
+          "startLine": 964,
+          "endLine": 968,
+          "text": "          for (const f of sortedReaddir(domainAgentsDir)) {\n            if (f.endsWith('.yaml') || f.endsWith('.yml')) {\n              files.push({ source: `domains/${domainEntry.name}/agents`, filePath: path.join(domainAgentsDir, f), fileName: f });\n            }\n          }"
+        },
+        "caller": {
+          "line": 959,
+          "declaration": "const domainEntries = fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name));"
+        },
+        "inputs": [
+          "filePath: path.join(domainAgentsDir"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor const domainEntries = fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name)); config/default/check operation 'filePath: path.join(domainAgentsDir' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor const domainEntries = fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name)); config/default/check operation 'filePath: path.join(domainAgentsDir' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 842,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014928",
+        "originalTuple": [
+          959,
+          84,
+          959,
+          113,
+          "path.join(domainAgentsDir, f)",
+          "path-call",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 966,
+        "currentPassage": {
+          "startLine": 964,
+          "endLine": 968,
+          "text": "          for (const f of sortedReaddir(domainAgentsDir)) {\n            if (f.endsWith('.yaml') || f.endsWith('.yml')) {\n              files.push({ source: `domains/${domainEntry.name}/agents`, filePath: path.join(domainAgentsDir, f), fileName: f });\n            }\n          }"
+        },
+        "caller": {
+          "line": 959,
+          "declaration": "const domainEntries = fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name));"
+        },
+        "inputs": [
+          "path.join(domainAgentsDir, f)"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor const domainEntries = fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name)); config/default/check operation 'path.join(domainAgentsDir, f)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor const domainEntries = fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name)); config/default/check operation 'path.join(domainAgentsDir, f)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    }
+  ]
+}

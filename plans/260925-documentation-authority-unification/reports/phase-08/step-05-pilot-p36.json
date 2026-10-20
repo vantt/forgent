@@ -1,0 +1,3659 @@
+{
+  "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+  "part": 36,
+  "items": [
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 2,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1002,
+            24,
+            1002,
+            61,
+            "path.join(targetSkillDir, 'SKILL.md')",
+            "path-call",
+            false,
+            "writer"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015034",
+        "originalTuple": [
+          1002,
+          24,
+          1002,
+          61,
+          "path.join(targetSkillDir, 'SKILL.md')",
+          "path-call",
+          false,
+          "writer"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1002,
+        "currentPassage": {
+          "startLine": 1000,
+          "endLine": 1004,
+          "text": "      fs.mkdirSync(targetSkillDir, { recursive: true });\n      const content = s.rawContent || (s.frontmatter ? `${s.frontmatter}\\n# ${s.name}\\n` : `# ${s.name}\\n`);\n      fs.writeFileSync(path.join(targetSkillDir, 'SKILL.md'), content, 'utf8');\n    }\n    const packagedSkillFile = path.join(targetSkillDir, 'SKILL.md');"
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "path.join(targetSkillDir, 'SKILL.md')"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) { uses \"path.join(targetSkillDir, 'SKILL.md')\"; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 3,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1004,
+            31,
+            1004,
+            68,
+            "path.join(targetSkillDir, 'SKILL.md')",
+            "path-call",
+            false,
+            "reader"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015035",
+        "originalTuple": [
+          1004,
+          31,
+          1004,
+          68,
+          "path.join(targetSkillDir, 'SKILL.md')",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1004,
+        "currentPassage": {
+          "startLine": 1002,
+          "endLine": 1006,
+          "text": "      fs.writeFileSync(path.join(targetSkillDir, 'SKILL.md'), content, 'utf8');\n    }\n    const packagedSkillFile = path.join(targetSkillDir, 'SKILL.md');\n    if (fs.existsSync(packagedSkillFile)) {\n      written.push(packagedSkillFile);"
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "path.join(targetSkillDir, 'SKILL.md')"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) { uses \"path.join(targetSkillDir, 'SKILL.md')\"; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 4,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-015036",
+        "originalTuple": [
+          1019,
+          22,
+          1019,
+          57,
+          "`Execute ${s.name} (${s.intentId})`",
+          "template-string",
+          false,
+          "help-text"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 1019,
+        "currentPassage": {
+          "startLine": 1017,
+          "endLine": 1021,
+          "text": "      return {\n        name: verb,\n        description: `Execute ${s.name} (${s.intentId})`,\n        file: `commands/fgos/${verb}.toml`,\n      };"
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "`Execute ${s.name} (${s.intentId})`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`Execute ${s.name} (${s.intentId})`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`Execute ${s.name} (${s.intentId})`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 5,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-015037",
+        "originalTuple": [
+          1020,
+          15,
+          1020,
+          43,
+          "`commands/fgos/${verb}.toml`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 1020,
+        "currentPassage": {
+          "startLine": 1018,
+          "endLine": 1022,
+          "text": "        name: verb,\n        description: `Execute ${s.name} (${s.intentId})`,\n        file: `commands/fgos/${verb}.toml`,\n      };\n    }),"
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "`commands/fgos/${verb}.toml`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`commands/fgos/${verb}.toml`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`commands/fgos/${verb}.toml`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 6,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1024,
+            24,
+            1024,
+            75,
+            "path.join(targetOutputDir, 'gemini-extension.json')",
+            "path-call",
+            false,
+            "writer"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015038",
+        "originalTuple": [
+          1024,
+          24,
+          1024,
+          75,
+          "path.join(targetOutputDir, 'gemini-extension.json')",
+          "path-call",
+          false,
+          "writer"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1024,
+        "currentPassage": {
+          "startLine": 1022,
+          "endLine": 1026,
+          "text": "    }),\n  };\n  const manifestPath = path.join(targetOutputDir, 'gemini-extension.json');\n  fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\\n`);\n  written.push(manifestPath);"
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "path.join(targetOutputDir, 'gemini-extension.json')"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) { uses \"path.join(targetOutputDir, 'gemini-extension.json')\"; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 7,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1024,
+            9,
+            1024,
+            49,
+            "manifestPath = path.join(targetOutputDir",
+            "config/default-root",
+            false,
+            "writer"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015039",
+        "originalTuple": [
+          1024,
+          9,
+          1024,
+          49,
+          "manifestPath = path.join(targetOutputDir",
+          "config/default-root",
+          false,
+          "writer"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1024,
+        "currentPassage": {
+          "startLine": 1022,
+          "endLine": 1026,
+          "text": "    }),\n  };\n  const manifestPath = path.join(targetOutputDir, 'gemini-extension.json');\n  fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\\n`);\n  written.push(manifestPath);"
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "manifestPath = path.join(targetOutputDir"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) { uses 'manifestPath = path.join(targetOutputDir'; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 8,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-015040",
+        "originalTuple": [
+          1025,
+          34,
+          1025,
+          74,
+          "`${JSON.stringify(manifest, null, 2)}\\n`",
+          "template-string",
+          false,
+          "writer"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 1025,
+        "currentPassage": {
+          "startLine": 1023,
+          "endLine": 1027,
+          "text": "  };\n  const manifestPath = path.join(targetOutputDir, 'gemini-extension.json');\n  fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\\n`);\n  written.push(manifestPath);\n"
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "`${JSON.stringify(manifest, null, 2)}\\n`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${JSON.stringify(manifest, null, 2)}\\\\n`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${JSON.stringify(manifest, null, 2)}\\\\n`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 9,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-015041",
+        "originalTuple": [
+          1038,
+          18,
+          1038,
+          31,
+          "`${trigger}\\`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 1038,
+        "currentPassage": {
+          "startLine": 1036,
+          "endLine": 1040,
+          "text": "    ...canonicalSkills.map((s) => {\n      const trigger = s.triggers.gemini;\n      return `- \\`${trigger}\\`: packaged skill \\`skills/${s.name}/SKILL.md\\` (intent: \\`${s.intentId}\\`)`;\n    }),\n    '',"
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "`${trigger}\\`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${trigger}\\\\`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${trigger}\\\\`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 10,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-015042",
+        "originalTuple": [
+          1038,
+          49,
+          1038,
+          77,
+          "`skills/${s.name}/SKILL.md\\`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 1038,
+        "currentPassage": {
+          "startLine": 1036,
+          "endLine": 1040,
+          "text": "    ...canonicalSkills.map((s) => {\n      const trigger = s.triggers.gemini;\n      return `- \\`${trigger}\\`: packaged skill \\`skills/${s.name}/SKILL.md\\` (intent: \\`${s.intentId}\\`)`;\n    }),\n    '',"
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "`skills/${s.name}/SKILL.md\\`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`skills/${s.name}/SKILL.md\\\\`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`skills/${s.name}/SKILL.md\\\\`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 11,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-015043",
+        "originalTuple": [
+          1038,
+          88,
+          1038,
+          104,
+          "`${s.intentId}\\`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 1038,
+        "currentPassage": {
+          "startLine": 1036,
+          "endLine": 1040,
+          "text": "    ...canonicalSkills.map((s) => {\n      const trigger = s.triggers.gemini;\n      return `- \\`${trigger}\\`: packaged skill \\`skills/${s.name}/SKILL.md\\` (intent: \\`${s.intentId}\\`)`;\n    }),\n    '',"
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "`${s.intentId}\\`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${s.intentId}\\\\`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${s.intentId}\\\\`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 12,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-015044",
+        "originalTuple": [
+          1041,
+          5,
+          1041,
+          15,
+          "join('\\n')",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 1041,
+        "currentPassage": {
+          "startLine": 1039,
+          "endLine": 1043,
+          "text": "    }),\n    '',\n  ].join('\\n');\n  const docPath = path.join(targetOutputDir, 'GEMINI.md');\n  fs.writeFileSync(docPath, geminiDoc);"
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "join('\\n')"
+        ],
+        "role": "non-document-operation",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation \"join('\\\\n')\". Pinned current passage: \"    }),\\n    '',\\n  ].join('\\\\n');\\n  const docPath = path.join(targetOutputDir, 'GEMINI.md');\\n  fs.writeFileSync(docPath, geminiDoc);\"",
+        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation \"join('\\\\n')\". Pinned current passage: \"    }),\\n    '',\\n  ].join('\\\\n');\\n  const docPath = path.join(targetOutputDir, 'GEMINI.md');\\n  fs.writeFileSync(docPath, geminiDoc);\"",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 13,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1042,
+            19,
+            1042,
+            58,
+            "path.join(targetOutputDir, 'GEMINI.md')",
+            "path-call",
+            false,
+            "writer"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015045",
+        "originalTuple": [
+          1042,
+          19,
+          1042,
+          58,
+          "path.join(targetOutputDir, 'GEMINI.md')",
+          "path-call",
+          false,
+          "writer"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1042,
+        "currentPassage": {
+          "startLine": 1040,
+          "endLine": 1044,
+          "text": "    '',\n  ].join('\\n');\n  const docPath = path.join(targetOutputDir, 'GEMINI.md');\n  fs.writeFileSync(docPath, geminiDoc);\n  written.push(docPath);"
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "path.join(targetOutputDir, 'GEMINI.md')"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) { uses \"path.join(targetOutputDir, 'GEMINI.md')\"; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 14,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1042,
+            9,
+            1042,
+            44,
+            "docPath = path.join(targetOutputDir",
+            "config/default-root",
+            false,
+            "writer"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015046",
+        "originalTuple": [
+          1042,
+          9,
+          1042,
+          44,
+          "docPath = path.join(targetOutputDir",
+          "config/default-root",
+          false,
+          "writer"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1042,
+        "currentPassage": {
+          "startLine": 1040,
+          "endLine": 1044,
+          "text": "    '',\n  ].join('\\n');\n  const docPath = path.join(targetOutputDir, 'GEMINI.md');\n  fs.writeFileSync(docPath, geminiDoc);\n  written.push(docPath);"
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "docPath = path.join(targetOutputDir"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) { uses 'docPath = path.join(targetOutputDir'; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 15,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1054,
+            11,
+            1054,
+            43,
+            "tomlPath = path.join(commandsDir",
+            "config/default-root",
+            false,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015047",
+        "originalTuple": [
+          1054,
+          11,
+          1054,
+          43,
+          "tomlPath = path.join(commandsDir",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1054,
+        "currentPassage": {
+          "startLine": 1052,
+          "endLine": 1056,
+          "text": "  for (const s of canonicalSkills) {\n    const verb = normalizeGeminiCommandVerb(s.intentId);\n    const tomlPath = path.join(commandsDir, `${verb}.toml`);\n    const packagedRelPath = `skills/${s.name}/SKILL.md`;\n    const tomlContent = ["
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "tomlPath = path.join(commandsDir"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) { uses 'tomlPath = path.join(commandsDir'; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 16,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1054,
+            22,
+            1054,
+            60,
+            "path.join(commandsDir, `${verb}.toml`)",
+            "path-call",
+            false,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015048",
+        "originalTuple": [
+          1054,
+          22,
+          1054,
+          60,
+          "path.join(commandsDir, `${verb}.toml`)",
+          "path-call",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1054,
+        "currentPassage": {
+          "startLine": 1052,
+          "endLine": 1056,
+          "text": "  for (const s of canonicalSkills) {\n    const verb = normalizeGeminiCommandVerb(s.intentId);\n    const tomlPath = path.join(commandsDir, `${verb}.toml`);\n    const packagedRelPath = `skills/${s.name}/SKILL.md`;\n    const tomlContent = ["
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "path.join(commandsDir, `${verb}.toml`)"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) { uses 'path.join(commandsDir, `${verb}.toml`)'; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 17,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-015049",
+        "originalTuple": [
+          1054,
+          45,
+          1054,
+          59,
+          "`${verb}.toml`",
+          "template-string",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 1054,
+        "currentPassage": {
+          "startLine": 1052,
+          "endLine": 1056,
+          "text": "  for (const s of canonicalSkills) {\n    const verb = normalizeGeminiCommandVerb(s.intentId);\n    const tomlPath = path.join(commandsDir, `${verb}.toml`);\n    const packagedRelPath = `skills/${s.name}/SKILL.md`;\n    const tomlContent = ["
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "`${verb}.toml`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${verb}.toml`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${verb}.toml`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 18,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1055,
+            11,
+            1055,
+            56,
+            "packagedRelPath = `skills/${s.name}/SKILL.md`",
+            "config/default-root",
+            false,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015050",
+        "originalTuple": [
+          1055,
+          11,
+          1055,
+          56,
+          "packagedRelPath = `skills/${s.name}/SKILL.md`",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1055,
+        "currentPassage": {
+          "startLine": 1053,
+          "endLine": 1057,
+          "text": "    const verb = normalizeGeminiCommandVerb(s.intentId);\n    const tomlPath = path.join(commandsDir, `${verb}.toml`);\n    const packagedRelPath = `skills/${s.name}/SKILL.md`;\n    const tomlContent = [\n      `name = \"${verb}\"`,"
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "packagedRelPath = `skills/${s.name}/SKILL.md`"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) { uses 'packagedRelPath = `skills/${s.name}/SKILL.md`'; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 19,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-015051",
+        "originalTuple": [
+          1055,
+          29,
+          1055,
+          56,
+          "`skills/${s.name}/SKILL.md`",
+          "template-string",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 1055,
+        "currentPassage": {
+          "startLine": 1053,
+          "endLine": 1057,
+          "text": "    const verb = normalizeGeminiCommandVerb(s.intentId);\n    const tomlPath = path.join(commandsDir, `${verb}.toml`);\n    const packagedRelPath = `skills/${s.name}/SKILL.md`;\n    const tomlContent = [\n      `name = \"${verb}\"`,"
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "`skills/${s.name}/SKILL.md`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`skills/${s.name}/SKILL.md`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`skills/${s.name}/SKILL.md`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 20,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-015052",
+        "originalTuple": [
+          1057,
+          7,
+          1057,
+          25,
+          "`name = \"${verb}\"`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 1057,
+        "currentPassage": {
+          "startLine": 1055,
+          "endLine": 1059,
+          "text": "    const packagedRelPath = `skills/${s.name}/SKILL.md`;\n    const tomlContent = [\n      `name = \"${verb}\"`,\n      `description = \"Run fgOS canonical skill ${s.name}\"`,\n      `intent = \"${s.intentId}\"`,"
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "`name = \"${verb}\"`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`name = \"${verb}\"`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`name = \"${verb}\"`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 21,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-015053",
+        "originalTuple": [
+          1058,
+          7,
+          1058,
+          59,
+          "`description = \"Run fgOS canonical skill ${s.name}\"`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 1058,
+        "currentPassage": {
+          "startLine": 1056,
+          "endLine": 1060,
+          "text": "    const tomlContent = [\n      `name = \"${verb}\"`,\n      `description = \"Run fgOS canonical skill ${s.name}\"`,\n      `intent = \"${s.intentId}\"`,\n      `packaged_source = \"${packagedRelPath}\"`,"
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "`description = \"Run fgOS canonical skill ${s.name}\"`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`description = \"Run fgOS canonical skill ${s.name}\"`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`description = \"Run fgOS canonical skill ${s.name}\"`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 22,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-015054",
+        "originalTuple": [
+          1059,
+          7,
+          1059,
+          33,
+          "`intent = \"${s.intentId}\"`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 1059,
+        "currentPassage": {
+          "startLine": 1057,
+          "endLine": 1061,
+          "text": "      `name = \"${verb}\"`,\n      `description = \"Run fgOS canonical skill ${s.name}\"`,\n      `intent = \"${s.intentId}\"`,\n      `packaged_source = \"${packagedRelPath}\"`,\n      `provenance = \"${s.canonicalDir || 'inline'}\"`,"
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "`intent = \"${s.intentId}\"`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`intent = \"${s.intentId}\"`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`intent = \"${s.intentId}\"`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 23,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-015055",
+        "originalTuple": [
+          1060,
+          7,
+          1060,
+          47,
+          "`packaged_source = \"${packagedRelPath}\"`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 1060,
+        "currentPassage": {
+          "startLine": 1058,
+          "endLine": 1062,
+          "text": "      `description = \"Run fgOS canonical skill ${s.name}\"`,\n      `intent = \"${s.intentId}\"`,\n      `packaged_source = \"${packagedRelPath}\"`,\n      `provenance = \"${s.canonicalDir || 'inline'}\"`,\n      `user_invocable = ${s.userInvocable}`,"
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "`packaged_source = \"${packagedRelPath}\"`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`packaged_source = \"${packagedRelPath}\"`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`packaged_source = \"${packagedRelPath}\"`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 24,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-015056",
+        "originalTuple": [
+          1061,
+          7,
+          1061,
+          53,
+          "`provenance = \"${s.canonicalDir || 'inline'}\"`",
+          "template-string",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 1061,
+        "currentPassage": {
+          "startLine": 1059,
+          "endLine": 1063,
+          "text": "      `intent = \"${s.intentId}\"`,\n      `packaged_source = \"${packagedRelPath}\"`,\n      `provenance = \"${s.canonicalDir || 'inline'}\"`,\n      `user_invocable = ${s.userInvocable}`,\n      `prompt = \"Read and follow the packaged fgOS skill instructions at ${packagedRelPath}, inside this fgos extension's own install directory, directly.\"`,"
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "`provenance = \"${s.canonicalDir || 'inline'}\"`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`provenance = \"${s.canonicalDir || \\'inline\\'}\"`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`provenance = \"${s.canonicalDir || \\'inline\\'}\"`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 25,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-015057",
+        "originalTuple": [
+          1062,
+          7,
+          1062,
+          44,
+          "`user_invocable = ${s.userInvocable}`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 1062,
+        "currentPassage": {
+          "startLine": 1060,
+          "endLine": 1064,
+          "text": "      `packaged_source = \"${packagedRelPath}\"`,\n      `provenance = \"${s.canonicalDir || 'inline'}\"`,\n      `user_invocable = ${s.userInvocable}`,\n      `prompt = \"Read and follow the packaged fgOS skill instructions at ${packagedRelPath}, inside this fgos extension's own install directory, directly.\"`,\n      '',"
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "`user_invocable = ${s.userInvocable}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`user_invocable = ${s.userInvocable}`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`user_invocable = ${s.userInvocable}`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 26,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-015058",
+        "originalTuple": [
+          1063,
+          7,
+          1063,
+          157,
+          "`prompt = \"Read and follow the packaged fgOS skill instructions at ${packagedRelPath}, inside this fgos extension's own install directory, directly.\"`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 1063,
+        "currentPassage": {
+          "startLine": 1061,
+          "endLine": 1065,
+          "text": "      `provenance = \"${s.canonicalDir || 'inline'}\"`,\n      `user_invocable = ${s.userInvocable}`,\n      `prompt = \"Read and follow the packaged fgOS skill instructions at ${packagedRelPath}, inside this fgos extension's own install directory, directly.\"`,\n      '',\n    ].join('\\n');"
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "`prompt = \"Read and follow the packaged fgOS skill instructions at ${packagedRelPath}, inside this fgos extension's own install directory, directly.\"`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`prompt = \"Read and follow the packaged fgOS skill instructions at ${packagedRelPath}, inside this fgos extension\\'s own install directory, directly.\"`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`prompt = \"Read and follow the packaged fgOS skill instructions at ${packagedRelPath}, inside this fgos extension\\'s own install directory, directly.\"`'. It formats values at export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 27,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-015059",
+        "originalTuple": [
+          1065,
+          7,
+          1065,
+          17,
+          "join('\\n')",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 1065,
+        "currentPassage": {
+          "startLine": 1063,
+          "endLine": 1067,
+          "text": "      `prompt = \"Read and follow the packaged fgOS skill instructions at ${packagedRelPath}, inside this fgos extension's own install directory, directly.\"`,\n      '',\n    ].join('\\n');\n    fs.writeFileSync(tomlPath, tomlContent);\n    written.push(tomlPath);"
+        },
+        "caller": {
+          "line": 944,
+          "declaration": "export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skills } = {}) {"
+        },
+        "inputs": [
+          "join('\\n')"
+        ],
+        "role": "non-document-operation",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation \"join('\\\\n')\". Pinned current passage: '      `prompt = \"Read and follow the packaged fgOS skill instructions at ${packagedRelPath}, inside this fgos extension\\'s own install directory, directly.\"`,\\n      \\'\\',\\n    ].join(\\'\\\\n\\');\\n    fs.writeFileSync(tomlPath, tomlContent);\\n    written.push(tomlPath);'",
+        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation \"join('\\\\n')\". Pinned current passage: '      `prompt = \"Read and follow the packaged fgOS skill instructions at ${packagedRelPath}, inside this fgos extension\\'s own install directory, directly.\"`,\\n      \\'\\',\\n    ].join(\\'\\\\n\\');\\n    fs.writeFileSync(tomlPath, tomlContent);\\n    written.push(tomlPath);'",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 28,
+      "value": {
+        "proofCommand": "env -u CLAUDE_CODE_SESSION_ID node --test test/setup/skill-wrappers.test.mjs",
+        "parityObligation": null,
+        "id": "dynamic-015060",
+        "originalTuple": [
+          1075,
+          18,
+          1075,
+          178,
+          "`<!-- Generated by fgOS skill assembly from ${sourceRelativePath} (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->`",
+          "template-string",
+          false,
+          "writer"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 1078,
+        "currentPassage": {
+          "startLine": 1076,
+          "endLine": 1080,
+          "text": "  const frontmatter = extractFrontmatter(sourceContent);\n  const header = `${ASSEMBLED_HEADER_PREFIX}${sourceRelativePath} (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->`;\n  return `${frontmatter}${header}\\n${sourceContent.slice(frontmatter.length)}`;\n}\n"
+        },
+        "caller": {
+          "line": 1075,
+          "declaration": "function withGeneratedHeader(sourceContent, sourceRelativePath) {"
+        },
+        "inputs": [
+          "`<!-- Generated by fgOS skill assembly from ${sourceRelativePath} (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->`"
+        ],
+        "role": "non-document-operation",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "L12-69: Pinned diagnostic/header text has no documentation-location operand; interpolation formats pool/release/assembly status. Own frozen operation '`<!-- Generated by fgOS skill assembly from ${sourceRelativePath} (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->`'. Pinned current passage: '  const frontmatter = extractFrontmatter(sourceContent);\\n  const header = `${ASSEMBLED_HEADER_PREFIX}${sourceRelativePath} (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->`;\\n  return `${frontmatter}${header}\\\\n${sourceContent.slice(frontmatter.length)}`;\\n}\\n'",
+        "reason": "L12-69: Pinned diagnostic/header text has no documentation-location operand; interpolation formats pool/release/assembly status. Own frozen operation '`<!-- Generated by fgOS skill assembly from ${sourceRelativePath} (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->`'. Pinned current passage: '  const frontmatter = extractFrontmatter(sourceContent);\\n  const header = `${ASSEMBLED_HEADER_PREFIX}${sourceRelativePath} (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->`;\\n  return `${frontmatter}${header}\\\\n${sourceContent.slice(frontmatter.length)}`;\\n}\\n'",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot",
+        "proofScope": "Existing owning behavior proof; not run in records-only rework."
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 29,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-015061",
+        "originalTuple": [
+          1076,
+          10,
+          1076,
+          79,
+          "`${frontmatter}${header}\\n${sourceContent.slice(frontmatter.length)}`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 1078,
+        "currentPassage": {
+          "startLine": 1076,
+          "endLine": 1080,
+          "text": "  const frontmatter = extractFrontmatter(sourceContent);\n  const header = `${ASSEMBLED_HEADER_PREFIX}${sourceRelativePath} (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->`;\n  return `${frontmatter}${header}\\n${sourceContent.slice(frontmatter.length)}`;\n}\n"
+        },
+        "caller": {
+          "line": 1075,
+          "declaration": "function withGeneratedHeader(sourceContent, sourceRelativePath) {"
+        },
+        "inputs": [
+          "`${frontmatter}${header}\\n${sourceContent.slice(frontmatter.length)}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${frontmatter}${header}\\\\n${sourceContent.slice(frontmatter.length)}`'. It formats values at function withGeneratedHeader(sourceContent, sourceRelativePath) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${frontmatter}${header}\\\\n${sourceContent.slice(frontmatter.length)}`'. It formats values at function withGeneratedHeader(sourceContent, sourceRelativePath) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 30,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1087,
+            9,
+            1087,
+            55,
+            "sourceRelativePath = path.relative(projectRoot",
+            "config/default-root",
+            false,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015062",
+        "originalTuple": [
+          1087,
+          9,
+          1087,
+          55,
+          "sourceRelativePath = path.relative(projectRoot",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1089,
+        "currentPassage": {
+          "startLine": 1087,
+          "endLine": 1091,
+          "text": "  }\n\n  const sourceRelativePath = path.relative(projectRoot, sourcePath).replaceAll('\\\\', '/');\n  const content = withGeneratedHeader(fs.readFileSync(sourcePath, 'utf8'), sourceRelativePath);\n  const tmpPath = `${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;"
+        },
+        "caller": {
+          "line": 1083,
+          "declaration": "function copyAssembledFile(projectRoot, sourcePath, targetPath) {"
+        },
+        "inputs": [
+          "sourceRelativePath = path.relative(projectRoot"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner function copyAssembledFile(projectRoot, sourcePath, targetPath) { uses 'sourceRelativePath = path.relative(projectRoot'; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 31,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-015063",
+        "originalTuple": [
+          1089,
+          19,
+          1089,
+          106,
+          "`${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`",
+          "template-string",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 1091,
+        "currentPassage": {
+          "startLine": 1089,
+          "endLine": 1093,
+          "text": "  const sourceRelativePath = path.relative(projectRoot, sourcePath).replaceAll('\\\\', '/');\n  const content = withGeneratedHeader(fs.readFileSync(sourcePath, 'utf8'), sourceRelativePath);\n  const tmpPath = `${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;\n  try {\n    fs.writeFileSync(tmpPath, content);"
+        },
+        "caller": {
+          "line": 1083,
+          "declaration": "function copyAssembledFile(projectRoot, sourcePath, targetPath) {"
+        },
+        "inputs": [
+          "`${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`'. It formats values at function copyAssembledFile(projectRoot, sourcePath, targetPath) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`'. It formats values at function copyAssembledFile(projectRoot, sourcePath, targetPath) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 32,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1089,
+            9,
+            1089,
+            106,
+            "tmpPath = `${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`",
+            "config/default-root",
+            true,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015064",
+        "originalTuple": [
+          1089,
+          9,
+          1089,
+          106,
+          "tmpPath = `${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1091,
+        "currentPassage": {
+          "startLine": 1089,
+          "endLine": 1093,
+          "text": "  const sourceRelativePath = path.relative(projectRoot, sourcePath).replaceAll('\\\\', '/');\n  const content = withGeneratedHeader(fs.readFileSync(sourcePath, 'utf8'), sourceRelativePath);\n  const tmpPath = `${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;\n  try {\n    fs.writeFileSync(tmpPath, content);"
+        },
+        "caller": {
+          "line": 1083,
+          "declaration": "function copyAssembledFile(projectRoot, sourcePath, targetPath) {"
+        },
+        "inputs": [
+          "tmpPath = `${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner function copyAssembledFile(projectRoot, sourcePath, targetPath) { uses 'tmpPath = `${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`'; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 33,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1124,
+            50,
+            1124,
+            93,
+            "path.join(projectRoot, '.agents', 'skills')",
+            "path-call",
+            true,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015065",
+        "originalTuple": [
+          1124,
+          50,
+          1124,
+          93,
+          "path.join(projectRoot, '.agents', 'skills')",
+          "path-call",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1137,
+        "currentPassage": {
+          "startLine": 1135,
+          "endLine": 1139,
+          "text": "  { prune = true, checkDuplicates = true, checkCollisions = true } = {},\n) {\n  const agentsSkillsRoot = targetAgentsSkills ?? path.join(projectRoot, '.agents', 'skills');\n  const coreSkillsRoot = path.join(projectRoot, 'core', 'skills');\n  const domainsRoot = path.join(projectRoot, 'domains');"
+        },
+        "caller": {
+          "line": 1132,
+          "declaration": "export function assembleSkills("
+        },
+        "inputs": [
+          "path.join(projectRoot, '.agents', 'skills')"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function assembleSkills( uses \"path.join(projectRoot, '.agents', 'skills')\"; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 34,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1124,
+            9,
+            1124,
+            71,
+            "agentsSkillsRoot = targetAgentsSkills ?? path.join(projectRoot",
+            "config/default-root",
+            true,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015066",
+        "originalTuple": [
+          1124,
+          9,
+          1124,
+          71,
+          "agentsSkillsRoot = targetAgentsSkills ?? path.join(projectRoot",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1137,
+        "currentPassage": {
+          "startLine": 1135,
+          "endLine": 1139,
+          "text": "  { prune = true, checkDuplicates = true, checkCollisions = true } = {},\n) {\n  const agentsSkillsRoot = targetAgentsSkills ?? path.join(projectRoot, '.agents', 'skills');\n  const coreSkillsRoot = path.join(projectRoot, 'core', 'skills');\n  const domainsRoot = path.join(projectRoot, 'domains');"
+        },
+        "caller": {
+          "line": 1132,
+          "declaration": "export function assembleSkills("
+        },
+        "inputs": [
+          "agentsSkillsRoot = targetAgentsSkills ?? path.join(projectRoot"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function assembleSkills( uses 'agentsSkillsRoot = targetAgentsSkills ?? path.join(projectRoot'; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 35,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1125,
+            26,
+            1125,
+            66,
+            "path.join(projectRoot, 'core', 'skills')",
+            "path-call",
+            true,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015067",
+        "originalTuple": [
+          1125,
+          26,
+          1125,
+          66,
+          "path.join(projectRoot, 'core', 'skills')",
+          "path-call",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1138,
+        "currentPassage": {
+          "startLine": 1136,
+          "endLine": 1140,
+          "text": ") {\n  const agentsSkillsRoot = targetAgentsSkills ?? path.join(projectRoot, '.agents', 'skills');\n  const coreSkillsRoot = path.join(projectRoot, 'core', 'skills');\n  const domainsRoot = path.join(projectRoot, 'domains');\n  const assembled = [];"
+        },
+        "caller": {
+          "line": 1132,
+          "declaration": "export function assembleSkills("
+        },
+        "inputs": [
+          "path.join(projectRoot, 'core', 'skills')"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function assembleSkills( uses \"path.join(projectRoot, 'core', 'skills')\"; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 36,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1125,
+            9,
+            1125,
+            47,
+            "coreSkillsRoot = path.join(projectRoot",
+            "config/default-root",
+            true,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015068",
+        "originalTuple": [
+          1125,
+          9,
+          1125,
+          47,
+          "coreSkillsRoot = path.join(projectRoot",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1138,
+        "currentPassage": {
+          "startLine": 1136,
+          "endLine": 1140,
+          "text": ") {\n  const agentsSkillsRoot = targetAgentsSkills ?? path.join(projectRoot, '.agents', 'skills');\n  const coreSkillsRoot = path.join(projectRoot, 'core', 'skills');\n  const domainsRoot = path.join(projectRoot, 'domains');\n  const assembled = [];"
+        },
+        "caller": {
+          "line": 1132,
+          "declaration": "export function assembleSkills("
+        },
+        "inputs": [
+          "coreSkillsRoot = path.join(projectRoot"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function assembleSkills( uses 'coreSkillsRoot = path.join(projectRoot'; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 37,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1126,
+            23,
+            1126,
+            56,
+            "path.join(projectRoot, 'domains')",
+            "path-call",
+            true,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015069",
+        "originalTuple": [
+          1126,
+          23,
+          1126,
+          56,
+          "path.join(projectRoot, 'domains')",
+          "path-call",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1139,
+        "currentPassage": {
+          "startLine": 1137,
+          "endLine": 1141,
+          "text": "  const agentsSkillsRoot = targetAgentsSkills ?? path.join(projectRoot, '.agents', 'skills');\n  const coreSkillsRoot = path.join(projectRoot, 'core', 'skills');\n  const domainsRoot = path.join(projectRoot, 'domains');\n  const assembled = [];\n"
+        },
+        "caller": {
+          "line": 1132,
+          "declaration": "export function assembleSkills("
+        },
+        "inputs": [
+          "path.join(projectRoot, 'domains')"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function assembleSkills( uses \"path.join(projectRoot, 'domains')\"; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 38,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1126,
+            9,
+            1126,
+            44,
+            "domainsRoot = path.join(projectRoot",
+            "config/default-root",
+            true,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015070",
+        "originalTuple": [
+          1126,
+          9,
+          1126,
+          44,
+          "domainsRoot = path.join(projectRoot",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1139,
+        "currentPassage": {
+          "startLine": 1137,
+          "endLine": 1141,
+          "text": "  const agentsSkillsRoot = targetAgentsSkills ?? path.join(projectRoot, '.agents', 'skills');\n  const coreSkillsRoot = path.join(projectRoot, 'core', 'skills');\n  const domainsRoot = path.join(projectRoot, 'domains');\n  const assembled = [];\n"
+        },
+        "caller": {
+          "line": 1132,
+          "declaration": "export function assembleSkills("
+        },
+        "inputs": [
+          "domainsRoot = path.join(projectRoot"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function assembleSkills( uses 'domainsRoot = path.join(projectRoot'; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 39,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1147,
+            26,
+            1147,
+            64,
+            "path.join(agentsSkillsRoot, '_shared')",
+            "path-call",
+            false,
+            "reader"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015071",
+        "originalTuple": [
+          1147,
+          26,
+          1147,
+          64,
+          "path.join(agentsSkillsRoot, '_shared')",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1160,
+        "currentPassage": {
+          "startLine": 1158,
+          "endLine": 1162,
+          "text": "  if (sharedFragments.length > 0) {\n    validSkillNames.add('_shared');\n    const targetShared = path.join(agentsSkillsRoot, '_shared');\n    for (const fragment of sharedFragments) {\n      const targetPath = path.join(targetShared, fragment.relativeFragmentPath);"
+        },
+        "caller": {
+          "line": 1132,
+          "declaration": "export function assembleSkills("
+        },
+        "inputs": [
+          "path.join(agentsSkillsRoot, '_shared')"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function assembleSkills( uses \"path.join(agentsSkillsRoot, '_shared')\"; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 40,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1149,
+            13,
+            1149,
+            48,
+            "targetPath = path.join(targetShared",
+            "config/default-root",
+            false,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015072",
+        "originalTuple": [
+          1149,
+          13,
+          1149,
+          48,
+          "targetPath = path.join(targetShared",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1162,
+        "currentPassage": {
+          "startLine": 1160,
+          "endLine": 1164,
+          "text": "    const targetShared = path.join(agentsSkillsRoot, '_shared');\n    for (const fragment of sharedFragments) {\n      const targetPath = path.join(targetShared, fragment.relativeFragmentPath);\n      fs.mkdirSync(path.dirname(targetPath), { recursive: true });\n      copyAssembledFile(projectRoot, path.join(projectRoot, fragment.sourcePath), targetPath);"
+        },
+        "caller": {
+          "line": 1132,
+          "declaration": "export function assembleSkills("
+        },
+        "inputs": [
+          "targetPath = path.join(targetShared"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function assembleSkills( uses 'targetPath = path.join(targetShared'; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 41,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1149,
+            26,
+            1149,
+            80,
+            "path.join(targetShared, fragment.relativeFragmentPath)",
+            "path-call",
+            false,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015073",
+        "originalTuple": [
+          1149,
+          26,
+          1149,
+          80,
+          "path.join(targetShared, fragment.relativeFragmentPath)",
+          "path-call",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1162,
+        "currentPassage": {
+          "startLine": 1160,
+          "endLine": 1164,
+          "text": "    const targetShared = path.join(agentsSkillsRoot, '_shared');\n    for (const fragment of sharedFragments) {\n      const targetPath = path.join(targetShared, fragment.relativeFragmentPath);\n      fs.mkdirSync(path.dirname(targetPath), { recursive: true });\n      copyAssembledFile(projectRoot, path.join(projectRoot, fragment.sourcePath), targetPath);"
+        },
+        "caller": {
+          "line": 1132,
+          "declaration": "export function assembleSkills("
+        },
+        "inputs": [
+          "path.join(targetShared, fragment.relativeFragmentPath)"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function assembleSkills( uses 'path.join(targetShared, fragment.relativeFragmentPath)'; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 42,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1151,
+            38,
+            1151,
+            81,
+            "path.join(projectRoot, fragment.sourcePath)",
+            "path-call",
+            false,
+            "reader"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015074",
+        "originalTuple": [
+          1151,
+          38,
+          1151,
+          81,
+          "path.join(projectRoot, fragment.sourcePath)",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1164,
+        "currentPassage": {
+          "startLine": 1162,
+          "endLine": 1166,
+          "text": "      const targetPath = path.join(targetShared, fragment.relativeFragmentPath);\n      fs.mkdirSync(path.dirname(targetPath), { recursive: true });\n      copyAssembledFile(projectRoot, path.join(projectRoot, fragment.sourcePath), targetPath);\n    }\n    assembled.push(targetShared);"
+        },
+        "caller": {
+          "line": 1132,
+          "declaration": "export function assembleSkills("
+        },
+        "inputs": [
+          "path.join(projectRoot, fragment.sourcePath)"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function assembleSkills( uses 'path.join(projectRoot, fragment.sourcePath)'; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 43,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1159,
+            11,
+            1159,
+            45,
+            "sourcePath = path.join(projectRoot",
+            "config/default-root",
+            false,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015075",
+        "originalTuple": [
+          1159,
+          11,
+          1159,
+          45,
+          "sourcePath = path.join(projectRoot",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1172,
+        "currentPassage": {
+          "startLine": 1170,
+          "endLine": 1174,
+          "text": "  for (const skill of canonicalSkills) {\n    validSkillNames.add(skill.name);\n    const sourcePath = path.join(projectRoot, skill.canonicalDir);\n    const targetPath = path.join(agentsSkillsRoot, skill.name);\n    const stat = fs.statSync(sourcePath);"
+        },
+        "caller": {
+          "line": 1132,
+          "declaration": "export function assembleSkills("
+        },
+        "inputs": [
+          "sourcePath = path.join(projectRoot"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function assembleSkills( uses 'sourcePath = path.join(projectRoot'; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 44,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1159,
+            24,
+            1159,
+            66,
+            "path.join(projectRoot, skill.canonicalDir)",
+            "path-call",
+            false,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015076",
+        "originalTuple": [
+          1159,
+          24,
+          1159,
+          66,
+          "path.join(projectRoot, skill.canonicalDir)",
+          "path-call",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1172,
+        "currentPassage": {
+          "startLine": 1170,
+          "endLine": 1174,
+          "text": "  for (const skill of canonicalSkills) {\n    validSkillNames.add(skill.name);\n    const sourcePath = path.join(projectRoot, skill.canonicalDir);\n    const targetPath = path.join(agentsSkillsRoot, skill.name);\n    const stat = fs.statSync(sourcePath);"
+        },
+        "caller": {
+          "line": 1132,
+          "declaration": "export function assembleSkills("
+        },
+        "inputs": [
+          "path.join(projectRoot, skill.canonicalDir)"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function assembleSkills( uses 'path.join(projectRoot, skill.canonicalDir)'; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 45,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1160,
+            11,
+            1160,
+            50,
+            "targetPath = path.join(agentsSkillsRoot",
+            "config/default-root",
+            false,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015077",
+        "originalTuple": [
+          1160,
+          11,
+          1160,
+          50,
+          "targetPath = path.join(agentsSkillsRoot",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1173,
+        "currentPassage": {
+          "startLine": 1171,
+          "endLine": 1175,
+          "text": "    validSkillNames.add(skill.name);\n    const sourcePath = path.join(projectRoot, skill.canonicalDir);\n    const targetPath = path.join(agentsSkillsRoot, skill.name);\n    const stat = fs.statSync(sourcePath);\n    if (stat.isDirectory()) {"
+        },
+        "caller": {
+          "line": 1132,
+          "declaration": "export function assembleSkills("
+        },
+        "inputs": [
+          "targetPath = path.join(agentsSkillsRoot"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function assembleSkills( uses 'targetPath = path.join(agentsSkillsRoot'; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 46,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1160,
+            24,
+            1160,
+            63,
+            "path.join(agentsSkillsRoot, skill.name)",
+            "path-call",
+            false,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015078",
+        "originalTuple": [
+          1160,
+          24,
+          1160,
+          63,
+          "path.join(agentsSkillsRoot, skill.name)",
+          "path-call",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1173,
+        "currentPassage": {
+          "startLine": 1171,
+          "endLine": 1175,
+          "text": "    validSkillNames.add(skill.name);\n    const sourcePath = path.join(projectRoot, skill.canonicalDir);\n    const targetPath = path.join(agentsSkillsRoot, skill.name);\n    const stat = fs.statSync(sourcePath);\n    if (stat.isDirectory()) {"
+        },
+        "caller": {
+          "line": 1132,
+          "declaration": "export function assembleSkills("
+        },
+        "inputs": [
+          "path.join(agentsSkillsRoot, skill.name)"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function assembleSkills( uses 'path.join(agentsSkillsRoot, skill.name)'; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 47,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1177,
+            15,
+            1177,
+            54,
+            "orphanPath = path.join(agentsSkillsRoot",
+            "config/default-root",
+            false,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015079",
+        "originalTuple": [
+          1177,
+          15,
+          1177,
+          54,
+          "orphanPath = path.join(agentsSkillsRoot",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1191,
+        "currentPassage": {
+          "startLine": 1189,
+          "endLine": 1193,
+          "text": "      if (isOwnTmpFile(entry.name)) continue;\n      if (!validSkillNames.has(entry.name)) {\n        const orphanPath = path.join(agentsSkillsRoot, entry.name);\n        if (!carriesAssembledHeader(orphanPath)) continue;\n        fs.rmSync(orphanPath, { recursive: true, force: true });"
+        },
+        "caller": {
+          "line": 1132,
+          "declaration": "export function assembleSkills("
+        },
+        "inputs": [
+          "orphanPath = path.join(agentsSkillsRoot"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function assembleSkills( uses 'orphanPath = path.join(agentsSkillsRoot'; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 48,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1177,
+            28,
+            1177,
+            67,
+            "path.join(agentsSkillsRoot, entry.name)",
+            "path-call",
+            false,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015080",
+        "originalTuple": [
+          1177,
+          28,
+          1177,
+          67,
+          "path.join(agentsSkillsRoot, entry.name)",
+          "path-call",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1191,
+        "currentPassage": {
+          "startLine": 1189,
+          "endLine": 1193,
+          "text": "      if (isOwnTmpFile(entry.name)) continue;\n      if (!validSkillNames.has(entry.name)) {\n        const orphanPath = path.join(agentsSkillsRoot, entry.name);\n        if (!carriesAssembledHeader(orphanPath)) continue;\n        fs.rmSync(orphanPath, { recursive: true, force: true });"
+        },
+        "caller": {
+          "line": 1132,
+          "declaration": "export function assembleSkills("
+        },
+        "inputs": [
+          "path.join(agentsSkillsRoot, entry.name)"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function assembleSkills( uses 'path.join(agentsSkillsRoot, entry.name)'; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 49,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1226,
+            30,
+            1226,
+            73,
+            "path.join(packageRoot, '.agents', 'skills')",
+            "path-call",
+            false,
+            "reader"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015081",
+        "originalTuple": [
+          1226,
+          30,
+          1226,
+          73,
+          "path.join(packageRoot, '.agents', 'skills')",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1241,
+        "currentPassage": {
+          "startLine": 1239,
+          "endLine": 1243,
+          "text": "    // shipped/committed) is still used below, unassembled.\n  }\n  const sourceAgentsSkills = path.join(packageRoot, '.agents', 'skills');\n  if (!fs.existsSync(sourceAgentsSkills)) {\n    return { copied: false, wrappersWritten: [] };"
+        },
+        "caller": {
+          "line": 1234,
+          "declaration": "export function materializeSkillsIntoProject(packageRoot, targetRoot) {"
+        },
+        "inputs": [
+          "path.join(packageRoot, '.agents', 'skills')"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function materializeSkillsIntoProject(packageRoot, targetRoot) { uses \"path.join(packageRoot, '.agents', 'skills')\"; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 50,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1230,
+            30,
+            1230,
+            72,
+            "path.join(targetRoot, '.agents', 'skills')",
+            "path-call",
+            false,
+            "reader"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015082",
+        "originalTuple": [
+          1230,
+          30,
+          1230,
+          72,
+          "path.join(targetRoot, '.agents', 'skills')",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1245,
+        "currentPassage": {
+          "startLine": 1243,
+          "endLine": 1247,
+          "text": "    return { copied: false, wrappersWritten: [] };\n  }\n  const targetAgentsSkills = path.join(targetRoot, '.agents', 'skills');\n  const targetClaudeSkills = path.join(targetRoot, '.claude', 'skills');\n  // Self-hosting (forgentX's own dev checkout running `fgos setup` on"
+        },
+        "caller": {
+          "line": 1234,
+          "declaration": "export function materializeSkillsIntoProject(packageRoot, targetRoot) {"
+        },
+        "inputs": [
+          "path.join(targetRoot, '.agents', 'skills')"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function materializeSkillsIntoProject(packageRoot, targetRoot) { uses \"path.join(targetRoot, '.agents', 'skills')\"; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 51,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1231,
+            30,
+            1231,
+            72,
+            "path.join(targetRoot, '.claude', 'skills')",
+            "path-call",
+            false,
+            "reader"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015083",
+        "originalTuple": [
+          1231,
+          30,
+          1231,
+          72,
+          "path.join(targetRoot, '.claude', 'skills')",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1246,
+        "currentPassage": {
+          "startLine": 1244,
+          "endLine": 1248,
+          "text": "  }\n  const targetAgentsSkills = path.join(targetRoot, '.agents', 'skills');\n  const targetClaudeSkills = path.join(targetRoot, '.claude', 'skills');\n  // Self-hosting (forgentX's own dev checkout running `fgos setup` on\n  // itself): packageRoot and targetRoot are the same real directory, so"
+        },
+        "caller": {
+          "line": 1234,
+          "declaration": "export function materializeSkillsIntoProject(packageRoot, targetRoot) {"
+        },
+        "inputs": [
+          "path.join(targetRoot, '.claude', 'skills')"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function materializeSkillsIntoProject(packageRoot, targetRoot) { uses \"path.join(targetRoot, '.claude', 'skills')\"; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 52,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1237,
+            18,
+            1237,
+            43,
+            "path.resolve(packageRoot)",
+            "path-call",
+            false,
+            "reader"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015084",
+        "originalTuple": [
+          1237,
+          18,
+          1237,
+          43,
+          "path.resolve(packageRoot)",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1252,
+        "currentPassage": {
+          "startLine": 1250,
+          "endLine": 1254,
+          "text": "  // target. Skip straight to wrapper (re)generation, the same thing\n  // `npm run build:skills` already does on its own.\n  const copied = path.resolve(packageRoot) !== path.resolve(targetRoot);\n  if (copied) {\n    copyDirRecursive(sourceAgentsSkills, targetAgentsSkills);"
+        },
+        "caller": {
+          "line": 1234,
+          "declaration": "export function materializeSkillsIntoProject(packageRoot, targetRoot) {"
+        },
+        "inputs": [
+          "path.resolve(packageRoot)"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function materializeSkillsIntoProject(packageRoot, targetRoot) { uses 'path.resolve(packageRoot)'; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 53,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            1237,
+            48,
+            1237,
+            72,
+            "path.resolve(targetRoot)",
+            "path-call",
+            false,
+            "reader"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015085",
+        "originalTuple": [
+          1237,
+          48,
+          1237,
+          72,
+          "path.resolve(targetRoot)",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 1252,
+        "currentPassage": {
+          "startLine": 1250,
+          "endLine": 1254,
+          "text": "  // target. Skip straight to wrapper (re)generation, the same thing\n  // `npm run build:skills` already does on its own.\n  const copied = path.resolve(packageRoot) !== path.resolve(targetRoot);\n  if (copied) {\n    copyDirRecursive(sourceAgentsSkills, targetAgentsSkills);"
+        },
+        "caller": {
+          "line": 1234,
+          "declaration": "export function materializeSkillsIntoProject(packageRoot, targetRoot) {"
+        },
+        "inputs": [
+          "path.resolve(targetRoot)"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function materializeSkillsIntoProject(packageRoot, targetRoot) { uses 'path.resolve(targetRoot)'; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 54,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            127,
+            9,
+            127,
+            53,
+            "relPath = sourceRelativePath.replaceAll('\\\\'",
+            "config/default-root",
+            false,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015086",
+        "originalTuple": [
+          127,
+          9,
+          127,
+          53,
+          "relPath = sourceRelativePath.replaceAll('\\\\'",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 127,
+        "currentPassage": {
+          "startLine": 125,
+          "endLine": 129,
+          "text": "    throw new Error('generateWrapperContent: source has no YAML frontmatter block (---...---) to copy');\n  }\n  const relPath = sourceRelativePath.replaceAll('\\\\', '/');\n  return (\n    `${frontmatter}\\n` +"
+        },
+        "caller": {
+          "line": 122,
+          "declaration": "export function generateWrapperContent(sourceContent, sourceRelativePath) {"
+        },
+        "inputs": [
+          "relPath = sourceRelativePath.replaceAll('\\\\'"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function generateWrapperContent(sourceContent, sourceRelativePath) { uses \"relPath = sourceRelativePath.replaceAll('\\\\\\\\'\"; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 55,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-015087",
+        "originalTuple": [
+          129,
+          5,
+          129,
+          23,
+          "`${frontmatter}\\n`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 129,
+        "currentPassage": {
+          "startLine": 127,
+          "endLine": 131,
+          "text": "  const relPath = sourceRelativePath.replaceAll('\\\\', '/');\n  return (\n    `${frontmatter}\\n` +\n    `${GENERATED_WRAPPER_MARKER}\\n` +\n    `The real skill content lives at \\`${relPath}\\`, an assembled projection whose generated header identifies its canonical source.\\n` +"
+        },
+        "caller": {
+          "line": 122,
+          "declaration": "export function generateWrapperContent(sourceContent, sourceRelativePath) {"
+        },
+        "inputs": [
+          "`${frontmatter}\\n`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${frontmatter}\\\\n`'. It formats values at export function generateWrapperContent(sourceContent, sourceRelativePath) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${frontmatter}\\\\n`'. It formats values at export function generateWrapperContent(sourceContent, sourceRelativePath) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 56,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-015088",
+        "originalTuple": [
+          130,
+          5,
+          130,
+          36,
+          "`${GENERATED_WRAPPER_MARKER}\\n`",
+          "template-string",
+          false,
+          "writer"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 130,
+        "currentPassage": {
+          "startLine": 128,
+          "endLine": 132,
+          "text": "  return (\n    `${frontmatter}\\n` +\n    `${GENERATED_WRAPPER_MARKER}\\n` +\n    `The real skill content lives at \\`${relPath}\\`, an assembled projection whose generated header identifies its canonical source.\\n` +\n    'Read that file and follow it directly.\\n'"
+        },
+        "caller": {
+          "line": 122,
+          "declaration": "export function generateWrapperContent(sourceContent, sourceRelativePath) {"
+        },
+        "inputs": [
+          "`${GENERATED_WRAPPER_MARKER}\\n`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${GENERATED_WRAPPER_MARKER}\\\\n`'. It formats values at export function generateWrapperContent(sourceContent, sourceRelativePath) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${GENERATED_WRAPPER_MARKER}\\\\n`'. It formats values at export function generateWrapperContent(sourceContent, sourceRelativePath) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 57,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-015089",
+        "originalTuple": [
+          131,
+          39,
+          131,
+          52,
+          "`${relPath}\\`",
+          "template-string",
+          false,
+          "writer"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 131,
+        "currentPassage": {
+          "startLine": 129,
+          "endLine": 133,
+          "text": "    `${frontmatter}\\n` +\n    `${GENERATED_WRAPPER_MARKER}\\n` +\n    `The real skill content lives at \\`${relPath}\\`, an assembled projection whose generated header identifies its canonical source.\\n` +\n    'Read that file and follow it directly.\\n'\n  );"
+        },
+        "caller": {
+          "line": 122,
+          "declaration": "export function generateWrapperContent(sourceContent, sourceRelativePath) {"
+        },
+        "inputs": [
+          "`${relPath}\\`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${relPath}\\\\`'. It formats values at export function generateWrapperContent(sourceContent, sourceRelativePath) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${relPath}\\\\`'. It formats values at export function generateWrapperContent(sourceContent, sourceRelativePath) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 58,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            145,
+            23,
+            145,
+            60,
+            "path.join(wrapperDirPath, 'SKILL.md')",
+            "path-call",
+            false,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015090",
+        "originalTuple": [
+          145,
+          23,
+          145,
+          60,
+          "path.join(wrapperDirPath, 'SKILL.md')",
+          "path-call",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 145,
+        "currentPassage": {
+          "startLine": 143,
+          "endLine": 147,
+          "text": " * function's to judge. */\nfunction isGeneratedWrapper(wrapperDirPath) {\n  const skillMdPath = path.join(wrapperDirPath, 'SKILL.md');\n  try {\n    return fs.readFileSync(skillMdPath, 'utf8').includes(GENERATED_WRAPPER_MARKER);"
+        },
+        "caller": {
+          "line": 144,
+          "declaration": "function isGeneratedWrapper(wrapperDirPath) {"
+        },
+        "inputs": [
+          "path.join(wrapperDirPath, 'SKILL.md')"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner function isGeneratedWrapper(wrapperDirPath) { uses \"path.join(wrapperDirPath, 'SKILL.md')\"; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 59,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            145,
+            9,
+            145,
+            47,
+            "skillMdPath = path.join(wrapperDirPath",
+            "config/default-root",
+            false,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015091",
+        "originalTuple": [
+          145,
+          9,
+          145,
+          47,
+          "skillMdPath = path.join(wrapperDirPath",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 145,
+        "currentPassage": {
+          "startLine": 143,
+          "endLine": 147,
+          "text": " * function's to judge. */\nfunction isGeneratedWrapper(wrapperDirPath) {\n  const skillMdPath = path.join(wrapperDirPath, 'SKILL.md');\n  try {\n    return fs.readFileSync(skillMdPath, 'utf8').includes(GENERATED_WRAPPER_MARKER);"
+        },
+        "caller": {
+          "line": 144,
+          "declaration": "function isGeneratedWrapper(wrapperDirPath) {"
+        },
+        "inputs": [
+          "skillMdPath = path.join(wrapperDirPath"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner function isGeneratedWrapper(wrapperDirPath) { uses 'skillMdPath = path.join(wrapperDirPath'; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 60,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            171,
+            13,
+            171,
+            52,
+            "sourcePath = path.join(agentsSkillsRoot",
+            "config/default-root",
+            false,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015092",
+        "originalTuple": [
+          171,
+          13,
+          171,
+          52,
+          "sourcePath = path.join(agentsSkillsRoot",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 171,
+        "currentPassage": {
+          "startLine": 169,
+          "endLine": 173,
+          "text": "      if (isOwnTmpFile(entry.name)) continue;\n      if (!entry.isDirectory() || entry.name === '_shared') continue;\n      const sourcePath = path.join(agentsSkillsRoot, entry.name, 'SKILL.md');\n      if (!fs.existsSync(sourcePath)) continue;\n"
+        },
+        "caller": {
+          "line": 164,
+          "declaration": "export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot) {"
+        },
+        "inputs": [
+          "sourcePath = path.join(agentsSkillsRoot"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot) { uses 'sourcePath = path.join(agentsSkillsRoot'; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 61,
+      "value": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            171,
+            26,
+            171,
+            77,
+            "path.join(agentsSkillsRoot, entry.name, 'SKILL.md')",
+            "path-call",
+            false,
+            "default-root"
+          ],
+          "candidateConstruction": null,
+          "comparison": "Same bounded input/export; exact target/output/status/findings with no semantic normalization. No candidate output claimed when parked.",
+          "blocker": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored."
+        },
+        "id": "dynamic-015093",
+        "originalTuple": [
+          171,
+          26,
+          171,
+          77,
+          "path.join(agentsSkillsRoot, entry.name, 'SKILL.md')",
+          "path-call",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "parked",
+        "currentLine": 171,
+        "currentPassage": {
+          "startLine": 169,
+          "endLine": 173,
+          "text": "      if (isOwnTmpFile(entry.name)) continue;\n      if (!entry.isDirectory() || entry.name === '_shared') continue;\n      const sourcePath = path.join(agentsSkillsRoot, entry.name, 'SKILL.md');\n      if (!fs.existsSync(sourcePath)) continue;\n"
+        },
+        "caller": {
+          "line": 164,
+          "declaration": "export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot) {"
+        },
+        "inputs": [
+          "path.join(agentsSkillsRoot, entry.name, 'SKILL.md')"
+        ],
+        "role": "instruction/generator",
+        "targetSetOrConstruction": "existing source and generated instruction/skill surfaces from caller options",
+        "stateExportDependency": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "Instruction composition or skill wrapper owner export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot) { uses \"path.join(agentsSkillsRoot, entry.name, 'SKILL.md')\"; generated outputs cannot be edited here.",
+        "blockedSeams": [
+          "generators"
+        ],
+        "blockedReason": "Owning generators/projections seam must trace source/config/export and complete output set; no generated diff authored.",
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    }
+  ]
+}

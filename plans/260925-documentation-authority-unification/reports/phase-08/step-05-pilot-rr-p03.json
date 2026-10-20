@@ -3,6 +3,728 @@
   "part": 3,
   "records": [
     {
+      "file": "src/state/events-jsonl-truncation-guard.mjs",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "b4dd68558622a872395138a790bc63926ebdf60323b880c6f69b23ca3d7ee0ab",
+      "kind": "references",
+      "id": "reference-003868",
+      "change": {
+        "id": "reference-003868",
+        "oldOutcome": {
+          "admission": "ADMIT",
+          "disposition": "patch",
+          "sourceSpans": [
+            {
+              "line": 140,
+              "columnStart": 260,
+              "columnEndExclusive": 309,
+              "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
+            }
+          ],
+          "coCutPaths": [
+            "CHANGELOG.md"
+          ]
+        },
+        "newOutcome": {
+          "admission": "ADMIT",
+          "disposition": "patch",
+          "sourceSpans": [
+            {
+              "line": 140,
+              "columnStart": 260,
+              "columnEndExclusive": 309,
+              "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
+            }
+          ],
+          "coCutPaths": [
+            "CHANGELOG.md",
+            "test/setup/checks.test.mjs"
+          ]
+        }
+      },
+      "record": {
+        "referenceId": "reference-003868",
+        "admission": "ADMIT",
+        "inventory": "step-02l-census-class6.json",
+        "edgeId": "class6-l-000415",
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryOrigins": [
+          {
+            "inventory": "step-02l-census-class6.json",
+            "id": "class6-l-000415",
+            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
+          }
+        ],
+        "slotKey": null,
+        "sourceSpans": [
+          {
+            "line": 140,
+            "columnStart": 260,
+            "columnEndExclusive": 309,
+            "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
+          }
+        ],
+        "originalSourceSpans": [
+          {
+            "columnEndExclusive": 309,
+            "columnStart": 260,
+            "line": 140,
+            "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
+          }
+        ],
+        "matchedExpression": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+        "passage": "      ok: false,\n      reason: \"content-mismatch\",\n      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/how-to/resolve-an-events-jsonl-truncation.md)`,\n      mark: currentMark,\n    };",
+        "passageSpan": {
+          "startLine": 138,
+          "endLine": 142
+        },
+        "role": "emitted-message",
+        "disposition": "patch",
+        "reason": "Executable data/message/file operation in own passage: '      ok: false,\\n      reason: \"content-mismatch\",\\n      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/how-to/resolve-an-events-jsonl-truncation.md)`,\\n      mark: currentMark,\\n    };' The exact registry alias names currentPath docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md; Phase 9 changes this emitted pointer only.",
+        "target": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+        "anchor": null,
+        "resolverWitness": {
+          "target": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+          "docId": "how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events-jsonl-truncation:resolve-an-events-jsonl-truncation",
+          "registryPath": "docs/doc-registry.json",
+          "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+          "alias": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+          "targetSha256": "da410923253f4bdf8219b75fae8176ce4e97b9114e4a2172dbb19adfea460862",
+          "claim": "live currentPath lookup; no writer destination adopts an alias"
+        },
+        "timing": "phase9",
+        "diffHunk": "--- a/src/state/events-jsonl-truncation-guard.mjs\n+++ b/src/state/events-jsonl-truncation-guard.mjs\n@@ -137,7 +137,7 @@\n     return {\n       ok: false,\n       reason: \"content-mismatch\",\n-      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/how-to/resolve-an-events-jsonl-truncation.md)`,\n+      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md)`,\n       mark: currentMark,\n     };\n   }\n",
+        "blockedCategory": null,
+        "blockedReason": null,
+        "dependency": null,
+        "dependencyCategory": null,
+        "successorNote": null,
+        "aliasWriteCheck": {
+          "isWriter": false,
+          "destinationIsAlias": false,
+          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
+        },
+        "proposedReplacement": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+        "priorRecordRefs": [
+          {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
+            "recordSha256": "c1256c92c1e0cd9ffb5b45c132257e973180c8046369eb53a28d49feda3b0dbf",
+            "matchingSlots": []
+          }
+        ],
+        "fixtureProvenance": null,
+        "rejectionRule": null,
+        "receiptId": "cli-help-messages-pilot",
+        "proofCommand": "missing",
+        "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
+        "parityObligation": {
+          "current": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+          "candidate": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+          "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
+          "blocker": null
+        },
+        "coCutTestGrep": {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/how-to/resolve-an-events-jsonl-truncation.md",
+            "docs\\/how-to\\/resolve-an-events-jsonl-truncation.md",
+            "docs\\/how-to\\/resolve-an-events-jsonl-truncation\\.md"
+          ],
+          "matches": [
+            {
+              "file": "test/setup/checks.test.mjs",
+              "line": 342,
+              "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+              "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
+            }
+          ]
+        }
+      },
+      "window": {
+        "startLine": 100,
+        "endLine": 180,
+        "text": "    // Log went from having a marked seq tail to having none at all --\n    // as unambiguous a truncation as they come.\n    return { ok: false, reason: \"log-emptied\", message: `log no longer has a seq'd tail (was seq ${storedMark.seq})`, mark: currentMark };\n  }\n\n  if (currentMark.seq < storedMark.seq) {\n    return {\n      ok: false,\n      reason: \"regressed\",\n      message: `current tip seq ${currentMark.seq} is lower than the last recorded mark (seq ${storedMark.seq}) -- the log went backwards`,\n      mark: currentMark,\n    };\n  }\n\n  const entries = raw\n    .split(\"\\n\")\n    .filter((l) => l !== \"\")\n    .map((line) => {\n      try {\n        return { line, parsed: JSON.parse(line) };\n      } catch {\n        return { line, parsed: null };\n      }\n    });\n  const atMark = entries.find((e) => e.parsed && e.parsed.seq === storedMark.seq);\n\n  if (!atMark) {\n    return {\n      ok: false,\n      reason: \"mark-seq-missing\",\n      message: `no line in the current log carries seq ${storedMark.seq} (the last recorded mark) even though the tip has grown to seq ${currentMark.seq} -- the position was renumbered out from under the mark`,\n      mark: currentMark,\n    };\n  }\n\n  const atMarkHash = hashLine(atMark.line);\n  if (atMarkHash !== storedMark.hash) {\n    return {\n      ok: false,\n      reason: \"content-mismatch\",\n      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/how-to/resolve-an-events-jsonl-truncation.md)`,\n      mark: currentMark,\n    };\n  }\n\n  return { ok: true, reason: \"clean\", message: `mark still holds at seq ${storedMark.seq}, tip now at seq ${currentMark.seq}`, mark: currentMark };\n}\n\n/**\n * Tầng A/T5 (TA-D10): the sidecar now holds a MAP `{fileName -> {seq,\n * hash}}` instead of a single `{seq, hash}` object -- one entry per\n * tracked file (baseline-0's own basename `\"events.jsonl\"`, or\n * `\"events/<writer file name>\"` for a per-writer file), since a\n * truncation on one writer's file must never be confused with, or hide\n * behind, another writer's own mark. Still one gitignored sidecar per\n * `.fgos/` dir (unchanged path/name) -- only its on-disk SHAPE changed.\n * `readGuardMarks`/`writeGuardMarks` own that shape; every other function\n * below narrows to one entry by `fileKey`.\n */\nexport function readGuardMarks(guardPath) {\n  let raw;\n  try {\n    raw = fs.readFileSync(guardPath, \"utf8\");\n  } catch {\n    return {};\n  }\n  try {\n    const parsed = JSON.parse(raw);\n    return parsed && typeof parsed === \"object\" && !Array.isArray(parsed) ? parsed : {};\n  } catch {\n    return {};\n  }\n}\n\n/** Persist the WHOLE marks map to `guardPath`. */\nexport function writeGuardMarks(guardPath, marks) {\n  fs.mkdirSync(path.dirname(guardPath), { recursive: true });\n  fs.writeFileSync(guardPath, `${JSON.stringify(marks)}\\n`, \"utf8\");\n}\n\n/** Read one file's persisted mark from the shared sidecar map. Missing"
+      },
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+      "cutoverSpecification": {
+        "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+        "file": "src/state/events-jsonl-truncation-guard.mjs",
+        "sourceSha256": "b4dd68558622a872395138a790bc63926ebdf60323b880c6f69b23ca3d7ee0ab",
+        "mode": "100644",
+        "sourceSpans": [
+          {
+            "line": 140,
+            "columnStart": 260,
+            "columnEndExclusive": 309,
+            "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
+          }
+        ],
+        "diff": "--- a/src/state/events-jsonl-truncation-guard.mjs\n+++ b/src/state/events-jsonl-truncation-guard.mjs\n@@ -137,7 +137,7 @@\n     return {\n       ok: false,\n       reason: \"content-mismatch\",\n-      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/how-to/resolve-an-events-jsonl-truncation.md)`,\n+      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md)`,\n       mark: currentMark,\n     };\n   }\n",
+        "expectedAfterSha256": "695215a9ab63d21a5eef2d314aa146e65269cc078efeb0462c7b252cb8c22c02",
+        "targetOwner": [
+          "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md"
+        ],
+        "claimAnchorProof": [
+          {
+            "target": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+            "docId": "how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events-jsonl-truncation:resolve-an-events-jsonl-truncation",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+            "targetSha256": "da410923253f4bdf8219b75fae8176ce4e97b9114e4a2172dbb19adfea460862",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        ],
+        "receiptId": "cli-help-messages-pilot",
+        "coCutPaths": [
+          "CHANGELOG.md",
+          "test/setup/checks.test.mjs"
+        ],
+        "testTargets": [
+          "env -u CLAUDE_CODE_SESSION_ID node --test test/setup/checks.test.mjs",
+          "missing: same-input complete output/category/exit cutover parity; current owning proofs alone are not migration acceptance"
+        ],
+        "prerequisites": [
+          "Lead-started independent semantic review",
+          "Missing exact-output proof",
+          "User-visible CHANGELOG.md Unreleased co-edit in separately authorized Phase 9 packet",
+          "Same-package Step 0 rebind if the final patch touches a bound target",
+          "Step 7 composes and de-duplicates shared co-cut test diffs by file/content; do not apply the same pinned test diff twice. Recompute combined hashes after all seams are assembled."
+        ],
+        "order": "Phase 9 atomic consumer cutover; no apply-now action",
+        "rollbackDiff": "--- a/src/state/events-jsonl-truncation-guard.mjs\n+++ b/src/state/events-jsonl-truncation-guard.mjs\n@@ -137,7 +137,7 @@\n     return {\n       ok: false,\n       reason: \"content-mismatch\",\n-      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md)`,\n+      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/how-to/resolve-an-events-jsonl-truncation.md)`,\n       mark: currentMark,\n     };\n   }\n",
+        "timing": "phase9",
+        "readiness": "pending / cutover-patch-only; never execution-ready",
+        "coCutTestGreps": [
+          {
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+            "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+            "needles": [
+              "docs/how-to/resolve-an-events-jsonl-truncation.md",
+              "docs\\/how-to\\/resolve-an-events-jsonl-truncation.md",
+              "docs\\/how-to\\/resolve-an-events-jsonl-truncation\\.md"
+            ],
+            "matches": [
+              {
+                "file": "test/setup/checks.test.mjs",
+                "line": 342,
+                "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+                "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
+              }
+            ]
+          }
+        ],
+        "coCutTestEdits": [
+          {
+            "file": "test/setup/checks.test.mjs",
+            "referenceId": "reference-003868",
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55",
+            "mode": "100644",
+            "grepMatches": [
+              {
+                "file": "test/setup/checks.test.mjs",
+                "line": 342,
+                "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+                "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
+              }
+            ],
+            "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+            "newPointer": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+            "substitutions": [
+              [
+                "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+                "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {"
+              ]
+            ],
+            "diff": "--- a/test/setup/checks.test.mjs\n+++ b/test/setup/checks.test.mjs\n@@ -339,7 +339,7 @@\n \n // ─── events-jsonl-not-truncated (tsk-cgg) ──────────────────────────────────\n \n-test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n+test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n   assert.equal(\n     FIX_REGISTRATIONS.some((f) => f.id === 'events-jsonl-not-truncated'),\n     false,\n",
+            "expectedAfterSha256": "a19a4a3d2ee134974c4483b9e719df84bc13c045e835c3aa06949ee9f9a059f9",
+            "rollbackDiff": "--- a/test/setup/checks.test.mjs\n+++ b/test/setup/checks.test.mjs\n@@ -339,7 +339,7 @@\n \n // ─── events-jsonl-not-truncated (tsk-cgg) ──────────────────────────────────\n \n-test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n+test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n   assert.equal(\n     FIX_REGISTRATIONS.some((f) => f.id === 'events-jsonl-not-truncated'),\n     false,\n",
+            "timing": "phase9",
+            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+            "grepDecisions": [
+              {
+                "match": {
+                  "file": "test/setup/checks.test.mjs",
+                  "line": 342,
+                  "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+                  "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
+                },
+                "disposition": "patch",
+                "reason": "L12-69: Owning exact emitted-string assertion (or navigation title) follows the single pointer delta; assertion shape and all surrounding bytes stay identical.",
+                "oldLine": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+                "newLine": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {"
+              }
+            ],
+            "disposition": "patch"
+          }
+        ]
+      }
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "kind": "references",
+      "id": "reference-003798",
+      "change": {
+        "id": "reference-003798",
+        "outcome": "unchanged admitted literal; final-state contextual check"
+      },
+      "record": {
+        "referenceId": "reference-003798",
+        "admission": "ADMIT",
+        "inventory": "step-02l-census-class6.json",
+        "edgeId": "class6-l-000344",
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryOrigins": [
+          {
+            "inventory": "step-02l-census-class6.json",
+            "id": "class6-l-000344",
+            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
+          }
+        ],
+        "slotKey": null,
+        "sourceSpans": [
+          {
+            "line": 361,
+            "columnStart": 80,
+            "columnEndExclusive": 103,
+            "text": "docs/decisions/index.md"
+          }
+        ],
+        "originalSourceSpans": [
+          {
+            "columnEndExclusive": 103,
+            "columnStart": 80,
+            "line": 361,
+            "text": "docs/decisions/index.md"
+          }
+        ],
+        "matchedExpression": "docs/decisions/index.md",
+        "passage": "    if (!knownDecisionIds.has(supersessionDecision)) {\n      throw new InstructionRegistryError(\n        `Law supersessionDecision \"${supersessionDecision}\" is not recorded in docs/decisions/index.md`,\n        { filePath: sourcePath, code: 'UNKNOWN_DECISION' },\n      );",
+        "passageSpan": {
+          "startLine": 359,
+          "endLine": 363
+        },
+        "role": "emitted-message",
+        "disposition": "preserve",
+        "reason": "Executable data/message/file operation in own passage: '    if (!knownDecisionIds.has(supersessionDecision)) {\\n      throw new InstructionRegistryError(\\n        `Law supersessionDecision \"${supersessionDecision}\" is not recorded in docs/decisions/index.md`,\\n        { filePath: sourcePath, code: \\'UNKNOWN_DECISION\\' },\\n      );' Preserve actual retained path, synthetic fixture bytes or external-project convention; L12-10/26 keep these roots. Preserve is not a parity pass.",
+        "target": null,
+        "anchor": null,
+        "resolverWitness": {
+          "rule": "retained/external project or comment; no replacement claimed",
+          "currentPath": "docs/decisions/index.md",
+          "exists": true
+        },
+        "timing": "none",
+        "diffHunk": null,
+        "blockedCategory": null,
+        "blockedReason": null,
+        "dependency": null,
+        "dependencyCategory": null,
+        "successorNote": null,
+        "aliasWriteCheck": {
+          "isWriter": false,
+          "destinationIsAlias": false,
+          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
+        },
+        "proposedReplacement": null,
+        "priorRecordRefs": [],
+        "fixtureProvenance": null,
+        "rejectionRule": null,
+        "receiptId": "setup-doctor-roots-pilot",
+        "proofCommand": "missing",
+        "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
+        "parityObligation": {
+          "current": "docs/decisions/index.md",
+          "candidate": "docs/decisions/index.md",
+          "comparison": "Same fixture/export on both sides; exact bytes/strings and status/category/exit for messages, or target set/mode/content/scan findings for readers/writers/defaults. No normalization. Exact qualified receiptId joins the per-seam fields.",
+          "blocker": null
+        }
+      },
+      "window": {
+        "startLine": 321,
+        "endLine": 401,
+        "text": "    );\n  }\n\n  // 8. Normalise relationship arrays\n  const toArrayOfStrings = (val, fieldName) => {\n    if (!val) return [];\n    if (typeof val === 'string') return [val.trim()];\n    if (Array.isArray(val) && val.every((item) => typeof item === 'string')) {\n      return val.map((item) => item.trim());\n    }\n    throw new InstructionRegistryError(\n      `Invalid \"${fieldName}\": must be a string or array of strings`,\n      { filePath: sourcePath, code: 'INVALID_METADATA' },\n    );\n  };\n\n  const dependsOn = toArrayOfStrings(meta.dependsOn, 'dependsOn');\n  const refines = toArrayOfStrings(meta.refines, 'refines');\n  const supersedes = toArrayOfStrings(meta.supersedes, 'supersedes');\n  const conflictsWith = toArrayOfStrings(meta.conflictsWith, 'conflictsWith');\n  const supersessionDecision = meta.supersessionDecision === undefined\n    ? null\n    : String(meta.supersessionDecision).trim();\n  if (meta.supersessionDecision !== undefined && !supersessionDecision) {\n    throw new InstructionRegistryError(\n      'Invalid \"supersessionDecision\": must be a non-empty string when provided',\n      { filePath: sourcePath, code: 'INVALID_METADATA' },\n    );\n  }\n  let supersessionDecisionVerified = false;\n  if (kind === 'law' && supersedes.length > 0) {\n    if (!supersessionDecision || !DECISION_ID_PATTERN.test(supersessionDecision)) {\n      throw new InstructionRegistryError(\n        'Law supersession requires \"supersessionDecision\" naming an existing D-ADR#### decision',\n        { filePath: sourcePath, code: 'INVALID_METADATA' },\n      );\n    }\n    const knownDecisionIds = readDecisionIds(projectRoot, fgosDir);\n    if (!knownDecisionIds.has(supersessionDecision)) {\n      throw new InstructionRegistryError(\n        `Law supersessionDecision \"${supersessionDecision}\" is not recorded in docs/decisions/index.md`,\n        { filePath: sourcePath, code: 'UNKNOWN_DECISION' },\n      );\n    }\n    supersessionDecisionVerified = true;\n  }\n\n  const renderHints = meta.renderHints && typeof meta.renderHints === 'object' && !Array.isArray(meta.renderHints)\n    ? { ...meta.renderHints }\n    : {};\n\n  const unit = Object.freeze({\n    id,\n    owner: unitOwner,\n    authority,\n    sourcePath,\n    fullPath,\n    scope,\n    kind,\n    mode,\n    appliesTo,\n    applicability: appliesTo,\n    specificity,\n    dependsOn,\n    refines,\n    supersedes,\n    supersessionDecision,\n    supersessionDecisionVerified,\n    conflictsWith,\n    renderHints,\n    title: typeof meta.title === 'string' ? meta.title : '',\n    description: typeof meta.description === 'string' ? meta.description : '',\n    body: body.trim(),\n    rawContent,\n  });\n  if (supersessionDecisionVerified) VERIFIED_SUPERSESSION_UNITS.add(unit);\n  return unit;\n}\n\n/**\n * Scan directory recursively for markdown files (*.md)."
+      },
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl"
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "kind": "dynamicTraces",
+      "id": "dynamic-013969",
+      "change": {
+        "id": "dynamic-013969",
+        "oldOutcome": {
+          "admission": "REJECT",
+          "disposition": "preserve",
+          "sourceSpans": null,
+          "coCutPaths": null
+        },
+        "newOutcome": {
+          "admission": "ADMIT",
+          "disposition": "preserve",
+          "sourceSpans": null,
+          "coCutPaths": null
+        }
+      },
+      "record": {
+        "proofCommand": "missing",
+        "parityObligation": {
+          "currentTuple": [
+            361,
+            9,
+            361,
+            104,
+            "`Law supersessionDecision \"${supersessionDecision}\" is not recorded in docs/decisions/index.md`",
+            "template-string",
+            true,
+            "reader"
+          ],
+          "candidateConstruction": "docs/decisions/index.md",
+          "comparison": "Exact same-input emitted/read behavior; literal patch owner supplies one diff. No parity pass inferred.",
+          "blocker": null,
+          "literalOwner": "reference-003798"
+        },
+        "id": "dynamic-013969",
+        "originalTuple": [
+          361,
+          9,
+          361,
+          104,
+          "`Law supersessionDecision \"${supersessionDecision}\" is not recorded in docs/decisions/index.md`",
+          "template-string",
+          true,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "ADMIT",
+        "disposition": "preserve",
+        "currentLine": 361,
+        "currentPassage": {
+          "startLine": 359,
+          "endLine": 363,
+          "text": "    if (!knownDecisionIds.has(supersessionDecision)) {\n      throw new InstructionRegistryError(\n        `Law supersessionDecision \"${supersessionDecision}\" is not recorded in docs/decisions/index.md`,\n        { filePath: sourcePath, code: 'UNKNOWN_DECISION' },\n      );"
+        },
+        "caller": {
+          "line": 188,
+          "declaration": "export function compileInstructionUnit(meta, body, rawContent, context) {"
+        },
+        "inputs": [
+          "`Law supersessionDecision \"${supersessionDecision}\" is not recorded in docs/decisions/index.md`"
+        ],
+        "role": "emitted-message",
+        "targetSetOrConstruction": "docs/decisions/index.md",
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": null,
+        "reason": "L12-69: Same passage as reference-003798; that literal record owns the single outcome and any Phase 9 pointer diff.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot",
+        "samePassageOwner": "reference-003798"
+      },
+      "window": {
+        "startLine": 321,
+        "endLine": 401,
+        "text": "    );\n  }\n\n  // 8. Normalise relationship arrays\n  const toArrayOfStrings = (val, fieldName) => {\n    if (!val) return [];\n    if (typeof val === 'string') return [val.trim()];\n    if (Array.isArray(val) && val.every((item) => typeof item === 'string')) {\n      return val.map((item) => item.trim());\n    }\n    throw new InstructionRegistryError(\n      `Invalid \"${fieldName}\": must be a string or array of strings`,\n      { filePath: sourcePath, code: 'INVALID_METADATA' },\n    );\n  };\n\n  const dependsOn = toArrayOfStrings(meta.dependsOn, 'dependsOn');\n  const refines = toArrayOfStrings(meta.refines, 'refines');\n  const supersedes = toArrayOfStrings(meta.supersedes, 'supersedes');\n  const conflictsWith = toArrayOfStrings(meta.conflictsWith, 'conflictsWith');\n  const supersessionDecision = meta.supersessionDecision === undefined\n    ? null\n    : String(meta.supersessionDecision).trim();\n  if (meta.supersessionDecision !== undefined && !supersessionDecision) {\n    throw new InstructionRegistryError(\n      'Invalid \"supersessionDecision\": must be a non-empty string when provided',\n      { filePath: sourcePath, code: 'INVALID_METADATA' },\n    );\n  }\n  let supersessionDecisionVerified = false;\n  if (kind === 'law' && supersedes.length > 0) {\n    if (!supersessionDecision || !DECISION_ID_PATTERN.test(supersessionDecision)) {\n      throw new InstructionRegistryError(\n        'Law supersession requires \"supersessionDecision\" naming an existing D-ADR#### decision',\n        { filePath: sourcePath, code: 'INVALID_METADATA' },\n      );\n    }\n    const knownDecisionIds = readDecisionIds(projectRoot, fgosDir);\n    if (!knownDecisionIds.has(supersessionDecision)) {\n      throw new InstructionRegistryError(\n        `Law supersessionDecision \"${supersessionDecision}\" is not recorded in docs/decisions/index.md`,\n        { filePath: sourcePath, code: 'UNKNOWN_DECISION' },\n      );\n    }\n    supersessionDecisionVerified = true;\n  }\n\n  const renderHints = meta.renderHints && typeof meta.renderHints === 'object' && !Array.isArray(meta.renderHints)\n    ? { ...meta.renderHints }\n    : {};\n\n  const unit = Object.freeze({\n    id,\n    owner: unitOwner,\n    authority,\n    sourcePath,\n    fullPath,\n    scope,\n    kind,\n    mode,\n    appliesTo,\n    applicability: appliesTo,\n    specificity,\n    dependsOn,\n    refines,\n    supersedes,\n    supersessionDecision,\n    supersessionDecisionVerified,\n    conflictsWith,\n    renderHints,\n    title: typeof meta.title === 'string' ? meta.title : '',\n    description: typeof meta.description === 'string' ? meta.description : '',\n    body: body.trim(),\n    rawContent,\n  });\n  if (supersessionDecisionVerified) VERIFIED_SUPERSESSION_UNITS.add(unit);\n  return unit;\n}\n\n/**\n * Scan directory recursively for markdown files (*.md)."
+      },
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl"
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "kind": "dynamicTraces",
+      "id": "dynamic-013982",
+      "change": {
+        "id": "dynamic-013982",
+        "oldOutcome": {
+          "admission": "ADMIT",
+          "disposition": "preserve",
+          "sourceSpans": null,
+          "coCutPaths": null
+        },
+        "newOutcome": {
+          "admission": "REJECT",
+          "disposition": "preserve",
+          "sourceSpans": null,
+          "coCutPaths": null
+        }
+      },
+      "record": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-013982",
+        "originalTuple": [
+          453,
+          8,
+          453,
+          79,
+          "manifestPath: custom path to architecture manifest (internal/test-only)",
+          "config/default-root",
+          true,
+          "comment"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 453,
+        "currentPassage": {
+          "startLine": 451,
+          "endLine": 455,
+          "text": " *\n * Options:\n *   - manifestPath: custom path to architecture manifest (internal/test-only)\n *   - allowedComponents: explicit array/set of allowed component names (internal/test-only)\n *   - allowedDomains: explicit array/set of allowed domain names (internal/test-only)"
+        },
+        "caller": {
+          "line": 457,
+          "declaration": "export function discoverKnownOwners(projectRoot, options = {}) {"
+        },
+        "inputs": [
+          "manifestPath: custom path to architecture manifest (internal/test-only)"
+        ],
+        "role": "comment",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "JSDoc parameter comment; actual defaults are separate admitted tuples",
+        "reason": "L12-71: JSDoc option declaration 'manifestPath: custom path to architecture manifest (internal/test-only)' describes API parameters; no path construction occurs here.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      },
+      "window": {
+        "startLine": 413,
+        "endLine": 493,
+        "text": "  }\n\n  const entries = fs.readdirSync(dir, { withFileTypes: true });\n  for (const entry of entries) {\n    if (entry.name.startsWith('.')) continue;\n    const fullPath = path.join(dir, entry.name);\n\n    // Verify containment (disallow symlinks escaping containmentRoot)\n    let realEntryPath;\n    try {\n      realEntryPath = fs.realpathSync(fullPath);\n    } catch {\n      continue;\n    }\n\n    const relToRoot = path.relative(realContainmentRoot, realEntryPath);\n    if (relToRoot.startsWith('..') || path.isAbsolute(relToRoot)) {\n      throw new InstructionRegistryError(\n        `Instruction source \"${toPosixPath(fullPath)}\" resolves outside containment root \"${toPosixPath(containmentRoot)}\" via symlink`,\n        { filePath: fullPath, code: 'CONTAINMENT_VIOLATION' },\n      );\n    }\n\n    if (entry.isDirectory()) {\n      results.push(...scanMarkdownFiles(fullPath, containmentRoot));\n    } else if (entry.isFile()) {\n      // Case policy: only lowercase .md extension is recognized\n      if (entry.name.endsWith('.md')) {\n        results.push(fullPath);\n      }\n    }\n  }\n  return results;\n}\n\n/**\n * Discover allowed components and domains under project root from the authoritative\n * architecture manifest (e.g. docs/architecture-manifest.json), rejecting unregistered roots.\n *\n * Options:\n *   - manifestPath: custom path to architecture manifest (internal/test-only)\n *   - allowedComponents: explicit array/set of allowed component names (internal/test-only)\n *   - allowedDomains: explicit array/set of allowed domain names (internal/test-only)\n */\nexport function discoverKnownOwners(projectRoot, options = {}) {\n  const manifestPath = options.manifestPath ?? path.join(projectRoot, 'docs', 'architecture-manifest.json');\n  const owners = new Set(['core', 'platform']);\n\n  if (fs.existsSync(manifestPath)) {\n    try {\n      const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));\n      if (Array.isArray(manifest.components)) {\n        for (const comp of manifest.components) {\n          if (typeof comp === 'string' && comp.trim()) {\n            owners.add(comp.trim());\n          }\n        }\n      }\n      if (Array.isArray(manifest.domains)) {\n        for (const dom of manifest.domains) {\n          if (typeof dom === 'string' && dom.trim()) {\n            owners.add(dom.trim());\n          }\n        }\n      }\n    } catch (err) {\n      throw new InstructionRegistryError(\n        `Failed to parse architecture manifest at ${manifestPath}: ${err.message}`,\n        { filePath: manifestPath, code: 'MANIFEST_ERROR', cause: err },\n      );\n    }\n  }\n\n  if (options.allowedComponents) {\n    for (const comp of options.allowedComponents) {\n      if (typeof comp === 'string' && comp.trim()) owners.add(comp.trim());\n    }\n  }\n  if (options.allowedDomains) {\n    for (const dom of options.allowedDomains) {\n      if (typeof dom === 'string' && dom.trim()) owners.add(dom.trim());"
+      },
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl"
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "kind": "dynamicTraces",
+      "id": "dynamic-013988",
+      "change": {
+        "id": "dynamic-013988",
+        "oldOutcome": {
+          "admission": "ADMIT",
+          "disposition": "preserve",
+          "sourceSpans": null,
+          "coCutPaths": null
+        },
+        "newOutcome": {
+          "admission": "REJECT",
+          "disposition": "preserve",
+          "sourceSpans": null,
+          "coCutPaths": null
+        }
+      },
+      "record": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-013988",
+        "originalTuple": [
+          571,
+          33,
+          571,
+          49,
+          "scope === scope)",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 571,
+        "currentPassage": {
+          "startLine": 569,
+          "endLine": 573,
+          "text": "\n  findByScope(scope) {\n    return this.filter((u) => u.scope === scope);\n  }\n}"
+        },
+        "caller": {
+          "line": 457,
+          "declaration": "export function discoverKnownOwners(projectRoot, options = {}) {"
+        },
+        "inputs": [
+          "scope === scope)"
+        ],
+        "role": "non-document-operation",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'scope === scope)'. Pinned current passage: '\\n  findByScope(scope) {\\n    return this.filter((u) => u.scope === scope);\\n  }\\n}'",
+        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'scope === scope)'. Pinned current passage: '\\n  findByScope(scope) {\\n    return this.filter((u) => u.scope === scope);\\n  }\\n}'",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      },
+      "window": {
+        "startLine": 531,
+        "endLine": 611,
+        "text": "  list() {\n    return [...this];\n  }\n\n  get units() {\n    return [...this];\n  }\n\n  get byId() {\n    return new Map(this.#byId);\n  }\n\n  filter(callback, thisArg) {\n    const results = Array.prototype.filter.call(this, callback, thisArg);\n    return new InstructionRegistry(...results);\n  }\n\n  slice(start, end) {\n    const results = Array.prototype.slice.call(this, start, end);\n    return new InstructionRegistry(...results);\n  }\n\n  concat(...items) {\n    const results = Array.prototype.concat.call(this, ...items);\n    return new InstructionRegistry(...results);\n  }\n\n  findByOwner(owner) {\n    return this.filter((u) => u.owner === owner);\n  }\n\n  findByKind(kind) {\n    return this.filter((u) => u.kind === kind);\n  }\n\n  findByAuthority(authorityType) {\n    return this.filter((u) => u.authority.type === authorityType);\n  }\n\n  findByScope(scope) {\n    return this.filter((u) => u.scope === scope);\n  }\n}\n\n/**\n * Discover canonical instruction sources from:\n *   - core/instructions/\n *   - components/<component>/instructions/\n *   - domains/<domain>/instructions/\n *\n * In production default discovery, instruction sources are strictly discovered\n * from within projectRoot. Allowed component and domain owners are authoritatively\n * resolved from docs/architecture-manifest.json. Unregistered default roots are rejected.\n *\n * Custom roots (coreRoot, componentsRoot, domainsRoot) are test-only/internal options\n * intended solely for test harness fixture isolation and cannot be used by production\n * default discovery.\n *\n * Options:\n *   - coreRoot: (internal/test-only) custom path to core/instructions/\n *   - componentsRoot: (internal/test-only) custom path to components/\n *   - domainsRoot: (internal/test-only) custom path to domains/\n *   - manifestPath: (internal/test-only) custom path to architecture manifest\n *   - knownOwners: Set or Array of valid owner names (internal/test-only override)\n *   - allowDuplicates: boolean (default false, throws on duplicate id)\n */\nexport function discoverInstructionSources(projectRoot, options = {}) {\n  const coreRoot = options.coreRoot ?? path.join(projectRoot, 'core', 'instructions');\n  const componentsRoot = options.componentsRoot ?? path.join(projectRoot, 'components');\n  const domainsRoot = options.domainsRoot ?? path.join(projectRoot, 'domains');\n\n  // Discover or use provided known owners\n  let knownOwners = null;\n  if (options.knownOwners) {\n    knownOwners = options.knownOwners instanceof Set\n      ? options.knownOwners\n      : new Set(options.knownOwners);\n  } else {\n    knownOwners = discoverKnownOwners(projectRoot, {\n      manifestPath: options.manifestPath,\n      allowedComponents: options.allowedComponents,"
+      },
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl"
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "kind": "dynamicTraces",
+      "id": "dynamic-013989",
+      "change": {
+        "id": "dynamic-013989",
+        "oldOutcome": {
+          "admission": "ADMIT",
+          "disposition": "preserve",
+          "sourceSpans": null,
+          "coCutPaths": null
+        },
+        "newOutcome": {
+          "admission": "REJECT",
+          "disposition": "preserve",
+          "sourceSpans": null,
+          "coCutPaths": null
+        }
+      },
+      "record": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-013989",
+        "originalTuple": [
+          590,
+          8,
+          590,
+          72,
+          "coreRoot: (internal/test-only) custom path to core/instructions/",
+          "config/default-root",
+          true,
+          "comment"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 590,
+        "currentPassage": {
+          "startLine": 588,
+          "endLine": 592,
+          "text": " *\n * Options:\n *   - coreRoot: (internal/test-only) custom path to core/instructions/\n *   - componentsRoot: (internal/test-only) custom path to components/\n *   - domainsRoot: (internal/test-only) custom path to domains/"
+        },
+        "caller": {
+          "line": 457,
+          "declaration": "export function discoverKnownOwners(projectRoot, options = {}) {"
+        },
+        "inputs": [
+          "coreRoot: (internal/test-only) custom path to core/instructions/"
+        ],
+        "role": "comment",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "JSDoc parameter comment; actual defaults are separate admitted tuples",
+        "reason": "L12-71: JSDoc option declaration 'coreRoot: (internal/test-only) custom path to core/instructions/' describes API parameters; no path construction occurs here.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      },
+      "window": {
+        "startLine": 550,
+        "endLine": 630,
+        "text": "    return new InstructionRegistry(...results);\n  }\n\n  concat(...items) {\n    const results = Array.prototype.concat.call(this, ...items);\n    return new InstructionRegistry(...results);\n  }\n\n  findByOwner(owner) {\n    return this.filter((u) => u.owner === owner);\n  }\n\n  findByKind(kind) {\n    return this.filter((u) => u.kind === kind);\n  }\n\n  findByAuthority(authorityType) {\n    return this.filter((u) => u.authority.type === authorityType);\n  }\n\n  findByScope(scope) {\n    return this.filter((u) => u.scope === scope);\n  }\n}\n\n/**\n * Discover canonical instruction sources from:\n *   - core/instructions/\n *   - components/<component>/instructions/\n *   - domains/<domain>/instructions/\n *\n * In production default discovery, instruction sources are strictly discovered\n * from within projectRoot. Allowed component and domain owners are authoritatively\n * resolved from docs/architecture-manifest.json. Unregistered default roots are rejected.\n *\n * Custom roots (coreRoot, componentsRoot, domainsRoot) are test-only/internal options\n * intended solely for test harness fixture isolation and cannot be used by production\n * default discovery.\n *\n * Options:\n *   - coreRoot: (internal/test-only) custom path to core/instructions/\n *   - componentsRoot: (internal/test-only) custom path to components/\n *   - domainsRoot: (internal/test-only) custom path to domains/\n *   - manifestPath: (internal/test-only) custom path to architecture manifest\n *   - knownOwners: Set or Array of valid owner names (internal/test-only override)\n *   - allowDuplicates: boolean (default false, throws on duplicate id)\n */\nexport function discoverInstructionSources(projectRoot, options = {}) {\n  const coreRoot = options.coreRoot ?? path.join(projectRoot, 'core', 'instructions');\n  const componentsRoot = options.componentsRoot ?? path.join(projectRoot, 'components');\n  const domainsRoot = options.domainsRoot ?? path.join(projectRoot, 'domains');\n\n  // Discover or use provided known owners\n  let knownOwners = null;\n  if (options.knownOwners) {\n    knownOwners = options.knownOwners instanceof Set\n      ? options.knownOwners\n      : new Set(options.knownOwners);\n  } else {\n    knownOwners = discoverKnownOwners(projectRoot, {\n      manifestPath: options.manifestPath,\n      allowedComponents: options.allowedComponents,\n      allowedDomains: options.allowedDomains,\n    });\n  }\n\n  const collected = [];\n  const idToPaths = new Map();\n\n  // 1. Core / platform instructions\n  if (fs.existsSync(coreRoot)) {\n    const files = scanMarkdownFiles(coreRoot, options.coreRoot ? coreRoot : projectRoot);\n    for (const fullPath of files) {\n      const sourcePath = toPosixPath(path.relative(projectRoot, fullPath));\n      const content = fs.readFileSync(fullPath, 'utf8');\n      const { meta, body, rawContent } = extractInstructionFrontmatter(content, sourcePath);\n      const unit = compileInstructionUnit(meta, body, rawContent, {\n        projectRoot,\n        fullPath,\n        sourcePath,\n        rootType: 'platform',"
+      },
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl"
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "kind": "dynamicTraces",
+      "id": "dynamic-013990",
+      "change": {
+        "id": "dynamic-013990",
+        "oldOutcome": {
+          "admission": "ADMIT",
+          "disposition": "preserve",
+          "sourceSpans": null,
+          "coCutPaths": null
+        },
+        "newOutcome": {
+          "admission": "REJECT",
+          "disposition": "preserve",
+          "sourceSpans": null,
+          "coCutPaths": null
+        }
+      },
+      "record": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-013990",
+        "originalTuple": [
+          591,
+          8,
+          591,
+          71,
+          "componentsRoot: (internal/test-only) custom path to components/",
+          "config/default-root",
+          true,
+          "comment"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 591,
+        "currentPassage": {
+          "startLine": 589,
+          "endLine": 593,
+          "text": " * Options:\n *   - coreRoot: (internal/test-only) custom path to core/instructions/\n *   - componentsRoot: (internal/test-only) custom path to components/\n *   - domainsRoot: (internal/test-only) custom path to domains/\n *   - manifestPath: (internal/test-only) custom path to architecture manifest"
+        },
+        "caller": {
+          "line": 457,
+          "declaration": "export function discoverKnownOwners(projectRoot, options = {}) {"
+        },
+        "inputs": [
+          "componentsRoot: (internal/test-only) custom path to components/"
+        ],
+        "role": "comment",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "JSDoc parameter comment; actual defaults are separate admitted tuples",
+        "reason": "L12-71: JSDoc option declaration 'componentsRoot: (internal/test-only) custom path to components/' describes API parameters; no path construction occurs here.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      },
+      "window": {
+        "startLine": 551,
+        "endLine": 631,
+        "text": "  }\n\n  concat(...items) {\n    const results = Array.prototype.concat.call(this, ...items);\n    return new InstructionRegistry(...results);\n  }\n\n  findByOwner(owner) {\n    return this.filter((u) => u.owner === owner);\n  }\n\n  findByKind(kind) {\n    return this.filter((u) => u.kind === kind);\n  }\n\n  findByAuthority(authorityType) {\n    return this.filter((u) => u.authority.type === authorityType);\n  }\n\n  findByScope(scope) {\n    return this.filter((u) => u.scope === scope);\n  }\n}\n\n/**\n * Discover canonical instruction sources from:\n *   - core/instructions/\n *   - components/<component>/instructions/\n *   - domains/<domain>/instructions/\n *\n * In production default discovery, instruction sources are strictly discovered\n * from within projectRoot. Allowed component and domain owners are authoritatively\n * resolved from docs/architecture-manifest.json. Unregistered default roots are rejected.\n *\n * Custom roots (coreRoot, componentsRoot, domainsRoot) are test-only/internal options\n * intended solely for test harness fixture isolation and cannot be used by production\n * default discovery.\n *\n * Options:\n *   - coreRoot: (internal/test-only) custom path to core/instructions/\n *   - componentsRoot: (internal/test-only) custom path to components/\n *   - domainsRoot: (internal/test-only) custom path to domains/\n *   - manifestPath: (internal/test-only) custom path to architecture manifest\n *   - knownOwners: Set or Array of valid owner names (internal/test-only override)\n *   - allowDuplicates: boolean (default false, throws on duplicate id)\n */\nexport function discoverInstructionSources(projectRoot, options = {}) {\n  const coreRoot = options.coreRoot ?? path.join(projectRoot, 'core', 'instructions');\n  const componentsRoot = options.componentsRoot ?? path.join(projectRoot, 'components');\n  const domainsRoot = options.domainsRoot ?? path.join(projectRoot, 'domains');\n\n  // Discover or use provided known owners\n  let knownOwners = null;\n  if (options.knownOwners) {\n    knownOwners = options.knownOwners instanceof Set\n      ? options.knownOwners\n      : new Set(options.knownOwners);\n  } else {\n    knownOwners = discoverKnownOwners(projectRoot, {\n      manifestPath: options.manifestPath,\n      allowedComponents: options.allowedComponents,\n      allowedDomains: options.allowedDomains,\n    });\n  }\n\n  const collected = [];\n  const idToPaths = new Map();\n\n  // 1. Core / platform instructions\n  if (fs.existsSync(coreRoot)) {\n    const files = scanMarkdownFiles(coreRoot, options.coreRoot ? coreRoot : projectRoot);\n    for (const fullPath of files) {\n      const sourcePath = toPosixPath(path.relative(projectRoot, fullPath));\n      const content = fs.readFileSync(fullPath, 'utf8');\n      const { meta, body, rawContent } = extractInstructionFrontmatter(content, sourcePath);\n      const unit = compileInstructionUnit(meta, body, rawContent, {\n        projectRoot,\n        fullPath,\n        sourcePath,\n        rootType: 'platform',\n        rootOwner: 'core',"
+      },
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl"
+    },
+    {
       "file": "src/setup/instruction-registry.mjs",
       "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
@@ -50,18 +772,18 @@
           "text": " *   - coreRoot: (internal/test-only) custom path to core/instructions/\n *   - componentsRoot: (internal/test-only) custom path to components/\n *   - domainsRoot: (internal/test-only) custom path to domains/\n *   - manifestPath: (internal/test-only) custom path to architecture manifest\n *   - knownOwners: Set or Array of valid owner names (internal/test-only override)"
         },
         "caller": {
-          "line": 457,
-          "declaration": "export function discoverKnownOwners(projectRoot, options = {}) {"
+          "line": 597,
+          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
         },
         "inputs": [
           "domainsRoot: (internal/test-only) custom path to domains/"
         ],
-        "role": "non-document-operation",
+        "role": "comment",
         "targetSetOrConstruction": null,
         "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'domainsRoot: (internal/test-only) custom path to domains/'. Pinned current passage: ' *   - coreRoot: (internal/test-only) custom path to core/instructions/\\n *   - componentsRoot: (internal/test-only) custom path to components/\\n *   - domainsRoot: (internal/test-only) custom path to domains/\\n *   - manifestPath: (internal/test-only) custom path to architecture manifest\\n *   - knownOwners: Set or Array of valid owner names (internal/test-only override)'",
-        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'domainsRoot: (internal/test-only) custom path to domains/'. Pinned current passage: ' *   - coreRoot: (internal/test-only) custom path to core/instructions/\\n *   - componentsRoot: (internal/test-only) custom path to components/\\n *   - domainsRoot: (internal/test-only) custom path to domains/\\n *   - manifestPath: (internal/test-only) custom path to architecture manifest\\n *   - knownOwners: Set or Array of valid owner names (internal/test-only override)'",
+        "rejectedAsUnrelatedReason": "JSDoc parameter comment; actual defaults are separate admitted tuples",
+        "reason": "L12-71: JSDoc option declaration 'domainsRoot: (internal/test-only) custom path to domains/' describes API parameters; no path construction occurs here.",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"
@@ -121,18 +843,18 @@
           "text": " *   - componentsRoot: (internal/test-only) custom path to components/\n *   - domainsRoot: (internal/test-only) custom path to domains/\n *   - manifestPath: (internal/test-only) custom path to architecture manifest\n *   - knownOwners: Set or Array of valid owner names (internal/test-only override)\n *   - allowDuplicates: boolean (default false, throws on duplicate id)"
         },
         "caller": {
-          "line": 457,
-          "declaration": "export function discoverKnownOwners(projectRoot, options = {}) {"
+          "line": 597,
+          "declaration": "export function discoverInstructionSources(projectRoot, options = {}) {"
         },
         "inputs": [
           "manifestPath: (internal/test-only) custom path to architecture manifest"
         ],
-        "role": "non-document-operation",
+        "role": "comment",
         "targetSetOrConstruction": null,
         "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'manifestPath: (internal/test-only) custom path to architecture manifest'. Pinned current passage: ' *   - componentsRoot: (internal/test-only) custom path to components/\\n *   - domainsRoot: (internal/test-only) custom path to domains/\\n *   - manifestPath: (internal/test-only) custom path to architecture manifest\\n *   - knownOwners: Set or Array of valid owner names (internal/test-only override)\\n *   - allowDuplicates: boolean (default false, throws on duplicate id)'",
-        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'manifestPath: (internal/test-only) custom path to architecture manifest'. Pinned current passage: ' *   - componentsRoot: (internal/test-only) custom path to components/\\n *   - domainsRoot: (internal/test-only) custom path to domains/\\n *   - manifestPath: (internal/test-only) custom path to architecture manifest\\n *   - knownOwners: Set or Array of valid owner names (internal/test-only override)\\n *   - allowDuplicates: boolean (default false, throws on duplicate id)'",
+        "rejectedAsUnrelatedReason": "JSDoc parameter comment; actual defaults are separate admitted tuples",
+        "reason": "L12-71: JSDoc option declaration 'manifestPath: (internal/test-only) custom path to architecture manifest' describes API parameters; no path construction occurs here.",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"
@@ -415,8 +1137,8 @@
         "targetSetOrConstruction": null,
         "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'fgosDir: options.fgosDir'. Pinned current passage: \"        rootOwner: 'core',\\n        knownOwners,\\n        fgosDir: options.fgosDir,\\n      });\\n      collected.push(unit);\"",
-        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'fgosDir: options.fgosDir'. Pinned current passage: \"        rootOwner: 'core',\\n        knownOwners,\\n        fgosDir: options.fgosDir,\\n      });\\n      collected.push(unit);\"",
+        "rejectedAsUnrelatedReason": "State directory pass-through into listWork; not a document location",
+        "reason": "L12-71: state directory 'fgosDir: options.fgosDir' handed to listWork; the generated decision-index read is owned by dynamic-013969.",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"
@@ -628,8 +1350,8 @@
         "targetSetOrConstruction": null,
         "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'fgosDir: options.fgosDir'. Pinned current passage: '            rootOwner: componentName,\\n            knownOwners,\\n            fgosDir: options.fgosDir,\\n          });\\n          collected.push(unit);'",
-        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'fgosDir: options.fgosDir'. Pinned current passage: '            rootOwner: componentName,\\n            knownOwners,\\n            fgosDir: options.fgosDir,\\n          });\\n          collected.push(unit);'",
+        "rejectedAsUnrelatedReason": "State directory pass-through into listWork; not a document location",
+        "reason": "L12-71: state directory 'fgosDir: options.fgosDir' handed to listWork; the generated decision-index read is owned by dynamic-013969.",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"
@@ -841,8 +1563,8 @@
         "targetSetOrConstruction": null,
         "stateExportDependency": null,
         "fixtureProvenance": null,
-        "rejectedAsUnrelatedReason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'fgosDir: options.fgosDir'. Pinned current passage: '            rootOwner: domainName,\\n            knownOwners,\\n            fgosDir: options.fgosDir,\\n          });\\n          collected.push(unit);'",
-        "reason": "L12-69: Scalar metadata/guard/accumulator or text serialization; this operation constructs no path or document operand. Own frozen operation 'fgosDir: options.fgosDir'. Pinned current passage: '            rootOwner: domainName,\\n            knownOwners,\\n            fgosDir: options.fgosDir,\\n          });\\n          collected.push(unit);'",
+        "rejectedAsUnrelatedReason": "State directory pass-through into listWork; not a document location",
+        "reason": "L12-71: state directory 'fgosDir: options.fgosDir' handed to listWork; the generated decision-index read is owned by dynamic-013969.",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"
@@ -987,7 +1709,8 @@
         "reason": "L12-69: Pinned diagnostic/header text has no documentation-location operand; interpolation formats pool/release/assembly status. Own frozen operation \"`warning: the lease still reads runner.providers; ${parts.join('; ')}`\". Pinned current passage: \"  if (onlyNew.length > 0) parts.push(`only in runner.llmAccounts: ${onlyNew.map((a) => `${a.pool}/${a.account}`).join(', ')}`);\\n  if (storeMismatch.length > 0) parts.push(`different login directories: ${storeMismatch.map((a) => `${a.pool}/${a.account}`).join(', ')}`);\\n  if (parts.length > 0) return { passed: true, message: `warning: the lease reads runner.llmAccounts for a pool it declares and runner.providers for the rest; ${parts.join('; ')}` };\\n  return { passed: true, message: 'runner.llmAccounts matches runner.providers' };\\n}\"",
         "blockedSeams": [],
         "blockedReason": null,
-        "receiptId": "setup-doctor-roots-pilot"
+        "receiptId": "setup-doctor-roots-pilot",
+        "censusDriftNote": "L12-71: diagnostic text drifted since census pin; current pinned parts.join formatting is unchanged in role."
       },
       "window": {
         "startLine": 127,
@@ -1477,7 +2200,7 @@
         "rejectionRule": null,
         "receiptId": "setup-doctor-roots-pilot",
         "proofCommand": "missing",
-        "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
+        "proofScope": "Exact emitted-output parity missing. Existing test/setup/checks.test.mjs (and readme-tag-check owning proof where relevant) are current behavior targets only, not this parity proof.",
         "parityObligation": {
           "current": "docs/how-to/cut-a-fgos-release-tag.md",
           "candidate": "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
@@ -1869,7 +2592,7 @@
         "rejectionRule": null,
         "receiptId": "setup-doctor-roots-pilot",
         "proofCommand": "missing",
-        "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
+        "proofScope": "Exact emitted-output parity missing. Existing test/setup/checks.test.mjs (and readme-tag-check owning proof where relevant) are current behavior targets only, not this parity proof.",
         "parityObligation": {
           "current": "docs/how-to/resolve-an-events-jsonl-truncation.md",
           "candidate": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
@@ -2535,7 +3258,7 @@
         "rejectionRule": null,
         "receiptId": "setup-doctor-roots-pilot",
         "proofCommand": "missing",
-        "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
+        "proofScope": "Exact emitted-output parity missing. Existing test/setup/checks.test.mjs (and readme-tag-check owning proof where relevant) are current behavior targets only, not this parity proof.",
         "parityObligation": {
           "current": "docs/how-to/write-a-task-spec.md",
           "candidate": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
@@ -3653,574 +4376,6 @@
         "text": "  key: 'docRegistry',\n  shape: DEFAULT_DOC_REGISTRY_SETTINGS,\n});\n\nregisterCheck({\n  id: 'doc-registry-enforce',\n  description: 'docRegistry.enforce in the shared config file is present and boolean',\n  check: (cwd) => checkDocRegistryEnforce(cwd),\n});\n\n// Same marker the release drift check uses to recognise the fgOS source repo.\nfunction isFgosSourceCheckout(root) {\n  return fs.existsSync(path.join(root, 'apps/fgos/Cargo.toml'));\n}\n\n// The doc registry is opt-in per project: doctor --fix only refreshes it.\nfunction docRegistryAdopted(root) {\n  return fs.existsSync(path.join(root, 'docs/doc-registry.md')) || fs.existsSync(path.join(root, 'docs/doc-registry.json'));\n}\n\nfunction checkDocRegistryStale(cwd) {\n  const mainCheckout = resolveMainCheckout(cwd);\n  const root = mainCheckout ?? cwd;\n  const fgosDir = path.join(root, '.fgos');\n  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) {\n    return { passed: true, message: 'knowledge registry check skipped -- no events log' };\n  }\n  if (!docRegistryAdopted(root)) {\n    return { passed: true, message: 'not applicable -- no doc registry in this project (run fgos doc-registry to adopt)' };\n  }\n  const view = rebuild(fgosDir);\n  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\n  const mdPath = path.join(root, 'docs/doc-registry.md');\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\n  const mdOk = fs.existsSync(mdPath) && fs.readFileSync(mdPath, 'utf8') === mdContent;\n  const jsonOk = fs.existsSync(jsonPath) && fs.readFileSync(jsonPath, 'utf8') === jsonContent;\n\n  if (mdOk && jsonOk) {\n    return { passed: true, message: 'doc-registry projections up to date' };\n  }\n  return { passed: false, message: 'docs/doc-registry.md or docs/doc-registry.json is stale -- run fgos doc-registry' };\n}\n\nfunction fixDocRegistryStale(cwd) {\n  const mainCheckout = resolveMainCheckout(cwd);\n  const root = mainCheckout ?? cwd;\n  const fgosDir = path.join(root, '.fgos');\n  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) {\n    return { changed: false, message: 'skipped -- no events log' };\n  }\n  if (!docRegistryAdopted(root)) {\n    return { changed: false, message: 'skipped -- no doc registry in this project (run fgos doc-registry to adopt)' };\n  }\n  let view;\n  try {\n    view = rebuild(fgosDir);\n  } catch (err) {\n    if (err instanceof StoreError || err.code === 'ENOENT') {\n      return { changed: false, message: `skipped -- ${err.message}` };\n    }\n    throw err;\n  }\n  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\n  const mdPath = path.join(root, 'docs/doc-registry.md');\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\n\n  fs.mkdirSync(path.dirname(mdPath), { recursive: true });\n  fs.writeFileSync(mdPath, mdContent, 'utf8');\n  fs.writeFileSync(jsonPath, jsonContent, 'utf8');\n  return { changed: true, message: 'regenerated docs/doc-registry.md and docs/doc-registry.json' };\n}\n\n// tsk-28x code review finding: this used to treat \"no file on disk at the\n// alias path\" as broken -- but D-tsk28x-9 defines an alias as a doc's OLD\n// path, kept purely as a historical lookup key (never a live location);\n// after a real migration (`fgos doc move-path`), the file legitimately no\n// longer exists there, which is the correct, expected post-migration\n// state, not a defect. That made this check fail every doc a migration\n// had already moved. The real \"broken\" shape (per resolveDocPath, this\n// same file's own resolver) is an alias that resolves AMBIGUOUSLY: two or\n// more non-retired docs claiming the identical alias string, or an alias"
       },
       "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl"
-    },
-    {
-      "file": "src/setup/registrations.mjs",
-      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "kind": "references",
-      "id": "reference-003833",
-      "change": {
-        "id": "reference-003833",
-        "oldOutcome": {
-          "admission": "ADMIT",
-          "disposition": "preserve",
-          "sourceSpans": [
-            {
-              "line": 3931,
-              "columnStart": 37,
-              "columnEndExclusive": 59,
-              "text": "docs/doc-registry.json"
-            }
-          ],
-          "coCutPaths": null
-        },
-        "newOutcome": {
-          "admission": "ADMIT",
-          "disposition": "parked",
-          "sourceSpans": [
-            {
-              "line": 3931,
-              "columnStart": 37,
-              "columnEndExclusive": 59,
-              "text": "docs/doc-registry.json"
-            }
-          ],
-          "coCutPaths": null
-        }
-      },
-      "record": {
-        "referenceId": "reference-003833",
-        "admission": "ADMIT",
-        "inventory": "step-02l-census-class6.json",
-        "edgeId": "class6-l-000389",
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "inventoryOrigins": [
-          {
-            "inventory": "step-02l-census-class6.json",
-            "id": "class6-l-000389",
-            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
-          }
-        ],
-        "slotKey": null,
-        "sourceSpans": [
-          {
-            "line": 3931,
-            "columnStart": 37,
-            "columnEndExclusive": 59,
-            "text": "docs/doc-registry.json"
-          }
-        ],
-        "originalSourceSpans": [
-          {
-            "columnEndExclusive": 59,
-            "columnStart": 37,
-            "line": 3912,
-            "text": "docs/doc-registry.json"
-          }
-        ],
-        "matchedExpression": "docs/doc-registry.json",
-        "passage": "  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\n  const mdPath = path.join(root, 'docs/doc-registry.md');\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\n  const mdOk = fs.existsSync(mdPath) && fs.readFileSync(mdPath, 'utf8') === mdContent;\n  const jsonOk = fs.existsSync(jsonPath) && fs.readFileSync(jsonPath, 'utf8') === jsonContent;",
-        "passageSpan": {
-          "startLine": 3929,
-          "endLine": 3933
-        },
-        "role": "reader/default",
-        "disposition": "parked",
-        "reason": "L12-69: Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized. Own passage \"  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\\n  const mdPath = path.join(root, 'docs/doc-registry.md');\\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\\n  const mdOk = fs.existsSync(mdPath) && fs.readFileSync(mdPath, 'utf8') === mdContent;\\n  const jsonOk = fs.existsSync(jsonPath) && fs.readFileSync(jsonPath, 'utf8') === jsonContent;\"",
-        "target": null,
-        "anchor": null,
-        "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/doc-registry.json",
-          "exists": true
-        },
-        "timing": "phase9",
-        "diffHunk": null,
-        "blockedCategory": "step5-parity",
-        "blockedReason": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
-        "dependency": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
-        "dependencyCategory": "step5-parity",
-        "successorNote": null,
-        "aliasWriteCheck": {
-          "isWriter": null,
-          "destinationIsAlias": null,
-          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
-        },
-        "proposedReplacement": null,
-        "priorRecordRefs": [],
-        "fixtureProvenance": null,
-        "rejectionRule": null,
-        "receiptId": "setup-doctor-roots-pilot",
-        "proofCommand": "missing",
-        "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
-        "parityObligation": {
-          "current": "docs/doc-registry.json",
-          "candidate": null,
-          "comparison": "Pending owning co-cut/export; no active patch or parity claim.",
-          "blocker": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized."
-        },
-        "samePassageOwner": "dynamic-014369"
-      },
-      "window": {
-        "startLine": 3891,
-        "endLine": 3971,
-        "text": "    return { passed: false, message: 'docRegistry.enforce is not a boolean' };\n  }\n  return { passed: true, message: `docRegistry: enforce=${settings.enforce}` };\n}\n\nregisterConfigDefault({\n  id: 'docRegistry',\n  key: 'docRegistry',\n  shape: DEFAULT_DOC_REGISTRY_SETTINGS,\n});\n\nregisterCheck({\n  id: 'doc-registry-enforce',\n  description: 'docRegistry.enforce in the shared config file is present and boolean',\n  check: (cwd) => checkDocRegistryEnforce(cwd),\n});\n\n// Same marker the release drift check uses to recognise the fgOS source repo.\nfunction isFgosSourceCheckout(root) {\n  return fs.existsSync(path.join(root, 'apps/fgos/Cargo.toml'));\n}\n\n// The doc registry is opt-in per project: doctor --fix only refreshes it.\nfunction docRegistryAdopted(root) {\n  return fs.existsSync(path.join(root, 'docs/doc-registry.md')) || fs.existsSync(path.join(root, 'docs/doc-registry.json'));\n}\n\nfunction checkDocRegistryStale(cwd) {\n  const mainCheckout = resolveMainCheckout(cwd);\n  const root = mainCheckout ?? cwd;\n  const fgosDir = path.join(root, '.fgos');\n  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) {\n    return { passed: true, message: 'knowledge registry check skipped -- no events log' };\n  }\n  if (!docRegistryAdopted(root)) {\n    return { passed: true, message: 'not applicable -- no doc registry in this project (run fgos doc-registry to adopt)' };\n  }\n  const view = rebuild(fgosDir);\n  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\n  const mdPath = path.join(root, 'docs/doc-registry.md');\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\n  const mdOk = fs.existsSync(mdPath) && fs.readFileSync(mdPath, 'utf8') === mdContent;\n  const jsonOk = fs.existsSync(jsonPath) && fs.readFileSync(jsonPath, 'utf8') === jsonContent;\n\n  if (mdOk && jsonOk) {\n    return { passed: true, message: 'doc-registry projections up to date' };\n  }\n  return { passed: false, message: 'docs/doc-registry.md or docs/doc-registry.json is stale -- run fgos doc-registry' };\n}\n\nfunction fixDocRegistryStale(cwd) {\n  const mainCheckout = resolveMainCheckout(cwd);\n  const root = mainCheckout ?? cwd;\n  const fgosDir = path.join(root, '.fgos');\n  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) {\n    return { changed: false, message: 'skipped -- no events log' };\n  }\n  if (!docRegistryAdopted(root)) {\n    return { changed: false, message: 'skipped -- no doc registry in this project (run fgos doc-registry to adopt)' };\n  }\n  let view;\n  try {\n    view = rebuild(fgosDir);\n  } catch (err) {\n    if (err instanceof StoreError || err.code === 'ENOENT') {\n      return { changed: false, message: `skipped -- ${err.message}` };\n    }\n    throw err;\n  }\n  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\n  const mdPath = path.join(root, 'docs/doc-registry.md');\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\n\n  fs.mkdirSync(path.dirname(mdPath), { recursive: true });\n  fs.writeFileSync(mdPath, mdContent, 'utf8');\n  fs.writeFileSync(jsonPath, jsonContent, 'utf8');\n  return { changed: true, message: 'regenerated docs/doc-registry.md and docs/doc-registry.json' };\n}\n\n// tsk-28x code review finding: this used to treat \"no file on disk at the\n// alias path\" as broken -- but D-tsk28x-9 defines an alias as a doc's OLD"
-      },
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "cutoverSpecification": {
-        "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-        "file": "src/setup/registrations.mjs",
-        "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-        "mode": "100644",
-        "sourceSpans": [
-          {
-            "line": 3518,
-            "columnStart": 96,
-            "columnEndExclusive": 133,
-            "text": "docs/how-to/cut-a-fgos-release-tag.md"
-          },
-          {
-            "line": 2094,
-            "columnStart": 109,
-            "columnEndExclusive": 158,
-            "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
-          },
-          {
-            "line": 874,
-            "columnStart": 142,
-            "columnEndExclusive": 174,
-            "text": "docs/how-to/write-a-task-spec.md"
-          }
-        ],
-        "diff": "--- a/src/setup/registrations.mjs\n+++ b/src/setup/registrations.mjs\n@@ -871,7 +871,7 @@\n     }\n   }\n   if (missing.length > 0) {\n-    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };\n+    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md` };\n   }\n   return { passed: true, message: 'every domain\\'s taskSpecMap entry and operation resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };\n }\n@@ -2091,7 +2091,7 @@\n   }\n   return {\n     passed: false,\n-    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,\n+    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md`,\n   };\n }\n \n@@ -3515,7 +3515,7 @@\n   }\n   return {\n     passed: false,\n-    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n+    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n   };\n }\n \n",
-        "expectedAfterSha256": "e5a0579e471f1e173a045ffd28eed898cbc2d7c2462db3c3d438836e9a489d62",
-        "targetOwner": [
-          "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
-          "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
-          "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md"
-        ],
-        "claimAnchorProof": [
-          {
-            "target": "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
-            "docId": "how-to-cut-a-fgos-release-tag:cut-a-fgos-release-tag",
-            "registryPath": "docs/doc-registry.json",
-            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
-            "alias": "docs/how-to/cut-a-fgos-release-tag.md",
-            "targetSha256": "9977b7d61ca9fa05bd8025e7d04112e2c087379f793649bb766b7e013d8fb659",
-            "claim": "live currentPath lookup; no writer destination adopts an alias"
-          },
-          {
-            "target": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
-            "docId": "how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events-jsonl-truncation:resolve-an-events-jsonl-truncation",
-            "registryPath": "docs/doc-registry.json",
-            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
-            "alias": "docs/how-to/resolve-an-events-jsonl-truncation.md",
-            "targetSha256": "da410923253f4bdf8219b75fae8176ce4e97b9114e4a2172dbb19adfea460862",
-            "claim": "live currentPath lookup; no writer destination adopts an alias"
-          },
-          {
-            "target": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
-            "docId": "how-to-write-a-task-spec:write-a-task-spec",
-            "registryPath": "docs/doc-registry.json",
-            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
-            "alias": "docs/how-to/write-a-task-spec.md",
-            "targetSha256": "dfdd678642adb8b4795088759d783a024d5b9afb41227bb96f907af173659083",
-            "claim": "live currentPath lookup; no writer destination adopts an alias"
-          }
-        ],
-        "receiptId": "setup-doctor-roots-pilot",
-        "coCutPaths": [
-          "CHANGELOG.md",
-          "test/setup/checks.test.mjs"
-        ],
-        "testTargets": [
-          "env -u CLAUDE_CODE_SESSION_ID node --test test/setup/checks.test.mjs",
-          "missing: same-input complete output/category/exit cutover parity; current owning proofs alone are not migration acceptance"
-        ],
-        "prerequisites": [
-          "Lead-started independent semantic review",
-          "Missing exact-output proof",
-          "User-visible CHANGELOG.md Unreleased co-edit in separately authorized Phase 9 packet",
-          "Same-package Step 0 rebind if the final patch touches a bound target",
-          "Step 7 composes and de-duplicates shared co-cut test diffs by file/content; do not apply the same pinned test diff twice. Recompute combined hashes after all seams are assembled."
-        ],
-        "order": "Phase 9 atomic consumer cutover; no apply-now action",
-        "rollbackDiff": "--- a/src/setup/registrations.mjs\n+++ b/src/setup/registrations.mjs\n@@ -871,7 +871,7 @@\n     }\n   }\n   if (missing.length > 0) {\n-    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md` };\n+    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };\n   }\n   return { passed: true, message: 'every domain\\'s taskSpecMap entry and operation resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };\n }\n@@ -2091,7 +2091,7 @@\n   }\n   return {\n     passed: false,\n-    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md`,\n+    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,\n   };\n }\n \n@@ -3515,7 +3515,7 @@\n   }\n   return {\n     passed: false,\n-    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n+    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n   };\n }\n \n",
-        "timing": "phase9",
-        "readiness": "pending / cutover-patch-only; never execution-ready",
-        "coCutTestGreps": [
-          {
-            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-            "oldPointer": "docs/how-to/cut-a-fgos-release-tag.md",
-            "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
-            "needles": [
-              "docs/how-to/cut-a-fgos-release-tag.md",
-              "docs\\/how-to\\/cut-a-fgos-release-tag.md",
-              "docs\\/how-to\\/cut-a-fgos-release-tag\\.md"
-            ],
-            "matches": []
-          },
-          {
-            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-            "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
-            "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
-            "needles": [
-              "docs/how-to/resolve-an-events-jsonl-truncation.md",
-              "docs\\/how-to\\/resolve-an-events-jsonl-truncation.md",
-              "docs\\/how-to\\/resolve-an-events-jsonl-truncation\\.md"
-            ],
-            "matches": [
-              {
-                "file": "test/setup/checks.test.mjs",
-                "line": 342,
-                "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
-                "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
-              }
-            ]
-          },
-          {
-            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-            "oldPointer": "docs/how-to/write-a-task-spec.md",
-            "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
-            "needles": [
-              "docs/how-to/write-a-task-spec.md",
-              "docs\\/how-to\\/write-a-task-spec.md",
-              "docs\\/how-to\\/write-a-task-spec\\.md"
-            ],
-            "matches": []
-          }
-        ],
-        "coCutTestEdits": [
-          {
-            "file": "test/setup/checks.test.mjs",
-            "referenceId": "reference-003806",
-            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-            "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55",
-            "mode": "100644",
-            "grepMatches": [
-              {
-                "file": "test/setup/checks.test.mjs",
-                "line": 342,
-                "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
-                "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
-              }
-            ],
-            "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
-            "newPointer": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
-            "substitutions": [
-              [
-                "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
-                "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {"
-              ]
-            ],
-            "diff": "--- a/test/setup/checks.test.mjs\n+++ b/test/setup/checks.test.mjs\n@@ -339,7 +339,7 @@\n \n // ─── events-jsonl-not-truncated (tsk-cgg) ──────────────────────────────────\n \n-test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n+test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n   assert.equal(\n     FIX_REGISTRATIONS.some((f) => f.id === 'events-jsonl-not-truncated'),\n     false,\n",
-            "expectedAfterSha256": "a19a4a3d2ee134974c4483b9e719df84bc13c045e835c3aa06949ee9f9a059f9",
-            "rollbackDiff": "--- a/test/setup/checks.test.mjs\n+++ b/test/setup/checks.test.mjs\n@@ -339,7 +339,7 @@\n \n // ─── events-jsonl-not-truncated (tsk-cgg) ──────────────────────────────────\n \n-test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n+test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n   assert.equal(\n     FIX_REGISTRATIONS.some((f) => f.id === 'events-jsonl-not-truncated'),\n     false,\n",
-            "timing": "phase9",
-            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
-            "grepDecisions": [
-              {
-                "match": {
-                  "file": "test/setup/checks.test.mjs",
-                  "line": 342,
-                  "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
-                  "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
-                },
-                "disposition": "patch",
-                "reason": "L12-69: Owning exact emitted-string assertion (or navigation title) follows the single pointer delta; assertion shape and all surrounding bytes stay identical.",
-                "oldLine": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
-                "newLine": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {"
-              }
-            ],
-            "disposition": "patch"
-          }
-        ]
-      }
-    },
-    {
-      "file": "src/setup/registrations.mjs",
-      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-      "kind": "references",
-      "id": "reference-003834",
-      "change": {
-        "id": "reference-003834",
-        "oldOutcome": {
-          "admission": "ADMIT",
-          "disposition": "preserve",
-          "sourceSpans": [
-            {
-              "line": 3962,
-              "columnStart": 37,
-              "columnEndExclusive": 59,
-              "text": "docs/doc-registry.json"
-            }
-          ],
-          "coCutPaths": null
-        },
-        "newOutcome": {
-          "admission": "ADMIT",
-          "disposition": "parked",
-          "sourceSpans": [
-            {
-              "line": 3962,
-              "columnStart": 37,
-              "columnEndExclusive": 59,
-              "text": "docs/doc-registry.json"
-            }
-          ],
-          "coCutPaths": null
-        }
-      },
-      "record": {
-        "referenceId": "reference-003834",
-        "admission": "ADMIT",
-        "inventory": "step-02l-census-class6.json",
-        "edgeId": "class6-l-000393",
-        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-        "inventoryOrigins": [
-          {
-            "inventory": "step-02l-census-class6.json",
-            "id": "class6-l-000393",
-            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
-          }
-        ],
-        "slotKey": null,
-        "sourceSpans": [
-          {
-            "line": 3962,
-            "columnStart": 37,
-            "columnEndExclusive": 59,
-            "text": "docs/doc-registry.json"
-          }
-        ],
-        "originalSourceSpans": [
-          {
-            "columnEndExclusive": 59,
-            "columnStart": 37,
-            "line": 3943,
-            "text": "docs/doc-registry.json"
-          }
-        ],
-        "matchedExpression": "docs/doc-registry.json",
-        "passage": "  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\n  const mdPath = path.join(root, 'docs/doc-registry.md');\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\n\n  fs.mkdirSync(path.dirname(mdPath), { recursive: true });",
-        "passageSpan": {
-          "startLine": 3960,
-          "endLine": 3964
-        },
-        "role": "reader/default",
-        "disposition": "parked",
-        "reason": "L12-69: Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized. Own passage \"  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\\n  const mdPath = path.join(root, 'docs/doc-registry.md');\\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\\n\\n  fs.mkdirSync(path.dirname(mdPath), { recursive: true });\"",
-        "target": null,
-        "anchor": null,
-        "resolverWitness": {
-          "rule": "retained/external project or comment; no replacement claimed",
-          "currentPath": "docs/doc-registry.json",
-          "exists": true
-        },
-        "timing": "phase9",
-        "diffHunk": null,
-        "blockedCategory": "step5-parity",
-        "blockedReason": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
-        "dependency": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
-        "dependencyCategory": "step5-parity",
-        "successorNote": null,
-        "aliasWriteCheck": {
-          "isWriter": null,
-          "destinationIsAlias": null,
-          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
-        },
-        "proposedReplacement": null,
-        "priorRecordRefs": [],
-        "fixtureProvenance": null,
-        "rejectionRule": null,
-        "receiptId": "setup-doctor-roots-pilot",
-        "proofCommand": "missing",
-        "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
-        "parityObligation": {
-          "current": "docs/doc-registry.json",
-          "candidate": null,
-          "comparison": "Pending owning co-cut/export; no active patch or parity claim.",
-          "blocker": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized."
-        },
-        "samePassageOwner": "dynamic-014378"
-      },
-      "window": {
-        "startLine": 3922,
-        "endLine": 4002,
-        "text": "  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) {\n    return { passed: true, message: 'knowledge registry check skipped -- no events log' };\n  }\n  if (!docRegistryAdopted(root)) {\n    return { passed: true, message: 'not applicable -- no doc registry in this project (run fgos doc-registry to adopt)' };\n  }\n  const view = rebuild(fgosDir);\n  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\n  const mdPath = path.join(root, 'docs/doc-registry.md');\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\n  const mdOk = fs.existsSync(mdPath) && fs.readFileSync(mdPath, 'utf8') === mdContent;\n  const jsonOk = fs.existsSync(jsonPath) && fs.readFileSync(jsonPath, 'utf8') === jsonContent;\n\n  if (mdOk && jsonOk) {\n    return { passed: true, message: 'doc-registry projections up to date' };\n  }\n  return { passed: false, message: 'docs/doc-registry.md or docs/doc-registry.json is stale -- run fgos doc-registry' };\n}\n\nfunction fixDocRegistryStale(cwd) {\n  const mainCheckout = resolveMainCheckout(cwd);\n  const root = mainCheckout ?? cwd;\n  const fgosDir = path.join(root, '.fgos');\n  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) {\n    return { changed: false, message: 'skipped -- no events log' };\n  }\n  if (!docRegistryAdopted(root)) {\n    return { changed: false, message: 'skipped -- no doc registry in this project (run fgos doc-registry to adopt)' };\n  }\n  let view;\n  try {\n    view = rebuild(fgosDir);\n  } catch (err) {\n    if (err instanceof StoreError || err.code === 'ENOENT') {\n      return { changed: false, message: `skipped -- ${err.message}` };\n    }\n    throw err;\n  }\n  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\n  const mdPath = path.join(root, 'docs/doc-registry.md');\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\n\n  fs.mkdirSync(path.dirname(mdPath), { recursive: true });\n  fs.writeFileSync(mdPath, mdContent, 'utf8');\n  fs.writeFileSync(jsonPath, jsonContent, 'utf8');\n  return { changed: true, message: 'regenerated docs/doc-registry.md and docs/doc-registry.json' };\n}\n\n// tsk-28x code review finding: this used to treat \"no file on disk at the\n// alias path\" as broken -- but D-tsk28x-9 defines an alias as a doc's OLD\n// path, kept purely as a historical lookup key (never a live location);\n// after a real migration (`fgos doc move-path`), the file legitimately no\n// longer exists there, which is the correct, expected post-migration\n// state, not a defect. That made this check fail every doc a migration\n// had already moved. The real \"broken\" shape (per resolveDocPath, this\n// same file's own resolver) is an alias that resolves AMBIGUOUSLY: two or\n// more non-retired docs claiming the identical alias string, or an alias\n// that collides with a DIFFERENT doc's own currentPath.\nfunction checkDocAliasBroken(cwd) {\n  const root = resolveMainCheckout(cwd) ?? cwd;\n  const fgosDir = path.join(root, '.fgos');\n  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };\n  const view = rebuild(fgosDir);\n  const docs = Object.values(view.docs || {}).filter((d) => d.docLifecycle !== 'retired');\n  const aliasOwners = new Map();\n  for (const doc of docs) {\n    for (const alias of doc.aliases || []) {\n      if (!aliasOwners.has(alias)) aliasOwners.set(alias, []);\n      aliasOwners.get(alias).push(doc.docId);\n    }\n  }\n  const currentPaths = new Map(docs.map((d) => [d.currentPath, d.docId]));\n  const broken = [];\n  for (const [alias, owners] of aliasOwners) {\n    if (owners.length > 1) {\n      broken.push(`${alias}: claimed by ${owners.length} docs (${owners.join(', ')})`);\n    } else if (currentPaths.has(alias) && currentPaths.get(alias) !== owners[0]) {\n      broken.push(`${alias}: alias of ${owners[0]} but also the currentPath of ${currentPaths.get(alias)}`);\n    }\n  }\n  if (broken.length === 0) return { passed: true, message: 'no broken doc aliases' };"
-      },
-      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
-      "cutoverSpecification": {
-        "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-        "file": "src/setup/registrations.mjs",
-        "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
-        "mode": "100644",
-        "sourceSpans": [
-          {
-            "line": 3518,
-            "columnStart": 96,
-            "columnEndExclusive": 133,
-            "text": "docs/how-to/cut-a-fgos-release-tag.md"
-          },
-          {
-            "line": 2094,
-            "columnStart": 109,
-            "columnEndExclusive": 158,
-            "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
-          },
-          {
-            "line": 874,
-            "columnStart": 142,
-            "columnEndExclusive": 174,
-            "text": "docs/how-to/write-a-task-spec.md"
-          }
-        ],
-        "diff": "--- a/src/setup/registrations.mjs\n+++ b/src/setup/registrations.mjs\n@@ -871,7 +871,7 @@\n     }\n   }\n   if (missing.length > 0) {\n-    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };\n+    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md` };\n   }\n   return { passed: true, message: 'every domain\\'s taskSpecMap entry and operation resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };\n }\n@@ -2091,7 +2091,7 @@\n   }\n   return {\n     passed: false,\n-    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,\n+    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md`,\n   };\n }\n \n@@ -3515,7 +3515,7 @@\n   }\n   return {\n     passed: false,\n-    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n+    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n   };\n }\n \n",
-        "expectedAfterSha256": "e5a0579e471f1e173a045ffd28eed898cbc2d7c2462db3c3d438836e9a489d62",
-        "targetOwner": [
-          "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
-          "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
-          "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md"
-        ],
-        "claimAnchorProof": [
-          {
-            "target": "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
-            "docId": "how-to-cut-a-fgos-release-tag:cut-a-fgos-release-tag",
-            "registryPath": "docs/doc-registry.json",
-            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
-            "alias": "docs/how-to/cut-a-fgos-release-tag.md",
-            "targetSha256": "9977b7d61ca9fa05bd8025e7d04112e2c087379f793649bb766b7e013d8fb659",
-            "claim": "live currentPath lookup; no writer destination adopts an alias"
-          },
-          {
-            "target": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
-            "docId": "how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events-jsonl-truncation:resolve-an-events-jsonl-truncation",
-            "registryPath": "docs/doc-registry.json",
-            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
-            "alias": "docs/how-to/resolve-an-events-jsonl-truncation.md",
-            "targetSha256": "da410923253f4bdf8219b75fae8176ce4e97b9114e4a2172dbb19adfea460862",
-            "claim": "live currentPath lookup; no writer destination adopts an alias"
-          },
-          {
-            "target": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
-            "docId": "how-to-write-a-task-spec:write-a-task-spec",
-            "registryPath": "docs/doc-registry.json",
-            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
-            "alias": "docs/how-to/write-a-task-spec.md",
-            "targetSha256": "dfdd678642adb8b4795088759d783a024d5b9afb41227bb96f907af173659083",
-            "claim": "live currentPath lookup; no writer destination adopts an alias"
-          }
-        ],
-        "receiptId": "setup-doctor-roots-pilot",
-        "coCutPaths": [
-          "CHANGELOG.md",
-          "test/setup/checks.test.mjs"
-        ],
-        "testTargets": [
-          "env -u CLAUDE_CODE_SESSION_ID node --test test/setup/checks.test.mjs",
-          "missing: same-input complete output/category/exit cutover parity; current owning proofs alone are not migration acceptance"
-        ],
-        "prerequisites": [
-          "Lead-started independent semantic review",
-          "Missing exact-output proof",
-          "User-visible CHANGELOG.md Unreleased co-edit in separately authorized Phase 9 packet",
-          "Same-package Step 0 rebind if the final patch touches a bound target",
-          "Step 7 composes and de-duplicates shared co-cut test diffs by file/content; do not apply the same pinned test diff twice. Recompute combined hashes after all seams are assembled."
-        ],
-        "order": "Phase 9 atomic consumer cutover; no apply-now action",
-        "rollbackDiff": "--- a/src/setup/registrations.mjs\n+++ b/src/setup/registrations.mjs\n@@ -871,7 +871,7 @@\n     }\n   }\n   if (missing.length > 0) {\n-    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md` };\n+    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };\n   }\n   return { passed: true, message: 'every domain\\'s taskSpecMap entry and operation resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };\n }\n@@ -2091,7 +2091,7 @@\n   }\n   return {\n     passed: false,\n-    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md`,\n+    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,\n   };\n }\n \n@@ -3515,7 +3515,7 @@\n   }\n   return {\n     passed: false,\n-    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n+    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n   };\n }\n \n",
-        "timing": "phase9",
-        "readiness": "pending / cutover-patch-only; never execution-ready",
-        "coCutTestGreps": [
-          {
-            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-            "oldPointer": "docs/how-to/cut-a-fgos-release-tag.md",
-            "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
-            "needles": [
-              "docs/how-to/cut-a-fgos-release-tag.md",
-              "docs\\/how-to\\/cut-a-fgos-release-tag.md",
-              "docs\\/how-to\\/cut-a-fgos-release-tag\\.md"
-            ],
-            "matches": []
-          },
-          {
-            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-            "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
-            "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
-            "needles": [
-              "docs/how-to/resolve-an-events-jsonl-truncation.md",
-              "docs\\/how-to\\/resolve-an-events-jsonl-truncation.md",
-              "docs\\/how-to\\/resolve-an-events-jsonl-truncation\\.md"
-            ],
-            "matches": [
-              {
-                "file": "test/setup/checks.test.mjs",
-                "line": 342,
-                "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
-                "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
-              }
-            ]
-          },
-          {
-            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-            "oldPointer": "docs/how-to/write-a-task-spec.md",
-            "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
-            "needles": [
-              "docs/how-to/write-a-task-spec.md",
-              "docs\\/how-to\\/write-a-task-spec.md",
-              "docs\\/how-to\\/write-a-task-spec\\.md"
-            ],
-            "matches": []
-          }
-        ],
-        "coCutTestEdits": [
-          {
-            "file": "test/setup/checks.test.mjs",
-            "referenceId": "reference-003806",
-            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
-            "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55",
-            "mode": "100644",
-            "grepMatches": [
-              {
-                "file": "test/setup/checks.test.mjs",
-                "line": 342,
-                "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
-                "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
-              }
-            ],
-            "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
-            "newPointer": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
-            "substitutions": [
-              [
-                "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
-                "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {"
-              ]
-            ],
-            "diff": "--- a/test/setup/checks.test.mjs\n+++ b/test/setup/checks.test.mjs\n@@ -339,7 +339,7 @@\n \n // ─── events-jsonl-not-truncated (tsk-cgg) ──────────────────────────────────\n \n-test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n+test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n   assert.equal(\n     FIX_REGISTRATIONS.some((f) => f.id === 'events-jsonl-not-truncated'),\n     false,\n",
-            "expectedAfterSha256": "a19a4a3d2ee134974c4483b9e719df84bc13c045e835c3aa06949ee9f9a059f9",
-            "rollbackDiff": "--- a/test/setup/checks.test.mjs\n+++ b/test/setup/checks.test.mjs\n@@ -339,7 +339,7 @@\n \n // ─── events-jsonl-not-truncated (tsk-cgg) ──────────────────────────────────\n \n-test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n+test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n   assert.equal(\n     FIX_REGISTRATIONS.some((f) => f.id === 'events-jsonl-not-truncated'),\n     false,\n",
-            "timing": "phase9",
-            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
-            "grepDecisions": [
-              {
-                "match": {
-                  "file": "test/setup/checks.test.mjs",
-                  "line": 342,
-                  "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
-                  "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
-                },
-                "disposition": "patch",
-                "reason": "L12-69: Owning exact emitted-string assertion (or navigation title) follows the single pointer delta; assertion shape and all surrounding bytes stay identical.",
-                "oldLine": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
-                "newLine": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {"
-              }
-            ],
-            "disposition": "patch"
-          }
-        ]
-      }
     }
   ]
 }

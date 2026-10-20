@@ -17,6 +17,7 @@
     "pinned-passage",
     "receipts",
     "rejections",
+    "retiring-retained",
     "review",
     "setup",
     "source-pins",
@@ -470,9 +471,21 @@
           "error": "unaccounted pinned legacy-root grep hit at 6659: docs/specs/workflow.md"
         }
       ]
+    },
+    {
+      "name": "A retiring target cannot preserve on a retained witness",
+      "owningRule": "retiring-retained",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "retiring-retained",
+          "where": "src/setup/registrations.mjs:reference-003819",
+          "error": "retiring tree cannot be a retained witness"
+        }
+      ]
     }
   ],
-  "passed": 36,
-  "total": 36,
+  "passed": 37,
+  "total": 37,
   "failures": []
 }

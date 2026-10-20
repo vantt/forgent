@@ -1,0 +1,3066 @@
+{
+  "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+  "part": 28,
+  "items": [
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 483,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014569",
+        "originalTuple": [
+          4986,
+          14,
+          4986,
+          132,
+          "`current platform (${arch}-${platform}) is not an approved rust host target (approved: ${approvedTargets.join(', ')})`",
+          "template-string",
+          true,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5005,
+        "currentPassage": {
+          "startLine": 5003,
+          "endLine": 5007,
+          "text": "  return {\n    passed: false,\n    message: `current platform (${arch}-${platform}) is not an approved rust host target (approved: ${approvedTargets.join(', ')})`,\n  };\n}"
+        },
+        "caller": {
+          "line": 4995,
+          "declaration": "const approvedTargets = RELEASE_TARGETS.map((t) => t.triple);"
+        },
+        "inputs": [
+          "`current platform (${arch}-${platform}) is not an approved rust host target (approved: ${approvedTargets.join(', ')})`"
+        ],
+        "role": "scalar/thread",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"`current platform (${arch}-${platform}) is not an approved rust host target (approved: ${approvedTargets.join(', ')})`\"",
+        "reason": "Concrete non-document operation: thread wait or array/string serialization, not path resolution: \"`current platform (${arch}-${platform}) is not an approved rust host target (approved: ${approvedTargets.join(', ')})`\"",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 484,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014570",
+        "originalTuple": [
+          4991,
+          9,
+          4991,
+          47,
+          "root = resolveMainCheckout(cwd) ?? cwd",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5010,
+        "currentPassage": {
+          "startLine": 5008,
+          "endLine": 5012,
+          "text": "\nfunction checkLegacyNodePayloadPresent(cwd) {\n  const root = resolveMainCheckout(cwd) ?? cwd;\n  const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);\n  const releaseInfo = resolveActiveReleaseForDoctor(cwd);"
+        },
+        "caller": {
+          "line": 5009,
+          "declaration": "function checkLegacyNodePayloadPresent(cwd) {"
+        },
+        "inputs": [
+          "root = resolveMainCheckout(cwd) ?? cwd"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkLegacyNodePayloadPresent(cwd) { config/default/check operation 'root = resolveMainCheckout(cwd) ?? cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkLegacyNodePayloadPresent(cwd) { config/default/check operation 'root = resolveMainCheckout(cwd) ?? cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 485,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014571",
+        "originalTuple": [
+          4992,
+          9,
+          4992,
+          29,
+          "candidateDirs = [cwd",
+          "config/default-root",
+          true,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5011,
+        "currentPassage": {
+          "startLine": 5009,
+          "endLine": 5013,
+          "text": "function checkLegacyNodePayloadPresent(cwd) {\n  const root = resolveMainCheckout(cwd) ?? cwd;\n  const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);\n  const releaseInfo = resolveActiveReleaseForDoctor(cwd);\n  let payloadPath = null;"
+        },
+        "caller": {
+          "line": 5011,
+          "declaration": "const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);"
+        },
+        "inputs": [
+          "candidateDirs = [cwd"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i); config/default/check operation 'candidateDirs = [cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i); config/default/check operation 'candidateDirs = [cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 486,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014572",
+        "originalTuple": [
+          4994,
+          7,
+          4994,
+          25,
+          "payloadPath = null",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5013,
+        "currentPassage": {
+          "startLine": 5011,
+          "endLine": 5015,
+          "text": "  const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);\n  const releaseInfo = resolveActiveReleaseForDoctor(cwd);\n  let payloadPath = null;\n\n  if (releaseInfo.manifest) {"
+        },
+        "caller": {
+          "line": 5011,
+          "declaration": "const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);"
+        },
+        "inputs": [
+          "payloadPath = null"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i); config/default/check operation 'payloadPath = null' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i); config/default/check operation 'payloadPath = null' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 487,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014573",
+        "originalTuple": [
+          4997,
+          11,
+          4997,
+          106,
+          "rootDir = releaseInfo.manifest.components?.legacyNode?.root ?? releaseInfo.manifest.root ?? '.'",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5016,
+        "currentPassage": {
+          "startLine": 5014,
+          "endLine": 5018,
+          "text": "\n  if (releaseInfo.manifest) {\n    const rootDir = releaseInfo.manifest.components?.legacyNode?.root ?? releaseInfo.manifest.root ?? '.';\n    const entry = releaseInfo.manifest.components?.legacyNode?.entry ?? releaseInfo.manifest.entry ?? 'bin/fgos.mjs';\n    payloadPath = resolveConfinedManifestPath(releaseInfo.releasePath, rootDir, entry);"
+        },
+        "caller": {
+          "line": 5011,
+          "declaration": "const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);"
+        },
+        "inputs": [
+          "rootDir = releaseInfo.manifest.components?.legacyNode?.root ?? releaseInfo.manifest.root ?? '.'"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i); config/default/check operation \"rootDir = releaseInfo.manifest.components?.legacyNode?.root ?? releaseInfo.manifest.root ?? '.'\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i); config/default/check operation \"rootDir = releaseInfo.manifest.components?.legacyNode?.root ?? releaseInfo.manifest.root ?? '.'\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 488,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014574",
+        "originalTuple": [
+          4997,
+          66,
+          4997,
+          106,
+          "root ?? releaseInfo.manifest.root ?? '.'",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5016,
+        "currentPassage": {
+          "startLine": 5014,
+          "endLine": 5018,
+          "text": "\n  if (releaseInfo.manifest) {\n    const rootDir = releaseInfo.manifest.components?.legacyNode?.root ?? releaseInfo.manifest.root ?? '.';\n    const entry = releaseInfo.manifest.components?.legacyNode?.entry ?? releaseInfo.manifest.entry ?? 'bin/fgos.mjs';\n    payloadPath = resolveConfinedManifestPath(releaseInfo.releasePath, rootDir, entry);"
+        },
+        "caller": {
+          "line": 5011,
+          "declaration": "const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);"
+        },
+        "inputs": [
+          "root ?? releaseInfo.manifest.root ?? '.'"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i); config/default/check operation \"root ?? releaseInfo.manifest.root ?? '.'\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i); config/default/check operation \"root ?? releaseInfo.manifest.root ?? '.'\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 489,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014575",
+        "originalTuple": [
+          4997,
+          95,
+          4997,
+          106,
+          "root ?? '.'",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5016,
+        "currentPassage": {
+          "startLine": 5014,
+          "endLine": 5018,
+          "text": "\n  if (releaseInfo.manifest) {\n    const rootDir = releaseInfo.manifest.components?.legacyNode?.root ?? releaseInfo.manifest.root ?? '.';\n    const entry = releaseInfo.manifest.components?.legacyNode?.entry ?? releaseInfo.manifest.entry ?? 'bin/fgos.mjs';\n    payloadPath = resolveConfinedManifestPath(releaseInfo.releasePath, rootDir, entry);"
+        },
+        "caller": {
+          "line": 5011,
+          "declaration": "const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);"
+        },
+        "inputs": [
+          "root ?? '.'"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i); config/default/check operation \"root ?? '.'\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i); config/default/check operation \"root ?? '.'\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 490,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014576",
+        "originalTuple": [
+          4999,
+          5,
+          4999,
+          70,
+          "payloadPath = resolveConfinedManifestPath(releaseInfo.releasePath",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5018,
+        "currentPassage": {
+          "startLine": 5016,
+          "endLine": 5020,
+          "text": "    const rootDir = releaseInfo.manifest.components?.legacyNode?.root ?? releaseInfo.manifest.root ?? '.';\n    const entry = releaseInfo.manifest.components?.legacyNode?.entry ?? releaseInfo.manifest.entry ?? 'bin/fgos.mjs';\n    payloadPath = resolveConfinedManifestPath(releaseInfo.releasePath, rootDir, entry);\n    if (payloadPath === null) {\n      return {"
+        },
+        "caller": {
+          "line": 5011,
+          "declaration": "const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);"
+        },
+        "inputs": [
+          "payloadPath = resolveConfinedManifestPath(releaseInfo.releasePath"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i); config/default/check operation 'payloadPath = resolveConfinedManifestPath(releaseInfo.releasePath' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i); config/default/check operation 'payloadPath = resolveConfinedManifestPath(releaseInfo.releasePath' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 491,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014577",
+        "originalTuple": [
+          5000,
+          9,
+          5000,
+          32,
+          "payloadPath === null) {",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5019,
+        "currentPassage": {
+          "startLine": 5017,
+          "endLine": 5021,
+          "text": "    const entry = releaseInfo.manifest.components?.legacyNode?.entry ?? releaseInfo.manifest.entry ?? 'bin/fgos.mjs';\n    payloadPath = resolveConfinedManifestPath(releaseInfo.releasePath, rootDir, entry);\n    if (payloadPath === null) {\n      return {\n        passed: false,"
+        },
+        "caller": {
+          "line": 5011,
+          "declaration": "const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);"
+        },
+        "inputs": [
+          "payloadPath === null) {"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i); config/default/check operation 'payloadPath === null) {' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i); config/default/check operation 'payloadPath === null) {' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 492,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014578",
+        "originalTuple": [
+          5003,
+          18,
+          5003,
+          125,
+          "`active release manifest's legacyNode root/entry (\"${rootDir}\"/\"${entry}\") escapes the active release path`",
+          "template-string",
+          true,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5022,
+        "currentPassage": {
+          "startLine": 5020,
+          "endLine": 5024,
+          "text": "      return {\n        passed: false,\n        message: `active release manifest's legacyNode root/entry (\"${rootDir}\"/\"${entry}\") escapes the active release path`,\n      };\n    }"
+        },
+        "caller": {
+          "line": 5011,
+          "declaration": "const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);"
+        },
+        "inputs": [
+          "`active release manifest's legacyNode root/entry (\"${rootDir}\"/\"${entry}\") escapes the active release path`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`active release manifest\\'s legacyNode root/entry (\"${rootDir}\"/\"${entry}\") escapes the active release path`'. It formats values at const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`active release manifest\\'s legacyNode root/entry (\"${rootDir}\"/\"${entry}\") escapes the active release path`'. It formats values at const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 493,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014579",
+        "originalTuple": [
+          5008,
+          32,
+          5008,
+          71,
+          "path.join(candidate, 'bin', 'fgos.mjs')",
+          "path-call",
+          true,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5027,
+        "currentPassage": {
+          "startLine": 5025,
+          "endLine": 5029,
+          "text": "  } else if (releaseInfo.isDevCheckout) {\n    for (const candidate of candidateDirs) {\n      const candidatePayload = path.join(candidate, 'bin', 'fgos.mjs');\n      if (fs.existsSync(candidatePayload)) {\n        payloadPath = candidatePayload;"
+        },
+        "caller": {
+          "line": 5011,
+          "declaration": "const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);"
+        },
+        "inputs": [
+          "path.join(candidate, 'bin', 'fgos.mjs')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i); config/default/check operation \"path.join(candidate, 'bin', 'fgos.mjs')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i); config/default/check operation \"path.join(candidate, 'bin', 'fgos.mjs')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 494,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014580",
+        "originalTuple": [
+          5010,
+          9,
+          5010,
+          39,
+          "payloadPath = candidatePayload",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5029,
+        "currentPassage": {
+          "startLine": 5027,
+          "endLine": 5031,
+          "text": "      const candidatePayload = path.join(candidate, 'bin', 'fgos.mjs');\n      if (fs.existsSync(candidatePayload)) {\n        payloadPath = candidatePayload;\n        break;\n      }"
+        },
+        "caller": {
+          "line": 5011,
+          "declaration": "const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);"
+        },
+        "inputs": [
+          "payloadPath = candidatePayload"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i); config/default/check operation 'payloadPath = candidatePayload' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i); config/default/check operation 'payloadPath = candidatePayload' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 495,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014581",
+        "originalTuple": [
+          5015,
+          21,
+          5015,
+          54,
+          "path.join(cwd, 'bin', 'fgos.mjs')",
+          "path-call",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5034,
+        "currentPassage": {
+          "startLine": 5032,
+          "endLine": 5036,
+          "text": "    }\n    if (!payloadPath) {\n      payloadPath = path.join(cwd, 'bin', 'fgos.mjs');\n    }\n  } else {"
+        },
+        "caller": {
+          "line": 5011,
+          "declaration": "const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);"
+        },
+        "inputs": [
+          "path.join(cwd, 'bin', 'fgos.mjs')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i); config/default/check operation \"path.join(cwd, 'bin', 'fgos.mjs')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i); config/default/check operation \"path.join(cwd, 'bin', 'fgos.mjs')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 496,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014582",
+        "originalTuple": [
+          5015,
+          7,
+          5015,
+          34,
+          "payloadPath = path.join(cwd",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5034,
+        "currentPassage": {
+          "startLine": 5032,
+          "endLine": 5036,
+          "text": "    }\n    if (!payloadPath) {\n      payloadPath = path.join(cwd, 'bin', 'fgos.mjs');\n    }\n  } else {"
+        },
+        "caller": {
+          "line": 5011,
+          "declaration": "const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);"
+        },
+        "inputs": [
+          "payloadPath = path.join(cwd"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i); config/default/check operation 'payloadPath = path.join(cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i); config/default/check operation 'payloadPath = path.join(cwd' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 497,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014583",
+        "originalTuple": [
+          5028,
+          37,
+          5028,
+          82,
+          "`legacy node payload present: ${payloadPath}`",
+          "template-string",
+          true,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5047,
+        "currentPassage": {
+          "startLine": 5045,
+          "endLine": 5049,
+          "text": "\n  if (fs.existsSync(payloadPath) && fs.statSync(payloadPath).isFile()) {\n    return { passed: true, message: `legacy node payload present: ${payloadPath}` };\n  }\n  return { passed: false, message: `legacy node payload does not exist at ${payloadPath}` };"
+        },
+        "caller": {
+          "line": 5011,
+          "declaration": "const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);"
+        },
+        "inputs": [
+          "`legacy node payload present: ${payloadPath}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`legacy node payload present: ${payloadPath}`'. It formats values at const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`legacy node payload present: ${payloadPath}`'. It formats values at const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 498,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014584",
+        "originalTuple": [
+          5030,
+          36,
+          5030,
+          90,
+          "`legacy node payload does not exist at ${payloadPath}`",
+          "template-string",
+          true,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5049,
+        "currentPassage": {
+          "startLine": 5047,
+          "endLine": 5051,
+          "text": "    return { passed: true, message: `legacy node payload present: ${payloadPath}` };\n  }\n  return { passed: false, message: `legacy node payload does not exist at ${payloadPath}` };\n}\n"
+        },
+        "caller": {
+          "line": 5011,
+          "declaration": "const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);"
+        },
+        "inputs": [
+          "`legacy node payload does not exist at ${payloadPath}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`legacy node payload does not exist at ${payloadPath}`'. It formats values at const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`legacy node payload does not exist at ${payloadPath}`'. It formats values at const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 499,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014585",
+        "originalTuple": [
+          5038,
+          21,
+          5038,
+          83,
+          "`Manifest path escapes containment or is invalid: ${relative}`",
+          "template-string",
+          true,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5057,
+        "currentPassage": {
+          "startLine": 5055,
+          "endLine": 5059,
+          "text": "  if (typeof relative !== 'string' || !relative || path.isAbsolute(relative) ||\n      relative.includes('\\\\') || relative.split('/').includes('..')) {\n    throw new Error(`Manifest path escapes containment or is invalid: ${relative}`);\n  }\n  const resolvedBase = path.resolve(base);"
+        },
+        "caller": {
+          "line": 5054,
+          "declaration": "function doctorDriftPath(base, relative = '.', optional = false) {"
+        },
+        "inputs": [
+          "`Manifest path escapes containment or is invalid: ${relative}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`Manifest path escapes containment or is invalid: ${relative}`'. It formats values at function doctorDriftPath(base, relative = '.', optional = false) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`Manifest path escapes containment or is invalid: ${relative}`'. It formats values at function doctorDriftPath(base, relative = '.', optional = false) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 500,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014586",
+        "originalTuple": [
+          5040,
+          24,
+          5040,
+          42,
+          "path.resolve(base)",
+          "path-call",
+          true,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5059,
+        "currentPassage": {
+          "startLine": 5057,
+          "endLine": 5061,
+          "text": "    throw new Error(`Manifest path escapes containment or is invalid: ${relative}`);\n  }\n  const resolvedBase = path.resolve(base);\n  const resolved = path.resolve(resolvedBase, relative);\n  if (resolved !== resolvedBase && !resolved.startsWith(resolvedBase + path.sep)) {"
+        },
+        "caller": {
+          "line": 5054,
+          "declaration": "function doctorDriftPath(base, relative = '.', optional = false) {"
+        },
+        "inputs": [
+          "path.resolve(base)"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function doctorDriftPath(base, relative = '.', optional = false) { config/default/check operation 'path.resolve(base)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function doctorDriftPath(base, relative = '.', optional = false) { config/default/check operation 'path.resolve(base)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 501,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014587",
+        "originalTuple": [
+          5041,
+          20,
+          5041,
+          56,
+          "path.resolve(resolvedBase, relative)",
+          "path-call",
+          true,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5060,
+        "currentPassage": {
+          "startLine": 5058,
+          "endLine": 5062,
+          "text": "  }\n  const resolvedBase = path.resolve(base);\n  const resolved = path.resolve(resolvedBase, relative);\n  if (resolved !== resolvedBase && !resolved.startsWith(resolvedBase + path.sep)) {\n    throw new Error(`Path escapes containment: ${relative}`);"
+        },
+        "caller": {
+          "line": 5054,
+          "declaration": "function doctorDriftPath(base, relative = '.', optional = false) {"
+        },
+        "inputs": [
+          "path.resolve(resolvedBase, relative)"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function doctorDriftPath(base, relative = '.', optional = false) { config/default/check operation 'path.resolve(resolvedBase, relative)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function doctorDriftPath(base, relative = '.', optional = false) { config/default/check operation 'path.resolve(resolvedBase, relative)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 502,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014588",
+        "originalTuple": [
+          5043,
+          21,
+          5043,
+          60,
+          "`Path escapes containment: ${relative}`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5062,
+        "currentPassage": {
+          "startLine": 5060,
+          "endLine": 5064,
+          "text": "  const resolved = path.resolve(resolvedBase, relative);\n  if (resolved !== resolvedBase && !resolved.startsWith(resolvedBase + path.sep)) {\n    throw new Error(`Path escapes containment: ${relative}`);\n  }\n  // lstat each segment: realpath containment alone still accepts in-root links,"
+        },
+        "caller": {
+          "line": 5054,
+          "declaration": "function doctorDriftPath(base, relative = '.', optional = false) {"
+        },
+        "inputs": [
+          "`Path escapes containment: ${relative}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`Path escapes containment: ${relative}`'. It formats values at function doctorDriftPath(base, relative = '.', optional = false) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`Path escapes containment: ${relative}`'. It formats values at function doctorDriftPath(base, relative = '.', optional = false) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 503,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014589",
+        "originalTuple": [
+          5049,
+          15,
+          5049,
+          42,
+          "path.join(current, segment)",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5068,
+        "currentPassage": {
+          "startLine": 5066,
+          "endLine": 5070,
+          "text": "  let current = path.parse(resolved).root;\n  for (const segment of resolved.slice(current.length).split(path.sep).filter(Boolean)) {\n    current = path.join(current, segment);\n    let stat;\n    try {"
+        },
+        "caller": {
+          "line": 5054,
+          "declaration": "function doctorDriftPath(base, relative = '.', optional = false) {"
+        },
+        "inputs": [
+          "path.join(current, segment)"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function doctorDriftPath(base, relative = '.', optional = false) { config/default/check operation 'path.join(current, segment)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function doctorDriftPath(base, relative = '.', optional = false) { config/default/check operation 'path.join(current, segment)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 504,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014590",
+        "originalTuple": [
+          5057,
+          48,
+          5057,
+          99,
+          "`Symlink refused in checkout diagnosis: ${current}`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5076,
+        "currentPassage": {
+          "startLine": 5074,
+          "endLine": 5078,
+          "text": "      throw error;\n    }\n    if (stat.isSymbolicLink()) throw new Error(`Symlink refused in checkout diagnosis: ${current}`);\n  }\n  return resolved;"
+        },
+        "caller": {
+          "line": 5054,
+          "declaration": "function doctorDriftPath(base, relative = '.', optional = false) {"
+        },
+        "inputs": [
+          "`Symlink refused in checkout diagnosis: ${current}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`Symlink refused in checkout diagnosis: ${current}`'. It formats values at function doctorDriftPath(base, relative = '.', optional = false) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`Symlink refused in checkout diagnosis: ${current}`'. It formats values at function doctorDriftPath(base, relative = '.', optional = false) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 505,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014591",
+        "originalTuple": [
+          506,
+          21,
+          506,
+          76,
+          "`${level} runner.rigorToTier missing -- run fgos setup`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 510,
+        "currentPassage": {
+          "startLine": 508,
+          "endLine": 512,
+          "text": "    const map = runner.rigorToTier;\n    if (!map || typeof map !== 'object' || Array.isArray(map)) {\n      problems.push(`${level} runner.rigorToTier missing -- run fgos setup`);\n    } else {\n      for (const rigor of RIGOR_VALUES) {"
+        },
+        "caller": {
+          "line": 500,
+          "declaration": "function checkRunnerRigorConfig(cwd) {"
+        },
+        "inputs": [
+          "`${level} runner.rigorToTier missing -- run fgos setup`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} runner.rigorToTier missing -- run fgos setup`'. It formats values at function checkRunnerRigorConfig(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} runner.rigorToTier missing -- run fgos setup`'. It formats values at function checkRunnerRigorConfig(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 506,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014592",
+        "originalTuple": [
+          5063,
+          9,
+          5063,
+          50,
+          "activationPath = doctorDriftPath(checkout",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5082,
+        "currentPassage": {
+          "startLine": 5080,
+          "endLine": 5084,
+          "text": "\nfunction doctorDriftActivation(checkout) {\n  const activationPath = doctorDriftPath(checkout, '.fgos/installation/activation.json', true);\n  if (!activationPath) return null;\n  const activation = JSON.parse(fs.readFileSync(activationPath, 'utf8'));"
+        },
+        "caller": {
+          "line": 5081,
+          "declaration": "function doctorDriftActivation(checkout) {"
+        },
+        "inputs": [
+          "activationPath = doctorDriftPath(checkout"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function doctorDriftActivation(checkout) { config/default/check operation 'activationPath = doctorDriftPath(checkout' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function doctorDriftActivation(checkout) { config/default/check operation 'activationPath = doctorDriftPath(checkout' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 507,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014593",
+        "originalTuple": [
+          5067,
+          21,
+          5067,
+          112,
+          "`Invalid activation releasePath in ${activationPath}; an absolute release path is required`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5086,
+        "currentPassage": {
+          "startLine": 5084,
+          "endLine": 5088,
+          "text": "  const activation = JSON.parse(fs.readFileSync(activationPath, 'utf8'));\n  if (!activation || typeof activation.releasePath !== 'string' || !path.isAbsolute(activation.releasePath)) {\n    throw new Error(`Invalid activation releasePath in ${activationPath}; an absolute release path is required`);\n  }\n  return activation;"
+        },
+        "caller": {
+          "line": 5081,
+          "declaration": "function doctorDriftActivation(checkout) {"
+        },
+        "inputs": [
+          "`Invalid activation releasePath in ${activationPath}; an absolute release path is required`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`Invalid activation releasePath in ${activationPath}; an absolute release path is required`'. It formats values at function doctorDriftActivation(checkout) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`Invalid activation releasePath in ${activationPath}; an absolute release path is required`'. It formats values at function doctorDriftActivation(checkout) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 508,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014594",
+        "originalTuple": [
+          5075,
+          22,
+          5075,
+          39,
+          "path.resolve(dir)",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5094,
+        "currentPassage": {
+          "startLine": 5092,
+          "endLine": 5096,
+          "text": "  const guidance = 'B: npm run fgos:dev -- <verb> runs working-tree code. A: rebuild/stage, then fgctl upgrade --from <release> in this workspace to update plain fgos.';\n  try {\n    const checkout = path.resolve(dir);\n    const marker = doctorDriftPath(checkout, 'apps/fgos/Cargo.toml', true);\n    if (!marker) return { passed: true, message: 'active-release-matches-checkout skipped: outside an fgOS source checkout (apps/fgos/Cargo.toml absent)' };"
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "path.resolve(dir)"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'path.resolve(dir)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'path.resolve(dir)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 509,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014595",
+        "originalTuple": [
+          5078,
+          56,
+          5078,
+          105,
+          "`Source checkout marker is not a file: ${marker}`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5097,
+        "currentPassage": {
+          "startLine": 5095,
+          "endLine": 5099,
+          "text": "    const marker = doctorDriftPath(checkout, 'apps/fgos/Cargo.toml', true);\n    if (!marker) return { passed: true, message: 'active-release-matches-checkout skipped: outside an fgOS source checkout (apps/fgos/Cargo.toml absent)' };\n    if (!fs.statSync(marker).isFile()) throw new Error(`Source checkout marker is not a file: ${marker}`);\n\n    const activation = doctorDriftActivation(checkout);"
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "`Source checkout marker is not a file: ${marker}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`Source checkout marker is not a file: ${marker}`'. It formats values at function checkActiveReleaseMatchesCheckout(dir) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`Source checkout marker is not a file: ${marker}`'. It formats values at function checkActiveReleaseMatchesCheckout(dir) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 510,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014596",
+        "originalTuple": [
+          5082,
+          9,
+          5082,
+          23,
+          "scopedEnv = {}",
+          "config/default-root",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5101,
+        "currentPassage": {
+          "startLine": 5099,
+          "endLine": 5103,
+          "text": "    const activation = doctorDriftActivation(checkout);\n    const explicitRelease = process.env.FGOS_ACTIVE_RELEASE_PATH;\n    let scopedEnv = {};\n    // A dev wrapper binds this exact source checkout. An inherited installation\n    // shim env may instead name main's release: it cannot override doctor's dir."
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "scopedEnv = {}"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'scopedEnv = {}' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'scopedEnv = {}' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 511,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014597",
+        "originalTuple": [
+          5086,
+          10,
+          5086,
+          39,
+          "path.resolve(explicitRelease)",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5105,
+        "currentPassage": {
+          "startLine": 5103,
+          "endLine": 5107,
+          "text": "    // shim env may instead name main's release: it cannot override doctor's dir.\n    if (explicitRelease && path.isAbsolute(explicitRelease) &&\n        (path.resolve(explicitRelease) === checkout ||\n         (activation && path.resolve(explicitRelease) === path.resolve(activation.releasePath)))) {\n      scopedEnv = {"
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "path.resolve(explicitRelease)"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'path.resolve(explicitRelease)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'path.resolve(explicitRelease)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 512,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014598",
+        "originalTuple": [
+          5087,
+          25,
+          5087,
+          54,
+          "path.resolve(explicitRelease)",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5106,
+        "currentPassage": {
+          "startLine": 5104,
+          "endLine": 5108,
+          "text": "    if (explicitRelease && path.isAbsolute(explicitRelease) &&\n        (path.resolve(explicitRelease) === checkout ||\n         (activation && path.resolve(explicitRelease) === path.resolve(activation.releasePath)))) {\n      scopedEnv = {\n        FGOS_ACTIVE_RELEASE_PATH: explicitRelease,"
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "path.resolve(explicitRelease)"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'path.resolve(explicitRelease)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'path.resolve(explicitRelease)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 513,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014599",
+        "originalTuple": [
+          5087,
+          59,
+          5087,
+          95,
+          "path.resolve(activation.releasePath)",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5106,
+        "currentPassage": {
+          "startLine": 5104,
+          "endLine": 5108,
+          "text": "    if (explicitRelease && path.isAbsolute(explicitRelease) &&\n        (path.resolve(explicitRelease) === checkout ||\n         (activation && path.resolve(explicitRelease) === path.resolve(activation.releasePath)))) {\n      scopedEnv = {\n        FGOS_ACTIVE_RELEASE_PATH: explicitRelease,"
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "path.resolve(activation.releasePath)"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'path.resolve(activation.releasePath)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'path.resolve(activation.releasePath)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 514,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014600",
+        "originalTuple": [
+          5088,
+          7,
+          5088,
+          20,
+          "scopedEnv = {",
+          "config/default-root",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5107,
+        "currentPassage": {
+          "startLine": 5105,
+          "endLine": 5109,
+          "text": "        (path.resolve(explicitRelease) === checkout ||\n         (activation && path.resolve(explicitRelease) === path.resolve(activation.releasePath)))) {\n      scopedEnv = {\n        FGOS_ACTIVE_RELEASE_PATH: explicitRelease,\n        FGOS_ACTIVE_MANIFEST_PATH: process.env.FGOS_ACTIVE_MANIFEST_PATH,"
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "scopedEnv = {"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'scopedEnv = {' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'scopedEnv = {' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 515,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014601",
+        "originalTuple": [
+          5089,
+          9,
+          5089,
+          50,
+          "FGOS_ACTIVE_RELEASE_PATH: explicitRelease",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5108,
+        "currentPassage": {
+          "startLine": 5106,
+          "endLine": 5110,
+          "text": "         (activation && path.resolve(explicitRelease) === path.resolve(activation.releasePath)))) {\n      scopedEnv = {\n        FGOS_ACTIVE_RELEASE_PATH: explicitRelease,\n        FGOS_ACTIVE_MANIFEST_PATH: process.env.FGOS_ACTIVE_MANIFEST_PATH,\n      };"
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "FGOS_ACTIVE_RELEASE_PATH: explicitRelease"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'FGOS_ACTIVE_RELEASE_PATH: explicitRelease' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'FGOS_ACTIVE_RELEASE_PATH: explicitRelease' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 516,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014602",
+        "originalTuple": [
+          5090,
+          9,
+          5090,
+          73,
+          "FGOS_ACTIVE_MANIFEST_PATH: process.env.FGOS_ACTIVE_MANIFEST_PATH",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5109,
+        "currentPassage": {
+          "startLine": 5107,
+          "endLine": 5111,
+          "text": "      scopedEnv = {\n        FGOS_ACTIVE_RELEASE_PATH: explicitRelease,\n        FGOS_ACTIVE_MANIFEST_PATH: process.env.FGOS_ACTIVE_MANIFEST_PATH,\n      };\n    } else if (!activation) {"
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "FGOS_ACTIVE_MANIFEST_PATH: process.env.FGOS_ACTIVE_MANIFEST_PATH"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'FGOS_ACTIVE_MANIFEST_PATH: process.env.FGOS_ACTIVE_MANIFEST_PATH' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'FGOS_ACTIVE_MANIFEST_PATH: process.env.FGOS_ACTIVE_MANIFEST_PATH' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 517,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014603",
+        "originalTuple": [
+          5094,
+          19,
+          5094,
+          37,
+          "path.resolve(main)",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5113,
+        "currentPassage": {
+          "startLine": 5111,
+          "endLine": 5115,
+          "text": "    } else if (!activation) {\n      const main = resolveMainCheckout(checkout);\n      if (main && path.resolve(main) !== checkout &&\n          doctorDriftPath(main, '.fgos/installation/activation.json', true)) {\n        return { passed: true, message: `active-release-matches-checkout skipped: activation belongs to main checkout ${main}, not this linked worktree` };"
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "path.resolve(main)"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'path.resolve(main)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'path.resolve(main)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 518,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014604",
+        "originalTuple": [
+          5096,
+          41,
+          5096,
+          153,
+          "`active-release-matches-checkout skipped: activation belongs to main checkout ${main}, not this linked worktree`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5115,
+        "currentPassage": {
+          "startLine": 5113,
+          "endLine": 5117,
+          "text": "      if (main && path.resolve(main) !== checkout &&\n          doctorDriftPath(main, '.fgos/installation/activation.json', true)) {\n        return { passed: true, message: `active-release-matches-checkout skipped: activation belongs to main checkout ${main}, not this linked worktree` };\n      }\n      return { passed: true, message: 'active-release-matches-checkout skipped: no activation owned by doctor dir' };"
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "`active-release-matches-checkout skipped: activation belongs to main checkout ${main}, not this linked worktree`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`active-release-matches-checkout skipped: activation belongs to main checkout ${main}, not this linked worktree`'. It formats values at function checkActiveReleaseMatchesCheckout(dir) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`active-release-matches-checkout skipped: activation belongs to main checkout ${main}, not this linked worktree`'. It formats values at function checkActiveReleaseMatchesCheckout(dir) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 519,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014605",
+        "originalTuple": [
+          510,
+          25,
+          510,
+          110,
+          "`${level} runner.rigorToTier.${rigor} must be one of ${MODEL_POLICY_TIERS.join('/')}`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 514,
+        "currentPassage": {
+          "startLine": 512,
+          "endLine": 516,
+          "text": "      for (const rigor of RIGOR_VALUES) {\n        if (!MODEL_POLICY_TIERS.includes(map[rigor])) {\n          problems.push(`${level} runner.rigorToTier.${rigor} must be one of ${MODEL_POLICY_TIERS.join('/')}`);\n        }\n      }"
+        },
+        "caller": {
+          "line": 500,
+          "declaration": "function checkRunnerRigorConfig(cwd) {"
+        },
+        "inputs": [
+          "`${level} runner.rigorToTier.${rigor} must be one of ${MODEL_POLICY_TIERS.join('/')}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is \"`${level} runner.rigorToTier.${rigor} must be one of ${MODEL_POLICY_TIERS.join('/')}`\". It formats values at function checkRunnerRigorConfig(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is \"`${level} runner.rigorToTier.${rigor} must be one of ${MODEL_POLICY_TIERS.join('/')}`\". It formats values at function checkRunnerRigorConfig(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 520,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014606",
+        "originalTuple": [
+          5101,
+          11,
+          5101,
+          85,
+          "releasePath = scopedEnv.FGOS_ACTIVE_RELEASE_PATH ?? activation.releasePath",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5120,
+        "currentPassage": {
+          "startLine": 5118,
+          "endLine": 5122,
+          "text": "    }\n\n    const releasePath = scopedEnv.FGOS_ACTIVE_RELEASE_PATH ?? activation.releasePath;\n    doctorDriftPath(releasePath);\n    const manifestPath = scopedEnv.FGOS_ACTIVE_MANIFEST_PATH ??"
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "releasePath = scopedEnv.FGOS_ACTIVE_RELEASE_PATH ?? activation.releasePath"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'releasePath = scopedEnv.FGOS_ACTIVE_RELEASE_PATH ?? activation.releasePath' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'releasePath = scopedEnv.FGOS_ACTIVE_RELEASE_PATH ?? activation.releasePath' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 521,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014607",
+        "originalTuple": [
+          5101,
+          35,
+          5101,
+          85,
+          "FGOS_ACTIVE_RELEASE_PATH ?? activation.releasePath",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5120,
+        "currentPassage": {
+          "startLine": 5118,
+          "endLine": 5122,
+          "text": "    }\n\n    const releasePath = scopedEnv.FGOS_ACTIVE_RELEASE_PATH ?? activation.releasePath;\n    doctorDriftPath(releasePath);\n    const manifestPath = scopedEnv.FGOS_ACTIVE_MANIFEST_PATH ??"
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "FGOS_ACTIVE_RELEASE_PATH ?? activation.releasePath"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'FGOS_ACTIVE_RELEASE_PATH ?? activation.releasePath' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'FGOS_ACTIVE_RELEASE_PATH ?? activation.releasePath' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 522,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014608",
+        "originalTuple": [
+          5103,
+          11,
+          5103,
+          64,
+          "manifestPath = scopedEnv.FGOS_ACTIVE_MANIFEST_PATH ??",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5122,
+        "currentPassage": {
+          "startLine": 5120,
+          "endLine": 5124,
+          "text": "    const releasePath = scopedEnv.FGOS_ACTIVE_RELEASE_PATH ?? activation.releasePath;\n    doctorDriftPath(releasePath);\n    const manifestPath = scopedEnv.FGOS_ACTIVE_MANIFEST_PATH ??\n      (scopedEnv.FGOS_ACTIVE_RELEASE_PATH && !doctorDriftPath(releasePath, 'manifest.json', true)\n        ? path.join(releasePath, 'target', 'dev-manifest.json')"
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "manifestPath = scopedEnv.FGOS_ACTIVE_MANIFEST_PATH ??"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'manifestPath = scopedEnv.FGOS_ACTIVE_MANIFEST_PATH ??' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'manifestPath = scopedEnv.FGOS_ACTIVE_MANIFEST_PATH ??' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 523,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014609",
+        "originalTuple": [
+          5103,
+          36,
+          5103,
+          64,
+          "FGOS_ACTIVE_MANIFEST_PATH ??",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5122,
+        "currentPassage": {
+          "startLine": 5120,
+          "endLine": 5124,
+          "text": "    const releasePath = scopedEnv.FGOS_ACTIVE_RELEASE_PATH ?? activation.releasePath;\n    doctorDriftPath(releasePath);\n    const manifestPath = scopedEnv.FGOS_ACTIVE_MANIFEST_PATH ??\n      (scopedEnv.FGOS_ACTIVE_RELEASE_PATH && !doctorDriftPath(releasePath, 'manifest.json', true)\n        ? path.join(releasePath, 'target', 'dev-manifest.json')"
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "FGOS_ACTIVE_MANIFEST_PATH ??"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'FGOS_ACTIVE_MANIFEST_PATH ??' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'FGOS_ACTIVE_MANIFEST_PATH ??' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 524,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014610",
+        "originalTuple": [
+          5105,
+          11,
+          5105,
+          64,
+          "path.join(releasePath, 'target', 'dev-manifest.json')",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5124,
+        "currentPassage": {
+          "startLine": 5122,
+          "endLine": 5126,
+          "text": "    const manifestPath = scopedEnv.FGOS_ACTIVE_MANIFEST_PATH ??\n      (scopedEnv.FGOS_ACTIVE_RELEASE_PATH && !doctorDriftPath(releasePath, 'manifest.json', true)\n        ? path.join(releasePath, 'target', 'dev-manifest.json')\n        : path.join(releasePath, 'manifest.json'));\n    doctorDriftPath(releasePath, path.relative(path.resolve(releasePath), path.resolve(manifestPath)).replaceAll('\\\\', '/'));"
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "path.join(releasePath, 'target', 'dev-manifest.json')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation \"path.join(releasePath, 'target', 'dev-manifest.json')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation \"path.join(releasePath, 'target', 'dev-manifest.json')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 525,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014611",
+        "originalTuple": [
+          5106,
+          11,
+          5106,
+          50,
+          "path.join(releasePath, 'manifest.json')",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5125,
+        "currentPassage": {
+          "startLine": 5123,
+          "endLine": 5127,
+          "text": "      (scopedEnv.FGOS_ACTIVE_RELEASE_PATH && !doctorDriftPath(releasePath, 'manifest.json', true)\n        ? path.join(releasePath, 'target', 'dev-manifest.json')\n        : path.join(releasePath, 'manifest.json'));\n    doctorDriftPath(releasePath, path.relative(path.resolve(releasePath), path.resolve(manifestPath)).replaceAll('\\\\', '/'));\n    // Read strictly before invoking the resolver, whose older consumers tolerate"
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "path.join(releasePath, 'manifest.json')"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation \"path.join(releasePath, 'manifest.json')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation \"path.join(releasePath, 'manifest.json')\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 526,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014612",
+        "originalTuple": [
+          5107,
+          48,
+          5107,
+          73,
+          "path.resolve(releasePath)",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5126,
+        "currentPassage": {
+          "startLine": 5124,
+          "endLine": 5128,
+          "text": "        ? path.join(releasePath, 'target', 'dev-manifest.json')\n        : path.join(releasePath, 'manifest.json'));\n    doctorDriftPath(releasePath, path.relative(path.resolve(releasePath), path.resolve(manifestPath)).replaceAll('\\\\', '/'));\n    // Read strictly before invoking the resolver, whose older consumers tolerate\n    // malformed manifests as a missing release. This check must report the error."
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "path.resolve(releasePath)"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'path.resolve(releasePath)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'path.resolve(releasePath)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 527,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014613",
+        "originalTuple": [
+          5107,
+          75,
+          5107,
+          101,
+          "path.resolve(manifestPath)",
+          "path-call",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5126,
+        "currentPassage": {
+          "startLine": 5124,
+          "endLine": 5128,
+          "text": "        ? path.join(releasePath, 'target', 'dev-manifest.json')\n        : path.join(releasePath, 'manifest.json'));\n    doctorDriftPath(releasePath, path.relative(path.resolve(releasePath), path.resolve(manifestPath)).replaceAll('\\\\', '/'));\n    // Read strictly before invoking the resolver, whose older consumers tolerate\n    // malformed manifests as a missing release. This check must report the error."
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "path.resolve(manifestPath)"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'path.resolve(manifestPath)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'path.resolve(manifestPath)' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 528,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014614",
+        "originalTuple": [
+          5111,
+          60,
+          5111,
+          85,
+          "candidateDirs: [checkout]",
+          "config/default-root",
+          true,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5130,
+        "currentPassage": {
+          "startLine": 5128,
+          "endLine": 5132,
+          "text": "    // malformed manifests as a missing release. This check must report the error.\n    JSON.parse(fs.readFileSync(manifestPath, 'utf8'));\n    const info = resolveActiveReleaseForDoctor(checkout, { candidateDirs: [checkout], env: scopedEnv });\n    const manifest = info.manifest;\n    if (!manifest || !Array.isArray(manifest.files)) throw new Error('Active release manifest must contain files[]');"
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "candidateDirs: [checkout]"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'candidateDirs: [checkout]' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'candidateDirs: [checkout]' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 529,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014615",
+        "originalTuple": [
+          5114,
+          11,
+          5114,
+          58,
+          "rawRoot = manifest.components?.legacyNode?.root",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5133,
+        "currentPassage": {
+          "startLine": 5131,
+          "endLine": 5135,
+          "text": "    const manifest = info.manifest;\n    if (!manifest || !Array.isArray(manifest.files)) throw new Error('Active release manifest must contain files[]');\n    const rawRoot = manifest.components?.legacyNode?.root;\n    if (typeof rawRoot !== 'string' || !rawRoot) throw new Error('Active release manifest missing components.legacyNode.root');\n    if (rawRoot !== '.' && path.posix.normalize(rawRoot) !== rawRoot) {"
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "rawRoot = manifest.components?.legacyNode?.root"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'rawRoot = manifest.components?.legacyNode?.root' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'rawRoot = manifest.components?.legacyNode?.root' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 530,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014616",
+        "originalTuple": [
+          5117,
+          23,
+          5117,
+          85,
+          "`Non-canonical legacyNode.root in active manifest: ${rawRoot}`",
+          "template-string",
+          true,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5136,
+        "currentPassage": {
+          "startLine": 5134,
+          "endLine": 5138,
+          "text": "    if (typeof rawRoot !== 'string' || !rawRoot) throw new Error('Active release manifest missing components.legacyNode.root');\n    if (rawRoot !== '.' && path.posix.normalize(rawRoot) !== rawRoot) {\n      throw new Error(`Non-canonical legacyNode.root in active manifest: ${rawRoot}`);\n    }\n    const payloadRoot = doctorDriftPath(releasePath, rawRoot);"
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "`Non-canonical legacyNode.root in active manifest: ${rawRoot}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`Non-canonical legacyNode.root in active manifest: ${rawRoot}`'. It formats values at function checkActiveReleaseMatchesCheckout(dir) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`Non-canonical legacyNode.root in active manifest: ${rawRoot}`'. It formats values at function checkActiveReleaseMatchesCheckout(dir) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 531,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014617",
+        "originalTuple": [
+          5119,
+          11,
+          5119,
+          52,
+          "payloadRoot = doctorDriftPath(releasePath",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5138,
+        "currentPassage": {
+          "startLine": 5136,
+          "endLine": 5140,
+          "text": "      throw new Error(`Non-canonical legacyNode.root in active manifest: ${rawRoot}`);\n    }\n    const payloadRoot = doctorDriftPath(releasePath, rawRoot);\n    if (rawRoot === '.' && payloadRoot === checkout) {\n      return { passed: true, message: 'active-release-matches-checkout skipped: development manifest uses this checkout directly (legacyNode.root=\".\")' };"
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "payloadRoot = doctorDriftPath(releasePath"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'payloadRoot = doctorDriftPath(releasePath' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'payloadRoot = doctorDriftPath(releasePath' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 532,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014618",
+        "originalTuple": [
+          5120,
+          28,
+          5120,
+          55,
+          "payloadRoot === checkout) {",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5139,
+        "currentPassage": {
+          "startLine": 5137,
+          "endLine": 5141,
+          "text": "    }\n    const payloadRoot = doctorDriftPath(releasePath, rawRoot);\n    if (rawRoot === '.' && payloadRoot === checkout) {\n      return { passed: true, message: 'active-release-matches-checkout skipped: development manifest uses this checkout directly (legacyNode.root=\".\")' };\n    }"
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "payloadRoot === checkout) {"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'payloadRoot === checkout) {' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'payloadRoot === checkout) {' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 533,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014619",
+        "originalTuple": [
+          5120,
+          9,
+          5120,
+          55,
+          "rawRoot === '.' && payloadRoot === checkout) {",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5139,
+        "currentPassage": {
+          "startLine": 5137,
+          "endLine": 5141,
+          "text": "    }\n    const payloadRoot = doctorDriftPath(releasePath, rawRoot);\n    if (rawRoot === '.' && payloadRoot === checkout) {\n      return { passed: true, message: 'active-release-matches-checkout skipped: development manifest uses this checkout directly (legacyNode.root=\".\")' };\n    }"
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "rawRoot === '.' && payloadRoot === checkout) {"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation \"rawRoot === '.' && payloadRoot === checkout) {\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation \"rawRoot === '.' && payloadRoot === checkout) {\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 534,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014620",
+        "originalTuple": [
+          5121,
+          142,
+          5121,
+          154,
+          "root=\".\")' }",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5140,
+        "currentPassage": {
+          "startLine": 5138,
+          "endLine": 5142,
+          "text": "    const payloadRoot = doctorDriftPath(releasePath, rawRoot);\n    if (rawRoot === '.' && payloadRoot === checkout) {\n      return { passed: true, message: 'active-release-matches-checkout skipped: development manifest uses this checkout directly (legacyNode.root=\".\")' };\n    }\n    if (!activation) {"
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "root=\".\")' }"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'root=\".\")\\' }' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'root=\".\")\\' }' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 535,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014621",
+        "originalTuple": [
+          5127,
+          11,
+          5127,
+          49,
+          "packagePath = doctorDriftPath(checkout",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5146,
+        "currentPassage": {
+          "startLine": 5144,
+          "endLine": 5148,
+          "text": "    }\n\n    const packagePath = doctorDriftPath(checkout, 'package.json');\n    const pkg = JSON.parse(fs.readFileSync(packagePath, 'utf8'));\n    // Validate declared paths before the shared walker can traverse an"
+        },
+        "caller": {
+          "line": 5091,
+          "declaration": "function checkActiveReleaseMatchesCheckout(dir) {"
+        },
+        "inputs": [
+          "packagePath = doctorDriftPath(checkout"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'packagePath = doctorDriftPath(checkout' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor function checkActiveReleaseMatchesCheckout(dir) { config/default/check operation 'packagePath = doctorDriftPath(checkout' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 536,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014622",
+        "originalTuple": [
+          5138,
+          11,
+          5138,
+          36,
+          "manifestPaths = new Set()",
+          "config/default-root",
+          true,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5157,
+        "currentPassage": {
+          "startLine": 5155,
+          "endLine": 5159,
+          "text": "    const sourceSet = new Set(sourceFiles);\n    const releaseSources = new Map();\n    const manifestPaths = new Set();\n    const prefix = rawRoot === '.' ? '' : rawRoot.replace(/\\/+$/, '') + '/';\n    for (const entry of manifest.files) {"
+        },
+        "caller": {
+          "line": 5153,
+          "declaration": "const sourceFiles = listLegacyNodeSourceFiles(checkout).filter((relative) =>"
+        },
+        "inputs": [
+          "manifestPaths = new Set()"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor const sourceFiles = listLegacyNodeSourceFiles(checkout).filter((relative) => config/default/check operation 'manifestPaths = new Set()' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor const sourceFiles = listLegacyNodeSourceFiles(checkout).filter((relative) => config/default/check operation 'manifestPaths = new Set()' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 537,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014623",
+        "originalTuple": [
+          5139,
+          20,
+          5139,
+          65,
+          "rawRoot === '.' ? '' : rawRoot.replace(/\\/+$/",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5158,
+        "currentPassage": {
+          "startLine": 5156,
+          "endLine": 5160,
+          "text": "    const releaseSources = new Map();\n    const manifestPaths = new Set();\n    const prefix = rawRoot === '.' ? '' : rawRoot.replace(/\\/+$/, '') + '/';\n    for (const entry of manifest.files) {\n      if (!entry || typeof entry.path !== 'string' || !entry.path ||"
+        },
+        "caller": {
+          "line": 5153,
+          "declaration": "const sourceFiles = listLegacyNodeSourceFiles(checkout).filter((relative) =>"
+        },
+        "inputs": [
+          "rawRoot === '.' ? '' : rawRoot.replace(/\\/+$/"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor const sourceFiles = listLegacyNodeSourceFiles(checkout).filter((relative) => config/default/check operation \"rawRoot === '.' ? '' : rawRoot.replace(/\\\\/+$/\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor const sourceFiles = listLegacyNodeSourceFiles(checkout).filter((relative) => config/default/check operation \"rawRoot === '.' ? '' : rawRoot.replace(/\\\\/+$/\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 538,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014624",
+        "originalTuple": [
+          514,
+          58,
+          514,
+          116,
+          "`${level} runner.rigorToTier has unknown rigor \"${rigor}\"`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 518,
+        "currentPassage": {
+          "startLine": 516,
+          "endLine": 520,
+          "text": "      }\n      for (const rigor of Object.keys(map)) {\n        if (!RIGOR_VALUES.includes(rigor)) problems.push(`${level} runner.rigorToTier has unknown rigor \"${rigor}\"`);\n      }\n    }"
+        },
+        "caller": {
+          "line": 500,
+          "declaration": "function checkRunnerRigorConfig(cwd) {"
+        },
+        "inputs": [
+          "`${level} runner.rigorToTier has unknown rigor \"${rigor}\"`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} runner.rigorToTier has unknown rigor \"${rigor}\"`'. It formats values at function checkRunnerRigorConfig(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`${level} runner.rigorToTier has unknown rigor \"${rigor}\"`'. It formats values at function checkRunnerRigorConfig(cwd) {; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 539,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014625",
+        "originalTuple": [
+          5141,
+          62,
+          5141,
+          69,
+          "path ||",
+          "config/default-root",
+          true,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5160,
+        "currentPassage": {
+          "startLine": 5158,
+          "endLine": 5162,
+          "text": "    const prefix = rawRoot === '.' ? '' : rawRoot.replace(/\\/+$/, '') + '/';\n    for (const entry of manifest.files) {\n      if (!entry || typeof entry.path !== 'string' || !entry.path ||\n          entry.path.includes('\\\\') || path.posix.isAbsolute(entry.path) ||\n          path.posix.normalize(entry.path) !== entry.path || entry.path.split('/').includes('..')) {"
+        },
+        "caller": {
+          "line": 5153,
+          "declaration": "const sourceFiles = listLegacyNodeSourceFiles(checkout).filter((relative) =>"
+        },
+        "inputs": [
+          "path ||"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor const sourceFiles = listLegacyNodeSourceFiles(checkout).filter((relative) => config/default/check operation 'path ||' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor const sourceFiles = listLegacyNodeSourceFiles(checkout).filter((relative) => config/default/check operation 'path ||' belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 540,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014626",
+        "originalTuple": [
+          5143,
+          54,
+          5143,
+          101,
+          "path || entry.path.split('/').includes('..')) {",
+          "config/default-root",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5162,
+        "currentPassage": {
+          "startLine": 5160,
+          "endLine": 5164,
+          "text": "      if (!entry || typeof entry.path !== 'string' || !entry.path ||\n          entry.path.includes('\\\\') || path.posix.isAbsolute(entry.path) ||\n          path.posix.normalize(entry.path) !== entry.path || entry.path.split('/').includes('..')) {\n        throw new Error(`Non-canonical or escaping manifest files[] path: ${entry?.path}`);\n      }"
+        },
+        "caller": {
+          "line": 5153,
+          "declaration": "const sourceFiles = listLegacyNodeSourceFiles(checkout).filter((relative) =>"
+        },
+        "inputs": [
+          "path || entry.path.split('/').includes('..')) {"
+        ],
+        "role": "doctor-config/infrastructure",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Doctor const sourceFiles = listLegacyNodeSourceFiles(checkout).filter((relative) => config/default/check operation \"path || entry.path.split('/').includes('..')) {\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "reason": "Doctor const sourceFiles = listLegacyNodeSourceFiles(checkout).filter((relative) => config/default/check operation \"path || entry.path.split('/').includes('..')) {\" belongs to installation/runtime health. Its exact declaration and source context give the non-document use; no root change specified.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 541,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014627",
+        "originalTuple": [
+          5144,
+          25,
+          5144,
+          90,
+          "`Non-canonical or escaping manifest files[] path: ${entry?.path}`",
+          "template-string",
+          false,
+          "default-root"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5163,
+        "currentPassage": {
+          "startLine": 5161,
+          "endLine": 5165,
+          "text": "          entry.path.includes('\\\\') || path.posix.isAbsolute(entry.path) ||\n          path.posix.normalize(entry.path) !== entry.path || entry.path.split('/').includes('..')) {\n        throw new Error(`Non-canonical or escaping manifest files[] path: ${entry?.path}`);\n      }\n      if (entry.kind !== 'file' || typeof entry.digest !== 'string' || !/^sha256:[0-9a-f]{64}$/.test(entry.digest)) {"
+        },
+        "caller": {
+          "line": 5153,
+          "declaration": "const sourceFiles = listLegacyNodeSourceFiles(checkout).filter((relative) =>"
+        },
+        "inputs": [
+          "`Non-canonical or escaping manifest files[] path: ${entry?.path}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`Non-canonical or escaping manifest files[] path: ${entry?.path}`'. It formats values at const sourceFiles = listLegacyNodeSourceFiles(checkout).filter((relative) =>; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`Non-canonical or escaping manifest files[] path: ${entry?.path}`'. It formats values at const sourceFiles = listLegacyNodeSourceFiles(checkout).filter((relative) =>; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "seam": "setup-doctor-roots",
+      "kind": "dynamicTraces",
+      "index": 542,
+      "value": {
+        "proofCommand": null,
+        "parityObligation": null,
+        "id": "dynamic-014628",
+        "originalTuple": [
+          5147,
+          25,
+          5147,
+          86,
+          "`Invalid file kind or digest for manifest file ${entry.path}`",
+          "template-string",
+          false,
+          "reader"
+        ],
+        "inventoryOrigins": [
+          "step-02l-census-class6.json"
+        ],
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "admission": "REJECT",
+        "disposition": "preserve",
+        "currentLine": 5166,
+        "currentPassage": {
+          "startLine": 5164,
+          "endLine": 5168,
+          "text": "      }\n      if (entry.kind !== 'file' || typeof entry.digest !== 'string' || !/^sha256:[0-9a-f]{64}$/.test(entry.digest)) {\n        throw new Error(`Invalid file kind or digest for manifest file ${entry.path}`);\n      }\n      if (manifestPaths.has(entry.path)) throw new Error(`Duplicate manifest file path: ${entry.path}`);"
+        },
+        "caller": {
+          "line": 5153,
+          "declaration": "const sourceFiles = listLegacyNodeSourceFiles(checkout).filter((relative) =>"
+        },
+        "inputs": [
+          "`Invalid file kind or digest for manifest file ${entry.path}`"
+        ],
+        "role": "non-document-message",
+        "targetSetOrConstruction": null,
+        "stateExportDependency": null,
+        "fixtureProvenance": null,
+        "rejectedAsUnrelatedReason": "Concrete scalar diagnostic/serialization template; its literal output is '`Invalid file kind or digest for manifest file ${entry.path}`'. It formats values at const sourceFiles = listLegacyNodeSourceFiles(checkout).filter((relative) =>; contains no documentation-location operand and is not a filesystem operation.",
+        "reason": "Concrete scalar diagnostic/serialization template; its literal output is '`Invalid file kind or digest for manifest file ${entry.path}`'. It formats values at const sourceFiles = listLegacyNodeSourceFiles(checkout).filter((relative) =>; contains no documentation-location operand and is not a filesystem operation.",
+        "blockedSeams": [],
+        "blockedReason": null,
+        "receiptId": "setup-doctor-roots-pilot"
+      }
+    }
+  ]
+}

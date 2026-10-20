@@ -7,6 +7,574 @@
       "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
       "kind": "references",
+      "id": "reference-003833",
+      "change": {
+        "id": "reference-003833",
+        "oldOutcome": {
+          "admission": "ADMIT",
+          "disposition": "preserve",
+          "sourceSpans": [
+            {
+              "line": 3931,
+              "columnStart": 37,
+              "columnEndExclusive": 59,
+              "text": "docs/doc-registry.json"
+            }
+          ],
+          "coCutPaths": null
+        },
+        "newOutcome": {
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "sourceSpans": [
+            {
+              "line": 3931,
+              "columnStart": 37,
+              "columnEndExclusive": 59,
+              "text": "docs/doc-registry.json"
+            }
+          ],
+          "coCutPaths": null
+        }
+      },
+      "record": {
+        "referenceId": "reference-003833",
+        "admission": "ADMIT",
+        "inventory": "step-02l-census-class6.json",
+        "edgeId": "class6-l-000389",
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryOrigins": [
+          {
+            "inventory": "step-02l-census-class6.json",
+            "id": "class6-l-000389",
+            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
+          }
+        ],
+        "slotKey": null,
+        "sourceSpans": [
+          {
+            "line": 3931,
+            "columnStart": 37,
+            "columnEndExclusive": 59,
+            "text": "docs/doc-registry.json"
+          }
+        ],
+        "originalSourceSpans": [
+          {
+            "columnEndExclusive": 59,
+            "columnStart": 37,
+            "line": 3912,
+            "text": "docs/doc-registry.json"
+          }
+        ],
+        "matchedExpression": "docs/doc-registry.json",
+        "passage": "  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\n  const mdPath = path.join(root, 'docs/doc-registry.md');\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\n  const mdOk = fs.existsSync(mdPath) && fs.readFileSync(mdPath, 'utf8') === mdContent;\n  const jsonOk = fs.existsSync(jsonPath) && fs.readFileSync(jsonPath, 'utf8') === jsonContent;",
+        "passageSpan": {
+          "startLine": 3929,
+          "endLine": 3933
+        },
+        "role": "reader/default",
+        "disposition": "parked",
+        "reason": "L12-69: Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized. Own passage \"  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\\n  const mdPath = path.join(root, 'docs/doc-registry.md');\\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\\n  const mdOk = fs.existsSync(mdPath) && fs.readFileSync(mdPath, 'utf8') === mdContent;\\n  const jsonOk = fs.existsSync(jsonPath) && fs.readFileSync(jsonPath, 'utf8') === jsonContent;\"",
+        "target": null,
+        "anchor": null,
+        "resolverWitness": {
+          "rule": "retained/external project or comment; no replacement claimed",
+          "currentPath": "docs/doc-registry.json",
+          "exists": true
+        },
+        "timing": "phase9",
+        "diffHunk": null,
+        "blockedCategory": "step5-parity",
+        "blockedReason": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "dependency": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "dependencyCategory": "step5-parity",
+        "successorNote": null,
+        "aliasWriteCheck": {
+          "isWriter": null,
+          "destinationIsAlias": null,
+          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
+        },
+        "proposedReplacement": null,
+        "priorRecordRefs": [],
+        "fixtureProvenance": null,
+        "rejectionRule": null,
+        "receiptId": "setup-doctor-roots-pilot",
+        "proofCommand": "missing",
+        "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
+        "parityObligation": {
+          "current": "docs/doc-registry.json",
+          "candidate": null,
+          "comparison": "Pending owning co-cut/export; no active patch or parity claim.",
+          "blocker": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized."
+        },
+        "samePassageOwner": "dynamic-014369"
+      },
+      "window": {
+        "startLine": 3891,
+        "endLine": 3971,
+        "text": "    return { passed: false, message: 'docRegistry.enforce is not a boolean' };\n  }\n  return { passed: true, message: `docRegistry: enforce=${settings.enforce}` };\n}\n\nregisterConfigDefault({\n  id: 'docRegistry',\n  key: 'docRegistry',\n  shape: DEFAULT_DOC_REGISTRY_SETTINGS,\n});\n\nregisterCheck({\n  id: 'doc-registry-enforce',\n  description: 'docRegistry.enforce in the shared config file is present and boolean',\n  check: (cwd) => checkDocRegistryEnforce(cwd),\n});\n\n// Same marker the release drift check uses to recognise the fgOS source repo.\nfunction isFgosSourceCheckout(root) {\n  return fs.existsSync(path.join(root, 'apps/fgos/Cargo.toml'));\n}\n\n// The doc registry is opt-in per project: doctor --fix only refreshes it.\nfunction docRegistryAdopted(root) {\n  return fs.existsSync(path.join(root, 'docs/doc-registry.md')) || fs.existsSync(path.join(root, 'docs/doc-registry.json'));\n}\n\nfunction checkDocRegistryStale(cwd) {\n  const mainCheckout = resolveMainCheckout(cwd);\n  const root = mainCheckout ?? cwd;\n  const fgosDir = path.join(root, '.fgos');\n  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) {\n    return { passed: true, message: 'knowledge registry check skipped -- no events log' };\n  }\n  if (!docRegistryAdopted(root)) {\n    return { passed: true, message: 'not applicable -- no doc registry in this project (run fgos doc-registry to adopt)' };\n  }\n  const view = rebuild(fgosDir);\n  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\n  const mdPath = path.join(root, 'docs/doc-registry.md');\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\n  const mdOk = fs.existsSync(mdPath) && fs.readFileSync(mdPath, 'utf8') === mdContent;\n  const jsonOk = fs.existsSync(jsonPath) && fs.readFileSync(jsonPath, 'utf8') === jsonContent;\n\n  if (mdOk && jsonOk) {\n    return { passed: true, message: 'doc-registry projections up to date' };\n  }\n  return { passed: false, message: 'docs/doc-registry.md or docs/doc-registry.json is stale -- run fgos doc-registry' };\n}\n\nfunction fixDocRegistryStale(cwd) {\n  const mainCheckout = resolveMainCheckout(cwd);\n  const root = mainCheckout ?? cwd;\n  const fgosDir = path.join(root, '.fgos');\n  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) {\n    return { changed: false, message: 'skipped -- no events log' };\n  }\n  if (!docRegistryAdopted(root)) {\n    return { changed: false, message: 'skipped -- no doc registry in this project (run fgos doc-registry to adopt)' };\n  }\n  let view;\n  try {\n    view = rebuild(fgosDir);\n  } catch (err) {\n    if (err instanceof StoreError || err.code === 'ENOENT') {\n      return { changed: false, message: `skipped -- ${err.message}` };\n    }\n    throw err;\n  }\n  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\n  const mdPath = path.join(root, 'docs/doc-registry.md');\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\n\n  fs.mkdirSync(path.dirname(mdPath), { recursive: true });\n  fs.writeFileSync(mdPath, mdContent, 'utf8');\n  fs.writeFileSync(jsonPath, jsonContent, 'utf8');\n  return { changed: true, message: 'regenerated docs/doc-registry.md and docs/doc-registry.json' };\n}\n\n// tsk-28x code review finding: this used to treat \"no file on disk at the\n// alias path\" as broken -- but D-tsk28x-9 defines an alias as a doc's OLD"
+      },
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "cutoverSpecification": {
+        "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+        "file": "src/setup/registrations.mjs",
+        "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+        "mode": "100644",
+        "sourceSpans": [
+          {
+            "line": 3518,
+            "columnStart": 96,
+            "columnEndExclusive": 133,
+            "text": "docs/how-to/cut-a-fgos-release-tag.md"
+          },
+          {
+            "line": 2094,
+            "columnStart": 109,
+            "columnEndExclusive": 158,
+            "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
+          },
+          {
+            "line": 874,
+            "columnStart": 142,
+            "columnEndExclusive": 174,
+            "text": "docs/how-to/write-a-task-spec.md"
+          }
+        ],
+        "diff": "--- a/src/setup/registrations.mjs\n+++ b/src/setup/registrations.mjs\n@@ -871,7 +871,7 @@\n     }\n   }\n   if (missing.length > 0) {\n-    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };\n+    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md` };\n   }\n   return { passed: true, message: 'every domain\\'s taskSpecMap entry and operation resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };\n }\n@@ -2091,7 +2091,7 @@\n   }\n   return {\n     passed: false,\n-    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,\n+    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md`,\n   };\n }\n \n@@ -3515,7 +3515,7 @@\n   }\n   return {\n     passed: false,\n-    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n+    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n   };\n }\n \n",
+        "expectedAfterSha256": "e5a0579e471f1e173a045ffd28eed898cbc2d7c2462db3c3d438836e9a489d62",
+        "targetOwner": [
+          "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
+          "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+          "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md"
+        ],
+        "claimAnchorProof": [
+          {
+            "target": "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
+            "docId": "how-to-cut-a-fgos-release-tag:cut-a-fgos-release-tag",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/cut-a-fgos-release-tag.md",
+            "targetSha256": "9977b7d61ca9fa05bd8025e7d04112e2c087379f793649bb766b7e013d8fb659",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          },
+          {
+            "target": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+            "docId": "how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events-jsonl-truncation:resolve-an-events-jsonl-truncation",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+            "targetSha256": "da410923253f4bdf8219b75fae8176ce4e97b9114e4a2172dbb19adfea460862",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          },
+          {
+            "target": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
+            "docId": "how-to-write-a-task-spec:write-a-task-spec",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/write-a-task-spec.md",
+            "targetSha256": "dfdd678642adb8b4795088759d783a024d5b9afb41227bb96f907af173659083",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        ],
+        "receiptId": "setup-doctor-roots-pilot",
+        "coCutPaths": [
+          "CHANGELOG.md",
+          "test/setup/checks.test.mjs"
+        ],
+        "testTargets": [
+          "env -u CLAUDE_CODE_SESSION_ID node --test test/setup/checks.test.mjs",
+          "missing: same-input complete output/category/exit cutover parity; current owning proofs alone are not migration acceptance"
+        ],
+        "prerequisites": [
+          "Lead-started independent semantic review",
+          "Missing exact-output proof",
+          "User-visible CHANGELOG.md Unreleased co-edit in separately authorized Phase 9 packet",
+          "Same-package Step 0 rebind if the final patch touches a bound target",
+          "Step 7 composes and de-duplicates shared co-cut test diffs by file/content; do not apply the same pinned test diff twice. Recompute combined hashes after all seams are assembled."
+        ],
+        "order": "Phase 9 atomic consumer cutover; no apply-now action",
+        "rollbackDiff": "--- a/src/setup/registrations.mjs\n+++ b/src/setup/registrations.mjs\n@@ -871,7 +871,7 @@\n     }\n   }\n   if (missing.length > 0) {\n-    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md` };\n+    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };\n   }\n   return { passed: true, message: 'every domain\\'s taskSpecMap entry and operation resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };\n }\n@@ -2091,7 +2091,7 @@\n   }\n   return {\n     passed: false,\n-    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md`,\n+    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,\n   };\n }\n \n@@ -3515,7 +3515,7 @@\n   }\n   return {\n     passed: false,\n-    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n+    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n   };\n }\n \n",
+        "timing": "phase9",
+        "readiness": "pending / cutover-patch-only; never execution-ready",
+        "coCutTestGreps": [
+          {
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "oldPointer": "docs/how-to/cut-a-fgos-release-tag.md",
+            "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+            "needles": [
+              "docs/how-to/cut-a-fgos-release-tag.md",
+              "docs\\/how-to\\/cut-a-fgos-release-tag.md",
+              "docs\\/how-to\\/cut-a-fgos-release-tag\\.md"
+            ],
+            "matches": []
+          },
+          {
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+            "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+            "needles": [
+              "docs/how-to/resolve-an-events-jsonl-truncation.md",
+              "docs\\/how-to\\/resolve-an-events-jsonl-truncation.md",
+              "docs\\/how-to\\/resolve-an-events-jsonl-truncation\\.md"
+            ],
+            "matches": [
+              {
+                "file": "test/setup/checks.test.mjs",
+                "line": 342,
+                "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+                "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
+              }
+            ]
+          },
+          {
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "oldPointer": "docs/how-to/write-a-task-spec.md",
+            "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+            "needles": [
+              "docs/how-to/write-a-task-spec.md",
+              "docs\\/how-to\\/write-a-task-spec.md",
+              "docs\\/how-to\\/write-a-task-spec\\.md"
+            ],
+            "matches": []
+          }
+        ],
+        "coCutTestEdits": [
+          {
+            "file": "test/setup/checks.test.mjs",
+            "referenceId": "reference-003806",
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55",
+            "mode": "100644",
+            "grepMatches": [
+              {
+                "file": "test/setup/checks.test.mjs",
+                "line": 342,
+                "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+                "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
+              }
+            ],
+            "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+            "newPointer": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+            "substitutions": [
+              [
+                "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+                "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {"
+              ]
+            ],
+            "diff": "--- a/test/setup/checks.test.mjs\n+++ b/test/setup/checks.test.mjs\n@@ -339,7 +339,7 @@\n \n // ─── events-jsonl-not-truncated (tsk-cgg) ──────────────────────────────────\n \n-test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n+test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n   assert.equal(\n     FIX_REGISTRATIONS.some((f) => f.id === 'events-jsonl-not-truncated'),\n     false,\n",
+            "expectedAfterSha256": "a19a4a3d2ee134974c4483b9e719df84bc13c045e835c3aa06949ee9f9a059f9",
+            "rollbackDiff": "--- a/test/setup/checks.test.mjs\n+++ b/test/setup/checks.test.mjs\n@@ -339,7 +339,7 @@\n \n // ─── events-jsonl-not-truncated (tsk-cgg) ──────────────────────────────────\n \n-test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n+test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n   assert.equal(\n     FIX_REGISTRATIONS.some((f) => f.id === 'events-jsonl-not-truncated'),\n     false,\n",
+            "timing": "phase9",
+            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+            "grepDecisions": [
+              {
+                "match": {
+                  "file": "test/setup/checks.test.mjs",
+                  "line": 342,
+                  "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+                  "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
+                },
+                "disposition": "patch",
+                "reason": "L12-69: Owning exact emitted-string assertion (or navigation title) follows the single pointer delta; assertion shape and all surrounding bytes stay identical.",
+                "oldLine": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+                "newLine": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {"
+              }
+            ],
+            "disposition": "patch"
+          }
+        ]
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "kind": "references",
+      "id": "reference-003834",
+      "change": {
+        "id": "reference-003834",
+        "oldOutcome": {
+          "admission": "ADMIT",
+          "disposition": "preserve",
+          "sourceSpans": [
+            {
+              "line": 3962,
+              "columnStart": 37,
+              "columnEndExclusive": 59,
+              "text": "docs/doc-registry.json"
+            }
+          ],
+          "coCutPaths": null
+        },
+        "newOutcome": {
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "sourceSpans": [
+            {
+              "line": 3962,
+              "columnStart": 37,
+              "columnEndExclusive": 59,
+              "text": "docs/doc-registry.json"
+            }
+          ],
+          "coCutPaths": null
+        }
+      },
+      "record": {
+        "referenceId": "reference-003834",
+        "admission": "ADMIT",
+        "inventory": "step-02l-census-class6.json",
+        "edgeId": "class6-l-000393",
+        "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryOrigins": [
+          {
+            "inventory": "step-02l-census-class6.json",
+            "id": "class6-l-000393",
+            "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
+          }
+        ],
+        "slotKey": null,
+        "sourceSpans": [
+          {
+            "line": 3962,
+            "columnStart": 37,
+            "columnEndExclusive": 59,
+            "text": "docs/doc-registry.json"
+          }
+        ],
+        "originalSourceSpans": [
+          {
+            "columnEndExclusive": 59,
+            "columnStart": 37,
+            "line": 3943,
+            "text": "docs/doc-registry.json"
+          }
+        ],
+        "matchedExpression": "docs/doc-registry.json",
+        "passage": "  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\n  const mdPath = path.join(root, 'docs/doc-registry.md');\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\n\n  fs.mkdirSync(path.dirname(mdPath), { recursive: true });",
+        "passageSpan": {
+          "startLine": 3960,
+          "endLine": 3964
+        },
+        "role": "reader/default",
+        "disposition": "parked",
+        "reason": "L12-69: Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized. Own passage \"  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\\n  const mdPath = path.join(root, 'docs/doc-registry.md');\\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\\n\\n  fs.mkdirSync(path.dirname(mdPath), { recursive: true });\"",
+        "target": null,
+        "anchor": null,
+        "resolverWitness": {
+          "rule": "retained/external project or comment; no replacement claimed",
+          "currentPath": "docs/doc-registry.json",
+          "exists": true
+        },
+        "timing": "phase9",
+        "diffHunk": null,
+        "blockedCategory": "step5-parity",
+        "blockedReason": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "dependency": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized.",
+        "dependencyCategory": "step5-parity",
+        "successorNote": null,
+        "aliasWriteCheck": {
+          "isWriter": null,
+          "destinationIsAlias": null,
+          "evidence": "No operation changes here; this record never adopts aliases as writer destinations."
+        },
+        "proposedReplacement": null,
+        "priorRecordRefs": [],
+        "fixtureProvenance": null,
+        "rejectionRule": null,
+        "receiptId": "setup-doctor-roots-pilot",
+        "proofCommand": "missing",
+        "proofScope": "Exact same-input current/candidate message/read/write/finding parity; existing module targets are named in the owning seam receipt and are not universal parity proofs.",
+        "parityObligation": {
+          "current": "docs/doc-registry.json",
+          "candidate": null,
+          "comparison": "Pending owning co-cut/export; no active patch or parity claim.",
+          "blocker": "Bounded registry/decision/outcome/inventory export and post-retirement scan-set parity missing; no automatic fix/root rewrite authorized."
+        },
+        "samePassageOwner": "dynamic-014378"
+      },
+      "window": {
+        "startLine": 3922,
+        "endLine": 4002,
+        "text": "  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) {\n    return { passed: true, message: 'knowledge registry check skipped -- no events log' };\n  }\n  if (!docRegistryAdopted(root)) {\n    return { passed: true, message: 'not applicable -- no doc registry in this project (run fgos doc-registry to adopt)' };\n  }\n  const view = rebuild(fgosDir);\n  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\n  const mdPath = path.join(root, 'docs/doc-registry.md');\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\n  const mdOk = fs.existsSync(mdPath) && fs.readFileSync(mdPath, 'utf8') === mdContent;\n  const jsonOk = fs.existsSync(jsonPath) && fs.readFileSync(jsonPath, 'utf8') === jsonContent;\n\n  if (mdOk && jsonOk) {\n    return { passed: true, message: 'doc-registry projections up to date' };\n  }\n  return { passed: false, message: 'docs/doc-registry.md or docs/doc-registry.json is stale -- run fgos doc-registry' };\n}\n\nfunction fixDocRegistryStale(cwd) {\n  const mainCheckout = resolveMainCheckout(cwd);\n  const root = mainCheckout ?? cwd;\n  const fgosDir = path.join(root, '.fgos');\n  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) {\n    return { changed: false, message: 'skipped -- no events log' };\n  }\n  if (!docRegistryAdopted(root)) {\n    return { changed: false, message: 'skipped -- no doc registry in this project (run fgos doc-registry to adopt)' };\n  }\n  let view;\n  try {\n    view = rebuild(fgosDir);\n  } catch (err) {\n    if (err instanceof StoreError || err.code === 'ENOENT') {\n      return { changed: false, message: `skipped -- ${err.message}` };\n    }\n    throw err;\n  }\n  const { jsonContent, mdContent } = computeKnowledgeProjection(view);\n  const mdPath = path.join(root, 'docs/doc-registry.md');\n  const jsonPath = path.join(root, 'docs/doc-registry.json');\n\n  fs.mkdirSync(path.dirname(mdPath), { recursive: true });\n  fs.writeFileSync(mdPath, mdContent, 'utf8');\n  fs.writeFileSync(jsonPath, jsonContent, 'utf8');\n  return { changed: true, message: 'regenerated docs/doc-registry.md and docs/doc-registry.json' };\n}\n\n// tsk-28x code review finding: this used to treat \"no file on disk at the\n// alias path\" as broken -- but D-tsk28x-9 defines an alias as a doc's OLD\n// path, kept purely as a historical lookup key (never a live location);\n// after a real migration (`fgos doc move-path`), the file legitimately no\n// longer exists there, which is the correct, expected post-migration\n// state, not a defect. That made this check fail every doc a migration\n// had already moved. The real \"broken\" shape (per resolveDocPath, this\n// same file's own resolver) is an alias that resolves AMBIGUOUSLY: two or\n// more non-retired docs claiming the identical alias string, or an alias\n// that collides with a DIFFERENT doc's own currentPath.\nfunction checkDocAliasBroken(cwd) {\n  const root = resolveMainCheckout(cwd) ?? cwd;\n  const fgosDir = path.join(root, '.fgos');\n  if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) return { passed: true, message: 'skipped' };\n  const view = rebuild(fgosDir);\n  const docs = Object.values(view.docs || {}).filter((d) => d.docLifecycle !== 'retired');\n  const aliasOwners = new Map();\n  for (const doc of docs) {\n    for (const alias of doc.aliases || []) {\n      if (!aliasOwners.has(alias)) aliasOwners.set(alias, []);\n      aliasOwners.get(alias).push(doc.docId);\n    }\n  }\n  const currentPaths = new Map(docs.map((d) => [d.currentPath, d.docId]));\n  const broken = [];\n  for (const [alias, owners] of aliasOwners) {\n    if (owners.length > 1) {\n      broken.push(`${alias}: claimed by ${owners.length} docs (${owners.join(', ')})`);\n    } else if (currentPaths.has(alias) && currentPaths.get(alias) !== owners[0]) {\n      broken.push(`${alias}: alias of ${owners[0]} but also the currentPath of ${currentPaths.get(alias)}`);\n    }\n  }\n  if (broken.length === 0) return { passed: true, message: 'no broken doc aliases' };"
+      },
+      "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "cutoverSpecification": {
+        "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+        "file": "src/setup/registrations.mjs",
+        "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+        "mode": "100644",
+        "sourceSpans": [
+          {
+            "line": 3518,
+            "columnStart": 96,
+            "columnEndExclusive": 133,
+            "text": "docs/how-to/cut-a-fgos-release-tag.md"
+          },
+          {
+            "line": 2094,
+            "columnStart": 109,
+            "columnEndExclusive": 158,
+            "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
+          },
+          {
+            "line": 874,
+            "columnStart": 142,
+            "columnEndExclusive": 174,
+            "text": "docs/how-to/write-a-task-spec.md"
+          }
+        ],
+        "diff": "--- a/src/setup/registrations.mjs\n+++ b/src/setup/registrations.mjs\n@@ -871,7 +871,7 @@\n     }\n   }\n   if (missing.length > 0) {\n-    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };\n+    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md` };\n   }\n   return { passed: true, message: 'every domain\\'s taskSpecMap entry and operation resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };\n }\n@@ -2091,7 +2091,7 @@\n   }\n   return {\n     passed: false,\n-    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,\n+    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md`,\n   };\n }\n \n@@ -3515,7 +3515,7 @@\n   }\n   return {\n     passed: false,\n-    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n+    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n   };\n }\n \n",
+        "expectedAfterSha256": "e5a0579e471f1e173a045ffd28eed898cbc2d7c2462db3c3d438836e9a489d62",
+        "targetOwner": [
+          "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
+          "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+          "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md"
+        ],
+        "claimAnchorProof": [
+          {
+            "target": "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
+            "docId": "how-to-cut-a-fgos-release-tag:cut-a-fgos-release-tag",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/cut-a-fgos-release-tag.md",
+            "targetSha256": "9977b7d61ca9fa05bd8025e7d04112e2c087379f793649bb766b7e013d8fb659",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          },
+          {
+            "target": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+            "docId": "how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events-jsonl-truncation:resolve-an-events-jsonl-truncation",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+            "targetSha256": "da410923253f4bdf8219b75fae8176ce4e97b9114e4a2172dbb19adfea460862",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          },
+          {
+            "target": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
+            "docId": "how-to-write-a-task-spec:write-a-task-spec",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/write-a-task-spec.md",
+            "targetSha256": "dfdd678642adb8b4795088759d783a024d5b9afb41227bb96f907af173659083",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        ],
+        "receiptId": "setup-doctor-roots-pilot",
+        "coCutPaths": [
+          "CHANGELOG.md",
+          "test/setup/checks.test.mjs"
+        ],
+        "testTargets": [
+          "env -u CLAUDE_CODE_SESSION_ID node --test test/setup/checks.test.mjs",
+          "missing: same-input complete output/category/exit cutover parity; current owning proofs alone are not migration acceptance"
+        ],
+        "prerequisites": [
+          "Lead-started independent semantic review",
+          "Missing exact-output proof",
+          "User-visible CHANGELOG.md Unreleased co-edit in separately authorized Phase 9 packet",
+          "Same-package Step 0 rebind if the final patch touches a bound target",
+          "Step 7 composes and de-duplicates shared co-cut test diffs by file/content; do not apply the same pinned test diff twice. Recompute combined hashes after all seams are assembled."
+        ],
+        "order": "Phase 9 atomic consumer cutover; no apply-now action",
+        "rollbackDiff": "--- a/src/setup/registrations.mjs\n+++ b/src/setup/registrations.mjs\n@@ -871,7 +871,7 @@\n     }\n   }\n   if (missing.length > 0) {\n-    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md` };\n+    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };\n   }\n   return { passed: true, message: 'every domain\\'s taskSpecMap entry and operation resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };\n }\n@@ -2091,7 +2091,7 @@\n   }\n   return {\n     passed: false,\n-    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md`,\n+    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,\n   };\n }\n \n@@ -3515,7 +3515,7 @@\n   }\n   return {\n     passed: false,\n-    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n+    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n   };\n }\n \n",
+        "timing": "phase9",
+        "readiness": "pending / cutover-patch-only; never execution-ready",
+        "coCutTestGreps": [
+          {
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "oldPointer": "docs/how-to/cut-a-fgos-release-tag.md",
+            "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+            "needles": [
+              "docs/how-to/cut-a-fgos-release-tag.md",
+              "docs\\/how-to\\/cut-a-fgos-release-tag.md",
+              "docs\\/how-to\\/cut-a-fgos-release-tag\\.md"
+            ],
+            "matches": []
+          },
+          {
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+            "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+            "needles": [
+              "docs/how-to/resolve-an-events-jsonl-truncation.md",
+              "docs\\/how-to\\/resolve-an-events-jsonl-truncation.md",
+              "docs\\/how-to\\/resolve-an-events-jsonl-truncation\\.md"
+            ],
+            "matches": [
+              {
+                "file": "test/setup/checks.test.mjs",
+                "line": 342,
+                "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+                "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
+              }
+            ]
+          },
+          {
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "oldPointer": "docs/how-to/write-a-task-spec.md",
+            "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+            "needles": [
+              "docs/how-to/write-a-task-spec.md",
+              "docs\\/how-to\\/write-a-task-spec.md",
+              "docs\\/how-to\\/write-a-task-spec\\.md"
+            ],
+            "matches": []
+          }
+        ],
+        "coCutTestEdits": [
+          {
+            "file": "test/setup/checks.test.mjs",
+            "referenceId": "reference-003806",
+            "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+            "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55",
+            "mode": "100644",
+            "grepMatches": [
+              {
+                "file": "test/setup/checks.test.mjs",
+                "line": 342,
+                "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+                "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
+              }
+            ],
+            "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+            "newPointer": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+            "substitutions": [
+              [
+                "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+                "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {"
+              ]
+            ],
+            "diff": "--- a/test/setup/checks.test.mjs\n+++ b/test/setup/checks.test.mjs\n@@ -339,7 +339,7 @@\n \n // ─── events-jsonl-not-truncated (tsk-cgg) ──────────────────────────────────\n \n-test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n+test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n   assert.equal(\n     FIX_REGISTRATIONS.some((f) => f.id === 'events-jsonl-not-truncated'),\n     false,\n",
+            "expectedAfterSha256": "a19a4a3d2ee134974c4483b9e719df84bc13c045e835c3aa06949ee9f9a059f9",
+            "rollbackDiff": "--- a/test/setup/checks.test.mjs\n+++ b/test/setup/checks.test.mjs\n@@ -339,7 +339,7 @@\n \n // ─── events-jsonl-not-truncated (tsk-cgg) ──────────────────────────────────\n \n-test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n+test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {\n   assert.equal(\n     FIX_REGISTRATIONS.some((f) => f.id === 'events-jsonl-not-truncated'),\n     false,\n",
+            "timing": "phase9",
+            "proofScope": "One explicit decision per pinned grep hit. Preserve retained real-file/capture provenance and historical comments; patch only affected message assertions/navigation titles. No assertion weakening and no cutover parity acceptance.",
+            "grepDecisions": [
+              {
+                "match": {
+                  "file": "test/setup/checks.test.mjs",
+                  "line": 342,
+                  "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+                  "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
+                },
+                "disposition": "patch",
+                "reason": "L12-69: Owning exact emitted-string assertion (or navigation title) follows the single pointer delta; assertion shape and all surrounding bytes stay identical.",
+                "oldLine": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+                "newLine": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {"
+              }
+            ],
+            "disposition": "patch"
+          }
+        ]
+      }
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "kind": "references",
       "id": "reference-003839",
       "change": {
         "id": "reference-003839",
@@ -708,8 +1276,8 @@
           "text": "  return {\n    passed: false,\n    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,\n  };\n}"
         },
         "caller": {
-          "line": 2075,
-          "declaration": "const existingFiles = filesToCheck.filter(({ logPath }) => fs.existsSync(logPath));"
+          "line": 2056,
+          "declaration": "function checkEventsJsonlNotTruncated(cwd) {"
         },
         "inputs": [
           "`truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`"
@@ -936,7 +1504,7 @@
             "default-root"
           ],
           "candidateConstruction": "root/CHANGELOG.md",
-          "comparison": "Exact same-input emitted/read behavior; literal patch owner supplies one diff. No parity pass inferred.",
+          "comparison": "Retained root file read, no diff and no literal patch owner. Same input bytes, extraction result and error behavior; cutover parity not run.",
           "blocker": null
         },
         "id": "dynamic-014299",
@@ -1021,7 +1589,7 @@
             "default-root"
           ],
           "candidateConstruction": "root/CHANGELOG.md",
-          "comparison": "Exact same-input emitted/read behavior; literal patch owner supplies one diff. No parity pass inferred.",
+          "comparison": "Retained root file read, no diff and no literal patch owner. Same input bytes, extraction result and error behavior; cutover parity not run.",
           "blocker": null
         },
         "id": "dynamic-014300",
@@ -1106,7 +1674,7 @@
             "default-root"
           ],
           "candidateConstruction": "root/README.md",
-          "comparison": "Exact same-input emitted/read behavior; literal patch owner supplies one diff. No parity pass inferred.",
+          "comparison": "Retained root file read, no diff and no literal patch owner. Same input bytes, extraction result and error behavior; cutover parity not run.",
           "blocker": null
         },
         "id": "dynamic-014301",
@@ -1144,7 +1712,7 @@
         "stateExportDependency": null,
         "fixtureProvenance": null,
         "rejectedAsUnrelatedReason": null,
-        "reason": "L12-69: Actual retained root-document reader; extract Unreleased/install tag, no relocation.",
+        "reason": "L12-71: README.md retained root reader extracts the pinned install tag. Own operand \"path.join(mainCheckout, 'README.md')\". No Unreleased extraction in this function.",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"
@@ -1191,7 +1759,7 @@
             "default-root"
           ],
           "candidateConstruction": "root/README.md",
-          "comparison": "Exact same-input emitted/read behavior; literal patch owner supplies one diff. No parity pass inferred.",
+          "comparison": "Retained root file read, no diff and no literal patch owner. Same input bytes, extraction result and error behavior; cutover parity not run.",
           "blocker": null
         },
         "id": "dynamic-014302",
@@ -1229,7 +1797,7 @@
         "stateExportDependency": null,
         "fixtureProvenance": null,
         "rejectedAsUnrelatedReason": null,
-        "reason": "L12-69: Actual retained root-document reader; extract Unreleased/install tag, no relocation.",
+        "reason": "L12-71: README.md retained root reader extracts the pinned install tag. Own operand 'readmePath = path.join(mainCheckout'. No Unreleased extraction in this function.",
         "blockedSeams": [],
         "blockedReason": null,
         "receiptId": "setup-doctor-roots-pilot"
@@ -1548,8 +2116,8 @@
           "text": "// registered fix with no try/catch of its own -- so the throw aborted the\n// ENTIRE `fgos doctor --fix` run, discarding every other fix's result.\n// Reproduced directly: a directory with a committed, row-carrying\n// docs/decisions/index.md and no readable .fgos store (this repo's own\n// merged-to-main future state on a fresh clone before .fgos exists) hit"
         },
         "caller": {
-          "line": 3718,
-          "declaration": "function checkDecisionIndexStale(cwd) {"
+          "line": 3760,
+          "declaration": "function fixDecisionIndexStale(cwd) {"
         },
         "inputs": [
           "directly: a directory with a committed"

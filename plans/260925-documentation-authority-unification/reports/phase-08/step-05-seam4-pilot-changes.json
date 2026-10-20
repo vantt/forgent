@@ -1,0 +1,363 @@
+{
+  "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+  "changes": [
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "field": "references",
+      "id": "reference-000168",
+      "changedFields": [
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "field": "references",
+      "id": "reference-000189",
+      "changedFields": [
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "field": "dynamicTraces",
+      "id": "dynamic-000766",
+      "changedFields": [
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "field": "references",
+      "id": "reference-003641",
+      "changedFields": [
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "field": "references",
+      "id": "reference-003643",
+      "changedFields": [
+        "blockedCategory",
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "field": "references",
+      "id": "reference-003649",
+      "changedFields": [
+        "aliasWriteCheck",
+        "anchor",
+        "coCutTestGrep",
+        "diffHunk",
+        "disposition",
+        "parityObligation",
+        "proposedReplacement",
+        "reason",
+        "resolverWitness",
+        "target",
+        "timing"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "field": "references",
+      "id": "reference-003652",
+      "changedFields": [
+        "blockedCategory",
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "field": "references",
+      "id": "reference-003653",
+      "changedFields": [
+        "blockedCategory",
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "field": "references",
+      "id": "reference-003655",
+      "changedFields": [
+        "diffHunk"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "field": "references",
+      "id": "reference-003658",
+      "changedFields": [
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "field": "references",
+      "id": "reference-003659",
+      "changedFields": [
+        "blockedCategory",
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "field": "references",
+      "id": "reference-003661",
+      "changedFields": [
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "field": "references",
+      "id": "reference-003662",
+      "changedFields": [
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "field": "references",
+      "id": "reference-003664",
+      "changedFields": [
+        "aliasWriteCheck",
+        "anchor",
+        "coCutTestGrep",
+        "diffHunk",
+        "disposition",
+        "parityObligation",
+        "proposedReplacement",
+        "reason",
+        "resolverWitness",
+        "target",
+        "timing"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "field": "references",
+      "id": "reference-003666",
+      "changedFields": [
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-013969",
+      "changedFields": [
+        "caller"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-013982",
+      "changedFields": [
+        "caller",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-013989",
+      "changedFields": [
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-013990",
+      "changedFields": [
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-013991",
+      "changedFields": [
+        "caller",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-013992",
+      "changedFields": [
+        "caller",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-014008",
+      "changedFields": [
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-014018",
+      "changedFields": [
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-014028",
+      "changedFields": [
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/setup/model-pool-checks.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-014072",
+      "changedFields": [
+        "censusDriftNote"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "references",
+      "id": "reference-003804",
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "references",
+      "id": "reference-003806",
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "references",
+      "id": "reference-003811",
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "references",
+      "id": "reference-003819",
+      "changedFields": [
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "references",
+      "id": "reference-003820",
+      "changedFields": [
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "references",
+      "id": "reference-003821",
+      "changedFields": [
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "references",
+      "id": "reference-003854",
+      "changedFields": [
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "references",
+      "id": "reference-003855",
+      "changedFields": [
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-014207",
+      "changedFields": [
+        "caller"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-014299",
+      "changedFields": [
+        "parityObligation"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-014300",
+      "changedFields": [
+        "parityObligation"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-014301",
+      "changedFields": [
+        "parityObligation",
+        "reason"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-014302",
+      "changedFields": [
+        "parityObligation",
+        "reason"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "field": "dynamicTraces",
+      "id": "dynamic-014338",
+      "changedFields": [
+        "caller"
+      ]
+    }
+  ],
+  "files": 6,
+  "ids": 39
+}

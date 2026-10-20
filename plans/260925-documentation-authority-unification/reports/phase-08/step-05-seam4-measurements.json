@@ -1,0 +1,136 @@
+{
+  "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+  "startedAt": "2026-10-20T17:56:35.525999Z",
+  "measuredAt": "2026-10-20T18:45:09.810357+00:00",
+  "elapsedSeconds": 2914.284,
+  "elapsedScope": "End-to-end author elapsed since ack through final full checker and all mutation probes; no independent semantic reviewer time.",
+  "originalSeamQueue": {
+    "files": 227,
+    "references": 368,
+    "dynamicTuples": 3622
+  },
+  "outputPromotions": {
+    "files": 4,
+    "references": 1902,
+    "dynamicTuples": 15
+  },
+  "fileRecords": 254,
+  "physicalFileRecords": 253,
+  "compositeLocators": 1,
+  "supplementalSources": 23,
+  "literalReferences": 2270,
+  "literalAdmitted": 2270,
+  "literalRejected": 0,
+  "literalDispositions": {
+    "render-join": 109,
+    "parked": 1992,
+    "preserve": 167,
+    "patch": 2
+  },
+  "dynamicTuples": 3637,
+  "dynamicAdmitted": 827,
+  "dynamicRejected": 2810,
+  "dynamicDispositions": {
+    "preserve": 2934,
+    "parked": 703
+  },
+  "parkedOccurrences": 2695,
+  "parkedFiles": 73,
+  "authorAddedOccurrences": 30,
+  "authorAddedParks": 6,
+  "sourceSpecifications": 14,
+  "inheritedSourceDiffs": 12,
+  "packetOnlyHeaderDiffs": 2,
+  "generatedOutputDiffs": 0,
+  "receipts": 5,
+  "reviewParts": 181,
+  "reviewLogicalItems": 6279,
+  "reviewStreamedItems": 6392,
+  "reviewUtf8Bytes": 68814484,
+  "maxPartBytes": 389936,
+  "maxPartRecords": 60,
+  "pilotClosureChangedIds": 39,
+  "pilotClosureChangedFiles": 6,
+  "subBatches": [
+    {
+      "subBatch": "decision-index",
+      "fileRecords": 2,
+      "literalReferences": 82,
+      "dynamicTuples": 12,
+      "admittedTuples": 6,
+      "rejectedTuples": 6,
+      "literalParks": 78
+    },
+    {
+      "subBatch": "doc-registry",
+      "fileRecords": 3,
+      "literalReferences": 1318,
+      "dynamicTuples": 21,
+      "admittedTuples": 17,
+      "rejectedTuples": 4,
+      "literalParks": 1318
+    },
+    {
+      "subBatch": "enduser-index",
+      "fileRecords": 7,
+      "literalReferences": 512,
+      "dynamicTuples": 39,
+      "admittedTuples": 25,
+      "rejectedTuples": 14,
+      "literalParks": 507
+    },
+    {
+      "subBatch": "instructions",
+      "fileRecords": 2,
+      "literalReferences": 0,
+      "dynamicTuples": 57,
+      "admittedTuples": 36,
+      "rejectedTuples": 21,
+      "literalParks": 0
+    },
+    {
+      "subBatch": "skills-and-support",
+      "fileRecords": 240,
+      "literalReferences": 358,
+      "dynamicTuples": 3508,
+      "admittedTuples": 743,
+      "rejectedTuples": 2765,
+      "literalParks": 89
+    }
+  ],
+  "inheritedPilotGeneratorIds": {
+    "originalIds": 165,
+    "parked": 153,
+    "rejected": 12,
+    "scope": "Separate joined canonical pilot records; not double-counted in the 254 newly authored records."
+  },
+  "generatedIntermediateCandidateHashes": null,
+  "generatedIntermediateInputsAwaitingRegeneration": 66,
+  "inheritedSourceSlotDispositions": {
+    "render-join": 123,
+    "preserve": 148,
+    "parked": 1912,
+    "patch": 24,
+    "phase9-row-flip": 65
+  },
+  "parkCountingScope": "parkedOccurrences counts original selected literal/dynamic occurrences only. Author-added parks, pilot carries and inherited source-slot dispositions are separate measures; joins may overlap and must not be summed as unique physical parks.",
+  "fieldRoleSweep": {
+    "changedRoleLabels": 669,
+    "docRegistryJsonSourceCaptureOccurrences": 332,
+    "docRegistryJsonAliasOccurrences": 343,
+    "outcomeChanges": 0
+  },
+  "checker": {
+    "failures": 0,
+    "files": 291,
+    "literalReferences": 2419,
+    "dynamicTuples": 5654,
+    "ruleFamilies": 35
+  },
+  "probes": {
+    "pilot": 37,
+    "seam4": 22,
+    "passed": 59,
+    "total": 59
+  }
+}

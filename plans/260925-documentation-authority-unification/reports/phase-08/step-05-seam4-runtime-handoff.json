@@ -1,0 +1,191 @@
+{
+  "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+  "file": "src/runner/merge.mjs",
+  "sourceSha256": "8ccdb5441f10f806a1753d47394b4c74c655d02c5c7a03f7a1af56ce08024eb4",
+  "owningSeam": "runtime-defaults-dynamic",
+  "originalReferences": [
+    {
+      "file": "src/runner/merge.mjs",
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 108,
+          "columnStart": 93,
+          "line": 536,
+          "text": "docs/decisions/"
+        }
+      ],
+      "expression": "docs/decisions/",
+      "legacyTarget": "docs/decisions/",
+      "origins": [
+        {
+          "inventory": "step-02l-census-class6.json",
+          "id": "class6-l-000299",
+          "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
+        }
+      ],
+      "roleHints": [
+        "reader"
+      ],
+      "stepFiveExcluded": [
+        {
+          "record": "src/runner/merge.mjs",
+          "reason": "L12-60(1): runtime-emitted/help/example string or executable reader/writer/default, not a maintained prose comment; Step 5 owns output/path parity.",
+          "id": "class6-l-000299"
+        }
+      ],
+      "id": "reference-003747",
+      "seam": "runtime-defaults-dynamic"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 115,
+          "columnStart": 100,
+          "line": 640,
+          "text": "docs/decisions/"
+        }
+      ],
+      "expression": "docs/decisions/",
+      "legacyTarget": "docs/decisions/",
+      "origins": [
+        {
+          "inventory": "step-02l-census-class6.json",
+          "id": "class6-l-000304",
+          "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
+        }
+      ],
+      "roleHints": [
+        "reader"
+      ],
+      "stepFiveExcluded": [
+        {
+          "record": "src/runner/merge.mjs",
+          "reason": "L12-60(1): runtime-emitted/help/example string or executable reader/writer/default, not a maintained prose comment; Step 5 owns output/path parity.",
+          "id": "class6-l-000304"
+        }
+      ],
+      "id": "reference-003748",
+      "seam": "runtime-defaults-dynamic"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 45,
+          "columnStart": 28,
+          "line": 409,
+          "text": "docs\\/decisions\\/"
+        }
+      ],
+      "expression": "docs\\/decisions\\/",
+      "legacyTarget": "docs/decisions/",
+      "origins": [
+        {
+          "inventory": "step-02l-census-class6.json",
+          "id": "class6-l-000297",
+          "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
+        }
+      ],
+      "roleHints": [
+        "reader"
+      ],
+      "stepFiveExcluded": [
+        {
+          "record": "src/runner/merge.mjs",
+          "reason": "L12-60(1): runtime-emitted/help/example string or executable reader/writer/default, not a maintained prose comment; Step 5 owns output/path parity.",
+          "id": "class6-l-000297"
+        }
+      ],
+      "id": "reference-003754",
+      "seam": "runtime-defaults-dynamic"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 97,
+          "columnStart": 82,
+          "line": 638,
+          "text": "docs/decisions/"
+        }
+      ],
+      "expression": "docs/decisions/",
+      "legacyTarget": "docs/decisions/",
+      "origins": [
+        {
+          "inventory": "step-02l-census-class6.json",
+          "id": "class6-l-000303",
+          "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
+        }
+      ],
+      "roleHints": [
+        "reader"
+      ],
+      "stepFiveExcluded": [
+        {
+          "record": "src/runner/merge.mjs",
+          "reason": "L12-60(1): runtime-emitted/help/example string or executable reader/writer/default, not a maintained prose comment; Step 5 owns output/path parity.",
+          "id": "class6-l-000303"
+        }
+      ],
+      "id": "reference-003770",
+      "seam": "runtime-defaults-dynamic"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "sourceSpans": [
+        {
+          "columnEndExclusive": 98,
+          "columnStart": 71,
+          "line": 562,
+          "text": "docs/decisions/NNNN-slug.md"
+        }
+      ],
+      "expression": "docs/decisions/NNNN-slug.md",
+      "legacyTarget": "docs/decisions/NNNN-slug.md",
+      "origins": [
+        {
+          "inventory": "step-02l-census-class6.json",
+          "id": "class6-l-000300",
+          "pin": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b"
+        }
+      ],
+      "roleHints": [
+        "reader"
+      ],
+      "stepFiveExcluded": [
+        {
+          "record": "src/runner/merge.mjs",
+          "reason": "L12-60(1): runtime-emitted/help/example string or executable reader/writer/default, not a maintained prose comment; Step 5 owns output/path parity.",
+          "id": "class6-l-000300"
+        }
+      ],
+      "id": "reference-003771",
+      "seam": "runtime-defaults-dynamic"
+    }
+  ],
+  "passages": [
+    {
+      "line": 409,
+      "text": "const DECISION_FILE_RE = /^docs\\/decisions\\/(\\d{4})-([^/]+)\\.md$/;"
+    },
+    {
+      "line": 536,
+      "text": "    const files = nulPaths(git(repoRoot, ['ls-tree', '-r', '--name-only', '-z', ref, '--', 'docs/decisions/']));"
+    },
+    {
+      "line": 562,
+      "text": "    throw new MergeError(`renumberDecisionFile: \"${oldPath}\" is not a docs/decisions/NNNN-slug.md path`, { oldPath });"
+    },
+    {
+      "line": 638,
+      "text": "    nulPaths(git(repoRoot, ['ls-tree', '-r', '--name-only', '-z', 'HEAD', '--', 'docs/decisions/'])),"
+    },
+    {
+      "line": 640,
+      "text": "  const branchFiles = nulPaths(git(repoRoot, ['ls-tree', '-r', '--name-only', '-z', branch, '--', 'docs/decisions/']));"
+    }
+  ],
+  "decision": "536/638/640 are already census-owned by runtime references 003747/003770/003748; DECISION_FILE_RE by 003754. No census gap and no generator-source rewrite inferred. 003771 is promoted CLI message custody; runtime must co-cut the renumber/read construction if changed."
+}
