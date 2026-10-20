@@ -17,9 +17,13 @@
 // rather than deep-equalling the whole object, so every return branch has
 // to keep its exact shape and every guard its exact order.
 import path from 'node:path';
+import crypto from 'node:crypto';
+import { gitPortOptions } from '../../git/inspect.mjs';
+import { createGitRecovery } from '../../git/recovery.mjs';
 import { execFileSync } from 'node:child_process';
 import {
   listWork,
+  addDecision,
   moveWork,
   recordFriction,
   assertAcceptanceEvidence,
@@ -75,7 +79,7 @@ import { checkDispatchAttestation } from '../../runner/attestation-guard.mjs';
 // `events.jsonl`) and returns `event: null` instead of throwing, so
 // every call site can still finish its own cleanup and return a
 // truthful envelope.
-function moveDeliveredOrRecordFault(dir, id, phase, testForceLockTimeoutId, { mergedSha, mergedInto } = {}) {
+function moveDeliveredOrRecordFault(dir, id, phase, testForceLockTimeoutId, { mergedSha, mergedInto, landSettlement } = {}) {
   try {
     recordApprovePostSuccessFault(dir, { id, phase, mergedSha, mergedInto });
     // Test-only failure seam (tsk-480 D3), same shape as
@@ -87,7 +91,7 @@ function moveDeliveredOrRecordFault(dir, id, phase, testForceLockTimeoutId, { me
     if (testForceLockTimeoutId === id) {
       throw new EventLogError('lock-timeout', `approve: simulated lock-timeout for "${id}" (FGOS_TEST_FORCE_APPROVE_LOCK_TIMEOUT)`);
     }
-    const { event } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human', mergedSha, mergedInto });
+    const { event } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human', mergedSha, mergedInto, landSettlement });
     return { event, error: null, diagnosticLog: null };
   } catch (err) {
     // Only an EventLogError (the write itself failing — e.g.
@@ -704,7 +708,29 @@ export async function approveUseCase(
     // itself, the main checkout mutex only for its final land step, and waits
     // on each (or fails fast under --no-wait) without redoing the verify run.
     const { mergeRootIntoMainCas } = await import('../../runner/merge.mjs');
+    const sourceOid = resolveRefSha(repoRoot, branchNameFor(id));
+    const destination = `refs/heads/${detectTrunk(repoRoot)}`;
+    const prior = [...view.decisions].reverse().find(decision => decision.id === id
+      && decision.landOperation?.source === sourceOid && decision.landOperation?.destination === destination);
+    let operationId;
+    if (prior) {
+      // A previously published operation is settled under its original id.
+      // Unknown native effects refuse before another operation is created.
+      const operation = createGitRecovery(gitPortOptions(repoRoot, { mutation: true })).inspectOperation({ operationId: prior.landOperation.operationId });
+      if (operation.outcome?.kind === 'land') operationId = prior.landOperation.operationId;
+      else if (!operation.terminal && ['target-attempt', 'land-verified'].includes(operation.phase?.phase)) {
+        throw new StoreError('precondition', `approve: Land operation ${prior.landOperation.operationId} requires recovery before another publication.`);
+      }
+    }
+    if (!operationId) {
+      operationId = crypto.randomUUID();
+      addDecision(dir, { id, kind: 'engine',
+        text: `approve: prepare Land operation ${operationId}`,
+        rationale: 'retain the publication identity until Work acknowledges delivery',
+        landOperation: { operationId, source: sourceOid, destination } });
+    }
     const result = await mergeRootIntoMainCas(repoRoot, item, branchNameFor(id), {
+      operationId,
       timeoutMs,
       ownFileSet,
       ...(noWait ? { lockWaitMs: 0 } : waitMs !== undefined ? { lockWaitMs: waitMs } : {}),
@@ -836,6 +862,10 @@ export async function approveUseCase(
       return { id, mode: 'merge', to: 'blocked', reason, target: 'main', timedOut: result.check.timedOut, exitStatus: result.check.status, output: result.check.output };
     }
 
+    if (result.outcome !== 'merged') {
+      throw new StoreError('precondition', `approve: merge returned ${result.outcome}; delivery was not recorded.`);
+    }
+
     // tsk-480: cleanup used to run either way relative to this write
     // (already real and permanent) — now moot on this path, since
     // cleanup no longer happens here at all (tsk-1p9 D1: deferred to
@@ -845,14 +875,15 @@ export async function approveUseCase(
     // already ran directly on repoRoot (no ephemeral worktree here) —
     // still correct, and still robust for an idempotent already-merged
     // re-approve (see the leaf-into-root comment above for why).
-    const mergedSha = resolveRefSha(repoRoot, 'main');
-    const moveResult = moveDeliveredOrRecordFault(dir, id, 'root-into-main merge', testForceLockTimeoutId, { mergedSha, mergedInto: 'main' });
+    const mergedSha = result.receipt?.localEffect.publishedOid ?? resolveRefSha(repoRoot, detectTrunk(repoRoot));
+    const moveResult = moveDeliveredOrRecordFault(dir, id, 'root-into-main merge', testForceLockTimeoutId, { mergedSha, mergedInto: 'main', landSettlement: result.landSettlement });
     if (!moveResult.event) {
       return {
         id,
         mode: 'merge',
         to: 'awaiting-approval',
         deliveryUnrecorded: true,
+        landOperationId: result.receipt?.operationId,
         target: 'main',
         branch: result.branch,
         output: result.check.output,

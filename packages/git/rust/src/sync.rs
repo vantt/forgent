@@ -51,6 +51,32 @@ impl GitDriver {
         writer: &str,
         id: &str,
     ) -> Result<SyncResult> {
+        self.start_sync_inner(repo, held, target, message, writer, id, false)
+    }
+    /// Prepare the same Sync operation, leaving its owned merge open so the
+    /// consumer can verify before committing under continuous custody.
+    pub fn prepare_sync(
+        &self,
+        repo: &RepoHandle,
+        held: Vec<BorrowedHandle<'_>>,
+        target: &Oid,
+        message: &str,
+        writer: &str,
+        id: &str,
+    ) -> Result<SyncResult> {
+        self.start_sync_inner(repo, held, target, message, writer, id, true)
+    }
+    #[allow(clippy::too_many_arguments)]
+    fn start_sync_inner(
+        &self,
+        repo: &RepoHandle,
+        held: Vec<BorrowedHandle<'_>>,
+        target: &Oid,
+        message: &str,
+        writer: &str,
+        id: &str,
+        prepare_only: bool,
+    ) -> Result<SyncResult> {
         if root(repo)? == repo.trusted_main_root() {
             return Err(failure("sync-linked-worktree-required"));
         }
@@ -271,14 +297,14 @@ impl GitDriver {
                 },
             )
             .map_err(failure)?;
-        let mut receipt = if conflicts.is_empty() {
+        let mut receipt = if conflicts.is_empty() && !prepare_only {
             self.finish_sync(repo, &scope, &wal, &state)
         } else {
             Ok(info(
                 id,
                 &head,
                 target.as_str(),
-                "conflicted-open",
+                if conflicts.is_empty() { "prepared" } else { "conflicted-open" },
                 conflicts,
                 None,
             ))

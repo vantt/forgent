@@ -735,8 +735,25 @@ export function moveWork(dir, args = {}) {
   throw new StoreError('conflict', `work "${args.id}": its plan evidence kept changing while moving to "delivered"; retry.`);
 }
 
-function moveWorkOnce(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger, rationale, alternatives, source, askSource, approved, mergedSha, mergedInto } = {}, planSnapshot = null) {
+function moveWorkOnce(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger, rationale, alternatives, source, askSource, approved, mergedSha, mergedInto, landSettlement } = {}, planSnapshot = null) {
   const result = withStateAndRefresh(dir, (tx) => {
+  if (landSettlement !== undefined) {
+    if (to !== 'delivered' || !landSettlement || landSettlement.settlementKind !== 'delivered'
+      || !['repoIdentity', 'operationId'].every(key => typeof landSettlement[key] === 'string' && landSettlement[key].length > 0)) {
+      throw new StoreError('validation', 'delivery requires a complete Land settlement identity.');
+    }
+    // Query under the same state transaction as append. An acknowledgement
+    // lost after the event was written must return that event, not append a
+    // second business settlement or consult a Git receipt as business truth.
+    const prior = readRawEvents(dir).find(event => event.type === 'work.move'
+      && ['repoIdentity', 'operationId', 'settlementKind'].every(key => event.payload?.landSettlement?.[key] === landSettlement[key]));
+    if (prior) {
+      if (prior.payload.id !== id || prior.payload.mergedSha !== mergedSha || prior.payload.mergedInto !== mergedInto) {
+        throw new StoreError('conflict', 'Land settlement identity is already bound to a different delivery.');
+      }
+      return prior;
+    }
+  }
   const before = currentView(dir);
   const work = before.work[id];
   if (!work) {
@@ -835,6 +852,7 @@ function moveWorkOnce(dir, { id, to, expectedStatus, reason, ask, answer, role, 
   if (mergedInto !== undefined) {
     rawEvent.payload.mergedInto = mergedInto;
   }
+  if (landSettlement !== undefined) rawEvent.payload.landSettlement = landSettlement;
   // Claim-trigger marker (claim-lock §7, additive, NOT `claimRole`): who/what
   // dispatched this claim (e.g. `'herdr'`) — audit-only, never a safety
   // mechanism (claimRole/loop.mjs's reclaim-guard are unaffected). Stamped

@@ -106,3 +106,30 @@ test('Sync abort restores pre-merge permission bits on clean merged paths',()=>{
   assert.equal(fs.readFileSync(path.join(f.linked,'modefile'),'utf8'),'base mode');assert.equal(fs.statSync(path.join(f.linked,'modefile')).mode&0o777,0o600);
  }finally{f.close();}
 });
+
+test('Sync preparation leaves the source tip unchanged until consumer verification finishes', () => {
+ const f=fixture();try {
+ const before=execFileSync('git',['-C',f.linked,'rev-parse','HEAD'],{encoding:'utf8'}).trim();
+ const prepared=f.port.prepare({operationId:'verify-first',target:f.target,message:'verified catchup'},f.held);
+ assert.equal(prepared.state,'prepared');
+ assert.equal(execFileSync('git',['-C',f.linked,'rev-parse','HEAD'],{encoding:'utf8'}).trim(),before);
+ assert.equal(fs.readFileSync(path.join(f.linked,'incoming'),'utf8'),'target\n');
+ assert.equal(f.port.prepare({operationId:'verify-first',target:f.target,message:'verified catchup'},f.held).state,'in-progress');
+ assert.equal(execFileSync('git',['-C',f.linked,'rev-parse','HEAD'],{encoding:'utf8'}).trim(),before);
+ const result=f.port.continue({operationId:'verify-first'},f.held);
+ assert.equal(result.state,'done');
+ assert.deepEqual(execFileSync('git',['-C',f.linked,'show','-s','--format=%P'],{encoding:'utf8'}).trim().split(' '),[before,f.target]);
+ }finally{f.close();}
+});
+
+test('a consumer can abort a prepared clean Sync after a red check without changing either branch', () => {
+ const f=fixture();try {
+ const before=execFileSync('git',['-C',f.linked,'rev-parse','HEAD'],{encoding:'utf8'}).trim();
+ f.port.prepare({operationId:'red-check',target:f.target,message:'must not publish'},f.held);
+ assert.equal(f.port.abort({operationId:'red-check'},f.held).state,'conflict-aborted');
+ assert.equal(execFileSync('git',['-C',f.linked,'rev-parse','HEAD'],{encoding:'utf8'}).trim(),before);
+ assert.equal(f.git('rev-parse','trunk'),f.target);
+ assert.equal(fs.existsSync(path.join(f.linked,'incoming')),false);
+ assert.equal(execFileSync('git',['-C',f.linked,'status','--porcelain'],{encoding:'utf8'}),'');
+ }finally{f.close();}
+});

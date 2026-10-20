@@ -44,6 +44,7 @@
     ],
     "Sync": [
       "start",
+      "prepare",
       "inspect",
       "continue",
       "abort"

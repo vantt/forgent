@@ -58,12 +58,12 @@ impl GitDriver {
                 // Generic terminal outcomes do not retain the original kind.
                 _ => None,
             };
-            return Ok(json!({"operationId":id,"kind":compact_kind,"requestDigest":c.request,
+            return Ok(json!({"repoIdentity":wal.repository_identity(),"operationId":id,"kind":compact_kind,"requestDigest":c.request,
                 "terminal":true,"compacted":true,"outcome":outcome}));
         }
         let c = wal.inspect(id).map_err(failure)?;
         Ok(
-            json!({"operationId":id,"kind":kind(&c.intent().kind),"requestDigest":c.intent().request_digest,"intent":c.intent(),"terminal":c.outcome().is_some(),"compacted":false,"outcome":c.outcome(),"phase":c.last_state()}),
+            json!({"repoIdentity":wal.repository_identity(),"operationId":id,"kind":kind(&c.intent().kind),"requestDigest":c.intent().request_digest,"intent":c.intent(),"terminal":c.outcome().is_some(),"compacted":false,"outcome":c.outcome(),"phase":c.last_state()}),
         )
     }
     pub fn list_pending(&self, repo: &RepoHandle, bound: usize) -> Result<Value> {

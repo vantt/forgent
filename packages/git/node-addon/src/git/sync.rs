@@ -55,6 +55,14 @@ impl GitSync {
                 &self.writer,
                 id
             ),
+            "prepare" => self.driver.prepare_sync(
+                &self.repo,
+                held,
+                &Oid::parse(text(&args, "target")?, self.repo.object_format()).map_err(error)?,
+                text(&args, "message")?,
+                &self.writer,
+                id
+            ),
             "inspect" => self.driver.inspect_sync(&self.repo, held, &self.writer, id),
             "continue" if args.get("nextOperationId").and_then(Value::as_str).is_some() => self.driver.retry_sync_commit(&self.repo, held, &self.writer, id, text(&args, "nextOperationId")?),
             "continue" => self
