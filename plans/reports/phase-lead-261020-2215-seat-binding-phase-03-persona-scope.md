@@ -36,3 +36,10 @@ Branch `worktree-agent-a9867440237cda6bf`, merged with `seat-binding-wave` (a287
 - The new definition-file readers live in `src/convention/seat-id.mjs`, not a module of their own, because a new `src/` file needs an architecture manifest row and `docs/architecture-manifest.json` belongs to the parallel phase. A later move to its own file is a one-row manifest change.
 - Domain personas are no longer visible to `fgos run --persona` or to core workflows. Phase 00 listed no cross-domain use; `domains/marketing/workflows/content-publish.yaml` names persona `brand-guardian`, which exists nowhere (unchanged behavior: the unit renders by name).
 - `conductor-case.test.mjs` failure exists on the track base and is outside this phase.
+
+## Follow-up after the second merge of the track (9a5c48142)
+
+- Definition-file readers moved to `src/convention/definition-names.mjs` (row added to `docs/architecture-manifest.json` at the `seat-id.mjs` layer, "domain"); `seat-id.mjs` holds only the seat-id rule again.
+- Two tests in `workflow-runner.test.mjs` needed the new behavior: persona provenance now carries `identity`, and a domain persona asked for by a core workflow is "not found" (the case that expected a same-domain duplicate error was replaced).
+- Whole group, final run: 240 files, 4217 tests, 4212 pass, 2 fail, 0 cancelled, 3 skipped. The 2 failures were `run.test.mjs` "verify command that outlives runner.timeoutMs" and `spawn-worker.test.mjs` "idleTimeoutMs kills a worker that went silent": timing tests under load; both files rerun alone: 101 pass, 0 fail.
+- The 2 cancelled of the first group run: the log kept only the summary line, so I cannot name them. That run's failing tests were the three `assignment-cwd-mutex-concurrency` cases (30 to 70 s timeouts), `holder-lock-checks`, `discussion-workflows` group-cognition (58 s), plus the persona tests fixed above; the cancelled ones were most likely among the long-timeout tests. The final run had 0 cancelled.
