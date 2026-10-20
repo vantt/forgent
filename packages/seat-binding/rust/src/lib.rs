@@ -16,6 +16,7 @@ pub mod explain;
 pub mod model;
 pub mod policy;
 pub mod rank;
+pub mod route;
 pub mod tier;
 
 pub use explain::explain;

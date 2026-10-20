@@ -51,6 +51,11 @@ export function noteLockHeld() {
   heldLocks += 1;
 }
 
+/** True while this process holds a state lock: a host exec must wait. */
+export function stateLockHeld() {
+  return heldLocks > 0;
+}
+
 /** Called by withStateTx exactly once when that lock is
  * really released. */
 export function noteLockReleased() {

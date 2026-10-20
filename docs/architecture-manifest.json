@@ -167,6 +167,7 @@
     "src/holder-lock/lock-scope.mjs": "infra",
     "src/holder-lock/fences.mjs": "infra",
     "src/terminal-control/client.mjs": "infra",
+    "src/seat-binding/client.mjs": "infra",
     "src/terminal-control/config.mjs": "infra",
     "src/state/events.mjs": "infra",
     "src/state/event-log.mjs": "kernel",

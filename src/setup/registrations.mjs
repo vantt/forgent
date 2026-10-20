@@ -141,6 +141,7 @@ import { discoverOperationPromptTemplates, TemplateResolutionError } from '../ru
 import { resolveHostBin, invokeHost } from '../util/host-bin.mjs';
 import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
 import { probeIdentity } from '../util/session-identity.mjs';
+import { createSeatBindingClient, resolveSeatBindingHost } from '../seat-binding/client.mjs';
 import { listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from '../runner/dispatch/assignment-layout.mjs';
 import { conventionCheck } from '../convention/convention-client.mjs';
 import { checkRunSupervisorRoute, checkProcessContainment, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkGateKillGrace, checkLegacyAttemptsStuck, fixLegacyAttemptsStuck, checkUnitsAwaitingResume, checkCancelWait } from './run-supervisor-checks.mjs';
@@ -6633,6 +6634,38 @@ registerCheck({
   id: 'writer-identity-resolvable',
   description: 'the writer identity resolves through the Rust host, both for the running host and for the activation a plain git commit hook uses',
   check: (cwd) => checkWriterIdentityResolvable(cwd),
+});
+
+/**
+ * The host Seat Binding would run (the same resolution the client uses:
+ * the activation host inside an activated release, FGOS_HOST_BIN outside one)
+ * answers `ladder` with protocol 1. Asked directly, never through the client's
+ * cached host, so an old activated release shows up as a version mismatch.
+ */
+export function checkSeatBindingRoute(cwd, { hostBin } = {}) {
+  const root = resolveMainCheckoutRoot(cwd) ?? cwd;
+  const fgosDir = path.join(root, '.fgos');
+  const { bin, tried, activated } = hostBin
+    ? { bin: hostBin, tried: [], activated: false }
+    : resolveSeatBindingHost({ cwd, fgosDir });
+  if (!bin) {
+    return { passed: false, message: `no host binary for the seat binding route (tried ${tried.join('; ')}) -- run fgctl init/repair, or set FGOS_HOST_BIN` };
+  }
+  try {
+    const ladder = createSeatBindingClient({ hostBin: bin }).tierLadder();
+    return {
+      passed: true,
+      message: `${bin} (${activated ? 'activation host' : 'host in reach'}) answers ladder at protocol 1, hostVersion ${ladder.hostVersion}, ${ladder.vocabulary.length} tiers`,
+    };
+  } catch (err) {
+    return { passed: false, message: `${bin} -> ${err.code ?? 'error'}: ${err.message}` };
+  }
+}
+
+registerCheck({
+  id: 'seat-binding-route',
+  description: 'the host Seat Binding runs answers the internal seat-binding route at protocol 1',
+  check: (cwd) => checkSeatBindingRoute(cwd),
 });
 
 registerCheck({
