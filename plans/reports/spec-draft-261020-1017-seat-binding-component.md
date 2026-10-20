@@ -166,3 +166,7 @@ Doctor có một dòng kiểm "mọi ghế của mọi preset đã đăng ký đ
 4. **Ngôn ngữ component:** Node trước (đề xuất), hay Rust ngay theo luật thiết kế 4?
 5. **Có cần hội đồng kiến trúc soát bản này trước khi duyệt?** Đề xuất có: nó đổi authority và contract config của mọi lượt chạy.
 6. **Năm câu taste** của [báo cáo thảo luận](discussion-261020-0947-model-tier-by-capability-and-seat.md) (số ghế frontier ở `shape-proposals`, `explain` hạ tier, synthesis business/delphi, panel ý kiến dẫn bằng họ rẻ, `code:review`) — có thể trả lời sau, vì chỉ là giá trị trong config mới.
+
+## Phụ lục: phát hiện thêm khi chứng minh MP-B1 (2026-10-20 11:15)
+
+- `code:review` khai `prefer` ghim `openai#codex-cli-bwrap`, nhưng trong phiên herdr ghế bind `codex-herdr` ([phase 07](phase-lead-261020-1110-model-pool-b1-p07-proof.md)): ghim invocation trong capability bị lựa chọn transport đè. Spec phải nói rõ ghim invocation (`họ#invocation`) là cứng hay chỉ là gợi ý, và `explain` phải in lý do khi nó bị đổi.
