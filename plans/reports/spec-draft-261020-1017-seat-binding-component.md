@@ -227,6 +227,51 @@ Chia theo việc phân biệt rõ được hay không, không theo việc hôm n
 
 **Định nghĩa phải nằm ngay cạnh config** (owner). Config là JSON, không có comment. Quyết định: **một nguồn** là hằng số định nghĩa thang trong component Seat Binding (cùng chỗ với từ vựng tier); `fgos setup` sinh khoá `"$comment"` (quy ước của JSON Schema, loader bỏ qua mọi khoá `$comment` ở mọi cấp) ngay cạnh `modelPolicies`, `tierFallback`, `maxTier` từ nguồn đó; doctor báo khi `$comment` lệch nguồn; `fgos dispatch explain` in định nghĩa bậc của ghế. Không chép tay (luật thiết kế 7). Phương án loại: đổi config sang JSONC/YAML (đổi định dạng mọi workspace, quá lớn); khoá dữ liệu `tiers` mang mô tả (hai nguồn sự thật cho một từ vựng cố định).
 
+### W. Workflow và config project: ai khai gì (owner 13:58)
+
+Sự thật hôm nay (`src/workflow/definition.mjs`, `src/runner/execution/patterns/role-tasks.mjs`): mỗi unit khai `capability`, `pattern`, `persona`, `params.roleTasks`, `rigor`; workflow **bị cấm** `executor`, `tier`, `prefer`, `overrides`. Ghế checker (`reviewer`, `red-team`) mang **đúng capability của unit** (`roleUnit` trả `{...unit, objective}`), không mang `code:review`.
+
+Ranh giới giữ nguyên và làm rõ: **workflow nói việc gì, ai ngồi ghế nào, làm gì; config project nói model nào; capability là chỗ nối.**
+
+- **Workflow** khai ghế tường minh: `seats: [{ seat, role, persona?, tier? }]`. `tier` ở đây là **sàn** (yêu cầu tối thiểu, khả chuyển như gói domain R.3); workflow **không** khai `families`.
+- **Config project** khai theo capability của unit: `families`, `tier`, `roles.<role>`, `seats.<seat>`; được chọn tier **bằng hoặc cao hơn** sàn của workflow, không thấp hơn.
+- **Trần** `maxTier` (global, capability) từ project. Sàn > trần → **từ chối có tên**, không tự hạ.
+- Taste theo ghế khoá bởi (capability, tên ghế): hai workflow cùng capability và cùng tên ghế dùng chung taste; muốn khác thì đặt tên ghế khác hoặc capability khác.
+
+Ví dụ workflow:
+
+```yaml
+- id: shape-proposals
+  template:
+    capability: architecture:shape
+    pattern: panel
+    seats:
+      - { seat: system,      role: producer,    persona: system-lens,      tier: frontier }
+      - { seat: alternative, role: producer,    persona: alternative-lens }
+      - { seat: constraint,  role: producer,    persona: constraint-lens }
+      - { seat: synthesis,   role: synthesizer }
+```
+
+Ví dụ config project (một capability, nhiều role; nhóm tiền tố viết gọn):
+
+```json
+"code:*": {
+  "families": ["gemini", "deepseek", "z-ai", "claude"],
+  "roles": {
+    "reviewer": { "families": ["openai", "claude"] },
+    "red-team": { "families": ["xai"] }
+  }
+},
+"code:review": { "families": ["openai", "claude"] },
+"architecture:shape": {
+  "tier": "flagship",
+  "seats": { "system": { "families": ["claude", "openai"] } },
+  "roles": { "synthesizer": { "families": ["claude"] } }
+}
+```
+
+Đọc: mọi unit `code:*` — người viết họ rẻ, người soát codex, người phá xai; unit mà việc chính là review (`code:review`) — người làm review codex. "Ai review code" nằm ở hai chỗ có chủ ý: ghế soát trong mọi unit code (`roles.reviewer`) khác unit lấy review làm việc chính; `explain` in ghế lấy taste từ dòng nào. Luật khác họ vẫn áp sau cùng (red-team xai mà producer xai → họ kế, có lý do).
+
 ## 9. Câu hỏi cho owner
 
 1. **Tách rigor khỏi tier (mục 4):** đồng ý xoá `rigorToTier`, tier khai trực tiếp? Hệ quả cần biết: item Work `risk: heavy` hôm nay tự lên flagship; sau tách nó chỉ thêm checker, tier giữ theo capability.
