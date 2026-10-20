@@ -1,0 +1,2117 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "evaluatedEdges": 117,
+  "changedEdges": 89,
+  "perBatch": {
+    "batch-001": 0,
+    "batch-002": 0,
+    "batch-003": 0,
+    "batch-004": 0,
+    "batch-005": 0,
+    "batch-006": 0,
+    "batch-007": 0,
+    "batch-008": 0,
+    "batch-009": 0,
+    "batch-010": 0,
+    "batch-011": 0,
+    "batch-012": 0,
+    "batch-013": 0,
+    "batch-014": 0,
+    "batch-015": 0,
+    "batch-016": 2,
+    "batch-017": 0,
+    "batch-018": 0,
+    "batch-019": 0,
+    "batch-020": 0,
+    "batch-021": 0,
+    "batch-022": 0,
+    "batch-023": 0,
+    "batch-024": 0,
+    "batch-025": 0,
+    "batch-026": 0,
+    "batch-027": 0,
+    "batch-028": 0,
+    "batch-029": 0,
+    "batch-030": 0,
+    "batch-031": 0,
+    "batch-032": 0,
+    "batch-033": 10,
+    "batch-034": 0,
+    "batch-035": 0,
+    "batch-036": 0,
+    "batch-037": 0,
+    "batch-038": 0,
+    "batch-039": 0,
+    "batch-040": 0,
+    "batch-041": 0,
+    "batch-042": 0,
+    "batch-043": 0,
+    "batch-044": 0,
+    "batch-045": 0,
+    "batch-046": 0,
+    "batch-047": 0,
+    "batch-048": 0,
+    "batch-049": 0,
+    "batch-050": 0,
+    "batch-051": 0,
+    "batch-052": 0,
+    "batch-053": 0,
+    "batch-054": 0,
+    "batch-055": 0,
+    "batch-056": 0,
+    "batch-057": 0,
+    "batch-058": 0,
+    "batch-059": 0,
+    "batch-060": 2,
+    "batch-061": 1,
+    "batch-062": 0,
+    "batch-063": 0,
+    "batch-064": 0,
+    "batch-065": 0,
+    "batch-066": 0,
+    "batch-067": 0,
+    "batch-068": 0,
+    "batch-069": 1,
+    "batch-070": 36,
+    "batch-071": 0,
+    "batch-072": 2,
+    "batch-073": 6,
+    "batch-074": 1,
+    "batch-075": 0,
+    "batch-076": 0,
+    "batch-077": 1,
+    "batch-078": 0,
+    "batch-079": 4,
+    "batch-080": 0,
+    "batch-081": 7,
+    "batch-082": 0,
+    "batch-083": 0,
+    "batch-084": 0,
+    "batch-085": 0,
+    "batch-086": 0,
+    "batch-087": 0,
+    "batch-088": 0,
+    "batch-089": 0,
+    "batch-090": 0,
+    "batch-091": 0,
+    "batch-092": 0,
+    "batch-093": 0,
+    "batch-094": 0,
+    "batch-095": 0,
+    "batch-096": 0,
+    "batch-097": 0,
+    "batch-098": 8,
+    "batch-099": 0,
+    "batch-100": 0,
+    "batch-101": 0,
+    "batch-102": 0,
+    "batch-103": 0,
+    "batch-104": 0,
+    "batch-105": 0,
+    "batch-106": 0,
+    "batch-107": 0,
+    "batch-108": 0,
+    "batch-109": 0,
+    "batch-110": 0,
+    "batch-111": 0,
+    "batch-112": 0,
+    "batch-113": 0,
+    "batch-114": 0,
+    "batch-115": 0,
+    "batch-116": 0,
+    "batch-117": 0,
+    "batch-118": 0,
+    "batch-119": 0,
+    "batch-120": 0,
+    "batch-121": 0,
+    "batch-122": 0,
+    "batch-123": 0,
+    "batch-124": 0,
+    "batch-125": 0,
+    "batch-126": 0,
+    "batch-127": 0,
+    "batch-128": 0,
+    "batch-129": 0,
+    "batch-130": 8
+  },
+  "gap02AddedOrPresent": 8,
+  "changes": [
+    {
+      "batch": "batch-016",
+      "file": "docs/platform/architecture-map.md",
+      "edgeId": "maps-j-06593",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#4-adr-0004-scope-and-non-goals"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-016",
+      "file": "docs/platform/architecture-map.md",
+      "edgeId": "maps-j-06594",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-033",
+      "file": "docs/architecture-map.md",
+      "edgeId": "maps-j-01237",
+      "holders": [
+        "docs/architecture-map.md#0010-bản-đồ-kiến-trúc-là-bản-chuẩn",
+        "docs/platform/architecture-map.md#0010-bản-đồ-kiến-trúc-là-bản-chuẩn"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-033",
+      "file": "docs/architecture-map.md",
+      "edgeId": "maps-j-01238",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#8-adr-0012-unified-typed-edge-graph-model"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-033",
+      "file": "docs/architecture-map.md",
+      "edgeId": "maps-j-01239",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#9-adr-0013-report-not-write-channel-for-discovered-from"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-033",
+      "file": "docs/architecture-map.md",
+      "edgeId": "maps-j-01240",
+      "holders": [
+        "docs/architecture-map.md#0015-đổi-tên-định-danh-contract-c1-c9-thành-ctr001-ctr009",
+        "docs/platform/architecture-map.md#0015-đổi-tên-định-danh-contract-c1-c9-thành-ctr001-ctr009"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-033",
+      "file": "docs/architecture-map.md",
+      "edgeId": "maps-j-01241",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-033",
+      "file": "docs/architecture-map.md",
+      "edgeId": "maps-j-01242",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#8-adr-0012-unified-typed-edge-graph-model"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-033",
+      "file": "docs/architecture-map.md",
+      "edgeId": "maps-j-01243",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#9-adr-0013-report-not-write-channel-for-discovered-from"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-033",
+      "file": "docs/architecture-map.md",
+      "edgeId": "maps-j-01244",
+      "holders": [
+        "docs/architecture-map.md#0015-đổi-tên-định-danh-contract-c1-c9-thành-ctr001-ctr009",
+        "docs/platform/architecture-map.md#0015-đổi-tên-định-danh-contract-c1-c9-thành-ctr001-ctr009"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-033",
+      "file": "docs/architecture-map.md",
+      "edgeId": "maps-j-01258",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#4-adr-0004-scope-and-non-goals"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-033",
+      "file": "docs/architecture-map.md",
+      "edgeId": "maps-j-01259",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-060",
+      "file": "docs/distillery/deep-dives/herdr-vs-tmux-observation.md",
+      "edgeId": "maps-j-01631",
+      "holders": [],
+      "gap02": true
+    },
+    {
+      "batch": "batch-060",
+      "file": "docs/distillery/deep-dives/parallel-decomposition-and-merge.md",
+      "edgeId": "maps-j-01637",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-061",
+      "file": "docs/distillery/porting-log.md",
+      "edgeId": "maps-j-01701",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0021-wire-main-checkout-lock-hook-qua-fgos-doctorsetup-không-epoch-fence"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-069",
+      "file": "docs/journals/260728-2038-claim-port-str46-parallel-merge.md",
+      "edgeId": "maps-j-04115",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#10-adr-0019-pre-release-exemption-for-the-schema-evolution-rule"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md",
+      "edgeId": "maps-j-04117",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04151",
+      "holders": [
+        "docs/architecture-map.md#0010-bản-đồ-kiến-trúc-là-bản-chuẩn",
+        "docs/platform/architecture-map.md#0010-bản-đồ-kiến-trúc-là-bản-chuẩn"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04153",
+      "holders": [
+        "docs/architecture-map.md#0015-đổi-tên-định-danh-contract-c1-c9-thành-ctr001-ctr009",
+        "docs/platform/architecture-map.md#0015-đổi-tên-định-danh-contract-c1-c9-thành-ctr001-ctr009"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04155",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04157",
+      "holders": [],
+      "gap02": true
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04159",
+      "holders": [],
+      "gap02": true
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04161",
+      "holders": [],
+      "gap02": true
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04167",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0005-runner-cô-lập-worker"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04169",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0008-routing-theo-audience-của-từng-interface"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04171",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04173",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0021-wire-main-checkout-lock-hook-qua-fgos-doctorsetup-không-epoch-fence"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04175",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0022-khảo-sát-choke-point-fgos-quyết-định-lặplệch-xuyên-clirunnerskill"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04177",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0023-thứ-tự-ưu-tiên-sản-phẩm-ship-faster-dod-result-docs-hoàn-thiện-sau-ngưỡng"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04179",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0025-thứ-tự-ưu-tiên-sản-phẩm-chi-tiết-hoá-0023-nạp-always-loaded-qua-agentsmd"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04181",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04183",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0028-đổi-tên-pinned-term-orchestrator-thành-launcher"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04185",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0029-sửa-ba-mệnh-đề-từ-vựng-dispatch-của-0026-bỏ-roottasksubtask-capacity-là-năng-lực-có-tên-t1-hai-giá-trị"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04187",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04189",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0031-bỏ-guard-cấm-từ-orchestrator-sau-khi-0029-đã-gán-nghĩa-mới"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04191",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0032-cổng-iron-law-chỉ-hỏi-ở-ranh-giới-trunk-thêm-mức-warn-agent-gõ-lệnh-thay-người"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04193",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0033-capacity-cli-spawn-shaped-thắng-haslivetaskaccess-thu-hẹp-0026-rule-2"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04195",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0034-đổi-tên-capacitycapacities-thành-executorexecutors-chốt-tách-capability"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04197",
+      "holders": [
+        "docs/platform/system-overview/spec.md#0016-mốc-mvp-của-fgos"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04199",
+      "holders": [
+        "docs/platform/system-overview/spec.md#0018-mốc-mvp2-của-fgos"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04201",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#2-adr-0002-flat-work-model"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04203",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#3-adr-0003-naming-and-data-layout"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04205",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#4-adr-0004-scope-and-non-goals"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04207",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#5-adr-0006-proposed-status"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04209",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#6-adr-0007-schema-and-event-evolution"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04211",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#7-adr-0011-explicit-version-for-every-contract"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04213",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#8-adr-0012-unified-typed-edge-graph-model"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04215",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#9-adr-0013-report-not-write-channel-for-discovered-from"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04217",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#10-adr-0019-pre-release-exemption-for-the-schema-evolution-rule"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04219",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#11-adr-0024-rename-proposed-status-to-awaiting-approval"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04221",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#12-adr-0027-domain-owns-the-pre-delivered-status-vocabulary"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04223",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#13-adr-0032-multi-role-team-harness"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-072",
+      "file": "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
+      "edgeId": "maps-j-04319",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-072",
+      "file": "docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md",
+      "edgeId": "maps-j-04380",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-073",
+      "file": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+      "edgeId": "maps-j-04441",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0023-thứ-tự-ưu-tiên-sản-phẩm-ship-faster-dod-result-docs-hoàn-thiện-sau-ngưỡng"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-073",
+      "file": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+      "edgeId": "maps-j-04442",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0023-thứ-tự-ưu-tiên-sản-phẩm-ship-faster-dod-result-docs-hoàn-thiện-sau-ngưỡng"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-073",
+      "file": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+      "edgeId": "maps-j-04444",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0032-cổng-iron-law-chỉ-hỏi-ở-ranh-giới-trunk-thêm-mức-warn-agent-gõ-lệnh-thay-người"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-073",
+      "file": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+      "edgeId": "maps-j-04445",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#13-adr-0032-multi-role-team-harness"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-073",
+      "file": "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md",
+      "edgeId": "maps-j-04464",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-073",
+      "file": "docs/knowledge/how-to-unify-two-independently-written-working-tree-clean-ch/unify-a-duplicated-clean-tree-check-across-return-and-approve.md",
+      "edgeId": "maps-j-04492",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0022-khảo-sát-choke-point-fgos-quyết-định-lặplệch-xuyên-clirunnerskill"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-074",
+      "file": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+      "edgeId": "maps-j-04541",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0028-đổi-tên-pinned-term-orchestrator-thành-launcher"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-077",
+      "file": "docs/knowledge/why-every-agent-task-tool-dispatch-is-enforced-through-a-pre/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md",
+      "edgeId": "maps-j-04703",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0033-capacity-cli-spawn-shaped-thắng-haslivetaskaccess-thu-hẹp-0026-rule-2"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-079",
+      "file": "docs/knowledge/why-fgos-treats-self-development-as-a-bounded-lane-with-its/why-fgos-self-development-is-not-the-default-mission.md",
+      "edgeId": "maps-j-04852",
+      "holders": [],
+      "gap02": true
+    },
+    {
+      "batch": "batch-079",
+      "file": "docs/knowledge/why-fgos-treats-self-development-as-a-bounded-lane-with-its/why-fgos-self-development-is-not-the-default-mission.md",
+      "edgeId": "maps-j-04853",
+      "holders": [],
+      "gap02": true
+    },
+    {
+      "batch": "batch-079",
+      "file": "docs/knowledge/why-fgos-worktrees-block-fgos-instead-of-locking-or-copying/worktree-isolation-axis-decision.md",
+      "edgeId": "maps-j-04862",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0021-wire-main-checkout-lock-hook-qua-fgos-doctorsetup-không-epoch-fence"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-079",
+      "file": "docs/knowledge/why-main-checkout-hook-wired-reported-a-false-negative-on-an/why-main-checkout-hook-wired-compared-raw-strings-instead-of-resolved-paths.md",
+      "edgeId": "maps-j-04893",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0021-wire-main-checkout-lock-hook-qua-fgos-doctorsetup-không-epoch-fence"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-081",
+      "file": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+      "edgeId": "maps-j-04966",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#12-adr-0027-domain-owns-the-pre-delivered-status-vocabulary"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-081",
+      "file": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+      "edgeId": "maps-j-04968",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#12-adr-0027-domain-owns-the-pre-delivered-status-vocabulary"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-081",
+      "file": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+      "edgeId": "maps-j-04971",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#12-adr-0027-domain-owns-the-pre-delivered-status-vocabulary"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-081",
+      "file": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+      "edgeId": "maps-j-04972",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#12-adr-0027-domain-owns-the-pre-delivered-status-vocabulary"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-081",
+      "file": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+      "edgeId": "maps-j-04974",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#12-adr-0027-domain-owns-the-pre-delivered-status-vocabulary"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-081",
+      "file": "docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md",
+      "edgeId": "author-wave5f-launcher-vocabulary-guard-L63C2",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0031-bỏ-guard-cấm-từ-orchestrator-sau-khi-0029-đã-gán-nghĩa-mới"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-081",
+      "file": "docs/knowledge/why-the-main-checkout-lock-hook-used-to-block-worktree-commi/why-the-main-checkout-lock-hook-used-to-block-worktree-commits.md",
+      "edgeId": "maps-j-05039",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0021-wire-main-checkout-lock-hook-qua-fgos-doctorsetup-không-epoch-fence"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-098",
+      "file": "docs/platform/documentation/history/id-systems-audit.md",
+      "edgeId": "maps-j-06707",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-098",
+      "file": "docs/platform/documentation/history/id-systems-audit.md",
+      "edgeId": "maps-j-06708",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#4-adr-0004-scope-and-non-goals"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-098",
+      "file": "docs/platform/documentation/history/id-systems-audit.md",
+      "edgeId": "maps-j-06715",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-098",
+      "file": "docs/platform/documentation/history/id-systems-audit.md",
+      "edgeId": "maps-j-06716",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-098",
+      "file": "docs/platform/documentation/history/id-systems-audit.md",
+      "edgeId": "maps-j-06717",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-098",
+      "file": "docs/platform/documentation/history/id-systems-audit.md",
+      "edgeId": "maps-j-06718",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-098",
+      "file": "docs/platform/documentation/history/id-systems-audit.md",
+      "edgeId": "maps-j-06721",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-098",
+      "file": "docs/platform/documentation/history/id-systems-audit.md",
+      "edgeId": "maps-j-06726",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#4-adr-0004-scope-and-non-goals"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-130",
+      "file": "docs/id-systems-audit.md",
+      "edgeId": "maps-j-04083",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-130",
+      "file": "docs/id-systems-audit.md",
+      "edgeId": "maps-j-04084",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#4-adr-0004-scope-and-non-goals"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-130",
+      "file": "docs/id-systems-audit.md",
+      "edgeId": "maps-j-04091",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-130",
+      "file": "docs/id-systems-audit.md",
+      "edgeId": "maps-j-04092",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-130",
+      "file": "docs/id-systems-audit.md",
+      "edgeId": "maps-j-04093",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-130",
+      "file": "docs/id-systems-audit.md",
+      "edgeId": "maps-j-04094",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-130",
+      "file": "docs/id-systems-audit.md",
+      "edgeId": "maps-j-04097",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-130",
+      "file": "docs/id-systems-audit.md",
+      "edgeId": "maps-j-04102",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#4-adr-0004-scope-and-non-goals"
+      ],
+      "gap02": false
+    }
+  ],
+  "evaluated": [
+    {
+      "batch": "batch-016",
+      "file": "docs/platform/architecture-map.md",
+      "edgeId": "maps-j-06593",
+      "legacy": "docs/decisions/0004-pham-vi-va-non-goal.md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#4-adr-0004-scope-and-non-goals"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-016",
+      "file": "docs/platform/architecture-map.md",
+      "edgeId": "maps-j-06594",
+      "legacy": "docs/decisions/0017-...md",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-016",
+      "file": "docs/platform/architecture-map.md",
+      "edgeId": "maps-j-06601",
+      "legacy": "docs/decisions/0000-index.md",
+      "holders": [],
+      "gap02": false
+    },
+    {
+      "batch": "batch-033",
+      "file": "docs/architecture-map.md",
+      "edgeId": "maps-j-01237",
+      "legacy": "docs/decisions/0010-ban-do-kien-truc-la-ban-chuan.md",
+      "holders": [
+        "docs/architecture-map.md#0010-bản-đồ-kiến-trúc-là-bản-chuẩn",
+        "docs/platform/architecture-map.md#0010-bản-đồ-kiến-trúc-là-bản-chuẩn"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-033",
+      "file": "docs/architecture-map.md",
+      "edgeId": "maps-j-01238",
+      "legacy": "docs/decisions/0012-typed-edge-model-supersedes-deps-parent-separation.md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#8-adr-0012-unified-typed-edge-graph-model"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-033",
+      "file": "docs/architecture-map.md",
+      "edgeId": "maps-j-01239",
+      "legacy": "docs/decisions/0013-discovered-from-runner-report-channel.md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#9-adr-0013-report-not-write-channel-for-discovered-from"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-033",
+      "file": "docs/architecture-map.md",
+      "edgeId": "maps-j-01240",
+      "legacy": "docs/decisions/0015-doi-ten-ctr-cho-contract.md",
+      "holders": [
+        "docs/architecture-map.md#0015-đổi-tên-định-danh-contract-c1-c9-thành-ctr001-ctr009",
+        "docs/platform/architecture-map.md#0015-đổi-tên-định-danh-contract-c1-c9-thành-ctr001-ctr009"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-033",
+      "file": "docs/architecture-map.md",
+      "edgeId": "maps-j-01241",
+      "legacy": "docs/decisions/0017-dong-audit-he-id-ten-goi.md",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-033",
+      "file": "docs/architecture-map.md",
+      "edgeId": "maps-j-01242",
+      "legacy": "docs/decisions/0012-typed-edge-model-supersedes-deps-parent-separation.md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#8-adr-0012-unified-typed-edge-graph-model"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-033",
+      "file": "docs/architecture-map.md",
+      "edgeId": "maps-j-01243",
+      "legacy": "docs/decisions/0013-discovered-from-runner-report-channel.md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#9-adr-0013-report-not-write-channel-for-discovered-from"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-033",
+      "file": "docs/architecture-map.md",
+      "edgeId": "maps-j-01244",
+      "legacy": "docs/decisions/0015-doi-ten-ctr-cho-contract.md",
+      "holders": [
+        "docs/architecture-map.md#0015-đổi-tên-định-danh-contract-c1-c9-thành-ctr001-ctr009",
+        "docs/platform/architecture-map.md#0015-đổi-tên-định-danh-contract-c1-c9-thành-ctr001-ctr009"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-033",
+      "file": "docs/architecture-map.md",
+      "edgeId": "maps-j-01258",
+      "legacy": "docs/decisions/0004-pham-vi-va-non-goal.md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#4-adr-0004-scope-and-non-goals"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-033",
+      "file": "docs/architecture-map.md",
+      "edgeId": "maps-j-01259",
+      "legacy": "docs/decisions/0017-...md",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-033",
+      "file": "docs/architecture-map.md",
+      "edgeId": "maps-j-01266",
+      "legacy": "docs/decisions/0000-index.md",
+      "holders": [],
+      "gap02": false
+    },
+    {
+      "batch": "batch-060",
+      "file": "docs/distillery/deep-dives/herdr-vs-tmux-observation.md",
+      "edgeId": "maps-j-01631",
+      "legacy": "docs/decisions/0014",
+      "holders": [],
+      "gap02": true
+    },
+    {
+      "batch": "batch-060",
+      "file": "docs/distillery/deep-dives/parallel-decomposition-and-merge.md",
+      "edgeId": "maps-j-01637",
+      "legacy": "docs/decisions/0026",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-061",
+      "file": "docs/distillery/porting-log.md",
+      "edgeId": "maps-j-01701",
+      "legacy": "docs/decisions/0021-wire-main-checkout-hook-qua-doctor-setup.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0021-wire-main-checkout-lock-hook-qua-fgos-doctorsetup-không-epoch-fence"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-061",
+      "file": "docs/distillery/sources/beehive.md",
+      "edgeId": "maps-j-01841",
+      "legacy": "docs/decisions/0000-index.md",
+      "holders": [],
+      "gap02": false
+    },
+    {
+      "batch": "batch-069",
+      "file": "docs/journals/260728-2038-claim-port-str46-parallel-merge.md",
+      "edgeId": "maps-j-04115",
+      "legacy": "docs/decisions/0019-mien-tru-viet-lai-nhat-ky.md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#10-adr-0019-pre-release-exemption-for-the-schema-evolution-rule"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md",
+      "edgeId": "maps-j-04117",
+      "legacy": "docs/decisions/0026-...md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md",
+      "edgeId": "author-wave4c-docs-knowledge-a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md-L108C30",
+      "legacy": "docs/decisions/0000-index.md",
+      "holders": [],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md",
+      "edgeId": "author-wave4c-docs-knowledge-a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md-L122C32",
+      "legacy": "docs/decisions/0000-index.md",
+      "holders": [],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04151",
+      "legacy": "docs/decisions/0010-ban-do-kien-truc-la-ban-chuan.md",
+      "holders": [
+        "docs/architecture-map.md#0010-bản-đồ-kiến-trúc-là-bản-chuẩn",
+        "docs/platform/architecture-map.md#0010-bản-đồ-kiến-trúc-là-bản-chuẩn"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04153",
+      "legacy": "docs/decisions/0015-doi-ten-ctr-cho-contract.md",
+      "holders": [
+        "docs/architecture-map.md#0015-đổi-tên-định-danh-contract-c1-c9-thành-ctr001-ctr009",
+        "docs/platform/architecture-map.md#0015-đổi-tên-định-danh-contract-c1-c9-thành-ctr001-ctr009"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04155",
+      "legacy": "docs/decisions/0017-dong-audit-he-id-ten-goi.md",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04157",
+      "legacy": "docs/decisions/0001-event-log-la-su-that.md",
+      "holders": [],
+      "gap02": true
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04159",
+      "legacy": "docs/decisions/0009-chong-giao-thoa-luc-cai.md",
+      "holders": [],
+      "gap02": true
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04161",
+      "legacy": "docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md",
+      "holders": [],
+      "gap02": true
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04163",
+      "legacy": "docs/decisions/0035",
+      "holders": [],
+      "gap02": true
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04164",
+      "legacy": "docs/decisions/0035-xac-lap-ranh-gioi-su-menh-fgos.md",
+      "holders": [],
+      "gap02": true
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04167",
+      "legacy": "docs/decisions/0005-runner-va-co-lap-worker.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0005-runner-cô-lập-worker"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04169",
+      "legacy": "docs/decisions/0008-routing-theo-audience.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0008-routing-theo-audience-của-từng-interface"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04171",
+      "legacy": "docs/decisions/0020-chan-fgos-khoi-worktree-worker.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04173",
+      "legacy": "docs/decisions/0021-wire-main-checkout-hook-qua-doctor-setup.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0021-wire-main-checkout-lock-hook-qua-fgos-doctorsetup-không-epoch-fence"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04175",
+      "legacy": "docs/decisions/0022-fgos-choke-point-survey.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0022-khảo-sát-choke-point-fgos-quyết-định-lặplệch-xuyên-clirunnerskill"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04177",
+      "legacy": "docs/decisions/0023-uu-tien-san-pham-ship-dod-hoan-thien.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0023-thứ-tự-ưu-tiên-sản-phẩm-ship-faster-dod-result-docs-hoàn-thiện-sau-ngưỡng"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04179",
+      "legacy": "docs/decisions/0025-mo-rong-uu-tien-san-pham-them-ux-van-hanh-vao-ship-faster.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0025-thứ-tự-ưu-tiên-sản-phẩm-chi-tiết-hoá-0023-nạp-always-loaded-qua-agentsmd"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04181",
+      "legacy": "docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04183",
+      "legacy": "docs/decisions/0028-doi-ten-orchestrator-thanh-launcher.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0028-đổi-tên-pinned-term-orchestrator-thành-launcher"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04185",
+      "legacy": "docs/decisions/0029-sua-dinh-nghia-roottask-subtask-capacity-t1-cua-0026.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0029-sửa-ba-mệnh-đề-từ-vựng-dispatch-của-0026-bỏ-roottasksubtask-capacity-là-năng-lực-có-tên-t1-hai-giá-trị"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04187",
+      "legacy": "docs/decisions/0030-them-release-con-nguoi-vao-thu-tu-uu-tien-san-pham.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04189",
+      "legacy": "docs/decisions/0031-bo-guard-cam-tu-orchestrator-sau-khi-0029-gan-nghia-moi.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0031-bỏ-guard-cấm-từ-orchestrator-sau-khi-0029-đã-gán-nghĩa-mới"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04191",
+      "legacy": "docs/decisions/0032-cong-iron-law-chi-hoi-o-ranh-gioi-trunk-them-muc-warn.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0032-cổng-iron-law-chỉ-hỏi-ở-ranh-giới-trunk-thêm-mức-warn-agent-gõ-lệnh-thay-người"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04193",
+      "legacy": "docs/decisions/0033-cli-spawn-shaped-capacity-thang-hasLiveTaskAccess.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0033-capacity-cli-spawn-shaped-thắng-haslivetaskaccess-thu-hẹp-0026-rule-2"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04195",
+      "legacy": "docs/decisions/0034-doi-ten-capacity-thanh-executor-chot-tach-capability.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0034-đổi-tên-capacitycapacities-thành-executorexecutors-chốt-tách-capability"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04197",
+      "legacy": "docs/decisions/0016-moc-mvp-fgos.md",
+      "holders": [
+        "docs/platform/system-overview/spec.md#0016-mốc-mvp-của-fgos"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04199",
+      "legacy": "docs/decisions/0018-moc-mvp2-fgos.md",
+      "holders": [
+        "docs/platform/system-overview/spec.md#0018-mốc-mvp2-của-fgos"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04201",
+      "legacy": "docs/decisions/0002-mo-hinh-viec-phang.md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#2-adr-0002-flat-work-model"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04203",
+      "legacy": "docs/decisions/0003-dat-ten-va-bo-cuc-du-lieu.md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#3-adr-0003-naming-and-data-layout"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04205",
+      "legacy": "docs/decisions/0004-pham-vi-va-non-goal.md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#4-adr-0004-scope-and-non-goals"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04207",
+      "legacy": "docs/decisions/0006-trang-thai-proposed.md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#5-adr-0006-proposed-status"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04209",
+      "legacy": "docs/decisions/0007-tien-hoa-schema-va-event.md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#6-adr-0007-schema-and-event-evolution"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04211",
+      "legacy": "docs/decisions/0011-version-tuong-minh-cho-moi-contract.md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#7-adr-0011-explicit-version-for-every-contract"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04213",
+      "legacy": "docs/decisions/0012-typed-edge-model-supersedes-deps-parent-separation.md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#8-adr-0012-unified-typed-edge-graph-model"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04215",
+      "legacy": "docs/decisions/0013-discovered-from-runner-report-channel.md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#9-adr-0013-report-not-write-channel-for-discovered-from"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04217",
+      "legacy": "docs/decisions/0019-mien-tru-viet-lai-nhat-ky.md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#10-adr-0019-pre-release-exemption-for-the-schema-evolution-rule"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04219",
+      "legacy": "docs/decisions/0024-doi-ten-status-proposed-thanh-awaiting-approval.md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#11-adr-0024-rename-proposed-status-to-awaiting-approval"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04221",
+      "legacy": "docs/decisions/0027-domain-so-huu-status-doan-truoc-delivered-supersede-base-workflow-model-d1-d3.md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#12-adr-0027-domain-owns-the-pre-delivered-status-vocabulary"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-070",
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "edgeId": "maps-j-04223",
+      "legacy": "docs/decisions/0032-multi-role-team-harness-role-holder-axis-va-handoff.md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#13-adr-0032-multi-role-team-harness"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-072",
+      "file": "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
+      "edgeId": "maps-j-04319",
+      "legacy": "docs/decisions/0020-chan-fgos-khoi-worktree-worker.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-072",
+      "file": "docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md",
+      "edgeId": "maps-j-04380",
+      "legacy": "docs/decisions/0020-chan-fgos-khoi-worktree-worker.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-073",
+      "file": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+      "edgeId": "maps-j-04441",
+      "legacy": "docs/decisions/0023-*.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0023-thứ-tự-ưu-tiên-sản-phẩm-ship-faster-dod-result-docs-hoàn-thiện-sau-ngưỡng"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-073",
+      "file": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+      "edgeId": "maps-j-04442",
+      "legacy": "docs/decisions/0023-uu-tien-san-pham-*.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0023-thứ-tự-ưu-tiên-sản-phẩm-ship-faster-dod-result-docs-hoàn-thiện-sau-ngưỡng"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-073",
+      "file": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+      "edgeId": "maps-j-04443",
+      "legacy": "docs/decisions/0000-index.md",
+      "holders": [],
+      "gap02": false
+    },
+    {
+      "batch": "batch-073",
+      "file": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+      "edgeId": "maps-j-04444",
+      "legacy": "docs/decisions/0032-iron-law-...md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0032-cổng-iron-law-chỉ-hỏi-ở-ranh-giới-trunk-thêm-mức-warn-agent-gõ-lệnh-thay-người"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-073",
+      "file": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+      "edgeId": "maps-j-04445",
+      "legacy": "docs/decisions/0032-multi-role-team-harness-...md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#13-adr-0032-multi-role-team-harness"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-073",
+      "file": "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md",
+      "edgeId": "maps-j-04464",
+      "legacy": "docs/decisions/0020-chan-fgos-khoi-worktree-worker.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-073",
+      "file": "docs/knowledge/how-to-unify-two-independently-written-working-tree-clean-ch/unify-a-duplicated-clean-tree-check-across-return-and-approve.md",
+      "edgeId": "maps-j-04492",
+      "legacy": "docs/decisions/0022-fgos-choke-point-survey.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0022-khảo-sát-choke-point-fgos-quyết-định-lặplệch-xuyên-clirunnerskill"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-074",
+      "file": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+      "edgeId": "maps-j-04541",
+      "legacy": "docs/decisions/0028-doi-ten-orchestrator-thanh-launcher.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0028-đổi-tên-pinned-term-orchestrator-thành-launcher"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-077",
+      "file": "docs/knowledge/why-every-agent-task-tool-dispatch-is-enforced-through-a-pre/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md",
+      "edgeId": "maps-j-04703",
+      "legacy": "docs/decisions/0033",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0033-capacity-cli-spawn-shaped-thắng-haslivetaskaccess-thu-hẹp-0026-rule-2"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-077",
+      "file": "docs/knowledge/why-every-agent-task-tool-dispatch-is-enforced-through-a-pre/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md",
+      "edgeId": "author-wave4g-docs-knowledge-why-every-agent-task-tool-dispatch-is-enforced-through-a-pre-why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention-L448C42",
+      "legacy": "docs/decisions/0000-index.md",
+      "holders": [],
+      "gap02": false
+    },
+    {
+      "batch": "batch-079",
+      "file": "docs/knowledge/why-fgos-treats-self-development-as-a-bounded-lane-with-its/why-fgos-self-development-is-not-the-default-mission.md",
+      "edgeId": "maps-j-04852",
+      "legacy": "docs/decisions/0035-xac-lap-ranh-gioi-su-menh-fgos.md",
+      "holders": [],
+      "gap02": true
+    },
+    {
+      "batch": "batch-079",
+      "file": "docs/knowledge/why-fgos-treats-self-development-as-a-bounded-lane-with-its/why-fgos-self-development-is-not-the-default-mission.md",
+      "edgeId": "maps-j-04853",
+      "legacy": "docs/decisions/0035-xac-lap-ranh-gioi-su-menh-fgos.md",
+      "holders": [],
+      "gap02": true
+    },
+    {
+      "batch": "batch-079",
+      "file": "docs/knowledge/why-fgos-worktrees-block-fgos-instead-of-locking-or-copying/worktree-isolation-axis-decision.md",
+      "edgeId": "maps-j-04862",
+      "legacy": "docs/decisions/0021-wire-main-checkout-hook-qua-doctor-setup.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0021-wire-main-checkout-lock-hook-qua-fgos-doctorsetup-không-epoch-fence"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-079",
+      "file": "docs/knowledge/why-main-checkout-hook-wired-reported-a-false-negative-on-an/why-main-checkout-hook-wired-compared-raw-strings-instead-of-resolved-paths.md",
+      "edgeId": "maps-j-04893",
+      "legacy": "docs/decisions/0021",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0021-wire-main-checkout-lock-hook-qua-fgos-doctorsetup-không-epoch-fence"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-081",
+      "file": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+      "edgeId": "maps-j-04966",
+      "legacy": "docs/decisions/0027-...md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#12-adr-0027-domain-owns-the-pre-delivered-status-vocabulary"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-081",
+      "file": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+      "edgeId": "maps-j-04968",
+      "legacy": "docs/decisions/0027",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#12-adr-0027-domain-owns-the-pre-delivered-status-vocabulary"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-081",
+      "file": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+      "edgeId": "maps-j-04971",
+      "legacy": "docs/decisions/0027",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#12-adr-0027-domain-owns-the-pre-delivered-status-vocabulary"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-081",
+      "file": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+      "edgeId": "maps-j-04972",
+      "legacy": "docs/decisions/0027",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#12-adr-0027-domain-owns-the-pre-delivered-status-vocabulary"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-081",
+      "file": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+      "edgeId": "maps-j-04974",
+      "legacy": "docs/decisions/0027-domain-so-huu-status-doan-truoc-delivered-supersede-base-workflow-model-d1-d3.md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#12-adr-0027-domain-owns-the-pre-delivered-status-vocabulary"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-081",
+      "file": "docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md",
+      "edgeId": "author-wave5f-launcher-vocabulary-guard-L63C2",
+      "legacy": "docs/decisions/0031-bo-guard-cam-tu-orchestrator-sau-khi-0029-gan-nghia-moi.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0031-bỏ-guard-cấm-từ-orchestrator-sau-khi-0029-đã-gán-nghĩa-mới"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-081",
+      "file": "docs/knowledge/why-the-main-checkout-lock-hook-used-to-block-worktree-commi/why-the-main-checkout-lock-hook-used-to-block-worktree-commits.md",
+      "edgeId": "maps-j-05039",
+      "legacy": "docs/decisions/0021-wire-main-checkout-hook-qua-doctor-setup.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0021-wire-main-checkout-lock-hook-qua-fgos-doctorsetup-không-epoch-fence"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-098",
+      "file": "docs/platform/documentation/history/id-systems-audit.md",
+      "edgeId": "maps-j-06707",
+      "legacy": "docs/decisions/0017-dong-audit-he-id-ten-goi.md",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-098",
+      "file": "docs/platform/documentation/history/id-systems-audit.md",
+      "edgeId": "maps-j-06708",
+      "legacy": "docs/decisions/0004-pham-vi-va-non-goal.md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#4-adr-0004-scope-and-non-goals"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-098",
+      "file": "docs/platform/documentation/history/id-systems-audit.md",
+      "edgeId": "maps-j-06711",
+      "legacy": "docs/decisions/0000-index.md:12-16",
+      "holders": [],
+      "gap02": false
+    },
+    {
+      "batch": "batch-098",
+      "file": "docs/platform/documentation/history/id-systems-audit.md",
+      "edgeId": "maps-j-06715",
+      "legacy": "docs/decisions/0017-dong-audit-he-id-ten-goi.md",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-098",
+      "file": "docs/platform/documentation/history/id-systems-audit.md",
+      "edgeId": "maps-j-06716",
+      "legacy": "docs/decisions/0017-dong-audit-he-id-ten-goi.md",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-098",
+      "file": "docs/platform/documentation/history/id-systems-audit.md",
+      "edgeId": "maps-j-06717",
+      "legacy": "docs/decisions/0017-dong-audit-he-id-ten-goi.md",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-098",
+      "file": "docs/platform/documentation/history/id-systems-audit.md",
+      "edgeId": "maps-j-06718",
+      "legacy": "docs/decisions/0017-dong-audit-he-id-ten-goi.md",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-098",
+      "file": "docs/platform/documentation/history/id-systems-audit.md",
+      "edgeId": "maps-j-06721",
+      "legacy": "docs/decisions/0017-dong-audit-he-id-ten-goi.md",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-098",
+      "file": "docs/platform/documentation/history/id-systems-audit.md",
+      "edgeId": "maps-j-06725",
+      "legacy": "docs/decisions/0000-index.md",
+      "holders": [],
+      "gap02": false
+    },
+    {
+      "batch": "batch-098",
+      "file": "docs/platform/documentation/history/id-systems-audit.md",
+      "edgeId": "maps-j-06726",
+      "legacy": "docs/decisions/0004-pham-vi-va-non-goal.md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#4-adr-0004-scope-and-non-goals"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-115",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "edgeId": "maps-j-07625",
+      "legacy": "docs/decisions/0021-wire-main-checkout-hook-qua-doctor-setup.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0021-wire-main-checkout-lock-hook-qua-fgos-doctorsetup-không-epoch-fence"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-115",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "edgeId": "maps-j-07628",
+      "legacy": "docs/decisions/0025",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0025-thứ-tự-ưu-tiên-sản-phẩm-chi-tiết-hoá-0023-nạp-always-loaded-qua-agentsmd"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-115",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "edgeId": "maps-j-07636",
+      "legacy": "docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-115",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "edgeId": "maps-j-07638",
+      "legacy": "docs/decisions/0000-index.md",
+      "holders": [],
+      "gap02": false
+    },
+    {
+      "batch": "batch-115",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "edgeId": "maps-j-07640",
+      "legacy": "docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-115",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "edgeId": "maps-j-07641",
+      "legacy": "docs/decisions/0028-doi-ten-orchestrator-thanh-launcher.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0028-đổi-tên-pinned-term-orchestrator-thành-launcher"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-115",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "edgeId": "maps-j-07644",
+      "legacy": "docs/decisions/0030",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-115",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "edgeId": "maps-j-07645",
+      "legacy": "docs/decisions/0000-index.md",
+      "holders": [],
+      "gap02": false
+    },
+    {
+      "batch": "batch-115",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "edgeId": "maps-j-07647",
+      "legacy": "docs/decisions/0000-index.md",
+      "holders": [],
+      "gap02": false
+    },
+    {
+      "batch": "batch-115",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "edgeId": "maps-j-07649",
+      "legacy": "docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-115",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "edgeId": "maps-j-07650",
+      "legacy": "docs/decisions/0028-doi-ten-orchestrator-thanh-launcher.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0028-đổi-tên-pinned-term-orchestrator-thành-launcher"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-115",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "edgeId": "maps-j-07651",
+      "legacy": "docs/decisions/0029-sua-dinh-nghia-roottask-subtask-capacity-t1-cua-0026.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0029-sửa-ba-mệnh-đề-từ-vựng-dispatch-của-0026-bỏ-roottasksubtask-capacity-là-năng-lực-có-tên-t1-hai-giá-trị"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-115",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "edgeId": "maps-j-07667",
+      "legacy": "docs/decisions/0030-them-release-con-nguoi-vao-thu-tu-uu-tien-san-pham.md",
+      "holders": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md#0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-126",
+      "file": "docs/backlog.md",
+      "edgeId": "maps-j-01299",
+      "legacy": "docs/decisions/0000-index.md",
+      "holders": [],
+      "gap02": false
+    },
+    {
+      "batch": "batch-130",
+      "file": "docs/id-systems-audit.md",
+      "edgeId": "maps-j-04083",
+      "legacy": "docs/decisions/0017-dong-audit-he-id-ten-goi.md",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-130",
+      "file": "docs/id-systems-audit.md",
+      "edgeId": "maps-j-04084",
+      "legacy": "docs/decisions/0004-pham-vi-va-non-goal.md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#4-adr-0004-scope-and-non-goals"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-130",
+      "file": "docs/id-systems-audit.md",
+      "edgeId": "maps-j-04087",
+      "legacy": "docs/decisions/0000-index.md:12-16",
+      "holders": [],
+      "gap02": false
+    },
+    {
+      "batch": "batch-130",
+      "file": "docs/id-systems-audit.md",
+      "edgeId": "maps-j-04091",
+      "legacy": "docs/decisions/0017-dong-audit-he-id-ten-goi.md",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-130",
+      "file": "docs/id-systems-audit.md",
+      "edgeId": "maps-j-04092",
+      "legacy": "docs/decisions/0017-dong-audit-he-id-ten-goi.md",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-130",
+      "file": "docs/id-systems-audit.md",
+      "edgeId": "maps-j-04093",
+      "legacy": "docs/decisions/0017-dong-audit-he-id-ten-goi.md",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-130",
+      "file": "docs/id-systems-audit.md",
+      "edgeId": "maps-j-04094",
+      "legacy": "docs/decisions/0017-dong-audit-he-id-ten-goi.md",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-130",
+      "file": "docs/id-systems-audit.md",
+      "edgeId": "maps-j-04097",
+      "legacy": "docs/decisions/0017-dong-audit-he-id-ten-goi.md",
+      "holders": [
+        "docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47",
+        "docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-130",
+      "file": "docs/id-systems-audit.md",
+      "edgeId": "maps-j-04101",
+      "legacy": "docs/decisions/0000-index.md",
+      "holders": [],
+      "gap02": false
+    },
+    {
+      "batch": "batch-130",
+      "file": "docs/id-systems-audit.md",
+      "edgeId": "maps-j-04102",
+      "legacy": "docs/decisions/0004-pham-vi-va-non-goal.md",
+      "holders": [
+        "docs/platform/work-state/decisions/retired-decision-history.md#4-adr-0004-scope-and-non-goals"
+      ],
+      "gap02": false
+    },
+    {
+      "batch": "batch-130",
+      "file": "docs/id-systems-audit.md",
+      "edgeId": "author-wave5c-docs-id-systems-audit-L147C33",
+      "legacy": "docs/decisions/0000-index.md",
+      "holders": [],
+      "gap02": false
+    }
+  ],
+  "noTitleMatchedHolder": [],
+  "nonzeroBatchCount": 14,
+  "evaluatedPerBatch": {
+    "batch-016": 3,
+    "batch-033": 11,
+    "batch-060": 2,
+    "batch-061": 2,
+    "batch-069": 1,
+    "batch-070": 40,
+    "batch-072": 2,
+    "batch-073": 7,
+    "batch-074": 1,
+    "batch-077": 2,
+    "batch-079": 4,
+    "batch-081": 7,
+    "batch-098": 10,
+    "batch-115": 13,
+    "batch-126": 1,
+    "batch-130": 11
+  },
+  "changedGap02Edges": 6,
+  "correspondence": "Pinned title/filename identity, including verified Vietnamese/English titles. The checker confirms translated candidate narratives against actual deleted source paragraphs/list items before their removal, never by number alone. Same-consumer notes quote the complete heading with a delimiter longer than any inline backtick run. The 0000 index is a generated projection, not a narrative decision."
+}

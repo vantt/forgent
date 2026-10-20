@@ -394,8 +394,11 @@ def scan_candidates(commit,file,inventory_spans):
             local_roots=[posixpath.dirname(file)]+(['/'.join(file.split('/')[:3])] if file.startswith('docs/platform/') else [])
             resolved=[posixpath.normpath(posixpath.join(root,raw)) for root in active_roots]
             local=[posixpath.normpath(posixpath.join(root,raw)) for root in local_roots]
-            if not internal and not row_roots and not context['parents'] and any(p in tree_set or p in dirs for p in local if not p.startswith(RETIRING_ROOTS)):continue
-            if not relative_decision_origin(commit,file,raw) and not any((p.startswith(RETIRING_ROOTS) or (internal and legacy_reference_target(p))) and (p in tree_set or p in dirs) for p in resolved):continue
+            # L12-53: sibling links in a dated migration source inventory are
+            # complete references, including native history/completion carriers.
+            inventory_link=('Document type: Source inventory' in body[:2500] and history_scope(file,body,n) and '/' not in raw and raw.endswith('.md') and any(p in tree_set for p in local))
+            if not inventory_link and not internal and not row_roots and not context['parents'] and any(p in tree_set or p in dirs for p in local if not p.startswith(RETIRING_ROOTS)):continue
+            if not inventory_link and not relative_decision_origin(commit,file,raw) and not any((p.startswith(RETIRING_ROOTS) or (internal and legacy_reference_target(p))) and (p in tree_set or p in dirs) for p in resolved):continue
             a,b=link.span();matches=[x for x in matches if not (a<=x[0] and x[1]<=b)];matches.append((a,b,link[0]))
         for a,b,token in sorted(matches):
             if line.startswith('Purpose:') and token.strip('`')==posixpath.basename(file):continue
@@ -496,12 +499,25 @@ def removed_decision_holders(commit, edge, legacy):
     inv=next((e for e in census()['entries'] if e['edgeId']==edge['edgeId']),None)
     if inv and not resolved:source+=' '+adjacent_passage(blob(commit,inv['consumerPath']).decode(),edge['sourceSpans'])
     sw=words(source);kept=[]
+    # L12-54: translated titles identify the same decision when its actual
+    # deleted narrative is carried. Compare source content, never number alone.
+    source_paths=[f['path'] for f in edge.get('targetFacts',[]) if f.get('state')=='removed' and f['path'].startswith('docs/decisions/'+match[1]+'-')]
+    source_path=source_paths[0] if len(set(source_paths))==1 else legacy.split('#')[0]
+    paragraphs=[]
+    for rev in path_history(commit,source_path):
+        if any(len(row)>1 and row[0]=='D' and row[1]==source_path for row in commit_changes(rev)):
+            original=blob(rev+'^',source_path).decode()
+            paragraphs=[re.sub(r'\s+',' ',p).strip() for p in re.split(r'\n\s*\n|\n(?=- )',original) if not p.lstrip().startswith(('#','---')) and len(re.sub(r'\s+',' ',p).strip())>=100]
+            break
     for holder in holders:
         tw=words(title(holder))
         # Strip section/ADR prefixes and retain the heading's distinguishing title.
         if tw[:1]==['adr']:tw=tw[1:]
         prefix=tw[:min(4,len(tw))]
-        if prefix and any(sw[i:i+len(prefix)]==prefix for i in range(len(sw))):kept.append(holder)
+        path,anchor=holder.split('#',1)
+        body=re.sub(r'\s+',' ',next(h['body'] for h in heading_sections(commit,path) if h['anchor']==anchor))
+        shared=[p for p in paragraphs if p in body]
+        if (prefix and any(sw[i:i+len(prefix)]==prefix for i in range(len(sw)))) or (len(set(shared))>=2 and sum(len(p) for p in set(shared))>=240):kept.append(holder)
     return tuple(kept)
 
 def removed_decision_successor(commit, file, edge, legacy):
@@ -511,18 +527,56 @@ def removed_decision_successor(commit, file, edge, legacy):
     notes=[note.rstrip('.') for note in successor_notes(edge['reason'])]
     match=re.search(r'/decisions/(\d{4})',legacy)
     all_numeric=decision_narrative_holders(commit,match[1]) if match else ()
-    internal=re.search(r'Non-executable internal-correspondence note:\s*`([^`]+)`',edge['reason'],re.I)
+    internal=re.search(r'Non-executable internal-correspondence note:\s*(?P<quote>`+)(?P<heading>.+?)(?P=quote)(?!`)(?=\s|[.;]|$)',edge['reason'],re.I)
     for holder in wanted:
         path,anchor=holder.split('#',1)
         if path==file and internal:
-            heading=next(h['sample'] for h in heading_sections(commit,path) if h['anchor']==anchor)
-            assert internal[1]==heading, 'internal correspondence must name exact title-matched heading'
+            section=next(h for h in heading_sections(commit,path) if h['anchor']==anchor)
+            heading=blob(commit,path).decode().splitlines()[section['startLine']-1].lstrip('#').strip()
+            assert internal['heading']==heading, 'internal correspondence must name exact title-matched heading'
             assert not edge.get('target') and not edge.get('anchor'), 'executable self-link forbidden'
             assert not re.search(r'!?\[[^\]]*\]\([^)]*\)',edge['reason']), 'internal correspondence must be non-executable'
         else:
             assert holder in notes, 'removed decision missing computed narrative-holder successor: '+repr(wanted)
     assert not any(note in all_numeric and note not in wanted for note in notes), 'removed decision title-collision successor'
 
+
+def replacement_unit_consistency(record, text):
+    """Compare complete source-line units, including deferred cutover replacements."""
+    coverage=record['checks']['coverage']; units=[]; bound=set()
+    lines=text.splitlines()
+    for unit in coverage.get('rowReplacementUnits',[]):
+        assert spans_text(text,unit['sourceSpans'])
+        ids=unit['edgeIds']; assert ids and not bound.intersection(ids)
+        for key in ids:
+            edge=next(e for e in record['edges'] if e['edgeId']==key)
+            assert edge['disposition']=='phase9-row-flip'
+            assert all(s['line'] in {x['line'] for x in unit['sourceSpans']} for s in edge['sourceSpans'])
+            assert 'Replacement: '+unit['replacement'] in edge['reason']
+        bound.update(ids);units.append((unit['sourceSpans'],unit['replacement']))
+    grouped=collections.defaultdict(list)
+    for edge in record['edges']:
+        if edge['edgeId'] in bound or edge.get('retiresWithTree'):continue
+        if edge.get('disposition') in ('patch','phase9-row-flip'):
+            grouped[unit_id(text,edge['sourceSpans'])].append(edge)
+    for edges in grouped.values():
+        patches=[e for e in edges if e['disposition']=='patch']
+        if patches:
+            edits=sorted(set(x for e in patches for x in replacement_changes(text,e['sourceSpans'],record['checks']['relativeResolution'][e['edgeId']]['replacement'])))
+            start=min(s['line'] for e in patches for s in e['sourceSpans']);end=max(s['line'] for e in patches for s in e['sourceSpans'])
+            offset=sum(len(x)+1 for x in lines[:start-1]); value='\n'.join(lines[start-1:end])
+            for a,b,new in reversed(edits):value=value[:a-offset]+new+value[b-offset:]
+            units.append(([{'line':n} for n in range(start,end+1)],value))
+        for edge in edges:
+            if edge['disposition']=='phase9-row-flip':
+                replacement=edge['reason'].split('Replacement:',1)[-1].strip()
+                units.append((edge['sourceSpans'],replacement))
+    for key in ('statusRowFlips','switchboardStatusRowFlips'):
+        units.extend((u['sourceSpans'],u['replacement']) for u in coverage.get(key,[]))
+    for i,(spans,replacement) in enumerate(units):
+        occupied={s['line'] for s in spans}
+        for other,value in units[i+1:]:
+            assert not occupied.intersection(s['line'] for s in other) or replacement==value, 'overlapping source-line replacement units disagree'
 
 def make_diff(file,before,after):
     return ''.join(difflib.unified_diff(before.splitlines(True),after.splitlines(True),fromfile='a/'+file,tofile='b/'+file,n=3)) if before!=after else ''
@@ -761,6 +815,7 @@ class Checker:
                 if edges and unit_id(before,edges[0]['sourceSpans']).startswith('canonical-'):
                     assert all(e.get('disposition')=='phase9-row-flip' for e in edges)
         check('unit-consistency',units)
+        check('replacement-unit-overlap',lambda:replacement_unit_consistency(r,before))
         def status_prose():
             expected=[];lines=before.splitlines()
             pattern=r'The (?:legacy source remains|retained legacy map remains)'

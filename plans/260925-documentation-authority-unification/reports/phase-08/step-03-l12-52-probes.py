@@ -15,7 +15,8 @@ def main():
     file=inv['consumerPath'];legacy=inv['normalizedReference']
     holders=m.removed_decision_holders(PIN,edge,legacy)
     assert len(holders)==1 and holders[0].split('#')[0]==file,holders
-    heading=next(h['sample'] for h in m.heading_sections(PIN,file) if h['anchor']==holders[0].split('#')[1])
+    section=next(h for h in m.heading_sections(PIN,file) if h['anchor']==holders[0].split('#')[1])
+    heading=m.blob(PIN,file).decode().splitlines()[section['startLine']-1].lstrip('#').strip()
     edge['reason']='L12-52(1): Non-executable internal-correspondence note: `'+heading+'`.'
     m.removed_decision_successor(PIN,file,edge,legacy)
     negatives=[]

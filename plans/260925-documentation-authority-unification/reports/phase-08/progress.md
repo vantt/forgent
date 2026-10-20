@@ -1,3 +1,45 @@
+## Step 3 — final author fix handback (2026-10-20)
+
+Fixed pin `ae141550c2e022310de7a0efea757580c0b2479f`. Binding authority: L12-50–53 and the supplied final Lead rulings (pending Lead recording as L12-54). **Final author corrections and proof are complete; independent review is pending.** Runner owns commits and Lead owns actual-commit accounting. No consumer edit or authority flip.
+
+- **Checker:** one canonical internal-correspondence note quotes the complete pinned heading, with double backticks where headings contain inline code; no executable self-link. The former 70-character anchor sample is no longer treated as the exact title. Translated decision titles are checked against the actual deleted narrative before removal: at least two distinct unchanged paragraphs/list items, ≥100 normalized characters each and ≥240 in total, while title/number collision checks stay active. The existing supplemental scanner covers complete sibling Markdown links in dated migration source inventories, including native history/completion carriers. New `replacement-unit-overlap` checks current patch units plus deferred row/status replacements; source-bound `coverage.rowReplacementUnits` represents each complete switchboard range once. Resolver, production code, vocabulary, extractor, comparator, tests and baselines remain unchanged.
+- **Named records:** 01326 now shares 06621’s four-part prompt holder. Switchboard 30–34 and 98–103 each have one edge-bound replacement; 104–108 retains author guidance and agrees with 08454/08455; fenced metadata has no status unit. 07912 parks as dead navigation. 04967 parks as description-rewrite after explicitly comparing source `herdr-plugin/src/fgos.rs` with audit `packages/herdr-fgos-common/rust/src/fgos.rs`; its reader role agrees but its adjacent file-list claim does not. 05017 names the runner 0031 heading and the stray first line-63 successor fragment is removed. 04701/04703 preserve under the historical banner. 07024/07039 park on full advisory carry because their present-tense live destination has only a carriage holder. Added two missing edges: runner `specs/runner.md:26` at L112 preserves; generated-index `dispatch-control-plane-redesign.md` at L42 parks for Step 5 generator/reader parity. Completed the 0000 generated-index, 07733 contract, 07691 verbatim-evidence, batch-033 exact self-heading, batch-107/bare reading-map resolution, batch-110 carriage/audit-label and id-systems-audit L164 text repairs.
+- **Successor sweep:** 117 preserved removed-decision edges examined, **89 text changes across 14 batches**. English/Vietnamese titles match the same narrative; numeric collisions remain distinct. All eight foundations-only edges carry P8-DOC-GAP-02 (six newly marked). No disposition, target, anchor or proposed diff changes in the sweep. Every batch, including zero counts, is reported in `step-03-final-successor-sweep.json`; nonzero changed-edge counts follow.
+
+| Batch | Changed edges |
+|---|---:|
+| batch-016 | 2 |
+| batch-033 | 10 |
+| batch-060 | 2 |
+| batch-061 | 1 |
+| batch-069 | 1 |
+| batch-070 | 36 |
+| batch-072 | 2 |
+| batch-073 | 6 |
+| batch-074 | 1 |
+| batch-077 | 1 |
+| batch-079 | 4 |
+| batch-081 | 7 |
+| batch-098 | 8 |
+| batch-130 | 8 |
+
+All other 116 batches have zero sweep text changes.
+
+- **ONE final request:** `step-03-final-review-request.md`, frozen index alongside it: **37 whole files / 1,015 edges / 11 parts**, outputs `review-a38-step-03-final-p01.md` … `p11.md`. Expands the one not-yet-reviewed patched batch-122 file and all 20 not-yet-reviewed batch-105 files in the original unpatched stratum, including zero-edge files. Seventeen files return for named targeted correction review (one overlaps the expansion). Ordinary parts meet ≤6 files / ≤150 edges / ≤400,000 bytes; larger indivisible files own their part and use ≤100-edge pages plus bounded Python field extraction. **19 sweep-only files / 74 changed edges** are separately listed. Prior requests, frozen seeds/memberships and outcomes remain unchanged. Reviewed/accepted 0/0; reviewers never run checker/probes.
+- **Fresh final proof:** **130 batches / 1,037 files / 9,423 edges / 0 checker failures / 0 open lead-ruling**, every set explicitly accounted. **208/208 negative probes rejected** (198 inherited + 10 new); all positive controls pass, including ten new controls, two inherited L12-52 controls and both form controls. **95/95 light tests pass, zero failures/skips.** Initial diagnostics exposed clipped title samples, inline backticks and 0019’s rule-gloss expansion; current receipts are fresh complete reruns after those fixes. Jobs were serial, tests unset `CLAUDE_CODE_SESSION_ID`, and scratch/cache/apply/fixture files stayed under `/tmp/fgos-work/final/`.
+
+Receipts: `step-03-final-check-result.json`, `step-03-final-probe-results.json`, `step-03-final-light-tests.log`, `step-03-final-verification.json`. The verification receipt independently checks every review and 130-batch record SHA binding, part/page bounds, unchanged original source tuples, the exact two added edges, sweep-only semantic conservation, protected owner-answer/prior-review files and allowed write scope. `git diff --check` is green. Both Phase 6 reproduction manifests, docs/**, root instructions, README and all production surfaces stay unchanged.
+
+Reproduce serially from the worktree root:
+
+```sh
+env -u CLAUDE_CODE_SESSION_ID python3 -B plans/260925-documentation-authority-unification/reports/phase-08/step-03-final-verify.py probes
+env -u CLAUDE_CODE_SESSION_ID python3 -B plans/260925-documentation-authority-unification/reports/phase-08/step-03-final-verify.py full
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work/final node --test test/scripts/doc-link-pass.test.mjs test/scripts/check-doc-candidate-status.test.mjs test/scripts/check-doc-constitution.test.mjs
+```
+
+This closes the assigned author-fix turn, not independent Step 3 acceptance or Phase 9 authorization. Lead retains review dispatch, actual-commit accounting and Step 4 source/target drift revalidation. No fgOS CLI, checkout git write, secret/state/config access, service or out-of-scope write; required atomic assignment outbox is the explicit exception. MDView MCP is unavailable; preview is left to Lead under this enforced plan-only write scope.
+
 ## Step 3 — L12-52 checker handoff (2026-10-20)
 
 - Pin remains `ae141550c2e022310de7a0efea757580c0b2479f`. Checker/probes only; **no batch record changed**. L12-50–53 and the prior latest progress were read. Prior art reused: `removed_decision_holders` with its deleted-title/collision resolution, `removed-decision-narrative-successor`, `successor-not-self`, `carriage_declarations`, and the existing related-retiring-preserve predicate. No resolver or production mechanism changed.

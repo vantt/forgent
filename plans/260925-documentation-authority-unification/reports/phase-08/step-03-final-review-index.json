@@ -1,0 +1,1592 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "reviewAcceptance": "pending; started 0, accepted 0; no inherited approval fabricated",
+  "priorMembershipMethod": "Lead-supplied review outcomes plus immutable wave5f/wave5g frozen indexes; no reseeding or replacement of prior membership",
+  "priorMembership": [
+    {
+      "batch": "batch-105",
+      "index": "step-03-wave5f-review-index.json",
+      "sha256": "43b655872934fffa3cf76967765dbef49d7e9710db1939a4aa7c21b842753950",
+      "reviewedFiles": [
+        "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "docs/platform/host-invocation-routing/architecture/invocation-kernel.md",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md",
+        "docs/platform/host-invocation-routing/intent-preservation-ledger.md"
+      ]
+    },
+    {
+      "batch": "batch-122",
+      "index": "step-03-wave5g-review-index.json",
+      "sha256": "77e343ababfb681dd8bc3d41288a74be5e76c79944fb4f98d62a2400f96bad6a",
+      "reviewedFiles": [
+        "docs/platform/work-state/architecture/implementation-pointers.md",
+        "docs/platform/work-state/contracts/cli-io-contract.md",
+        "docs/platform/work-state/decisions/retired-decision-history.md",
+        "docs/platform/work-state/spec.md"
+      ]
+    }
+  ],
+  "selectedFiles": 37,
+  "selectedEdges": 1015,
+  "parts": [
+    {
+      "part": 1,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-final-p01.md",
+      "files": [
+        {
+          "file": "docs/decisions/index.md",
+          "set": "batch-059",
+          "inclusion": [
+            "targeted: disposition/target/anchor/proposed diff or added-edge coverage changed"
+          ],
+          "edges": 78,
+          "recordSha256": "3d46f9ec8ba8ca9c52c33db4aa486593f0470a17dd1c299b3a1e5b8394185642",
+          "sourceDigest": "a0c9f0239f56019041a4a8e01327aee43740ea0e3643c0b291a706fd4b1a4b66",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 33997,
+          "recordBytes": 636897,
+          "sourcePlusRecordBytes": 670894,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 78
+            }
+          ]
+        }
+      ],
+      "fileCount": 1,
+      "edges": 78,
+      "sourcePlusRecordBytes": 670894
+    },
+    {
+      "part": 2,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-final-p02.md",
+      "files": [
+        {
+          "file": "docs/knowledge/why-every-agent-task-tool-dispatch-is-enforced-through-a-pre/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md",
+          "set": "batch-077",
+          "inclusion": [
+            "targeted: disposition/target/anchor/proposed diff or added-edge coverage changed"
+          ],
+          "edges": 7,
+          "recordSha256": "9897f82dc55d80b05437452a3983fe664ca89b9ff65096cfe02b664a7e602270",
+          "sourceDigest": "56135aa57f25197aaad2b7ed475d9dce4133398b638c57967c95e0fade029974",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 27023,
+          "recordBytes": 11462,
+          "sourcePlusRecordBytes": 38485,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 7
+            }
+          ]
+        },
+        {
+          "file": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+          "set": "batch-081",
+          "inclusion": [
+            "targeted: named A/B record-text, internal-correspondence or search-coverage correction"
+          ],
+          "edges": 9,
+          "recordSha256": "4b7fbc9ca502a9829a3d18a3a792e94871e4dbf3e058412cd4129a99d185e642",
+          "sourceDigest": "7cf21351c63b388bb6d6fdba95f7351fc3fbd3c632de2b97f81aa7dd60878048",
+          "diffSha256": "8e43c49add2736ac3483851b70a110bf341cba75e9b6996928979d6a6e39c38c",
+          "sourceBytes": 22451,
+          "recordBytes": 33094,
+          "sourcePlusRecordBytes": 55545,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 9
+            }
+          ]
+        },
+        {
+          "file": "docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md",
+          "set": "batch-081",
+          "inclusion": [
+            "targeted: named A/B record-text, internal-correspondence or search-coverage correction"
+          ],
+          "edges": 7,
+          "recordSha256": "2aa2301980214f1536512ccd8d7e539e1cc28bab6ea302a65830498b40f52b02",
+          "sourceDigest": "1cbc795929d012368ede09260f179a75576defb1c1c3a17c4f56ce2d1245ac81",
+          "diffSha256": "adcdd6a655969ac68a7e9d1f49777b25d7da626b72f60ac450a6a7b738e46612",
+          "sourceBytes": 3901,
+          "recordBytes": 27329,
+          "sourcePlusRecordBytes": 31230,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 7
+            }
+          ]
+        }
+      ],
+      "fileCount": 3,
+      "edges": 23,
+      "sourcePlusRecordBytes": 125260
+    },
+    {
+      "part": 3,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-final-p03.md",
+      "files": [
+        {
+          "file": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md",
+          "set": "batch-086",
+          "inclusion": [
+            "targeted: named A/B record-text, internal-correspondence or search-coverage correction"
+          ],
+          "edges": 472,
+          "recordSha256": "e956e431ddf2652619db9dca3914cdf3063fbd4acee42edb1d106d82adcf9571",
+          "sourceDigest": "6b314f37f7a87aac6f37ce3be3a2229567313b4c87969fc3968e0d32390284bf",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 131125,
+          "recordBytes": 531431,
+          "sourcePlusRecordBytes": 662556,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 100
+            },
+            {
+              "firstEdge": 101,
+              "lastEdge": 200
+            },
+            {
+              "firstEdge": 201,
+              "lastEdge": 300
+            },
+            {
+              "firstEdge": 301,
+              "lastEdge": 400
+            },
+            {
+              "firstEdge": 401,
+              "lastEdge": 472
+            }
+          ]
+        }
+      ],
+      "fileCount": 1,
+      "edges": 472,
+      "sourcePlusRecordBytes": 662556
+    },
+    {
+      "part": 4,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-final-p04.md",
+      "files": [
+        {
+          "file": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
+          "set": "batch-105",
+          "inclusion": [
+            "expansion: every unreviewed file of the original unpatched stratum containing 07039/07024, including zero-edge files"
+          ],
+          "edges": 3,
+          "recordSha256": "7efca184069cbd902478d6649c3ab900c1ef9897ae4fff432631399868af2b9e",
+          "sourceDigest": "e736adcf550e767e87fe080adb6791b2dd1931f84b2d2078f761f1869882fc84",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 4519,
+          "recordBytes": 4034,
+          "sourcePlusRecordBytes": 8553,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 3
+            }
+          ]
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+          "set": "batch-105",
+          "inclusion": [
+            "expansion: every unreviewed file of the original unpatched stratum containing 07039/07024, including zero-edge files"
+          ],
+          "edges": 17,
+          "recordSha256": "6d2639e8236a01a19d96d980243d7e39fb283e5146eb28c9469a15f6f5d23f86",
+          "sourceDigest": "900076c8bbb4ddfa56589f86e4d51df2e28ea712dd0f8866b4f67bce9794a2c4",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 17758,
+          "recordBytes": 15430,
+          "sourcePlusRecordBytes": 33188,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 17
+            }
+          ]
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+          "set": "batch-105",
+          "inclusion": [
+            "expansion: every unreviewed file of the original unpatched stratum containing 07039/07024, including zero-edge files"
+          ],
+          "edges": 16,
+          "recordSha256": "23667bb0c80bc2a71529ee04cadde46dae586c314698a1a794c29b0513a3da6e",
+          "sourceDigest": "c4be1d2cd83c8207a89608d3f6e6822b30973a6947ad8004c26fa1e45399a49b",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 23764,
+          "recordBytes": 15410,
+          "sourcePlusRecordBytes": 39174,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 16
+            }
+          ]
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+          "set": "batch-105",
+          "inclusion": [
+            "expansion: every unreviewed file of the original unpatched stratum containing 07039/07024, including zero-edge files"
+          ],
+          "edges": 5,
+          "recordSha256": "866636617100e15e4c7097a6b3306d0328b994e9f601fae9fa23e64c2211708d",
+          "sourceDigest": "2660a8e9f0291a4c99f0dd06dc7dc4695d407965d6c937117639639690773c2e",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 4798,
+          "recordBytes": 6704,
+          "sourcePlusRecordBytes": 11502,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 5
+            }
+          ]
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+          "set": "batch-105",
+          "inclusion": [
+            "targeted: disposition/target/anchor/proposed diff or added-edge coverage changed",
+            "expansion: every unreviewed file of the original unpatched stratum containing 07039/07024, including zero-edge files"
+          ],
+          "edges": 16,
+          "recordSha256": "68011597a2e99925307e22d172904b56606c3d0b4a94a46ccff08ea75a0766c9",
+          "sourceDigest": "f8e978fb99dbb6f794353e68f654d5b80396a7149f485c530ee46fcf9a8f84f9",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 15339,
+          "recordBytes": 28955,
+          "sourcePlusRecordBytes": 44294,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 16
+            }
+          ]
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/contracts/command-route-descriptor.md",
+          "set": "batch-105",
+          "inclusion": [
+            "expansion: every unreviewed file of the original unpatched stratum containing 07039/07024, including zero-edge files"
+          ],
+          "edges": 1,
+          "recordSha256": "3bac7ed2b574a2769744a0c84ff0f2fb759bd75b72dbe3b4a648ab8d4ddc0501",
+          "sourceDigest": "aba85b7f20eab828165bfaea494c77c4a526bea3db511d51276401443de07b54",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 3587,
+          "recordBytes": 1798,
+          "sourcePlusRecordBytes": 5385,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 1
+            }
+          ]
+        }
+      ],
+      "fileCount": 6,
+      "edges": 58,
+      "sourcePlusRecordBytes": 142096
+    },
+    {
+      "part": 5,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-final-p05.md",
+      "files": [
+        {
+          "file": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+          "set": "batch-105",
+          "inclusion": [
+            "targeted: disposition/target/anchor/proposed diff or added-edge coverage changed"
+          ],
+          "edges": 15,
+          "recordSha256": "6607f765ab7b022148e9b13e9ae1f6d33d39df9880d13c5593a9fcec6c6beb7a",
+          "sourceDigest": "ce3f29b86c0b2ad7f35c44e64c0bc4369000fad68baf0499bc108021e0139f70",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 17761,
+          "recordBytes": 22598,
+          "sourcePlusRecordBytes": 40359,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 15
+            }
+          ]
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+          "set": "batch-105",
+          "inclusion": [
+            "expansion: every unreviewed file of the original unpatched stratum containing 07039/07024, including zero-edge files"
+          ],
+          "edges": 3,
+          "recordSha256": "7640f142ea5e0ee1c7a3100417c66d7b6fc324d62a9a73a097d8884e557e3074",
+          "sourceDigest": "19a69423f450586e21e98f5c932dcb5c1520ab1ccee370ccc0dcac14b2815714",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 3235,
+          "recordBytes": 3904,
+          "sourcePlusRecordBytes": 7139,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 3
+            }
+          ]
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/contracts/legacy-payload.md",
+          "set": "batch-105",
+          "inclusion": [
+            "expansion: every unreviewed file of the original unpatched stratum containing 07039/07024, including zero-edge files"
+          ],
+          "edges": 2,
+          "recordSha256": "1e5b9e39a1b97cec93b934d0cd84cc61e3d571107f7e859b2c85e2832670aad3",
+          "sourceDigest": "30d88a025bf714263860005e1f0f37c96be1c338166febe7b3668ee1c10bd6d6",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 3777,
+          "recordBytes": 2856,
+          "sourcePlusRecordBytes": 6633,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 2
+            }
+          ]
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/contracts/operation-catalog.md",
+          "set": "batch-105",
+          "inclusion": [
+            "expansion: every unreviewed file of the original unpatched stratum containing 07039/07024, including zero-edge files"
+          ],
+          "edges": 2,
+          "recordSha256": "a3f24d808ea8c627a13b0fbc75156d4d5635cc6df476b5a5d13dc1a5f58e3e2a",
+          "sourceDigest": "6b453ba9878a7f93509832c677e78d75f5686d3f4a371fbcdd03fe55388246ab",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 3300,
+          "recordBytes": 2970,
+          "sourcePlusRecordBytes": 6270,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 2
+            }
+          ]
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/contracts/operation-provider.md",
+          "set": "batch-105",
+          "inclusion": [
+            "expansion: every unreviewed file of the original unpatched stratum containing 07039/07024, including zero-edge files"
+          ],
+          "edges": 1,
+          "recordSha256": "7f22eb8900f6b66425b79a742156dd0ea5646eee9aaa2de7377952a01da83a47",
+          "sourceDigest": "a0627e1f394730024382a9d1c220c1a75f7e32fb6d60a1f98615b678289c2ef5",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 3338,
+          "recordBytes": 1837,
+          "sourcePlusRecordBytes": 5175,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 1
+            }
+          ]
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+          "set": "batch-105",
+          "inclusion": [
+            "expansion: every unreviewed file of the original unpatched stratum containing 07039/07024, including zero-edge files"
+          ],
+          "edges": 27,
+          "recordSha256": "6a170231d4d458f2178bcc9bc75bbec3819d29951b9ae4cb16acdb49a65306e6",
+          "sourceDigest": "3739b4d22b221a87b2c8a4c60679dd3de6d524a0931b8fd5bfea4ffe0829b8ca",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 22496,
+          "recordBytes": 42938,
+          "sourcePlusRecordBytes": 65434,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 27
+            }
+          ]
+        }
+      ],
+      "fileCount": 6,
+      "edges": 50,
+      "sourcePlusRecordBytes": 131010
+    },
+    {
+      "part": 6,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-final-p06.md",
+      "files": [
+        {
+          "file": "docs/platform/host-invocation-routing/history/host-invocation-baseline.md",
+          "set": "batch-105",
+          "inclusion": [
+            "expansion: every unreviewed file of the original unpatched stratum containing 07039/07024, including zero-edge files"
+          ],
+          "edges": 2,
+          "recordSha256": "3318976587d280c59577199b58353d45fd2f7c1dd5c1ca608f1c9960ee50be4e",
+          "sourceDigest": "165f732b474ace314c8f890888082544e13573d15291c94871b7de58655238a4",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 2648,
+          "recordBytes": 2758,
+          "sourcePlusRecordBytes": 5406,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 2
+            }
+          ]
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/history/source-inventory.md",
+          "set": "batch-105",
+          "inclusion": [
+            "expansion: every unreviewed file of the original unpatched stratum containing 07039/07024, including zero-edge files"
+          ],
+          "edges": 13,
+          "recordSha256": "ca63a7feca94ea7f237772c403afbca36dc74ff56bdd56b72174efd3a93eccad",
+          "sourceDigest": "60189711d4193579d0acc5213ec765adb17224f6d81a275fdc7e7fc3abe5c01b",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 5623,
+          "recordBytes": 15528,
+          "sourcePlusRecordBytes": 21151,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 13
+            }
+          ]
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/r2-external-process-rollout-plan.md",
+          "set": "batch-105",
+          "inclusion": [
+            "expansion: every unreviewed file of the original unpatched stratum containing 07039/07024, including zero-edge files"
+          ],
+          "edges": 0,
+          "recordSha256": "db7dd3f286569641cdd53b5ecfc598eb39a38249b7ec89dfed7b5112a15b89f9",
+          "sourceDigest": "2188f9a15473d9dd2149b7c75ad471f733329bf6283b0edfcb526f6be7ba8476",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 1399,
+          "recordBytes": 943,
+          "sourcePlusRecordBytes": 2342,
+          "readingPages": [
+            {
+              "firstEdge": 0,
+              "lastEdge": 0
+            }
+          ]
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/r3-remote-peer-rollout-plan.md",
+          "set": "batch-105",
+          "inclusion": [
+            "expansion: every unreviewed file of the original unpatched stratum containing 07039/07024, including zero-edge files"
+          ],
+          "edges": 0,
+          "recordSha256": "84e88c502fca53df26f0da13a7a932db9690bd6ee6f7750a8cd50e1c2cd43d19",
+          "sourceDigest": "a93b6eaa791dbde6be510d6f2f035102eccca8393a71093febd6924236dc5a27",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 1360,
+          "recordBytes": 938,
+          "sourcePlusRecordBytes": 2298,
+          "readingPages": [
+            {
+              "firstEdge": 0,
+              "lastEdge": 0
+            }
+          ]
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/spec.md",
+          "set": "batch-105",
+          "inclusion": [
+            "expansion: every unreviewed file of the original unpatched stratum containing 07039/07024, including zero-edge files"
+          ],
+          "edges": 2,
+          "recordSha256": "4cdffc3a16f639663ad505b2f368bc91fbde24d32369284c58ee936350c3af24",
+          "sourceDigest": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 32766,
+          "recordBytes": 5949,
+          "sourcePlusRecordBytes": 38715,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 2
+            }
+          ]
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+          "set": "batch-105",
+          "inclusion": [
+            "expansion: every unreviewed file of the original unpatched stratum containing 07039/07024, including zero-edge files"
+          ],
+          "edges": 5,
+          "recordSha256": "c261d9bdbf3ef0cffd5014536d6625ee0bb02c4fe287a288987b8acdc29ce8d6",
+          "sourceDigest": "4cd3b4a66ad636ace987474315e5575a202391e35b9925285a032e8b307a4ce2",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 7254,
+          "recordBytes": 5802,
+          "sourcePlusRecordBytes": 13056,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 5
+            }
+          ]
+        }
+      ],
+      "fileCount": 6,
+      "edges": 22,
+      "sourcePlusRecordBytes": 82968
+    },
+    {
+      "part": 7,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-final-p07.md",
+      "files": [
+        {
+          "file": "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+          "set": "batch-105",
+          "inclusion": [
+            "expansion: every unreviewed file of the original unpatched stratum containing 07039/07024, including zero-edge files"
+          ],
+          "edges": 2,
+          "recordSha256": "0e934dcc3f38cf2a96a1b96b07b49f0b82d0d099a6a79bd86a7d723c56a9a704",
+          "sourceDigest": "c3f31468ab486cf548fdd942ceb5fb0743a2abf476fb3820784a6f62c8b1a448",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 11243,
+          "recordBytes": 4572,
+          "sourcePlusRecordBytes": 15815,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 2
+            }
+          ]
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "set": "batch-105",
+          "inclusion": [
+            "expansion: every unreviewed file of the original unpatched stratum containing 07039/07024, including zero-edge files"
+          ],
+          "edges": 2,
+          "recordSha256": "cbf33d2673e26cf66b7d4371a89787361fcc8bb58effd3a0c7bcc6639a2b670b",
+          "sourceDigest": "88fd9d8bab58c2d320f4769383cd3f6de146f95fa97bf5271e96634a32602be4",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 5518,
+          "recordBytes": 2994,
+          "sourcePlusRecordBytes": 8512,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 2
+            }
+          ]
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "set": "batch-105",
+          "inclusion": [
+            "expansion: every unreviewed file of the original unpatched stratum containing 07039/07024, including zero-edge files"
+          ],
+          "edges": 6,
+          "recordSha256": "52e2971d98dae05d359d793581b953212ddad574ddf537317504fc9a0451805e",
+          "sourceDigest": "455c0a5c92ad6d0c11fce08f2c45e0634b843a977dfe34a644cfc3f735bcea0c",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 10956,
+          "recordBytes": 7869,
+          "sourcePlusRecordBytes": 18825,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 6
+            }
+          ]
+        },
+        {
+          "file": "docs/platform/intent-preservation-ledger.md",
+          "set": "batch-107",
+          "inclusion": [
+            "targeted: named A/B record-text, internal-correspondence or search-coverage correction"
+          ],
+          "edges": 10,
+          "recordSha256": "861c81b3c5189ff8a9314094d46c8b1201efdb7c00b9cb9dc535d4423ee76424",
+          "sourceDigest": "c32388310dcd5e30abc94d0c49718229ab0678196d4c8002c8a1629e16070121",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 17191,
+          "recordBytes": 14561,
+          "sourcePlusRecordBytes": 31752,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 10
+            }
+          ]
+        },
+        {
+          "file": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+          "set": "batch-110",
+          "inclusion": [
+            "targeted: named A/B record-text, internal-correspondence or search-coverage correction"
+          ],
+          "edges": 28,
+          "recordSha256": "ed6cd5ef5d0795397ca3280576a3392f337df24f19cea9223d399393bde7d0c1",
+          "sourceDigest": "770f949ac340a17c9d4236e6635ae679b872795e974c11d641b50c3029a4c977",
+          "diffSha256": "8b60f9b16b8570478c105d6bc969d0c6f5be4a61d3093ac98f892b6c49bacbba",
+          "sourceBytes": 49005,
+          "recordBytes": 31148,
+          "sourcePlusRecordBytes": 80153,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 28
+            }
+          ]
+        },
+        {
+          "file": "docs/platform/packaging-distribution/verification/source-preservation-audit.md",
+          "set": "batch-110",
+          "inclusion": [
+            "targeted: named A/B record-text, internal-correspondence or search-coverage correction"
+          ],
+          "edges": 50,
+          "recordSha256": "7afe50744136ee6563863cd960c313dfdeb1a407919fb13c8a17e574eaa327c7",
+          "sourceDigest": "e6a389aa7495b41e4b953323511470e02322897f6a9d794d49ae8bacb77aa85b",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 17529,
+          "recordBytes": 62201,
+          "sourcePlusRecordBytes": 79730,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 50
+            }
+          ]
+        }
+      ],
+      "fileCount": 6,
+      "edges": 98,
+      "sourcePlusRecordBytes": 234787
+    },
+    {
+      "part": 8,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-final-p08.md",
+      "files": [
+        {
+          "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "set": "batch-115",
+          "inclusion": [
+            "targeted: disposition/target/anchor/proposed diff or added-edge coverage changed"
+          ],
+          "edges": 71,
+          "recordSha256": "5fe7c2a8c16448cebc326f9c408a15184e46a6fc149e3c60413eb0dad318cf99",
+          "sourceDigest": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+          "diffSha256": "a3468681d9c8d0d667f13309ed17e9dfc7589fb61fa692a57e0d1ac85a1cafaa",
+          "sourceBytes": 182676,
+          "recordBytes": 91667,
+          "sourcePlusRecordBytes": 274343,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 71
+            }
+          ]
+        },
+        {
+          "file": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+          "set": "batch-115",
+          "inclusion": [
+            "targeted: named A/B record-text, internal-correspondence or search-coverage correction"
+          ],
+          "edges": 4,
+          "recordSha256": "ffc46afae6534120e3a61bfcf958638de967f607b5bc5d15403fc8c411567373",
+          "sourceDigest": "e68528aa3987c7be6494fb02dcd8ce7372fece7e3c171780d489cac4accfc14b",
+          "diffSha256": "4ec0e7a60201d962d3dc15beec188e571f3166c13b80f63fb92d76b5a5cf8f28",
+          "sourceBytes": 92419,
+          "recordBytes": 12873,
+          "sourcePlusRecordBytes": 105292,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 4
+            }
+          ]
+        }
+      ],
+      "fileCount": 2,
+      "edges": 75,
+      "sourcePlusRecordBytes": 379635
+    },
+    {
+      "part": 9,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-final-p09.md",
+      "files": [
+        {
+          "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+          "set": "batch-115",
+          "inclusion": [
+            "targeted: named A/B record-text, internal-correspondence or search-coverage correction"
+          ],
+          "edges": 17,
+          "recordSha256": "d7499c7c5c905e99b9522c1b085ad89088e1ae3284c1c9da0e5c6e26c37d616d",
+          "sourceDigest": "38b4c82e7ec19c98dddb438de7d76c989b96b2df17193676bec3c093b50c9202",
+          "diffSha256": "7483ac715d2706c35a3df039d1e3e0944ae960d6bfd5edc1856be7013123635a",
+          "sourceBytes": 180961,
+          "recordBytes": 192069,
+          "sourcePlusRecordBytes": 373030,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 17
+            }
+          ]
+        }
+      ],
+      "fileCount": 1,
+      "edges": 17,
+      "sourcePlusRecordBytes": 373030
+    },
+    {
+      "part": 10,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-final-p10.md",
+      "files": [
+        {
+          "file": "docs/platform/work-state/contracts/cli-io-contract.md",
+          "set": "batch-122",
+          "inclusion": [
+            "targeted: disposition/target/anchor/proposed diff or added-edge coverage changed"
+          ],
+          "edges": 16,
+          "recordSha256": "9101ad77fc0f0376ade650edcd18a908ef2d465da9cf898d59c9425aae1b24bd",
+          "sourceDigest": "a8bb798b7a717c66a41427065d17c4ba261a81c42faf14d0e06895330ef5f68e",
+          "diffSha256": "db2d3c2fff58bc5eb966bf73a5721791bf4ce9dda21d9ecbc374bfb2b259a6cd",
+          "sourceBytes": 31773,
+          "recordBytes": 272153,
+          "sourcePlusRecordBytes": 303926,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 16
+            }
+          ]
+        },
+        {
+          "file": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+          "set": "batch-122",
+          "inclusion": [
+            "expansion: every patched batch-122 file outside prior reviewed membership"
+          ],
+          "edges": 5,
+          "recordSha256": "90f4fda2ab94a470ae70313a96188b5468e9d928851d6c6311f78c9290aad7e6",
+          "sourceDigest": "d434c42e3baae4705783125cfb2d91f34f66cb1573e36f8da6d72fb596dee2e7",
+          "diffSha256": "4c0b8efaabddefa3298649d3ffa45445e4f6e9253679954a2664e40df393cb19",
+          "sourceBytes": 5375,
+          "recordBytes": 15478,
+          "sourcePlusRecordBytes": 20853,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 5
+            }
+          ]
+        },
+        {
+          "file": "docs/coexistence.md",
+          "set": "batch-126",
+          "inclusion": [
+            "targeted: disposition/target/anchor/proposed diff or added-edge coverage changed"
+          ],
+          "edges": 6,
+          "recordSha256": "b0e9ca06e27fa5f58d364a9d66ed1bd86af8c8c4bda62f5ad6c48460b63b1e50",
+          "sourceDigest": "287b6013a2416aa86fe16b6cd705d78dd57d4ca190f0b61971521c7506e525e4",
+          "diffSha256": "1de613c077371292143b3809ca6aec20fa00ac787373ecead0dfa1cb09be9986",
+          "sourceBytes": 7298,
+          "recordBytes": 39893,
+          "sourcePlusRecordBytes": 47191,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 6
+            }
+          ]
+        }
+      ],
+      "fileCount": 3,
+      "edges": 27,
+      "sourcePlusRecordBytes": 371970
+    },
+    {
+      "part": 11,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-final-p11.md",
+      "files": [
+        {
+          "file": "docs/id-systems-audit.md",
+          "set": "batch-130",
+          "inclusion": [
+            "targeted: named A/B record-text, internal-correspondence or search-coverage correction"
+          ],
+          "edges": 26,
+          "recordSha256": "255f4116e23ebb67cf2b79c9c4c2034cf9f9f7f6b6b10f2ea6bd505d664225f8",
+          "sourceDigest": "c8d2d797b10ff41d841ef7234c49bed93744abd62b950f650ddb4cde58e20687",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 13697,
+          "recordBytes": 27826,
+          "sourcePlusRecordBytes": 41523,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 26
+            }
+          ]
+        },
+        {
+          "file": "docs/transitional-switchboard.md",
+          "set": "batch-130",
+          "inclusion": [
+            "targeted: disposition/target/anchor/proposed diff or added-edge coverage changed"
+          ],
+          "edges": 69,
+          "recordSha256": "ab34d62209986c54efa77e70269fe06b4a89e247c6c9b362b0cb81b88467203d",
+          "sourceDigest": "b058029179bae791d084a6881660adc3f64da7537d4880cd51421158f8e2b752",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sourceBytes": 13207,
+          "recordBytes": 94797,
+          "sourcePlusRecordBytes": 108004,
+          "readingPages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 69
+            }
+          ]
+        }
+      ],
+      "fileCount": 2,
+      "edges": 95,
+      "sourcePlusRecordBytes": 149527
+    }
+  ],
+  "sweepOnlyFiles": [
+    {
+      "file": "docs/platform/architecture-map.md",
+      "set": "batch-016",
+      "changedEdges": 2,
+      "edgeIds": [
+        "maps-j-06593",
+        "maps-j-06594"
+      ]
+    },
+    {
+      "file": "docs/architecture-map.md",
+      "set": "batch-033",
+      "changedEdges": 10,
+      "edgeIds": [
+        "maps-j-01237",
+        "maps-j-01238",
+        "maps-j-01239",
+        "maps-j-01240",
+        "maps-j-01241",
+        "maps-j-01242",
+        "maps-j-01243",
+        "maps-j-01244",
+        "maps-j-01258",
+        "maps-j-01259"
+      ]
+    },
+    {
+      "file": "docs/distillery/deep-dives/herdr-vs-tmux-observation.md",
+      "set": "batch-060",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-01631"
+      ]
+    },
+    {
+      "file": "docs/distillery/deep-dives/parallel-decomposition-and-merge.md",
+      "set": "batch-060",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-01637"
+      ]
+    },
+    {
+      "file": "docs/distillery/porting-log.md",
+      "set": "batch-061",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-01701"
+      ]
+    },
+    {
+      "file": "docs/journals/260728-2038-claim-port-str46-parallel-merge.md",
+      "set": "batch-069",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-04115"
+      ]
+    },
+    {
+      "file": "docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md",
+      "set": "batch-070",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-04117"
+      ]
+    },
+    {
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "set": "batch-070",
+      "changedEdges": 35,
+      "edgeIds": [
+        "maps-j-04151",
+        "maps-j-04153",
+        "maps-j-04155",
+        "maps-j-04157",
+        "maps-j-04159",
+        "maps-j-04161",
+        "maps-j-04167",
+        "maps-j-04169",
+        "maps-j-04171",
+        "maps-j-04173",
+        "maps-j-04175",
+        "maps-j-04177",
+        "maps-j-04179",
+        "maps-j-04181",
+        "maps-j-04183",
+        "maps-j-04185",
+        "maps-j-04187",
+        "maps-j-04189",
+        "maps-j-04191",
+        "maps-j-04193",
+        "maps-j-04195",
+        "maps-j-04197",
+        "maps-j-04199",
+        "maps-j-04201",
+        "maps-j-04203",
+        "maps-j-04205",
+        "maps-j-04207",
+        "maps-j-04209",
+        "maps-j-04211",
+        "maps-j-04213",
+        "maps-j-04215",
+        "maps-j-04217",
+        "maps-j-04219",
+        "maps-j-04221",
+        "maps-j-04223"
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
+      "set": "batch-072",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-04319"
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md",
+      "set": "batch-072",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-04380"
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+      "set": "batch-073",
+      "changedEdges": 4,
+      "edgeIds": [
+        "maps-j-04441",
+        "maps-j-04442",
+        "maps-j-04444",
+        "maps-j-04445"
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md",
+      "set": "batch-073",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-04464"
+      ]
+    },
+    {
+      "file": "docs/knowledge/how-to-unify-two-independently-written-working-tree-clean-ch/unify-a-duplicated-clean-tree-check-across-return-and-approve.md",
+      "set": "batch-073",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-04492"
+      ]
+    },
+    {
+      "file": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+      "set": "batch-074",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-04541"
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-treats-self-development-as-a-bounded-lane-with-its/why-fgos-self-development-is-not-the-default-mission.md",
+      "set": "batch-079",
+      "changedEdges": 2,
+      "edgeIds": [
+        "maps-j-04852",
+        "maps-j-04853"
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-worktrees-block-fgos-instead-of-locking-or-copying/worktree-isolation-axis-decision.md",
+      "set": "batch-079",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-04862"
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-main-checkout-hook-wired-reported-a-false-negative-on-an/why-main-checkout-hook-wired-compared-raw-strings-instead-of-resolved-paths.md",
+      "set": "batch-079",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-04893"
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-the-main-checkout-lock-hook-used-to-block-worktree-commi/why-the-main-checkout-lock-hook-used-to-block-worktree-commits.md",
+      "set": "batch-081",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-05039"
+      ]
+    },
+    {
+      "file": "docs/platform/documentation/history/id-systems-audit.md",
+      "set": "batch-098",
+      "changedEdges": 8,
+      "edgeIds": [
+        "maps-j-06707",
+        "maps-j-06708",
+        "maps-j-06715",
+        "maps-j-06716",
+        "maps-j-06717",
+        "maps-j-06718",
+        "maps-j-06721",
+        "maps-j-06726"
+      ]
+    }
+  ],
+  "sweepOnlyChangedEdges": 74,
+  "changedFiles": [
+    {
+      "file": "docs/platform/architecture-map.md",
+      "set": "batch-016",
+      "changedEdges": 2,
+      "edgeIds": [
+        "maps-j-06593",
+        "maps-j-06594"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "a8be3dfee4db9277be9781e598b922a4d56011c98da3059983550a856875edb4",
+      "afterRecordSha256": "75d3e6308bb3f5650adc16a8ca6c631c4b1e82104b390a2849086315f870b3bd"
+    },
+    {
+      "file": "docs/architecture-map.md",
+      "set": "batch-033",
+      "changedEdges": 10,
+      "edgeIds": [
+        "maps-j-01237",
+        "maps-j-01238",
+        "maps-j-01239",
+        "maps-j-01240",
+        "maps-j-01241",
+        "maps-j-01242",
+        "maps-j-01243",
+        "maps-j-01244",
+        "maps-j-01258",
+        "maps-j-01259"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "3b3a2c740aea106a9c1fcbe8e85d3f40a050774f920074bef26a9569cb898f09",
+      "afterRecordSha256": "a19e3c36a43e182c16115fd00f64fb8eebfd01316ba702e7c80f2d4b6e97002c"
+    },
+    {
+      "file": "docs/decisions/index.md",
+      "set": "batch-059",
+      "changedEdges": 1,
+      "edgeIds": [
+        "author-final-L42C43-batch-059"
+      ],
+      "semanticChange": true,
+      "beforeRecordSha256": "31a4e6bc577d2a5f1ded4399dd6d3d0fef11c327b50c642ed136ea4a4984280b",
+      "afterRecordSha256": "3d46f9ec8ba8ca9c52c33db4aa486593f0470a17dd1c299b3a1e5b8394185642"
+    },
+    {
+      "file": "docs/distillery/deep-dives/herdr-vs-tmux-observation.md",
+      "set": "batch-060",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-01631"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "2b78e2a4bb6386ce5bf3dcefded6dbb3a2efd6cbad12dbb9389de9302c633e34",
+      "afterRecordSha256": "017d37a03d01432daf68a41ac9c658f0fb33820d9739aa9ffeab97dcbe01456b"
+    },
+    {
+      "file": "docs/distillery/deep-dives/parallel-decomposition-and-merge.md",
+      "set": "batch-060",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-01637"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "1f5611b1d2b94572baffe9b774438f17cc94122e92d4a43bf6dbf71baa4cb41d",
+      "afterRecordSha256": "bb6de79ce1f15c6f17b53e46940aa7efca06b6edd26520ba63e633c5a9ce097e"
+    },
+    {
+      "file": "docs/distillery/porting-log.md",
+      "set": "batch-061",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-01701"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "3aba273f3c18ebedef7349efecaf583c7bf2a40a3072b9612a94a71091431c8d",
+      "afterRecordSha256": "d48731cb701ed3d1f0d1dd01cda493e3aaaa9af98f8a914bace48f55735808c1"
+    },
+    {
+      "file": "docs/journals/260728-2038-claim-port-str46-parallel-merge.md",
+      "set": "batch-069",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-04115"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "6503aeaa8ce4a5b3c06f31765adb2ee87775aa2da152f564515ee173056a5964",
+      "afterRecordSha256": "2969a8c1a640634c1e5a352604a4c40f9e457f00c9088058d9070eb0cd6c30d8"
+    },
+    {
+      "file": "docs/knowledge/a-decision-doc-can-be-superseded-twice-superseded-by-becomes/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md",
+      "set": "batch-070",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-04117"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "dd00a0805e472c99e8dc15adddebc72efd9e8848358bc076218942d08df08950",
+      "afterRecordSha256": "0213acc9a22cadef5e11ba0f1cff5af27b5854525462e35e6589bd97c866a33e"
+    },
+    {
+      "file": "docs/knowledge/decisions-index/decision-record.md",
+      "set": "batch-070",
+      "changedEdges": 35,
+      "edgeIds": [
+        "maps-j-04151",
+        "maps-j-04153",
+        "maps-j-04155",
+        "maps-j-04157",
+        "maps-j-04159",
+        "maps-j-04161",
+        "maps-j-04167",
+        "maps-j-04169",
+        "maps-j-04171",
+        "maps-j-04173",
+        "maps-j-04175",
+        "maps-j-04177",
+        "maps-j-04179",
+        "maps-j-04181",
+        "maps-j-04183",
+        "maps-j-04185",
+        "maps-j-04187",
+        "maps-j-04189",
+        "maps-j-04191",
+        "maps-j-04193",
+        "maps-j-04195",
+        "maps-j-04197",
+        "maps-j-04199",
+        "maps-j-04201",
+        "maps-j-04203",
+        "maps-j-04205",
+        "maps-j-04207",
+        "maps-j-04209",
+        "maps-j-04211",
+        "maps-j-04213",
+        "maps-j-04215",
+        "maps-j-04217",
+        "maps-j-04219",
+        "maps-j-04221",
+        "maps-j-04223"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "10cefaf5cc256560dea7511261e461f078c3c834444a6a0635562a86a3687e2d",
+      "afterRecordSha256": "1be351941942306d5fec672a071209143bc11b51de8e6f3df76d6f1cc4f2cdbd"
+    },
+    {
+      "file": "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
+      "set": "batch-072",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-04319"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "ed48af4292f727de5df3a57a3e608af9666c1bac8f37f8e6439b18d126f3a706",
+      "afterRecordSha256": "92fda78487ecf6769748c7dabd03b0b4ec445a0bc472efb17bd7fd9db5060762"
+    },
+    {
+      "file": "docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md",
+      "set": "batch-072",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-04380"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "2a22f3c194afa0c58d8c16d2df7ae022c2b869ce197bc5566af2f21b24ffbd8a",
+      "afterRecordSha256": "6a16132ff017e8be845b8ca1b50635b12edd79ebbb9305480c383ad2ad8288de"
+    },
+    {
+      "file": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+      "set": "batch-073",
+      "changedEdges": 4,
+      "edgeIds": [
+        "maps-j-04441",
+        "maps-j-04442",
+        "maps-j-04444",
+        "maps-j-04445"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "51b73cea7308344e4a76a3f0c37117e2dc9a94ef3c058aac7b696ec24a23ef6b",
+      "afterRecordSha256": "20c2fee9e4fa0806dc3099d31a197828b440ecc94a176f55c949f07ab019e66a"
+    },
+    {
+      "file": "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md",
+      "set": "batch-073",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-04464"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "f93246ab3f69be14aa65133421b83f904a0f5aee8171b54d15f3146d6590e10b",
+      "afterRecordSha256": "99fc332ffebc160336acadbec9bece6ebbc15d4830b4f62a909854591faf652a"
+    },
+    {
+      "file": "docs/knowledge/how-to-unify-two-independently-written-working-tree-clean-ch/unify-a-duplicated-clean-tree-check-across-return-and-approve.md",
+      "set": "batch-073",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-04492"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "0f87529b443a9300eda4f23467c0d5c12bef65cabacb61008c77baa130e5cef4",
+      "afterRecordSha256": "059fe1dca80d5d0d2c09138b86a7f215a8f19e31a55213349daf1619ea806863"
+    },
+    {
+      "file": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+      "set": "batch-074",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-04541"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "3b7355f40577ee777cbf89a9c1e5a5557ff248b1871723666a0244412f59a416",
+      "afterRecordSha256": "e5df855ddce651a9efef5310e092fb2817b093b5243406f49c8dfddc976a44b6"
+    },
+    {
+      "file": "docs/knowledge/why-every-agent-task-tool-dispatch-is-enforced-through-a-pre/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md",
+      "set": "batch-077",
+      "changedEdges": 2,
+      "edgeIds": [
+        "maps-j-04701",
+        "maps-j-04703"
+      ],
+      "semanticChange": true,
+      "beforeRecordSha256": "3304904cacf8d570a8201d81cd6419fd431fcb07934dc6cb1faecb1b230bc9e1",
+      "afterRecordSha256": "9897f82dc55d80b05437452a3983fe664ca89b9ff65096cfe02b664a7e602270"
+    },
+    {
+      "file": "docs/knowledge/why-fgos-treats-self-development-as-a-bounded-lane-with-its/why-fgos-self-development-is-not-the-default-mission.md",
+      "set": "batch-079",
+      "changedEdges": 2,
+      "edgeIds": [
+        "maps-j-04852",
+        "maps-j-04853"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "0af76ddf57cf699f97df8c8908afce16fae55fcbadb7685e8381e0c8a15d37ca",
+      "afterRecordSha256": "67682cb7c2959ccb4ecd66b211a0a4bc7dc8bdfa9f812e6f97a5cc2b5c7e93ed"
+    },
+    {
+      "file": "docs/knowledge/why-fgos-worktrees-block-fgos-instead-of-locking-or-copying/worktree-isolation-axis-decision.md",
+      "set": "batch-079",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-04862"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "6ba565498503042547c4478f928899f4f4f629e7fb7e22ee131d676f54ee196b",
+      "afterRecordSha256": "2fd9123e6783c8c9176780b2781e5b3bea497cae87f17b5129ec16e3cf37875a"
+    },
+    {
+      "file": "docs/knowledge/why-main-checkout-hook-wired-reported-a-false-negative-on-an/why-main-checkout-hook-wired-compared-raw-strings-instead-of-resolved-paths.md",
+      "set": "batch-079",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-04893"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "4bc6f4eb994c8953c123ab20217e19b1aafc6111365094e3fa0d471e2ebf4a2c",
+      "afterRecordSha256": "63fff9321575e2d5e76224ec433ffd61318f54aaf571da29e2e6df1c0e1dbf4c"
+    },
+    {
+      "file": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+      "set": "batch-081",
+      "changedEdges": 6,
+      "edgeIds": [
+        "maps-j-04966",
+        "maps-j-04967",
+        "maps-j-04968",
+        "maps-j-04971",
+        "maps-j-04972",
+        "maps-j-04974"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "35d87e320ae80b9ee0c0e888a3f7e49a458aa9f4b98f2953ba6ff86567c8654f",
+      "afterRecordSha256": "4b7fbc9ca502a9829a3d18a3a792e94871e4dbf3e058412cd4129a99d185e642"
+    },
+    {
+      "file": "docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md",
+      "set": "batch-081",
+      "changedEdges": 2,
+      "edgeIds": [
+        "maps-j-05017",
+        "author-wave5f-launcher-vocabulary-guard-L63C2"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "a48ff1261a42565111dfa3ad03d7118e82cfd90e2d55a514e34722fa1a2d579b",
+      "afterRecordSha256": "2aa2301980214f1536512ccd8d7e539e1cc28bab6ea302a65830498b40f52b02"
+    },
+    {
+      "file": "docs/knowledge/why-the-main-checkout-lock-hook-used-to-block-worktree-commi/why-the-main-checkout-lock-hook-used-to-block-worktree-commits.md",
+      "set": "batch-081",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-05039"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "b3c992bba1e04ea1fcc2b6c5b56875ad38bf4821eff1388b4457c87c39cebe21",
+      "afterRecordSha256": "c8ebefb801b9a365561efe31c13723cc4b841c6a6e1a436f704add4e72fb47b2"
+    },
+    {
+      "file": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md",
+      "set": "batch-086",
+      "changedEdges": 0,
+      "edgeIds": [],
+      "semanticChange": false,
+      "beforeRecordSha256": "1b99e84e621b94d552f3cf9bef8002d5b310c89cf1431170c0e4b41e64a4ff55",
+      "afterRecordSha256": "e956e431ddf2652619db9dca3914cdf3063fbd4acee42edb1d106d82adcf9571"
+    },
+    {
+      "file": "docs/platform/documentation/history/id-systems-audit.md",
+      "set": "batch-098",
+      "changedEdges": 8,
+      "edgeIds": [
+        "maps-j-06707",
+        "maps-j-06708",
+        "maps-j-06715",
+        "maps-j-06716",
+        "maps-j-06717",
+        "maps-j-06718",
+        "maps-j-06721",
+        "maps-j-06726"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "c3e360e068b6e5ff46cf833b816cb1426411c0cf0a5fc3d7bb44c03a19052b49",
+      "afterRecordSha256": "705453f1b4d6088237930f116ed5045d80381b94519545e7ac09febe1e89ce3b"
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "set": "batch-105",
+      "changedEdges": 4,
+      "edgeIds": [
+        "maps-j-07024",
+        "author-wave5f-docs-platform-host-invocation-routing-architecture-release-boundaries-L189C122",
+        "author-wave5f-docs-platform-host-invocation-routing-architecture-release-boundaries-L189C199",
+        "author-wave5f-docs-platform-host-invocation-routing-architecture-release-boundaries-L189C284"
+      ],
+      "semanticChange": true,
+      "beforeRecordSha256": "185333f2f3618f3562f05eeb816b3c95a23d4d9fa7223611e684eec6d0d95e03",
+      "afterRecordSha256": "68011597a2e99925307e22d172904b56606c3d0b4a94a46ccff08ea75a0766c9"
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "set": "batch-105",
+      "changedEdges": 2,
+      "edgeIds": [
+        "maps-j-07039",
+        "author-wave5f-docs-platform-host-invocation-routing-contracts-component-protocol-L326C94"
+      ],
+      "semanticChange": true,
+      "beforeRecordSha256": "8458e0491046d209a85e876e645854ae52733fbf0b6f98fc412b6d9de409c023",
+      "afterRecordSha256": "6607f765ab7b022148e9b13e9ae1f6d33d39df9880d13c5593a9fcec6c6beb7a"
+    },
+    {
+      "file": "docs/platform/intent-preservation-ledger.md",
+      "set": "batch-107",
+      "changedEdges": 0,
+      "edgeIds": [],
+      "semanticChange": false,
+      "beforeRecordSha256": "2f5b5f1f6981355ca4c56d7b95bd67e87d7241c7fe49d2e65bbb67edbda3dc48",
+      "afterRecordSha256": "861c81b3c5189ff8a9314094d46c8b1201efdb7c00b9cb9dc535d4423ee76424"
+    },
+    {
+      "file": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "set": "batch-110",
+      "changedEdges": 5,
+      "edgeIds": [
+        "maps-j-07273",
+        "maps-j-07274",
+        "maps-j-07275",
+        "maps-j-07276",
+        "maps-j-07277"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "a4cda577ef0b3feef08a9d7aad369ab97cde172928ea52e2ec52e1caf117e2e0",
+      "afterRecordSha256": "ed6cd5ef5d0795397ca3280576a3392f337df24f19cea9223d399393bde7d0c1"
+    },
+    {
+      "file": "docs/platform/packaging-distribution/verification/source-preservation-audit.md",
+      "set": "batch-110",
+      "changedEdges": 6,
+      "edgeIds": [
+        "maps-j-07399",
+        "maps-j-07400",
+        "maps-j-07401",
+        "maps-j-07402",
+        "maps-j-07403",
+        "maps-j-07404"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "e2bf5942ad03891e1b47f24bdc529c652a3ea182e25956da4aac9c77af31fcb9",
+      "afterRecordSha256": "7afe50744136ee6563863cd960c313dfdeb1a407919fb13c8a17e574eaa327c7"
+    },
+    {
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "set": "batch-115",
+      "changedEdges": 14,
+      "edgeIds": [
+        "maps-j-07625",
+        "maps-j-07628",
+        "maps-j-07636",
+        "maps-j-07638",
+        "maps-j-07640",
+        "maps-j-07641",
+        "maps-j-07644",
+        "maps-j-07645",
+        "maps-j-07647",
+        "maps-j-07649",
+        "maps-j-07650",
+        "maps-j-07651",
+        "maps-j-07667",
+        "author-final-L112C2-batch-115"
+      ],
+      "semanticChange": true,
+      "beforeRecordSha256": "339e5b8c69ab5b394ce2c02538e53c9bb2e1780ea8672948f815fb07ebbac7d9",
+      "afterRecordSha256": "5fe7c2a8c16448cebc326f9c408a15184e46a6fc149e3c60413eb0dad318cf99"
+    },
+    {
+      "file": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "set": "batch-115",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-07691"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "99f7bddd2ca183884deb4aa3b536e98d39d1b6fb598768d685a39b641ddc62a7",
+      "afterRecordSha256": "ffc46afae6534120e3a61bfcf958638de967f607b5bc5d15403fc8c411567373"
+    },
+    {
+      "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "set": "batch-115",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-07733"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "a21aba8d1f81c4a7b80838c461258d0071d77cfa955be93dc56ea3653566db90",
+      "afterRecordSha256": "d7499c7c5c905e99b9522c1b085ad89088e1ae3284c1c9da0e5c6e26c37d616d"
+    },
+    {
+      "file": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "set": "batch-122",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-07912"
+      ],
+      "semanticChange": true,
+      "beforeRecordSha256": "7987c1994724983e84fb0fa99070b0925d18fcf1fefcf8afa46a18195315bd1f",
+      "afterRecordSha256": "9101ad77fc0f0376ade650edcd18a908ef2d465da9cf898d59c9425aae1b24bd"
+    },
+    {
+      "file": "docs/coexistence.md",
+      "set": "batch-126",
+      "changedEdges": 1,
+      "edgeIds": [
+        "maps-j-01326"
+      ],
+      "semanticChange": true,
+      "beforeRecordSha256": "cab6987e9fa8047575da7571bf8d7c1d1d794795c41849cdb87b2611f2e81b1c",
+      "afterRecordSha256": "b0e9ca06e27fa5f58d364a9d66ed1bd86af8c8c4bda62f5ad6c48460b63b1e50"
+    },
+    {
+      "file": "docs/id-systems-audit.md",
+      "set": "batch-130",
+      "changedEdges": 8,
+      "edgeIds": [
+        "maps-j-04083",
+        "maps-j-04084",
+        "maps-j-04091",
+        "maps-j-04092",
+        "maps-j-04093",
+        "maps-j-04094",
+        "maps-j-04097",
+        "maps-j-04102"
+      ],
+      "semanticChange": false,
+      "beforeRecordSha256": "e8f9fa584933fdc964ea233fdead0f4c4c5af5fa181cfcc964ef9675570173ea",
+      "afterRecordSha256": "255f4116e23ebb67cf2b79c9c4c2034cf9f9f7f6b6b10f2ea6bd505d664225f8"
+    },
+    {
+      "file": "docs/transitional-switchboard.md",
+      "set": "batch-130",
+      "changedEdges": 4,
+      "edgeIds": [
+        "maps-j-08391",
+        "maps-j-08453",
+        "maps-j-08454",
+        "maps-j-08455"
+      ],
+      "semanticChange": true,
+      "beforeRecordSha256": "c92700cebaf2337a1fb88f5e30d86b59d9645698b995092d0ca62a7438c72669",
+      "afterRecordSha256": "ab34d62209986c54efa77e70269fe06b4a89e247c6c9b362b0cb81b88467203d"
+    }
+  ]
+}
