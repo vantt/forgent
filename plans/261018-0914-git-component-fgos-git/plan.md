@@ -13,6 +13,8 @@ created: 2026-10-18
 
 # Plan GIT: the fgos-git component
 
+**Status 2026-10-20:** phases 01–06 landed; phase 07 started. Board owner decision 11:34 (Asia/Saigon): foundation layers first, Work later; Git 07 no longer waits for the Event Store Work cutover. Legacy event Git duties use a temporary Work-side typed-port adapter, removed by WORK at cutover.
+
 **Approved by the owner 2026-10-18 11:44 (Asia/Saigon).** Writer machines: two, the owner machine (workspaces forgentX, mdview, mcp-skill-hub) and the second machine (`~/projects/forgent`). The third machine runs no fgOS today; if it starts, it activates the then-current release and is added to the landing list before any cutover.
 
 ## Sources (binding)
@@ -40,7 +42,7 @@ created: 2026-10-18
 | D7 | New registry row `repo-config` (mutex, repo scope, rank 80 leaf, `<fgosDir>/locks/repo-config.lock`, fence none) serializes RepositoryConfig. | Spec §18 open item 3 assigns the row to this plan. |
 | D8 | Custody: one `dispatch-cwd` lease per unit run, held by the controller from producer start through the runner commit (its git children borrow it), receipt and handoff; the supervisor declares the domain in the lease's existing predecessor record on every platform; the controller clears its own record after the receipt (recorded handoff). Admission: a best-effort domain (`linux-pgroup`, `macos-tree`) or an unprovable one is `custody-predecessor-unknown`; a producer without a declared domain is refused at start. No new record. Phase 04 lands stop-everything. | Spec §6; holder-lock §8; red team (admission holes). |
 | D9 | One-door gate = static scan (Node data flow plus Rust `Command::new`) plus a runtime spawn spy preloaded by `scripts/run-tests.mjs`; doctor `git-mutation-one-door` reads a census artifact generated at build. | Spec §12 detection rule; existing spy pattern. |
-| D10 | Workflow `integrate.mjs` deletion date: the phase 07 release, target **2026-11-13**. If the Event Store cutover slips, the date moves with it and the board row records the new date. | Spec §13 Q4 gives the date to this plan. |
+| D10 | Workflow `integrate.mjs` deletion date: the phase 07 release, target **2026-11-13**. If the phase 08 proof gate slips, the date moves with it and the board row records the new date. Event Store Work cutover no longer blocks phase 07 (owner 2026-10-20 11:34). | Spec §13 Q4 gives the date to this plan. |
 | D11 | Addon targets are the existing release targets (`src/util/release-targets.mjs`: linux-x64, windows-x64); no new target. A red windows-x64 build blocks the phase 07 release, which makes the addon required. | Spec §12 no fallback; red team (scope). |
 | D12 | The lease-lifetime change is planned here (spec §6, signed 2026-10-18) but conflicts with 6.4's recorded decision of 2026-10-16 to fold it into 6.4; Q5 asks the owner. Default: this plan owns it and 6.4 drops its fold. | Review rule: never silently undo an owner decision. |
 | D13 | Threat model: Git guarantees hold against fgOS's own and confined writers; unconfined same-user code (which can run `git commit --no-verify`) is outside, as spec §9 says for raw Git. Cheap hardening is still applied (one-shot grant, WAL root trust, config preflight). | Red team (forgery findings). |
@@ -56,14 +58,14 @@ created: 2026-10-18
 | 04 | [Custody lease across the runner commit, successor admission](./phase-04-custody-lease-and-successor-admission.md) | 6.3 landed, Q5 | opus | 20h |
 | 05 | [ScopedCommit, Sync, write-scope leaf, hook contract, cutover grant](./phase-05-scoped-commit-sync-hooks.md) | 02, 04 | opus | 32h |
 | 06 | [Land, SafeRestore, RepositoryConfig, Recovery](./phase-06-land-restore-config-recovery.md) | 02, 03, 05 | opus | 32h |
-| 07 | [Caller migration, three-core deletion, one-door gate](./phase-07-caller-migration-and-one-door.md) | 01-06, Event Store legacy cutover landed | sonnet (opus review) | 44h |
+| 07 | [Caller migration, three-core deletion, one-door gate](./phase-07-caller-migration-and-one-door.md) | 01-06; temporary Work event adapter (owner 2026-10-20 11:34) | sonnet (opus review) | 44h |
 | 08 | [Implementation-time proofs, docs, landing](./phase-08-proof-gate-docs-landing.md) | 07, Event Store V-EVENT green (E1 and E3 start after 01) | opus | 18h |
 
 ```text
 01 ──> 02 ──> 03 ──┐
  │      └──> 05 ──┴─> 06 ──> 07 ──> 08
- │   04 ──┘                   ▲
- └──> Event Store plan ──> ES legacy cutover (uses 05's cutover ScopedCommit) ──┘
+ │   04 ──┘
+ └──> Event Store plan ──> WORK cutover (later deletes the temporary event adapter)
 ```
 
 Parallel lanes: 02 ∥ 04; 03 ∥ 05 after 02. File ownership per phase is in each phase file; no two parallel phases own the same file.
@@ -72,7 +74,7 @@ Parallel lanes: 02 ∥ 04; 03 ∥ 05 after 02. File ownership per phase is in ea
 
 - **After 01:** the Publication port in Rust (in-process for `fgos-event-store`) and in the combined addon (Node), `Inspect.resolveRepo`, `RepositoryConfig.ensureFetchMapping`, the addon crate with an Event Store module slot, doctor rows and packaging. Interface in [phase 01](./phase-01-publication-port.md#interface-handed-to-the-event-store).
 - **After 05:** ScopedCommit in the main checkout under main-checkout 50 with `cutoverGrant`, and hook support for the grant (spec §7), which Event Store §18 step 5 needs.
-- The Event Store legacy cutover lands before the phase 07 release (spec §12 ordering). The Event Store plan removes the event-file allowlist rows with that cutover.
+- Owner amendment 2026-10-20 11:34: phase 07 proceeds before the Event Store Work cutover. Legacy event checkpoint/compaction and Land event duties use the temporary Work-side ScopedCommit / Checkpoint / declared-Land-path adapter described in phase 07; no raw Git allowlist is retained. WORK deletes that adapter and the legacy event duties at its Event Store cutover. Phase 08 keeps its proof gates; no partial switch reaches main.
 
 ### Event Store interface reconciliation (M1-M10)
 

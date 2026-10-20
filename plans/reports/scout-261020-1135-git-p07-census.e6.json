@@ -1,0 +1,1526 @@
+{
+  "scope": "Unit commit/sync inspected assertions only; not final whole-suite E6",
+  "retargeted": 0,
+  "retired": 0,
+  "assertions": [
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 51,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 52,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 53,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 54,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 55,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 62,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 63,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 64,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 72,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 73,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 74,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 75,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 76,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 83,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 84,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 85,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 86,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 93,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 94,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 95,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 96,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 97,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 104,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 105,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 113,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 114,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 115,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 116,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 123,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 124,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 125,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 134,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 135,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 136,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 137,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 138,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 155,
+      "column": 7,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 156,
+      "column": 7,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 162,
+      "column": 5,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 179,
+      "column": 7,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 180,
+      "column": 7,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 191,
+      "column": 23,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 192,
+      "column": 22,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 192,
+      "column": 50,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 192,
+      "column": 82,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 192,
+      "column": 106,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 193,
+      "column": 20,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 194,
+      "column": 23,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 199,
+      "column": 7,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 208,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 209,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 210,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 218,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 219,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 220,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 227,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 228,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 229,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 235,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 236,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 237,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 241,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 250,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 251,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 252,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 255,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 266,
+      "column": 5,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 267,
+      "column": 5,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 281,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 282,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 288,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 318,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 319,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 320,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 321,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 334,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 335,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 342,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 343,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 358,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 359,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 360,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 367,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 368,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 369,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 373,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 377,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 385,
+      "column": 5,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 389,
+      "column": 3,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 403,
+      "column": 5,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/runner/execution/commit-unit-work.test.mjs",
+      "line": 403,
+      "column": 48,
+      "label": "kept",
+      "target": "legacy (migration pending)"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 21,
+      "column": 106,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 27,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 32,
+      "column": 45,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 32,
+      "column": 85,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 33,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 34,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 35,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 39,
+      "column": 122,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 46,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 46,
+      "column": 68,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 46,
+      "column": 159,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 53,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 54,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 54,
+      "column": 108,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 64,
+      "column": 47,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 64,
+      "column": 109,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 65,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 73,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 76,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 77,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 96,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 97,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 103,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 105,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 105,
+      "column": 74,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 106,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 108,
+      "column": 80,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 109,
+      "column": 156,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 143,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 144,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 145,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 145,
+      "column": 74,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 146,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 146,
+      "column": 71,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 146,
+      "column": 145,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 146,
+      "column": 208,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 146,
+      "column": 298,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 146,
+      "column": 361,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 146,
+      "column": 455,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 147,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 147,
+      "column": 97,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 155,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 157,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 158,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 165,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 166,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 167,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 167,
+      "column": 60,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 168,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 177,
+      "column": 3,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 177,
+      "column": 53,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 178,
+      "column": 3,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 184,
+      "column": 3,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 185,
+      "column": 3,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 186,
+      "column": 3,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 187,
+      "column": 3,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 198,
+      "column": 3,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 198,
+      "column": 44,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 199,
+      "column": 3,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 200,
+      "column": 3,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 204,
+      "column": 3,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 205,
+      "column": 3,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 217,
+      "column": 3,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 218,
+      "column": 3,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 218,
+      "column": 76,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 219,
+      "column": 3,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 219,
+      "column": 75,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 229,
+      "column": 3,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 230,
+      "column": 3,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 231,
+      "column": 3,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 245,
+      "column": 7,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 246,
+      "column": 7,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 248,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 250,
+      "column": 7,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 252,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 262,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 264,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 274,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 275,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 277,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 285,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 287,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 297,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/scoped-commit.test.mjs",
+      "line": 299,
+      "column": 5,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 20,
+      "column": 101,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 26,
+      "column": 106,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 26,
+      "column": 140,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 27,
+      "column": 2,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 28,
+      "column": 60,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 28,
+      "column": 94,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 29,
+      "column": 2,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 30,
+      "column": 2,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 31,
+      "column": 2,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 36,
+      "column": 2,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 37,
+      "column": 92,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 37,
+      "column": 137,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 38,
+      "column": 123,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 39,
+      "column": 121,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 39,
+      "column": 157,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 44,
+      "column": 2,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 44,
+      "column": 84,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 44,
+      "column": 168,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 44,
+      "column": 254,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 45,
+      "column": 2,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 48,
+      "column": 2,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 56,
+      "column": 2,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 57,
+      "column": 2,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 58,
+      "column": 2,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 65,
+      "column": 2,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 66,
+      "column": 2,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 67,
+      "column": 2,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 68,
+      "column": 2,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 69,
+      "column": 2,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 70,
+      "column": 2,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 74,
+      "column": 2,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 81,
+      "column": 3,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 83,
+      "column": 3,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 86,
+      "column": 110,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 91,
+      "column": 4,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 92,
+      "column": 4,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 93,
+      "column": 4,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 94,
+      "column": 4,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 103,
+      "column": 3,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 105,
+      "column": 3,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 106,
+      "column": 3,
+      "label": "kept",
+      "target": "native port"
+    },
+    {
+      "file": "test/git/sync.test.mjs",
+      "line": 106,
+      "column": 84,
+      "label": "kept",
+      "target": "native port"
+    }
+  ]
+}
