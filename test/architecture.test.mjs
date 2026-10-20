@@ -882,7 +882,7 @@ test('A4 boundary guard: dispatch, execution, the dispatch barrel and src/workfl
       .filter((m) => path.posix.normalize(path.posix.join(path.posix.dirname(from), m[3])) === to)
       .map((m) => m[1].split(',').map((x) => x.trim()).filter(Boolean).join(', '));
     assert.deepEqual(named, [imports], edge);
-    assert.equal((source.match(new RegExp(`['"][^'"]*${path.posix.basename(to)}['"]`, 'g')) ?? []).length, 1, `${edge}: imported once, by name`);
+    assert.equal(resolvedRelativeImports(from, source).filter((dep) => dep === to).length, 1, `${edge}: imported once, by name`);
   }
 });
 

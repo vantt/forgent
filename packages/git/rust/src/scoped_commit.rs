@@ -45,8 +45,12 @@ impl LegacyEventLayout {
         let mut seen = BTreeSet::new();
         for p in &self.exact_paths {
             let shard = p.strip_prefix(".fgos/events/").is_some_and(|name| {
-                let name = name.strip_prefix("archive/").unwrap_or(name);
-                !name.is_empty() && !name.contains('/') && name.ends_with(".jsonl")
+                let archived = name.strip_prefix("archive/");
+                let name = archived.unwrap_or(name);
+                !name.is_empty() && !name.contains('/')
+                    && (name.ends_with(".jsonl")
+                        || (archived.is_some() && name.strip_suffix(".manifest.json")
+                            .is_some_and(|stem| !stem.is_empty())))
             });
             if !seen.insert(p) || !(p == ".fgos/events.jsonl" || p == ".fgos/porting/events.jsonl" || shard)
                 || crate::fgos_scope_literal(p).is_err() {

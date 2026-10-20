@@ -456,9 +456,11 @@ impl GitDriver {
         };
         #[cfg(unix)]
         if let Some(path) = existing {
+            if !missing(Path::new(path))? {
             let custody = crate::refs::custody_lock_path(repo, Path::new(path))?;
             resource_set.push(format!("worktree:{path}:custody:{}", custody.display()));
             resource_set.sort();
+            }
         }
         admission(wal, id, &resource_set)?;
         let request_digest =
@@ -532,7 +534,10 @@ impl GitDriver {
         id: &str,
     ) -> Result<WorktreeHandle> {
         let scope = self.worktree_scope(repo, held)?;
-        self.create_worktree_locked(repo, &scope, input, writer, id, false)
+        // Like commit/sync, cache stamp-validated facts only for this operation.
+        // Every child still revalidates topology, config stamps and its borrower.
+        let current = self.checkout_repository(repo)?;
+        self.create_worktree_locked(&current, &scope, input, writer, id, false)
     }
     /// Detached session allocation owns only its mkdtemp directory on failure.
     #[allow(clippy::too_many_arguments)]
@@ -547,6 +552,8 @@ impl GitDriver {
         id: &str,
     ) -> Result<WorktreeHandle> {
         let scope = self.worktree_scope(repo, held)?;
+        let current = self.checkout_repository(repo)?;
+        let repo = &current;
         if !wal::valid_id(session_id) {
             return Err(failure("invalid-session-id"));
         }
@@ -1197,6 +1204,81 @@ impl GitDriver {
             }
         }
         Ok(issues)
+    }
+    /// Inspect an absent checkout's registration and require a successful owned
+    /// create record. Record the exact removal before touching admin evidence.
+    pub fn prune_missing_worktree(
+        &self,
+        repo: &RepoHandle,
+        held: Vec<BorrowedHandle<'_>>,
+        path: &Path,
+        writer: &str,
+        id: &str,
+    ) -> Result<()> {
+        let scope = self.worktree_scope(repo, held)?;
+        let path = canonical_destination(path)?;
+        if !missing(&path)? {
+            return Err(failure("worktree-prune-path-present"));
+        }
+        let wal = Wal::open(repo).map_err(failure)?;
+        if existing(&wal, id)?.is_some() {
+            return self.repair_worktree_locked(repo, &scope, id);
+        }
+        let issues = self.inspect_worktree_orphans(repo)?;
+        let issue = issues.iter().find(|issue| issue.path == path
+            && issue.reason == "missing-worktree-preserved")
+            .ok_or_else(|| failure("worktree-prune-registration-unproven"))?;
+        let admin = repo.common_dir().join("worktrees").join(&issue.registration);
+        let identity = admin_identity(&admin)?;
+        if !missing(&admin.join("locked"))? {
+            return Err(failure("worktree-user-locked"));
+        }
+        let common = fs::read_to_string(admin.join("commondir")).map_err(failure)?;
+        if admin.join(common.trim_end()).canonicalize().map_err(failure)? != repo.common_dir() {
+            return Err(recovery("worktree-admin-backlink-changed"));
+        }
+        let scan = wal.scan(100_000).map_err(failure)?;
+        if !scan.complete || scan.entries.iter().any(|entry| entry.error.is_some()) {
+            return Err(recovery("git-wal-unreadable"));
+        }
+        let mut owned = None;
+        for entry in scan.entries {
+            let Some(chain) = existing(&wal, &entry.operation_id)? else { continue };
+            if matches!(&chain.intent().kind, OperationKind::WorktreeCreate {
+                path: created, registration, ..
+            } if created.as_ref() == text(&path)? && registration.as_ref() == issue.registration)
+                && matches!(chain.outcome(), Some(Outcome::Worktree { completed: true, .. })) {
+                owned = Some(entry.operation_id);
+                break;
+            }
+        }
+        let owned = owned.ok_or_else(|| failure("worktree-prune-ownership-unproven"))?;
+        // Resolve the registered admin HEAD, never a vanished worker gitfile.
+        let head = fs::read_to_string(admin.join("HEAD")).map_err(failure)?;
+        let tip = if let Some(name) = head.trim_end().strip_prefix("ref: ") {
+            match self.resolve_ref(repo, &RefName::parse(name).map_err(failure)?)? {
+                RefValue::Direct(tip) => tip,
+                _ => return Err(failure("worktree-prune-tip-unproven")),
+            }
+        } else {
+            Oid::parse(head.trim_end(), repo.object_format()).map_err(failure)?
+        };
+        let evidence = wal::canonical_digest(&(owned, text(&path)?, &identity)).map_err(failure)?;
+        let chain = self.begin_worktree(repo, &scope, &wal,
+            OperationKind::WorktreeRemove {
+                path: text(&path)?.into(), registration: issue.registration.clone().into(),
+                registration_identity: identity.clone().into(),
+                delivery: Box::new(wal::WorktreeDeliveryBinding {
+                    delivered_to: tip.as_str().into(), evidence_digest: evidence.clone(),
+                }),
+            }, writer, id, Tip::Oid(tip.as_str().into()), Tip::Absent)?;
+        let attempted = wal.append(&chain, Phase::TargetAttempt {
+            prior_target_attempt: None, expected: chain.intent().expected.clone(), next: Tip::Absent,
+        }).map_err(failure)?;
+        self.prune_owned_registration(&scope, &admin, text(&path)?, &identity)
+            .map_err(|error| pending(error, id))?;
+        self.finish_worktree(repo, &scope, &wal, &attempted, true,
+            vec![format!("missing checkout; owned create evidence: {evidence}")])
     }
     /// Prune is operation-specific; Git's global prune could destroy unrelated evidence.
     pub fn prune_worktree(

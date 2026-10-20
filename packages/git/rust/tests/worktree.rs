@@ -640,3 +640,25 @@ fn lock_naming_a_dead_or_unparseable_or_reused_owner_stays_a_finding() {
     late.wait().unwrap();
     assert_eq!(got, "locked-registration");
 }
+
+#[test]
+fn missing_checkout_prune_requires_owned_create_and_preserves_unknown_residue() {
+    let f = Fixture::new();
+    let owned = f.root.join("owned");
+    f.create(&owned);
+    let admin = f.repo.common_dir().join("worktrees/owned");
+    fs::remove_dir_all(&owned).unwrap();
+    fs::write(admin.join("unknown"), "keep").unwrap();
+    assert!(f.driver.prune_missing_worktree(&f.repo, vec![], &owned, "fixture", "prune")
+        .unwrap_err().cause.contains("residue-uncertain"));
+    assert!(admin.join("HEAD").exists());
+    fs::remove_file(admin.join("unknown")).unwrap();
+    f.driver.prune_missing_worktree(&f.repo, vec![], &owned, "fixture", "prune").unwrap();
+    assert!(!admin.exists());
+    let unowned = f.root.join("unowned");
+    git(&f.path, &["worktree", "add", "--detach", unowned.to_str().unwrap()]);
+    fs::remove_dir_all(&unowned).unwrap();
+    assert!(f.driver.prune_missing_worktree(&f.repo, vec![], &unowned, "fixture", "unowned-prune")
+        .unwrap_err().cause.contains("ownership-unproven"));
+    assert!(f.repo.common_dir().join("worktrees/unowned/HEAD").exists());
+}

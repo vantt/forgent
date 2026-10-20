@@ -34,6 +34,20 @@ test('temporary Work declaration admits exact legacy events on main only',()=>{
   const moved=commitLegacyEventFiles(options,{files:[old,archived],baseline:moveBaseline,message:'chore(work): archive',operationId:'archive'});
   assert.equal(moved.status,'committed');assert.deepEqual(moved.files,[archived,old]);
   assert.equal(git('show',`HEAD:${archived}`),'base\nevent');
+  const manifest='.fgos/events/archive/moved.manifest.json';
+  const manifestBaseline=createGitScopedCommit(options).preflight();
+  fs.writeFileSync(path.join(temp,manifest),JSON.stringify({archive:archived})+'\n');
+  const manifested=commitLegacyEventFiles(options,{files:[manifest],baseline:manifestBaseline,message:'chore(work): archive manifest',operationId:'archive-manifest'});
+  assert.equal(manifested.status,'committed');assert.deepEqual(manifested.files,[manifest]);
+  fs.appendFileSync(path.join(temp,manifest),'\n');
+  assert.equal(checkpointLegacyEventFiles(options,{files:[manifest],message:'chore(work): manifest checkpoint',operationId:'manifest-checkpoint'}).status,'committed');
+  const deleteManifestBaseline=createGitScopedCommit(options).preflight();
+  fs.rmSync(path.join(temp,manifest));
+  const deletedManifest=commitLegacyEventFiles(options,{files:[manifest],baseline:deleteManifestBaseline,message:'chore(work): remove archive manifest',operationId:'manifest-delete'});
+  assert.equal(deletedManifest.status,'committed');assert.deepEqual(deletedManifest.files,[manifest]);
+  for(const bad of ['.fgos/events/moved.manifest.json','.fgos/events/archive/.manifest.json','.fgos/events/archive/nested/a.manifest.json','.fgos/events/archive/a.manifest.json.extra']) {
+   assert.throws(()=>checkpointLegacyEventFiles(options,{files:[bad],message:'refuse',operationId:'bad-manifest-'+bad.replaceAll('/','-')}),/invalid-legacy-event-path/);
+  }
   const linked=path.join(temp,'linked');git('worktree','add','-qb','worker',linked);
   assert.throws(()=>checkpointLegacyEventFiles({...options,repoPath:linked},{files,message:'refuse',operationId:'linked'}),/main-required/);
   assert.throws(()=>commitLegacyEventFiles(options,{files:['.fgos/events/../config.json'],baseline:createGitScopedCommit(options).preflight(),message:'refuse',operationId:'traversal'}),/invalid-legacy-event-path/);

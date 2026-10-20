@@ -458,7 +458,7 @@ export function reclaimOrphanedCheckout(repoRoot, branch, { callerCwd = process.
     }
   } else {
     try {
-      pruneWorktrees(repoRoot);
+      worktreePort(repoRoot).prune({ path: orphanPath, operationId: operationId() });
     } catch (err) {
       throw new WorktreeError(
         `pruning stale worktree registration for "${branch}" (path already gone: "${orphanPath}") failed: ${err.message}`,
@@ -512,7 +512,7 @@ function relocateOrphanedCheckout(repoRoot, branch, targetPath) {
 
   if (!fs.existsSync(orphanPath)) {
     try {
-      pruneWorktrees(repoRoot);
+      worktreePort(repoRoot).prune({ path: orphanPath, operationId: operationId() });
     } catch (err) {
       throw new WorktreeError(
         `pruning stale worktree registration for "${branch}" (path already gone: "${orphanPath}") failed: ${err.message}`,
