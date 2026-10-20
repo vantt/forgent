@@ -1089,3 +1089,38 @@ than exempting those files. New findings fail; removed findings must be removed
 from the list. The generic scanner still returns those findings; E3 remains its
 only fixture exemption class. WORK/Git caller cutover must remove these findings
 before claiming the whole-repository zero-legacy gate.
+
+
+### Store read latency refinement (2026-10-20, dormant)
+
+The retained cursor records `verifiedTips`, exact ref-name/OID bindings from a
+complete, undeferred read. Every new read observes the actual refs through Git
+Inspect. Only a matching binding at a certified tip, with the same query and
+retained history, can avoid reloading that tip's header. New names, moved refs,
+lost history and deferred reads still verify the DAG; mirror rewind checks remain.
+Old cursors without bindings take the verification path. Legacy reads reuse only
+the current command's authority, HEAD and legacy-ref observation when discovering
+and reading the old consumer roots. No driver-side HEAD/ref snapshot is reused across commands; cursor bindings are
+cache keys checked against freshly observed refs.
+
+The Node facade attaches an opaque native envelope-validation proof to each
+returned sequence using a weak association owned by that consumer view. It is
+neither a hidden current-state cache nor durable truth. Each supplied envelope is
+compared in full with this proof; an edited or unrecognized envelope undergoes
+normal hash validation. A copied, serialized or lost view works through ordinary
+verification. Every call still reads local bytes and observes current Git refs
+and HEAD. The native boundary takes retained JSON in one transfer and returns only
+the sequence suffix after an exactly equal retained prefix; the facade returns
+the same complete public sequence and fold decision as before.
+
+The existing verified active-frame cache compares actual marker-closed prefix
+bytes and decoding authority on every read, verifies the entire new/speculative
+tail and checks sequence continuity across the boundary. Rewritten prefixes use
+the full verifier. Its existing 4 MiB bound remains. Append retains all three
+steady-state fsyncs and every initialization/recovery durability barrier.
+
+The store benchmark advances its own cursor with `readInGate`'s tail before
+append and records `outsideReadMs` for every mutation and outside-read p50/p95
+per session count. Its 60-second limit and 50 ms p95 budget are unchanged. Host
+acceptance still requires all 1/10/15/20-session rows; sandbox diagnostics do not
+establish that acceptance. Work remains unwired.

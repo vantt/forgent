@@ -149,6 +149,7 @@ async function storeIncrementBenchmark({root,out,sessions,filesystem,checkout,st
       }
       const increments=observations.map(o=>o.storeIncrementMs), upperBounds=observations.map(o=>o.incrementUpperBoundMs), waits=observations.map(o=>o.waitMs);
       const row={seed,sessions:concurrency,mutations:observations.length,elapsedMs,windows,spawns,
+        outsideRead:{p50Ms:percentile(observations.map(o=>o.outsideReadMs),.5),p95Ms:percentile(observations.map(o=>o.outsideReadMs),.95)},
         incrementUpperBoundP95Ms:percentile(upperBounds,.95),
         storeIncrementP50Ms:percentile(increments,.5),storeIncrementP95Ms:percentile(increments,.95),
         stages:Object.fromEntries(['readInGate','append','fold','prepareEvents','cacheWrite'].map(stage=>[stage,{

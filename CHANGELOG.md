@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Reduce dormant Event Store read overhead through validated retained views and current-command Git fact reuse; verify only new active-log tails, preserve append durability, and fix concurrent store benchmark cursors with explicit outside-read timings.
+
 - Keep Event Store retired-path enforcement dormant until the tracked cutover fence; preserve append root durability, tolerate partial maintenance headers, and expose an absent local origin as `null`. Dormant door checks tolerate unrelated Work edits.
 
 - Harden the dormant Event Store: reuse verified reads and stamped Git configuration, avoid syncing untouched directories, expose local maintenance facts and canonical branch keys, and block retired event paths and event-ref bypasses. Store latency benchmarks can seed realistic history without a Work consumer.

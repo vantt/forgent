@@ -35,7 +35,9 @@ export function runWorker([repo,stateRoot,manifestPath,releaseRoot,index,count,b
   let snapshot;
   for(let i=0;i<Number(count);i++){
     const start=performance.now();
+    const readStart=performance.now();
     const read=store.read({streams:['project'],cursor:snapshot?.cursor,folded:snapshot?.sequence??[]},[]);
+    const outsideReadMs=performance.now()-readStart;
     snapshot=read;
     const view=Object.fromEntries(read.sequence.map(e=>[e.payload.id,e.payload]));
     const requested=performance.now();let gateStart,gateEnd;const stages={prepareEvents:0};
@@ -46,14 +48,16 @@ export function runWorker([repo,stateRoot,manifestPath,releaseRoot,index,count,b
       const tail=timed('readInGate',()=>store.readInGate(store.ownOrigin,'project',read.cursor.cover[`${store.ownOrigin}:project`]??0));
       const input={eventType:'benchmark.created',schemaVersion:1,payload:{id:`s${index}-${i}`,title:'latency'},ts:new Date().toISOString()};
       if(trace==='yes')fs.writeSync(2,`ES_APPEND_BEGIN:${index}\n`);
-      const ack=timed('append',()=>store.append('project',[input],read.cursor.cover,`session-${index}`,[60]));
+      const cursor={...read.cursor.cover};
+      for(const event of tail.events)cursor[`${event.origin}:${event.stream}`]=event.seq;
+      const ack=timed('append',()=>store.append('project',[input],cursor,`session-${index}`,[60]));
       if(trace==='yes')fs.writeSync(2,`ES_APPEND_END:${index}\n`);
       timed('fold',()=>{for(const e of [...tail.events,...ack.events])view[e.payload.id]=e.payload;});
       timed('cacheWrite',()=>{const tmp=cache+`.${index}.tmp`;fs.writeFileSync(tmp,JSON.stringify(view));fs.renameSync(tmp,cache);});
       if(trace==='yes')fs.writeSync(2,`ES_GATE_END:${index}\n`);
       gateEnd=performance.now();
     },{prefetched:{writer:`session-${index}`,eventStore:store}});
-    observations.push({incrementUpperBoundMs:gateEnd-gateStart,waitMs:gateStart-requested,totalMs:performance.now()-start,stages,storeIncrementMs:stages.readInGate+stages.append+stages.fold});
+    observations.push({outsideReadMs,incrementUpperBoundMs:gateEnd-gateStart,waitMs:gateStart-requested,totalMs:performance.now()-start,stages,storeIncrementMs:stages.readInGate+stages.append+stages.fold});
   }
   console.log(JSON.stringify({index:Number(index),observations}));
 }

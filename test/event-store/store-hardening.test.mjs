@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { fixture, append, loaderOptions, addon } from './phase07-fixture.mjs';
 import { branchKey } from '../../src/event-store/index.mjs';
 import { benchmarkStore, seedStore } from '../../scripts/event-store/store-increment-worker.mjs';
@@ -123,4 +123,51 @@ test('Inspect config reuse rejects changed stamps and recovers after repair',t=>
   assert.throws(()=>f.store.read({streams:['project']},[]));
   f.git('config','--unset','include.path');
   assert.deepEqual(f.store.read({streams:['project']},[]).sequence,[]);
+});
+
+
+test('retained native view rejects edited envelopes and an ordinary copied view still verifies',t=>{
+  const {store}=fixture(t);
+  append(store,[{payload:{id:'retained',title:'original'}}]);
+  store.seal('project',[]);
+  const first=store.read({streams:['project']},[]);
+  const next=store.read({streams:['project'],cursor:first.cursor,folded:first.sequence},[]);
+  assert.deepEqual(next.sequence,first.sequence);
+  assert.notEqual(next.sequence[0],first.sequence[0]);
+  assert.equal('sequencePrefix' in next,false);
+  const copied=structuredClone(next.sequence);
+  assert.deepEqual(store.read({streams:['project'],cursor:next.cursor,folded:copied},[]).sequence,copied);
+  next.sequence[0].payload.title='tampered';
+  assert.throws(()=>store.read({streams:['project'],cursor:next.cursor,folded:next.sequence},[]),/event hash mismatch/);
+});
+
+test('concurrent benchmark sessions advance the own cursor with the in-gate tail',async t=>{
+  const f=fixture(t);f.git('config','fgos.machineId','spawn-benchmark');
+  const manifest=path.join(f.temp,'native-addon.json');
+  fs.writeFileSync(manifest,JSON.stringify(loaderOptions.descriptor.manifest));
+  const root=loaderOptions.descriptor.releaseRoot;
+  const store=benchmarkStore(f.repo,f.stateRoot,manifest,root);
+  seedStore(store,{items:5});
+  const barrier=path.join(f.temp,'concurrent-barrier');fs.mkdirSync(barrier);
+  const pending=[];const children=[];
+  for(let i=0;i<4;i++){
+    const child=spawn(process.execPath,[path.join(root,'scripts/event-store/store-increment-worker.mjs'),f.repo,f.stateRoot,manifest,root,String(i),'4',barrier,'no']);
+    children.push(child);let stdout='',stderr='';
+    child.stdout.on('data',b=>stdout+=b);child.stderr.on('data',b=>stderr+=b);
+    pending.push(new Promise((resolve,reject)=>{
+      child.on('error',reject);child.on('close',code=>code===0?resolve(JSON.parse(stdout)):reject(Error(stderr)));
+    }));
+  }
+  t.after(()=>children.forEach(c=>{if(c.exitCode===null)c.kill('SIGKILL');}));
+  const completed=Promise.all(pending);
+  const deadline=Date.now()+20000;
+  while(!children.every((_,i)=>fs.existsSync(path.join(barrier,`${i}.ready`)))){
+    assert.ok(Date.now()<deadline,'workers reach the barrier');
+    await Promise.race([completed.then(()=>{throw Error('workers exited before barrier');}),new Promise(r=>setTimeout(r,10))]);
+  }
+  fs.writeFileSync(path.join(barrier,'go'),'go');
+  const results=await completed;
+  assert.equal(results.flatMap(r=>r.observations).length,16);
+  assert.ok(results.every(r=>r.observations.every(o=>o.outsideReadMs>0)));
+  assert.equal(store.read({streams:['project']},[]).sequence.length,21);
 });

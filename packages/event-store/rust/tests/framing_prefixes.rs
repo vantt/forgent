@@ -86,3 +86,47 @@ fn wrong_checksum_marker_and_complete_unmarked_lines_never_fold() {
     assert!(repo.append_cursor(1, &Default::default()).is_err());
     assert_eq!(fs::read(paths.active()).unwrap(), bad);
 }
+
+#[test]
+fn cached_prefix_verifies_growing_tail_and_cross_boundary_sequence() {
+    let repo = Repo::new();
+    let origin = repo.append(1).ack.origin;
+    let bytes = fs::read(repo.layout.stream(&repo.stream).active()).unwrap();
+    decode(&bytes, &origin, &repo.stream, false).unwrap();
+    let second = batch(&origin, 2, 1);
+    let torn = [bytes.as_slice(), &second[..second.len() - 1]].concat();
+    assert_eq!(
+        decode(&torn, &origin, &repo.stream, false)
+            .unwrap()
+            .events
+            .len(),
+        1
+    );
+    let complete = [bytes.as_slice(), second.as_slice()].concat();
+    assert_eq!(
+        decode(&complete, &origin, &repo.stream, false)
+            .unwrap()
+            .events
+            .len(),
+        2
+    );
+    // A valid marker cannot legitimize a sequence gap across the reused boundary.
+    let gap = [complete.as_slice(), batch(&origin, 4, 1).as_slice()].concat();
+    assert_eq!(
+        decode(&gap, &origin, &repo.stream, false)
+            .unwrap_err()
+            .code
+            .as_str(),
+        "event-store-seq-recovery-conflict"
+    );
+    let mut damaged = complete;
+    let offset = damaged.windows(8).position(|b| b == b"work.add").unwrap();
+    damaged[offset] = b'X';
+    assert_eq!(
+        decode(&damaged, &origin, &repo.stream, false)
+            .unwrap_err()
+            .code
+            .as_str(),
+        "event-store-integrity"
+    );
+}

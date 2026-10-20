@@ -1,4 +1,5 @@
 //! Outside-gate read: local files, stable tip observations, Git coverage, order.
+pub use crate::order::VerifiedView;
 use crate::{
     append::Positions,
     cursor::{fold_answer, Cursor, Fold},
@@ -7,7 +8,7 @@ use crate::{
     layout::{Layout, StreamId},
     legacy::{self, LegacyEvent},
     open_read::read_own,
-    order::{order, stream_key},
+    order::{order, order_retained, stream_key},
     walk::{self, blob, git_error},
 };
 use fgos_git::{HeadFact, Inspect, ObjectType, Oid, RefPrefix, RefValue, RepoHandle};
@@ -23,6 +24,7 @@ pub struct ReadResult {
     pub cursor: Cursor,
     pub fold: Fold,
     pub full_order: Vec<String>,
+    pub verified_view: VerifiedView,
 }
 pub struct ReadRequest<'a> {
     pub layout: &'a Layout,
@@ -201,13 +203,16 @@ fn read_legacy(
         crate::fence::validate_refs(Some(&oid), refs.values())?;
         legacy_files(port, repo, &oid, streams)
     } else {
-        if matches!(
-            head,
-            HeadFact::Unborn { .. }
-        ) {
+        if matches!(head, HeadFact::Unborn { .. }) {
             return Ok(Vec::new());
         }
-        crate::legacy_import::read_consumer_from_head(port, repo, streams)
+        crate::legacy_import::read_consumer_at(
+            port,
+            &authority,
+            streams,
+            &head,
+            refs.get("refs/fgos/legacy"),
+        )
     }
 }
 /// Must be called outside state rank 60. Local reads precede ref observations.
@@ -215,6 +220,16 @@ pub fn read(
     port: &dyn Inspect,
     repo: &RepoHandle,
     req: ReadRequest<'_>,
+) -> Result<ReadResult, Error> {
+    read_with_view(port, repo, req, None)
+}
+/// Reuse only exact envelopes from a previously verified consumer view.
+/// Changed input still undergoes ordinary validation; Git facts never reuse.
+pub fn read_with_view(
+    port: &dyn Inspect,
+    repo: &RepoHandle,
+    req: ReadRequest<'_>,
+    view: Option<&VerifiedView>,
 ) -> Result<ReadResult, Error> {
     let mut local = Vec::new();
     for stream in req.streams {
@@ -252,7 +267,18 @@ pub fn read(
     let oids: Vec<_> = tips.iter().map(|t| t.oid.clone()).collect();
     let mut walked = walk::Walked::default();
     let mut own_published = Positions::new();
+    // A certified object is reusable only under the exact namespace binding
+    // that was verified with the retained view. Re-observe every ref first;
+    // a new name, moved ref, lost view or deferred history runs the verifier.
+    let unchanged = |tip: &Tip| {
+        have_history
+            && certificates.contains(tip.oid.as_str())
+            && req.cursor.verified_tips.get(&tip.name).map(String::as_str) == Some(tip.oid.as_str())
+    };
     for tip in &tips {
+        if unchanged(tip) {
+            continue;
+        }
         let part = walk::walk_verified(
             port,
             repo,
@@ -282,7 +308,7 @@ pub fn read(
             .and_modify(|n| *n = (*n).max(*seq))
             .or_insert(*seq);
     }
-    for tip in tips.iter().filter(|t| t.mirror) {
+    for tip in tips.iter().filter(|t| t.mirror && !unchanged(t)) {
         let mirror_stops = if req.cursor.mirror_tips.contains_key(&tip.name) {
             certificates.clone()
         } else {
@@ -326,7 +352,7 @@ pub fn read(
                 .is_some_and(|high| e.seq <= *high)
     });
     walk::check_contiguous(&union, &Positions::new())?;
-    let ordered = order(&union, &Positions::new(), req.project)?;
+    let ordered = order_retained(&union, &Positions::new(), req.project, view)?;
     let mut cursor = Cursor {
         certified: certificates,
         streams: query,
@@ -347,6 +373,11 @@ pub fn read(
             .certified
             .extend(oids.iter().map(|o| o.as_str().into()));
     }
+    cursor.verified_tips = tips
+        .iter()
+        .filter(|t| cursor.certified.contains(t.oid.as_str()))
+        .map(|t| (t.name.clone(), t.oid.as_str().into()))
+        .collect();
     cursor.mirror_tips = tips
         .iter()
         .filter(|t| t.mirror)
@@ -403,6 +434,9 @@ pub fn read(
     };
     Ok(ReadResult {
         events: delta,
+        verified_view: VerifiedView {
+            events: ordered.events.clone(),
+        },
         sequence: ordered.events,
         legacy,
         deferred: ordered.deferred,
