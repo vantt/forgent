@@ -50,6 +50,7 @@ Out of scope for the first slice, recorded in section 15 so the interfaces keep 
 - acknowledgement (`acked`), `handled`, `reply_by`, expiry with dead letters, approval (`held`);
 - delivery between machines and anything pushed to a Git remote;
 - the pi and omp adapters;
+- headless workers (`cli-spawn`, no pane and no tty): the first slice serves sessions in a terminal; a headless worker is one Unit run owned by the runner (section 15.7);
 - human-addressed groups, the rate limit per machine and the collapse of identical bodies.
 
 Out of scope for good:
@@ -453,6 +454,10 @@ Not done in the first slice because no named consumer needs a message to survive
 
 Reasons it may be done later, kept so the decision is not rebuilt from nothing: a message to a worker on another machine that restarts (needs a name that survives a restart); a long-lived coordinator resumed over days that still expects its waiting mail; and the council round 2 finding that a successor taking a name must not receive stale instructions, which needs a binding generation. Revisit trigger: a named consumer needs mail to survive a restart of the recipient. Measured 2026-10-20 (plans/reports/research-261020-1457-mailbox-claude-busy-socket-and-subagent-probe.md, Claude Code 2.1.304, `claude -p`, one run): the `session_id` stayed the same across `--resume <id>` and `--continue` and both appended to the same transcript, while the process id and the socket path changed for every process. So for Claude Code a durable address would key on `session_id`, never on the pid or the socket. Not measured: the interactive REPL, `--fork-session`, resume after `/compact`, and the same question for Codex, pi, omp and agy.
 
+### 15.7 Headless workers (not in the first slice)
+
+fgOS starts some workers headless (`cli-spawn`: no pane, no tty) and some in a pane (`herdr-spawn`). Owner, 2026-10-20: the terminal case is the fuller one and comes first; a headless worker is not built first. Differences recorded for later: a headless worker cannot be woken by a typed signal and has no idle state to wake (it runs one Unit and exits), so it can only be reached at a checkpoint (tier `turn`); hooks do run in print mode (the Stop gate was measured on `claude -p`, `codex exec` and the others, `plans/reports/research-261019-1653-mailbox-delivery-cli-probe.md` measurement 1). Steering a running Unit belongs to the runner (section 15.4).
+
 ### 15.6 Subagents and teammates: out of scope by principle
 
 **Principle (owner, 2026-10-20): work with the boss, never reach past the boss into the people who work for them.** The mailbox addresses the head of a CLI. Whatever a head delegates to its subagents or teammates is the head's own business; the mailbox never addresses, wakes, steers or injects into them. A message for the head reaches the head, and the head decides whether to pass any of it on. Reasons that support the principle: the head owns the context and the authority of its helpers; a message placed directly into a subordinate bypasses the head's framing and its judgement (section 8); Claude Code itself sends a subagent's outgoing message under the parent's address; and fgOS starts every worker it controls as its own CLI process, so anything fgOS needs to address is already a head.
@@ -493,6 +498,7 @@ For the other CLIs, research report 261015 records that a subagent's outgoing me
 | 2026-10-19 | Council round 2 design changes: drain verb plus a nudge-only port; derived reply link; lazy deadlines; file-per-message record; hook installer table and guard; S1 is Claude end to end | council, applied by the controller | applied in this revision, awaiting owner sign-off with the rest of the spec; plans/reports/research-261019-1834-mailbox-spec-council-round2.md |
 | 2026-10-20 | An address belongs to a terminal plus the head of the CLI in it; a subagent is not addressed directly; one clone per project per machine with many worktrees is assumed (this machine has one clone of the repository and linked worktrees; other machines not seen) | owner | agreed provisionally; research A confirms |
 | 2026-10-20 | Durable sessions are not done in the first slice; recorded in section 15.5 as not done and possibly done later, not removed | owner | accepted |
+| 2026-10-20 | The first slice serves sessions in a terminal (pane or tty); headless workers come later (section 15.7) | owner | accepted |
 | 2026-10-20 | Delegation boundary: the mailbox works with the head of a CLI and never reaches into its subagents or teammates (owner: work with the boss, do not reach into the boss's staff) | owner | accepted as a principle; section 15.6; the `drain` rule for `agent_id` events follows from it |
 
 ## 18. Evidence and limits
