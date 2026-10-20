@@ -214,6 +214,21 @@ function leftByDeadController(attempt, assignmentsDir) {
   return prior !== null && fs.existsSync(path.join(prior.dir, 'envelope.json'));
 }
 
+/** The newest `seatSchema` of a unit record this release can resume. It writes none, so a record that
+ * carries the field came from a newer release: resuming it here would run it under rules this release
+ * does not know. Read-only inspection of the record is unaffected. */
+const KNOWN_SEAT_SCHEMA = 0;
+
+function assertRecordNotFromNewerRelease(unitRunId, unitRecord) {
+  const schema = unitRecord?.seatSchema;
+  if (schema === undefined || schema === null) return;
+  if (typeof schema === 'number' && schema <= KNOWN_SEAT_SCHEMA) return;
+  throw new RunnerConfigError(
+    `cannot resume unit run "${unitRunId}": unit.json field seatSchema is ${JSON.stringify(schema)}, written by a newer release than this one; resume it with that release`,
+    { code: 'record-from-newer-release' },
+  );
+}
+
 /**
  * A resume never starts a second agent over an attempt the previous controller left: an attempt whose
  * supervisor still works (or an adopter) is named and refused, an attempt from before the run supervisor
@@ -541,6 +556,7 @@ async function runUnitBody(options, scope) {
     }
     scope.control = control;
     unitRecord = JSON.parse(fs.readFileSync(unitJsonPath, 'utf8'));
+    assertRecordNotFromNewerRelease(unitRunId, unitRecord);
     unit = validateUnit(unitRecord.unit);
     // A writing run is never resumed without the port, and a standalone one only into a free worktree.
     const resumeLink = normalizeWorkflowLink(unitRecord.workflow);

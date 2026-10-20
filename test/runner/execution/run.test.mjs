@@ -744,6 +744,23 @@ test('a unit-run input reaches the roles as the absolute path of that role\'s re
   await assert.rejects(() => run(undefined, { resumeUnitRunId: second.unitRunId }), /no resolvedInputs/);
 });
 
+test('a resume refuses a unit record carrying a seatSchema from a newer release, and the record stays readable', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha']);
+  const run = (unitData, extra = {}) =>
+    runUnit({ unitData, repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern: 'solo', ...extra });
+  const first = await run({ id: 'u-seat', objective: 'Write docs', capability: 'docs:write', writes: [] });
+  assert.equal(first.outcome, 'pass');
+  const unitPath = path.join(repoRoot, '.fgos', 'assignments', first.unitRunId, 'unit.json');
+  const record = JSON.parse(fs.readFileSync(unitPath, 'utf8'));
+  fs.writeFileSync(unitPath, JSON.stringify({ ...record, seatSchema: 1 }));
+  await assert.rejects(
+    () => run(undefined, { resumeUnitRunId: first.unitRunId }),
+    (err) => err.code === 'record-from-newer-release' && /seatSchema/.test(err.message),
+  );
+  assert.equal(JSON.parse(fs.readFileSync(unitPath, 'utf8')).seatSchema, 1, 'the refused record is left untouched');
+});
+
 test('anonymizeInputs hands the role a copy under a neutral name, keeps the mapping in unit.json, and a resume reuses it', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha']);
