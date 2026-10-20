@@ -227,7 +227,8 @@ Doctor có một dòng kiểm "mọi ghế của mọi preset đã đăng ký đ
 - Câu 10: nghĩ thêm. Hướng owner: domain (vd marketing) cung cấp một **bộ persona chung**; persona để **file riêng** (dễ thay, dễ cập nhật) thay vì khối trong file workflow.
 - 13:17 câu 3: **đồng ý** — chỉ origin người (`human-cli`) được nâng tier; override do agent tạo vượt tier cấu hình → từ chối có tên.
 - 13:17 câu 10: **hỗ trợ cả hai**, persona của domain chỉ thấy trong domain đó: (a) bộ persona chung của domain; (b) workflow đóng gói trong một thư mục riêng thì persona đặt **ngay cạnh** file workflow, không chép vào thư mục `agents/` riêng. Tên theo tiền tố loại: `wf.<name>.<ext>`, `agent.<name>.<ext>` (vd `six-hats/wf.six-hats.yaml`, `six-hats/agent.black-hat.yaml`). Luật tên và nơi đặt này là việc của Convention (sinh/phân giải/kiểm tên + đường dẫn); đọc, thứ tự tầng, ghim nội dung vẫn ở `agent-definitions`. Thứ tự tầng: workspace → thư mục workflow → domain (của chính workflow) → core.
-- Còn mở: 6 (taste, giải thích lại cho owner), R.
+- 13:26 câu 6: **đồng ý đề xuất**: (a) `shape-proposals` 1 ghế frontier (lens hệ thống), 2 ghế flagship; (b) `explain` hạ xuống flagship; (c) synthesis business/delphi giữ standard; (d) panel ý kiến dẫn bằng họ rẻ (gemini, deepseek, glm); (e) `code:review`/`code:debug` giữ codex rồi claude.
+- Còn mở: R (đã trình bày lại, mục R.2).
 
 ### R. Brainstorm: phạm vi của taste theo role (owner 12:48: global không hợp)
 
@@ -241,6 +242,15 @@ Vấn đề: "red-team → xai" hợp với review code và phản biện kiến
 | R4 global + đè theo domain | `roles` global làm mặc định, R1 đè | ít dòng | chính là thứ owner thấy không hợp: mặc định global vẫn rò sang domain không khai |
 
 Đề xuất: **R1** (và R3 khi cần chính xác, cùng một hình dạng khoá `roles` bên trong capability hoặc nhóm). Không có `roles` cấp runner. Thứ tự lớp 5.1 thành: người > ghế > persona > role trong capability > role trong nhóm domain > capability > nhóm domain > mặc định. Câu cho owner: R1 có đủ không, hay domain cần mang taste theo gói (R2) khi đóng gói domain cho project khác?
+
+#### R.2 Trình bày lại (13:26)
+
+Ví dụ thật: red-team ở code muốn xai (phá mạnh), ở marketing muốn claude (phê bình giọng thương hiệu kỹ), ở kiến trúc muốn xai.
+
+- **R1 — khai trong config của project, theo nhóm capability của domain:** `capabilities."code:*".roles.red-team.families = ["xai"]`, `capabilities."marketing:*".roles.red-team.families = ["claude"]`. Một file, người chủ project thấy hết. Khi đem domain marketing sang project khác, taste không đi theo; project đó chạy mặc định cho tới khi tự khai.
+- **R2 — domain tự mang taste trong gói của nó** (`domains/marketing/…`), project đè bằng R1. Taste đi theo domain. Nhưng họ model phụ thuộc máy (máy kia không có account xai thì vô nghĩa), nên taste theo **họ** mang theo gói thì yếu; taste theo **tier** và **độ độc lập** (judge cần flagship, phải khác họ) thì mang đi đâu cũng đúng.
+
+Đề xuất: **R1 ngay** (một nguồn, đúng thẩm quyền config project). **R2 sau, khi đóng gói domain cho project khác (mission #1), và chỉ cho khoá khả chuyển (`tier`), không cho `families`.**
 
 ## Phụ lục: phát hiện thêm khi chứng minh MP-B1 (2026-10-20 11:15)
 
