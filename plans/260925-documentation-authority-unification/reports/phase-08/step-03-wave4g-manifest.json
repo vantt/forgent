@@ -1,0 +1,1104 @@
+{
+  "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "inventoryInputCommit": "1a0f61ac53433292e08fb378ebbb6c1c72fd3b74",
+  "files": [
+    {
+      "file": "docs/knowledge/why-disposable-worktrees-need-their-own-dependency-install/disposable-worktree-dependency-provisioning.md",
+      "set": "batch-077",
+      "sourceBytes": 3611,
+      "digest": "836f2dfbe6c2587b3fb90e189501799be5ed213cf9627a91678c280e6e7178d0",
+      "inventoryFileDigest": "836f2dfbe6c2587b3fb90e189501799be5ed213cf9627a91678c280e6e7178d0",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "6c6250affd2ec4dedefbc70fe7cf71730a0f2893fcf880e0932d11b9ab1493e5",
+      "recordBytes": 975,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-docs-index-preserves-a-doc-s-prior-id-when-the-store-is/docs-index-preserves-prior-id-when-the-store-is-unreachable.md",
+      "set": "batch-077",
+      "sourceBytes": 5350,
+      "digest": "1398a9ed7ab46acc59df087c4a2f812f7f14a7c989463c2941f479a424b63118",
+      "inventoryFileDigest": "1398a9ed7ab46acc59df087c4a2f812f7f14a7c989463c2941f479a424b63118",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "3fb4c97775e25c9aa28f3d7cbf9beebf9305d68a0db1969189891f161292c420",
+      "recordBytes": 3928,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-doctor-checks-are-documented-as-an-open-registry-not-a-f/why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md",
+      "set": "batch-077",
+      "sourceBytes": 3461,
+      "digest": "a48c79e266545d92f7375c794731d255f9fbd4b4115f37be0dd9b41e4d374c10",
+      "inventoryFileDigest": "a48c79e266545d92f7375c794731d255f9fbd4b4115f37be0dd9b41e4d374c10",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "a727f90d7c2806fe13c388f7bc6f0518472cb370402665b4bd9503652e81d4af",
+      "recordBytes": 10644,
+      "retiresWithTree": false,
+      "edgeCount": 7,
+      "dispositions": {
+        "preserve": 7
+      }
+    },
+    {
+      "file": "docs/knowledge/why-every-agent-task-tool-dispatch-is-enforced-through-a-pre/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md",
+      "set": "batch-077",
+      "sourceBytes": 27023,
+      "digest": "56135aa57f25197aaad2b7ed475d9dce4133398b638c57967c95e0fade029974",
+      "inventoryFileDigest": "56135aa57f25197aaad2b7ed475d9dce4133398b638c57967c95e0fade029974",
+      "diffSha256": "3d5eecc8c76e03ea9c0bace12bf9da57d7029eb54426ec5eeefdc877ebe7da0d",
+      "recordSha256": "1a150134d44d0bbb2e6cae246aec19a5f81aca80e32c9e59633a2da9ec5ff790",
+      "recordBytes": 43414,
+      "retiresWithTree": false,
+      "edgeCount": 7,
+      "dispositions": {
+        "patch": 2,
+        "preserve": 5
+      }
+    },
+    {
+      "file": "docs/knowledge/why-execution-fan-out-reuses-computeschedule-not-selectwave/why-execution-fan-out-reuses-computeschedule-instead-of-selectwave.md",
+      "set": "batch-077",
+      "sourceBytes": 20444,
+      "digest": "af12b1df2aba62579085df863ddc19a40a7118fc12c2948809d0809b64a58b96",
+      "inventoryFileDigest": "af12b1df2aba62579085df863ddc19a40a7118fc12c2948809d0809b64a58b96",
+      "diffSha256": "796d17ac6f5b0ae938f4e2f6aaf8094450ac16c4987b2671e2d4f27deac6f717",
+      "recordSha256": "693555e010ca566f943b419ff2bf6822cf760697f3c327dba25b37a35c90a041",
+      "recordBytes": 53775,
+      "retiresWithTree": false,
+      "edgeCount": 8,
+      "dispositions": {
+        "patch": 4,
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/knowledge/why-executor-aware-backend-dispatch-exists/agent-executor-executor-aware-dispatch.md",
+      "set": "batch-077",
+      "sourceBytes": 5832,
+      "digest": "321a6118452e014a53b98b14a305b8fac5612ef70ee98c657df9270a8af99c7e",
+      "inventoryFileDigest": "321a6118452e014a53b98b14a305b8fac5612ef70ee98c657df9270a8af99c7e",
+      "diffSha256": "77c37cff4d40f92975bc16928f656d90261dd8e6ae69194b382442fddac6785f",
+      "recordSha256": "89067764b8a863bdcca9e8989aec09e6b50c84bb3c1c85ac3b0507d41b27c4c9",
+      "recordBytes": 42806,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "patch": 4
+      }
+    },
+    {
+      "file": "docs/knowledge/why-executor-dispatch-audits-record-command-alongside-provid/executor-dispatch-audit-records-command-not-just-provider-label.md",
+      "set": "batch-077",
+      "sourceBytes": 3237,
+      "digest": "120bb9acae663329948e27ede2a3a31dbb9c2a4df3f4db0e0f0b71d4e4f16065",
+      "inventoryFileDigest": "120bb9acae663329948e27ede2a3a31dbb9c2a4df3f4db0e0f0b71d4e4f16065",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "2170c3f6918bc70bbfde8c6e99edffba9b596ab6dbae601d21f14fed1ed94d07",
+      "recordBytes": 997,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-fgos-add-items-landed-permanently-at-stage-executing-wit/why-fgos-add-defaulted-new-items-to-stage-executing-with-no-way-back.md",
+      "set": "batch-077",
+      "sourceBytes": 8150,
+      "digest": "1e88735e9f48698b791c52b92782efa8d822fa87658a4ec90b7d719b0216919d",
+      "inventoryFileDigest": "1e88735e9f48698b791c52b92782efa8d822fa87658a4ec90b7d719b0216919d",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "6e81730b8277e17646870cd5cabc900be50e5cb6725c7064138d3f42aad24e61",
+      "recordBytes": 3112,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-add-now-caps-a-work-item-s-id-at-30-characters/long-work-item-ids-max-length-guard.md",
+      "set": "batch-077",
+      "sourceBytes": 7218,
+      "digest": "153f79c35730cc341649af06790de86d14186a9d0d1f50f2e72934fd12f0b5e5",
+      "inventoryFileDigest": "153f79c35730cc341649af06790de86d14186a9d0d1f50f2e72934fd12f0b5e5",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "9629c7342e9ef2bf1d965c314f8da9c4967c5b05ce3a5c7afc6261ef66e3772a",
+      "recordBytes": 964,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-fgos-added-a-pre-commit-guard-refusing-a-staged-deletion/why-fgos-refuses-a-staged-fgos-deletion-at-commit-time.md",
+      "set": "batch-077",
+      "sourceBytes": 4492,
+      "digest": "55298648a721aaf29424c1ed37243455fd1a2714d4831aae14bbd8b1f0e2dcb1",
+      "inventoryFileDigest": "55298648a721aaf29424c1ed37243455fd1a2714d4831aae14bbd8b1f0e2dcb1",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "a7bb4cb84dcb3152b237af5cf5bb3648e68c430fbfa0b09baa087946ea17b524",
+      "recordBytes": 988,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-fgos-added-sync-root-and-drift-detection/why-fgos-added-sync-root-and-drift-detection.md",
+      "set": "batch-077",
+      "sourceBytes": 13596,
+      "digest": "9810993cbb98167500aaa7dd870d934cfb1bf56f6e520d42a007b2261907942f",
+      "inventoryFileDigest": "9810993cbb98167500aaa7dd870d934cfb1bf56f6e520d42a007b2261907942f",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "c0eea5abcd8cff53ceb98f94f0619a7646632b035d37600477b1758b235c626f",
+      "recordBytes": 3231,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-answer-s-real-resume-behavior-is-statusatask-rather/why-fgos-answer-resumes-to-statusatask-not-always-todo.md",
+      "set": "batch-077",
+      "sourceBytes": 2443,
+      "digest": "2a1f3f7f0f747bb16f545835568f913e3941e2cb27c93cc658519a3123645a27",
+      "inventoryFileDigest": "2a1f3f7f0f747bb16f545835568f913e3941e2cb27c93cc658519a3123645a27",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "d1cf6241278f0b429a7d8f89d5b84b8c0d536718a9ec088b58399f87bc2e8f46",
+      "recordBytes": 7683,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-approve-distinguishes-a-pre-existing-merge-head-fro/why-fgos-approve-distinguishes-a-pre-existing-merge-head-from-its-own-conflict.md",
+      "set": "batch-077",
+      "sourceBytes": 6810,
+      "digest": "315fbbff1e4ed3cbf6fbc28f6054434d696afcfb26e7620ceb468b84820be86c",
+      "inventoryFileDigest": "315fbbff1e4ed3cbf6fbc28f6054434d696afcfb26e7620ceb468b84820be86c",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "6985a5443f04f591d5251f573a4d5ca21ddb12363ac6c7963619afd0badade66",
+      "recordBytes": 5489,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-approve-refuses-a-leaf-merging-into-an-already-reso/why-approve-refuses-a-leaf-merging-into-an-already-resolved-root.md",
+      "set": "batch-077",
+      "sourceBytes": 5464,
+      "digest": "feb3435857be9af0e12347bc582ce936ef81480d6bdc907d85a5c49c248a7e41",
+      "inventoryFileDigest": "feb3435857be9af0e12347bc582ce936ef81480d6bdc907d85a5c49c248a7e41",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "9056e2b76a0d2bcfa01ae95ec8545fe6bee3b516f18e8a3a9994c2f393041cf0",
+      "recordBytes": 998,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-fgos-catchup-needed-its-own-already-caught-up-guard/why-catchup-needed-its-own-already-caught-up-guard.md",
+      "set": "batch-077",
+      "sourceBytes": 4345,
+      "digest": "60d866c141b7646df6aa9694e9d6e3e091f9c5b42bd264150c12fd2b4a97d55c",
+      "inventoryFileDigest": "60d866c141b7646df6aa9694e9d6e3e091f9c5b42bd264150c12fd2b4a97d55c",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "5ff75227268a586d8e31d62461c3d94501c4998b73985fd2cb0ba5b382b91503",
+      "recordBytes": 8568,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 2,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md",
+      "set": "batch-077",
+      "sourceBytes": 5237,
+      "digest": "45f94e96f9c10ce7394e99c65594d661b638692359bd09e174ddac002320381b",
+      "inventoryFileDigest": "45f94e96f9c10ce7394e99c65594d661b638692359bd09e174ddac002320381b",
+      "diffSha256": "54238feac304220b5534c8f9239944c03a8e712f4faf318b92815b19051f3ac7",
+      "recordSha256": "66086c71c2a1cba424b3380d1b9c1d35c19e5d6a9a9eeb9a64de853b3999ec70",
+      "recordBytes": 13541,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 2,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-cleanup-next-keeps-exit-code-classification-instead/why-cleanup-next-keeps-exit-code-classification-instead-of-a-driver-call.md",
+      "set": "batch-077",
+      "sourceBytes": 3411,
+      "digest": "87ff4e1dac4a63b231a2b27806806108d832db3df3e35de26f0a7279c6d9fc7f",
+      "inventoryFileDigest": "87ff4e1dac4a63b231a2b27806806108d832db3df3e35de26f0a7279c6d9fc7f",
+      "diffSha256": "9b0b5fc884699966947b6ee469c4a40bbdaa86ba22d49b177b3e2e5b52e3f966",
+      "recordSha256": "578663493771d7311d72b01766c1e2bdd1b8c2f31b0daed3870c628c1229b30f",
+      "recordBytes": 10543,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-coding-compounding-s-retrospective-synthesis-commit/why-fgos-compounding-refuses-to-commit-when-merge-head-is-set.md",
+      "set": "batch-077",
+      "sourceBytes": 8466,
+      "digest": "7c9080a62f324c2aec08d513edd55eafb2535d5877dd5cedc98f9251425ef48f",
+      "inventoryFileDigest": "7c9080a62f324c2aec08d513edd55eafb2535d5877dd5cedc98f9251425ef48f",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "17bb5d5e8c3a2fc12fdb0ddb86e6e202f4ffac87ff103fff28e0f74e5ebfddc2",
+      "recordBytes": 2650,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-coding-driving-s-title-description-print-lives-in-o/why-fgos-coding-drivings-title-description-print-lives-in-one-shared-place.md",
+      "set": "batch-077",
+      "sourceBytes": 4055,
+      "digest": "8d326be618ca82e9b096c102df4317a148f7ea34458c4a744983fd3552d124f0",
+      "inventoryFileDigest": "8d326be618ca82e9b096c102df4317a148f7ea34458c4a744983fd3552d124f0",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "7e365b9f188eaa4a1adde8013f1d05d0aee1eb57c47dd7b6a9405f1b27cdd618",
+      "recordBytes": 2126,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-coding-planning-and-fgos-coding-validating-merged-t/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md",
+      "set": "batch-077",
+      "sourceBytes": 17206,
+      "digest": "b8dbc8707f92e19c57b1adb1f23aac55a2dcf3e8aafb6f072833787b626e93a8",
+      "inventoryFileDigest": "b8dbc8707f92e19c57b1adb1f23aac55a2dcf3e8aafb6f072833787b626e93a8",
+      "diffSha256": "b859f3955e7b6ee3f0aeec6000f9f8f53c40d03dcd807cfbb3fb590c74d02873",
+      "recordSha256": "49bc81412b856a1a7fb9baabcdf822552ead0cb54c8dd919caa5fd31cfa42a60",
+      "recordBytes": 48348,
+      "retiresWithTree": false,
+      "edgeCount": 8,
+      "dispositions": {
+        "preserve": 2,
+        "patch": 2,
+        "parked": 4
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-coding-planning-s-mode-gate-moved-to-fgos-routing-a/why-fgos-planning-moved-mode-gate-to-fgos-routing.md",
+      "set": "batch-077",
+      "sourceBytes": 12532,
+      "digest": "28d6d89b11c53f01910ec418862e496a7f240063cf3048f998124bf1c5f8b4b8",
+      "inventoryFileDigest": "28d6d89b11c53f01910ec418862e496a7f240063cf3048f998124bf1c5f8b4b8",
+      "diffSha256": "076a630a1674f332159a8e5fa209412e9393dd200cc813ed0b4dd4808e8a3b6f",
+      "recordSha256": "78abb7ec8f8c913540ca1dc70096c28a8f5e4f11a5e5c9abde94440309fdf85b",
+      "recordBytes": 17847,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-coding-planning-writes-docsref-immediately-after-cr/why-fgos-coding-planning-writes-docsref-when-it-self-creates-a-feature-dir.md",
+      "set": "batch-077",
+      "sourceBytes": 3535,
+      "digest": "5cdead6fdbfdda5df9d5f2e0c86236dec2cb78ce8d0d267ad420e8ae57e5f49c",
+      "inventoryFileDigest": "5cdead6fdbfdda5df9d5f2e0c86236dec2cb78ce8d0d267ad420e8ae57e5f49c",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "2c928a3412247fee27b9a6e15aa194cfc11e3a87943bc92b05cafebc97b45898",
+      "recordBytes": 8697,
+      "retiresWithTree": false,
+      "edgeCount": 7,
+      "dispositions": {
+        "preserve": 7
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-cut-specific-state-runner-import-edges-consolidated/why-state-and-runner-import-edges-were-cut-and-cli-logic-moved-to-a-use-case-layer.md",
+      "set": "batch-077",
+      "sourceBytes": 4064,
+      "digest": "5ac6ae4dde5a7c6832f06e37ad9cd45ab10f0fabcc86895a21a749ea00f561e2",
+      "inventoryFileDigest": "5ac6ae4dde5a7c6832f06e37ad9cd45ab10f0fabcc86895a21a749ea00f561e2",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "07e379b17a887d85df78007a066eb85e97581b104a341fe66954cb1b68afc497",
+      "recordBytes": 1990,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-detects-post-land-drift-among-sibling-leaves-by-int/why-post-land-drift-detection-intersects-real-changed-paths-not-declared-footprint.md",
+      "set": "batch-077",
+      "sourceBytes": 4119,
+      "digest": "6f17c1efb7f7db4b4ab921a803b4fb5939e6260c112fe0d109b5bfa7007a0131",
+      "inventoryFileDigest": "6f17c1efb7f7db4b4ab921a803b4fb5939e6260c112fe0d109b5bfa7007a0131",
+      "diffSha256": "009b2503548a27724e6604b6f6248cd532aad76e828fec43aa07aae7525dc727",
+      "recordSha256": "7b3c8297fb7c00478c277b7b99b156bff19264a8ae1f3758d053b1a4177808dc",
+      "recordBytes": 24003,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "patch": 2,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-discover-could-overwrite-an-already-locked-verify-c/discovery-decompose-reporoot-verify-overwrite.md",
+      "set": "batch-077",
+      "sourceBytes": 10881,
+      "digest": "15ec7e208391f609137d56e2397c668393ee99ae5b217c752bb5e12f5bf19a15",
+      "inventoryFileDigest": "15ec7e208391f609137d56e2397c668393ee99ae5b217c752bb5e12f5bf19a15",
+      "diffSha256": "3d73292fdc64256ea85974091860c58ca628bcd77ba8841f941554d7793dc54e",
+      "recordSha256": "2addb71d20c2d15f1afc1f418a18f2e4783d23f26493df206e7a641ecaac9f04",
+      "recordBytes": 23066,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "parked": 2,
+        "preserve": 2,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-discover-next-shrank-to-a-picker/why-discover-next-shrank-to-a-picker.md",
+      "set": "batch-078",
+      "sourceBytes": 4242,
+      "digest": "4f44fe79fdd27c88e918c5a00926de537755881b4adb04c80859659a5385f793",
+      "inventoryFileDigest": "4f44fe79fdd27c88e918c5a00926de537755881b4adb04c80859659a5385f793",
+      "diffSha256": "b3a0d456f22e1b422552c97f7d0dae8513bfe9be00eb9e2aca3d035bcba5d88a",
+      "recordSha256": "63245fe16ebc9771d623c096346c25ad52383458ff27ee5bba6f7d75e3fc0161",
+      "recordBytes": 20217,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-discover-now-trusts-a-locked-context-md-instead-of/fgos-discover-trusts-a-locked-context-instead-of-blind-rejudging.md",
+      "set": "batch-078",
+      "sourceBytes": 4839,
+      "digest": "4ad5c2ab6667ec79d9629715ea7ece4227f881a5798eefd3d4c557d9e7aad380",
+      "inventoryFileDigest": "4ad5c2ab6667ec79d9629715ea7ece4227f881a5798eefd3d4c557d9e7aad380",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "a289392ec005e31c1d9a5e8449ace3565add6e41fb386f772700130aae73c13f",
+      "recordBytes": 4121,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-dispatch-splits-into-gather-packets-with-a-second-e/why-fgos-dispatch-splits-into-gather-packets-and-a-gated-exec-packet.md",
+      "set": "batch-078",
+      "sourceBytes": 7539,
+      "digest": "e7ec6d2ba18bc1cd41fa72215c03f98d58aa4040b840e5d5fb7414f6effe8964",
+      "inventoryFileDigest": "e7ec6d2ba18bc1cd41fa72215c03f98d58aa4040b840e5d5fb7414f6effe8964",
+      "diffSha256": "5c4af3be9e91ca50f2e6426c3f79424bed808ba8c1b7143da93ca4ad4bc66a5c",
+      "recordSha256": "9aade91613a07cb9166a5ae5f209516947eef0254c31c3a5236749c8793bee59",
+      "recordBytes": 25421,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 2,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-doctor-s-checktoolregistryconfigured-now-reports-fa/why-doctor-now-fails-on-a-degraded-impact-analysis-tool-instead-of-passing.md",
+      "set": "batch-078",
+      "sourceBytes": 2223,
+      "digest": "31daf0993ddbc44eba93b5641a0f84919dce47b93d140cb5811dd347ec52bfae",
+      "inventoryFileDigest": "31daf0993ddbc44eba93b5641a0f84919dce47b93d140cb5811dd347ec52bfae",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "d92894627d2117545b77ad7194842a073ba264ba1c8b8a8333af0b4ea7a2463f",
+      "recordBytes": 1008,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-fgos-doctor-setup-uninstall-resolve-the-real-main-checko/why-doctor-setup-and-uninstall-had-to-resolve-the-real-main-checkout-not-raw-cwd.md",
+      "set": "batch-078",
+      "sourceBytes": 3244,
+      "digest": "a7c66a8f553f88aaf2fd25ef8564a436783967793f03a9b7d9ccd22cd11d2e61",
+      "inventoryFileDigest": "a7c66a8f553f88aaf2fd25ef8564a436783967793f03a9b7d9ccd22cd11d2e61",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "b1faa86d6c4d17bdd28e7ea52ad9a9a0580cf9aee6b2416a3e6fb07bde712c41",
+      "recordBytes": 1947,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-events-jsonl-can-silently-lose-lines-under-concurre/events-jsonl-lost-update-race-under-concurrent-session-writes.md",
+      "set": "batch-078",
+      "sourceBytes": 14958,
+      "digest": "6e22a95075a1f64221d8e681e5343d0e8d5fb8ae056ff904e059c0c0f3410b43",
+      "inventoryFileDigest": "6e22a95075a1f64221d8e681e5343d0e8d5fb8ae056ff904e059c0c0f3410b43",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "0a71b2a4af667774fc3bd45a18d93a42769ec2407742b09ac7ab7f8424cc5f9b",
+      "recordBytes": 11489,
+      "retiresWithTree": false,
+      "edgeCount": 7,
+      "dispositions": {
+        "preserve": 7
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-fanout-treats-a-dispatched-agent-s-worktree-isolati/why-fanouts-worktree-isolation-race-is-a-recoverable-self-heal-not-a-lowered-batch-cap.md",
+      "set": "batch-078",
+      "sourceBytes": 7009,
+      "digest": "e20b5bc070cf729ec3f95d9e2f704454b4b9b64db7f248e2c216c56d8b4c8ee7",
+      "inventoryFileDigest": "e20b5bc070cf729ec3f95d9e2f704454b4b9b64db7f248e2c216c56d8b4c8ee7",
+      "diffSha256": "3238edf9cca424fc92b36fb9b8eb7e485bb8e5e91204b76708ee1ca0927561b1",
+      "recordSha256": "3f64f19dd8117568d34dd52abcacef681f7cc24229a42c2195c3f0878f4074ef",
+      "recordBytes": 21974,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-fgos-runner-died-in-every-agent-shell/harness-shell-snapshot-strips-underscore-prefixed-helper-functions.md",
+      "set": "batch-078",
+      "sourceBytes": 5097,
+      "digest": "2d88b59f205e349e60c687f0dd45d7ae7b452e0451f3f31cb68cc0bf877ff5d0",
+      "inventoryFileDigest": "2d88b59f205e349e60c687f0dd45d7ae7b452e0451f3f31cb68cc0bf877ff5d0",
+      "diffSha256": "48575f568071227c33f44f6a5d3d5dbe59019a9e0ff00376ce79e130305f04e1",
+      "recordSha256": "d777e6f2d72168c55fe4c200a2b03b035ea207927b95cfe726c7991fdaa6e0b5",
+      "recordBytes": 22874,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "preserve": 3,
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-install-moved-from-always-pulling-main-head-to-a-ta/why-fgos-install-is-pinned-to-a-semver-tag-instead-of-main-head.md",
+      "set": "batch-078",
+      "sourceBytes": 3457,
+      "digest": "b29c111e501fee2d74c9d81cbf05fc0511951a0aa0e99abc4727053b42dcde69",
+      "inventoryFileDigest": "b29c111e501fee2d74c9d81cbf05fc0511951a0aa0e99abc4727053b42dcde69",
+      "diffSha256": "d22c83b8b228c5e901f7b686929dc95e390718c42b38911a70b953638018fbed",
+      "recordSha256": "639ced942af2d08a988cf3b395b806be05e1b73cede6f4a525ebd4395cea0295",
+      "recordBytes": 13332,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-keeps-growing-the-same-decision-logic-in-more-than/fgos-choke-point-pattern.md",
+      "set": "batch-078",
+      "sourceBytes": 3471,
+      "digest": "b45738cfa7cdf2187249153b30dca5fec64309b573a7fb3e38fa90b976e27103",
+      "inventoryFileDigest": "b45738cfa7cdf2187249153b30dca5fec64309b573a7fb3e38fa90b976e27103",
+      "diffSha256": "29e62c35f348bbc5f2a7bbfdd698339060fc0e5812d659d105cf5ba3d9664ade",
+      "recordSha256": "90c69ea5ea056b6ef761d32b851def8978163a7ed783ff31f338d20f81162593",
+      "recordBytes": 70567,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "patch": 5
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-main-checkout-lock-could-report-ambiguous-with-no-r/main-checkout-lock-toctou-race.md",
+      "set": "batch-078",
+      "sourceBytes": 3251,
+      "digest": "5719baf6bf9bd472947ca9ced5a3a0bbb8d914a219c19b2d4dd766f1b9a053ac",
+      "inventoryFileDigest": "5719baf6bf9bd472947ca9ced5a3a0bbb8d914a219c19b2d4dd766f1b9a053ac",
+      "diffSha256": "d875382aa1ce6e2baadd7340b534f829298a2b9c1c5479dbc4b4a6c96ab592d6",
+      "recordSha256": "d5c7383cb9f91a7ceddcee00deba6c835103c2152b4458789611d532b78de0a9",
+      "recordBytes": 24340,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+      "set": "batch-078",
+      "sourceBytes": 3640,
+      "digest": "df972d749388feecaffe4d5298a6eecf7501ddac0ec01372d1fbd5a284921c92",
+      "inventoryFileDigest": "df972d749388feecaffe4d5298a6eecf7501ddac0ec01372d1fbd5a284921c92",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "26fd797011bab2ecfe8dc3220936ea8c7e204430f486aa855992f48349ec75d4",
+      "recordBytes": 1860,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-roo/why-merge-next-auto-syncs-blockedonsync-roots.md",
+      "set": "batch-078",
+      "sourceBytes": 8288,
+      "digest": "5bfdaefc98c510cb85ee63faa51239581a4564a797d5349eeece7a2c12ec4e9d",
+      "inventoryFileDigest": "5bfdaefc98c510cb85ee63faa51239581a4564a797d5349eeece7a2c12ec4e9d",
+      "diffSha256": "101e716b5588b0f679330a7c303f1f83623425c64006aa265ced26609ebc94b5",
+      "recordSha256": "eb1eeda0aa3b654b4b46da08cd85b812a9ec3c81ed39040063f916ca2c77e5da",
+      "recordBytes": 13325,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 3,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-merge-now-refuses-outside-the-main-checkout/why-fgos-merge-now-refuses-outside-the-main-checkout.md",
+      "set": "batch-078",
+      "sourceBytes": 4466,
+      "digest": "e4db5c539db53ff092226752471a8473f56696a7bb965f581f9720dff46718ae",
+      "inventoryFileDigest": "e4db5c539db53ff092226752471a8473f56696a7bb965f581f9720dff46718ae",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "e4ef7bbfa25af07069d361aec96374f683f2ee7f19b9c909d0b02cac564b5812",
+      "recordBytes": 978,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-fgos-merge-throughput-bottlenecked-despite-parallel-disp/why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline.md",
+      "set": "batch-078",
+      "sourceBytes": 9895,
+      "digest": "2f517cd1f7a16aa01de1d86b822497d94273f69e5e5f1f4635065dfe7e0dd376",
+      "inventoryFileDigest": "2f517cd1f7a16aa01de1d86b822497d94273f69e5e5f1f4635065dfe7e0dd376",
+      "diffSha256": "824087bb3e71edddaa9e369fd2047bc9d5dd8f27f9c425dc49b3fb6ed96a24f2",
+      "recordSha256": "7c32d1210e5920918a7fca2307f83077e5ea454df0e9467ec970112c09942fec",
+      "recordBytes": 60869,
+      "retiresWithTree": false,
+      "edgeCount": 7,
+      "dispositions": {
+        "patch": 6,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-move-gained-an-answer-flag-closing-the-last-unreach/why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human.md",
+      "set": "batch-078",
+      "sourceBytes": 1796,
+      "digest": "f7c6dc2d99c605adcc99e32881a2c515adef0dd4f0ec4e38b03719854912a8d4",
+      "inventoryFileDigest": "f7c6dc2d99c605adcc99e32881a2c515adef0dd4f0ec4e38b03719854912a8d4",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "19b5fba56bf0a991af1f41f621b06cd83be8963e07907d154a5de419da063e77",
+      "recordBytes": 1001,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-fgos-move-to-awaiting-approval-refuses-a-doing-item-with/why-fgos-move-refuses-awaiting-approval-from-doing-without-skip-return-guard.md",
+      "set": "batch-078",
+      "sourceBytes": 5382,
+      "digest": "91e111ab143e612bdebd73cdde599285eccdf1c9ca0592e5cca8fd0f2257edcc",
+      "inventoryFileDigest": "91e111ab143e612bdebd73cdde599285eccdf1c9ca0592e5cca8fd0f2257edcc",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "4fbfa90e13a6abf886f76dc1658c59a0d3a8e5d0eb7559c7142714512e2ad19b",
+      "recordBytes": 1010,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md",
+      "set": "batch-078",
+      "sourceBytes": 4962,
+      "digest": "83dd80030a6195067a4c59cdb578ac34e574d5475be42c19c3d1497a1eb7e7db",
+      "inventoryFileDigest": "83dd80030a6195067a4c59cdb578ac34e574d5475be42c19c3d1497a1eb7e7db",
+      "diffSha256": "e1efdbc7a400de0cb26e455f14e470a06479f1eb60338ca0376bfc0fb13f0597",
+      "recordSha256": "a50757548f80267a627781a66c82a55ea837a157812e7ff8141eb8e21d4da7af",
+      "recordBytes": 24374,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "patch": 2,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md",
+      "set": "batch-078",
+      "sourceBytes": 2537,
+      "digest": "f469fa839ebf32362dc1c36c54214f7139c22eec424d801ad45bdbeb49be8435",
+      "inventoryFileDigest": "f469fa839ebf32362dc1c36c54214f7139c22eec424d801ad45bdbeb49be8435",
+      "diffSha256": "bc488b22e37992ea25282642ecd5e51a2fbbbc66b802548e37dda33a0a6658c6",
+      "recordSha256": "a45a7e2a6628393171cffd5214442d8dd629ffcdcf5a92b4f186eb1d3abbc667",
+      "recordBytes": 31709,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "patch": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-wh/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md",
+      "set": "batch-078",
+      "sourceBytes": 3601,
+      "digest": "f477e051c28843a44890300e6bcac49b644364629ad7109c251e86e66be4ae33",
+      "inventoryFileDigest": "f477e051c28843a44890300e6bcac49b644364629ad7109c251e86e66be4ae33",
+      "diffSha256": "2d3c1491cac9056a37af29c7c98e42a4d16638c2e2563694c2d236c14123ecb5",
+      "recordSha256": "91c205e50252e97740b48747dbd0914b7accc5da94a566c29ec4c18699026d0e",
+      "recordBytes": 22576,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "patch": 2,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-requires-a-gate-ask-question-to-restate-its-own-con/why-gate-questions-must-be-self-sufficient-and-mechanically-checked-for-it.md",
+      "set": "batch-078",
+      "sourceBytes": 3948,
+      "digest": "5798bc04d98c11090a308e6f336145c8414504af85c1c1bcec72b8fb1c8d9087",
+      "inventoryFileDigest": "5798bc04d98c11090a308e6f336145c8414504af85c1c1bcec72b8fb1c8d9087",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "f139dcb4aedb4d213168023b4fb820af7d89fe01c98f95edc0c8999628b1ec45",
+      "recordBytes": 1849,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-retired-fgos-runner-json-entirely-instead-of-fixing/why-fgos-retired-the-fgos-runner-json-legacy-config-fallback.md",
+      "set": "batch-078",
+      "sourceBytes": 5852,
+      "digest": "eee08d6b197499b143e64a2812e21d665e148519892908f0ec0f36f3233f2376",
+      "inventoryFileDigest": "eee08d6b197499b143e64a2812e21d665e148519892908f0ec0f36f3233f2376",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "3aa5cab2ec22b3e47d8fb58800220ece61dca4b412b0eda95c892537ea6cdabf",
+      "recordBytes": 4542,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md",
+      "set": "batch-078",
+      "sourceBytes": 5544,
+      "digest": "5c337e4f0a9c9370381472f133d2e25849cc107af38b822b1beb1cf6f23a17e2",
+      "inventoryFileDigest": "5c337e4f0a9c9370381472f133d2e25849cc107af38b822b1beb1cf6f23a17e2",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "4932ac834f7a6af66912361a2ea325b83e6077dbddfa93f3a5eb9967e7847542",
+      "recordBytes": 3928,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-retro-next-shrank-to-a-launcher/why-retro-next-shrank-to-a-launcher.md",
+      "set": "batch-078",
+      "sourceBytes": 3687,
+      "digest": "49e7dc8f39520448a9fa129f188ccfd490321252dfddcd1620d0488e1d4860b9",
+      "inventoryFileDigest": "49e7dc8f39520448a9fa129f188ccfd490321252dfddcd1620d0488e1d4860b9",
+      "diffSha256": "0393c8f0497ba78ec118708e11509e6c9551e1bece67ba0dcf6f7257457fa74b",
+      "recordSha256": "8d03ddeb4ea7c95448dbeecac0d89eb96f0e01c3d27549c6648afe4023695b58",
+      "recordBytes": 10429,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-fgos-review-crashed-with-enobufs-on-very-stale-branch-di/why-fgos-review-crashed-with-enobufs-on-stale-branch-diffs.md",
+      "set": "batch-078",
+      "sourceBytes": 4877,
+      "digest": "abf689df0605bae68078665f85aca6651ec07f4999a81eae0582919b510de2e5",
+      "inventoryFileDigest": "abf689df0605bae68078665f85aca6651ec07f4999a81eae0582919b510de2e5",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "086e26a78ea239b49e6e5b12ef372dff55cad124cc28dc310db952566a128477",
+      "recordBytes": 1997,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    }
+  ],
+  "sets": [
+    {
+      "set": "batch-077",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000077",
+      "population": [
+        "docs/knowledge/why-every-agent-task-tool-dispatch-is-enforced-through-a-pre/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md",
+        "docs/knowledge/why-execution-fan-out-reuses-computeschedule-not-selectwave/why-execution-fan-out-reuses-computeschedule-instead-of-selectwave.md",
+        "docs/knowledge/why-executor-aware-backend-dispatch-exists/agent-executor-executor-aware-dispatch.md",
+        "docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md",
+        "docs/knowledge/why-fgos-cleanup-next-keeps-exit-code-classification-instead/why-cleanup-next-keeps-exit-code-classification-instead-of-a-driver-call.md",
+        "docs/knowledge/why-fgos-coding-planning-and-fgos-coding-validating-merged-t/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md",
+        "docs/knowledge/why-fgos-coding-planning-s-mode-gate-moved-to-fgos-routing-a/why-fgos-planning-moved-mode-gate-to-fgos-routing.md",
+        "docs/knowledge/why-fgos-detects-post-land-drift-among-sibling-leaves-by-int/why-post-land-drift-detection-intersects-real-changed-paths-not-declared-footprint.md",
+        "docs/knowledge/why-fgos-discover-could-overwrite-an-already-locked-verify-c/discovery-decompose-reporoot-verify-overwrite.md"
+      ],
+      "populationCount": 9,
+      "ranks": [
+        {
+          "file": "docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md",
+          "rankHash": "2dc47cbc23f732c54c93102d09993f50853297c391008a4ea5e278083749ccd1"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-coding-planning-s-mode-gate-moved-to-fgos-routing-a/why-fgos-planning-moved-mode-gate-to-fgos-routing.md",
+          "rankHash": "577ccdafe80f28f3bfb14fe43b252868e23133622bf3c87bb0239d89693289ba"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-discover-could-overwrite-an-already-locked-verify-c/discovery-decompose-reporoot-verify-overwrite.md",
+          "rankHash": "6d49ff8d9ae53afee3d30e3383ed35272e8ec0d1c5b5e92ee18313f4658ac8cf"
+        },
+        {
+          "file": "docs/knowledge/why-execution-fan-out-reuses-computeschedule-not-selectwave/why-execution-fan-out-reuses-computeschedule-instead-of-selectwave.md",
+          "rankHash": "9137beeecf497baf272a039e6c5a2ae9d640a1990da44092f0210d1212cd5124"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-cleanup-next-keeps-exit-code-classification-instead/why-cleanup-next-keeps-exit-code-classification-instead-of-a-driver-call.md",
+          "rankHash": "97976fef9b4ef31e809bf8c5d3f523f04c8a7af3c506e402a8be6e02188ede13"
+        },
+        {
+          "file": "docs/knowledge/why-executor-aware-backend-dispatch-exists/agent-executor-executor-aware-dispatch.md",
+          "rankHash": "cbb1a576df59a5c374eb925181dee770393a57827cfd9d32789f9cd503f8cb73"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-coding-planning-and-fgos-coding-validating-merged-t/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md",
+          "rankHash": "e647dec171a8c8d9fa21603d30f8bbc3cf42aa24e1a1de4707a6c2902074dd37"
+        },
+        {
+          "file": "docs/knowledge/why-every-agent-task-tool-dispatch-is-enforced-through-a-pre/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md",
+          "rankHash": "f989eb5a7fcb242ee64695307c890dbfcb505ac38f2c50b110525d5c69782e66"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-detects-post-land-drift-among-sibling-leaves-by-int/why-post-land-drift-detection-intersects-real-changed-paths-not-declared-footprint.md",
+          "rankHash": "fe2648c9c78fc152147016469bcbb9107e6c5e6eada3377d10fce343a2b4733d"
+        }
+      ],
+      "sample": [
+        "docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md",
+        "docs/knowledge/why-fgos-coding-planning-s-mode-gate-moved-to-fgos-routing-a/why-fgos-planning-moved-mode-gate-to-fgos-routing.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md",
+        "docs/knowledge/why-fgos-coding-planning-s-mode-gate-moved-to-fgos-routing-a/why-fgos-planning-moved-mode-gate-to-fgos-routing.md"
+      ],
+      "distinctReviewCount": 2,
+      "pilotFullReviewFiles": [
+        "docs/knowledge/why-disposable-worktrees-need-their-own-dependency-install/disposable-worktree-dependency-provisioning.md",
+        "docs/knowledge/why-docs-index-preserves-a-doc-s-prior-id-when-the-store-is/docs-index-preserves-prior-id-when-the-store-is-unreachable.md",
+        "docs/knowledge/why-doctor-checks-are-documented-as-an-open-registry-not-a-f/why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md",
+        "docs/knowledge/why-every-agent-task-tool-dispatch-is-enforced-through-a-pre/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md",
+        "docs/knowledge/why-execution-fan-out-reuses-computeschedule-not-selectwave/why-execution-fan-out-reuses-computeschedule-instead-of-selectwave.md",
+        "docs/knowledge/why-executor-aware-backend-dispatch-exists/agent-executor-executor-aware-dispatch.md",
+        "docs/knowledge/why-executor-dispatch-audits-record-command-alongside-provid/executor-dispatch-audit-records-command-not-just-provider-label.md",
+        "docs/knowledge/why-fgos-add-items-landed-permanently-at-stage-executing-wit/why-fgos-add-defaulted-new-items-to-stage-executing-with-no-way-back.md",
+        "docs/knowledge/why-fgos-add-now-caps-a-work-item-s-id-at-30-characters/long-work-item-ids-max-length-guard.md",
+        "docs/knowledge/why-fgos-added-a-pre-commit-guard-refusing-a-staged-deletion/why-fgos-refuses-a-staged-fgos-deletion-at-commit-time.md",
+        "docs/knowledge/why-fgos-added-sync-root-and-drift-detection/why-fgos-added-sync-root-and-drift-detection.md",
+        "docs/knowledge/why-fgos-answer-s-real-resume-behavior-is-statusatask-rather/why-fgos-answer-resumes-to-statusatask-not-always-todo.md",
+        "docs/knowledge/why-fgos-approve-distinguishes-a-pre-existing-merge-head-fro/why-fgos-approve-distinguishes-a-pre-existing-merge-head-from-its-own-conflict.md",
+        "docs/knowledge/why-fgos-approve-refuses-a-leaf-merging-into-an-already-reso/why-approve-refuses-a-leaf-merging-into-an-already-resolved-root.md",
+        "docs/knowledge/why-fgos-catchup-needed-its-own-already-caught-up-guard/why-catchup-needed-its-own-already-caught-up-guard.md",
+        "docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md",
+        "docs/knowledge/why-fgos-cleanup-next-keeps-exit-code-classification-instead/why-cleanup-next-keeps-exit-code-classification-instead-of-a-driver-call.md",
+        "docs/knowledge/why-fgos-coding-compounding-s-retrospective-synthesis-commit/why-fgos-compounding-refuses-to-commit-when-merge-head-is-set.md",
+        "docs/knowledge/why-fgos-coding-driving-s-title-description-print-lives-in-o/why-fgos-coding-drivings-title-description-print-lives-in-one-shared-place.md",
+        "docs/knowledge/why-fgos-coding-planning-and-fgos-coding-validating-merged-t/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md",
+        "docs/knowledge/why-fgos-coding-planning-s-mode-gate-moved-to-fgos-routing-a/why-fgos-planning-moved-mode-gate-to-fgos-routing.md",
+        "docs/knowledge/why-fgos-coding-planning-writes-docsref-immediately-after-cr/why-fgos-coding-planning-writes-docsref-when-it-self-creates-a-feature-dir.md",
+        "docs/knowledge/why-fgos-cut-specific-state-runner-import-edges-consolidated/why-state-and-runner-import-edges-were-cut-and-cli-logic-moved-to-a-use-case-layer.md",
+        "docs/knowledge/why-fgos-detects-post-land-drift-among-sibling-leaves-by-int/why-post-land-drift-detection-intersects-real-changed-paths-not-declared-footprint.md",
+        "docs/knowledge/why-fgos-discover-could-overwrite-an-already-locked-verify-c/discovery-decompose-reporoot-verify-overwrite.md"
+      ],
+      "dispositions": {
+        "preserve": 46,
+        "patch": 18,
+        "parked": 8
+      }
+    },
+    {
+      "set": "batch-078",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000078",
+      "population": [
+        "docs/knowledge/why-fgos-discover-next-shrank-to-a-picker/why-discover-next-shrank-to-a-picker.md",
+        "docs/knowledge/why-fgos-dispatch-splits-into-gather-packets-with-a-second-e/why-fgos-dispatch-splits-into-gather-packets-and-a-gated-exec-packet.md",
+        "docs/knowledge/why-fgos-fanout-treats-a-dispatched-agent-s-worktree-isolati/why-fanouts-worktree-isolation-race-is-a-recoverable-self-heal-not-a-lowered-batch-cap.md",
+        "docs/knowledge/why-fgos-fgos-runner-died-in-every-agent-shell/harness-shell-snapshot-strips-underscore-prefixed-helper-functions.md",
+        "docs/knowledge/why-fgos-install-moved-from-always-pulling-main-head-to-a-ta/why-fgos-install-is-pinned-to-a-semver-tag-instead-of-main-head.md",
+        "docs/knowledge/why-fgos-keeps-growing-the-same-decision-logic-in-more-than/fgos-choke-point-pattern.md",
+        "docs/knowledge/why-fgos-main-checkout-lock-could-report-ambiguous-with-no-r/main-checkout-lock-toctou-race.md",
+        "docs/knowledge/why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-roo/why-merge-next-auto-syncs-blockedonsync-roots.md",
+        "docs/knowledge/why-fgos-merge-throughput-bottlenecked-despite-parallel-disp/why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline.md",
+        "docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md",
+        "docs/knowledge/why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md",
+        "docs/knowledge/why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-wh/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md",
+        "docs/knowledge/why-fgos-retro-next-shrank-to-a-launcher/why-retro-next-shrank-to-a-launcher.md"
+      ],
+      "populationCount": 13,
+      "ranks": [
+        {
+          "file": "docs/knowledge/why-fgos-install-moved-from-always-pulling-main-head-to-a-ta/why-fgos-install-is-pinned-to-a-semver-tag-instead-of-main-head.md",
+          "rankHash": "0303baaa1e0c9d8384a6669834d0685b2e6982124744528a7a4989d41a0693c2"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-main-checkout-lock-could-report-ambiguous-with-no-r/main-checkout-lock-toctou-race.md",
+          "rankHash": "22818af23152f2b90d3e71bc76a1b30e07cb724905843d05d85fa07c1906916c"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-merge-throughput-bottlenecked-despite-parallel-disp/why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline.md",
+          "rankHash": "412dc1f28d9bff47b2665d252b43b0a42d228f811d6f738a73395848bbaa72cd"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md",
+          "rankHash": "466a1508aeb386e4776397232be051b534d5a34e48ca715608e274095598b775"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-fgos-runner-died-in-every-agent-shell/harness-shell-snapshot-strips-underscore-prefixed-helper-functions.md",
+          "rankHash": "517cb9e5653d49c62afe05ba1a5330281260eefdaafba3e71dc522cd463e3e3f"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-retro-next-shrank-to-a-launcher/why-retro-next-shrank-to-a-launcher.md",
+          "rankHash": "5e157da869792411c90059ba48a821aaed397d03c1a8987f516c2a061c8ae101"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-dispatch-splits-into-gather-packets-with-a-second-e/why-fgos-dispatch-splits-into-gather-packets-and-a-gated-exec-packet.md",
+          "rankHash": "71b86f532f0920199ef0b09782c61454a1ae2a14fbc524bd8753ee1b8501535d"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-fanout-treats-a-dispatched-agent-s-worktree-isolati/why-fanouts-worktree-isolation-race-is-a-recoverable-self-heal-not-a-lowered-batch-cap.md",
+          "rankHash": "9046334cb4fc471a1a82fadf6b48177bad9b66232075dc52c03576e374b0c095"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md",
+          "rankHash": "b69a4d7f5574a0b641a627e170efc598db2d2d6bc5391f7620918adead4fab1a"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-roo/why-merge-next-auto-syncs-blockedonsync-roots.md",
+          "rankHash": "badccdd0666b10440dbd18b22d807f12a875ad24d8abdd2b7bf85f5ab268c0c9"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-discover-next-shrank-to-a-picker/why-discover-next-shrank-to-a-picker.md",
+          "rankHash": "c0c2e144488140647c8d7095a22b8ae2259e2292a2d6d81712b6041e9cc765c5"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-wh/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md",
+          "rankHash": "ddc0382e1a4b7dd3f4fccb91cebbea70e126c9945aaef7d988a79af224c7c07a"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-keeps-growing-the-same-decision-logic-in-more-than/fgos-choke-point-pattern.md",
+          "rankHash": "f7668a4da36866f262b37ccc63f5eadb036909af401a6c7fb171b4d05d0087bc"
+        }
+      ],
+      "sample": [
+        "docs/knowledge/why-fgos-install-moved-from-always-pulling-main-head-to-a-ta/why-fgos-install-is-pinned-to-a-semver-tag-instead-of-main-head.md",
+        "docs/knowledge/why-fgos-main-checkout-lock-could-report-ambiguous-with-no-r/main-checkout-lock-toctou-race.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/knowledge/why-fgos-install-moved-from-always-pulling-main-head-to-a-ta/why-fgos-install-is-pinned-to-a-semver-tag-instead-of-main-head.md",
+        "docs/knowledge/why-fgos-main-checkout-lock-could-report-ambiguous-with-no-r/main-checkout-lock-toctou-race.md"
+      ],
+      "distinctReviewCount": 2,
+      "pilotFullReviewFiles": [
+        "docs/knowledge/why-fgos-discover-next-shrank-to-a-picker/why-discover-next-shrank-to-a-picker.md",
+        "docs/knowledge/why-fgos-discover-now-trusts-a-locked-context-md-instead-of/fgos-discover-trusts-a-locked-context-instead-of-blind-rejudging.md",
+        "docs/knowledge/why-fgos-dispatch-splits-into-gather-packets-with-a-second-e/why-fgos-dispatch-splits-into-gather-packets-and-a-gated-exec-packet.md",
+        "docs/knowledge/why-fgos-doctor-s-checktoolregistryconfigured-now-reports-fa/why-doctor-now-fails-on-a-degraded-impact-analysis-tool-instead-of-passing.md",
+        "docs/knowledge/why-fgos-doctor-setup-uninstall-resolve-the-real-main-checko/why-doctor-setup-and-uninstall-had-to-resolve-the-real-main-checkout-not-raw-cwd.md",
+        "docs/knowledge/why-fgos-events-jsonl-can-silently-lose-lines-under-concurre/events-jsonl-lost-update-race-under-concurrent-session-writes.md",
+        "docs/knowledge/why-fgos-fanout-treats-a-dispatched-agent-s-worktree-isolati/why-fanouts-worktree-isolation-race-is-a-recoverable-self-heal-not-a-lowered-batch-cap.md",
+        "docs/knowledge/why-fgos-fgos-runner-died-in-every-agent-shell/harness-shell-snapshot-strips-underscore-prefixed-helper-functions.md",
+        "docs/knowledge/why-fgos-install-moved-from-always-pulling-main-head-to-a-ta/why-fgos-install-is-pinned-to-a-semver-tag-instead-of-main-head.md",
+        "docs/knowledge/why-fgos-keeps-growing-the-same-decision-logic-in-more-than/fgos-choke-point-pattern.md",
+        "docs/knowledge/why-fgos-main-checkout-lock-could-report-ambiguous-with-no-r/main-checkout-lock-toctou-race.md",
+        "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+        "docs/knowledge/why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-roo/why-merge-next-auto-syncs-blockedonsync-roots.md",
+        "docs/knowledge/why-fgos-merge-now-refuses-outside-the-main-checkout/why-fgos-merge-now-refuses-outside-the-main-checkout.md",
+        "docs/knowledge/why-fgos-merge-throughput-bottlenecked-despite-parallel-disp/why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline.md",
+        "docs/knowledge/why-fgos-move-gained-an-answer-flag-closing-the-last-unreach/why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human.md",
+        "docs/knowledge/why-fgos-move-to-awaiting-approval-refuses-a-doing-item-with/why-fgos-move-refuses-awaiting-approval-from-doing-without-skip-return-guard.md",
+        "docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md",
+        "docs/knowledge/why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md",
+        "docs/knowledge/why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-wh/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md",
+        "docs/knowledge/why-fgos-requires-a-gate-ask-question-to-restate-its-own-con/why-gate-questions-must-be-self-sufficient-and-mechanically-checked-for-it.md",
+        "docs/knowledge/why-fgos-retired-fgos-runner-json-entirely-instead-of-fixing/why-fgos-retired-the-fgos-runner-json-legacy-config-fallback.md",
+        "docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md",
+        "docs/knowledge/why-fgos-retro-next-shrank-to-a-launcher/why-retro-next-shrank-to-a-launcher.md",
+        "docs/knowledge/why-fgos-review-crashed-with-enobufs-on-very-stale-branch-di/why-fgos-review-crashed-with-enobufs-on-stale-branch-diffs.md"
+      ],
+      "dispositions": {
+        "patch": 29,
+        "preserve": 31
+      }
+    }
+  ],
+  "unpatchedStrata": {
+    "077": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-077",
+      "population": [
+        "docs/knowledge/why-docs-index-preserves-a-doc-s-prior-id-when-the-store-is/docs-index-preserves-prior-id-when-the-store-is-unreachable.md",
+        "docs/knowledge/why-doctor-checks-are-documented-as-an-open-registry-not-a-f/why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md",
+        "docs/knowledge/why-fgos-add-items-landed-permanently-at-stage-executing-wit/why-fgos-add-defaulted-new-items-to-stage-executing-with-no-way-back.md",
+        "docs/knowledge/why-fgos-added-sync-root-and-drift-detection/why-fgos-added-sync-root-and-drift-detection.md",
+        "docs/knowledge/why-fgos-answer-s-real-resume-behavior-is-statusatask-rather/why-fgos-answer-resumes-to-statusatask-not-always-todo.md",
+        "docs/knowledge/why-fgos-approve-distinguishes-a-pre-existing-merge-head-fro/why-fgos-approve-distinguishes-a-pre-existing-merge-head-from-its-own-conflict.md",
+        "docs/knowledge/why-fgos-catchup-needed-its-own-already-caught-up-guard/why-catchup-needed-its-own-already-caught-up-guard.md",
+        "docs/knowledge/why-fgos-coding-compounding-s-retrospective-synthesis-commit/why-fgos-compounding-refuses-to-commit-when-merge-head-is-set.md",
+        "docs/knowledge/why-fgos-coding-driving-s-title-description-print-lives-in-o/why-fgos-coding-drivings-title-description-print-lives-in-one-shared-place.md",
+        "docs/knowledge/why-fgos-coding-planning-writes-docsref-immediately-after-cr/why-fgos-coding-planning-writes-docsref-when-it-self-creates-a-feature-dir.md",
+        "docs/knowledge/why-fgos-cut-specific-state-runner-import-edges-consolidated/why-state-and-runner-import-edges-were-cut-and-cli-logic-moved-to-a-use-case-layer.md"
+      ],
+      "populationCount": 11,
+      "ranks": [
+        {
+          "file": "docs/knowledge/why-fgos-add-items-landed-permanently-at-stage-executing-wit/why-fgos-add-defaulted-new-items-to-stage-executing-with-no-way-back.md",
+          "rankHash": "028c47eba33b5d4f73b110fe7ab00903b97e5683224b2898636b4b8313338a97"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-coding-planning-writes-docsref-immediately-after-cr/why-fgos-coding-planning-writes-docsref-when-it-self-creates-a-feature-dir.md",
+          "rankHash": "2d0dd2b9df780ff7b1fc723964ceec9d94c59891f2dd035d98b75427fedc3a6f"
+        },
+        {
+          "file": "docs/knowledge/why-doctor-checks-are-documented-as-an-open-registry-not-a-f/why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md",
+          "rankHash": "301f32d34bbb51debb3ce2cd768ca126bdaad149bd86803ed096bd2a6edb0bd0"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-coding-driving-s-title-description-print-lives-in-o/why-fgos-coding-drivings-title-description-print-lives-in-one-shared-place.md",
+          "rankHash": "3e36ed5af7a8cd6b852774dadb6c96e57cd9d058c462f9f236f43b83a842e061"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-cut-specific-state-runner-import-edges-consolidated/why-state-and-runner-import-edges-were-cut-and-cli-logic-moved-to-a-use-case-layer.md",
+          "rankHash": "4166cb1b80e54302616d99a56bf55a3a5cec0acf95ccf6c6d644aed39be71c36"
+        },
+        {
+          "file": "docs/knowledge/why-docs-index-preserves-a-doc-s-prior-id-when-the-store-is/docs-index-preserves-prior-id-when-the-store-is-unreachable.md",
+          "rankHash": "41fb04d6d9a1b9398b2d24cbca16ce12b0568062115e1536d3a2029069506f7a"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-approve-distinguishes-a-pre-existing-merge-head-fro/why-fgos-approve-distinguishes-a-pre-existing-merge-head-from-its-own-conflict.md",
+          "rankHash": "48177fa48788a1868dd4dee5208640e763d45c84f2ebff505d734ebef36b8405"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-coding-compounding-s-retrospective-synthesis-commit/why-fgos-compounding-refuses-to-commit-when-merge-head-is-set.md",
+          "rankHash": "4953177e0ebb12ec429297b899e51a499ac178e4784f39588b7d5faa078d41ee"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-catchup-needed-its-own-already-caught-up-guard/why-catchup-needed-its-own-already-caught-up-guard.md",
+          "rankHash": "629930b3e9a50c4ef9a39194c4013045b9dbb290f082f86c647ed4abb35368bd"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-added-sync-root-and-drift-detection/why-fgos-added-sync-root-and-drift-detection.md",
+          "rankHash": "8d42eac2a7d40a790d4e76851af9ee36688f02be4a70abe124731f1d4c052847"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-answer-s-real-resume-behavior-is-statusatask-rather/why-fgos-answer-resumes-to-statusatask-not-always-todo.md",
+          "rankHash": "db17d369cb90f2cb8554b021d74b9534386797dc6867a974c3a130202a891721"
+        }
+      ],
+      "selected": [
+        "docs/knowledge/why-fgos-add-items-landed-permanently-at-stage-executing-wit/why-fgos-add-defaulted-new-items-to-stage-executing-with-no-way-back.md",
+        "docs/knowledge/why-fgos-coding-planning-writes-docsref-immediately-after-cr/why-fgos-coding-planning-writes-docsref-when-it-self-creates-a-feature-dir.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    },
+    "078": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-078",
+      "population": [
+        "docs/knowledge/why-fgos-discover-now-trusts-a-locked-context-md-instead-of/fgos-discover-trusts-a-locked-context-instead-of-blind-rejudging.md",
+        "docs/knowledge/why-fgos-doctor-setup-uninstall-resolve-the-real-main-checko/why-doctor-setup-and-uninstall-had-to-resolve-the-real-main-checkout-not-raw-cwd.md",
+        "docs/knowledge/why-fgos-events-jsonl-can-silently-lose-lines-under-concurre/events-jsonl-lost-update-race-under-concurrent-session-writes.md",
+        "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+        "docs/knowledge/why-fgos-requires-a-gate-ask-question-to-restate-its-own-con/why-gate-questions-must-be-self-sufficient-and-mechanically-checked-for-it.md",
+        "docs/knowledge/why-fgos-retired-fgos-runner-json-entirely-instead-of-fixing/why-fgos-retired-the-fgos-runner-json-legacy-config-fallback.md",
+        "docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md",
+        "docs/knowledge/why-fgos-review-crashed-with-enobufs-on-very-stale-branch-di/why-fgos-review-crashed-with-enobufs-on-stale-branch-diffs.md"
+      ],
+      "populationCount": 8,
+      "ranks": [
+        {
+          "file": "docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md",
+          "rankHash": "21a73d34e2a659cea309b8d930b5328e7588cfb2a697181214c0cba3726d38bd"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+          "rankHash": "3d7fb29828600da9b2318c2ba7043a625e86fe921f30e65abd0066d384e8cf68"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-doctor-setup-uninstall-resolve-the-real-main-checko/why-doctor-setup-and-uninstall-had-to-resolve-the-real-main-checkout-not-raw-cwd.md",
+          "rankHash": "47c3677fedc5bf40f689baf75919f33eaece8af16167857c5e54d4cd3f264c54"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-retired-fgos-runner-json-entirely-instead-of-fixing/why-fgos-retired-the-fgos-runner-json-legacy-config-fallback.md",
+          "rankHash": "50cdf2302dd64c9d6687f1a623af4fe0fa953d646e98bd4d7a148dbfc3013940"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-review-crashed-with-enobufs-on-very-stale-branch-di/why-fgos-review-crashed-with-enobufs-on-stale-branch-diffs.md",
+          "rankHash": "5e337592bbfef5b7a380b7722a3c2a4aa6c3ec0846098274d4af645ae0af8124"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-requires-a-gate-ask-question-to-restate-its-own-con/why-gate-questions-must-be-self-sufficient-and-mechanically-checked-for-it.md",
+          "rankHash": "7a77b770f69d5d8f2c93440ac134ba5f9752c544f871b09104df80bdbfcb0f7c"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-events-jsonl-can-silently-lose-lines-under-concurre/events-jsonl-lost-update-race-under-concurrent-session-writes.md",
+          "rankHash": "7d7482716d91a19ab2b1c5c53ce2aeae15c24e3b0979d78a9edf9664b6aa6282"
+        },
+        {
+          "file": "docs/knowledge/why-fgos-discover-now-trusts-a-locked-context-md-instead-of/fgos-discover-trusts-a-locked-context-instead-of-blind-rejudging.md",
+          "rankHash": "bfa6ddfabfef4dad3103fd3dfae9b03e1735a4bbb5ba2bdebaae07db0557bab9"
+        }
+      ],
+      "selected": [
+        "docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md",
+        "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    }
+  },
+  "recordFiles": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-077.jsonl",
+      "sha256": "0c7af7678250e59d729331c57de345840ee71d6577dfabdb5ede9283f019c47b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-078.jsonl",
+      "sha256": "8d5d9645a1153b9a4c8b91a10e79c8676ebe71f571def34884ba9f5172c631c3"
+    }
+  ]
+}

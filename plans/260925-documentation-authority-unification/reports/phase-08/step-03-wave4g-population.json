@@ -1,0 +1,61 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "completedBatches": [
+    "077",
+    "078"
+  ],
+  "pendingBatches": [
+    "079",
+    "080",
+    "081",
+    "082"
+  ],
+  "stopReason": "Whole-file authoring budget boundary after batch 078; batches 079–082 remain unauthored.",
+  "files": 50,
+  "inventoryEdges": 127,
+  "addedEdges": 5,
+  "edges": 132,
+  "patchedFiles": 22,
+  "dispositions": {
+    "patch": 47,
+    "preserve": 77,
+    "parked": 8
+  },
+  "parks": {
+    "description-rewrite": 4,
+    "lead-ruling": 4
+  },
+  "reviewAcceptance": "pending independent A51 review",
+  "perSet": {
+    "batch-077": {
+      "files": 25,
+      "inventoryEdges": 68,
+      "addedEdges": 4,
+      "edges": 72,
+      "patchedFiles": 9,
+      "dispositions": {
+        "preserve": 46,
+        "patch": 18,
+        "parked": 8
+      },
+      "parks": {
+        "description-rewrite": 4,
+        "lead-ruling": 4
+      },
+      "reviewAcceptance": "pending independent A51 review"
+    },
+    "batch-078": {
+      "files": 25,
+      "inventoryEdges": 59,
+      "addedEdges": 1,
+      "edges": 60,
+      "patchedFiles": 13,
+      "dispositions": {
+        "patch": 29,
+        "preserve": 31
+      },
+      "parks": {},
+      "reviewAcceptance": "pending independent A51 review"
+    }
+  }
+}

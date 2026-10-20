@@ -1,0 +1,28 @@
+{
+  "set": "batch-077",
+  "edges": [
+    "maps-j-04741",
+    "maps-j-04742",
+    "maps-j-04743",
+    "maps-j-04744"
+  ],
+  "consumer": "docs/knowledge/why-fgos-coding-planning-and-fgos-coding-validating-merged-t/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md",
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "whatIsHappening": "Four old documentation spellings are file identities in the completed Post-merge prose sync (tsk-2tk) section: 04741 is numbered item 4; 04742–04744 are the immediately following sentence naming three docs that were updated to past tense.",
+  "cause": "L12-26(5)/L12-42(3) preserve completed past-event identities. The unchanged renamed-alias-preserve predicate exempts source-computed explicit history and captured regions, not this unfenced completed-update section. This turn cannot alter that predicate.",
+  "options": [
+    {
+      "choice": "Preserve historical spelling with exact successor note under existing history rulings",
+      "cost": "Lead confirms passage role; any future mechanical support is a separately authorized checker task, with no change in this author turn."
+    },
+    {
+      "choice": "Redirect all four old names to current alias holders as navigation",
+      "cost": "No predicate extension, but changes the recorded historical file identities; author does not recommend it."
+    }
+  ],
+  "recommendation": "Preserve with real non-executable alias successor notes under the existing completed-past-action rule; keep non-executable lead-ruling parks until Lead settles the current record/checker conflict.",
+  "answerScope": "Disposition and source-role treatment of these four edges only, no consumer edit, no new history rule or checker/probe/resolver change authorized here. Other independent records and batch-078 proceed.",
+  "closure": "batch-077 cannot close while any of these lead-ruling parks remains; all other sets have zero open lead-ruling edges",
+  "reviewPart": "review-a38-step-03-wave4g-p02.md",
+  "rulingStatus": "pending Lead; author does not self-accept"
+}

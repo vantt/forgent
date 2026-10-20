@@ -1,0 +1,1067 @@
+{
+  "authorPin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "assignmentInputHead": "63952951acd56d1d5b9cbed45117f2a497f4db5c",
+  "newPopulation": {
+    "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "completedBatches": [
+      "077",
+      "078"
+    ],
+    "pendingBatches": [
+      "079",
+      "080",
+      "081",
+      "082"
+    ],
+    "stopReason": "Whole-file authoring budget boundary after batch 078; batches 079–082 remain unauthored.",
+    "files": 50,
+    "inventoryEdges": 127,
+    "addedEdges": 5,
+    "edges": 132,
+    "patchedFiles": 22,
+    "dispositions": {
+      "patch": 47,
+      "preserve": 77,
+      "parked": 8
+    },
+    "parks": {
+      "description-rewrite": 4,
+      "lead-ruling": 4
+    },
+    "reviewAcceptance": "pending independent A51 review",
+    "perSet": {
+      "batch-077": {
+        "files": 25,
+        "inventoryEdges": 68,
+        "addedEdges": 4,
+        "edges": 72,
+        "patchedFiles": 9,
+        "dispositions": {
+          "preserve": 46,
+          "patch": 18,
+          "parked": 8
+        },
+        "parks": {
+          "description-rewrite": 4,
+          "lead-ruling": 4
+        },
+        "reviewAcceptance": "pending independent A51 review"
+      },
+      "batch-078": {
+        "files": 25,
+        "inventoryEdges": 59,
+        "addedEdges": 1,
+        "edges": 60,
+        "patchedFiles": 13,
+        "dispositions": {
+          "patch": 29,
+          "preserve": 31
+        },
+        "parks": {},
+        "reviewAcceptance": "pending independent A51 review"
+      }
+    }
+  },
+  "verificationAttempts": [
+    {
+      "scope": "new batch 077 only",
+      "failureCount": 10,
+      "cause": "Whole-file patch line evidence was placed in anchor proof with null anchors; corrected record proof shape, retaining nonempty descriptionTruth target quotes."
+    },
+    {
+      "scope": "full sets 001–078",
+      "files": 652,
+      "edges": 4237,
+      "failureCount": 1,
+      "cause": "04793 Ranked priority substring matched target H1; corrected the record to exact H2 with matching line evidence, then reran full checker."
+    },
+    {
+      "scope": "final full sets 001–078",
+      "failureCount": 0
+    }
+  ],
+  "checker": {
+    "result": "step-03-wave4g-check-result.json",
+    "sha256": "d392a7c47cb30e64dd0b5854a9502c7882e28d09452d1f70b7600210c242893e",
+    "files": 652,
+    "edges": 4237,
+    "failureCount": 0,
+    "locatorReviewFlags": [
+      {
+        "file": "docs/reading-map.md",
+        "edgeId": "maps-j-08011",
+        "check": "patch-locator-review",
+        "locatorTokens": [
+          "§13.1."
+        ],
+        "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+        "recordedScopeReason": "This is the initial whole-file confinement spec pointer; §13.1 belongs to the later private-home recipe citation (08012), which remains parked separately.",
+        "correspondence": null
+      },
+      {
+        "file": "docs/routing-handoff-contract.md",
+        "edgeId": "maps-j-08056",
+        "check": "patch-locator-review",
+        "locatorTokens": [
+          "ADR-0005"
+        ],
+        "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+        "recordedScopeReason": "ADR-0005 is headed 0005 in the live decision file. The source D3/D4 clause labels remain verbatim; this pointer targets the complete Runner isolation decision, not an area portal.",
+        "correspondence": null
+      },
+      {
+        "file": "docs/specs/reading-map.md",
+        "edgeId": "maps-j-08184",
+        "check": "patch-locator-review",
+        "locatorTokens": [
+          "§13.1."
+        ],
+        "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+        "recordedScopeReason": "This is the initial whole-file confinement spec pointer; §13.1 belongs to the later private-home recipe citation (08185), which remains parked separately.",
+        "correspondence": null
+      },
+      {
+        "file": "docs/specs/workflow.md",
+        "edgeId": "maps-j-08379",
+        "check": "patch-locator-review",
+        "locatorTokens": [
+          "0027"
+        ],
+        "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+        "recordedScopeReason": "The source labels this as Lifecycle Work and universal tail, a whole-file current lifecycle pointer. The dated 0027 decision number is kept; its narrative remains in retired decision history, not an executable target.",
+        "correspondence": null
+      },
+      {
+        "file": "docs/how-to/configure-and-operate-agent-confinement.md",
+        "edgeId": "maps-j-03990",
+        "check": "patch-locator-review",
+        "locatorTokens": [
+          "§9.2."
+        ],
+        "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+        "recordedScopeReason": "Complete source claim is bound to the pinned target passage; the repository anchor API supplies the closest enclosing heading.",
+        "correspondence": null
+      }
+    ],
+    "openLeadRulingEdgesPerSet": {
+      "batch-001": [],
+      "batch-002": [],
+      "batch-003": [],
+      "batch-004": [],
+      "batch-005": [],
+      "batch-006": [],
+      "batch-007": [],
+      "batch-008": [],
+      "batch-009": [],
+      "batch-010": [],
+      "batch-011": [],
+      "batch-012": [],
+      "batch-013": [],
+      "batch-014": [],
+      "batch-015": [],
+      "batch-016": [],
+      "batch-017": [],
+      "batch-018": [],
+      "batch-019": [],
+      "batch-020": [],
+      "batch-021": [],
+      "batch-022": [],
+      "batch-023": [],
+      "batch-024": [],
+      "batch-025": [],
+      "batch-026": [],
+      "batch-027": [],
+      "batch-028": [],
+      "batch-029": [],
+      "batch-030": [],
+      "batch-031": [],
+      "batch-032": [],
+      "batch-033": [],
+      "batch-034": [],
+      "batch-035": [],
+      "batch-036": [],
+      "batch-037": [],
+      "batch-038": [],
+      "batch-039": [],
+      "batch-040": [],
+      "batch-041": [],
+      "batch-042": [],
+      "batch-043": [],
+      "batch-044": [],
+      "batch-045": [],
+      "batch-046": [],
+      "batch-047": [],
+      "batch-048": [],
+      "batch-049": [],
+      "batch-050": [],
+      "batch-051": [],
+      "batch-052": [],
+      "batch-053": [],
+      "batch-054": [],
+      "batch-055": [],
+      "batch-056": [],
+      "batch-057": [],
+      "batch-058": [],
+      "batch-059": [],
+      "batch-060": [],
+      "batch-061": [],
+      "batch-062": [],
+      "batch-063": [],
+      "batch-064": [],
+      "batch-065": [],
+      "batch-066": [],
+      "batch-067": [],
+      "batch-068": [],
+      "batch-069": [],
+      "batch-070": [],
+      "batch-071": [],
+      "batch-072": [],
+      "batch-073": [],
+      "batch-074": [],
+      "batch-075": [],
+      "batch-076": [],
+      "batch-077": [
+        "maps-j-04741",
+        "maps-j-04742",
+        "maps-j-04743",
+        "maps-j-04744"
+      ],
+      "batch-078": []
+    },
+    "notClosableSets": [
+      "batch-077"
+    ]
+  },
+  "selectionReplay": [
+    {
+      "set": "batch-077",
+      "patchedPopulation": 9,
+      "patchedSeeded": 2,
+      "mandatory": 0,
+      "unpatchedEligible": 11,
+      "unpatchedSeeded": 2,
+      "independentHashlibNulCeilReplay": "matches"
+    },
+    {
+      "set": "batch-078",
+      "patchedPopulation": 13,
+      "patchedSeeded": 2,
+      "mandatory": 0,
+      "unpatchedEligible": 8,
+      "unpatchedSeeded": 2,
+      "independentHashlibNulCeilReplay": "matches"
+    }
+  ],
+  "packet": {
+    "request": "step-03-wave4g-review-request.md",
+    "files": 9,
+    "edges": 31,
+    "parts": [
+      {
+        "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave4g-p01.md",
+        "files": 6,
+        "edges": 20,
+        "sourcePlusRecordBytes": 117031
+      },
+      {
+        "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave4g-p02.md",
+        "files": 3,
+        "edges": 11,
+        "sourcePlusRecordBytes": 80526
+      }
+    ],
+    "reviewedDenominators": 0,
+    "reworkNumerators": "pending"
+  },
+  "allCurrentRecordFilesBound": 78,
+  "newWholeFileReadsBound": 50,
+  "priorPhase08PathsUnchanged": 1360,
+  "protectedBindings": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/audit-report.py",
+      "sha256": "dd7d3c58ae344377688b8006523ac2d95f1f8c3c6379465ef0c3fa9db95b753c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/scan-consumers.py",
+      "sha256": "04c26e8a5a5087cd0f16081cd0960898b49182ade4b7ec589d3ec5e9c29ad1ac"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-author-review-request.md",
+      "sha256": "48512402aecf43dcb460a6ca0425c9522b83d685b2de485ba6080afb94df81d6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-01-pilot-b-review-request.md",
+      "sha256": "b5844c7008567fbbf18b7dc620fa9166d5943aa58bb86c142ba853862348dffe"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-review-request.md",
+      "sha256": "e480c1021d46fe6bccda2df91d29f8ce6ec32a1378a6ace8972af8c6b8e363d9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02b-review-request.md",
+      "sha256": "be46bb48444bcbdc75fdee4d154677f890ad202d10d06c420177267ab17385dc"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-mapping-review-request.md",
+      "sha256": "6c2be190de35b15a9639a4b09816402ab2e133b84825a48822155503da3ef64e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-replay.py",
+      "sha256": "ed70f3dd00b442f9b88f5909781f9b8db5c9d7a4be8f0888180c73037a75be4c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02c-review-request.md",
+      "sha256": "2773cac9f4f60b43be92090c84dfc6ad3e8860e4c65f54b3c52664604706fcff"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02e-mapping-review-request.md",
+      "sha256": "1910fb33843b48915b0edd6826913db58e71519cd30552d19015d0ae59dd04f9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02e-packet.py",
+      "sha256": "10e8cdaf81f3a73ab034f67f93a215aa33ef27cfacc85b6be7d93c252daf4c34"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02e-parser.py",
+      "sha256": "3ad4b7fd44c9a842eb68a66cdb7986be3deee4dedbddf4edd0f1eb1569a34ce1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02e-replay.py",
+      "sha256": "55982240a46dbd8853c6b3a54c937da27dd302f5f8aa27f1889e60f3e676dd26"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02f-mapping-review-request.md",
+      "sha256": "24d8e14310ed48b12a68bab740043069ac8a121183726298f44d2a43c42c6634"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02f-packet.py",
+      "sha256": "46d70511dd6b156a5a812130bc8989b85bfc510606f1b0a73aba2097b22ba26d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02f-parser.py",
+      "sha256": "b23d403d91e3999e102ac70b74559f27d086f57c7aaa9b680f28f1817a370aa4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02f-probes.py",
+      "sha256": "bf04d90b588c57e865ffaeb58508e3b52a87f94cf71b9bfc78db630d65615ff4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02f-replay.py",
+      "sha256": "12e4f31fdd67446b05ff4d0722008140733b5905c8edfc23d79d52e08ff36e3a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02g-mapping-review-request.md",
+      "sha256": "2d49b36d54a306871966c26f45aede0668140e3c62bbbf76e4d47438a0880cc7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02g-packet.py",
+      "sha256": "8e222249ebccbf83bd64abc8dd08f578f45eebe4a29fb1eb705afa506d8d7bb6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02g-parser.py",
+      "sha256": "a219ae23e7d435a3a1e19b4f858b0c3312415e9deb19f872db660bbe802ab82b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02g-probes.py",
+      "sha256": "48d790d1efa9231e0df2e9978951e5956842df7f9d37c21de1aaef6bb1bbe268"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02g-replay.py",
+      "sha256": "7936741aab4357309db273de91ad4285a3b9b0e0adc0ff737f10c1baa186b65b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02h-mapping-review-request.md",
+      "sha256": "14857521399e0d66179d21ed74d96678bdb608f50d346a621886db8e62f9f846"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02h-packet.py",
+      "sha256": "5cfb2f16e4c22dd416a1d7bdec8f59c831d101004b49dc52a5190d1972ac7ab6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02h-parser.py",
+      "sha256": "cc1baadddbcebc3aa81ce337a0de7c442e1a4417cedecb7722fa7a4b41f28d23"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02h-probes.py",
+      "sha256": "3b9759e6369435d108bd2cfc3474e86e136279fc1547eee2a4dcec7a6ed2dcc5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02h-replay.py",
+      "sha256": "99863da4556850510129ec119f1d923ce9e2b46b8d966a1f0b8ac009835a6ac5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02i-class4.py",
+      "sha256": "836a3a0a72f73f8ce4aa0ce73ee7b5454eeef3aba0ae2ebdeceac3572e97c46e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02i-defects.py",
+      "sha256": "5c3091907d9c66b91520e7ef7bcea573e73eb4bdb0d375df894a4d132718aff3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02i-diff.py",
+      "sha256": "165f38614ae6249911e1f20b5aa5c65b3f56f055bdebcdb3f657151ca17dce4c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02i-mapping-review-request.md",
+      "sha256": "9bc37975125d50a886fde7d5dea36590aaeec8e7619be0e825fdc1e405055127"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02i-packet.py",
+      "sha256": "8ab3d22136a107b0473254e5026590399f9a5757769ae6ba4a0d269b3be6e3e5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02i-parser.py",
+      "sha256": "5a3a86f32e7ba64c73e719bcc27fd577f9d8393526fc788499d03b4c3a674599"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02i-probes.py",
+      "sha256": "10b419a73a292acd80db18c41ede8093d24315eee9852dd3055646209dbfd488"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02i-replay.py",
+      "sha256": "207d82dc9a5e04fdc629f7dba75feadce0e0980df5ed61c3114eda2c49904e71"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02j-mapping-review-request.md",
+      "sha256": "d0746b0ae471b482c6d9bdd38280dad00f1f76621558da983ca44b81f3c43933"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02j-packet.py",
+      "sha256": "8facc369b8ff345a5ced3a600e5ee3182f0b8fe94de6337c60cdc77aa6c24344"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02j-parser.py",
+      "sha256": "2e871befa21deee5fc2d1cb8760578d60707a6b7fc66827712531af45434574e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02j-probes.py",
+      "sha256": "4ac0603eb1e5b62631bd363848e064f3c56628a57b3c7b8c24a2f8dd49b991a7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02j-replay.py",
+      "sha256": "192bd94d6a8929640992436c6c3d551010bda2ec447c09047ca3421bffa1b133"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02j-semantics.py",
+      "sha256": "41fd710fda86aaf2bb7cda7171aec612eeb45c83b15e9e23d1d4f54710313972"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02k-inventory-review-request.md",
+      "sha256": "97d1cfb3fa51e1abbc802b4ff8b6306ed7d12c2ee5665d66da6563f8ff4db1a0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02k-inventory.py",
+      "sha256": "a6a968618a2aa5b769158fc6dd338357a810b7ab8ca30871a0484dba9f159b52"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02k-parser.py",
+      "sha256": "1e5a9cb9f0ea88ab3707049fdcfc6082064f9d4013101c6081ca831d9dcc5033"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02k-probes.py",
+      "sha256": "f39f8bc2b43f97f81e5f8c34962ea7fbeb7ed87cb8ac38d47be0e4fb9c4b13f6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02k-replay.py",
+      "sha256": "d09a8285fe6ff444222e9ad579d0ba47537712a023339022735a0cee7ff9cf6b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02l-accounting.py",
+      "sha256": "2d756cdef21f932157dbe65d58a8e80ffbdf4446616ef6984309f17825c025f5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02l-inventory-review-request.md",
+      "sha256": "48275382eae384fd2110df3cf07034946328dfffbc31651736aceb432cc64060"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02l-inventory.py",
+      "sha256": "f85bc90e1ba7df9828486de5f1794eb0ab93a2ee73e218893852fca62acec043"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02l-parser.py",
+      "sha256": "a479feb3410d022845cd8d7a6db8bb67376c8d9f93a91dae9b0f33b9c4904e60"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02l-probes.py",
+      "sha256": "fd0562a24e9773fbcdd2d8020041060a3a37171d73acdff60c7942b58bdc760b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02l-replay.py",
+      "sha256": "18b3becd627dbc6309fedd70e05101a24f0b8dfe16f58ab82857f6f8b1fce63c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-author-r2.py",
+      "sha256": "a641e430e7a2db8a3e62320e2531985d9aa7bc01f8f6f1ef7868e3b6d64924ba"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-author-r3.py",
+      "sha256": "06128fa71ea6d93331c3a906599f39cc43bcc3d339ad97d1ec8fd7b989911c2e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-batch073-expansion-review-request.md",
+      "sha256": "a8f4bf0875766c66e55985fc51c715e4b4a394bf926f2f6d0a587d538990f376"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-check.py",
+      "sha256": "fdb5acdb8cf7b10b7e0eb9867fc0205a271322677867a7ce7762cb8c726007cc"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-pilot-r2-review-request.md",
+      "sha256": "419aedcf1f080a84ea2b48c789199eeb044b3bf1b7874b5cc8c38c7bbe57d57a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-pilot-r3-review-request.md",
+      "sha256": "2aa0d5835dd0a434bd83bf8ae778e47477d5c39b09e5e9b51c3cd2d0114037d1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-pilot-r4-review-request.md",
+      "sha256": "c8ecef395f03704b962fa8094c46623c62979395c91c0ec54ef7ecaf1d27b4ec"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-pilot-review-request.md",
+      "sha256": "c09917ef86ff62d6c88a5aa3481c652936529698c28d6edbcde4f7a05928308b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-probes.py",
+      "sha256": "0715367a52e37f61c9bfd8b8622d35f9ede7c12d08e0f16b5040babf0f3714d5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-001.jsonl",
+      "sha256": "78ce07e713d194f142fdcd43393436abf2ecaa1e6ec83b0b2d26adfcd5b8537a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-002.jsonl",
+      "sha256": "098c200cf541423eee03191dbbfcce7a68f3bb8b0a9956c9f71fc97d5e457fe0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-003.jsonl",
+      "sha256": "08c01c8258dec6910b9a629557f1a8ede54ef597d9facb02cfa3f1b8a648acd4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-004.jsonl",
+      "sha256": "26020e7e42701ad62bd9f2e829a88e9cc75fb707a1c247295276fe267acbcd8f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-005.jsonl",
+      "sha256": "0d32397f1e7f370b6be07922d2eaccae8ef44f95d4daa23b55b420a553bb78c2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-006.jsonl",
+      "sha256": "62ff854f61d9dfba736517e9bf289b9b383d334059654aafb9368a4daeffa1b1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-007.jsonl",
+      "sha256": "274a0ad083d291ad632aa9654496132df5303a47f135faa7ed3e612eefcef354"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-008.jsonl",
+      "sha256": "3069bb82fc1edd87a6538f7db4391aa62df1ac0e8a02e91de81aeb75033cd140"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-009.jsonl",
+      "sha256": "32c45ee2932cad40a6ea66b44e6854be92522fdd2cf43e9518cefe5c6e7fad0a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-010.jsonl",
+      "sha256": "f446b558e996b05f94b34079176b3907cd4aaf65a7e0d5c98e426097da0b06bf"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-011.jsonl",
+      "sha256": "9bd96e6f9bfff0351b6c4fa1154f15f4c4d68d6745747f669b439bd7a9e871cb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-012.jsonl",
+      "sha256": "70a595d080e5e929e3651149655ccad758459a0894068fb5a3237fcd61c6e057"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-013.jsonl",
+      "sha256": "c9fe0883495a0d6df9fccfa7fbbc13b122702e8d0fb20cc0a46a6e0c0a6fa306"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-014.jsonl",
+      "sha256": "ba6f5e2f56ad8d1e791d6242edcdf373c145e198ba2dac1cb13a0c6d06c9e3d4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-015.jsonl",
+      "sha256": "de8882c4bdadd2f5aa0bf2f965fd04b2f9f5237d05e959a82f1ec16849bce496"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-016.jsonl",
+      "sha256": "a8be3dfee4db9277be9781e598b922a4d56011c98da3059983550a856875edb4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-017.jsonl",
+      "sha256": "b2a683f19c352375017ca574f056560402383302658107f2884b9a2b527ad3a1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-018.jsonl",
+      "sha256": "708cc5ed88f3950ea91f8de2655a288131942b52d692a5a0536ee7721c961de3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-019.jsonl",
+      "sha256": "1a0643cf59c111defe5cafd81d9eac903e019ebacad5ee1bb3d7424f933a14e8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-020.jsonl",
+      "sha256": "b3518e4d63ff79a4d77570137958a6b0af2a13a5b2faa48edbd41fc9812b8fa7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-021.jsonl",
+      "sha256": "9f2e01db86667304913ab94232c34c22a459f843223df6d6fd3fee297215bdcb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-022.jsonl",
+      "sha256": "8657c897000c42c9b0a7fe2aed7161010efbe7daea966d355eeb8cdcf352d980"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-023.jsonl",
+      "sha256": "4c54ba05692d41cce18f67ecd93a0f60a4ac9f435d397c2f1fbc082fce937a15"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-024.jsonl",
+      "sha256": "6a76603d574229139d0d2dc6bec6bd110043802e91d0a3238280efddc7ab1165"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-025.jsonl",
+      "sha256": "61ac79210490083bb1470277916c78acfc4200d1b0610a8a1c3cd2ea7fe1a329"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-026.jsonl",
+      "sha256": "7b12b874b3f5b4b0f8e4a7f281a0319d6f8913ba414809366c2a8ce25dcfa6f3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-027.jsonl",
+      "sha256": "e7363cafc833e77b7bdf94f48cb49d68eb26b568ac227579de5c530e92eaaa85"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-028.jsonl",
+      "sha256": "4aef3af3f87e0a36ca1e85b2117f84f937e61a3cbc664c8de766ecddf85a8e47"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-029.jsonl",
+      "sha256": "a07ae82c5cc68c66abe264e9c6ab6d716e7ca48e405a92b6a69c0ab25471f433"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-030.jsonl",
+      "sha256": "e3c84ff75c77abba07b481903f3943f267d1a72c140bb2b86d179775ff4fcbf6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-031.jsonl",
+      "sha256": "2262650c235b18d231b68cf2881c0ca6391bb71caa26bb21b262f9082b9732de"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-032.jsonl",
+      "sha256": "cf683c2663c1d9a77f4253b08108a99998b192ba317eca311a8364c4a835f708"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-033.jsonl",
+      "sha256": "e1c4f6545d4184d4ea5e05f77b9ab35c9c7f5946126827df22a5f2e854306675"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-034.jsonl",
+      "sha256": "a0eb8a8a75e00e4467ca7fecdd66ebcbfe9f372a70c69c0f84694fd831d8e75a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-035.jsonl",
+      "sha256": "eced999dc9d536b4882061e8b30816adbc69945c555d2ffc6e96ca17bc0d865a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-036.jsonl",
+      "sha256": "44e22e3c315397d6691c250f902ede369037ebf97e289a5af327dd6dc7fb9258"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-037.jsonl",
+      "sha256": "38eb0aaacea683b9fe8ca0026781cdbc564b543acd7c21c0e7648248bd15ad4d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-038.jsonl",
+      "sha256": "11aad87a084c8a125eef008229a863f6d3acbd56e41e39b68a597057641be5f2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-039.jsonl",
+      "sha256": "33435ed06c40758704685b6f8aa0c45a166b43869b3cc57a3cc26198aa00e31d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-040.jsonl",
+      "sha256": "c6abe0d0d1dc05b38728e9acd61da96fd0d01e2957ee7ed1bd9d406ed3a6b43b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-041.jsonl",
+      "sha256": "e2fefb1a31bba3a2ec3031d5490cf47bf2d9af3f3c426961c891672b74f0884f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-042.jsonl",
+      "sha256": "287d6cf3632a95ab416e2ebad3a3295bbc4d0dda34e472bafa66ea99d0cf10f4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-043.jsonl",
+      "sha256": "91b9faa7c292f9cdd276e0346e9fc9a230f445e5d688797f810a7bf47c1914fd"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-044.jsonl",
+      "sha256": "caeb971925934f2f21a684d0a69ab264ad15793074f12b753666916a29061b29"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-045.jsonl",
+      "sha256": "079c1065a0fbc9396b9b071cb761e8048990ed874e8b6ef3e5b53d0e22be0472"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-046.jsonl",
+      "sha256": "911011cbf1c7ccbe53884ce1cffd615639127a1b86a1b94e5f638a5da16fc9b7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-047.jsonl",
+      "sha256": "c52249a7a30805b93fe3800337d2b1a36cf7907b79fa51e566bb9d47eb2bb4f3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-048.jsonl",
+      "sha256": "f24093b482346b77a7c17842824f8b0c55f39bf15d7d99fd6dcc43dc420fb1d5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-049.jsonl",
+      "sha256": "4ecaeda857f444c5bcdac7f109482f76ee9d0fd03a4b1e0ac6e29df586ed77da"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-050.jsonl",
+      "sha256": "02ff5b99b51d2225631801903716bb0d2791bef7b22b5982ea01689a27f9ae5b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-051.jsonl",
+      "sha256": "8e97a1d396eabb24a023f1b03292fb78a51ef7d767c1df5f47563905e8156f83"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-052.jsonl",
+      "sha256": "90df44d30f8699bf0d24a9051ad8e8dffdd0cc5b01f57bb2ace5c8c5e6e435b0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-053.jsonl",
+      "sha256": "097915ff94a5c6d7af9fa67b8e1da31c5e4d5ca22902cc368aed7060ca32c6bb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-054.jsonl",
+      "sha256": "16e4cbbb7724df633058e2779af01c7e0a1d67fd9880b42e52a183e7475ea924"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-055.jsonl",
+      "sha256": "ad84aa24fefb096eb1ec24090c5ad7c0e4aa5e23bf941cbeb772c10a103d11bf"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-056.jsonl",
+      "sha256": "58138975dde677714ab67f46270594b5d78d3f2aefcc7e137b4726babcdbf78e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-057.jsonl",
+      "sha256": "5de2308b31bdf028b7843a47a52727573d5f1dc6706385b6b31e96214836b980"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
+      "sha256": "575f8e420b456713019e0f9bfd5c50ed76fcf7e2fbcd3270bdf1f642be3e8d53"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-059.jsonl",
+      "sha256": "3d6d2f818f60d3ec6d0f21f7afc06f1274ccb2047bc6ae1d196ebccc021c0a67"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-060.jsonl",
+      "sha256": "b342bf3ac3e64efa815c92c3a852b42350f6fe086cc9e562adac9babee766b01"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-061.jsonl",
+      "sha256": "c822575a9a01163aa5b50d9fb2ae51e442727ec762cc07cbc86e79646b4a1a72"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-062.jsonl",
+      "sha256": "482538a35729a6fd64139f15b13b30995400544d60f903c8339a010740352703"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-063.jsonl",
+      "sha256": "cf26e3113a7e730c8252deb6f7fa3616c8307be673da103f648b468a5c89f138"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-064.jsonl",
+      "sha256": "98e18b8e21cfaf7422bacfc16ccb42e3d6872c7aa609c68dabd3d1cf515f0690"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-065.jsonl",
+      "sha256": "83ab48b377ce021f0f1c8ec5519115e1d4eb330025e423059df422e5e89d9771"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-066.jsonl",
+      "sha256": "997ec29e616454af919d70af8914aff7160bb91187ff9b59ea1db22780dd2dfc"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-067.jsonl",
+      "sha256": "5b2d481c4abd83d7c8f5e0087e59a1b8e629d479bb3f750f92e4fe0c1d399a96"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-068.jsonl",
+      "sha256": "21085224f3c993a2c03f2fa82855bb9e454411b75ae965c08bcfb56e04e4b4fc"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-069.jsonl",
+      "sha256": "89201e6e652a7660baa2083d3ddd5401d05458bad4658f3b1b19a5ad9d4d7489"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-070.jsonl",
+      "sha256": "8ccca889e4c18deef8021b75bfe6837412f7af76945f839e371714aaf644de63"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-071.jsonl",
+      "sha256": "9f8c4cecb44ff7a23f04591c18bc8e16eb9fe79a4d74fa213600024093933bb7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-072.jsonl",
+      "sha256": "20abaa052f7f33920812053d189cc8abe22975fbcec1a068e3e8418cc594f540"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-073.jsonl",
+      "sha256": "36087d5b701255bfa705ff3a64bfa2b5c250ec2055b74efebf8ff6b4e9010b8f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-074.jsonl",
+      "sha256": "374a56838de70aa748d1b9e8ea738599483d42037ae4af81e80556dabd3fd774"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-075.jsonl",
+      "sha256": "37123a7b74e3136258bfca24e49aee0bf607c93d63dfc4ae50731ee848dcf190"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-076.jsonl",
+      "sha256": "d778db417be032dc72af601c223b93c95d3482af13dad4c54dc335c0c71dfe77"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-resolve.py",
+      "sha256": "766f96d8417af71a275f37da64072277e04bf21608a83c67a5c52afdffb3b8ba"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-review-pack.py",
+      "sha256": "6c06509bbddad32c9fa83b682d7ab055869f01f97c5f4d9d68a9aa959a7819d1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-check.py",
+      "sha256": "01a25ad418348c89f0551e7768d437e890f6b2b4222760a6c4304439bb3c0586"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-closeout.py",
+      "sha256": "41fee1056ff472b45068f90edb7485b5812c3ebcb6515c3d09a29f133dc3f046"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-expansion-review-request.md",
+      "sha256": "4ad409a739b8160876ea57e27a56af8271818f1a64d1121f794c0584237d5eae"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-r2-author.py",
+      "sha256": "5655eeadc23fc89206174f443852105fe294bc86bac5adb9e5d32eec8797bec3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-r2-probes.py",
+      "sha256": "8510f6d9826e424d8e3b8427301bc0dc6e132acaabb10c0709f3b16ac5e4513a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-r3-probes.py",
+      "sha256": "ae651e7928259cf99772adbe2182cd514b5f93b7583513c1a404c9b9c3fbf045"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-r3-review-request.md",
+      "sha256": "b8dbe6affa6cb74580c481e293e8a9c81d619784aefad22f27222e426cc1da0f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave1-review-request.md",
+      "sha256": "9bdab8e9794ef10b2b6adaa1894ba97a657ddf7b574bda6cdb56776628135f85"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-author.py",
+      "sha256": "27697b603fa12eca191f7ab2c20358795c92458ec4ec2ff0e9bd34da7fca5191"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-check.py",
+      "sha256": "b62199f6a351752cc139de6f18b2dd9460366cab90df80d63b3d62de09921aea"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-expansion-review-request.md",
+      "sha256": "6bfab868f71ded1b7f2455a36919b6e18de5733201b01c13a1de48bf57226fd7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-packet.py",
+      "sha256": "d0b0c49d79c860d2afdcba57d0eaa44fe954a30bad0ab461f584221face3bc20"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-probes.py",
+      "sha256": "5fdbe396d8099c51ad719348f95333656906ed234e162c996428f7e03684b00c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-r2-author.py",
+      "sha256": "aeafdd3cfb9267b3c26cee17d84766a2d54ffd96043c560b5a7577deccae079e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave2-review-request.md",
+      "sha256": "9dfc70d874f66ee78b5f9b283546ed538c2ae708594f1a0fdb216758b0425ad8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-author.py",
+      "sha256": "b9f924eb092a65c26440a232739011072a20cd0b29d3889c90541aa4fde45251"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-check.py",
+      "sha256": "9d1290a986d837f0f70f2381968d33a58bef24b194feeb19f5fa99b7993b86c8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-expansion-review-request.md",
+      "sha256": "03ba977135e112b202f4e8fec28a4f66ee51c92b0686b73560e6347f092fc828"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-packet.py",
+      "sha256": "d059e14d9ef6c87a4fc376475f2fef32aabcdda56ebbb1f477ba977a1dd0d281"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-probes.py",
+      "sha256": "ac88fc3e125f4ef918f6aa1164bc672e019085f4b7385fc35278648fd2c801d9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-r2-author.py",
+      "sha256": "3c9552d4266d60ecb7cbbf12567d77da5e74466d88e351eaec66924ab965ad1b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-review-request.md",
+      "sha256": "64bf6bf400c78b7b64824a25854385042ebd0a7c6d6c67521359521c3dad6e42"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave3-verify.py",
+      "sha256": "47f50aee5cb89be3f81e833a9a4b5f099393ec355dc559cfbb5e77be2a23625d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-author.py",
+      "sha256": "973f43a5105df1074a367920ae578837e65205dfe32e53bcc61c1f3720bdd0a7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-check.py",
+      "sha256": "ceff6ba8109d0923b5d976dd95e5163461e230e473649728ff497699cb55c6f7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-packet.py",
+      "sha256": "321e4efd25b2a7591151b6412bf9e11cf62ed5de5304563dbdd21a156e7f35cf"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-probes.py",
+      "sha256": "96cefdf781ad926314c97d12bf38284a3fb1698be71fd5615260232b65d48568"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4-review-request.md",
+      "sha256": "a72fa702e87d75744ac7963700c533ea6b8f085a8673a6f2849a5ebda8f50431"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4b-review-request.md",
+      "sha256": "efd61d43d5b0d87cd37a1ff748b10445ccbd4f7a6d03efa62e98378e1f6b3338"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-author.py",
+      "sha256": "e2040cabb4107ed6efd167ceeaea50cb91d215d0ddd0d3bf8287affa821a6651"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-check.py",
+      "sha256": "a14a942971bb3bd50839813ed878d693ca3ca2768c683216f404de95cb8a1581"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-packet.py",
+      "sha256": "97942c5e218746f0c73bd06b44340a27469617b7feba504896388e960bfc7a53"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-probes.py",
+      "sha256": "e304ef5cc4da8ccd6d57a0cd72e47bc4b710597de6b4901552266362e7327511"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-r2-author.py",
+      "sha256": "44edaa410eabc8b0ae0558eab74b520d974d7b57d18893a07262b5d171c19bc4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4c-review-request.md",
+      "sha256": "7931d892e2a7fd61d207248a9ec4ac6b27c834987f18c669dc32af2e20517bf9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-author.py",
+      "sha256": "63df3aad6e3f3c77647c1ac9b840213ada63c09027429ab42e1d4d604bc89b13"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-check.py",
+      "sha256": "f9baff9b66103f4d9cb944fbbad9f1f9be01c9592830362d79926afd909a579d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-packet.py",
+      "sha256": "40d81d2aa9a785b957607549c3605f01eb70ca61f02cfeca72548485108707ee"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-probes.py",
+      "sha256": "642fe7f1f49735f1aa63db15ec9f4e343c027397633066f1f5fdd0fbea54c302"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-replay.py",
+      "sha256": "2c9a020d54df7566d882f7eabd08f949ae20194b4caef3af87a9b81a62597862"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4d-review-request.md",
+      "sha256": "8fb92310a1342822143bbc33539eeb9800b3ddd597259ecd6fb5b8ad8d2a9a7e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4e-author.py",
+      "sha256": "4eb5a2d36d82183f1ba286be38d4bc807d3a6f6f657f03339c968954c4ee8e7f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4e-check.py",
+      "sha256": "5c211b2eda9e4ef2de7bcce854ade3dd891fbc5ff280c3a0856a81c12661030c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4e-packet.py",
+      "sha256": "9b6ce16b665a38879a1c56b16c75c2f80887cd3134369d5214b2447dd693ac86"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4e-probes.py",
+      "sha256": "d88b001e14e913a540eb50ce84b676d526311f5070d9bc1ce175ed39b6c0c105"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4e-replay.py",
+      "sha256": "c90c705a38c2a067a5be0a56ab2c9f2e6f2c811044c9c5004b4039efe762b5ac"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4e-review-request.md",
+      "sha256": "6ca99d9cc0243940030bfe1419e4fda587b431840ac8ee027208543058af9a44"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4f-review-request.md",
+      "sha256": "bc4b5f02083cf800ca199326c9869bce64e419519448f5488624cb7d581cbd93"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "sha256": "d3947e2d959241dcddacdca8337f001d64e2a6cfde32217a8a125fbc00f4a664"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "sha256": "75d2f20e4868f3500f982f3445501f679cbe3eb03fe2e222b2c322e3c5db18e5"
+    }
+  ],
+  "changedTrackedPaths": [
+    "plans/260925-documentation-authority-unification/reports/phase-08/progress.md"
+  ],
+  "newPaths": [
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-077.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-078.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4g-binding-manifest.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4g-check-result.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4g-lead-ruling-gaps.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4g-manifest.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4g-population.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4g-review-index.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4g-review-request.md",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave4g-whole-file-reads.json"
+  ],
+  "gitDiffCheckExit": 0,
+  "limits": [
+    "Record-only author proof, no independent semantic acceptance.",
+    "No checker/probe/resolver rule changed or probe replay claimed.",
+    "No npm suite run for these record-only changes.",
+    "No consumer edits, foreground service/fgOS CLI, secrets/config access, git writes or reproduction-manifest writes.",
+    "Required outbox files are the brief-authorized scope exception.",
+    "079–082 remain unauthored at the complete batch boundary after 078.",
+    "Lead owns preview, actual-commit accounting and independent acceptance."
+  ],
+  "replayCommand": "env -u CLAUDE_CODE_SESSION_ID python3 - <<'PY'\nimport sys, pathlib, importlib.util, json\nsys.dont_write_bytecode=True\np=pathlib.Path('plans/260925-documentation-authority-unification/reports/phase-08/step-03-check.py')\ns=importlib.util.spec_from_file_location('check',p); m=importlib.util.module_from_spec(s); s.loader.exec_module(m)\nm.SETS=tuple(f'{i:03}' for i in range(1,79))\nr=m.Checker('ae141550c2e022310de7a0efea757580c0b2479f').all(m.records())\nprint(json.dumps(r,ensure_ascii=False,indent=2))\nraise SystemExit(bool(r['failureCount']))\nPY"
+}

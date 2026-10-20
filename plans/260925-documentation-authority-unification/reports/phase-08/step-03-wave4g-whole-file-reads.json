@@ -1,0 +1,992 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": [
+    {
+      "file": "docs/knowledge/why-disposable-worktrees-need-their-own-dependency-install/disposable-worktree-dependency-provisioning.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3611,
+      "lines": 73,
+      "sha256": "836f2dfbe6c2587b3fb90e189501799be5ed213cf9627a91678c280e6e7178d0",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 73,
+          "sha256": "11c9c8c969e1f6fc12be3d63a73fdf9b5a2ccaa303a9f864fa747f6da794b138"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-docs-index-preserves-a-doc-s-prior-id-when-the-store-is/docs-index-preserves-prior-id-when-the-store-is-unreachable.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5350,
+      "lines": 101,
+      "sha256": "1398a9ed7ab46acc59df087c4a2f812f7f14a7c989463c2941f479a424b63118",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "11a4ac02c2f1b3e43ee9722a24859590a2810dbca521ee300602aa45ab683400"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 101,
+          "sha256": "3a942a30b0449abbf2235236029c029f2573a17724340661579a1e80d94a3c7e"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-doctor-checks-are-documented-as-an-open-registry-not-a-f/why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3461,
+      "lines": 72,
+      "sha256": "a48c79e266545d92f7375c794731d255f9fbd4b4115f37be0dd9b41e4d374c10",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 72,
+          "sha256": "fed4994b8051948f5c024b051e3a50c11af68666747d889baf7b243808cd04f5"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-every-agent-task-tool-dispatch-is-enforced-through-a-pre/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 27023,
+      "lines": 460,
+      "sha256": "56135aa57f25197aaad2b7ed475d9dce4133398b638c57967c95e0fade029974",
+      "inventoryEdges": 6,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "3ca38aa45844f3a03cd98985ba02b1f84e7fd186c0aa358364fbd1461c065492"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "3f7180a6751df8759c6e28a87a1aedd6ec9a2506e3f37b9a54d4da8279d4fb0d"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "0a46f04685a6127a0b8dfdd078100ed35d426eab3101dd58b0c834b469328fb0"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "f24e632eeedfbfc5c7813270722148ef1f82c8ee6058e0506d6b9fc3168e6f40"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "f2caf67aba1adba027c9a00363a63feaaa2154d0eabb36132ae66d96d564fc85"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 460,
+          "sha256": "d2bf1fc36955f2b42d81f51bfb0a019faa93d68f6f8b79fba394226d122010d4"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-execution-fan-out-reuses-computeschedule-not-selectwave/why-execution-fan-out-reuses-computeschedule-instead-of-selectwave.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 20444,
+      "lines": 361,
+      "sha256": "af12b1df2aba62579085df863ddc19a40a7118fc12c2948809d0809b64a58b96",
+      "inventoryEdges": 8,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "b867a1626415bcc04dd05450d5e9a88d1729129e80ffa3f674e4e2bc79d5aa46"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "f89f16a6e5b42a4c71566d90a20d53c27380dae9d71100914cfeb1de854c64a8"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "ff6f601ad8ca25cad3d285ebc257b449d59628a726f157bc2a03f16748790353"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "5ba70ba435c6478e7d8a3ed504f441cf9ebf82685e0d2dba6835c85fc4f4781c"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 361,
+          "sha256": "1f563110c0676b5523430b7a13f889ea509a771f366e7a5ee1e2bfae1d6e7a78"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-executor-aware-backend-dispatch-exists/agent-executor-executor-aware-dispatch.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5832,
+      "lines": 108,
+      "sha256": "321a6118452e014a53b98b14a305b8fac5612ef70ee98c657df9270a8af99c7e",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "6147f0f01fd2086fdba346d64fecc5e91b4782aa24bcb75b3e9eeed0502951cd"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 108,
+          "sha256": "c0c46ad0ac9f386496df47ac2354a8d7ee7ceb21f3c94387796e8484ebfbc993"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-executor-dispatch-audits-record-command-alongside-provid/executor-dispatch-audit-records-command-not-just-provider-label.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3237,
+      "lines": 68,
+      "sha256": "120bb9acae663329948e27ede2a3a31dbb9c2a4df3f4db0e0f0b71d4e4f16065",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 68,
+          "sha256": "967e7a2a7e9ec9dd64a66f84b4550e123bcb63daa24682128564c4c20089b79e"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-add-items-landed-permanently-at-stage-executing-wit/why-fgos-add-defaulted-new-items-to-stage-executing-with-no-way-back.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 8150,
+      "lines": 153,
+      "sha256": "1e88735e9f48698b791c52b92782efa8d822fa87658a4ec90b7d719b0216919d",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "d543f8a1984e1d7b971e2d164e1f87853d7d98c5b5038e2c2300abe2ee6c3bc2"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 153,
+          "sha256": "682fc4194fa308175e3ab43703b52cea750e0ad04c1b358b6f319a862403e5a0"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-add-now-caps-a-work-item-s-id-at-30-characters/long-work-item-ids-max-length-guard.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 7218,
+      "lines": 133,
+      "sha256": "153f79c35730cc341649af06790de86d14186a9d0d1f50f2e72934fd12f0b5e5",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "e14c648c3f1329e762406c8aab0bc6a66a6ffde9c5617c8f787f428acf06b9f2"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 133,
+          "sha256": "73164699e8fd86cc84477ccea7ce95b3a63a8879edee727c162522b72f896498"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-added-a-pre-commit-guard-refusing-a-staged-deletion/why-fgos-refuses-a-staged-fgos-deletion-at-commit-time.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4492,
+      "lines": 83,
+      "sha256": "55298648a721aaf29424c1ed37243455fd1a2714d4831aae14bbd8b1f0e2dcb1",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "49b1c72a66c9c8f59bcf25ef46d3b14be53165fd3099fd958ca4e74d8168c8be"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 83,
+          "sha256": "e99a7f587dec8ae4d4475cbfc186d0f045193efd71d33b3bd3cc0003c829ea7e"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-added-sync-root-and-drift-detection/why-fgos-added-sync-root-and-drift-detection.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 13596,
+      "lines": 246,
+      "sha256": "9810993cbb98167500aaa7dd870d934cfb1bf56f6e520d42a007b2261907942f",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "973a89fd3f0f2097219cacec6242e07fdd77627067df2fc334a2ebf0ef2f2cbc"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "e6750c96c038e7e43817b74b5c7d980f537b19a44ef8bff294857ac615f1ce2b"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "3d17e79fe126b29f91fdfba19fddd08172225c0fe4c8f49f1afac5d044013016"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 246,
+          "sha256": "e4c0a38745d1b7bdada289af8c0ff91853d8f4541d4ffbbfb73290a19176381d"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-answer-s-real-resume-behavior-is-statusatask-rather/why-fgos-answer-resumes-to-statusatask-not-always-todo.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2443,
+      "lines": 51,
+      "sha256": "2a1f3f7f0f747bb16f545835568f913e3941e2cb27c93cc658519a3123645a27",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 51,
+          "sha256": "3f41182d0d003e10610c6b931c5c4fc2fd28f55b643648d7dae34d31f34ac342"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-approve-distinguishes-a-pre-existing-merge-head-fro/why-fgos-approve-distinguishes-a-pre-existing-merge-head-from-its-own-conflict.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6810,
+      "lines": 130,
+      "sha256": "315fbbff1e4ed3cbf6fbc28f6054434d696afcfb26e7620ceb468b84820be86c",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "6423c3d6fd6e298e5dd3a1c76a806082a708f917923c85b7a81f0f928c9d3b0f"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 130,
+          "sha256": "151fbb10319f7d8e2f676ecaeed9af3e9307ab5f3f2520b34372dcd0cedff205"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-approve-refuses-a-leaf-merging-into-an-already-reso/why-approve-refuses-a-leaf-merging-into-an-already-resolved-root.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5464,
+      "lines": 106,
+      "sha256": "feb3435857be9af0e12347bc582ce936ef81480d6bdc907d85a5c49c248a7e41",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "765d5a6a9b9757560d94b01fcce9bad3447704d4eb84668450146913cabea8c9"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 106,
+          "sha256": "10147a6bbbe0856fe068a4014065b41c40387a19ad754f79478069fbdeb89b63"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-catchup-needed-its-own-already-caught-up-guard/why-catchup-needed-its-own-already-caught-up-guard.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4345,
+      "lines": 90,
+      "sha256": "60d866c141b7646df6aa9694e9d6e3e091f9c5b42bd264150c12fd2b4a97d55c",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "82299e9e06ec7f7a201b2a946af11ae321b6bfd2fbaaa6073b749a63b0d045f2"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 90,
+          "sha256": "497171a5e17f41319e7ffbdec02d86d35719fc707d08d601883a7523092c2113"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5237,
+      "lines": 95,
+      "sha256": "45f94e96f9c10ce7394e99c65594d661b638692359bd09e174ddac002320381b",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "9cdb67fff7579bbf77fb5886a2941eb586cfd530c4f48ce6544c66919ee9e804"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 95,
+          "sha256": "0b47c9944d3c2506c1e4cf3c139e27a89340685cd733c816c59576e22c64ddce"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-cleanup-next-keeps-exit-code-classification-instead/why-cleanup-next-keeps-exit-code-classification-instead-of-a-driver-call.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3411,
+      "lines": 69,
+      "sha256": "87ff4e1dac4a63b231a2b27806806108d832db3df3e35de26f0a7279c6d9fc7f",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 69,
+          "sha256": "a1156405e0dd28dcda61cc33d8056d6eef2dc7aa4ca87eddb0970205b5c21c51"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-coding-compounding-s-retrospective-synthesis-commit/why-fgos-compounding-refuses-to-commit-when-merge-head-is-set.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 8466,
+      "lines": 151,
+      "sha256": "7c9080a62f324c2aec08d513edd55eafb2535d5877dd5cedc98f9251425ef48f",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "a88028b8fa8ab90bf28ec7368c0957c67d011ff5e329d789f7e1fef284735d71"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 151,
+          "sha256": "13090bffd11928b5d72b8152632fbab6fe9468f1bf30206e0c07a03d169ce04b"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-coding-driving-s-title-description-print-lives-in-o/why-fgos-coding-drivings-title-description-print-lives-in-one-shared-place.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4055,
+      "lines": 79,
+      "sha256": "8d326be618ca82e9b096c102df4317a148f7ea34458c4a744983fd3552d124f0",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 79,
+          "sha256": "7f9e376f72bc1581197d8b655b055613bcfcf452ddc7054ff1e00464c782a557"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-coding-planning-and-fgos-coding-validating-merged-t/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 17206,
+      "lines": 304,
+      "sha256": "b8dbc8707f92e19c57b1adb1f23aac55a2dcf3e8aafb6f072833787b626e93a8",
+      "inventoryEdges": 8,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "2f92d8106351aa3b2d317da1ca2cccb136f2b42c64973d60d27a7d6c3775e074"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "b3e809d9b1c03db6dd5d530bafdb7967ec33d6ce3a18356133a0c83d1eb8cfee"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "6bd4d2ae4befb445b5544c025ae1005d7c21d7c8442d46711480b896712fabde"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 304,
+          "sha256": "d9a78f4d3e48cba4eefd85743f968017175ae84b8d4b2fb8351b45f73897034a"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-coding-planning-s-mode-gate-moved-to-fgos-routing-a/why-fgos-planning-moved-mode-gate-to-fgos-routing.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 12532,
+      "lines": 219,
+      "sha256": "28d6d89b11c53f01910ec418862e496a7f240063cf3048f998124bf1c5f8b4b8",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "8b67b3408cd126e6d0b67f70e25cc3e60d8d0ca73948c1dba7bb9a973e23d4b5"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "e1e7a8e27ec03488888a2a6244526e11024eae077677500fbbf3ea11b6221952"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 219,
+          "sha256": "bfd92738f026694604caa939fd37ed0086e78406d165efaecbf13ae6349a5c70"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-coding-planning-writes-docsref-immediately-after-cr/why-fgos-coding-planning-writes-docsref-when-it-self-creates-a-feature-dir.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3535,
+      "lines": 72,
+      "sha256": "5cdead6fdbfdda5df9d5f2e0c86236dec2cb78ce8d0d267ad420e8ae57e5f49c",
+      "inventoryEdges": 7,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 72,
+          "sha256": "2234a4fc48eef5f20584584901ac713b53229f51aeb8c69f1186aeaf413ac89e"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-cut-specific-state-runner-import-edges-consolidated/why-state-and-runner-import-edges-were-cut-and-cli-logic-moved-to-a-use-case-layer.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4064,
+      "lines": 79,
+      "sha256": "5ac6ae4dde5a7c6832f06e37ad9cd45ab10f0fabcc86895a21a749ea00f561e2",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 79,
+          "sha256": "9b4945e3303604555ad26719b7f218c0b82eecfc7f2191ceb3ea4dbb9c8f7351"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-detects-post-land-drift-among-sibling-leaves-by-int/why-post-land-drift-detection-intersects-real-changed-paths-not-declared-footprint.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4119,
+      "lines": 81,
+      "sha256": "6f17c1efb7f7db4b4ab921a803b4fb5939e6260c112fe0d109b5bfa7007a0131",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "269f7447776bf45113b095dce0a0940bac72ba15cd444d332c3600c83ba40eb6"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 81,
+          "sha256": "f753680608fb52dc11b89b710274469c7b091d0a9fbbd81c02fd9397861bccbe"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-discover-could-overwrite-an-already-locked-verify-c/discovery-decompose-reporoot-verify-overwrite.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 10881,
+      "lines": 194,
+      "sha256": "15ec7e208391f609137d56e2397c668393ee99ae5b217c752bb5e12f5bf19a15",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "3f2e1c538b8fcbfd5a95a1408afb6bc991eebc7d37dbff3371745f646d08ec71"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "fb1daf8a095f6ca312dba83eedb74bb8879351eb123b75bc752d0c3b8b53e081"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 194,
+          "sha256": "47b0c659e185d20caa46035ed0f9a5d381381079e1a575c140090938b0ca2c49"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-discover-next-shrank-to-a-picker/why-discover-next-shrank-to-a-picker.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4242,
+      "lines": 84,
+      "sha256": "4f44fe79fdd27c88e918c5a00926de537755881b4adb04c80859659a5385f793",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "7fb0d2810ea3b79d2c885ec7b133ac3e3f348233086adf413d1efdd947564388"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 84,
+          "sha256": "1824c87a3bda38e95d753506c3291a05cc887cbca1bd95fa4dc1a1611ab5047e"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-discover-now-trusts-a-locked-context-md-instead-of/fgos-discover-trusts-a-locked-context-instead-of-blind-rejudging.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4839,
+      "lines": 95,
+      "sha256": "4ad5c2ab6667ec79d9629715ea7ece4227f881a5798eefd3d4c557d9e7aad380",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "382cdd507e0f686060e58a5bb70dd584cf5ac00f816db87d297095b5dbbc32e5"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 95,
+          "sha256": "2a0212e5cfdf4391144db48715b8a02e92b9ff3e0f19e3a1df85d9101fdb3be6"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-dispatch-splits-into-gather-packets-with-a-second-e/why-fgos-dispatch-splits-into-gather-packets-and-a-gated-exec-packet.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 7539,
+      "lines": 134,
+      "sha256": "e7ec6d2ba18bc1cd41fa72215c03f98d58aa4040b840e5d5fb7414f6effe8964",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "67d38e3f5fc49b4ab6e50cccce07c864896728e2fa55af551db1f53af978c1ab"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 134,
+          "sha256": "368dd8aa7e94a5018f8e637d194ce982f2e7091c48fb050b54ca3d598ec69e10"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-doctor-s-checktoolregistryconfigured-now-reports-fa/why-doctor-now-fails-on-a-degraded-impact-analysis-tool-instead-of-passing.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2223,
+      "lines": 45,
+      "sha256": "31daf0993ddbc44eba93b5641a0f84919dce47b93d140cb5811dd347ec52bfae",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 45,
+          "sha256": "a1a20df5659c7c52a610b661718692fb7f944101243473c299f48d1b617aeab7"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-doctor-setup-uninstall-resolve-the-real-main-checko/why-doctor-setup-and-uninstall-had-to-resolve-the-real-main-checkout-not-raw-cwd.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3244,
+      "lines": 65,
+      "sha256": "a7c66a8f553f88aaf2fd25ef8564a436783967793f03a9b7d9ccd22cd11d2e61",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 65,
+          "sha256": "1da9b4c4dfd67a06007e9fb46aa83e42155bd3507199bcd3145352f0ccd521f4"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-events-jsonl-can-silently-lose-lines-under-concurre/events-jsonl-lost-update-race-under-concurrent-session-writes.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 14958,
+      "lines": 275,
+      "sha256": "6e22a95075a1f64221d8e681e5343d0e8d5fb8ae056ff904e059c0c0f3410b43",
+      "inventoryEdges": 7,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "8d9c2fb0bb2bd283bf3e020c33eab5f4a95da189a0a8163f81199f67c0ecebaa"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "cc10bb5ac1da53b228c520653dfe9e93abf2a3d50b53fce74888559dcc8b2bcc"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "b81e124569557cf1f0c5ebaa128e17808ef7aebd1cea247af0cd7a6d72a59bdc"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 275,
+          "sha256": "44425328b592ba715273a366d52d2dd105800e67cfb0de9e18650a3b7020fab6"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-fanout-treats-a-dispatched-agent-s-worktree-isolati/why-fanouts-worktree-isolation-race-is-a-recoverable-self-heal-not-a-lowered-batch-cap.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 7009,
+      "lines": 126,
+      "sha256": "e20b5bc070cf729ec3f95d9e2f704454b4b9b64db7f248e2c216c56d8b4c8ee7",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "4e6110dc3f782db025c1917ea2050eed6d4dab66b4a4018c18558c9b12d08b2d"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 126,
+          "sha256": "c12bcdfd30c8a22b280168262b53a759a798256db3fd9612442c92858efc76af"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-fgos-runner-died-in-every-agent-shell/harness-shell-snapshot-strips-underscore-prefixed-helper-functions.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5097,
+      "lines": 106,
+      "sha256": "2d88b59f205e349e60c687f0dd45d7ae7b452e0451f3f31cb68cc0bf877ff5d0",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "aa9791ae7dfa94d3d9e3337f61a9c8979ea0fbe29c666f27a8d58a9eda6e9da2"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 106,
+          "sha256": "cc2e1edb04d8fc1f02c5a62e9d7006e7a76ce8ef394b0bfe021dc5e3ba4b6f0c"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-install-moved-from-always-pulling-main-head-to-a-ta/why-fgos-install-is-pinned-to-a-semver-tag-instead-of-main-head.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3457,
+      "lines": 63,
+      "sha256": "b29c111e501fee2d74c9d81cbf05fc0511951a0aa0e99abc4727053b42dcde69",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 63,
+          "sha256": "c1447f0c0427c69490ce860c9667208b039a1377bb062d98b70c5989079b2404"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-keeps-growing-the-same-decision-logic-in-more-than/fgos-choke-point-pattern.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3471,
+      "lines": 69,
+      "sha256": "b45738cfa7cdf2187249153b30dca5fec64309b573a7fb3e38fa90b976e27103",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 69,
+          "sha256": "37cb495f5ae864f968959f9aeaf7acbbf47c0389d70e967a4a24e30fec177104"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-main-checkout-lock-could-report-ambiguous-with-no-r/main-checkout-lock-toctou-race.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3251,
+      "lines": 68,
+      "sha256": "5719baf6bf9bd472947ca9ced5a3a0bbb8d914a219c19b2d4dd766f1b9a053ac",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 68,
+          "sha256": "1573f9b925ac8bb9190122bf98e77337fb4922833c9e3c00bf544dacdd6b775e"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3640,
+      "lines": 73,
+      "sha256": "df972d749388feecaffe4d5298a6eecf7501ddac0ec01372d1fbd5a284921c92",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 73,
+          "sha256": "457e9c6a216c8e30e78743bafa566db6e0ce2c311c01dce3311291634cdc9481"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-merge-next-now-auto-syncs-a-clean-blockedonsync-roo/why-merge-next-auto-syncs-blockedonsync-roots.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 8288,
+      "lines": 134,
+      "sha256": "5bfdaefc98c510cb85ee63faa51239581a4564a797d5349eeece7a2c12ec4e9d",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "68d3398ab5a601b9766ebd27ddbb87a4e6170010f0e66fc8f968ae03d4658453"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 134,
+          "sha256": "00fe25122f91aaaaa118307ae102a5631c4dd94ac65a52925a621be5c7dd4c1a"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-merge-now-refuses-outside-the-main-checkout/why-fgos-merge-now-refuses-outside-the-main-checkout.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4466,
+      "lines": 90,
+      "sha256": "e4db5c539db53ff092226752471a8473f56696a7bb965f581f9720dff46718ae",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "7a514173b0a67091a5782778ba7dbeea0d5304f4c932d2c3e2dd23de50eba0d9"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 90,
+          "sha256": "5d929a8a0e5cae7aede13621d5e8e36f9c8ea0f2c72a41145f274d329301c872"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-merge-throughput-bottlenecked-despite-parallel-disp/why-merge-was-a-single-lane-funnel-under-a-16-lane-dispatch-pipeline.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 9895,
+      "lines": 173,
+      "sha256": "2f517cd1f7a16aa01de1d86b822497d94273f69e5e5f1f4635065dfe7e0dd376",
+      "inventoryEdges": 7,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "3c6cfb119e96ca744f711dc1725d04c62125eee64bc51f56813af1ea6e16e6a1"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "63662b73bbd2b8bab9e5bac3ac1a9de5919d491dec0d75ed5d066d966586f9f0"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 173,
+          "sha256": "976b238fa4ba21d97db49d9c73cbcf4a1fed7049019faf8bf39457503493072f"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-move-gained-an-answer-flag-closing-the-last-unreach/why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1796,
+      "lines": 39,
+      "sha256": "f7c6dc2d99c605adcc99e32881a2c515adef0dd4f0ec4e38b03719854912a8d4",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 39,
+          "sha256": "5e11acf2f75e5fd76d88bd946d3358624d59212fdf55c46918c2f2d1db544cd7"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-move-to-awaiting-approval-refuses-a-doing-item-with/why-fgos-move-refuses-awaiting-approval-from-doing-without-skip-return-guard.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5382,
+      "lines": 104,
+      "sha256": "91e111ab143e612bdebd73cdde599285eccdf1c9ca0592e5cca8fd0f2257edcc",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "50ce01757ba0e2363c42b8178e077db2dd483ca47034333796436c1b3e80a645"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 104,
+          "sha256": "42e4f7aafe94cd69e9ce5defada93f4595352965b60c9dc39c7555eb5774bd2a"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4962,
+      "lines": 97,
+      "sha256": "83dd80030a6195067a4c59cdb578ac34e574d5475be42c19c3d1497a1eb7e7db",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "fd425a77ef48dcc87ba3a6cfc29f331acc7eb3668b409e1abec34848441e4630"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 97,
+          "sha256": "68261457ef18403b2f1a731804c09c2543276420b7e7cfea13b6c476b60fe17a"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-now-gates-a-risk-heavy-item-from-reaching-delivered/why-a-heavy-risk-item-can-no-longer-reach-delivered-without-a-plan-md.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2537,
+      "lines": 52,
+      "sha256": "f469fa839ebf32362dc1c36c54214f7139c22eec424d801ad45bdbeb49be8435",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 52,
+          "sha256": "ee2d5f211f8ca0650101123767b7fa25d621da564a2c28bae5c905071c155ce8"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-refreshes-a-work-item-s-branch-base-at-pick-time-wh/why-pick-refreshes-a-commitless-branchs-base-but-never-touches-a-worked-one.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3601,
+      "lines": 70,
+      "sha256": "f477e051c28843a44890300e6bcac49b644364629ad7109c251e86e66be4ae33",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 70,
+          "sha256": "7ea06cd27391b284e4f56b9e15d72881fb1bba991c62cf5658a491292394a0c8"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-requires-a-gate-ask-question-to-restate-its-own-con/why-gate-questions-must-be-self-sufficient-and-mechanically-checked-for-it.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3948,
+      "lines": 70,
+      "sha256": "5798bc04d98c11090a308e6f336145c8414504af85c1c1bcec72b8fb1c8d9087",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 70,
+          "sha256": "e8e95032f681986399280f9d6ec40d9d4e4963bf2e245abb1288f4857b254a1a"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-retired-fgos-runner-json-entirely-instead-of-fixing/why-fgos-retired-the-fgos-runner-json-legacy-config-fallback.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5852,
+      "lines": 108,
+      "sha256": "eee08d6b197499b143e64a2812e21d665e148519892908f0ec0f36f3233f2376",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "33fe2c2a7b000cc3ca765d45f338222d6d6122d78bf7770a880905672e78df83"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 108,
+          "sha256": "ec8e844ed9a403d2ee53c94adf88f431b978bb95381893e491a80b886a52510c"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5544,
+      "lines": 107,
+      "sha256": "5c337e4f0a9c9370381472f133d2e25849cc107af38b822b1beb1cf6f23a17e2",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "afc928fccb33fbcf968e8b0324f528d5434a7c5cf9b91e8c756ac0968c215f80"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 107,
+          "sha256": "ab88a4b83717e1cc7207fece05b0fa96ef9222fdf3ff9859dbb1a92d75e66cef"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-retro-next-shrank-to-a-launcher/why-retro-next-shrank-to-a-launcher.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3687,
+      "lines": 75,
+      "sha256": "49e7dc8f39520448a9fa129f188ccfd490321252dfddcd1620d0488e1d4860b9",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 75,
+          "sha256": "07be929822839d8063ae397719c633e366b5e590bc9fe44e6244cf1af7f93d09"
+        }
+      ]
+    },
+    {
+      "file": "docs/knowledge/why-fgos-review-crashed-with-enobufs-on-very-stale-branch-di/why-fgos-review-crashed-with-enobufs-on-stale-branch-diffs.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4877,
+      "lines": 93,
+      "sha256": "abf689df0605bae68078665f85aca6651ec07f4999a81eae0582919b510de2e5",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "b77faf7de9299e2287f2645165d4ef1fca1ba1a9d5d9fce5927c0478b6cee7f4"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 93,
+          "sha256": "0b2332362f2966f7854d4e0754f2bc9382e1608ede690226b0c24f85576c7c13"
+        }
+      ]
+    }
+  ],
+  "sourceBytes": 322787,
+  "method": "Complete immutable source bytes read; every inventory span bound; supplemental full-file scan and context considered. Author traversal is not independent review."
+}

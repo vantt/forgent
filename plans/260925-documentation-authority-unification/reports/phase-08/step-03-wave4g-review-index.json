@@ -1,0 +1,305 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "manifest": "step-03-wave4g-manifest.json",
+  "binding": "step-03-wave4g-binding-manifest.json",
+  "selectedFiles": 9,
+  "selectedEdges": 31,
+  "perSet": [
+    {
+      "set": "batch-077",
+      "allFiles": 25,
+      "patchedPopulation": 9,
+      "patchedSeedSample": 2,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 2,
+      "unpatchedEligiblePopulation": 11,
+      "unpatchedSample": 2,
+      "distinctSelected": 4,
+      "patchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    },
+    {
+      "set": "batch-078",
+      "allFiles": 25,
+      "patchedPopulation": 13,
+      "patchedSeedSample": 2,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 2,
+      "unpatchedEligiblePopulation": 8,
+      "unpatchedSample": 2,
+      "distinctSelected": 4,
+      "patchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    }
+  ],
+  "parts": [
+    {
+      "part": 1,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave4g-p01.md",
+      "files": [
+        {
+          "file": "docs/knowledge/why-fgos-add-items-landed-permanently-at-stage-executing-wit/why-fgos-add-defaulted-new-items-to-stage-executing-with-no-way-back.md",
+          "set": "batch-077",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "6e81730b8277e17646870cd5cabc900be50e5cb6725c7064138d3f42aad24e61",
+          "sourceDigest": "1e88735e9f48698b791c52b92782efa8d822fa87658a4ec90b7d719b0216919d",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 3112,
+          "sourceBytes": 8150,
+          "contextPlusRecordBytes": 11262
+        },
+        {
+          "file": "docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md",
+          "set": "batch-077",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 3,
+          "recordSha256": "66086c71c2a1cba424b3380d1b9c1d35c19e5d6a9a9eeb9a64de853b3999ec70",
+          "sourceDigest": "45f94e96f9c10ce7394e99c65594d661b638692359bd09e174ddac002320381b",
+          "diffSha256": "54238feac304220b5534c8f9239944c03a8e712f4faf318b92815b19051f3ac7",
+          "recordBytes": 13541,
+          "sourceBytes": 5237,
+          "contextPlusRecordBytes": 18778
+        },
+        {
+          "file": "docs/knowledge/why-fgos-coding-planning-s-mode-gate-moved-to-fgos-routing-a/why-fgos-planning-moved-mode-gate-to-fgos-routing.md",
+          "set": "batch-077",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 3,
+          "recordSha256": "78abb7ec8f8c913540ca1dc70096c28a8f5e4f11a5e5c9abde94440309fdf85b",
+          "sourceDigest": "28d6d89b11c53f01910ec418862e496a7f240063cf3048f998124bf1c5f8b4b8",
+          "diffSha256": "076a630a1674f332159a8e5fa209412e9393dd200cc813ed0b4dd4808e8a3b6f",
+          "recordBytes": 17847,
+          "sourceBytes": 12532,
+          "contextPlusRecordBytes": 30379
+        },
+        {
+          "file": "docs/knowledge/why-fgos-coding-planning-writes-docsref-immediately-after-cr/why-fgos-coding-planning-writes-docsref-when-it-self-creates-a-feature-dir.md",
+          "set": "batch-077",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 7,
+          "recordSha256": "2c928a3412247fee27b9a6e15aa194cfc11e3a87943bc92b05cafebc97b45898",
+          "sourceDigest": "5cdead6fdbfdda5df9d5f2e0c86236dec2cb78ce8d0d267ad420e8ae57e5f49c",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 8697,
+          "sourceBytes": 3535,
+          "contextPlusRecordBytes": 12232
+        },
+        {
+          "file": "docs/knowledge/why-fgos-install-moved-from-always-pulling-main-head-to-a-ta/why-fgos-install-is-pinned-to-a-semver-tag-instead-of-main-head.md",
+          "set": "batch-078",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "639ced942af2d08a988cf3b395b806be05e1b73cede6f4a525ebd4395cea0295",
+          "sourceDigest": "b29c111e501fee2d74c9d81cbf05fc0511951a0aa0e99abc4727053b42dcde69",
+          "diffSha256": "d22c83b8b228c5e901f7b686929dc95e390718c42b38911a70b953638018fbed",
+          "recordBytes": 13332,
+          "sourceBytes": 3457,
+          "contextPlusRecordBytes": 16789
+        },
+        {
+          "file": "docs/knowledge/why-fgos-main-checkout-lock-could-report-ambiguous-with-no-r/main-checkout-lock-toctou-race.md",
+          "set": "batch-078",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 3,
+          "recordSha256": "d5c7383cb9f91a7ceddcee00deba6c835103c2152b4458789611d532b78de0a9",
+          "sourceDigest": "5719baf6bf9bd472947ca9ced5a3a0bbb8d914a219c19b2d4dd766f1b9a053ac",
+          "diffSha256": "d875382aa1ce6e2baadd7340b534f829298a2b9c1c5479dbc4b4a6c96ab592d6",
+          "recordBytes": 24340,
+          "sourceBytes": 3251,
+          "contextPlusRecordBytes": 27591
+        }
+      ],
+      "fileCount": 6,
+      "edges": 20,
+      "sourcePlusRecordBytes": 117031,
+      "readingPages": [
+        {
+          "file": "docs/knowledge/why-fgos-add-items-landed-permanently-at-stage-executing-wit/why-fgos-add-defaulted-new-items-to-stage-executing-with-no-way-back.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-fgos-coding-planning-s-mode-gate-moved-to-fgos-routing-a/why-fgos-planning-moved-mode-gate-to-fgos-routing.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-fgos-coding-planning-writes-docsref-immediately-after-cr/why-fgos-coding-planning-writes-docsref-when-it-self-creates-a-feature-dir.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 7
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-fgos-install-moved-from-always-pulling-main-head-to-a-ta/why-fgos-install-is-pinned-to-a-semver-tag-instead-of-main-head.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-fgos-main-checkout-lock-could-report-ambiguous-with-no-r/main-checkout-lock-toctou-race.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 2,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave4g-p02.md",
+      "files": [
+        {
+          "file": "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+          "set": "batch-078",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 1,
+          "recordSha256": "26fd797011bab2ecfe8dc3220936ea8c7e204430f486aa855992f48349ec75d4",
+          "sourceDigest": "df972d749388feecaffe4d5298a6eecf7501ddac0ec01372d1fbd5a284921c92",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 1860,
+          "sourceBytes": 3640,
+          "contextPlusRecordBytes": 5500
+        },
+        {
+          "file": "docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md",
+          "set": "batch-078",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "4932ac834f7a6af66912361a2ea325b83e6077dbddfa93f3a5eb9967e7847542",
+          "sourceDigest": "5c337e4f0a9c9370381472f133d2e25849cc107af38b822b1beb1cf6f23a17e2",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 3928,
+          "sourceBytes": 5544,
+          "contextPlusRecordBytes": 9472
+        },
+        {
+          "file": "docs/knowledge/why-fgos-coding-planning-and-fgos-coding-validating-merged-t/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md",
+          "set": "batch-077",
+          "strata": [
+            "open-lead-ruling"
+          ],
+          "edges": 8,
+          "recordSha256": "49bc81412b856a1a7fb9baabcdf822552ead0cb54c8dd919caa5fd31cfa42a60",
+          "sourceDigest": "b8dbc8707f92e19c57b1adb1f23aac55a2dcf3e8aafb6f072833787b626e93a8",
+          "diffSha256": "b859f3955e7b6ee3f0aeec6000f9f8f53c40d03dcd807cfbb3fb590c74d02873",
+          "recordBytes": 48348,
+          "sourceBytes": 17206,
+          "contextPlusRecordBytes": 65554
+        }
+      ],
+      "fileCount": 3,
+      "edges": 11,
+      "sourcePlusRecordBytes": 80526,
+      "readingPages": [
+        {
+          "file": "docs/knowledge/why-fgos-merge-loop-tsk-1sm-recurses-into-loop-not-ck-loop/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-fgos-retro-loop-restores-the-compound-verb-instead-of-in/fgos-retro-loop-and-the-restored-compound-verb.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-fgos-coding-planning-and-fgos-coding-validating-merged-t/why-planning-and-validating-collapsed-into-one-co-adjustment-gate.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 8
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    }
+  ],
+  "reviewersStarted": 0,
+  "accepted": 0,
+  "scope": "New batches 077–078 only; 079–082 remain unauthored; existing reviews and ≤076 records unchanged."
+}
