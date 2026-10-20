@@ -1,0 +1,31 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": [
+    {
+      "file": "docs/platform/terminal-control/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 23597,
+      "lines": 191,
+      "sha256": "549bd92fb431256653c1e3d52f608c8462592c9c9210dceb323a467e3c7b9096",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "315ad0f61afd97d992d20a814b5bb658968f14dfadbdcd0b5e61dd48d21f8679"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "9aed9bb92bb5c40571885276ef3995e49fdeb77eea7b51305b12090b35a7aa04"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 191,
+          "sha256": "faafad04b9e6a6844d4d04152326c29a0e3555109ac176f01376e8b36913d8e5"
+        }
+      ]
+    }
+  ],
+  "method": "Full pinned source-byte traversal, exact inventory spans, supplemental scan and per-edge context assessment. Author traversal is not independent review."
+}

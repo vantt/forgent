@@ -1,0 +1,31 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": [
+    {
+      "file": "docs/platform/vision.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 10544,
+      "lines": 208,
+      "sha256": "682192b6df66b26feb445963d59a39ac3a366439923838e8904189056c91cb17",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "e2e5b2e3de11b775593d6f8a310597c2948d823d27916a7da4f7ef3e46fec136"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "d5fd426a02ca686ad74353ec3cee065abeba32774cc5eff8148e1bda1c22a493"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 208,
+          "sha256": "74ce89cf9ec95ddcf1f1df9153604d4c3d6f941ef8b0f450bd323a102175eb19"
+        }
+      ]
+    }
+  ],
+  "method": "Full pinned source-byte traversal, exact inventory spans, supplemental scan and per-edge context assessment. Author traversal is not independent review."
+}

@@ -1,0 +1,246 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "gaps": [
+    {
+      "set": "batch-117",
+      "edgeId": "maps-j-07786",
+      "file": "docs/platform/system-architecture/history/architect-readme.md",
+      "sourceLine": 17,
+      "category": "lead-ruling",
+      "situation": "H1 # Architect README Source Carriage encloses wrapper metadata, including Related: docs/architect/README.md at L17. The literal source body starts explicitly at L24–26.",
+      "cause": "The unchanged carriage_declaration recognizes the H1 over the metadata, while related_header still recognizes that metadata bullet as navigation; preserve is rejected by related-retiring-preserve. A normal Related park would imply a settled wrapper boundary that the current source-carriage framing does not establish.",
+      "options": [
+        {
+          "choice": "Treat wrapper metadata as outside carriage; Related self-source parks for consolidation",
+          "cost": "Lead clarifies boundary and extends the existing checker/probe door; preserve source body and provenance."
+        },
+        {
+          "choice": "Treat the H1 as enclosing wrapper metadata too; preserve the original Related source identity",
+          "cost": "Lead exempts this actual declared-carriage Related edge in the existing predicate with focused probes; no consumer edit."
+        }
+      ],
+      "recommendation": "Use the explicit source-body start at L24–26 as the wrapper/body boundary, then park the wrapper Related as a self/source duplication under L12-34(4); leave literal body links unchanged. Do not change a predicate in this author lane.",
+      "answerScope": "Only source-carriage H1 versus wrapper metadata boundary for this edge and equivalent source-bound cases. Does not authorize consumer edits, source retirement, semantic acceptance or checker edits by this Doer."
+    },
+    {
+      "set": "batch-115",
+      "edgeId": "maps-j-07625",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "sourceLine": 441,
+      "matchedExpression": "docs/decisions/0021-wire-main-checkout-hook-qua-doctor-setup.md",
+      "category": "lead-ruling",
+      "situation": "A literal deleted-decision identity occurs in the original ADR history narrative; its title-matched successor is a heading in this same candidate consumer.",
+      "cause": "removed-decision-narrative-successor requires a Non-executable successor note to that heading for preserve; successor-not-self strips the anchor and rejects the same-consumer note. Existing author primitives remove such self notes, exposing this incompatible requirement. No consumer patch or checker change is authorized here.",
+      "options": [
+        {
+          "choice": "Allow a source-bound non-executable intra-document narrative note",
+          "cost": "Lead extends the existing successor predicate with focused positive/negative probes; it must never create a consumer self-link."
+        },
+        {
+          "choice": "Exempt same-consumer narrative successors from the required note and record internal correspondence separately",
+          "cost": "Lead settles a record form through the existing checker/probe door; old source identity remains preserved."
+        }
+      ],
+      "recommendation": "Exempt the mandatory successor-note requirement when the actual pinned narrative holder is this consumer itself; retain a source-bound internal narrative-correspondence field or precise prose without the successor-note label. Do not permit executable self-links.",
+      "answerScope": "Only record-only correspondence for a historical deleted-decision reference whose exact narrative holder is in the same consumer. Preserve title collision checks, all other removed-decision notes and the ban on executable self pointers; no consumer edits or acceptance."
+    },
+    {
+      "set": "batch-115",
+      "edgeId": "maps-j-07628",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "sourceLine": 538,
+      "matchedExpression": "docs/decisions/0025",
+      "category": "lead-ruling",
+      "situation": "A literal deleted-decision identity occurs in the original ADR history narrative; its title-matched successor is a heading in this same candidate consumer.",
+      "cause": "removed-decision-narrative-successor requires a Non-executable successor note to that heading for preserve; successor-not-self strips the anchor and rejects the same-consumer note. Existing author primitives remove such self notes, exposing this incompatible requirement. No consumer patch or checker change is authorized here.",
+      "options": [
+        {
+          "choice": "Allow a source-bound non-executable intra-document narrative note",
+          "cost": "Lead extends the existing successor predicate with focused positive/negative probes; it must never create a consumer self-link."
+        },
+        {
+          "choice": "Exempt same-consumer narrative successors from the required note and record internal correspondence separately",
+          "cost": "Lead settles a record form through the existing checker/probe door; old source identity remains preserved."
+        }
+      ],
+      "recommendation": "Exempt the mandatory successor-note requirement when the actual pinned narrative holder is this consumer itself; retain a source-bound internal narrative-correspondence field or precise prose without the successor-note label. Do not permit executable self-links.",
+      "answerScope": "Only record-only correspondence for a historical deleted-decision reference whose exact narrative holder is in the same consumer. Preserve title collision checks, all other removed-decision notes and the ban on executable self pointers; no consumer edits or acceptance."
+    },
+    {
+      "set": "batch-115",
+      "edgeId": "maps-j-07636",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "sourceLine": 809,
+      "matchedExpression": "docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-\n  cli-spawn.md",
+      "category": "lead-ruling",
+      "situation": "A literal deleted-decision identity occurs in the original ADR history narrative; its title-matched successor is a heading in this same candidate consumer.",
+      "cause": "removed-decision-narrative-successor requires a Non-executable successor note to that heading for preserve; successor-not-self strips the anchor and rejects the same-consumer note. Existing author primitives remove such self notes, exposing this incompatible requirement. No consumer patch or checker change is authorized here.",
+      "options": [
+        {
+          "choice": "Allow a source-bound non-executable intra-document narrative note",
+          "cost": "Lead extends the existing successor predicate with focused positive/negative probes; it must never create a consumer self-link."
+        },
+        {
+          "choice": "Exempt same-consumer narrative successors from the required note and record internal correspondence separately",
+          "cost": "Lead settles a record form through the existing checker/probe door; old source identity remains preserved."
+        }
+      ],
+      "recommendation": "Exempt the mandatory successor-note requirement when the actual pinned narrative holder is this consumer itself; retain a source-bound internal narrative-correspondence field or precise prose without the successor-note label. Do not permit executable self-links.",
+      "answerScope": "Only record-only correspondence for a historical deleted-decision reference whose exact narrative holder is in the same consumer. Preserve title collision checks, all other removed-decision notes and the ban on executable self pointers; no consumer edits or acceptance."
+    },
+    {
+      "set": "batch-115",
+      "edgeId": "maps-j-07640",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "sourceLine": 917,
+      "matchedExpression": "docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md",
+      "category": "lead-ruling",
+      "situation": "A literal deleted-decision identity occurs in the original ADR history narrative; its title-matched successor is a heading in this same candidate consumer.",
+      "cause": "removed-decision-narrative-successor requires a Non-executable successor note to that heading for preserve; successor-not-self strips the anchor and rejects the same-consumer note. Existing author primitives remove such self notes, exposing this incompatible requirement. No consumer patch or checker change is authorized here.",
+      "options": [
+        {
+          "choice": "Allow a source-bound non-executable intra-document narrative note",
+          "cost": "Lead extends the existing successor predicate with focused positive/negative probes; it must never create a consumer self-link."
+        },
+        {
+          "choice": "Exempt same-consumer narrative successors from the required note and record internal correspondence separately",
+          "cost": "Lead settles a record form through the existing checker/probe door; old source identity remains preserved."
+        }
+      ],
+      "recommendation": "Exempt the mandatory successor-note requirement when the actual pinned narrative holder is this consumer itself; retain a source-bound internal narrative-correspondence field or precise prose without the successor-note label. Do not permit executable self-links.",
+      "answerScope": "Only record-only correspondence for a historical deleted-decision reference whose exact narrative holder is in the same consumer. Preserve title collision checks, all other removed-decision notes and the ban on executable self pointers; no consumer edits or acceptance."
+    },
+    {
+      "set": "batch-115",
+      "edgeId": "maps-j-07641",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "sourceLine": 918,
+      "matchedExpression": "docs/decisions/0028-doi-ten-orchestrator-thanh-launcher.md",
+      "category": "lead-ruling",
+      "situation": "A literal deleted-decision identity occurs in the original ADR history narrative; its title-matched successor is a heading in this same candidate consumer.",
+      "cause": "removed-decision-narrative-successor requires a Non-executable successor note to that heading for preserve; successor-not-self strips the anchor and rejects the same-consumer note. Existing author primitives remove such self notes, exposing this incompatible requirement. No consumer patch or checker change is authorized here.",
+      "options": [
+        {
+          "choice": "Allow a source-bound non-executable intra-document narrative note",
+          "cost": "Lead extends the existing successor predicate with focused positive/negative probes; it must never create a consumer self-link."
+        },
+        {
+          "choice": "Exempt same-consumer narrative successors from the required note and record internal correspondence separately",
+          "cost": "Lead settles a record form through the existing checker/probe door; old source identity remains preserved."
+        }
+      ],
+      "recommendation": "Exempt the mandatory successor-note requirement when the actual pinned narrative holder is this consumer itself; retain a source-bound internal narrative-correspondence field or precise prose without the successor-note label. Do not permit executable self-links.",
+      "answerScope": "Only record-only correspondence for a historical deleted-decision reference whose exact narrative holder is in the same consumer. Preserve title collision checks, all other removed-decision notes and the ban on executable self pointers; no consumer edits or acceptance."
+    },
+    {
+      "set": "batch-115",
+      "edgeId": "maps-j-07644",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "sourceLine": 982,
+      "matchedExpression": "docs/decisions/0030",
+      "category": "lead-ruling",
+      "situation": "A literal deleted-decision identity occurs in the original ADR history narrative; its title-matched successor is a heading in this same candidate consumer.",
+      "cause": "removed-decision-narrative-successor requires a Non-executable successor note to that heading for preserve; successor-not-self strips the anchor and rejects the same-consumer note. Existing author primitives remove such self notes, exposing this incompatible requirement. No consumer patch or checker change is authorized here.",
+      "options": [
+        {
+          "choice": "Allow a source-bound non-executable intra-document narrative note",
+          "cost": "Lead extends the existing successor predicate with focused positive/negative probes; it must never create a consumer self-link."
+        },
+        {
+          "choice": "Exempt same-consumer narrative successors from the required note and record internal correspondence separately",
+          "cost": "Lead settles a record form through the existing checker/probe door; old source identity remains preserved."
+        }
+      ],
+      "recommendation": "Exempt the mandatory successor-note requirement when the actual pinned narrative holder is this consumer itself; retain a source-bound internal narrative-correspondence field or precise prose without the successor-note label. Do not permit executable self-links.",
+      "answerScope": "Only record-only correspondence for a historical deleted-decision reference whose exact narrative holder is in the same consumer. Preserve title collision checks, all other removed-decision notes and the ban on executable self pointers; no consumer edits or acceptance."
+    },
+    {
+      "set": "batch-115",
+      "edgeId": "maps-j-07649",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "sourceLine": 1091,
+      "matchedExpression": "docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md",
+      "category": "lead-ruling",
+      "situation": "A literal deleted-decision identity occurs in the original ADR history narrative; its title-matched successor is a heading in this same candidate consumer.",
+      "cause": "removed-decision-narrative-successor requires a Non-executable successor note to that heading for preserve; successor-not-self strips the anchor and rejects the same-consumer note. Existing author primitives remove such self notes, exposing this incompatible requirement. No consumer patch or checker change is authorized here.",
+      "options": [
+        {
+          "choice": "Allow a source-bound non-executable intra-document narrative note",
+          "cost": "Lead extends the existing successor predicate with focused positive/negative probes; it must never create a consumer self-link."
+        },
+        {
+          "choice": "Exempt same-consumer narrative successors from the required note and record internal correspondence separately",
+          "cost": "Lead settles a record form through the existing checker/probe door; old source identity remains preserved."
+        }
+      ],
+      "recommendation": "Exempt the mandatory successor-note requirement when the actual pinned narrative holder is this consumer itself; retain a source-bound internal narrative-correspondence field or precise prose without the successor-note label. Do not permit executable self-links.",
+      "answerScope": "Only record-only correspondence for a historical deleted-decision reference whose exact narrative holder is in the same consumer. Preserve title collision checks, all other removed-decision notes and the ban on executable self pointers; no consumer edits or acceptance."
+    },
+    {
+      "set": "batch-115",
+      "edgeId": "maps-j-07650",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "sourceLine": 1092,
+      "matchedExpression": "docs/decisions/0028-doi-ten-orchestrator-thanh-launcher.md",
+      "category": "lead-ruling",
+      "situation": "A literal deleted-decision identity occurs in the original ADR history narrative; its title-matched successor is a heading in this same candidate consumer.",
+      "cause": "removed-decision-narrative-successor requires a Non-executable successor note to that heading for preserve; successor-not-self strips the anchor and rejects the same-consumer note. Existing author primitives remove such self notes, exposing this incompatible requirement. No consumer patch or checker change is authorized here.",
+      "options": [
+        {
+          "choice": "Allow a source-bound non-executable intra-document narrative note",
+          "cost": "Lead extends the existing successor predicate with focused positive/negative probes; it must never create a consumer self-link."
+        },
+        {
+          "choice": "Exempt same-consumer narrative successors from the required note and record internal correspondence separately",
+          "cost": "Lead settles a record form through the existing checker/probe door; old source identity remains preserved."
+        }
+      ],
+      "recommendation": "Exempt the mandatory successor-note requirement when the actual pinned narrative holder is this consumer itself; retain a source-bound internal narrative-correspondence field or precise prose without the successor-note label. Do not permit executable self-links.",
+      "answerScope": "Only record-only correspondence for a historical deleted-decision reference whose exact narrative holder is in the same consumer. Preserve title collision checks, all other removed-decision notes and the ban on executable self pointers; no consumer edits or acceptance."
+    },
+    {
+      "set": "batch-115",
+      "edgeId": "maps-j-07651",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "sourceLine": 1093,
+      "matchedExpression": "docs/decisions/0029-sua-dinh-nghia-roottask-subtask-capacity-t1-cua-0026.md",
+      "category": "lead-ruling",
+      "situation": "A literal deleted-decision identity occurs in the original ADR history narrative; its title-matched successor is a heading in this same candidate consumer.",
+      "cause": "removed-decision-narrative-successor requires a Non-executable successor note to that heading for preserve; successor-not-self strips the anchor and rejects the same-consumer note. Existing author primitives remove such self notes, exposing this incompatible requirement. No consumer patch or checker change is authorized here.",
+      "options": [
+        {
+          "choice": "Allow a source-bound non-executable intra-document narrative note",
+          "cost": "Lead extends the existing successor predicate with focused positive/negative probes; it must never create a consumer self-link."
+        },
+        {
+          "choice": "Exempt same-consumer narrative successors from the required note and record internal correspondence separately",
+          "cost": "Lead settles a record form through the existing checker/probe door; old source identity remains preserved."
+        }
+      ],
+      "recommendation": "Exempt the mandatory successor-note requirement when the actual pinned narrative holder is this consumer itself; retain a source-bound internal narrative-correspondence field or precise prose without the successor-note label. Do not permit executable self-links.",
+      "answerScope": "Only record-only correspondence for a historical deleted-decision reference whose exact narrative holder is in the same consumer. Preserve title collision checks, all other removed-decision notes and the ban on executable self pointers; no consumer edits or acceptance."
+    },
+    {
+      "set": "batch-115",
+      "edgeId": "maps-j-07667",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "sourceLine": 1209,
+      "matchedExpression": "docs/decisions/0030-them-release-con-nguoi-vao-thu-tu-uu-tien-san-pham.md",
+      "category": "lead-ruling",
+      "situation": "A literal deleted-decision identity occurs in the original ADR history narrative; its title-matched successor is a heading in this same candidate consumer.",
+      "cause": "removed-decision-narrative-successor requires a Non-executable successor note to that heading for preserve; successor-not-self strips the anchor and rejects the same-consumer note. Existing author primitives remove such self notes, exposing this incompatible requirement. No consumer patch or checker change is authorized here.",
+      "options": [
+        {
+          "choice": "Allow a source-bound non-executable intra-document narrative note",
+          "cost": "Lead extends the existing successor predicate with focused positive/negative probes; it must never create a consumer self-link."
+        },
+        {
+          "choice": "Exempt same-consumer narrative successors from the required note and record internal correspondence separately",
+          "cost": "Lead settles a record form through the existing checker/probe door; old source identity remains preserved."
+        }
+      ],
+      "recommendation": "Exempt the mandatory successor-note requirement when the actual pinned narrative holder is this consumer itself; retain a source-bound internal narrative-correspondence field or precise prose without the successor-note label. Do not permit executable self-links.",
+      "answerScope": "Only record-only correspondence for a historical deleted-decision reference whose exact narrative holder is in the same consumer. Preserve title collision checks, all other removed-decision notes and the ban on executable self pointers; no consumer edits or acceptance."
+    }
+  ]
+}

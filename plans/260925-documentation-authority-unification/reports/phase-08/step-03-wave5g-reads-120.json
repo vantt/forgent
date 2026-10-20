@@ -1,0 +1,346 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": [
+    {
+      "file": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3354,
+      "lines": 89,
+      "sha256": "23ff53b38e19a4560db14acd42183d23e792c6228221e7d066fd053e51e4a988",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "cc201f2271ff89f593444f28fe6d9d704636834de8cbf58c8a7af02c198581ca"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 89,
+          "sha256": "6f2e5a2ea6ae53322b557ee6fbb8cc479c38e36e5737d0b2c9d9e76d4ccfb016"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4929,
+      "lines": 114,
+      "sha256": "ebd9cab58f559b5052bfdc73328dd398d3b8940826eb1a49503bf71508a7bdbf",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "4699b3a520a700ada0699dfed4b24b36e2a9ed4317eb4a3f32f69bdbd0b125e5"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 114,
+          "sha256": "3f2ce53ede75c8f58875d32396dd364d6de628234409894e835978a3e5cae92c"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4764,
+      "lines": 112,
+      "sha256": "02a74857d6f7a0cd1f69e4ec38c54489d3b918e110764edb267306e250b4a6cf",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "cbf40f0c3b740b2d5766f5f252c5dd9489261e130fa72bea31092e84ea5a047a"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 112,
+          "sha256": "739b4647f1f53622768a60ec8e3c4c4700127d582eb92dc2c8a732462c7cbcbc"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4549,
+      "lines": 114,
+      "sha256": "56968d7d764d9519bd62f61a20b975dcd3a38407c092c55a684095ab97f87b81",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "631ddaec992cd8a9c9286c43777c339a14231d9cde0775a45f8d4df8b38063b4"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 114,
+          "sha256": "fb833f807956ea42922455b5f5c07e4b262234933b7d848199181b31dc1a9e43"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4353,
+      "lines": 111,
+      "sha256": "5942bed6b8819ac41f02afcf5d1a7978f30078c5e602a6e1fb9307669d82968a",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "6086af400b26d664c837624967ab6fcefac3d629e48ae520e9ab9512b5c92302"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 111,
+          "sha256": "5be63faf45f4f1837f75ea7c8f45985b5bc824e0064aa9d54008fa83c2c6563e"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 12444,
+      "lines": 246,
+      "sha256": "66c29168cf76703b4d80e331b134233e2c6585a77a942cd0689eee6881e5deaa",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "619d2d5427ad1783721d7b3b6fcd281407db556d65a8437572fa1098ea1764ff"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "ae4e465cf670e3c982d84ded6c9d14a3dc6ffee02f005c3b3aab28f32eb0f5f1"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "40e3db8295c68290f0aff75c4a952af2f0bc432bb8399e422e4c97b826fe6be1"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 246,
+          "sha256": "c76f332ee3a93d1e485122d6f00b1530f989538dee38eb6d4291cb3673553232"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 12388,
+      "lines": 256,
+      "sha256": "7d6b64b8f5572c88fd034272101c35f9f4824008bacbcae94f9bd72ef2b55cf9",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "b8dd933642eae7dcf153b9eb2f61c0864ccb5467928fa81d7625de4fb1e887b5"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "3e638805d2f677eec4134f79a7870822531d8c1f4e2d4825b6d603a605f24ab2"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "17d7681add300d03a904f4aa2eb89c8bf65f8ceda01689c70c6b356551d46990"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 256,
+          "sha256": "bf674bed4a4a0285b7a1b7d281a5870be97723f957541346679fe2d3744b6807"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5718,
+      "lines": 134,
+      "sha256": "4b3ffdbdb28fba7323c9361ac0b7f61646fc2f67a3a504dce7cbdddcdc59caf1",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "56bfd439b18e8bd8d25cb731a0ae0c1f7f6a537c4da8bbcc65716194b388ea94"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 134,
+          "sha256": "33fe3b9707e3b3f6d0ba3a1aec673867cd07a649015f82133c7bac7f2a693484"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/ui-spec/architecture/spec.config.yaml",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 509,
+      "lines": 23,
+      "sha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 23,
+          "sha256": "d71a1fa19b4472bda7890f5527be46e25cba684cfd9c6a041334a3704ed96737"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/ui-spec/architecture/spec.config.yaml.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1328,
+      "lines": 24,
+      "sha256": "ca2059fa23dd34e2e1f5bd373ba7aab56842bba3e4d6a7cb2cc2221e7b78d7c9",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 24,
+          "sha256": "e45492c2cccf13829bc153aabd623c2ba645e87ba3276d10d52b06cdbbf68ba6"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3000,
+      "lines": 70,
+      "sha256": "85044a1bcbeea7c3687205669a62bcce0aaa8550c1eabb526abb304f12904e59",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 70,
+          "sha256": "b41cf372f4df429bbdec6eebc6e872484e4e4cfd1a9726adc69eee5d2a0ec410"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4189,
+      "lines": 88,
+      "sha256": "adadb49a002cad09d4df9541f9907cab8bb0a28655ac25eea7389c76e2636e1f",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "5e19aa360dedc4df56ba4fea3a22ba00c46a3c549814dd6e5e0f3400efa18635"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 88,
+          "sha256": "3ea59097774325747139a72138eba39ff67ef85c5fbc13183a0dcf1e6711c9db"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3263,
+      "lines": 87,
+      "sha256": "ba00ae2b6fabb389308c763efe779c577d33532afee5bea1c693cba5517c2f04",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "3f5e677859d858aba5f22ef36d6c167e7828b192f733d860ea96cc04c9af9d36"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 87,
+          "sha256": "89b7f4ce87bca12499ec56070f1dd11af7901cc08580e1e07f2f728aabc3e56b"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/ui-spec/history/schema/surface-contract.schema.json.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1374,
+      "lines": 24,
+      "sha256": "6425d6ca8812db6da84b9d8ed9f60f599d8dc3c091e1c3f66882dc50f1a14d6e",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 24,
+          "sha256": "43c2ea2e7bce78f94ca2e9c63a8d983d1d945dd04c3fb5bdd3dc7474acd687bf"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3632,
+      "lines": 95,
+      "sha256": "961ac9ca0a055a4d389c1454d0b184132231222a7f72bef86ebe3da747af7b13",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "5312b2354348eb4523acc661b7c7a38576cef27d8e23190c2b2f32e327afd0a9"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 95,
+          "sha256": "7701c0da321ae01f715316eb213adf738c6c5a503e626cbc31a23dbeb7bc1542"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3260,
+      "lines": 86,
+      "sha256": "f21c7e948d0a6223c351316c38515db1daf89f28388c1c6bb5b3d92360f9937b",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "f1d6a625bdc7b17f516efa2be0c71a46c76b435bf39ff9656bce90abc93eeaba"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 86,
+          "sha256": "11c007508a3650ab6cbb926b717a98335981c969eb709a0df8765a0a17c6831d"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/ui-spec/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4950,
+      "lines": 116,
+      "sha256": "436782fa67de9576dd20c28c7f2b960a4a5c11316689afbd81ad7bdc0c6880d6",
+      "inventoryEdges": 9,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "08100950ad282895284744d4db9e2a170e9ed241e0606976144c5ec5af3b2b70"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 116,
+          "sha256": "89cb52ee2d095479ae9bad1e9c38eb4506781638519ecfedc6ad81eb08ee9a8f"
+        }
+      ]
+    }
+  ],
+  "method": "Full pinned source-byte traversal, exact inventory spans, supplemental scan and per-edge context assessment. Author traversal is not independent review."
+}

@@ -1,0 +1,171 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": [
+    {
+      "file": "docs/platform/system-architecture/architecture/architecture-intent.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 41130,
+      "lines": 799,
+      "sha256": "82b51061421d4995781ac999111d8a1bb4479f0b1b6180afabcdbf2928d928c2",
+      "inventoryEdges": 13,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "af1e532fc9a3ed0ee830fe00aad023104e020ae33e5a62c7372744121451b90b"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "dd3eb517de97f9d53877663b4b33899bea2aa3e30e21748479958fac688dda94"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "213e166bda88f519afb662049e9323811bccc57a912aca04285f9d5a8a292431"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "4e27b2a3721e34d6604fdb7742cf89a633491a117f9514aad1f8337cd7e50492"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "9ae55ea330e37cf2e30b75639b1b79a7411f4a3de7f8faa3979c60db10605e1f"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "cb261cde2646f74f527756250173ec4ded4d03128bdf2d74c724fa9ba5fcdca6"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "999de473922df06f9c19ae17f1d72b1f17322c5a7e6d25480c88dea7d6feb0cf"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "4a483e09aef24ce86dca13847a0f1e0a84a2eae6d69337f2667347b3a8f14daf"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "2fd6b76163ee97872b22fa2f2a85d59f255bfbcb1f0b7d68c93500e4c45974dd"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 799,
+          "sha256": "aa86642cdc16bc8aacc12126ce03ea45bf5c3e602e06ed4fee29d193e2e2f361"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6621,
+      "lines": 159,
+      "sha256": "50099b7a34e0f160bb9d5a8bb56527531ef747a31cca021302eae981d9e05a99",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "6775748f68d5a7b17a3818cf9178588c7850cd7a3afe7babad96a36912b33ccd"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 159,
+          "sha256": "6ad3d9007b2ac6cdb9a4871485a9fcb6a9ffc92aa6e304ea32bbbdc03d718efb"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 13062,
+      "lines": 296,
+      "sha256": "9ee4f29458ce8631cb9df0818b3d27ef17d715ea18f631248676e868ccd4f8c0",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "6717d6cefa6f66c30f0956156f3d0592fdd22498966e6c3986df12b8706ac85b"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "f0b9f9be377e54c29a6951adaaf924649aa4762b645de5f2a83648c5813b7058"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "1cce08fcb732137d22c77055fd2086bde3b37dd88b92bee588fe7fc631082dc3"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 296,
+          "sha256": "ac879d309e24d20dc1dbbba1b228381ce91942651db189c08d9a5243be20bf4a"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 19352,
+      "lines": 371,
+      "sha256": "441108da9c93fa071b4065319c40562ab44d410b714fe0140252a26280a4c15e",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "1e7d88a35826f04e88a81f0062136427409e454d83e76aa51a5c5107f5656642"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "601d53580d0bb8a0591340f885fd5f47830aa10da901a99950c8405158ced372"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "1341b0edeb133068c8b313f5996478929d3b5e340c1057d85828bb22600419fe"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "cf54d8ec2953d5fb38436eaed321e3d3614e31e851ee51a133873155cf67bccf"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 371,
+          "sha256": "84028a17046f56453486b77af5dfc4ba27c104503b4e521b63ebe8cbef4dbe69"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/system-architecture/history/architect-readme.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4417,
+      "lines": 85,
+      "sha256": "c5f844433fb08effcc472c7e251e8389f6edc3022fc9e1daf4a8011be08c903b",
+      "inventoryEdges": 18,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "fa7e661879cc4c76c4fc50fd2f94185f8968b48a899190a277e8faa671e072f3"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 85,
+          "sha256": "4421b85d5575093a7b2521e0b488a5586b24c82a6eccd51f98aa8cf4971c3db9"
+        }
+      ]
+    }
+  ],
+  "method": "Full pinned source-byte traversal, exact inventory spans, supplemental scan and per-edge context assessment. Author traversal is not independent review."
+}

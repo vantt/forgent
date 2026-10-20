@@ -1,0 +1,31 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": [
+    {
+      "file": "docs/platform/system-overview/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 19993,
+      "lines": 198,
+      "sha256": "b027026ae37327e96ce572c9a06fdaebf7d5146625c1abeb10b3bdcb033b0e54",
+      "inventoryEdges": 11,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "e17268e76c140b884574d4e7d29a8892ed8d58488db08d7fb75888d949d213e7"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "7b621a5629c4940567d3bb7ad2c0b3c8bf62f95fa8f3a85f18a8486a3dfeff35"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 198,
+          "sha256": "5ac0623bc77877f19b5cc74e6a9590dd24110942f3190d652151123d1e79ca8e"
+        }
+      ]
+    }
+  ],
+  "method": "Full pinned source-byte traversal, exact inventory spans, supplemental scan and per-edge context assessment. Author traversal is not independent review."
+}

@@ -1,0 +1,58 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "completedBatches": [
+    "122",
+    "121",
+    "120",
+    "119",
+    "118",
+    "117",
+    "116",
+    "115",
+    "114"
+  ],
+  "pendingAssignedBatches": [],
+  "files": 49,
+  "inventoryEdges": 342,
+  "addedEdges": 46,
+  "edges": 388,
+  "patchedFiles": 35,
+  "dispositions": {
+    "parked": 68,
+    "preserve": 259,
+    "patch": 55,
+    "phase9-row-flip": 6
+  },
+  "parks": {
+    "description-rewrite": 32,
+    "step5-parity": 5,
+    "GAP-02": 5,
+    "phase9-carry": 15,
+    "lead-ruling": 11
+  },
+  "openLeadRulingEdgesPerSet": {
+    "122": [],
+    "121": [],
+    "120": [],
+    "119": [],
+    "118": [],
+    "117": [
+      "maps-j-07786"
+    ],
+    "116": [],
+    "115": [
+      "maps-j-07625",
+      "maps-j-07628",
+      "maps-j-07636",
+      "maps-j-07640",
+      "maps-j-07641",
+      "maps-j-07644",
+      "maps-j-07649",
+      "maps-j-07650",
+      "maps-j-07651",
+      "maps-j-07667"
+    ],
+    "114": []
+  },
+  "reviewAcceptance": "pending independent review; author does not close sets"
+}

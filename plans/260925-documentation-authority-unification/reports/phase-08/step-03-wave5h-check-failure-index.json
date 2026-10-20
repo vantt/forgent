@@ -1,0 +1,143 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "scope": "Final full unchanged checker: every canonical batch actually present in this isolated checkout; parallel batches 105–113 absent and not fabricated.",
+  "failureCount": 12,
+  "expectedL12_52FailureCount": 11,
+  "additionalL12_53CoverageFailureCount": 1,
+  "failures": [
+    {
+      "file": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md",
+      "check": "author-added-search-coverage",
+      "detail": "",
+      "edgeIds": [
+        "author-wave5h-source-inventory-L40C181",
+        "author-wave5h-source-inventory-L40C244",
+        "author-wave5h-source-inventory-L44C5"
+      ],
+      "ruling": "L12-53",
+      "expectedPendingCheckerExemption": false,
+      "actualBlocker": "Unchanged scanner retains separate basename label/destination spans for both line-40 sibling links and emits no line-44 phase-7-completion link. Exact whole-link added edges cannot satisfy its span equality and scanner-join counter. Scanner update belongs to Doer A, not this records-only worker."
+    },
+    {
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "check": "removed-decision-narrative-successor",
+      "detail": "removed decision missing computed narrative-holder successor: ('docs/platform/runner/decisions/h-36d872fbb0e5.md#0021-wire-main-checkout-lock-hook-qua-fgos-doctorsetup-không-epoch-fence',)",
+      "edgeIds": [
+        "maps-j-07625"
+      ],
+      "ruling": "L12-52(1)",
+      "expectedPendingCheckerExemption": true
+    },
+    {
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "check": "removed-decision-narrative-successor",
+      "detail": "removed decision missing computed narrative-holder successor: ('docs/platform/runner/decisions/h-36d872fbb0e5.md#0025-thứ-tự-ưu-tiên-sản-phẩm-chi-tiết-hoá-0023-nạp-always-loaded-qua-agentsmd',)",
+      "edgeIds": [
+        "maps-j-07628"
+      ],
+      "ruling": "L12-52(1)",
+      "expectedPendingCheckerExemption": true
+    },
+    {
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "check": "removed-decision-narrative-successor",
+      "detail": "removed decision missing computed narrative-holder successor: ('docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity',)",
+      "edgeIds": [
+        "maps-j-07636"
+      ],
+      "ruling": "L12-52(1)",
+      "expectedPendingCheckerExemption": true
+    },
+    {
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "check": "removed-decision-narrative-successor",
+      "detail": "removed decision missing computed narrative-holder successor: ('docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity',)",
+      "edgeIds": [
+        "maps-j-07640"
+      ],
+      "ruling": "L12-52(1)",
+      "expectedPendingCheckerExemption": true
+    },
+    {
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "check": "removed-decision-narrative-successor",
+      "detail": "removed decision missing computed narrative-holder successor: ('docs/platform/runner/decisions/h-36d872fbb0e5.md#0028-đổi-tên-pinned-term-orchestrator-thành-launcher',)",
+      "edgeIds": [
+        "maps-j-07641"
+      ],
+      "ruling": "L12-52(1)",
+      "expectedPendingCheckerExemption": true
+    },
+    {
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "check": "removed-decision-narrative-successor",
+      "detail": "removed decision missing computed narrative-holder successor: ('docs/platform/runner/decisions/h-36d872fbb0e5.md#0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm',)",
+      "edgeIds": [
+        "maps-j-07644"
+      ],
+      "ruling": "L12-52(1)",
+      "expectedPendingCheckerExemption": true
+    },
+    {
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "check": "removed-decision-narrative-successor",
+      "detail": "removed decision missing computed narrative-holder successor: ('docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity',)",
+      "edgeIds": [
+        "maps-j-07649"
+      ],
+      "ruling": "L12-52(1)",
+      "expectedPendingCheckerExemption": true
+    },
+    {
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "check": "removed-decision-narrative-successor",
+      "detail": "removed decision missing computed narrative-holder successor: ('docs/platform/runner/decisions/h-36d872fbb0e5.md#0028-đổi-tên-pinned-term-orchestrator-thành-launcher',)",
+      "edgeIds": [
+        "maps-j-07650"
+      ],
+      "ruling": "L12-52(1)",
+      "expectedPendingCheckerExemption": true
+    },
+    {
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "check": "removed-decision-narrative-successor",
+      "detail": "removed decision missing computed narrative-holder successor: ('docs/platform/runner/decisions/h-36d872fbb0e5.md#0029-sửa-ba-mệnh-đề-từ-vựng-dispatch-của-0026-bỏ-roottasksubtask-capacity-là-năng-lực-có-tên-t1-hai-giá-trị',)",
+      "edgeIds": [
+        "maps-j-07651"
+      ],
+      "ruling": "L12-52(1)",
+      "expectedPendingCheckerExemption": true
+    },
+    {
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "check": "removed-decision-narrative-successor",
+      "detail": "removed decision missing computed narrative-holder successor: ('docs/platform/runner/decisions/h-36d872fbb0e5.md#0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm',)",
+      "edgeIds": [
+        "maps-j-07667"
+      ],
+      "ruling": "L12-52(1)",
+      "expectedPendingCheckerExemption": true
+    },
+    {
+      "file": "docs/platform/system-architecture/history/architect-readme.md",
+      "check": "carriage-no-existence-claims",
+      "detail": "",
+      "edgeIds": [
+        "maps-j-07786"
+      ],
+      "ruling": "L12-52(2)",
+      "expectedPendingCheckerExemption": true
+    }
+  ],
+  "checkedBatches": 121,
+  "files": 970,
+  "edges": 8761,
+  "fullCheckReceipt": "step-03-wave5h-check-result.json",
+  "fullCheckReceiptSha256": "de84e09114d9f5b26efecaa1ceac8062fcbca8fc498b28c7ab4e02d9d2ab2fe5",
+  "fullFailuresEqualTargeted": true,
+  "otherFailureCount": 0,
+  "inheritedNotClosableSets": [
+    "batch-089"
+  ],
+  "acceptance": "Blocked on one additional L12-53 scanner coverage defect beyond the 11 expected pending L12-52 exemptions; records and review request authored, independent semantic acceptance not claimed."
+}

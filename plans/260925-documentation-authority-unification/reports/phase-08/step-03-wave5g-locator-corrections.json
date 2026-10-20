@@ -1,0 +1,59 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "changes": [
+    {
+      "file": "docs/platform/runner/architecture/h-69197b459754.md",
+      "beforeRecordSha256": "3c80160bb11dd57685de0fb86cd0fb8c0f9249ac64a8e9e0461271eca7a38002",
+      "afterRecordSha256": "bfc66389119e182adb6e6d5fed4beb6eb0497b83c340ee15c409762ef4273c97",
+      "edges": [
+        "maps-j-07592"
+      ],
+      "outcomeChange": [
+        "maps-j-07592"
+      ],
+      "proofOnly": [],
+      "reason": "Full-check advisory locator review: park the stale above-vocabulary locator as a whole description rewrite; bind exact ADR-prefix/translated-heading/catalog correspondence on the other three citations. No checker/probe change."
+    },
+    {
+      "file": "docs/platform/runner/contracts/routing-handoff.md",
+      "beforeRecordSha256": "0b162967d7847afa1d94595ac4c5fe16d8b2bbc468515acba41be83ace56a604",
+      "afterRecordSha256": "1fd28a3113e5347bbb70f46712bf9e0b7d32ef19095d073c953c32feee68bf14",
+      "edges": [
+        "maps-j-07614"
+      ],
+      "outcomeChange": [],
+      "proofOnly": [
+        "maps-j-07614"
+      ],
+      "reason": "Full-check advisory locator review: park the stale above-vocabulary locator as a whole description rewrite; bind exact ADR-prefix/translated-heading/catalog correspondence on the other three citations. No checker/probe change."
+    },
+    {
+      "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "beforeRecordSha256": "a10939127fdef78238c826f64e4f9a3d2a985e2757f3410231fb3be45abe597b",
+      "afterRecordSha256": "a21aba8d1f81c4a7b80838c461258d0071d77cfa955be93dc56ea3653566db90",
+      "edges": [
+        "maps-j-07732"
+      ],
+      "outcomeChange": [],
+      "proofOnly": [
+        "maps-j-07732"
+      ],
+      "reason": "Full-check advisory locator review: park the stale above-vocabulary locator as a whole description rewrite; bind exact ADR-prefix/translated-heading/catalog correspondence on the other three citations. No checker/probe change."
+    },
+    {
+      "file": "docs/platform/system-overview/spec.md",
+      "beforeRecordSha256": "b6a12a3e493cf9e986fcd25a78e0b2461b89a55133ee040b0af9e5d096cf9b5e",
+      "afterRecordSha256": "935cb9a46ea1911ce058a418a091eefb3769525cd0c49432ab69fa935cf29380",
+      "edges": [
+        "maps-j-07807"
+      ],
+      "outcomeChange": [],
+      "proofOnly": [
+        "maps-j-07807"
+      ],
+      "reason": "Full-check advisory locator review: park the stale above-vocabulary locator as a whole description rewrite; bind exact ADR-prefix/translated-heading/catalog correspondence on the other three citations. No checker/probe change."
+    }
+  ],
+  "priorFullChecker": "970 files / 8758 edges / 0 failures; superseded by final rerun after these record corrections",
+  "scope": "Only new batches 115/118; source/digest/inventory/supplemental ids and seed populations unchanged."
+}
