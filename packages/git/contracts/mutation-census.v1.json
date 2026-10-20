@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "e2f42f2f94cc5f18cfbe75c2715a1522ce998f8440d0ffaab2e558837b87da33",
+  "payloadDigest": "666e6b764d89b7f14a722614f8b24e4a3b176b64e1451cc2b08cb676624496d9",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -584,7 +584,7 @@
     "scripts/probe-storytelling-material.mjs": "c697fb57bee9fd1e4d2464edd31312e41e9f661e540b159f86d7573ff83e9b5c",
     "scripts/project-agents.mjs": "8af93fe4d0c75957a82da98b5c4dfa5aabba78fd4e60338b8cac861996b0e468",
     "scripts/regenerate-observe-fixtures.mjs": "07c5b42795e22c36d75363e2265cf59b6f6244d63f7413d9dacf9fe0e3071631",
-    "scripts/run-rust-dev-host.mjs": "07c6a5beecf97d89e7c946039c019f3057d053cf91db7b16b13e547c1890cb76",
+    "scripts/run-rust-dev-host.mjs": "23b256c397da248c87d47fee25e3b4eff9bf918d41be1e03b12b17c6f317bb5c",
     "scripts/run-test-canary.mjs": "ef25e2f8237ffefddbf707c68289c0fe00ee95bd10da6a51a80fd965b30c42ba",
     "scripts/run-tests.mjs": "daac24795e6859a5981948d3a185b96b0ebacfef0d6582197d3ed4e333e55eb2",
     "scripts/stress-test-files.mjs": "c3ccd385982e8e1865b54e02abef044ae3e85a4547f34c9efd2fcbcc66d37240",
@@ -759,7 +759,7 @@
     "src/runner/execution/patterns/role-tasks.mjs": "0fe9b6ac4898c658cfc051766a29f848d72b6960b3a1cfd16053e72b703d8ecc",
     "src/runner/execution/patterns/solo.mjs": "d439ed457e517936f2d7f1e2c2ac076876dee2d8b19d8325017047309e45c490",
     "src/runner/execution/role-ledger.mjs": "5b244127187be94fa7175c3bb32feb0fb0e9daf4ef2e3f25030ab2f9b2d0fa14",
-    "src/runner/execution/run.mjs": "73cdceb14396a74e967e0679a4e2fde3d6cef4dda1416d810574c538aa50d766",
+    "src/runner/execution/run.mjs": "94f2079d85f8c959bce83f13d9f2aea7583c69fa9cf32b9ee19bc7ccce9999dd",
     "src/runner/execution/unit-control.mjs": "7758226c1321bda3cd53e5018c7030b714adf138ba8e3fccbeb8a4f5337f9022",
     "src/runner/execution/unit-run-history.mjs": "ca16c5a4f62b82ad43910874919e0f4603c285c8dafed3e401c35ce32f73c5fb",
     "src/runner/execution/unit-state.mjs": "21bace2f8debba43bc794fda037c62590da3fe644f7cc07a2f3a728548eb5db6",
@@ -906,7 +906,7 @@
     "src/verbs/state/step.mjs": "ddebfcb5b53edfd67086ead35d886b86a1f49ad0ce18b98d7b637df239b059fb",
     "src/verbs/worktree/create.mjs": "b09413339c4594efa3261433f827ee1d8dd7080d270fc1cf28e9d68e2b4ed261",
     "src/verbs/worktree/remove.mjs": "5fb637c87b16cacb0caa20dbc7023cf22a6e261c06505050048cb6190b906dc5",
-    "src/workflow/case-admission-port.mjs": "dc2a23e8536202456613a06cb85c2508d215ba8c7819d77088646b15127b36b3",
+    "src/workflow/case-admission-port.mjs": "a9712f4f891357286ea0d42aab46a10689a038d68b5623371f39a48820cad972",
     "src/workflow/case-admission.mjs": "92b13d3a089e77f46fd1de5331ddb45d594d146c34225bcf9657804c4dbb5a42",
     "src/workflow/case-bindings.mjs": "d553c2bfef7a52bfed32c7674685f0b56b1473235d74a260c9b54274bf78e8fc",
     "src/workflow/case-close.mjs": "8c92c160e4cc7d704420e2f6e7888298942a3fea9358ee8ae5a7d2ef0a81d6c3",
@@ -953,7 +953,7 @@
     "install.sh": 1,
     "package-lock.json": 1,
     "packages": 135,
-    "plans": 1733,
+    "plans": 1737,
     "plugins": 97,
     "rustfmt.toml": 1,
     "test": 755,
@@ -2659,14 +2659,14 @@
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 1199,
+      "line": 1215,
       "spawn": "runCommand -> src/runner/goal-check.mjs:61",
       "binary": "(consumer verify command (cfg?.capabilities?.[unit?.capability]?.verify))",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 1199,
+      "line": 1215,
       "spawn": "runCommand -> src/runner/goal-check.mjs:61",
       "binary": "(consumer verify command (unit?.verify))",
       "class": "configured-binary"
