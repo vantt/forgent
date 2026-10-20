@@ -3,6 +3,7 @@ import path from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
 import { createGitInspect } from '../../git/inspect.mjs';
 import { createGitWorktree } from '../../git/worktree.mjs';
+import { setProvisionedAside } from '../../runner/worktree.mjs';
 
 const OID = /^(?:[0-9a-f]{40}|[0-9a-f]{64})$/;
 
@@ -30,6 +31,8 @@ function worktreeTip(inspect, target) {
 // deliveredTo, which some non-internal ref must contain. evidenceDigest is the
 // sha256 of the delivery statement this verb makes, so the Git operation record
 // binds the exact path, tip and delivery target the caller asserted.
+// What `worktree create` provisioned is set aside first, so the port judges
+// only the checkout's own bytes; a refusal puts it back.
 export function removeWorktreeUseCase(ctx, options, loaderOptions) {
   if (!options.path || typeof options.path !== 'string') throw new Error('worktree remove requires a path');
   if (!options.deliveredTo || typeof options.deliveredTo !== 'string') throw new Error('worktree remove requires --delivered-to <ref>');
@@ -42,6 +45,13 @@ export function removeWorktreeUseCase(ctx, options, loaderOptions) {
     .update(JSON.stringify({ path: target, expectedTip, deliveredTo: delivered }))
     .digest('hex');
   const port = createGitWorktree({ ...base, writer: ctx.writer }, loaderOptions);
-  port.remove({ path: target, expectedTip, deliveredTo: delivered.oid, evidenceDigest, operationId: `worktree-${randomUUID()}` });
+  const provisioned = setProvisionedAside(ctx.stateRoot, target);
+  try {
+    port.remove({ path: target, expectedTip, deliveredTo: delivered.oid, evidenceDigest, operationId: `worktree-${randomUUID()}` });
+  } catch (err) {
+    provisioned.restore();
+    throw err;
+  }
+  provisioned.discard();
   return { removed: true, path: target, expectedTip, deliveredTo: delivered.oid, deliveredToRef: delivered.ref, evidenceDigest };
 }
