@@ -44,9 +44,16 @@ export function checkExecutorFamilyUnique(cwd) {
   return { passed: true, message: `each of ${byFamily.size} agent families has one executor` };
 }
 
-// Where each agent family's CLI reads project skills from. A family not listed has no known
-// skill directory here, so its declared skills are reported as not checked rather than failed.
-const FAMILY_SKILL_DIRS = { claude: '.claude/skills', openai: '.agents/skills' };
+// Where each agent CLI reads project skills from, keyed by the invocation's command name. A CLI
+// not listed has no known skill directory here, so it is reported as not checked rather than failed.
+const CLI_SKILL_DIRS = { claude: '.claude/skills', codex: '.agents/skills', omp: '.omp/skills', pi: '.pi/skills', grok: '.grok/skills' };
+
+function invocationCliNames(entry) {
+  const commands = Array.isArray(entry.invocations) && entry.invocations.length > 0
+    ? entry.invocations.map(inv => inv?.command)
+    : [entry.command];
+  return [...new Set(commands.filter(c => typeof c === 'string' && c !== '').map(c => path.basename(c)))];
+}
 
 /**
  * An executor that declares `supports.skills` is only truthful when the skill is really installed
@@ -63,13 +70,14 @@ export function checkExecutorSkillsInstalled(cwd) {
   for (const [id, entry] of Object.entries(runnerConfig.executors ?? {})) {
     const skills = entry?.supports?.skills;
     if (entry?.kind !== 'agent' || !Array.isArray(skills)) continue;
-    const family = deriveProviderFamily(entry);
-    const dir = FAMILY_SKILL_DIRS[family];
-    if (!dir) { unchecked.push(`${id} (family ${family})`); continue; }
-    for (const skill of skills) {
-      checked += 1;
-      if (!fs.existsSync(path.join(root, dir, skill.replaceAll(':', '-'), 'SKILL.md'))) {
-        missing.push(`${id} declares ${skill} but ${dir}/${skill.replaceAll(':', '-')}/SKILL.md is missing in ${root} -- install the skill for that runtime, or remove it from executors.${id}.supports.skills`);
+    for (const cli of invocationCliNames(entry)) {
+      const dir = CLI_SKILL_DIRS[cli];
+      if (!dir) { unchecked.push(`${id} (cli ${cli})`); continue; }
+      for (const skill of skills) {
+        checked += 1;
+        if (!fs.existsSync(path.join(root, dir, skill.replaceAll(':', '-'), 'SKILL.md'))) {
+          missing.push(`${id} declares ${skill} but ${dir}/${skill.replaceAll(':', '-')}/SKILL.md is missing in ${root} -- install the skill for the ${cli} CLI, or remove it from executors.${id}.supports.skills`);
+        }
       }
     }
   }
