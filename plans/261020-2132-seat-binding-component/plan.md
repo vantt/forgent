@@ -276,3 +276,44 @@ Result: zero unresolved contradictions.
 ## Owner questions (only these)
 
 1. **Landing hour.** Phase 12 is a stop-everything landing on three workspaces plus the second machine (board rule: the owner picks the time). Needed when phase 11 is merged.
+
+## Validation Log
+
+### Session 1 — 2026-10-20
+**Trigger:** owner 21:50 "plan xong thì chạy ak-plan validate/redteam để kiểm tra, sau đó chạy ak:cook"; run after the red-team pass (16 accepted items applied, sweep clean).
+**Verification pass:** skipped by the validate guard. `## Red Team Review` already carries Full-tier evidence: 4 reviewers; big-lead re-checks of `config.mjs:359-361`, `config.mjs:395-405`, `run.mjs:699-1374`; 0 `[UNVERIFIED]` tags in the plan files.
+**Questions asked:** 0 to the owner. Each decision point below is answered from the approved spec (`docs/specs/seat-binding.md`, D-ADR0072) or from code. Under AGENTS.md priority 2 the big lead decides inside the approved frame and reports. The one owner question, the landing hour, is asked when phase 11 merges.
+
+#### Decision points reviewed (answered by the big lead)
+1. **[Assumptions]** Unit `rigor`, `--rigor`, guide `rigorFloor` and Work `risk: heavy` stop raising tier (planner decision 4).
+   - Answer: correct. This is D2 ("rigor only sets checker count and independence"), approved 21:31.
+   - Mitigation kept: these appear in the conversion diff, the dry-bind output and the CHANGELOG, so nothing changes silently.
+2. **[Architecture]** One track branch with one landing merge, about 17 days (decision 1).
+   - Answer: correct. This is the owner's "one wave" (D11) plus the schema fence, so a partial cutover can never sit on main.
+   - The pre-wave phase -01 is the only thing that lands on main early. It is inert by itself.
+3. **[Tradeoffs]** Global bare verbs are copied into each project file instead of editing the global file (decision 4).
+   - Answer: correct. The approved spec forbids new keys in the global file this wave (spec §9 step 5), and an edit there breaks other activations (incident 2026-10-13).
+4. **[Assumptions]** `tester` is a checker seat that has role `reviewer` for taste lookup only and keeps today's result contract (decision 8).
+   - Answer: correct. It fills a gap in the spec without changing behaviour.
+   - Spec errata go in phase 11. The owner sees them in the phase 11 summary.
+5. **[Risks]** No dead pre-fence record may be left without an existing verb that settles it.
+   - Answer: phase 00 measures this on live forgentX, where 11–31 records are `running` today.
+   - The reversal trigger (a read-only role-key shim for that record class) is pre-decided, so it needs no owner input.
+6. **[Scope]** Model-config diff stays out of scope (MP-B1 06 / SEAT step 7).
+   - Answer: correct, per the owner's sequence (diff after landing, owner approves).
+
+#### Confirmed Decisions
+- Proceed to implementation with `/ak:cook --auto`. Each phase group runs as a Sonnet lead in its own worktree under `core/skills/_shared/ak-cook-worker-contract.md`. The big lead verifies with the full `npm test` before each merge into the track.
+- Phase -01 goes first, on main. Phase 00 runs in parallel because it only writes a report.
+
+#### Action Items
+- [ ] Ask the owner for the landing hour when phase 11 merges.
+
+#### Impact on Phases
+- None. No phase file changed in this session.
+
+### Whole-Plan Consistency Sweep
+- No new decision deltas in this session, so there is nothing to propagate.
+- Re-checked: the -01/00 order in "Phases", "Dependency graph" and "Landing recipe" agree.
+- The single owner question matches "Owner questions".
+- 0 unresolved contradictions.
