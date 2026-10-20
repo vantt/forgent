@@ -1,0 +1,782 @@
+{
+  "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "inventoryInputCommit": "1a0f61ac53433292e08fb378ebbb6c1c72fd3b74",
+  "files": [
+    {
+      "file": "docs/reference/claude-named-executor.md",
+      "set": "batch-123",
+      "sourceBytes": 3076,
+      "digest": "40c17a51b0de65d1ee9867587be900ff2b082f6ebe2687e2c6736b5b8dcd042c",
+      "inventoryFileDigest": "40c17a51b0de65d1ee9867587be900ff2b082f6ebe2687e2c6736b5b8dcd042c",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "84a1a4c011f98afb0c8eff917ca14074565786b2fa8deda8343650d2a9fd22c8",
+      "recordBytes": 2726,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/reference/coding-worker-contract-shape.md",
+      "set": "batch-123",
+      "sourceBytes": 4448,
+      "digest": "03c68ea5ffbd57348f328221b46c8ef7a31c51b47fdaaf627be95ebc5427da4f",
+      "inventoryFileDigest": "03c68ea5ffbd57348f328221b46c8ef7a31c51b47fdaaf627be95ebc5427da4f",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "6937750315e67c7324c320e61a3cdaa475aab2c850a95228e6199508d43ad0b0",
+      "recordBytes": 1863,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/reference/discussion-quality-rubric.md",
+      "set": "batch-123",
+      "sourceBytes": 4039,
+      "digest": "65b2ca24c4362589f8d1f920dc674ac4625f0bd273816a264fe8b87c86e9c1fe",
+      "inventoryFileDigest": "65b2ca24c4362589f8d1f920dc674ac4625f0bd273816a264fe8b87c86e9c1fe",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "09781b586c906f45166340479d9006c01f951b08c12b1d0a08d647ef4d348832",
+      "recordBytes": 1829,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/reference/dispatch-module-boundaries.md",
+      "set": "batch-123",
+      "sourceBytes": 4229,
+      "digest": "99cf0a339d63912ea095fe4bb2fcd5a5f18064f467029c3365f0d6ed8eb0dde9",
+      "inventoryFileDigest": "99cf0a339d63912ea095fe4bb2fcd5a5f18064f467029c3365f0d6ed8eb0dde9",
+      "diffSha256": "bfab89aa76d1166af4702bd2326d6b81ab17e6e24c44d43e2eb7976626931370",
+      "recordSha256": "37270819e2466b4cb437f95f7bcd4000045a3d99ceebd0e9cabb8f98d8738b55",
+      "recordBytes": 32644,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/reference/fgos-faults-read-surface.md",
+      "set": "batch-123",
+      "sourceBytes": 2640,
+      "digest": "f01faa2900f6af30470838f79a719459d7731a02f07c6797c5c1ed06200c5590",
+      "inventoryFileDigest": "f01faa2900f6af30470838f79a719459d7731a02f07c6797c5c1ed06200c5590",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "ad9be918bd416683b5aabd80d86075d1a02bb8cfdbdb6c7d949422531e54f5de",
+      "recordBytes": 1781,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/reference/runner-capabilities-advise-execute-slots.md",
+      "set": "batch-123",
+      "sourceBytes": 3507,
+      "digest": "12bacdc1b6771d8ba7d5df22cb357900eb8572144fe9bfc27af34511cf9738ad",
+      "inventoryFileDigest": "12bacdc1b6771d8ba7d5df22cb357900eb8572144fe9bfc27af34511cf9738ad",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "1497f5a80ebd14a7063dc9c9c46c336c979dcd59ca8eab1aefab1b0d9187634c",
+      "recordBytes": 2707,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/templates/architecture.md",
+      "set": "batch-124",
+      "sourceBytes": 1478,
+      "digest": "4dbe00e3ac6e365af738e61bf930780958e82b59f29d947d94859d037dbe9d0d",
+      "inventoryFileDigest": "4dbe00e3ac6e365af738e61bf930780958e82b59f29d947d94859d037dbe9d0d",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "daa76577654c84a25de2a6714ad51a9b7b471fb30ff6140d7ba230cd24b7f9fb",
+      "recordBytes": 2321,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/templates/area-readme.md",
+      "set": "batch-124",
+      "sourceBytes": 3763,
+      "digest": "ff2741785d000ae3e61eeeaf09e1a1318ded5080fb5cfbcc2ad01c2f35461ea8",
+      "inventoryFileDigest": "ff2741785d000ae3e61eeeaf09e1a1318ded5080fb5cfbcc2ad01c2f35461ea8",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "7a61796d3dcf7d9a529d3e5df771ef631a4f01f86811258e363588b30e5cfadb",
+      "recordBytes": 4218,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/templates/contract.md",
+      "set": "batch-124",
+      "sourceBytes": 1192,
+      "digest": "5e894fbda25b858b80740a1676032dac9e2ede0aa5cd12b566506e7123d69a4d",
+      "inventoryFileDigest": "5e894fbda25b858b80740a1676032dac9e2ede0aa5cd12b566506e7123d69a4d",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "31e5c58036775b93f36bee94d71c263772f07177f4a2a627310b3aa3f069d878",
+      "recordBytes": 2281,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/templates/decision.md",
+      "set": "batch-124",
+      "sourceBytes": 857,
+      "digest": "c0f1d59f2917dfc70841f52ea1dc8232cb5e5f8ff88c950d4a498fc9a6a17802",
+      "inventoryFileDigest": "c0f1d59f2917dfc70841f52ea1dc8232cb5e5f8ff88c950d4a498fc9a6a17802",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "f72d3b6be6c8eceda64479c7428d4e2813a85badc4c8aa05332a6e4d1ffc4ea0",
+      "recordBytes": 2281,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/templates/discussion.md",
+      "set": "batch-124",
+      "sourceBytes": 812,
+      "digest": "3cc78a7f91f9d2f350158c36117fd470d971dae394f8deeeac98758ca9868e0a",
+      "inventoryFileDigest": "3cc78a7f91f9d2f350158c36117fd470d971dae394f8deeeac98758ca9868e0a",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "352b896a904a40018c67d95a64eb3e010d85410c07ba7607414616626f8c60d8",
+      "recordBytes": 769,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/templates/generated.md",
+      "set": "batch-124",
+      "sourceBytes": 634,
+      "digest": "e94a37cae8b21421eeca2fd2b54e602c92d43a50d1b36af7dea01dce6ca3806c",
+      "inventoryFileDigest": "e94a37cae8b21421eeca2fd2b54e602c92d43a50d1b36af7dea01dce6ca3806c",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "94c9cb24ae25c3ddbc6ba79da7be57eccc9d3ca49e6acd9b86afc5ef73ceffdf",
+      "recordBytes": 768,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/templates/intent-preservation-ledger.md",
+      "set": "batch-124",
+      "sourceBytes": 1879,
+      "digest": "4b2c2916f67d00b5158ce9d82c93bb21dfad41f6c5cc3ffdbf01d29a51fe9c50",
+      "inventoryFileDigest": "4b2c2916f67d00b5158ce9d82c93bb21dfad41f6c5cc3ffdbf01d29a51fe9c50",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "076f6fafa231b8dfd2326f657245f435fad10735d1cb96a0452865781e6a3b38",
+      "recordBytes": 1461,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/templates/spec.md",
+      "set": "batch-124",
+      "sourceBytes": 1449,
+      "digest": "980f368c517dad90aa9a1426285d6d200633e4ef6f0c4625e40d1ee9923a0b0e",
+      "inventoryFileDigest": "980f368c517dad90aa9a1426285d6d200633e4ef6f0c4625e40d1ee9923a0b0e",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "88fbd110ef39a295e8da42cd7470650f5b1a6635321453a2d339b907b35ecc5c",
+      "recordBytes": 1439,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/templates/subcomponent-readme.md",
+      "set": "batch-124",
+      "sourceBytes": 2506,
+      "digest": "c87c476534b677740bb610aee582b1a4cb095ca3c4e2de6ea47f1ddc6c3a891b",
+      "inventoryFileDigest": "c87c476534b677740bb610aee582b1a4cb095ca3c4e2de6ea47f1ddc6c3a891b",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "7ca36047bc629d36997a2642b816df660047489e4fe97a0edd7446c8ab369db4",
+      "recordBytes": 1269,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/templates/verification.md",
+      "set": "batch-124",
+      "sourceBytes": 829,
+      "digest": "3ae81f2d4d4724e6e4da585ac073ae5ce78b5f7ace0fba37f504bf9579c722f4",
+      "inventoryFileDigest": "3ae81f2d4d4724e6e4da585ac073ae5ce78b5f7ace0fba37f504bf9579c722f4",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "9d0faea7cfe9ebe740d725697c8abfa1cdac7c05525f1c99f6a96330ee9555ed",
+      "recordBytes": 2285,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/templates/vision.md",
+      "set": "batch-124",
+      "sourceBytes": 1238,
+      "digest": "61d867cd5921cb157c8cfbaa874f733fa94b4478c4d1710a59d6804dae57f622",
+      "inventoryFileDigest": "61d867cd5921cb157c8cfbaa874f733fa94b4478c4d1710a59d6804dae57f622",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "8df0abf77a39e8cbd1d20e23fde2ebf0ffe7d25c35f52523ab5e930ce4a37f7f",
+      "recordBytes": 1561,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/ui-spec/00-overview.md",
+      "set": "batch-125",
+      "sourceBytes": 3564,
+      "digest": "76af5d449a69613a2cd3871e5b898934f8b57db685d0d87d1cb4eb3375ff71d7",
+      "inventoryFileDigest": "76af5d449a69613a2cd3871e5b898934f8b57db685d0d87d1cb4eb3375ff71d7",
+      "diffSha256": "17a08f815059dde94988749f4c2df7d886dec5a0b175d578da5400dcdda90d6e",
+      "recordSha256": "be4ef41a0925f1c1d0673ded27b44fe0fef004e9be23e5bffadf0d6ff023d01a",
+      "recordBytes": 18714,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "patch": 2,
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/ui-spec/15-system-events.md",
+      "set": "batch-125",
+      "sourceBytes": 2058,
+      "digest": "c0cd51f52e54872823d6f683bc25ff396df706712ef76b57794de5e0fcca75a9",
+      "inventoryFileDigest": "c0cd51f52e54872823d6f683bc25ff396df706712ef76b57794de5e0fcca75a9",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "1061618b6ab6b78c963384e60900d1c26c8221e3fcc45e77f572fac17699693b",
+      "recordBytes": 1558,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/ui-spec/20-domain-rules.md",
+      "set": "batch-125",
+      "sourceBytes": 3249,
+      "digest": "cefbf0207b8492ffaffff1f23e13494e94f1343cd9ae4ae1fd82a187dc212e32",
+      "inventoryFileDigest": "cefbf0207b8492ffaffff1f23e13494e94f1343cd9ae4ae1fd82a187dc212e32",
+      "diffSha256": "31bd02b80dc10b062fb71053cc7ed34c1e1350e9376375c541ef785d80d6c995",
+      "recordSha256": "6277139e9272b918bab52628ac44ab88615d904df627290ccd15b1d916b3e7a0",
+      "recordBytes": 14012,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/ui-spec/30-states-and-errors.md",
+      "set": "batch-125",
+      "sourceBytes": 2313,
+      "digest": "5fe51d275b13c958c865da6c8a0bf60142506e1c5c637829afa23e9b0579736e",
+      "inventoryFileDigest": "5fe51d275b13c958c865da6c8a0bf60142506e1c5c637829afa23e9b0579736e",
+      "diffSha256": "b9cb77f89d85c4de9699f1bb5bd1e413c20e7ef8452ac29945e680eaa13b167c",
+      "recordSha256": "5fdaede81bd46840765e2427c213863a6ec496383adde51e0ccf8807fc41a950",
+      "recordBytes": 8078,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/ui-spec/components/C01-item-card.md",
+      "set": "batch-125",
+      "sourceBytes": 2392,
+      "digest": "3c31c82cef06bb6f819b4bf8a37fe8f7afa2991daff0a180f827f8b66641ab0a",
+      "inventoryFileDigest": "3c31c82cef06bb6f819b4bf8a37fe8f7afa2991daff0a180f827f8b66641ab0a",
+      "diffSha256": "cd13e339c5fd3c8ebc6d4d819fce9f4108638ac1b972199a023400431c74880d",
+      "recordSha256": "b3511fdde716c38a25b6cd395dafe6e4a7df38c886f8d392d3380e0ac992af88",
+      "recordBytes": 18208,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+      "set": "batch-125",
+      "sourceBytes": 2647,
+      "digest": "dfbc24dda82d286ae4934255d0dbe56fe58b92012048cddca56ffc70a47c6b28",
+      "inventoryFileDigest": "dfbc24dda82d286ae4934255d0dbe56fe58b92012048cddca56ffc70a47c6b28",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "dc3d100cbf47c97ce1ce16dfb23fc1e10bbd03a8289a0ff04551c5265a3112d6",
+      "recordBytes": 791,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/ui-spec/flows/F02-approve-a-merge.md",
+      "set": "batch-125",
+      "sourceBytes": 2293,
+      "digest": "0ee36f45917952bebc2eb4c95f00c770e4514b8e029ce120c761a45d0ed8ca1d",
+      "inventoryFileDigest": "0ee36f45917952bebc2eb4c95f00c770e4514b8e029ce120c761a45d0ed8ca1d",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "2367fdb55087915122b124b9b8ac99c8cfa1abb09607effc6d570ab59747eb74",
+      "recordBytes": 782,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/ui-spec/generated/coverage-report.md",
+      "set": "batch-125",
+      "sourceBytes": 571,
+      "digest": "738eba6ed62f160d8637e9d6b012c1c74f15cd89fe87df28a53b55e0cc41c101",
+      "inventoryFileDigest": "738eba6ed62f160d8637e9d6b012c1c74f15cd89fe87df28a53b55e0cc41c101",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "997c60cbbad453676220280121f76dc30951123e48c2e2a844f251f8a65645bd",
+      "recordBytes": 782,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/ui-spec/generated/wireframe-v2.html",
+      "set": "batch-125",
+      "sourceBytes": 631319,
+      "digest": "77894fdda0966833d6d9ba595745a315db67d64feea7c9e6d5faed34a8d2ce80",
+      "inventoryFileDigest": "77894fdda0966833d6d9ba595745a315db67d64feea7c9e6d5faed34a8d2ce80",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "feef09a1f14f6122f938075d8d159dcd5554859c8df4578d44e432dd6df4d3ff",
+      "recordBytes": 135057,
+      "retiresWithTree": false,
+      "edgeCount": 11,
+      "dispositions": {
+        "parked": 11
+      }
+    },
+    {
+      "file": "docs/ui-spec/modals/M01-answer-question.md",
+      "set": "batch-125",
+      "sourceBytes": 3963,
+      "digest": "6c459c08d0ad35c362181fac748b68c765c60441597049e3e3c00c8485a61f23",
+      "inventoryFileDigest": "6c459c08d0ad35c362181fac748b68c765c60441597049e3e3c00c8485a61f23",
+      "diffSha256": "7b2bdb6ae3bd9746147e4267107365aca268d3c9dd230ed754ab94b6b3adda2e",
+      "recordSha256": "d612ca68a14c99db6755c22a85393f5bc31f5c18bacf40c4e1b6fdc6b8f4bfa3",
+      "recordBytes": 10030,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/ui-spec/modals/M02-approve-merge.md",
+      "set": "batch-125",
+      "sourceBytes": 3802,
+      "digest": "f52cb369e8ec0039fa64b0f4a7ca3bbf9ccfd37b3fe2fc342a410d59c5bb23b8",
+      "inventoryFileDigest": "f52cb369e8ec0039fa64b0f4a7ca3bbf9ccfd37b3fe2fc342a410d59c5bb23b8",
+      "diffSha256": "a5a393f45a82e8bb0bf4ead780ecc03c78996dc1c6515d88643e1e26d1ffa94c",
+      "recordSha256": "be95f597ef126c8b13aa2fc3049cdd7cc41ed1ef7680e43a7a43569a903358c2",
+      "recordBytes": 9254,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "set": "batch-125",
+      "sourceBytes": 3587,
+      "digest": "b0a16742180949c5a1b6836690c67c74c9dbd7f0ebf400d3c26eb7a4d18fe3d1",
+      "inventoryFileDigest": "b0a16742180949c5a1b6836690c67c74c9dbd7f0ebf400d3c26eb7a4d18fe3d1",
+      "diffSha256": "d3fb1017975cc5a866a575f1b16c43f29d9a283825e97977bef97f15dec52177",
+      "recordSha256": "bc51454695a6b95d01196cf990824290714ba5bdffe8cbefbefaeb6f0eb96f2f",
+      "recordBytes": 14402,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/ui-spec/screens/S01-sign-in.md",
+      "set": "batch-125",
+      "sourceBytes": 3401,
+      "digest": "725f76c4946a2c051770d59891b395eb194003cbb916a5731945ee5e22ac3eff",
+      "inventoryFileDigest": "725f76c4946a2c051770d59891b395eb194003cbb916a5731945ee5e22ac3eff",
+      "diffSha256": "2264118d084df0e397853ecccf5f9defbabec22bafa51581f4cd601d922b3b76",
+      "recordSha256": "35cbb062650c6f8f2cf7e32bae0bd7a313fefa78635c5ff1cf5d0aaba46ee93d",
+      "recordBytes": 9340,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/ui-spec/screens/S02-taskboard.md",
+      "set": "batch-125",
+      "sourceBytes": 11488,
+      "digest": "d84abd8635907d8b69402c6fc767e97479348e2c66517d38e7bb3f03b9bf800f",
+      "inventoryFileDigest": "d84abd8635907d8b69402c6fc767e97479348e2c66517d38e7bb3f03b9bf800f",
+      "diffSha256": "56ca839527d44e454990f98694ef4ce767f5acb729fb97c733e7e00572e5b46f",
+      "recordSha256": "d71c56c399afdb2a35cdfa7f78d3263e6ee750b8d03a136f85e317f221d54587",
+      "recordBytes": 10599,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/ui-spec/screens/S03-task-detail.md",
+      "set": "batch-125",
+      "sourceBytes": 11428,
+      "digest": "df9faacc4ec5e989f935d7e7a3ef327ba751e7271f6e55be7d9891cb0f7b52b3",
+      "inventoryFileDigest": "df9faacc4ec5e989f935d7e7a3ef327ba751e7271f6e55be7d9891cb0f7b52b3",
+      "diffSha256": "085722b5d511b254f0eae37c128724abf8bd0a831944ab370cb25d734092827c",
+      "recordSha256": "7cb67429a40c028fa9042dfaec972b0f3fac6a7f0c786067764768011f813f13",
+      "recordBytes": 10793,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+      "set": "batch-125",
+      "sourceBytes": 4732,
+      "digest": "0f358fadb71d6aa504c26c7e8f851c911e4feee10b5ef102456df0007da5ab7b",
+      "inventoryFileDigest": "0f358fadb71d6aa504c26c7e8f851c911e4feee10b5ef102456df0007da5ab7b",
+      "diffSha256": "98b6f54d75aaa309779c855189dce441aa42933b291cef98a904572379898974",
+      "recordSha256": "41514c0c0013670ad3bad5cc223a1cf63e6d1ac6f43dfdbe3a304e867bc50228",
+      "recordBytes": 10307,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/ui-spec/spec.config.yaml",
+      "set": "batch-125",
+      "sourceBytes": 509,
+      "digest": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+      "inventoryFileDigest": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+      "diffSha256": "8e01ea962aa04a288b2c38553e3af8a3d8ce219c6cbdf211351547daecd891c4",
+      "recordSha256": "0af6446b1100a1a2caddbfc8e71443347dc7a445615d0585e064bb4eac2047a5",
+      "recordBytes": 7917,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    }
+  ],
+  "sets": [
+    {
+      "set": "batch-123",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000123",
+      "population": [
+        "docs/reference/dispatch-module-boundaries.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/reference/dispatch-module-boundaries.md",
+          "rankHash": "0694a93cf40a5b7f359c0201d6942b4cd14ee43d306504cbdd6ea887a28db3f4"
+        }
+      ],
+      "sample": [
+        "docs/reference/dispatch-module-boundaries.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/reference/dispatch-module-boundaries.md"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/reference/claude-named-executor.md",
+        "docs/reference/coding-worker-contract-shape.md",
+        "docs/reference/discussion-quality-rubric.md",
+        "docs/reference/dispatch-module-boundaries.md",
+        "docs/reference/fgos-faults-read-surface.md",
+        "docs/reference/runner-capabilities-advise-execute-slots.md"
+      ],
+      "dispositions": {
+        "preserve": 7,
+        "patch": 2
+      }
+    },
+    {
+      "set": "batch-124",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000124",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "pilotFullReviewFiles": [
+        "docs/templates/architecture.md",
+        "docs/templates/area-readme.md",
+        "docs/templates/contract.md",
+        "docs/templates/decision.md",
+        "docs/templates/discussion.md",
+        "docs/templates/generated.md",
+        "docs/templates/intent-preservation-ledger.md",
+        "docs/templates/spec.md",
+        "docs/templates/subcomponent-readme.md",
+        "docs/templates/verification.md",
+        "docs/templates/vision.md"
+      ],
+      "dispositions": {
+        "preserve": 8
+      }
+    },
+    {
+      "set": "batch-125",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000125",
+      "population": [
+        "docs/ui-spec/00-overview.md",
+        "docs/ui-spec/20-domain-rules.md",
+        "docs/ui-spec/30-states-and-errors.md",
+        "docs/ui-spec/components/C01-item-card.md",
+        "docs/ui-spec/modals/M01-answer-question.md",
+        "docs/ui-spec/modals/M02-approve-merge.md",
+        "docs/ui-spec/modals/M03-add-edit-item.md",
+        "docs/ui-spec/screens/S01-sign-in.md",
+        "docs/ui-spec/screens/S02-taskboard.md",
+        "docs/ui-spec/screens/S03-task-detail.md",
+        "docs/ui-spec/screens/S04-questions-needing-answer.md",
+        "docs/ui-spec/spec.config.yaml"
+      ],
+      "populationCount": 12,
+      "ranks": [
+        {
+          "file": "docs/ui-spec/modals/M02-approve-merge.md",
+          "rankHash": "00ba2ed4bfa90b174c89d1bc5f8cb75f3a26e3b4b1b4daea518f76d61971f262"
+        },
+        {
+          "file": "docs/ui-spec/modals/M03-add-edit-item.md",
+          "rankHash": "02611f68ed19c9d3d1a85c09f2d7e0de5d2193337c13e01382cee46457e655fd"
+        },
+        {
+          "file": "docs/ui-spec/screens/S01-sign-in.md",
+          "rankHash": "02b3f3094826d06a8ecfee6d9424512c0a89c4445fc770170be1a9066f2e26d0"
+        },
+        {
+          "file": "docs/ui-spec/20-domain-rules.md",
+          "rankHash": "121ff6180ef06ec8f67d3219a49fc1c2923b270c404736c15314fe18c1582b2d"
+        },
+        {
+          "file": "docs/ui-spec/30-states-and-errors.md",
+          "rankHash": "27c5000a1e3f549f8fccd16838983d44258f67c4c2b032244f376e1c499a1c4d"
+        },
+        {
+          "file": "docs/ui-spec/00-overview.md",
+          "rankHash": "2e01ee7b403f1f04c2c465d60300dd3cf426af533a78769e2f22869965770130"
+        },
+        {
+          "file": "docs/ui-spec/modals/M01-answer-question.md",
+          "rankHash": "5d846d1e825af79fda26b8687fd678aef74a56defb7fc9dd54b552f1879491cf"
+        },
+        {
+          "file": "docs/ui-spec/components/C01-item-card.md",
+          "rankHash": "64b689aa367d7631c61b831908cd4f509c75589b98a6a233395b365c09aa512d"
+        },
+        {
+          "file": "docs/ui-spec/screens/S03-task-detail.md",
+          "rankHash": "734ee22bc0261cf31f0b501db31fb9de6ca80e6e19272e9d52c8bbb5be1c7a28"
+        },
+        {
+          "file": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+          "rankHash": "836e41c30dc7bd6d2d9d6ffaeb1741607b7dae6a92c3441cd9043d7a08721b15"
+        },
+        {
+          "file": "docs/ui-spec/screens/S02-taskboard.md",
+          "rankHash": "d2419e13c298343d2bc4e1e8888349027a3f55c46f38a665192b1bda4d04d92e"
+        },
+        {
+          "file": "docs/ui-spec/spec.config.yaml",
+          "rankHash": "f3b48fcad7d70a66064197c90175f310c733ba734d68f69c811d009c75ac72a4"
+        }
+      ],
+      "sample": [
+        "docs/ui-spec/modals/M02-approve-merge.md",
+        "docs/ui-spec/modals/M03-add-edit-item.md"
+      ],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/ui-spec/generated/wireframe-v2.html",
+          "bytes": 631319,
+          "edges": 11,
+          "sizeThreshold": true,
+          "edgeThreshold": false
+        }
+      ],
+      "selected": [
+        "docs/ui-spec/generated/wireframe-v2.html",
+        "docs/ui-spec/modals/M02-approve-merge.md",
+        "docs/ui-spec/modals/M03-add-edit-item.md"
+      ],
+      "distinctReviewCount": 3,
+      "pilotFullReviewFiles": [
+        "docs/ui-spec/00-overview.md",
+        "docs/ui-spec/15-system-events.md",
+        "docs/ui-spec/20-domain-rules.md",
+        "docs/ui-spec/30-states-and-errors.md",
+        "docs/ui-spec/components/C01-item-card.md",
+        "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+        "docs/ui-spec/flows/F02-approve-a-merge.md",
+        "docs/ui-spec/generated/coverage-report.md",
+        "docs/ui-spec/generated/wireframe-v2.html",
+        "docs/ui-spec/modals/M01-answer-question.md",
+        "docs/ui-spec/modals/M02-approve-merge.md",
+        "docs/ui-spec/modals/M03-add-edit-item.md",
+        "docs/ui-spec/screens/S01-sign-in.md",
+        "docs/ui-spec/screens/S02-taskboard.md",
+        "docs/ui-spec/screens/S03-task-detail.md",
+        "docs/ui-spec/screens/S04-questions-needing-answer.md",
+        "docs/ui-spec/spec.config.yaml"
+      ],
+      "dispositions": {
+        "patch": 14,
+        "preserve": 8,
+        "parked": 11
+      }
+    }
+  ],
+  "unpatchedStrata": {
+    "123": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-123",
+      "population": [
+        "docs/reference/claude-named-executor.md",
+        "docs/reference/coding-worker-contract-shape.md",
+        "docs/reference/discussion-quality-rubric.md",
+        "docs/reference/fgos-faults-read-surface.md",
+        "docs/reference/runner-capabilities-advise-execute-slots.md"
+      ],
+      "populationCount": 5,
+      "ranks": [
+        {
+          "file": "docs/reference/coding-worker-contract-shape.md",
+          "rankHash": "259902fb4a5422530306496a3dd956856d7b782504c02bdae437a9340c5d6bd7"
+        },
+        {
+          "file": "docs/reference/claude-named-executor.md",
+          "rankHash": "43e87e3e1d04a88df24bbf05d524377053274b897e42950e47c317f49a0fc831"
+        },
+        {
+          "file": "docs/reference/discussion-quality-rubric.md",
+          "rankHash": "66869d082ec5db8f893ccbd98aa5ef0f60f92a95791851907111a06e3e4af846"
+        },
+        {
+          "file": "docs/reference/runner-capabilities-advise-execute-slots.md",
+          "rankHash": "9985cc33bd50a69e067f39e3aaa2a11f7c48cde4211f682e2c8e62df6f3d3c20"
+        },
+        {
+          "file": "docs/reference/fgos-faults-read-surface.md",
+          "rankHash": "aff1d136110bccc6fb44ccbe304843bb17af847679e3d066c1a9709a859abbd3"
+        }
+      ],
+      "selected": [
+        "docs/reference/coding-worker-contract-shape.md"
+      ],
+      "reviewedDenominator": 0,
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; >3% expands the entire set, never pooled"
+    },
+    "124": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-124",
+      "population": [
+        "docs/templates/architecture.md",
+        "docs/templates/contract.md",
+        "docs/templates/decision.md",
+        "docs/templates/verification.md"
+      ],
+      "populationCount": 4,
+      "ranks": [
+        {
+          "file": "docs/templates/contract.md",
+          "rankHash": "1d9605a136e9a3f83efb2df80e42a6e37ebfb42a29e16c26b913962267b7b6f0"
+        },
+        {
+          "file": "docs/templates/verification.md",
+          "rankHash": "96dd0b086c92e29634336cd1089892c493d4fdf41ec9a5f1044236df3846f035"
+        },
+        {
+          "file": "docs/templates/decision.md",
+          "rankHash": "d15cae8b43bf942b31848dc44f0068348b2067ad61a818827ecc2eed4ada9f20"
+        },
+        {
+          "file": "docs/templates/architecture.md",
+          "rankHash": "fb134db7f80687a7255f855453061184eb6663739581cc9239f16a4e8a9bf58d"
+        }
+      ],
+      "selected": [
+        "docs/templates/contract.md"
+      ],
+      "reviewedDenominator": 0,
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; >3% expands the entire set, never pooled"
+    },
+    "125": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-125",
+      "population": [
+        "docs/ui-spec/15-system-events.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/ui-spec/15-system-events.md",
+          "rankHash": "bfa809175090f0abb2dbd000b05bba3604de55343269b49addb15835ebc35c71"
+        }
+      ],
+      "selected": [
+        "docs/ui-spec/15-system-events.md"
+      ],
+      "reviewedDenominator": 0,
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; >3% expands the entire set, never pooled"
+    }
+  },
+  "recordFiles": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-123.jsonl",
+      "sha256": "8e7101e9f4e36034a9275f791677aafada760bf9185aa4b31d89e837881a42f9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-124.jsonl",
+      "sha256": "bcba33b9ebfabf52589eecc29ea5572202a621df88d331250c90727ee38eb443"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-125.jsonl",
+      "sha256": "979622849cd9f9ce8a11796672ef46a9e71fe9a2a34edc09917ef5aa9310a5dc"
+    }
+  ]
+}

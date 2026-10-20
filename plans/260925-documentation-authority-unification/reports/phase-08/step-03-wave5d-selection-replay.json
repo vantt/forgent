@@ -1,0 +1,46 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "method": "Independent hashlib/ceil replay of both exact NUL seeds, populations, ranks, samples and mandatory union; packet/source/edge-page bounds asserted.",
+  "sets": [
+    {
+      "set": "batch-123",
+      "patchedPopulation": 1,
+      "patchedSample": 1,
+      "mandatory": 0,
+      "eligibleUnpatchedPopulation": 5,
+      "unpatchedSample": 1,
+      "distinctSelected": 2,
+      "reviewedDenominator": 0,
+      "reworkNumerator": "pending",
+      "openLeadRulingEdges": []
+    },
+    {
+      "set": "batch-124",
+      "patchedPopulation": 0,
+      "patchedSample": 0,
+      "mandatory": 0,
+      "eligibleUnpatchedPopulation": 4,
+      "unpatchedSample": 1,
+      "distinctSelected": 1,
+      "reviewedDenominator": 0,
+      "reworkNumerator": "pending",
+      "openLeadRulingEdges": []
+    },
+    {
+      "set": "batch-125",
+      "patchedPopulation": 12,
+      "patchedSample": 2,
+      "mandatory": 1,
+      "eligibleUnpatchedPopulation": 1,
+      "unpatchedSample": 1,
+      "distinctSelected": 4,
+      "reviewedDenominator": 0,
+      "reworkNumerator": "pending",
+      "openLeadRulingEdges": []
+    }
+  ],
+  "files": 7,
+  "edges": 19,
+  "parts": 2,
+  "pass": true
+}

@@ -1,0 +1,294 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "assignmentInputHead": "0dd23a73a84540d41ec6655ef6fb9d3f799b59f6",
+  "authorOrder": [
+    "125",
+    "124",
+    "123"
+  ],
+  "completeBatches": [
+    "123",
+    "124",
+    "125"
+  ],
+  "unstartedBatches": [
+    "122",
+    "121",
+    "120",
+    "119",
+    "118",
+    "117",
+    "116",
+    "115",
+    "114",
+    "113",
+    "112",
+    "111",
+    "110",
+    "109",
+    "108",
+    "107",
+    "106",
+    "105"
+  ],
+  "boundary": "Whole-file context-budget checkpoint before batch 122; no partial next record.",
+  "newPopulation": {
+    "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "sets": [
+      {
+        "set": "batch-123",
+        "files": 6,
+        "inventoryEdges": 9,
+        "addedEdges": 0,
+        "edges": 9,
+        "patchedFiles": 1,
+        "dispositions": {
+          "preserve": 7,
+          "patch": 2
+        },
+        "parks": {}
+      },
+      {
+        "set": "batch-124",
+        "files": 11,
+        "inventoryEdges": 8,
+        "addedEdges": 0,
+        "edges": 8,
+        "patchedFiles": 0,
+        "dispositions": {
+          "preserve": 8
+        },
+        "parks": {}
+      },
+      {
+        "set": "batch-125",
+        "files": 17,
+        "inventoryEdges": 33,
+        "addedEdges": 0,
+        "edges": 33,
+        "patchedFiles": 12,
+        "dispositions": {
+          "patch": 14,
+          "preserve": 8,
+          "parked": 11
+        },
+        "parks": {
+          "step5-parity": 11
+        }
+      }
+    ],
+    "files": 34,
+    "edges": 50,
+    "patchedFiles": 13,
+    "dispositions": {
+      "preserve": 23,
+      "patch": 16,
+      "parked": 11
+    },
+    "authorBoundary": "Completed in order 125,124,123. Stop before 122 at whole-file context budget; 105–122 remain unauthored.",
+    "acceptance": "AUTHOR checkpoint only; no independent review, actual-commit accounting or set closure."
+  },
+  "fullChecker": {
+    "batches": 90,
+    "files": 787,
+    "edges": 6547,
+    "failures": 0,
+    "result": "step-03-wave5d-check-result.json",
+    "openLeadRulingEdges": 0,
+    "notClosableSets": [],
+    "inheritedLocatorAdvisoryFlags": 5,
+    "newLocatorAdvisoryFlags": 0
+  },
+  "fullCheckerCommand": "env -u CLAUDE_CODE_SESSION_ID python3 plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5d-verification-run.py",
+  "freezeCommand": "env -u CLAUDE_CODE_SESSION_ID python3 plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5d-verification-run.py --freeze",
+  "samplingProof": {
+    "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "method": "Independent hashlib/ceil replay of both exact NUL seeds, populations, ranks, samples and mandatory union; packet/source/edge-page bounds asserted.",
+    "sets": [
+      {
+        "set": "batch-123",
+        "patchedPopulation": 1,
+        "patchedSample": 1,
+        "mandatory": 0,
+        "eligibleUnpatchedPopulation": 5,
+        "unpatchedSample": 1,
+        "distinctSelected": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending",
+        "openLeadRulingEdges": []
+      },
+      {
+        "set": "batch-124",
+        "patchedPopulation": 0,
+        "patchedSample": 0,
+        "mandatory": 0,
+        "eligibleUnpatchedPopulation": 4,
+        "unpatchedSample": 1,
+        "distinctSelected": 1,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending",
+        "openLeadRulingEdges": []
+      },
+      {
+        "set": "batch-125",
+        "patchedPopulation": 12,
+        "patchedSample": 2,
+        "mandatory": 1,
+        "eligibleUnpatchedPopulation": 1,
+        "unpatchedSample": 1,
+        "distinctSelected": 4,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending",
+        "openLeadRulingEdges": []
+      }
+    ],
+    "files": 7,
+    "edges": 19,
+    "parts": 2,
+    "pass": true
+  },
+  "lightTests": {
+    "passed": 95,
+    "failed": 0,
+    "skipped": 0,
+    "log": "step-03-wave5d-light-tests.log",
+    "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work/wave5d node --test test/scripts/doc-link-pass.test.mjs test/scripts/check-doc-candidate-status.test.mjs test/scripts/check-doc-constitution.test.mjs"
+  },
+  "protectedBindings": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-check.py",
+      "sha256": "9049a171e9f1037fcd45581fe6442410d0d982f55fdc1f45799d0b47134f4a28",
+      "equalsInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-resolve.py",
+      "sha256": "766f96d8417af71a275f37da64072277e04bf21608a83c67a5c52afdffb3b8ba",
+      "equalsInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5c-verification-run.py",
+      "sha256": "1734b140b1f318218ea305d1eecbee00495a68d488a2ee78c0d537ddab0902e9",
+      "equalsInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+      "sha256": "026b6966dcccbca11e353f17e189d94a1d18d20b7847e99ef1d62c4102a72840",
+      "equalsInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+      "sha256": "3c607f54bfa98987b345bc21a8460403cfd831066e923898133ba9385ad26759",
+      "equalsInputHead": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5c-review-request.md",
+      "sha256": "1335425c08a2dada9b950698168fd6d2b3d3876fec52ffba4396b8676cef8af9",
+      "equalsInputHead": true
+    }
+  ],
+  "scopeProof": {
+    "trackedWorkingTreeChanges": [],
+    "stagedChanges": [],
+    "allNewPathsAllowed": true,
+    "checkedNewPaths": [
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-123.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-124.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-125.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5d-check-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5d-lead-ruling-gaps.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5d-light-tests.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5d-manifest.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5d-population.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5d-progress.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5d-review-index.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5d-review-request.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5d-selection-replay.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5d-verification-run.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5d-whole-file-reads.json"
+    ],
+    "diffCheckExit": 0,
+    "allPriorTrackedPhase8AndPhase6FilesUnchanged": true
+  },
+  "initialInvocation": "Interrupted before any result while final substantive quote/comparison bindings were tightened; final all-worktree run alone is proof.",
+  "artifactBindings": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5d-check-result.json",
+      "sha256": "ef4fd0d33663bd58a0b9740a851bd817ae6b8f679484e0393d0ba2cead9a6787",
+      "bytes": 5987
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5d-lead-ruling-gaps.json",
+      "sha256": "5b050008f35b489fab678fcf4f4cc55bbc45b1f184fd1e1c8828ac3d9005bd6f",
+      "bytes": 266
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5d-light-tests.log",
+      "sha256": "136932465c75b5a7184d8f422f698eac2ab27fcb14934d3d7fb8a5612a8135c3",
+      "bytes": 8285
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5d-manifest.json",
+      "sha256": "d219df4f139a6a6c84fecbf603f3df79fc4480f9f21f51d2939bc4312a6438c8",
+      "bytes": 31366
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5d-population.json",
+      "sha256": "f6bd9d848bfa726ccc0d6c0df7decbf70293f772bac0d227e1ed58b743d38ab0",
+      "bytes": 1211
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5d-progress.md",
+      "sha256": "32a2a35b60533bf428c1e383b9d22bb8fb0349e3c624b0e29c92f3c4b6814f82",
+      "bytes": 4622
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5d-review-index.json",
+      "sha256": "d113b6227735d4ae2fcc75cd16ccca83f1a9587aca080518f5a4f81bc1ebbf12",
+      "bytes": 27309
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5d-review-request.md",
+      "sha256": "ac213ff53f301585c3bbb06d7f691c2fdc26fd455aefb4c91293eee7e940e444",
+      "bytes": 7265
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5d-selection-replay.json",
+      "sha256": "f9d7d2e1d13b1a1bc08d9617e949d89e18c272951a558c491befbf1ee8fa2ddd",
+      "bytes": 1236
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5d-verification-run.py",
+      "sha256": "6b06163ded67c298a6ab1de8fa43b8f4e71ed89bb3ebc94d6715ebbdcf73c936",
+      "bytes": 3781
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5d-whole-file-reads.json",
+      "sha256": "b449b05258d45c7a429b1487843cd8b3b6cdc0ec1c6f763c6ca54cb7a6f97b73",
+      "bytes": 26077
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-123.jsonl",
+      "sha256": "8e7101e9f4e36034a9275f791677aafada760bf9185aa4b31d89e837881a42f9",
+      "bytes": 43550
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-124.jsonl",
+      "sha256": "bcba33b9ebfabf52589eecc29ea5572202a621df88d331250c90727ee38eb443",
+      "bytes": 20653
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-125.jsonl",
+      "sha256": "979622849cd9f9ce8a11796672ef46a9e71fe9a2a34edc09917ef5aa9310a5dc",
+      "bytes": 280624
+    }
+  ],
+  "limits": [
+    "AUTHOR checkpoint, not completion of all 105–125",
+    "105–122 unauthored; continue at 122",
+    "No consumer edit, independent review, acceptance, actual-commit accounting, set/phase closure",
+    "No new rule/checker/probe/resolver change",
+    "No full npm suite or negative-probe replay",
+    "Markdown preview remains Lead responsibility; no service startup",
+    "No fgOS CLI, git write, state/secrets/config access; scratch confined to wave5d; atomic outbox required exception"
+  ]
+}
