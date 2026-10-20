@@ -1,0 +1,461 @@
+{
+  "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "inventoryInputCommit": "1a0f61ac53433292e08fb378ebbb6c1c72fd3b74",
+  "files": [
+    {
+      "file": "docs/architecture-manifest.json",
+      "set": "batch-126",
+      "sourceBytes": 15304,
+      "digest": "ca065694d38c4a8f1d158180c4f16a0decfda9443e742f2edae0e849cd4f453d",
+      "inventoryFileDigest": "ca065694d38c4a8f1d158180c4f16a0decfda9443e742f2edae0e849cd4f453d",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "8fdf7159b72eae34e3764e4ed74aad45fec214e8a3b0775f0274cff491d971ed",
+      "recordBytes": 1578,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/backlog.md",
+      "set": "batch-126",
+      "sourceBytes": 126374,
+      "digest": "b9f6678387c5f2a15766739e0e14919c1dc8cb7087e5c3784c985f26a1a2dc6d",
+      "inventoryFileDigest": "b9f6678387c5f2a15766739e0e14919c1dc8cb7087e5c3784c985f26a1a2dc6d",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "2ff9105b65cd2b88b640701e4a95eff2d3c26144494188a559d85a25a6534a47",
+      "recordBytes": 86333,
+      "retiresWithTree": false,
+      "edgeCount": 58,
+      "dispositions": {
+        "preserve": 55,
+        "parked": 3
+      }
+    },
+    {
+      "file": "docs/coexistence.md",
+      "set": "batch-126",
+      "sourceBytes": 7298,
+      "digest": "287b6013a2416aa86fe16b6cd705d78dd57d4ca190f0b61971521c7506e525e4",
+      "inventoryFileDigest": "287b6013a2416aa86fe16b6cd705d78dd57d4ca190f0b61971521c7506e525e4",
+      "diffSha256": "c9c759d3fa4d77bbcb3b0fc254653c899c7a0d3c46395bc6f6d573a0471ea37d",
+      "recordSha256": "686c2a2f38bf624810672eecf1d5358182e1639045ce4790419f7cdb48947419",
+      "recordBytes": 24991,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "parked": 2,
+        "patch": 2,
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/distribution-vision.md",
+      "set": "batch-126",
+      "sourceBytes": 13072,
+      "digest": "8d99a9a9b60331f1100fa1aa314e0149411f29ace7c30d9c52837fbf16d084c1",
+      "inventoryFileDigest": "8d99a9a9b60331f1100fa1aa314e0149411f29ace7c30d9c52837fbf16d084c1",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "242627e0dd4e2dc5f736d88832547bfc56070927564d56754e0685c02eef98d9",
+      "recordBytes": 16281,
+      "retiresWithTree": false,
+      "edgeCount": 13,
+      "dispositions": {
+        "preserve": 13
+      }
+    },
+    {
+      "file": "docs/doc-registry.json",
+      "set": "batch-127",
+      "sourceBytes": 665762,
+      "digest": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+      "inventoryFileDigest": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "2d8d122f4860877942a0a07a2a85f429cc30cda618def0e399bf879f67049d09",
+      "recordBytes": 4639548,
+      "retiresWithTree": false,
+      "edgeCount": 825,
+      "dispositions": {
+        "parked": 825
+      }
+    },
+    {
+      "file": "docs/doc-registry.md",
+      "set": "batch-128",
+      "sourceBytes": 291671,
+      "digest": "d039d7ec2b1bb93780ae6a5bc09dbeb02ead6ef60d0e9a980ac59463ce511392",
+      "inventoryFileDigest": "d039d7ec2b1bb93780ae6a5bc09dbeb02ead6ef60d0e9a980ac59463ce511392",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "7e6db968429ea8ce2ce0b133ef6ec2b8462a33d1ed7e0321f3910659435200b1",
+      "recordBytes": 2517515,
+      "retiresWithTree": false,
+      "edgeCount": 493,
+      "dispositions": {
+        "parked": 493
+      }
+    },
+    {
+      "file": "docs/enduser-docs-index.json",
+      "set": "batch-129",
+      "sourceBytes": 289110,
+      "digest": "55a188251a55da321d4c79b363a8cf72ae234e8b55375e35e66538586df652e7",
+      "inventoryFileDigest": "55a188251a55da321d4c79b363a8cf72ae234e8b55375e35e66538586df652e7",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "318a6c95f294fb245a6a5043415d019177454932411b920b3c3335018525f4e7",
+      "recordBytes": 2955014,
+      "retiresWithTree": false,
+      "edgeCount": 506,
+      "dispositions": {
+        "parked": 506
+      }
+    },
+    {
+      "file": "docs/id-systems-audit.md",
+      "set": "batch-130",
+      "sourceBytes": 13697,
+      "digest": "c8d2d797b10ff41d841ef7234c49bed93744abd62b950f650ddb4cde58e20687",
+      "inventoryFileDigest": "c8d2d797b10ff41d841ef7234c49bed93744abd62b950f650ddb4cde58e20687",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "5d9e5126128054e3d69fb150ef8f80936dbf458e29bfebacd8033913ab28eea8",
+      "recordBytes": 25037,
+      "retiresWithTree": false,
+      "edgeCount": 26,
+      "dispositions": {
+        "preserve": 26
+      }
+    },
+    {
+      "file": "docs/io-contract.md",
+      "set": "batch-130",
+      "sourceBytes": 16969,
+      "digest": "f105d675aee40f04d581f4a3e99be18a0bc64f8fb6de7b063cba4123c334d2d0",
+      "inventoryFileDigest": "f105d675aee40f04d581f4a3e99be18a0bc64f8fb6de7b063cba4123c334d2d0",
+      "diffSha256": "3c1935d1ae5d83760f18b50c14c94c1079510c3afd3aa97af583fec0048ec932",
+      "recordSha256": "37b2fd63d2e3a778218cf17288ec30cdb7cd49c1ffea6e51c8ad63e9e72e52d1",
+      "recordBytes": 257264,
+      "retiresWithTree": false,
+      "edgeCount": 11,
+      "dispositions": {
+        "parked": 3,
+        "patch": 6,
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/operator-runbook-herdr-cockpit.md",
+      "set": "batch-130",
+      "sourceBytes": 3489,
+      "digest": "5c5b7d6c6d80c4822586376676176e58d3434536f774bea50e162b20990840da",
+      "inventoryFileDigest": "5c5b7d6c6d80c4822586376676176e58d3434536f774bea50e162b20990840da",
+      "diffSha256": "36bd7d076403786c184de56fb03fb7747c69bc957d7e5e8b973d135dc17c3430",
+      "recordSha256": "16a30a28ff43989de44e4f2aaa8f042d7db1edc6c0dc59bbf712e04863410926",
+      "recordBytes": 396054,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 2
+      }
+    },
+    {
+      "file": "docs/transitional-switchboard.md",
+      "set": "batch-130",
+      "sourceBytes": 13207,
+      "digest": "b058029179bae791d084a6881660adc3f64da7537d4880cd51421158f8e2b752",
+      "inventoryFileDigest": "b058029179bae791d084a6881660adc3f64da7537d4880cd51421158f8e2b752",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "4023b03ea1c9f416311c8654fc6b99a3b90971104d5dfa7ac7f0586fd3c19c1a",
+      "recordBytes": 89379,
+      "retiresWithTree": false,
+      "edgeCount": 69,
+      "dispositions": {
+        "preserve": 4,
+        "phase9-row-flip": 65
+      }
+    },
+    {
+      "file": "docs/work-item-lifecycle-vision.md",
+      "set": "batch-130",
+      "sourceBytes": 6935,
+      "digest": "d4267552c03638faa76d826ba5f47677a7ee683e23f50e933d1705bb78b6cf08",
+      "inventoryFileDigest": "d4267552c03638faa76d826ba5f47677a7ee683e23f50e933d1705bb78b6cf08",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "bede0027aa382bf2a53ee3b50697c450be894a36e3209e7900f660ad4916a0f0",
+      "recordBytes": 900,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    }
+  ],
+  "sets": [
+    {
+      "set": "batch-126",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000126",
+      "population": [
+        "docs/coexistence.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/coexistence.md",
+          "rankHash": "9491bd33a04a4cf351441447b309401280aeabbb2f23b57ad2d312efb22e2195"
+        }
+      ],
+      "sample": [
+        "docs/coexistence.md"
+      ],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/backlog.md",
+          "bytes": 126374,
+          "edges": 58,
+          "sizeThreshold": true,
+          "edgeThreshold": true
+        }
+      ],
+      "selected": [
+        "docs/backlog.md",
+        "docs/coexistence.md"
+      ],
+      "distinctReviewCount": 2,
+      "pilotFullReviewFiles": [
+        "docs/architecture-manifest.json",
+        "docs/backlog.md",
+        "docs/coexistence.md",
+        "docs/distribution-vision.md"
+      ],
+      "dispositions": {
+        "preserve": 71,
+        "parked": 5,
+        "patch": 2
+      }
+    },
+    {
+      "set": "batch-127",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000127",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/doc-registry.json",
+          "bytes": 665762,
+          "edges": 825,
+          "sizeThreshold": true,
+          "edgeThreshold": true
+        }
+      ],
+      "selected": [
+        "docs/doc-registry.json"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/doc-registry.json"
+      ],
+      "dispositions": {
+        "parked": 825
+      }
+    },
+    {
+      "set": "batch-128",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000128",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/doc-registry.md",
+          "bytes": 291671,
+          "edges": 493,
+          "sizeThreshold": true,
+          "edgeThreshold": true
+        }
+      ],
+      "selected": [
+        "docs/doc-registry.md"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/doc-registry.md"
+      ],
+      "dispositions": {
+        "parked": 493
+      }
+    },
+    {
+      "set": "batch-129",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000129",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/enduser-docs-index.json",
+          "bytes": 289110,
+          "edges": 506,
+          "sizeThreshold": true,
+          "edgeThreshold": true
+        }
+      ],
+      "selected": [
+        "docs/enduser-docs-index.json"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/enduser-docs-index.json"
+      ],
+      "dispositions": {
+        "parked": 506
+      }
+    },
+    {
+      "set": "batch-130",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000130",
+      "population": [
+        "docs/io-contract.md",
+        "docs/operator-runbook-herdr-cockpit.md"
+      ],
+      "populationCount": 2,
+      "ranks": [
+        {
+          "file": "docs/io-contract.md",
+          "rankHash": "c05e7c7317ac642950b69f5520c1f23ff81083714568d697f1e73160ac0e1799"
+        },
+        {
+          "file": "docs/operator-runbook-herdr-cockpit.md",
+          "rankHash": "f29a1ca1a3781d863dd37436d9105f42119cdc2b0ab43d4368b522b62f78b181"
+        }
+      ],
+      "sample": [
+        "docs/io-contract.md"
+      ],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/transitional-switchboard.md",
+          "bytes": 13207,
+          "edges": 69,
+          "sizeThreshold": false,
+          "edgeThreshold": true
+        }
+      ],
+      "selected": [
+        "docs/io-contract.md",
+        "docs/transitional-switchboard.md"
+      ],
+      "distinctReviewCount": 2,
+      "pilotFullReviewFiles": [
+        "docs/id-systems-audit.md",
+        "docs/io-contract.md",
+        "docs/operator-runbook-herdr-cockpit.md",
+        "docs/transitional-switchboard.md",
+        "docs/work-item-lifecycle-vision.md"
+      ],
+      "dispositions": {
+        "preserve": 32,
+        "parked": 3,
+        "patch": 8,
+        "phase9-row-flip": 65
+      }
+    }
+  ],
+  "unpatchedStrata": {
+    "126": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-126",
+      "population": [
+        "docs/architecture-manifest.json",
+        "docs/distribution-vision.md"
+      ],
+      "populationCount": 2,
+      "ranks": [
+        {
+          "file": "docs/distribution-vision.md",
+          "rankHash": "4c258eafc5630fcf37ee0d6b5ae1e2dcd4479948b5573e6f705698cfd13be542"
+        },
+        {
+          "file": "docs/architecture-manifest.json",
+          "rankHash": "95d4311a050eff0f1ce794ead738583a4ad3eab5fdad41cc82dff8bd75bf045c"
+        }
+      ],
+      "selected": [
+        "docs/distribution-vision.md"
+      ],
+      "reviewedDenominator": 0,
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; >3% expands the entire set, never pooled"
+    },
+    "127": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-127",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reviewedDenominator": 0,
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; >3% expands the entire set, never pooled"
+    },
+    "128": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-128",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reviewedDenominator": 0,
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; >3% expands the entire set, never pooled"
+    },
+    "129": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-129",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reviewedDenominator": 0,
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; >3% expands the entire set, never pooled"
+    },
+    "130": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-130",
+      "population": [
+        "docs/id-systems-audit.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/id-systems-audit.md",
+          "rankHash": "12f3ae8bb3b2e196011a20d1dbdc1bb30ecc3d9064ee2a1a6f2e969b205a4d84"
+        }
+      ],
+      "selected": [
+        "docs/id-systems-audit.md"
+      ],
+      "reviewedDenominator": 0,
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; >3% expands the entire set, never pooled"
+    }
+  },
+  "recordFiles": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-126.jsonl",
+      "sha256": "6cc1d8da700a6c1389658ebc796501f447f41d650db260061ceb10bd6c196225"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-127.jsonl",
+      "sha256": "2d8d122f4860877942a0a07a2a85f429cc30cda618def0e399bf879f67049d09"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-128.jsonl",
+      "sha256": "7e6db968429ea8ce2ce0b133ef6ec2b8462a33d1ed7e0321f3910659435200b1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-129.jsonl",
+      "sha256": "318a6c95f294fb245a6a5043415d019177454932411b920b3c3335018525f4e7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-130.jsonl",
+      "sha256": "a4dec8839d1836b3a6c2c61b812d3236f6cec78a74ecc930cf5f023ffb59111c"
+    }
+  ]
+}

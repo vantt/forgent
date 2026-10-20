@@ -1,0 +1,20 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "head": "0c2ba7b5f110b1936f653d1978769922e5448e1e",
+  "sourceDrift": [
+    {
+      "batch": "batch-126",
+      "file": "docs/architecture-manifest.json",
+      "authorPinDigest": "ca065694d38c4a8f1d158180c4f16a0decfda9443e742f2edae0e849cd4f453d",
+      "headDigest": "9be1d045e8cb07f77e8164c3f493e95a522facd5fbdae8363d15b7c53b47a433",
+      "handling": "Step 4 source/span/diff revalidation at then-current tree; no rebind or consumer edit here"
+    },
+    {
+      "batch": "batch-126",
+      "file": "docs/backlog.md",
+      "authorPinDigest": "b9f6678387c5f2a15766739e0e14919c1dc8cb7087e5c3784c985f26a1a2dc6d",
+      "headDigest": "0f7d4fdb5a8af136279153d11401597ec29c3f773f574a3f8a7d4d4d2fdd4eff",
+      "handling": "Step 4 source/span/diff revalidation at then-current tree; no rebind or consumer edit here"
+    }
+  ]
+}

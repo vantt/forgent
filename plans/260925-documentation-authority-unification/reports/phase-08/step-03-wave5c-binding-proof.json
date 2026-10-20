@@ -1,0 +1,90 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "samplingReplay": [
+    {
+      "set": "batch-126",
+      "patchedPopulation": 1,
+      "patchedSample": 1,
+      "mandatory": 1,
+      "unpatchedEligiblePopulation": 2,
+      "unpatchedSample": 1,
+      "selected": [
+        "docs/backlog.md",
+        "docs/coexistence.md",
+        "docs/distribution-vision.md"
+      ]
+    },
+    {
+      "set": "batch-127",
+      "patchedPopulation": 0,
+      "patchedSample": 0,
+      "mandatory": 1,
+      "unpatchedEligiblePopulation": 0,
+      "unpatchedSample": 0,
+      "selected": [
+        "docs/doc-registry.json"
+      ]
+    },
+    {
+      "set": "batch-128",
+      "patchedPopulation": 0,
+      "patchedSample": 0,
+      "mandatory": 1,
+      "unpatchedEligiblePopulation": 0,
+      "unpatchedSample": 0,
+      "selected": [
+        "docs/doc-registry.md"
+      ]
+    },
+    {
+      "set": "batch-129",
+      "patchedPopulation": 0,
+      "patchedSample": 0,
+      "mandatory": 1,
+      "unpatchedEligiblePopulation": 0,
+      "unpatchedSample": 0,
+      "selected": [
+        "docs/enduser-docs-index.json"
+      ]
+    },
+    {
+      "set": "batch-130",
+      "patchedPopulation": 2,
+      "patchedSample": 1,
+      "mandatory": 1,
+      "unpatchedEligiblePopulation": 1,
+      "unpatchedSample": 1,
+      "selected": [
+        "docs/io-contract.md",
+        "docs/transitional-switchboard.md",
+        "docs/id-systems-audit.md"
+      ]
+    }
+  ],
+  "selectedFiles": 9,
+  "selectedEdges": 2007,
+  "parts": 6,
+  "maxEdgePageBytes": 306012,
+  "allSourcePagesBound": true,
+  "allNewRecordBindingsMatch": true,
+  "trackedChanges": [],
+  "allUntrackedWritesInsideExactBriefAllowlist": true,
+  "protectedCheckers": [
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-check.py",
+      "sha256": "9049a171e9f1037fcd45581fe6442410d0d982f55fdc1f45799d0b47134f4a28",
+      "unchangedFromHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-resolve.py",
+      "sha256": "766f96d8417af71a275f37da64072277e04bf21608a83c67a5c52afdffb3b8ba",
+      "unchangedFromHead": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-wave5a-check.py",
+      "sha256": "b8dcb63c70c0b392b49bff272166fba4f6a0c6394e94469cb7f6a08a8877abbe",
+      "unchangedFromHead": true
+    }
+  ],
+  "method": "Independent hashlib/ceil/NUL-seed and source-page replay; exact inventory threshold witnesses, record/diff/packet joins, read-only git scope comparison. No checker predicates changed."
+}

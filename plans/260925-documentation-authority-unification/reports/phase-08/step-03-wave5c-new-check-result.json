@@ -1,0 +1,39 @@
+{
+  "authorCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": 12,
+  "edges": 2010,
+  "failures": [
+    {
+      "file": "docs/backlog.md",
+      "check": "anchor-carriage-locator",
+      "detail": ""
+    },
+    {
+      "file": "docs/transitional-switchboard.md",
+      "check": "retiring-preserve-wording",
+      "detail": ""
+    }
+  ],
+  "failureCount": 2,
+  "locatorReviewFlags": [],
+  "openLeadRulingEdgesBySet": {},
+  "notClosableSets": [],
+  "checkedBatches": [
+    "126",
+    "127",
+    "128",
+    "129",
+    "130"
+  ],
+  "openLeadRulingEdgesPerSet": {
+    "126": [],
+    "127": [],
+    "128": [],
+    "129": [],
+    "130": []
+  },
+  "checkerSourceSha256": "9049a171e9f1037fcd45581fe6442410d0d982f55fdc1f45799d0b47134f4a28",
+  "resolverSourceSha256": "766f96d8417af71a275f37da64072277e04bf21608a83c67a5c52afdffb3b8ba",
+  "scope": "All canonical record files actually present in this isolated worktree; 083–125 are another Doer lane and are not fabricated here.",
+  "scratchRouting": "Existing checker and resolver unchanged; only TemporaryDirectory dir and anchor-cache Path redirected inside /tmp/fgos-work/wave5c/"
+}

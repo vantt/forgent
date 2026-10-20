@@ -1,0 +1,3759 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "newBatches": [
+    "126",
+    "127",
+    "128",
+    "129",
+    "130"
+  ],
+  "selectedFiles": 9,
+  "selectedEdges": 2007,
+  "reviewedDenominator": 0,
+  "reworkNumerator": "pending",
+  "parts": [
+    {
+      "part": 1,
+      "report": "review-a38-step-03-wave5c-p01.md",
+      "files": [
+        {
+          "file": "docs/backlog.md",
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-126.jsonl",
+          "sourceDigest": "b9f6678387c5f2a15766739e0e14919c1dc8cb7087e5c3784c985f26a1a2dc6d",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordSha256": "2ff9105b65cd2b88b640701e4a95eff2d3c26144494188a559d85a25a6534a47",
+          "recordBytes": 86333,
+          "membership": {
+            "set": "batch-126",
+            "patchedSample": false,
+            "mandatory": true,
+            "unpatchedSample": false
+          },
+          "edgePages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 50,
+              "edgeIds": [
+                "maps-j-01276",
+                "maps-j-01277",
+                "maps-j-01278",
+                "maps-j-01279",
+                "maps-j-01280",
+                "maps-j-01281",
+                "maps-j-01282",
+                "maps-j-01283",
+                "maps-j-01284",
+                "maps-j-01285",
+                "maps-j-01286",
+                "maps-j-01287",
+                "maps-j-01288",
+                "maps-j-01289",
+                "maps-j-01290",
+                "maps-j-01291",
+                "maps-j-01292",
+                "maps-j-01293",
+                "maps-j-01294",
+                "maps-j-01295",
+                "maps-j-01296",
+                "maps-j-01297",
+                "maps-j-01298",
+                "maps-j-01299",
+                "maps-j-01300",
+                "maps-j-01301",
+                "maps-j-01302",
+                "maps-j-01303",
+                "maps-j-01304",
+                "maps-j-01305",
+                "maps-j-01306",
+                "maps-j-01307",
+                "maps-j-01308",
+                "maps-j-01309",
+                "maps-j-01310",
+                "maps-j-01311",
+                "maps-j-01312",
+                "maps-j-01313",
+                "maps-j-01314",
+                "maps-j-01315",
+                "maps-j-01316",
+                "maps-j-01317",
+                "maps-j-01318",
+                "maps-j-01319",
+                "maps-j-01320",
+                "maps-j-01321",
+                "maps-j-01322",
+                "maps-j-01323",
+                "author-wave5c-docs-backlog-L37C410",
+                "author-wave5c-docs-backlog-L40C297"
+              ],
+              "fieldExtractionBytes": 54133
+            },
+            {
+              "firstEdge": 51,
+              "lastEdge": 58,
+              "edgeIds": [
+                "author-wave5c-docs-backlog-L40C354",
+                "author-wave5c-docs-backlog-L40C513",
+                "author-wave5c-docs-backlog-L108C292",
+                "author-wave5c-docs-backlog-L110C134",
+                "author-wave5c-docs-backlog-L110C189",
+                "author-wave5c-docs-backlog-L110C216",
+                "author-wave5c-docs-backlog-L110C235",
+                "author-wave5c-docs-backlog-L116C997"
+              ],
+              "fieldExtractionBytes": 9040
+            }
+          ],
+          "sourcePages": [
+            {
+              "firstLine": 1,
+              "lastLine": 80
+            },
+            {
+              "firstLine": 81,
+              "lastLine": 149
+            }
+          ]
+        },
+        {
+          "file": "docs/coexistence.md",
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-126.jsonl",
+          "sourceDigest": "287b6013a2416aa86fe16b6cd705d78dd57d4ca190f0b61971521c7506e525e4",
+          "diffSha256": "c9c759d3fa4d77bbcb3b0fc254653c899c7a0d3c46395bc6f6d573a0471ea37d",
+          "recordSha256": "686c2a2f38bf624810672eecf1d5358182e1639045ce4790419f7cdb48947419",
+          "recordBytes": 24991,
+          "membership": {
+            "set": "batch-126",
+            "patchedSample": true,
+            "mandatory": false,
+            "unpatchedSample": false
+          },
+          "edgePages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 6,
+              "edgeIds": [
+                "maps-j-01324",
+                "maps-j-01325",
+                "maps-j-01326",
+                "maps-j-01327",
+                "maps-j-01328",
+                "maps-j-01329"
+              ],
+              "fieldExtractionBytes": 9819
+            }
+          ],
+          "sourcePages": [
+            {
+              "firstLine": 1,
+              "lastLine": 80
+            },
+            {
+              "firstLine": 81,
+              "lastLine": 133
+            }
+          ]
+        },
+        {
+          "file": "docs/distribution-vision.md",
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-126.jsonl",
+          "sourceDigest": "8d99a9a9b60331f1100fa1aa314e0149411f29ace7c30d9c52837fbf16d084c1",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordSha256": "242627e0dd4e2dc5f736d88832547bfc56070927564d56754e0685c02eef98d9",
+          "recordBytes": 16281,
+          "membership": {
+            "set": "batch-126",
+            "patchedSample": false,
+            "mandatory": false,
+            "unpatchedSample": true
+          },
+          "edgePages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 13,
+              "edgeIds": [
+                "maps-j-01896",
+                "maps-j-01897",
+                "maps-j-01898",
+                "maps-j-01899",
+                "maps-j-01900",
+                "maps-j-01901",
+                "author-wave5c-docs-distribution-vision-L20C44",
+                "author-wave5c-docs-distribution-vision-L59C41",
+                "author-wave5c-docs-distribution-vision-L61C12",
+                "author-wave5c-docs-distribution-vision-L65C9",
+                "author-wave5c-docs-distribution-vision-L66C25",
+                "author-wave5c-docs-distribution-vision-L72C30",
+                "author-wave5c-docs-distribution-vision-L149C25"
+              ],
+              "fieldExtractionBytes": 14527
+            }
+          ],
+          "sourcePages": [
+            {
+              "firstLine": 1,
+              "lastLine": 80
+            },
+            {
+              "firstLine": 81,
+              "lastLine": 160
+            },
+            {
+              "firstLine": 161,
+              "lastLine": 184
+            }
+          ]
+        },
+        {
+          "file": "docs/id-systems-audit.md",
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-130.jsonl",
+          "sourceDigest": "c8d2d797b10ff41d841ef7234c49bed93744abd62b950f650ddb4cde58e20687",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordSha256": "5d9e5126128054e3d69fb150ef8f80936dbf458e29bfebacd8033913ab28eea8",
+          "recordBytes": 25037,
+          "membership": {
+            "set": "batch-130",
+            "patchedSample": false,
+            "mandatory": false,
+            "unpatchedSample": true
+          },
+          "edgePages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 26,
+              "edgeIds": [
+                "maps-j-04081",
+                "maps-j-04082",
+                "maps-j-04083",
+                "maps-j-04084",
+                "maps-j-04085",
+                "maps-j-04086",
+                "maps-j-04087",
+                "maps-j-04088",
+                "maps-j-04089",
+                "maps-j-04090",
+                "maps-j-04091",
+                "maps-j-04092",
+                "maps-j-04093",
+                "maps-j-04094",
+                "maps-j-04095",
+                "maps-j-04096",
+                "maps-j-04097",
+                "maps-j-04098",
+                "maps-j-04099",
+                "maps-j-04100",
+                "maps-j-04101",
+                "maps-j-04102",
+                "maps-j-04103",
+                "author-wave5c-docs-id-systems-audit-L49C167",
+                "author-wave5c-docs-id-systems-audit-L147C33",
+                "author-wave5c-docs-id-systems-audit-L164C100"
+              ],
+              "fieldExtractionBytes": 24316
+            }
+          ],
+          "sourcePages": [
+            {
+              "firstLine": 1,
+              "lastLine": 80
+            },
+            {
+              "firstLine": 81,
+              "lastLine": 160
+            },
+            {
+              "firstLine": 161,
+              "lastLine": 178
+            }
+          ]
+        }
+      ],
+      "fileCount": 4,
+      "edgeCount": 103,
+      "indivisibleException": false,
+      "recordAndSourceBytes": 313083
+    },
+    {
+      "part": 2,
+      "report": "review-a38-step-03-wave5c-p02.md",
+      "files": [
+        {
+          "file": "docs/doc-registry.json",
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-127.jsonl",
+          "sourceDigest": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordSha256": "2d8d122f4860877942a0a07a2a85f429cc30cda618def0e399bf879f67049d09",
+          "recordBytes": 4639548,
+          "membership": {
+            "set": "batch-127",
+            "patchedSample": false,
+            "mandatory": true,
+            "unpatchedSample": false
+          },
+          "edgePages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 50,
+              "edgeIds": [
+                "maps-j-01910",
+                "maps-j-01911",
+                "maps-j-01912",
+                "maps-j-01913",
+                "maps-j-01914",
+                "maps-j-01915",
+                "maps-j-01916",
+                "maps-j-01917",
+                "maps-j-01918",
+                "maps-j-01919",
+                "maps-j-01920",
+                "maps-j-01921",
+                "maps-j-01922",
+                "maps-j-01923",
+                "maps-j-01924",
+                "maps-j-01925",
+                "maps-j-01926",
+                "maps-j-01927",
+                "maps-j-01928",
+                "maps-j-01929",
+                "maps-j-01930",
+                "maps-j-01931",
+                "maps-j-01932",
+                "maps-j-01933",
+                "maps-j-01934",
+                "maps-j-01935",
+                "maps-j-01936",
+                "maps-j-01937",
+                "maps-j-01938",
+                "maps-j-01939",
+                "maps-j-01940",
+                "maps-j-01941",
+                "maps-j-01942",
+                "maps-j-01943",
+                "maps-j-01944",
+                "maps-j-01945",
+                "maps-j-01946",
+                "maps-j-01947",
+                "maps-j-01948",
+                "maps-j-01949",
+                "maps-j-01950",
+                "maps-j-01951",
+                "maps-j-01952",
+                "maps-j-01953",
+                "maps-j-01954",
+                "maps-j-01955",
+                "maps-j-01956",
+                "maps-j-01957",
+                "maps-j-01958",
+                "maps-j-01959"
+              ],
+              "fieldExtractionBytes": 281465
+            },
+            {
+              "firstEdge": 51,
+              "lastEdge": 100,
+              "edgeIds": [
+                "maps-j-01960",
+                "maps-j-01961",
+                "maps-j-01962",
+                "maps-j-01963",
+                "maps-j-01964",
+                "maps-j-01965",
+                "maps-j-01966",
+                "maps-j-01967",
+                "maps-j-01968",
+                "maps-j-01969",
+                "maps-j-01970",
+                "maps-j-01971",
+                "maps-j-01972",
+                "maps-j-01973",
+                "maps-j-01974",
+                "maps-j-01975",
+                "maps-j-01976",
+                "maps-j-01977",
+                "maps-j-01978",
+                "maps-j-01979",
+                "maps-j-01980",
+                "maps-j-01981",
+                "maps-j-01982",
+                "maps-j-01983",
+                "maps-j-01984",
+                "maps-j-01985",
+                "maps-j-01986",
+                "maps-j-01987",
+                "maps-j-01988",
+                "maps-j-01989",
+                "maps-j-01990",
+                "maps-j-01991",
+                "maps-j-01992",
+                "maps-j-01993",
+                "maps-j-01994",
+                "maps-j-01995",
+                "maps-j-01996",
+                "maps-j-01997",
+                "maps-j-01998",
+                "maps-j-01999",
+                "maps-j-02000",
+                "maps-j-02001",
+                "maps-j-02002",
+                "maps-j-02003",
+                "maps-j-02004",
+                "maps-j-02005",
+                "maps-j-02006",
+                "maps-j-02007",
+                "maps-j-02008",
+                "maps-j-02009"
+              ],
+              "fieldExtractionBytes": 281323
+            },
+            {
+              "firstEdge": 101,
+              "lastEdge": 150,
+              "edgeIds": [
+                "maps-j-02010",
+                "maps-j-02011",
+                "maps-j-02012",
+                "maps-j-02013",
+                "maps-j-02014",
+                "maps-j-02015",
+                "maps-j-02016",
+                "maps-j-02017",
+                "maps-j-02018",
+                "maps-j-02019",
+                "maps-j-02020",
+                "maps-j-02021",
+                "maps-j-02022",
+                "maps-j-02023",
+                "maps-j-02024",
+                "maps-j-02025",
+                "maps-j-02026",
+                "maps-j-02027",
+                "maps-j-02028",
+                "maps-j-02029",
+                "maps-j-02030",
+                "maps-j-02031",
+                "maps-j-02032",
+                "maps-j-02033",
+                "maps-j-02034",
+                "maps-j-02035",
+                "maps-j-02036",
+                "maps-j-02037",
+                "maps-j-02038",
+                "maps-j-02039",
+                "maps-j-02040",
+                "maps-j-02041",
+                "maps-j-02042",
+                "maps-j-02043",
+                "maps-j-02044",
+                "maps-j-02045",
+                "maps-j-02046",
+                "maps-j-02047",
+                "maps-j-02048",
+                "maps-j-02049",
+                "maps-j-02050",
+                "maps-j-02051",
+                "maps-j-02052",
+                "maps-j-02053",
+                "maps-j-02054",
+                "maps-j-02055",
+                "maps-j-02056",
+                "maps-j-02057",
+                "maps-j-02058",
+                "maps-j-02059"
+              ],
+              "fieldExtractionBytes": 287586
+            },
+            {
+              "firstEdge": 151,
+              "lastEdge": 200,
+              "edgeIds": [
+                "maps-j-02060",
+                "maps-j-02061",
+                "maps-j-02062",
+                "maps-j-02063",
+                "maps-j-02064",
+                "maps-j-02065",
+                "maps-j-02066",
+                "maps-j-02067",
+                "maps-j-02068",
+                "maps-j-02069",
+                "maps-j-02070",
+                "maps-j-02071",
+                "maps-j-02072",
+                "maps-j-02073",
+                "maps-j-02074",
+                "maps-j-02075",
+                "maps-j-02076",
+                "maps-j-02077",
+                "maps-j-02078",
+                "maps-j-02079",
+                "maps-j-02080",
+                "maps-j-02081",
+                "maps-j-02082",
+                "maps-j-02083",
+                "maps-j-02084",
+                "maps-j-02085",
+                "maps-j-02086",
+                "maps-j-02087",
+                "maps-j-02088",
+                "maps-j-02089",
+                "maps-j-02090",
+                "maps-j-02091",
+                "maps-j-02092",
+                "maps-j-02093",
+                "maps-j-02094",
+                "maps-j-02095",
+                "maps-j-02096",
+                "maps-j-02097",
+                "maps-j-02098",
+                "maps-j-02099",
+                "maps-j-02100",
+                "maps-j-02101",
+                "maps-j-02102",
+                "maps-j-02103",
+                "maps-j-02104",
+                "maps-j-02105",
+                "maps-j-02106",
+                "maps-j-02107",
+                "maps-j-02108",
+                "maps-j-02109"
+              ],
+              "fieldExtractionBytes": 285241
+            },
+            {
+              "firstEdge": 201,
+              "lastEdge": 250,
+              "edgeIds": [
+                "maps-j-02110",
+                "maps-j-02111",
+                "maps-j-02112",
+                "maps-j-02113",
+                "maps-j-02114",
+                "maps-j-02115",
+                "maps-j-02116",
+                "maps-j-02117",
+                "maps-j-02118",
+                "maps-j-02119",
+                "maps-j-02120",
+                "maps-j-02121",
+                "maps-j-02122",
+                "maps-j-02123",
+                "maps-j-02124",
+                "maps-j-02125",
+                "maps-j-02126",
+                "maps-j-02127",
+                "maps-j-02128",
+                "maps-j-02129",
+                "maps-j-02130",
+                "maps-j-02131",
+                "maps-j-02132",
+                "maps-j-02133",
+                "maps-j-02134",
+                "maps-j-02135",
+                "maps-j-02136",
+                "maps-j-02137",
+                "maps-j-02138",
+                "maps-j-02139",
+                "maps-j-02140",
+                "maps-j-02141",
+                "maps-j-02142",
+                "maps-j-02143",
+                "maps-j-02144",
+                "maps-j-02145",
+                "maps-j-02146",
+                "maps-j-02147",
+                "maps-j-02148",
+                "maps-j-02149",
+                "maps-j-02150",
+                "maps-j-02151",
+                "maps-j-02152",
+                "maps-j-02153",
+                "maps-j-02154",
+                "maps-j-02155",
+                "maps-j-02156",
+                "maps-j-02157",
+                "maps-j-02158",
+                "maps-j-02159"
+              ],
+              "fieldExtractionBytes": 286510
+            },
+            {
+              "firstEdge": 251,
+              "lastEdge": 300,
+              "edgeIds": [
+                "maps-j-02160",
+                "maps-j-02161",
+                "maps-j-02162",
+                "maps-j-02163",
+                "maps-j-02164",
+                "maps-j-02165",
+                "maps-j-02166",
+                "maps-j-02167",
+                "maps-j-02168",
+                "maps-j-02169",
+                "maps-j-02170",
+                "maps-j-02171",
+                "maps-j-02172",
+                "maps-j-02173",
+                "maps-j-02174",
+                "maps-j-02175",
+                "maps-j-02176",
+                "maps-j-02177",
+                "maps-j-02178",
+                "maps-j-02179",
+                "maps-j-02180",
+                "maps-j-02181",
+                "maps-j-02182",
+                "maps-j-02183",
+                "maps-j-02184",
+                "maps-j-02185",
+                "maps-j-02186",
+                "maps-j-02187",
+                "maps-j-02188",
+                "maps-j-02189",
+                "maps-j-02190",
+                "maps-j-02191",
+                "maps-j-02192",
+                "maps-j-02193",
+                "maps-j-02194",
+                "maps-j-02195",
+                "maps-j-02196",
+                "maps-j-02197",
+                "maps-j-02198",
+                "maps-j-02199",
+                "maps-j-02200",
+                "maps-j-02201",
+                "maps-j-02202",
+                "maps-j-02203",
+                "maps-j-02204",
+                "maps-j-02205",
+                "maps-j-02206",
+                "maps-j-02207",
+                "maps-j-02208",
+                "maps-j-02209"
+              ],
+              "fieldExtractionBytes": 282983
+            },
+            {
+              "firstEdge": 301,
+              "lastEdge": 350,
+              "edgeIds": [
+                "maps-j-02210",
+                "maps-j-02211",
+                "maps-j-02212",
+                "maps-j-02213",
+                "maps-j-02214",
+                "maps-j-02215",
+                "maps-j-02216",
+                "maps-j-02217",
+                "maps-j-02218",
+                "maps-j-02219",
+                "maps-j-02220",
+                "maps-j-02221",
+                "maps-j-02222",
+                "maps-j-02223",
+                "maps-j-02224",
+                "maps-j-02225",
+                "maps-j-02226",
+                "maps-j-02227",
+                "maps-j-02228",
+                "maps-j-02229",
+                "maps-j-02230",
+                "maps-j-02231",
+                "maps-j-02232",
+                "maps-j-02233",
+                "maps-j-02234",
+                "maps-j-02235",
+                "maps-j-02236",
+                "maps-j-02237",
+                "maps-j-02238",
+                "maps-j-02239",
+                "maps-j-02240",
+                "maps-j-02241",
+                "maps-j-02242",
+                "maps-j-02243",
+                "maps-j-02244",
+                "maps-j-02245",
+                "maps-j-02246",
+                "maps-j-02247",
+                "maps-j-02248",
+                "maps-j-02249",
+                "maps-j-02250",
+                "maps-j-02251",
+                "maps-j-02252",
+                "maps-j-02253",
+                "maps-j-02254",
+                "maps-j-02255",
+                "maps-j-02256",
+                "maps-j-02257",
+                "maps-j-02258",
+                "maps-j-02259"
+              ],
+              "fieldExtractionBytes": 295373
+            },
+            {
+              "firstEdge": 351,
+              "lastEdge": 400,
+              "edgeIds": [
+                "maps-j-02260",
+                "maps-j-02261",
+                "maps-j-02262",
+                "maps-j-02263",
+                "maps-j-02264",
+                "maps-j-02265",
+                "maps-j-02266",
+                "maps-j-02267",
+                "maps-j-02268",
+                "maps-j-02269",
+                "maps-j-02270",
+                "maps-j-02271",
+                "maps-j-02272",
+                "maps-j-02273",
+                "maps-j-02274",
+                "maps-j-02275",
+                "maps-j-02276",
+                "maps-j-02277",
+                "maps-j-02278",
+                "maps-j-02279",
+                "maps-j-02280",
+                "maps-j-02281",
+                "maps-j-02282",
+                "maps-j-02283",
+                "maps-j-02284",
+                "maps-j-02285",
+                "maps-j-02286",
+                "maps-j-02287",
+                "maps-j-02288",
+                "maps-j-02289",
+                "maps-j-02290",
+                "maps-j-02291",
+                "maps-j-02292",
+                "maps-j-02293",
+                "maps-j-02294",
+                "maps-j-02295",
+                "maps-j-02296",
+                "maps-j-02297",
+                "maps-j-02298",
+                "maps-j-02299",
+                "maps-j-02300",
+                "maps-j-02301",
+                "maps-j-02302",
+                "maps-j-02303",
+                "maps-j-02304",
+                "maps-j-02305",
+                "maps-j-02306",
+                "maps-j-02307",
+                "maps-j-02308",
+                "maps-j-02309"
+              ],
+              "fieldExtractionBytes": 296095
+            },
+            {
+              "firstEdge": 401,
+              "lastEdge": 450,
+              "edgeIds": [
+                "maps-j-02310",
+                "maps-j-02311",
+                "maps-j-02312",
+                "maps-j-02313",
+                "maps-j-02314",
+                "maps-j-02315",
+                "maps-j-02316",
+                "maps-j-02317",
+                "maps-j-02318",
+                "maps-j-02319",
+                "maps-j-02320",
+                "maps-j-02321",
+                "maps-j-02322",
+                "maps-j-02323",
+                "maps-j-02324",
+                "maps-j-02325",
+                "maps-j-02326",
+                "maps-j-02327",
+                "maps-j-02328",
+                "maps-j-02329",
+                "maps-j-02330",
+                "maps-j-02331",
+                "maps-j-02332",
+                "maps-j-02333",
+                "maps-j-02334",
+                "maps-j-02335",
+                "maps-j-02336",
+                "maps-j-02337",
+                "maps-j-02338",
+                "maps-j-02339",
+                "maps-j-02340",
+                "maps-j-02341",
+                "maps-j-02342",
+                "maps-j-02343",
+                "maps-j-02344",
+                "maps-j-02345",
+                "maps-j-02346",
+                "maps-j-02347",
+                "maps-j-02348",
+                "maps-j-02349",
+                "maps-j-02350",
+                "maps-j-02351",
+                "maps-j-02352",
+                "maps-j-02353",
+                "maps-j-02354",
+                "maps-j-02355",
+                "maps-j-02356",
+                "maps-j-02357",
+                "maps-j-02358",
+                "maps-j-02359"
+              ],
+              "fieldExtractionBytes": 296896
+            },
+            {
+              "firstEdge": 451,
+              "lastEdge": 500,
+              "edgeIds": [
+                "maps-j-02360",
+                "maps-j-02361",
+                "maps-j-02362",
+                "maps-j-02363",
+                "maps-j-02364",
+                "maps-j-02365",
+                "maps-j-02366",
+                "maps-j-02367",
+                "maps-j-02368",
+                "maps-j-02369",
+                "maps-j-02370",
+                "maps-j-02371",
+                "maps-j-02372",
+                "maps-j-02373",
+                "maps-j-02374",
+                "maps-j-02375",
+                "maps-j-02376",
+                "maps-j-02377",
+                "maps-j-02378",
+                "maps-j-02379",
+                "maps-j-02380",
+                "maps-j-02381",
+                "maps-j-02382",
+                "maps-j-02383",
+                "maps-j-02384",
+                "maps-j-02385",
+                "maps-j-02386",
+                "maps-j-02387",
+                "maps-j-02388",
+                "maps-j-02389",
+                "maps-j-02390",
+                "maps-j-02391",
+                "maps-j-02392",
+                "maps-j-02393",
+                "maps-j-02394",
+                "maps-j-02395",
+                "maps-j-02396",
+                "maps-j-02397",
+                "maps-j-02398",
+                "maps-j-02399",
+                "maps-j-02400",
+                "maps-j-02401",
+                "maps-j-02402",
+                "maps-j-02403",
+                "maps-j-02404",
+                "maps-j-02405",
+                "maps-j-02406",
+                "maps-j-02407",
+                "maps-j-02408",
+                "maps-j-02409"
+              ],
+              "fieldExtractionBytes": 289820
+            },
+            {
+              "firstEdge": 501,
+              "lastEdge": 550,
+              "edgeIds": [
+                "maps-j-02410",
+                "maps-j-02411",
+                "maps-j-02412",
+                "maps-j-02413",
+                "maps-j-02414",
+                "maps-j-02415",
+                "maps-j-02416",
+                "maps-j-02417",
+                "maps-j-02418",
+                "maps-j-02419",
+                "maps-j-02420",
+                "maps-j-02421",
+                "maps-j-02422",
+                "maps-j-02423",
+                "maps-j-02424",
+                "maps-j-02425",
+                "maps-j-02426",
+                "maps-j-02427",
+                "maps-j-02428",
+                "maps-j-02429",
+                "maps-j-02430",
+                "maps-j-02431",
+                "maps-j-02432",
+                "maps-j-02433",
+                "maps-j-02434",
+                "maps-j-02435",
+                "maps-j-02436",
+                "maps-j-02437",
+                "maps-j-02438",
+                "maps-j-02439",
+                "maps-j-02440",
+                "maps-j-02441",
+                "maps-j-02442",
+                "maps-j-02443",
+                "maps-j-02444",
+                "maps-j-02445",
+                "maps-j-02446",
+                "maps-j-02447",
+                "maps-j-02448",
+                "maps-j-02449",
+                "maps-j-02450",
+                "maps-j-02451",
+                "maps-j-02452",
+                "maps-j-02453",
+                "maps-j-02454",
+                "maps-j-02455",
+                "maps-j-02456",
+                "maps-j-02457",
+                "maps-j-02458",
+                "maps-j-02459"
+              ],
+              "fieldExtractionBytes": 292322
+            },
+            {
+              "firstEdge": 551,
+              "lastEdge": 600,
+              "edgeIds": [
+                "maps-j-02460",
+                "maps-j-02461",
+                "maps-j-02462",
+                "maps-j-02463",
+                "maps-j-02464",
+                "maps-j-02465",
+                "maps-j-02466",
+                "maps-j-02467",
+                "maps-j-02468",
+                "maps-j-02469",
+                "maps-j-02470",
+                "maps-j-02471",
+                "maps-j-02472",
+                "maps-j-02473",
+                "maps-j-02474",
+                "maps-j-02475",
+                "maps-j-02476",
+                "maps-j-02477",
+                "maps-j-02478",
+                "maps-j-02479",
+                "maps-j-02480",
+                "maps-j-02481",
+                "maps-j-02482",
+                "maps-j-02483",
+                "maps-j-02484",
+                "maps-j-02485",
+                "maps-j-02486",
+                "maps-j-02487",
+                "maps-j-02488",
+                "maps-j-02489",
+                "maps-j-02490",
+                "maps-j-02491",
+                "maps-j-02492",
+                "maps-j-02493",
+                "maps-j-02494",
+                "maps-j-02495",
+                "maps-j-02496",
+                "maps-j-02497",
+                "maps-j-02498",
+                "maps-j-02499",
+                "maps-j-02500",
+                "maps-j-02501",
+                "maps-j-02502",
+                "maps-j-02503",
+                "maps-j-02504",
+                "maps-j-02505",
+                "maps-j-02506",
+                "maps-j-02507",
+                "maps-j-02508",
+                "maps-j-02509"
+              ],
+              "fieldExtractionBytes": 297653
+            },
+            {
+              "firstEdge": 601,
+              "lastEdge": 650,
+              "edgeIds": [
+                "maps-j-02510",
+                "maps-j-02511",
+                "maps-j-02512",
+                "maps-j-02513",
+                "maps-j-02514",
+                "maps-j-02515",
+                "maps-j-02516",
+                "maps-j-02517",
+                "maps-j-02518",
+                "maps-j-02519",
+                "maps-j-02520",
+                "maps-j-02521",
+                "maps-j-02522",
+                "maps-j-02523",
+                "maps-j-02524",
+                "maps-j-02525",
+                "maps-j-02526",
+                "maps-j-02527",
+                "maps-j-02528",
+                "maps-j-02529",
+                "maps-j-02530",
+                "maps-j-02531",
+                "maps-j-02532",
+                "maps-j-02533",
+                "maps-j-02534",
+                "maps-j-02535",
+                "maps-j-02536",
+                "maps-j-02537",
+                "maps-j-02538",
+                "maps-j-02539",
+                "maps-j-02540",
+                "maps-j-02541",
+                "maps-j-02542",
+                "maps-j-02543",
+                "maps-j-02544",
+                "maps-j-02545",
+                "maps-j-02546",
+                "maps-j-02547",
+                "maps-j-02548",
+                "maps-j-02549",
+                "maps-j-02550",
+                "maps-j-02551",
+                "maps-j-02552",
+                "maps-j-02553",
+                "maps-j-02554",
+                "maps-j-02555",
+                "maps-j-02556",
+                "maps-j-02557",
+                "maps-j-02558",
+                "maps-j-02559"
+              ],
+              "fieldExtractionBytes": 268517
+            },
+            {
+              "firstEdge": 651,
+              "lastEdge": 700,
+              "edgeIds": [
+                "maps-j-02560",
+                "maps-j-02561",
+                "maps-j-02562",
+                "maps-j-02563",
+                "maps-j-02564",
+                "maps-j-02565",
+                "maps-j-02566",
+                "maps-j-02567",
+                "maps-j-02568",
+                "maps-j-02569",
+                "maps-j-02570",
+                "maps-j-02571",
+                "maps-j-02572",
+                "maps-j-02573",
+                "maps-j-02574",
+                "maps-j-02575",
+                "maps-j-02576",
+                "maps-j-02577",
+                "maps-j-02578",
+                "maps-j-02579",
+                "maps-j-02580",
+                "maps-j-02581",
+                "maps-j-02582",
+                "maps-j-02583",
+                "maps-j-02584",
+                "maps-j-02585",
+                "maps-j-02586",
+                "maps-j-02587",
+                "maps-j-02588",
+                "maps-j-02589",
+                "maps-j-02590",
+                "maps-j-02591",
+                "maps-j-02592",
+                "maps-j-02593",
+                "maps-j-02594",
+                "maps-j-02595",
+                "maps-j-02596",
+                "maps-j-02597",
+                "maps-j-02598",
+                "maps-j-02599",
+                "maps-j-02600",
+                "maps-j-02601",
+                "maps-j-02602",
+                "maps-j-02603",
+                "maps-j-02604",
+                "maps-j-02605",
+                "maps-j-02606",
+                "maps-j-02607",
+                "maps-j-02608",
+                "maps-j-02609"
+              ],
+              "fieldExtractionBytes": 270831
+            },
+            {
+              "firstEdge": 701,
+              "lastEdge": 750,
+              "edgeIds": [
+                "maps-j-02610",
+                "maps-j-02611",
+                "maps-j-02612",
+                "maps-j-02613",
+                "maps-j-02614",
+                "maps-j-02615",
+                "maps-j-02616",
+                "maps-j-02617",
+                "maps-j-02618",
+                "maps-j-02619",
+                "maps-j-02620",
+                "maps-j-02621",
+                "maps-j-02622",
+                "maps-j-02623",
+                "maps-j-02624",
+                "maps-j-02625",
+                "maps-j-02626",
+                "maps-j-02627",
+                "maps-j-02628",
+                "maps-j-02629",
+                "maps-j-02630",
+                "maps-j-02631",
+                "maps-j-02632",
+                "maps-j-02633",
+                "maps-j-02634",
+                "maps-j-02635",
+                "maps-j-02636",
+                "maps-j-02637",
+                "maps-j-02638",
+                "maps-j-02639",
+                "maps-j-02640",
+                "maps-j-02641",
+                "maps-j-02642",
+                "maps-j-02643",
+                "maps-j-02644",
+                "maps-j-02645",
+                "maps-j-02646",
+                "maps-j-02647",
+                "maps-j-02648",
+                "maps-j-02649",
+                "maps-j-02650",
+                "maps-j-02651",
+                "maps-j-02652",
+                "maps-j-02653",
+                "maps-j-02654",
+                "maps-j-02655",
+                "maps-j-02656",
+                "maps-j-02657",
+                "maps-j-02658",
+                "maps-j-02659"
+              ],
+              "fieldExtractionBytes": 281880
+            },
+            {
+              "firstEdge": 751,
+              "lastEdge": 800,
+              "edgeIds": [
+                "maps-j-02660",
+                "maps-j-02661",
+                "maps-j-02662",
+                "maps-j-02663",
+                "maps-j-02664",
+                "maps-j-02665",
+                "maps-j-02666",
+                "maps-j-02667",
+                "maps-j-02668",
+                "maps-j-02669",
+                "maps-j-02670",
+                "maps-j-02671",
+                "maps-j-02672",
+                "maps-j-02673",
+                "maps-j-02674",
+                "maps-j-02675",
+                "maps-j-02676",
+                "maps-j-02677",
+                "maps-j-02678",
+                "maps-j-02679",
+                "maps-j-02680",
+                "maps-j-02681",
+                "maps-j-02682",
+                "maps-j-02683",
+                "maps-j-02684",
+                "maps-j-02685",
+                "maps-j-02686",
+                "maps-j-02687",
+                "maps-j-02688",
+                "maps-j-02689",
+                "maps-j-02690",
+                "maps-j-02691",
+                "maps-j-02692",
+                "maps-j-02693",
+                "maps-j-02694",
+                "maps-j-02695",
+                "maps-j-02696",
+                "maps-j-02697",
+                "maps-j-02698",
+                "maps-j-02699",
+                "maps-j-02700",
+                "maps-j-02701",
+                "maps-j-02702",
+                "maps-j-02703",
+                "maps-j-02704",
+                "maps-j-02705",
+                "maps-j-02706",
+                "maps-j-02707",
+                "maps-j-02708",
+                "maps-j-02709"
+              ],
+              "fieldExtractionBytes": 283248
+            },
+            {
+              "firstEdge": 801,
+              "lastEdge": 825,
+              "edgeIds": [
+                "maps-j-02710",
+                "maps-j-02711",
+                "maps-j-02712",
+                "maps-j-02713",
+                "maps-j-02714",
+                "maps-j-02715",
+                "maps-j-02716",
+                "maps-j-02717",
+                "maps-j-02718",
+                "maps-j-02719",
+                "maps-j-02720",
+                "maps-j-02721",
+                "maps-j-02722",
+                "maps-j-02723",
+                "maps-j-02724",
+                "maps-j-02725",
+                "maps-j-02726",
+                "maps-j-02727",
+                "maps-j-02728",
+                "maps-j-02729",
+                "maps-j-02730",
+                "maps-j-02731",
+                "maps-j-02732",
+                "maps-j-02733",
+                "maps-j-02734"
+              ],
+              "fieldExtractionBytes": 140912
+            }
+          ],
+          "sourcePages": [
+            {
+              "firstLine": 1,
+              "lastLine": 80
+            },
+            {
+              "firstLine": 81,
+              "lastLine": 160
+            },
+            {
+              "firstLine": 161,
+              "lastLine": 240
+            },
+            {
+              "firstLine": 241,
+              "lastLine": 320
+            },
+            {
+              "firstLine": 321,
+              "lastLine": 400
+            },
+            {
+              "firstLine": 401,
+              "lastLine": 480
+            },
+            {
+              "firstLine": 481,
+              "lastLine": 560
+            },
+            {
+              "firstLine": 561,
+              "lastLine": 640
+            },
+            {
+              "firstLine": 641,
+              "lastLine": 720
+            },
+            {
+              "firstLine": 721,
+              "lastLine": 800
+            },
+            {
+              "firstLine": 801,
+              "lastLine": 880
+            },
+            {
+              "firstLine": 881,
+              "lastLine": 960
+            },
+            {
+              "firstLine": 961,
+              "lastLine": 1040
+            },
+            {
+              "firstLine": 1041,
+              "lastLine": 1120
+            },
+            {
+              "firstLine": 1121,
+              "lastLine": 1200
+            },
+            {
+              "firstLine": 1201,
+              "lastLine": 1280
+            },
+            {
+              "firstLine": 1281,
+              "lastLine": 1360
+            },
+            {
+              "firstLine": 1361,
+              "lastLine": 1440
+            },
+            {
+              "firstLine": 1441,
+              "lastLine": 1520
+            },
+            {
+              "firstLine": 1521,
+              "lastLine": 1600
+            },
+            {
+              "firstLine": 1601,
+              "lastLine": 1680
+            },
+            {
+              "firstLine": 1681,
+              "lastLine": 1760
+            },
+            {
+              "firstLine": 1761,
+              "lastLine": 1840
+            },
+            {
+              "firstLine": 1841,
+              "lastLine": 1920
+            },
+            {
+              "firstLine": 1921,
+              "lastLine": 2000
+            },
+            {
+              "firstLine": 2001,
+              "lastLine": 2080
+            },
+            {
+              "firstLine": 2081,
+              "lastLine": 2160
+            },
+            {
+              "firstLine": 2161,
+              "lastLine": 2240
+            },
+            {
+              "firstLine": 2241,
+              "lastLine": 2320
+            },
+            {
+              "firstLine": 2321,
+              "lastLine": 2400
+            },
+            {
+              "firstLine": 2401,
+              "lastLine": 2480
+            },
+            {
+              "firstLine": 2481,
+              "lastLine": 2560
+            },
+            {
+              "firstLine": 2561,
+              "lastLine": 2640
+            },
+            {
+              "firstLine": 2641,
+              "lastLine": 2720
+            },
+            {
+              "firstLine": 2721,
+              "lastLine": 2800
+            },
+            {
+              "firstLine": 2801,
+              "lastLine": 2880
+            },
+            {
+              "firstLine": 2881,
+              "lastLine": 2960
+            },
+            {
+              "firstLine": 2961,
+              "lastLine": 3040
+            },
+            {
+              "firstLine": 3041,
+              "lastLine": 3120
+            },
+            {
+              "firstLine": 3121,
+              "lastLine": 3200
+            },
+            {
+              "firstLine": 3201,
+              "lastLine": 3280
+            },
+            {
+              "firstLine": 3281,
+              "lastLine": 3360
+            },
+            {
+              "firstLine": 3361,
+              "lastLine": 3440
+            },
+            {
+              "firstLine": 3441,
+              "lastLine": 3520
+            },
+            {
+              "firstLine": 3521,
+              "lastLine": 3600
+            },
+            {
+              "firstLine": 3601,
+              "lastLine": 3680
+            },
+            {
+              "firstLine": 3681,
+              "lastLine": 3760
+            },
+            {
+              "firstLine": 3761,
+              "lastLine": 3840
+            },
+            {
+              "firstLine": 3841,
+              "lastLine": 3920
+            },
+            {
+              "firstLine": 3921,
+              "lastLine": 4000
+            },
+            {
+              "firstLine": 4001,
+              "lastLine": 4080
+            },
+            {
+              "firstLine": 4081,
+              "lastLine": 4160
+            },
+            {
+              "firstLine": 4161,
+              "lastLine": 4240
+            },
+            {
+              "firstLine": 4241,
+              "lastLine": 4320
+            },
+            {
+              "firstLine": 4321,
+              "lastLine": 4400
+            },
+            {
+              "firstLine": 4401,
+              "lastLine": 4480
+            },
+            {
+              "firstLine": 4481,
+              "lastLine": 4560
+            },
+            {
+              "firstLine": 4561,
+              "lastLine": 4640
+            },
+            {
+              "firstLine": 4641,
+              "lastLine": 4720
+            },
+            {
+              "firstLine": 4721,
+              "lastLine": 4800
+            },
+            {
+              "firstLine": 4801,
+              "lastLine": 4880
+            },
+            {
+              "firstLine": 4881,
+              "lastLine": 4960
+            },
+            {
+              "firstLine": 4961,
+              "lastLine": 5040
+            },
+            {
+              "firstLine": 5041,
+              "lastLine": 5120
+            },
+            {
+              "firstLine": 5121,
+              "lastLine": 5200
+            },
+            {
+              "firstLine": 5201,
+              "lastLine": 5280
+            },
+            {
+              "firstLine": 5281,
+              "lastLine": 5360
+            },
+            {
+              "firstLine": 5361,
+              "lastLine": 5440
+            },
+            {
+              "firstLine": 5441,
+              "lastLine": 5520
+            },
+            {
+              "firstLine": 5521,
+              "lastLine": 5600
+            },
+            {
+              "firstLine": 5601,
+              "lastLine": 5680
+            },
+            {
+              "firstLine": 5681,
+              "lastLine": 5760
+            },
+            {
+              "firstLine": 5761,
+              "lastLine": 5840
+            },
+            {
+              "firstLine": 5841,
+              "lastLine": 5920
+            },
+            {
+              "firstLine": 5921,
+              "lastLine": 6000
+            },
+            {
+              "firstLine": 6001,
+              "lastLine": 6080
+            },
+            {
+              "firstLine": 6081,
+              "lastLine": 6160
+            },
+            {
+              "firstLine": 6161,
+              "lastLine": 6240
+            },
+            {
+              "firstLine": 6241,
+              "lastLine": 6320
+            },
+            {
+              "firstLine": 6321,
+              "lastLine": 6400
+            },
+            {
+              "firstLine": 6401,
+              "lastLine": 6480
+            },
+            {
+              "firstLine": 6481,
+              "lastLine": 6560
+            },
+            {
+              "firstLine": 6561,
+              "lastLine": 6640
+            },
+            {
+              "firstLine": 6641,
+              "lastLine": 6720
+            },
+            {
+              "firstLine": 6721,
+              "lastLine": 6800
+            },
+            {
+              "firstLine": 6801,
+              "lastLine": 6880
+            },
+            {
+              "firstLine": 6881,
+              "lastLine": 6960
+            },
+            {
+              "firstLine": 6961,
+              "lastLine": 7040
+            },
+            {
+              "firstLine": 7041,
+              "lastLine": 7120
+            },
+            {
+              "firstLine": 7121,
+              "lastLine": 7200
+            },
+            {
+              "firstLine": 7201,
+              "lastLine": 7280
+            },
+            {
+              "firstLine": 7281,
+              "lastLine": 7360
+            },
+            {
+              "firstLine": 7361,
+              "lastLine": 7440
+            },
+            {
+              "firstLine": 7441,
+              "lastLine": 7520
+            },
+            {
+              "firstLine": 7521,
+              "lastLine": 7600
+            },
+            {
+              "firstLine": 7601,
+              "lastLine": 7680
+            },
+            {
+              "firstLine": 7681,
+              "lastLine": 7760
+            },
+            {
+              "firstLine": 7761,
+              "lastLine": 7840
+            },
+            {
+              "firstLine": 7841,
+              "lastLine": 7920
+            },
+            {
+              "firstLine": 7921,
+              "lastLine": 8000
+            },
+            {
+              "firstLine": 8001,
+              "lastLine": 8080
+            },
+            {
+              "firstLine": 8081,
+              "lastLine": 8160
+            },
+            {
+              "firstLine": 8161,
+              "lastLine": 8240
+            },
+            {
+              "firstLine": 8241,
+              "lastLine": 8320
+            },
+            {
+              "firstLine": 8321,
+              "lastLine": 8400
+            },
+            {
+              "firstLine": 8401,
+              "lastLine": 8480
+            },
+            {
+              "firstLine": 8481,
+              "lastLine": 8560
+            },
+            {
+              "firstLine": 8561,
+              "lastLine": 8640
+            },
+            {
+              "firstLine": 8641,
+              "lastLine": 8720
+            },
+            {
+              "firstLine": 8721,
+              "lastLine": 8800
+            },
+            {
+              "firstLine": 8801,
+              "lastLine": 8880
+            },
+            {
+              "firstLine": 8881,
+              "lastLine": 8960
+            },
+            {
+              "firstLine": 8961,
+              "lastLine": 9040
+            },
+            {
+              "firstLine": 9041,
+              "lastLine": 9120
+            },
+            {
+              "firstLine": 9121,
+              "lastLine": 9200
+            },
+            {
+              "firstLine": 9201,
+              "lastLine": 9280
+            },
+            {
+              "firstLine": 9281,
+              "lastLine": 9360
+            },
+            {
+              "firstLine": 9361,
+              "lastLine": 9440
+            },
+            {
+              "firstLine": 9441,
+              "lastLine": 9520
+            },
+            {
+              "firstLine": 9521,
+              "lastLine": 9600
+            },
+            {
+              "firstLine": 9601,
+              "lastLine": 9680
+            },
+            {
+              "firstLine": 9681,
+              "lastLine": 9760
+            },
+            {
+              "firstLine": 9761,
+              "lastLine": 9840
+            },
+            {
+              "firstLine": 9841,
+              "lastLine": 9920
+            },
+            {
+              "firstLine": 9921,
+              "lastLine": 10000
+            },
+            {
+              "firstLine": 10001,
+              "lastLine": 10080
+            },
+            {
+              "firstLine": 10081,
+              "lastLine": 10160
+            },
+            {
+              "firstLine": 10161,
+              "lastLine": 10240
+            },
+            {
+              "firstLine": 10241,
+              "lastLine": 10320
+            },
+            {
+              "firstLine": 10321,
+              "lastLine": 10400
+            },
+            {
+              "firstLine": 10401,
+              "lastLine": 10480
+            },
+            {
+              "firstLine": 10481,
+              "lastLine": 10560
+            },
+            {
+              "firstLine": 10561,
+              "lastLine": 10640
+            },
+            {
+              "firstLine": 10641,
+              "lastLine": 10720
+            },
+            {
+              "firstLine": 10721,
+              "lastLine": 10800
+            },
+            {
+              "firstLine": 10801,
+              "lastLine": 10880
+            },
+            {
+              "firstLine": 10881,
+              "lastLine": 10960
+            },
+            {
+              "firstLine": 10961,
+              "lastLine": 11040
+            },
+            {
+              "firstLine": 11041,
+              "lastLine": 11120
+            },
+            {
+              "firstLine": 11121,
+              "lastLine": 11200
+            },
+            {
+              "firstLine": 11201,
+              "lastLine": 11280
+            },
+            {
+              "firstLine": 11281,
+              "lastLine": 11360
+            },
+            {
+              "firstLine": 11361,
+              "lastLine": 11440
+            },
+            {
+              "firstLine": 11441,
+              "lastLine": 11520
+            },
+            {
+              "firstLine": 11521,
+              "lastLine": 11600
+            },
+            {
+              "firstLine": 11601,
+              "lastLine": 11680
+            },
+            {
+              "firstLine": 11681,
+              "lastLine": 11760
+            },
+            {
+              "firstLine": 11761,
+              "lastLine": 11840
+            },
+            {
+              "firstLine": 11841,
+              "lastLine": 11920
+            },
+            {
+              "firstLine": 11921,
+              "lastLine": 12000
+            },
+            {
+              "firstLine": 12001,
+              "lastLine": 12080
+            },
+            {
+              "firstLine": 12081,
+              "lastLine": 12160
+            },
+            {
+              "firstLine": 12161,
+              "lastLine": 12240
+            },
+            {
+              "firstLine": 12241,
+              "lastLine": 12320
+            },
+            {
+              "firstLine": 12321,
+              "lastLine": 12400
+            },
+            {
+              "firstLine": 12401,
+              "lastLine": 12480
+            },
+            {
+              "firstLine": 12481,
+              "lastLine": 12560
+            },
+            {
+              "firstLine": 12561,
+              "lastLine": 12640
+            },
+            {
+              "firstLine": 12641,
+              "lastLine": 12720
+            },
+            {
+              "firstLine": 12721,
+              "lastLine": 12800
+            },
+            {
+              "firstLine": 12801,
+              "lastLine": 12880
+            },
+            {
+              "firstLine": 12881,
+              "lastLine": 12960
+            },
+            {
+              "firstLine": 12961,
+              "lastLine": 13040
+            },
+            {
+              "firstLine": 13041,
+              "lastLine": 13120
+            },
+            {
+              "firstLine": 13121,
+              "lastLine": 13200
+            },
+            {
+              "firstLine": 13201,
+              "lastLine": 13280
+            },
+            {
+              "firstLine": 13281,
+              "lastLine": 13360
+            },
+            {
+              "firstLine": 13361,
+              "lastLine": 13440
+            },
+            {
+              "firstLine": 13441,
+              "lastLine": 13520
+            },
+            {
+              "firstLine": 13521,
+              "lastLine": 13600
+            },
+            {
+              "firstLine": 13601,
+              "lastLine": 13680
+            },
+            {
+              "firstLine": 13681,
+              "lastLine": 13760
+            },
+            {
+              "firstLine": 13761,
+              "lastLine": 13840
+            },
+            {
+              "firstLine": 13841,
+              "lastLine": 13916
+            }
+          ]
+        }
+      ],
+      "fileCount": 1,
+      "edgeCount": 825,
+      "indivisibleException": true,
+      "recordAndSourceBytes": 5305310
+    },
+    {
+      "part": 3,
+      "report": "review-a38-step-03-wave5c-p03.md",
+      "files": [
+        {
+          "file": "docs/doc-registry.md",
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-128.jsonl",
+          "sourceDigest": "d039d7ec2b1bb93780ae6a5bc09dbeb02ead6ef60d0e9a980ac59463ce511392",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordSha256": "7e6db968429ea8ce2ce0b133ef6ec2b8462a33d1ed7e0321f3910659435200b1",
+          "recordBytes": 2517515,
+          "membership": {
+            "set": "batch-128",
+            "patchedSample": false,
+            "mandatory": true,
+            "unpatchedSample": false
+          },
+          "edgePages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 50,
+              "edgeIds": [
+                "maps-j-02735",
+                "maps-j-02736",
+                "maps-j-02737",
+                "maps-j-02738",
+                "maps-j-02739",
+                "maps-j-02740",
+                "maps-j-02741",
+                "maps-j-02742",
+                "maps-j-02743",
+                "maps-j-02744",
+                "maps-j-02745",
+                "maps-j-02746",
+                "maps-j-02747",
+                "maps-j-02748",
+                "maps-j-02749",
+                "maps-j-02750",
+                "maps-j-02751",
+                "maps-j-02752",
+                "maps-j-02753",
+                "maps-j-02754",
+                "maps-j-02755",
+                "maps-j-02756",
+                "maps-j-02757",
+                "maps-j-02758",
+                "maps-j-02759",
+                "maps-j-02760",
+                "maps-j-02761",
+                "maps-j-02762",
+                "maps-j-02763",
+                "maps-j-02764",
+                "maps-j-02765",
+                "maps-j-02766",
+                "maps-j-02767",
+                "maps-j-02768",
+                "maps-j-02769",
+                "maps-j-02770",
+                "maps-j-02771",
+                "maps-j-02772",
+                "maps-j-02773",
+                "maps-j-02774",
+                "maps-j-02775",
+                "maps-j-02776",
+                "maps-j-02777",
+                "maps-j-02778",
+                "maps-j-02779",
+                "maps-j-02780",
+                "maps-j-02781",
+                "maps-j-02782",
+                "maps-j-02783",
+                "maps-j-02784"
+              ],
+              "fieldExtractionBytes": 277184
+            },
+            {
+              "firstEdge": 51,
+              "lastEdge": 100,
+              "edgeIds": [
+                "maps-j-02785",
+                "maps-j-02786",
+                "maps-j-02787",
+                "maps-j-02788",
+                "maps-j-02789",
+                "maps-j-02790",
+                "maps-j-02791",
+                "maps-j-02792",
+                "maps-j-02793",
+                "maps-j-02794",
+                "maps-j-02795",
+                "maps-j-02796",
+                "maps-j-02797",
+                "maps-j-02798",
+                "maps-j-02799",
+                "maps-j-02800",
+                "maps-j-02801",
+                "maps-j-02802",
+                "maps-j-02803",
+                "maps-j-02804",
+                "maps-j-02805",
+                "maps-j-02806",
+                "maps-j-02807",
+                "maps-j-02808",
+                "maps-j-02809",
+                "maps-j-02810",
+                "maps-j-02811",
+                "maps-j-02812",
+                "maps-j-02813",
+                "maps-j-02814",
+                "maps-j-02815",
+                "maps-j-02816",
+                "maps-j-02817",
+                "maps-j-02818",
+                "maps-j-02819",
+                "maps-j-02820",
+                "maps-j-02821",
+                "maps-j-02822",
+                "maps-j-02823",
+                "maps-j-02824",
+                "maps-j-02825",
+                "maps-j-02826",
+                "maps-j-02827",
+                "maps-j-02828",
+                "maps-j-02829",
+                "maps-j-02830",
+                "maps-j-02831",
+                "maps-j-02832",
+                "maps-j-02833",
+                "maps-j-02834"
+              ],
+              "fieldExtractionBytes": 282788
+            },
+            {
+              "firstEdge": 101,
+              "lastEdge": 150,
+              "edgeIds": [
+                "maps-j-02835",
+                "maps-j-02836",
+                "maps-j-02837",
+                "maps-j-02838",
+                "maps-j-02839",
+                "maps-j-02840",
+                "maps-j-02841",
+                "maps-j-02842",
+                "maps-j-02843",
+                "maps-j-02844",
+                "maps-j-02845",
+                "maps-j-02846",
+                "maps-j-02847",
+                "maps-j-02848",
+                "maps-j-02849",
+                "maps-j-02850",
+                "maps-j-02851",
+                "maps-j-02852",
+                "maps-j-02853",
+                "maps-j-02854",
+                "maps-j-02855",
+                "maps-j-02856",
+                "maps-j-02857",
+                "maps-j-02858",
+                "maps-j-02859",
+                "maps-j-02860",
+                "maps-j-02861",
+                "maps-j-02862",
+                "maps-j-02863",
+                "maps-j-02864",
+                "maps-j-02865",
+                "maps-j-02866",
+                "maps-j-02867",
+                "maps-j-02868",
+                "maps-j-02869",
+                "maps-j-02870",
+                "maps-j-02871",
+                "maps-j-02872",
+                "maps-j-02873",
+                "maps-j-02874",
+                "maps-j-02875",
+                "maps-j-02876",
+                "maps-j-02877",
+                "maps-j-02878",
+                "maps-j-02879",
+                "maps-j-02880",
+                "maps-j-02881",
+                "maps-j-02882",
+                "maps-j-02883",
+                "maps-j-02884"
+              ],
+              "fieldExtractionBytes": 282458
+            },
+            {
+              "firstEdge": 151,
+              "lastEdge": 200,
+              "edgeIds": [
+                "maps-j-02885",
+                "maps-j-02886",
+                "maps-j-02887",
+                "maps-j-02888",
+                "maps-j-02889",
+                "maps-j-02890",
+                "maps-j-02891",
+                "maps-j-02892",
+                "maps-j-02893",
+                "maps-j-02894",
+                "maps-j-02895",
+                "maps-j-02896",
+                "maps-j-02897",
+                "maps-j-02898",
+                "maps-j-02899",
+                "maps-j-02900",
+                "maps-j-02901",
+                "maps-j-02902",
+                "maps-j-02903",
+                "maps-j-02904",
+                "maps-j-02905",
+                "maps-j-02906",
+                "maps-j-02907",
+                "maps-j-02908",
+                "maps-j-02909",
+                "maps-j-02910",
+                "maps-j-02911",
+                "maps-j-02912",
+                "maps-j-02913",
+                "maps-j-02914",
+                "maps-j-02915",
+                "maps-j-02916",
+                "maps-j-02917",
+                "maps-j-02918",
+                "maps-j-02919",
+                "maps-j-02920",
+                "maps-j-02921",
+                "maps-j-02922",
+                "maps-j-02923",
+                "maps-j-02924",
+                "maps-j-02925",
+                "maps-j-02926",
+                "maps-j-02927",
+                "maps-j-02928",
+                "maps-j-02929",
+                "maps-j-02930",
+                "maps-j-02931",
+                "maps-j-02932",
+                "maps-j-02933",
+                "maps-j-02934"
+              ],
+              "fieldExtractionBytes": 289315
+            },
+            {
+              "firstEdge": 201,
+              "lastEdge": 250,
+              "edgeIds": [
+                "maps-j-02935",
+                "maps-j-02936",
+                "maps-j-02937",
+                "maps-j-02938",
+                "maps-j-02939",
+                "maps-j-02940",
+                "maps-j-02941",
+                "maps-j-02942",
+                "maps-j-02943",
+                "maps-j-02944",
+                "maps-j-02945",
+                "maps-j-02946",
+                "maps-j-02947",
+                "maps-j-02948",
+                "maps-j-02949",
+                "maps-j-02950",
+                "maps-j-02951",
+                "maps-j-02952",
+                "maps-j-02953",
+                "maps-j-02954",
+                "maps-j-02955",
+                "maps-j-02956",
+                "maps-j-02957",
+                "maps-j-02958",
+                "maps-j-02959",
+                "maps-j-02960",
+                "maps-j-02961",
+                "maps-j-02962",
+                "maps-j-02963",
+                "maps-j-02964",
+                "maps-j-02965",
+                "maps-j-02966",
+                "maps-j-02967",
+                "maps-j-02968",
+                "maps-j-02969",
+                "maps-j-02970",
+                "maps-j-02971",
+                "maps-j-02972",
+                "maps-j-02973",
+                "maps-j-02974",
+                "maps-j-02975",
+                "maps-j-02976",
+                "maps-j-02977",
+                "maps-j-02978",
+                "maps-j-02979",
+                "maps-j-02980",
+                "maps-j-02981",
+                "maps-j-02982",
+                "maps-j-02983",
+                "maps-j-02984"
+              ],
+              "fieldExtractionBytes": 282759
+            },
+            {
+              "firstEdge": 251,
+              "lastEdge": 300,
+              "edgeIds": [
+                "maps-j-02985",
+                "maps-j-02986",
+                "maps-j-02987",
+                "maps-j-02988",
+                "maps-j-02989",
+                "maps-j-02990",
+                "maps-j-02991",
+                "maps-j-02992",
+                "maps-j-02993",
+                "maps-j-02994",
+                "maps-j-02995",
+                "maps-j-02996",
+                "maps-j-02997",
+                "maps-j-02998",
+                "maps-j-02999",
+                "maps-j-03000",
+                "maps-j-03001",
+                "maps-j-03002",
+                "maps-j-03003",
+                "maps-j-03004",
+                "maps-j-03005",
+                "maps-j-03006",
+                "maps-j-03007",
+                "maps-j-03008",
+                "maps-j-03009",
+                "maps-j-03010",
+                "maps-j-03011",
+                "maps-j-03012",
+                "maps-j-03013",
+                "maps-j-03014",
+                "maps-j-03015",
+                "maps-j-03016",
+                "maps-j-03017",
+                "maps-j-03018",
+                "maps-j-03019",
+                "maps-j-03020",
+                "maps-j-03021",
+                "maps-j-03022",
+                "maps-j-03023",
+                "maps-j-03024",
+                "maps-j-03025",
+                "maps-j-03026",
+                "maps-j-03027",
+                "maps-j-03028",
+                "maps-j-03029",
+                "maps-j-03030",
+                "maps-j-03031",
+                "maps-j-03032",
+                "maps-j-03033",
+                "maps-j-03034"
+              ],
+              "fieldExtractionBytes": 284481
+            },
+            {
+              "firstEdge": 301,
+              "lastEdge": 350,
+              "edgeIds": [
+                "maps-j-03035",
+                "maps-j-03036",
+                "maps-j-03037",
+                "maps-j-03038",
+                "maps-j-03039",
+                "maps-j-03040",
+                "maps-j-03041",
+                "maps-j-03042",
+                "maps-j-03043",
+                "maps-j-03044",
+                "maps-j-03045",
+                "maps-j-03046",
+                "maps-j-03047",
+                "maps-j-03048",
+                "maps-j-03049",
+                "maps-j-03050",
+                "maps-j-03051",
+                "maps-j-03052",
+                "maps-j-03053",
+                "maps-j-03054",
+                "maps-j-03055",
+                "maps-j-03056",
+                "maps-j-03057",
+                "maps-j-03058",
+                "maps-j-03059",
+                "maps-j-03060",
+                "maps-j-03061",
+                "maps-j-03062",
+                "maps-j-03063",
+                "maps-j-03064",
+                "maps-j-03065",
+                "maps-j-03066",
+                "maps-j-03067",
+                "maps-j-03068",
+                "maps-j-03069",
+                "maps-j-03070",
+                "maps-j-03071",
+                "maps-j-03072",
+                "maps-j-03073",
+                "maps-j-03074",
+                "maps-j-03075",
+                "maps-j-03076",
+                "maps-j-03077",
+                "maps-j-03078",
+                "maps-j-03079",
+                "maps-j-03080",
+                "maps-j-03081",
+                "maps-j-03082",
+                "maps-j-03083",
+                "maps-j-03084"
+              ],
+              "fieldExtractionBytes": 255949
+            },
+            {
+              "firstEdge": 351,
+              "lastEdge": 400,
+              "edgeIds": [
+                "maps-j-03085",
+                "maps-j-03086",
+                "maps-j-03087",
+                "maps-j-03088",
+                "maps-j-03089",
+                "maps-j-03090",
+                "maps-j-03091",
+                "maps-j-03092",
+                "maps-j-03093",
+                "maps-j-03094",
+                "maps-j-03095",
+                "maps-j-03096",
+                "maps-j-03097",
+                "maps-j-03098",
+                "maps-j-03099",
+                "maps-j-03100",
+                "maps-j-03101",
+                "maps-j-03102",
+                "maps-j-03103",
+                "maps-j-03104",
+                "maps-j-03105",
+                "maps-j-03106",
+                "maps-j-03107",
+                "maps-j-03108",
+                "maps-j-03109",
+                "maps-j-03110",
+                "maps-j-03111",
+                "maps-j-03112",
+                "maps-j-03113",
+                "maps-j-03114",
+                "maps-j-03115",
+                "maps-j-03116",
+                "maps-j-03117",
+                "maps-j-03118",
+                "maps-j-03119",
+                "maps-j-03120",
+                "maps-j-03121",
+                "maps-j-03122",
+                "maps-j-03123",
+                "maps-j-03124",
+                "maps-j-03125",
+                "maps-j-03126",
+                "maps-j-03127",
+                "maps-j-03128",
+                "maps-j-03129",
+                "maps-j-03130",
+                "maps-j-03131",
+                "maps-j-03132",
+                "maps-j-03133",
+                "maps-j-03134"
+              ],
+              "fieldExtractionBytes": 210947
+            },
+            {
+              "firstEdge": 401,
+              "lastEdge": 450,
+              "edgeIds": [
+                "maps-j-03135",
+                "maps-j-03136",
+                "maps-j-03137",
+                "maps-j-03138",
+                "maps-j-03139",
+                "maps-j-03140",
+                "maps-j-03141",
+                "maps-j-03142",
+                "maps-j-03143",
+                "maps-j-03144",
+                "maps-j-03145",
+                "maps-j-03146",
+                "maps-j-03147",
+                "maps-j-03148",
+                "maps-j-03149",
+                "maps-j-03150",
+                "maps-j-03151",
+                "maps-j-03152",
+                "maps-j-03153",
+                "maps-j-03154",
+                "maps-j-03155",
+                "maps-j-03156",
+                "maps-j-03157",
+                "maps-j-03158",
+                "maps-j-03159",
+                "maps-j-03160",
+                "maps-j-03161",
+                "maps-j-03162",
+                "maps-j-03163",
+                "maps-j-03164",
+                "maps-j-03165",
+                "maps-j-03166",
+                "maps-j-03167",
+                "maps-j-03168",
+                "maps-j-03169",
+                "maps-j-03170",
+                "maps-j-03171",
+                "maps-j-03172",
+                "maps-j-03173",
+                "maps-j-03174",
+                "maps-j-03175",
+                "maps-j-03176",
+                "maps-j-03177",
+                "maps-j-03178",
+                "maps-j-03179",
+                "maps-j-03180",
+                "maps-j-03181",
+                "maps-j-03182",
+                "maps-j-03183",
+                "maps-j-03184"
+              ],
+              "fieldExtractionBytes": 212877
+            },
+            {
+              "firstEdge": 451,
+              "lastEdge": 493,
+              "edgeIds": [
+                "maps-j-03185",
+                "maps-j-03186",
+                "maps-j-03187",
+                "maps-j-03188",
+                "maps-j-03189",
+                "maps-j-03190",
+                "maps-j-03191",
+                "maps-j-03192",
+                "maps-j-03193",
+                "maps-j-03194",
+                "maps-j-03195",
+                "maps-j-03196",
+                "maps-j-03197",
+                "maps-j-03198",
+                "maps-j-03199",
+                "maps-j-03200",
+                "maps-j-03201",
+                "maps-j-03202",
+                "maps-j-03203",
+                "maps-j-03204",
+                "maps-j-03205",
+                "maps-j-03206",
+                "maps-j-03207",
+                "maps-j-03208",
+                "maps-j-03209",
+                "maps-j-03210",
+                "maps-j-03211",
+                "maps-j-03212",
+                "maps-j-03213",
+                "maps-j-03214",
+                "maps-j-03215",
+                "maps-j-03216",
+                "maps-j-03217",
+                "maps-j-03218",
+                "maps-j-03219",
+                "maps-j-03220",
+                "maps-j-03221",
+                "maps-j-03222",
+                "maps-j-03223",
+                "maps-j-03224",
+                "maps-j-03225",
+                "maps-j-03226",
+                "maps-j-03227"
+              ],
+              "fieldExtractionBytes": 182158
+            }
+          ],
+          "sourcePages": [
+            {
+              "firstLine": 1,
+              "lastLine": 80
+            },
+            {
+              "firstLine": 81,
+              "lastLine": 160
+            },
+            {
+              "firstLine": 161,
+              "lastLine": 240
+            },
+            {
+              "firstLine": 241,
+              "lastLine": 320
+            },
+            {
+              "firstLine": 321,
+              "lastLine": 400
+            },
+            {
+              "firstLine": 401,
+              "lastLine": 480
+            },
+            {
+              "firstLine": 481,
+              "lastLine": 560
+            },
+            {
+              "firstLine": 561,
+              "lastLine": 640
+            },
+            {
+              "firstLine": 641,
+              "lastLine": 720
+            },
+            {
+              "firstLine": 721,
+              "lastLine": 800
+            },
+            {
+              "firstLine": 801,
+              "lastLine": 880
+            },
+            {
+              "firstLine": 881,
+              "lastLine": 960
+            },
+            {
+              "firstLine": 961,
+              "lastLine": 1040
+            },
+            {
+              "firstLine": 1041,
+              "lastLine": 1120
+            },
+            {
+              "firstLine": 1121,
+              "lastLine": 1200
+            },
+            {
+              "firstLine": 1201,
+              "lastLine": 1280
+            },
+            {
+              "firstLine": 1281,
+              "lastLine": 1360
+            },
+            {
+              "firstLine": 1361,
+              "lastLine": 1440
+            },
+            {
+              "firstLine": 1441,
+              "lastLine": 1520
+            },
+            {
+              "firstLine": 1521,
+              "lastLine": 1600
+            },
+            {
+              "firstLine": 1601,
+              "lastLine": 1680
+            },
+            {
+              "firstLine": 1681,
+              "lastLine": 1760
+            },
+            {
+              "firstLine": 1761,
+              "lastLine": 1840
+            },
+            {
+              "firstLine": 1841,
+              "lastLine": 1920
+            },
+            {
+              "firstLine": 1921,
+              "lastLine": 2000
+            },
+            {
+              "firstLine": 2001,
+              "lastLine": 2080
+            },
+            {
+              "firstLine": 2081,
+              "lastLine": 2160
+            },
+            {
+              "firstLine": 2161,
+              "lastLine": 2240
+            },
+            {
+              "firstLine": 2241,
+              "lastLine": 2320
+            },
+            {
+              "firstLine": 2321,
+              "lastLine": 2400
+            },
+            {
+              "firstLine": 2401,
+              "lastLine": 2480
+            },
+            {
+              "firstLine": 2481,
+              "lastLine": 2560
+            },
+            {
+              "firstLine": 2561,
+              "lastLine": 2640
+            },
+            {
+              "firstLine": 2641,
+              "lastLine": 2720
+            },
+            {
+              "firstLine": 2721,
+              "lastLine": 2800
+            },
+            {
+              "firstLine": 2801,
+              "lastLine": 2880
+            },
+            {
+              "firstLine": 2881,
+              "lastLine": 2960
+            },
+            {
+              "firstLine": 2961,
+              "lastLine": 3040
+            },
+            {
+              "firstLine": 3041,
+              "lastLine": 3120
+            },
+            {
+              "firstLine": 3121,
+              "lastLine": 3200
+            },
+            {
+              "firstLine": 3201,
+              "lastLine": 3280
+            },
+            {
+              "firstLine": 3281,
+              "lastLine": 3360
+            },
+            {
+              "firstLine": 3361,
+              "lastLine": 3440
+            },
+            {
+              "firstLine": 3441,
+              "lastLine": 3462
+            }
+          ]
+        }
+      ],
+      "fileCount": 1,
+      "edgeCount": 493,
+      "indivisibleException": true,
+      "recordAndSourceBytes": 2809186
+    },
+    {
+      "part": 4,
+      "report": "review-a38-step-03-wave5c-p04.md",
+      "files": [
+        {
+          "file": "docs/enduser-docs-index.json",
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-129.jsonl",
+          "sourceDigest": "55a188251a55da321d4c79b363a8cf72ae234e8b55375e35e66538586df652e7",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordSha256": "318a6c95f294fb245a6a5043415d019177454932411b920b3c3335018525f4e7",
+          "recordBytes": 2955014,
+          "membership": {
+            "set": "batch-129",
+            "patchedSample": false,
+            "mandatory": true,
+            "unpatchedSample": false
+          },
+          "edgePages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 50,
+              "edgeIds": [
+                "maps-j-03228",
+                "maps-j-03229",
+                "maps-j-03230",
+                "maps-j-03231",
+                "maps-j-03232",
+                "maps-j-03233",
+                "maps-j-03234",
+                "maps-j-03235",
+                "maps-j-03236",
+                "maps-j-03237",
+                "maps-j-03238",
+                "maps-j-03239",
+                "maps-j-03240",
+                "maps-j-03241",
+                "maps-j-03242",
+                "maps-j-03243",
+                "maps-j-03244",
+                "maps-j-03245",
+                "maps-j-03246",
+                "maps-j-03247",
+                "maps-j-03248",
+                "maps-j-03249",
+                "maps-j-03250",
+                "maps-j-03251",
+                "maps-j-03252",
+                "maps-j-03253",
+                "maps-j-03254",
+                "maps-j-03255",
+                "maps-j-03256",
+                "maps-j-03257",
+                "maps-j-03258",
+                "maps-j-03259",
+                "maps-j-03260",
+                "maps-j-03261",
+                "maps-j-03262",
+                "maps-j-03263",
+                "maps-j-03264",
+                "maps-j-03265",
+                "maps-j-03266",
+                "maps-j-03267",
+                "maps-j-03268",
+                "maps-j-03269",
+                "maps-j-03270",
+                "maps-j-03271",
+                "maps-j-03272",
+                "maps-j-03273",
+                "maps-j-03274",
+                "maps-j-03275",
+                "maps-j-03276",
+                "maps-j-03277"
+              ],
+              "fieldExtractionBytes": 294626
+            },
+            {
+              "firstEdge": 51,
+              "lastEdge": 100,
+              "edgeIds": [
+                "maps-j-03278",
+                "maps-j-03279",
+                "maps-j-03280",
+                "maps-j-03281",
+                "maps-j-03282",
+                "maps-j-03283",
+                "maps-j-03284",
+                "maps-j-03285",
+                "maps-j-03286",
+                "maps-j-03287",
+                "maps-j-03288",
+                "maps-j-03289",
+                "maps-j-03290",
+                "maps-j-03291",
+                "maps-j-03292",
+                "maps-j-03293",
+                "maps-j-03294",
+                "maps-j-03295",
+                "maps-j-03296",
+                "maps-j-03297",
+                "maps-j-03298",
+                "maps-j-03299",
+                "maps-j-03300",
+                "maps-j-03301",
+                "maps-j-03302",
+                "maps-j-03303",
+                "maps-j-03304",
+                "maps-j-03305",
+                "maps-j-03306",
+                "maps-j-03307",
+                "maps-j-03308",
+                "maps-j-03309",
+                "maps-j-03310",
+                "maps-j-03311",
+                "maps-j-03312",
+                "maps-j-03313",
+                "maps-j-03314",
+                "maps-j-03315",
+                "maps-j-03316",
+                "maps-j-03317",
+                "maps-j-03318",
+                "maps-j-03319",
+                "maps-j-03320",
+                "maps-j-03321",
+                "maps-j-03322",
+                "maps-j-03323",
+                "maps-j-03324",
+                "maps-j-03325",
+                "maps-j-03326",
+                "maps-j-03327"
+              ],
+              "fieldExtractionBytes": 295473
+            },
+            {
+              "firstEdge": 101,
+              "lastEdge": 150,
+              "edgeIds": [
+                "maps-j-03328",
+                "maps-j-03329",
+                "maps-j-03330",
+                "maps-j-03331",
+                "maps-j-03332",
+                "maps-j-03333",
+                "maps-j-03334",
+                "maps-j-03335",
+                "maps-j-03336",
+                "maps-j-03337",
+                "maps-j-03338",
+                "maps-j-03339",
+                "maps-j-03340",
+                "maps-j-03341",
+                "maps-j-03342",
+                "maps-j-03343",
+                "maps-j-03344",
+                "maps-j-03345",
+                "maps-j-03346",
+                "maps-j-03347",
+                "maps-j-03348",
+                "maps-j-03349",
+                "maps-j-03350",
+                "maps-j-03351",
+                "maps-j-03352",
+                "maps-j-03353",
+                "maps-j-03354",
+                "maps-j-03355",
+                "maps-j-03356",
+                "maps-j-03357",
+                "maps-j-03358",
+                "maps-j-03359",
+                "maps-j-03360",
+                "maps-j-03361",
+                "maps-j-03362",
+                "maps-j-03363",
+                "maps-j-03364",
+                "maps-j-03365",
+                "maps-j-03366",
+                "maps-j-03367",
+                "maps-j-03368",
+                "maps-j-03369",
+                "maps-j-03370",
+                "maps-j-03371",
+                "maps-j-03372",
+                "maps-j-03373",
+                "maps-j-03374",
+                "maps-j-03375",
+                "maps-j-03376",
+                "maps-j-03377"
+              ],
+              "fieldExtractionBytes": 294241
+            },
+            {
+              "firstEdge": 151,
+              "lastEdge": 200,
+              "edgeIds": [
+                "maps-j-03378",
+                "maps-j-03379",
+                "maps-j-03380",
+                "maps-j-03381",
+                "maps-j-03382",
+                "maps-j-03383",
+                "maps-j-03384",
+                "maps-j-03385",
+                "maps-j-03386",
+                "maps-j-03387",
+                "maps-j-03388",
+                "maps-j-03389",
+                "maps-j-03390",
+                "maps-j-03391",
+                "maps-j-03392",
+                "maps-j-03393",
+                "maps-j-03394",
+                "maps-j-03395",
+                "maps-j-03396",
+                "maps-j-03397",
+                "maps-j-03398",
+                "maps-j-03399",
+                "maps-j-03400",
+                "maps-j-03401",
+                "maps-j-03402",
+                "maps-j-03403",
+                "maps-j-03404",
+                "maps-j-03405",
+                "maps-j-03406",
+                "maps-j-03407",
+                "maps-j-03408",
+                "maps-j-03409",
+                "maps-j-03410",
+                "maps-j-03411",
+                "maps-j-03412",
+                "maps-j-03413",
+                "maps-j-03414",
+                "maps-j-03415",
+                "maps-j-03416",
+                "maps-j-03417",
+                "maps-j-03418",
+                "maps-j-03419",
+                "maps-j-03420",
+                "maps-j-03421",
+                "maps-j-03422",
+                "maps-j-03423",
+                "maps-j-03424",
+                "maps-j-03425",
+                "maps-j-03426",
+                "maps-j-03427"
+              ],
+              "fieldExtractionBytes": 303452
+            },
+            {
+              "firstEdge": 201,
+              "lastEdge": 250,
+              "edgeIds": [
+                "maps-j-03428",
+                "maps-j-03429",
+                "maps-j-03430",
+                "maps-j-03431",
+                "maps-j-03432",
+                "maps-j-03433",
+                "maps-j-03434",
+                "maps-j-03435",
+                "maps-j-03436",
+                "maps-j-03437",
+                "maps-j-03438",
+                "maps-j-03439",
+                "maps-j-03440",
+                "maps-j-03441",
+                "maps-j-03442",
+                "maps-j-03443",
+                "maps-j-03444",
+                "maps-j-03445",
+                "maps-j-03446",
+                "maps-j-03447",
+                "maps-j-03448",
+                "maps-j-03449",
+                "maps-j-03450",
+                "maps-j-03451",
+                "maps-j-03452",
+                "maps-j-03453",
+                "maps-j-03454",
+                "maps-j-03455",
+                "maps-j-03456",
+                "maps-j-03457",
+                "maps-j-03458",
+                "maps-j-03459",
+                "maps-j-03460",
+                "maps-j-03461",
+                "maps-j-03462",
+                "maps-j-03463",
+                "maps-j-03464",
+                "maps-j-03465",
+                "maps-j-03466",
+                "maps-j-03467",
+                "maps-j-03468",
+                "maps-j-03469",
+                "maps-j-03470",
+                "maps-j-03471",
+                "maps-j-03472",
+                "maps-j-03473",
+                "maps-j-03474",
+                "maps-j-03475",
+                "maps-j-03476",
+                "maps-j-03477"
+              ],
+              "fieldExtractionBytes": 303502
+            },
+            {
+              "firstEdge": 251,
+              "lastEdge": 300,
+              "edgeIds": [
+                "maps-j-03478",
+                "maps-j-03479",
+                "maps-j-03480",
+                "maps-j-03481",
+                "maps-j-03482",
+                "maps-j-03483",
+                "maps-j-03484",
+                "maps-j-03485",
+                "maps-j-03486",
+                "maps-j-03487",
+                "maps-j-03488",
+                "maps-j-03489",
+                "maps-j-03490",
+                "maps-j-03491",
+                "maps-j-03492",
+                "maps-j-03493",
+                "maps-j-03494",
+                "maps-j-03495",
+                "maps-j-03496",
+                "maps-j-03497",
+                "maps-j-03498",
+                "maps-j-03499",
+                "maps-j-03500",
+                "maps-j-03501",
+                "maps-j-03502",
+                "maps-j-03503",
+                "maps-j-03504",
+                "maps-j-03505",
+                "maps-j-03506",
+                "maps-j-03507",
+                "maps-j-03508",
+                "maps-j-03509",
+                "maps-j-03510",
+                "maps-j-03511",
+                "maps-j-03512",
+                "maps-j-03513",
+                "maps-j-03514",
+                "maps-j-03515",
+                "maps-j-03516",
+                "maps-j-03517",
+                "maps-j-03518",
+                "maps-j-03519",
+                "maps-j-03520",
+                "maps-j-03521",
+                "maps-j-03522",
+                "maps-j-03523",
+                "maps-j-03524",
+                "maps-j-03525",
+                "maps-j-03526",
+                "maps-j-03527"
+              ],
+              "fieldExtractionBytes": 299469
+            },
+            {
+              "firstEdge": 301,
+              "lastEdge": 350,
+              "edgeIds": [
+                "maps-j-03528",
+                "maps-j-03529",
+                "maps-j-03530",
+                "maps-j-03531",
+                "maps-j-03532",
+                "maps-j-03533",
+                "maps-j-03534",
+                "maps-j-03535",
+                "maps-j-03536",
+                "maps-j-03537",
+                "maps-j-03538",
+                "maps-j-03539",
+                "maps-j-03540",
+                "maps-j-03541",
+                "maps-j-03542",
+                "maps-j-03543",
+                "maps-j-03544",
+                "maps-j-03545",
+                "maps-j-03546",
+                "maps-j-03547",
+                "maps-j-03548",
+                "maps-j-03549",
+                "maps-j-03550",
+                "maps-j-03551",
+                "maps-j-03552",
+                "maps-j-03553",
+                "maps-j-03554",
+                "maps-j-03555",
+                "maps-j-03556",
+                "maps-j-03557",
+                "maps-j-03558",
+                "maps-j-03559",
+                "maps-j-03560",
+                "maps-j-03561",
+                "maps-j-03562",
+                "maps-j-03563",
+                "maps-j-03564",
+                "maps-j-03565",
+                "maps-j-03566",
+                "maps-j-03567",
+                "maps-j-03568",
+                "maps-j-03569",
+                "maps-j-03570",
+                "maps-j-03571",
+                "maps-j-03572",
+                "maps-j-03573",
+                "maps-j-03574",
+                "maps-j-03575",
+                "maps-j-03576",
+                "maps-j-03577"
+              ],
+              "fieldExtractionBytes": 306012
+            },
+            {
+              "firstEdge": 351,
+              "lastEdge": 400,
+              "edgeIds": [
+                "maps-j-03578",
+                "maps-j-03579",
+                "maps-j-03580",
+                "maps-j-03581",
+                "maps-j-03582",
+                "maps-j-03583",
+                "maps-j-03584",
+                "maps-j-03585",
+                "maps-j-03586",
+                "maps-j-03587",
+                "maps-j-03588",
+                "maps-j-03589",
+                "maps-j-03590",
+                "maps-j-03591",
+                "maps-j-03592",
+                "maps-j-03593",
+                "maps-j-03594",
+                "maps-j-03595",
+                "maps-j-03596",
+                "maps-j-03597",
+                "maps-j-03598",
+                "maps-j-03599",
+                "maps-j-03600",
+                "maps-j-03601",
+                "maps-j-03602",
+                "maps-j-03603",
+                "maps-j-03604",
+                "maps-j-03605",
+                "maps-j-03606",
+                "maps-j-03607",
+                "maps-j-03608",
+                "maps-j-03609",
+                "maps-j-03610",
+                "maps-j-03611",
+                "maps-j-03612",
+                "maps-j-03613",
+                "maps-j-03614",
+                "maps-j-03615",
+                "maps-j-03616",
+                "maps-j-03617",
+                "maps-j-03618",
+                "maps-j-03619",
+                "maps-j-03620",
+                "maps-j-03621",
+                "maps-j-03622",
+                "maps-j-03623",
+                "maps-j-03624",
+                "maps-j-03625",
+                "maps-j-03626",
+                "maps-j-03627"
+              ],
+              "fieldExtractionBytes": 291372
+            },
+            {
+              "firstEdge": 401,
+              "lastEdge": 450,
+              "edgeIds": [
+                "maps-j-03628",
+                "maps-j-03629",
+                "maps-j-03630",
+                "maps-j-03631",
+                "maps-j-03632",
+                "maps-j-03633",
+                "maps-j-03634",
+                "maps-j-03635",
+                "maps-j-03636",
+                "maps-j-03637",
+                "maps-j-03638",
+                "maps-j-03639",
+                "maps-j-03640",
+                "maps-j-03641",
+                "maps-j-03642",
+                "maps-j-03643",
+                "maps-j-03644",
+                "maps-j-03645",
+                "maps-j-03646",
+                "maps-j-03647",
+                "maps-j-03648",
+                "maps-j-03649",
+                "maps-j-03650",
+                "maps-j-03651",
+                "maps-j-03652",
+                "maps-j-03653",
+                "maps-j-03654",
+                "maps-j-03655",
+                "maps-j-03656",
+                "maps-j-03657",
+                "maps-j-03658",
+                "maps-j-03659",
+                "maps-j-03660",
+                "maps-j-03661",
+                "maps-j-03662",
+                "maps-j-03663",
+                "maps-j-03664",
+                "maps-j-03665",
+                "maps-j-03666",
+                "maps-j-03667",
+                "maps-j-03668",
+                "maps-j-03669",
+                "maps-j-03670",
+                "maps-j-03671",
+                "maps-j-03672",
+                "maps-j-03673",
+                "maps-j-03674",
+                "maps-j-03675",
+                "maps-j-03676",
+                "maps-j-03677"
+              ],
+              "fieldExtractionBytes": 297635
+            },
+            {
+              "firstEdge": 451,
+              "lastEdge": 500,
+              "edgeIds": [
+                "maps-j-03678",
+                "maps-j-03679",
+                "maps-j-03680",
+                "maps-j-03681",
+                "maps-j-03682",
+                "maps-j-03683",
+                "maps-j-03684",
+                "maps-j-03685",
+                "maps-j-03686",
+                "maps-j-03687",
+                "maps-j-03688",
+                "maps-j-03689",
+                "maps-j-03690",
+                "maps-j-03691",
+                "maps-j-03692",
+                "maps-j-03693",
+                "maps-j-03694",
+                "maps-j-03695",
+                "maps-j-03696",
+                "maps-j-03697",
+                "maps-j-03698",
+                "maps-j-03699",
+                "maps-j-03700",
+                "maps-j-03701",
+                "maps-j-03702",
+                "maps-j-03703",
+                "maps-j-03704",
+                "maps-j-03705",
+                "maps-j-03706",
+                "maps-j-03707",
+                "maps-j-03708",
+                "maps-j-03709",
+                "maps-j-03710",
+                "maps-j-03711",
+                "maps-j-03712",
+                "maps-j-03713",
+                "maps-j-03714",
+                "maps-j-03715",
+                "maps-j-03716",
+                "maps-j-03717",
+                "maps-j-03718",
+                "maps-j-03719",
+                "maps-j-03720",
+                "maps-j-03721",
+                "maps-j-03722",
+                "maps-j-03723",
+                "maps-j-03724",
+                "maps-j-03725",
+                "maps-j-03726",
+                "maps-j-03727"
+              ],
+              "fieldExtractionBytes": 282457
+            },
+            {
+              "firstEdge": 501,
+              "lastEdge": 506,
+              "edgeIds": [
+                "maps-j-03728",
+                "maps-j-03729",
+                "maps-j-03730",
+                "maps-j-03731",
+                "maps-j-03732",
+                "maps-j-03733"
+              ],
+              "fieldExtractionBytes": 34775
+            }
+          ],
+          "sourcePages": [
+            {
+              "firstLine": 1,
+              "lastLine": 80
+            },
+            {
+              "firstLine": 81,
+              "lastLine": 160
+            },
+            {
+              "firstLine": 161,
+              "lastLine": 240
+            },
+            {
+              "firstLine": 241,
+              "lastLine": 320
+            },
+            {
+              "firstLine": 321,
+              "lastLine": 400
+            },
+            {
+              "firstLine": 401,
+              "lastLine": 480
+            },
+            {
+              "firstLine": 481,
+              "lastLine": 560
+            },
+            {
+              "firstLine": 561,
+              "lastLine": 640
+            },
+            {
+              "firstLine": 641,
+              "lastLine": 720
+            },
+            {
+              "firstLine": 721,
+              "lastLine": 800
+            },
+            {
+              "firstLine": 801,
+              "lastLine": 880
+            },
+            {
+              "firstLine": 881,
+              "lastLine": 960
+            },
+            {
+              "firstLine": 961,
+              "lastLine": 1040
+            },
+            {
+              "firstLine": 1041,
+              "lastLine": 1120
+            },
+            {
+              "firstLine": 1121,
+              "lastLine": 1200
+            },
+            {
+              "firstLine": 1201,
+              "lastLine": 1280
+            },
+            {
+              "firstLine": 1281,
+              "lastLine": 1360
+            },
+            {
+              "firstLine": 1361,
+              "lastLine": 1440
+            },
+            {
+              "firstLine": 1441,
+              "lastLine": 1520
+            },
+            {
+              "firstLine": 1521,
+              "lastLine": 1600
+            },
+            {
+              "firstLine": 1601,
+              "lastLine": 1680
+            },
+            {
+              "firstLine": 1681,
+              "lastLine": 1760
+            },
+            {
+              "firstLine": 1761,
+              "lastLine": 1840
+            },
+            {
+              "firstLine": 1841,
+              "lastLine": 1920
+            },
+            {
+              "firstLine": 1921,
+              "lastLine": 2000
+            },
+            {
+              "firstLine": 2001,
+              "lastLine": 2080
+            },
+            {
+              "firstLine": 2081,
+              "lastLine": 2160
+            },
+            {
+              "firstLine": 2161,
+              "lastLine": 2240
+            },
+            {
+              "firstLine": 2241,
+              "lastLine": 2320
+            },
+            {
+              "firstLine": 2321,
+              "lastLine": 2400
+            },
+            {
+              "firstLine": 2401,
+              "lastLine": 2480
+            },
+            {
+              "firstLine": 2481,
+              "lastLine": 2560
+            },
+            {
+              "firstLine": 2561,
+              "lastLine": 2640
+            },
+            {
+              "firstLine": 2641,
+              "lastLine": 2720
+            },
+            {
+              "firstLine": 2721,
+              "lastLine": 2800
+            },
+            {
+              "firstLine": 2801,
+              "lastLine": 2880
+            },
+            {
+              "firstLine": 2881,
+              "lastLine": 2960
+            },
+            {
+              "firstLine": 2961,
+              "lastLine": 3040
+            },
+            {
+              "firstLine": 3041,
+              "lastLine": 3120
+            },
+            {
+              "firstLine": 3121,
+              "lastLine": 3200
+            },
+            {
+              "firstLine": 3201,
+              "lastLine": 3280
+            },
+            {
+              "firstLine": 3281,
+              "lastLine": 3360
+            },
+            {
+              "firstLine": 3361,
+              "lastLine": 3440
+            },
+            {
+              "firstLine": 3441,
+              "lastLine": 3520
+            },
+            {
+              "firstLine": 3521,
+              "lastLine": 3600
+            },
+            {
+              "firstLine": 3601,
+              "lastLine": 3680
+            },
+            {
+              "firstLine": 3681,
+              "lastLine": 3760
+            },
+            {
+              "firstLine": 3761,
+              "lastLine": 3840
+            },
+            {
+              "firstLine": 3841,
+              "lastLine": 3920
+            },
+            {
+              "firstLine": 3921,
+              "lastLine": 4000
+            },
+            {
+              "firstLine": 4001,
+              "lastLine": 4080
+            },
+            {
+              "firstLine": 4081,
+              "lastLine": 4160
+            },
+            {
+              "firstLine": 4161,
+              "lastLine": 4240
+            },
+            {
+              "firstLine": 4241,
+              "lastLine": 4320
+            },
+            {
+              "firstLine": 4321,
+              "lastLine": 4400
+            },
+            {
+              "firstLine": 4401,
+              "lastLine": 4480
+            },
+            {
+              "firstLine": 4481,
+              "lastLine": 4560
+            },
+            {
+              "firstLine": 4561,
+              "lastLine": 4640
+            },
+            {
+              "firstLine": 4641,
+              "lastLine": 4720
+            },
+            {
+              "firstLine": 4721,
+              "lastLine": 4800
+            },
+            {
+              "firstLine": 4801,
+              "lastLine": 4880
+            },
+            {
+              "firstLine": 4881,
+              "lastLine": 4960
+            },
+            {
+              "firstLine": 4961,
+              "lastLine": 5040
+            },
+            {
+              "firstLine": 5041,
+              "lastLine": 5120
+            },
+            {
+              "firstLine": 5121,
+              "lastLine": 5130
+            }
+          ]
+        }
+      ],
+      "fileCount": 1,
+      "edgeCount": 506,
+      "indivisibleException": true,
+      "recordAndSourceBytes": 3244124
+    },
+    {
+      "part": 5,
+      "report": "review-a38-step-03-wave5c-p05.md",
+      "files": [
+        {
+          "file": "docs/io-contract.md",
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-130.jsonl",
+          "sourceDigest": "f105d675aee40f04d581f4a3e99be18a0bc64f8fb6de7b063cba4123c334d2d0",
+          "diffSha256": "3c1935d1ae5d83760f18b50c14c94c1079510c3afd3aa97af583fec0048ec932",
+          "recordSha256": "37b2fd63d2e3a778218cf17288ec30cdb7cd49c1ffea6e51c8ad63e9e72e52d1",
+          "recordBytes": 257264,
+          "membership": {
+            "set": "batch-130",
+            "patchedSample": true,
+            "mandatory": false,
+            "unpatchedSample": false
+          },
+          "edgePages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 11,
+              "edgeIds": [
+                "maps-j-04104",
+                "maps-j-04105",
+                "maps-j-04106",
+                "maps-j-04107",
+                "maps-j-04108",
+                "maps-j-04109",
+                "maps-j-04110",
+                "maps-j-04111",
+                "maps-j-04112",
+                "maps-j-04113",
+                "maps-j-04114"
+              ],
+              "fieldExtractionBytes": 22136
+            }
+          ],
+          "sourcePages": [
+            {
+              "firstLine": 1,
+              "lastLine": 80
+            },
+            {
+              "firstLine": 81,
+              "lastLine": 160
+            },
+            {
+              "firstLine": 161,
+              "lastLine": 221
+            }
+          ]
+        }
+      ],
+      "fileCount": 1,
+      "edgeCount": 11,
+      "indivisibleException": false,
+      "recordAndSourceBytes": 274233
+    },
+    {
+      "part": 6,
+      "report": "review-a38-step-03-wave5c-p06.md",
+      "files": [
+        {
+          "file": "docs/transitional-switchboard.md",
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-130.jsonl",
+          "sourceDigest": "b058029179bae791d084a6881660adc3f64da7537d4880cd51421158f8e2b752",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordSha256": "4023b03ea1c9f416311c8654fc6b99a3b90971104d5dfa7ac7f0586fd3c19c1a",
+          "recordBytes": 89379,
+          "membership": {
+            "set": "batch-130",
+            "patchedSample": false,
+            "mandatory": true,
+            "unpatchedSample": false
+          },
+          "edgePages": [
+            {
+              "firstEdge": 1,
+              "lastEdge": 50,
+              "edgeIds": [
+                "maps-j-08389",
+                "maps-j-08390",
+                "maps-j-08391",
+                "maps-j-08392",
+                "maps-j-08393",
+                "maps-j-08394",
+                "maps-j-08395",
+                "maps-j-08396",
+                "maps-j-08397",
+                "maps-j-08398",
+                "maps-j-08399",
+                "maps-j-08400",
+                "maps-j-08401",
+                "maps-j-08402",
+                "maps-j-08403",
+                "maps-j-08404",
+                "maps-j-08405",
+                "maps-j-08406",
+                "maps-j-08407",
+                "maps-j-08408",
+                "maps-j-08409",
+                "maps-j-08410",
+                "maps-j-08411",
+                "maps-j-08412",
+                "maps-j-08413",
+                "maps-j-08414",
+                "maps-j-08415",
+                "maps-j-08416",
+                "maps-j-08417",
+                "maps-j-08418",
+                "maps-j-08419",
+                "maps-j-08420",
+                "maps-j-08421",
+                "maps-j-08422",
+                "maps-j-08423",
+                "maps-j-08424",
+                "maps-j-08425",
+                "maps-j-08426",
+                "maps-j-08427",
+                "maps-j-08428",
+                "maps-j-08429",
+                "maps-j-08430",
+                "maps-j-08431",
+                "maps-j-08432",
+                "maps-j-08433",
+                "maps-j-08434",
+                "maps-j-08435",
+                "maps-j-08436",
+                "maps-j-08437",
+                "maps-j-08438"
+              ],
+              "fieldExtractionBytes": 70158
+            },
+            {
+              "firstEdge": 51,
+              "lastEdge": 69,
+              "edgeIds": [
+                "maps-j-08439",
+                "maps-j-08440",
+                "maps-j-08441",
+                "maps-j-08442",
+                "maps-j-08443",
+                "maps-j-08444",
+                "maps-j-08445",
+                "maps-j-08446",
+                "maps-j-08447",
+                "maps-j-08448",
+                "maps-j-08449",
+                "maps-j-08450",
+                "maps-j-08451",
+                "maps-j-08452",
+                "maps-j-08453",
+                "maps-j-08454",
+                "maps-j-08455",
+                "maps-j-08456",
+                "maps-j-08457"
+              ],
+              "fieldExtractionBytes": 19725
+            }
+          ],
+          "sourcePages": [
+            {
+              "firstLine": 1,
+              "lastLine": 80
+            },
+            {
+              "firstLine": 81,
+              "lastLine": 119
+            }
+          ]
+        }
+      ],
+      "fileCount": 1,
+      "edgeCount": 69,
+      "indivisibleException": false,
+      "recordAndSourceBytes": 102586
+    }
+  ]
+}

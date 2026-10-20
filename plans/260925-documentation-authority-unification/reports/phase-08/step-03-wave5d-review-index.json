@@ -1,0 +1,733 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "newBatches": [
+    "123",
+    "124",
+    "125"
+  ],
+  "authorOrder": [
+    "125",
+    "124",
+    "123"
+  ],
+  "unstartedBatches": [
+    "122",
+    "121",
+    "120",
+    "119",
+    "118",
+    "117",
+    "116",
+    "115",
+    "114",
+    "113",
+    "112",
+    "111",
+    "110",
+    "109",
+    "108",
+    "107",
+    "106",
+    "105"
+  ],
+  "selections": [
+    {
+      "set": "batch-123",
+      "patchedPopulation": 1,
+      "patchedSample": 1,
+      "mandatory": 0,
+      "eligibleUnpatchedPopulation": 5,
+      "unpatchedSample": 1,
+      "distinctSelected": 2,
+      "reviewedDenominator": 0,
+      "reworkNumerator": "pending",
+      "openLeadRulingEdges": []
+    },
+    {
+      "set": "batch-124",
+      "patchedPopulation": 0,
+      "patchedSample": 0,
+      "mandatory": 0,
+      "eligibleUnpatchedPopulation": 4,
+      "unpatchedSample": 1,
+      "distinctSelected": 1,
+      "reviewedDenominator": 0,
+      "reworkNumerator": "pending",
+      "openLeadRulingEdges": []
+    },
+    {
+      "set": "batch-125",
+      "patchedPopulation": 12,
+      "patchedSample": 2,
+      "mandatory": 1,
+      "eligibleUnpatchedPopulation": 1,
+      "unpatchedSample": 1,
+      "distinctSelected": 4,
+      "reviewedDenominator": 0,
+      "reworkNumerator": "pending",
+      "openLeadRulingEdges": []
+    }
+  ],
+  "distinctFiles": 7,
+  "selectedEdges": 19,
+  "parts": [
+    {
+      "part": 1,
+      "output": "review-a38-step-03-wave5d-p01.md",
+      "files": [
+        {
+          "file": "docs/reference/coding-worker-contract-shape.md",
+          "set": "batch-123",
+          "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-123.jsonl",
+          "sourceSha256": "03c68ea5ffbd57348f328221b46c8ef7a31c51b47fdaaf627be95ebc5427da4f",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordSha256": "dbabb6badc5e65f23273f65df61e53765074f042ebe16f1995acf73bcd9f3bb5",
+          "sourceBytes": 4448,
+          "edges": 1,
+          "mandatory": false,
+          "sourcePages": [
+            {
+              "firstCharacter": 0,
+              "lastCharacterExclusive": 4418,
+              "bytes": 4448,
+              "sha256": "03c68ea5ffbd57348f328221b46c8ef7a31c51b47fdaaf627be95ebc5427da4f"
+            }
+          ],
+          "edgePages": [
+            {
+              "start": 0,
+              "stopExclusive": 1
+            }
+          ],
+          "reason": "seeded unpatched"
+        },
+        {
+          "file": "docs/reference/dispatch-module-boundaries.md",
+          "set": "batch-123",
+          "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-123.jsonl",
+          "sourceSha256": "99cf0a339d63912ea095fe4bb2fcd5a5f18064f467029c3365f0d6ed8eb0dde9",
+          "diffSha256": "bfab89aa76d1166af4702bd2326d6b81ab17e6e24c44d43e2eb7976626931370",
+          "recordSha256": "482d9b94e865c15c55c80a0e2c2e669d003762ff3552e3c8904748c33f7396f6",
+          "sourceBytes": 4229,
+          "edges": 2,
+          "mandatory": false,
+          "sourcePages": [
+            {
+              "firstCharacter": 0,
+              "lastCharacterExclusive": 4211,
+              "bytes": 4229,
+              "sha256": "99cf0a339d63912ea095fe4bb2fcd5a5f18064f467029c3365f0d6ed8eb0dde9"
+            }
+          ],
+          "edgePages": [
+            {
+              "start": 0,
+              "stopExclusive": 2
+            }
+          ],
+          "reason": "seeded patched"
+        },
+        {
+          "file": "docs/templates/contract.md",
+          "set": "batch-124",
+          "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-124.jsonl",
+          "sourceSha256": "5e894fbda25b858b80740a1676032dac9e2ede0aa5cd12b566506e7123d69a4d",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordSha256": "f38647c3172b395fea90dc422512acadd6871a80e1874a2fc6ea5d019f31aff2",
+          "sourceBytes": 1192,
+          "edges": 2,
+          "mandatory": false,
+          "sourcePages": [
+            {
+              "firstCharacter": 0,
+              "lastCharacterExclusive": 1192,
+              "bytes": 1192,
+              "sha256": "5e894fbda25b858b80740a1676032dac9e2ede0aa5cd12b566506e7123d69a4d"
+            }
+          ],
+          "edgePages": [
+            {
+              "start": 0,
+              "stopExclusive": 2
+            }
+          ],
+          "reason": "seeded unpatched"
+        },
+        {
+          "file": "docs/ui-spec/15-system-events.md",
+          "set": "batch-125",
+          "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-125.jsonl",
+          "sourceSha256": "c0cd51f52e54872823d6f683bc25ff396df706712ef76b57794de5e0fcca75a9",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordSha256": "f54da60cd1eb43b54c6540ab80830d5ded106a964983320ae3a0ba5611b80859",
+          "sourceBytes": 2058,
+          "edges": 1,
+          "mandatory": false,
+          "sourcePages": [
+            {
+              "firstCharacter": 0,
+              "lastCharacterExclusive": 2052,
+              "bytes": 2058,
+              "sha256": "c0cd51f52e54872823d6f683bc25ff396df706712ef76b57794de5e0fcca75a9"
+            }
+          ],
+          "edgePages": [
+            {
+              "start": 0,
+              "stopExclusive": 1
+            }
+          ],
+          "reason": "seeded unpatched"
+        },
+        {
+          "file": "docs/ui-spec/modals/M02-approve-merge.md",
+          "set": "batch-125",
+          "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-125.jsonl",
+          "sourceSha256": "f52cb369e8ec0039fa64b0f4a7ca3bbf9ccfd37b3fe2fc342a410d59c5bb23b8",
+          "diffSha256": "a5a393f45a82e8bb0bf4ead780ecc03c78996dc1c6515d88643e1e26d1ffa94c",
+          "recordSha256": "d126a0581b6422379637113c6b654a61be3bcf8714f1324540267eecec2e1bbb",
+          "sourceBytes": 3802,
+          "edges": 1,
+          "mandatory": false,
+          "sourcePages": [
+            {
+              "firstCharacter": 0,
+              "lastCharacterExclusive": 3192,
+              "bytes": 3802,
+              "sha256": "f52cb369e8ec0039fa64b0f4a7ca3bbf9ccfd37b3fe2fc342a410d59c5bb23b8"
+            }
+          ],
+          "edgePages": [
+            {
+              "start": 0,
+              "stopExclusive": 1
+            }
+          ],
+          "reason": "seeded patched"
+        },
+        {
+          "file": "docs/ui-spec/modals/M03-add-edit-item.md",
+          "set": "batch-125",
+          "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-125.jsonl",
+          "sourceSha256": "b0a16742180949c5a1b6836690c67c74c9dbd7f0ebf400d3c26eb7a4d18fe3d1",
+          "diffSha256": "d3fb1017975cc5a866a575f1b16c43f29d9a283825e97977bef97f15dec52177",
+          "recordSha256": "dbefd15c96e72b730229dd54320f84e72d7f6a0ab8c34353e60ee9aceb5e42ba",
+          "sourceBytes": 3587,
+          "edges": 1,
+          "mandatory": false,
+          "sourcePages": [
+            {
+              "firstCharacter": 0,
+              "lastCharacterExclusive": 2886,
+              "bytes": 3587,
+              "sha256": "b0a16742180949c5a1b6836690c67c74c9dbd7f0ebf400d3c26eb7a4d18fe3d1"
+            }
+          ],
+          "edgePages": [
+            {
+              "start": 0,
+              "stopExclusive": 1
+            }
+          ],
+          "reason": "seeded patched"
+        }
+      ],
+      "fileCount": 6,
+      "edges": 8,
+      "indivisibleLargeFile": false
+    },
+    {
+      "part": 2,
+      "output": "review-a38-step-03-wave5d-p02.md",
+      "files": [
+        {
+          "file": "docs/ui-spec/generated/wireframe-v2.html",
+          "set": "batch-125",
+          "recordPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-125.jsonl",
+          "sourceSha256": "77894fdda0966833d6d9ba595745a315db67d64feea7c9e6d5faed34a8d2ce80",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordSha256": "233455738b4723681a5db3241e7a9c1c220d08d02e14f1112e43890a6f49e32f",
+          "sourceBytes": 631319,
+          "edges": 11,
+          "mandatory": true,
+          "sourcePages": [
+            {
+              "firstCharacter": 0,
+              "lastCharacterExclusive": 8000,
+              "bytes": 8083,
+              "sha256": "122edb9b9a4cba3c38a045e3352a1bcb54718a0f2f7e90d9af65540af577360c"
+            },
+            {
+              "firstCharacter": 8000,
+              "lastCharacterExclusive": 16000,
+              "bytes": 8282,
+              "sha256": "45cd4991ed3107ed162142f1b438bb117b735629cd45911ce87b2f929899d9b2"
+            },
+            {
+              "firstCharacter": 16000,
+              "lastCharacterExclusive": 24000,
+              "bytes": 8168,
+              "sha256": "73b8e8ac419acfa15cec2650db0f945c8e63e427efd7d80c7bc27c5dc9971439"
+            },
+            {
+              "firstCharacter": 24000,
+              "lastCharacterExclusive": 32000,
+              "bytes": 8000,
+              "sha256": "2a9ba2c65aad703f06fb05ef3a344476327994f0447932744f527ac3d676ae95"
+            },
+            {
+              "firstCharacter": 32000,
+              "lastCharacterExclusive": 40000,
+              "bytes": 8000,
+              "sha256": "5f95d76dd860349a1f187dfa7891ed0e2f337d4d535aa6f2a5be292faa4f0cfb"
+            },
+            {
+              "firstCharacter": 40000,
+              "lastCharacterExclusive": 48000,
+              "bytes": 8000,
+              "sha256": "01ccd6c625c8a2368a15e7c43bc70c17c914c0a2112fd395fa336afdbe79621c"
+            },
+            {
+              "firstCharacter": 48000,
+              "lastCharacterExclusive": 56000,
+              "bytes": 8000,
+              "sha256": "3c3dc688a6f029ffdd512c9172d1f641236f3ea05600f790d0b63335651da5a4"
+            },
+            {
+              "firstCharacter": 56000,
+              "lastCharacterExclusive": 64000,
+              "bytes": 8000,
+              "sha256": "e20448e6c3a80d25c0cb24569357c41f9f4e3678305890e358e5d831cb3bebf9"
+            },
+            {
+              "firstCharacter": 64000,
+              "lastCharacterExclusive": 72000,
+              "bytes": 8000,
+              "sha256": "fad2ac8eb3a8bf81f7bb817daceb4748077ce137996d813be9bcb870064f9d98"
+            },
+            {
+              "firstCharacter": 72000,
+              "lastCharacterExclusive": 80000,
+              "bytes": 8000,
+              "sha256": "74b1ab1fea848f94da2419d458e23dafa5c1d64147d925b2316ec5c688517162"
+            },
+            {
+              "firstCharacter": 80000,
+              "lastCharacterExclusive": 88000,
+              "bytes": 8000,
+              "sha256": "bd0732302cf90a09747db88600d9506aec909523ccae22af47ec25991a8cf3d1"
+            },
+            {
+              "firstCharacter": 88000,
+              "lastCharacterExclusive": 96000,
+              "bytes": 8000,
+              "sha256": "274bd6268b881c66f054af3415054db9333f04c82238b6de67a00aa648252031"
+            },
+            {
+              "firstCharacter": 96000,
+              "lastCharacterExclusive": 104000,
+              "bytes": 8000,
+              "sha256": "f15792e7ae0bf4a9f80e412295ebbc121a64aad460a417204d7b3102efb926b6"
+            },
+            {
+              "firstCharacter": 104000,
+              "lastCharacterExclusive": 112000,
+              "bytes": 8000,
+              "sha256": "4e74810d03c743fa901e0aa2813e0ffc2e2a3f83d67a47fe4c765cff2ca24bd9"
+            },
+            {
+              "firstCharacter": 112000,
+              "lastCharacterExclusive": 120000,
+              "bytes": 8000,
+              "sha256": "20b90370ab706e92da77394186e8b25c7976402f7de9276eee75f07b836aa462"
+            },
+            {
+              "firstCharacter": 120000,
+              "lastCharacterExclusive": 128000,
+              "bytes": 8000,
+              "sha256": "8ee67f8484e6dd67e6256ddbdb829543c6d49bae5cabfa59438386b2f7eca80d"
+            },
+            {
+              "firstCharacter": 128000,
+              "lastCharacterExclusive": 136000,
+              "bytes": 8000,
+              "sha256": "6b7a24cee04a253ebbc31efe073f0c72c94497eb3cf9a83881628434053143eb"
+            },
+            {
+              "firstCharacter": 136000,
+              "lastCharacterExclusive": 144000,
+              "bytes": 8000,
+              "sha256": "17a8d73af85476c60346d72b55fdc60b4b076d2292bdf1779bbb622fb37e4dcd"
+            },
+            {
+              "firstCharacter": 144000,
+              "lastCharacterExclusive": 152000,
+              "bytes": 8000,
+              "sha256": "3348cb34d22315910bf477030188b4ab477ffb7b1017583afb8e1168751b34fc"
+            },
+            {
+              "firstCharacter": 152000,
+              "lastCharacterExclusive": 160000,
+              "bytes": 8000,
+              "sha256": "0fd5532d3bd1fcb22213234a13bcfa7e766a00f331c31ab3fc564578ecacfafb"
+            },
+            {
+              "firstCharacter": 160000,
+              "lastCharacterExclusive": 168000,
+              "bytes": 8000,
+              "sha256": "6f8aca4e49139f3bde31367742fa0a9073639afec33c3b25db95fc5333e470ce"
+            },
+            {
+              "firstCharacter": 168000,
+              "lastCharacterExclusive": 176000,
+              "bytes": 8000,
+              "sha256": "fc0707c6fe2f70079063c4dcfef5812cd8a56aec3c154bcf3143bb7c18adb71a"
+            },
+            {
+              "firstCharacter": 176000,
+              "lastCharacterExclusive": 184000,
+              "bytes": 8000,
+              "sha256": "46a5ca95ff98309d16b0a091a4bfb3c025fd6ee0f5a9d8f7b266c6e55df5728c"
+            },
+            {
+              "firstCharacter": 184000,
+              "lastCharacterExclusive": 192000,
+              "bytes": 8000,
+              "sha256": "67708c9ff27dc73d02a4dff0050c7da35dda2514b6eaea0ed05b432d58a174d2"
+            },
+            {
+              "firstCharacter": 192000,
+              "lastCharacterExclusive": 200000,
+              "bytes": 8000,
+              "sha256": "14edf01aff6e8ec512f3e1cabe30a7b33db6d17105abe5446363d43eb524c9a6"
+            },
+            {
+              "firstCharacter": 200000,
+              "lastCharacterExclusive": 208000,
+              "bytes": 8000,
+              "sha256": "5594f0b43409650af4911d332e98aa12a069605a9b3b5482fc4d5bb7c33a4c7c"
+            },
+            {
+              "firstCharacter": 208000,
+              "lastCharacterExclusive": 216000,
+              "bytes": 8000,
+              "sha256": "699a4e0cf45b6f9db8e147545de2338cc346c849b131924c7926cdf074e0e8ce"
+            },
+            {
+              "firstCharacter": 216000,
+              "lastCharacterExclusive": 224000,
+              "bytes": 8000,
+              "sha256": "0609ef2d3a50d1b2227ef53be4e3cb7c00ed20b19714eeaa15e0bf5c9dd7d342"
+            },
+            {
+              "firstCharacter": 224000,
+              "lastCharacterExclusive": 232000,
+              "bytes": 8000,
+              "sha256": "8183d3c5ab98e553115ec75db5ab031adf3f9fc1105af75f6207f4f1b4192e40"
+            },
+            {
+              "firstCharacter": 232000,
+              "lastCharacterExclusive": 240000,
+              "bytes": 8000,
+              "sha256": "6c97f806f48d00779f096dfd2f401304ff079dbaefea140a050da459796efc61"
+            },
+            {
+              "firstCharacter": 240000,
+              "lastCharacterExclusive": 248000,
+              "bytes": 8000,
+              "sha256": "eafcf90613facb5faacbadcf8fb98ef4a45495c57c08db37a95e2ff7093ff080"
+            },
+            {
+              "firstCharacter": 248000,
+              "lastCharacterExclusive": 256000,
+              "bytes": 8000,
+              "sha256": "d3c2ec022c1140cdbfe6c16aa276b67c8b874e7540855f4289fc110ddc2b5587"
+            },
+            {
+              "firstCharacter": 256000,
+              "lastCharacterExclusive": 264000,
+              "bytes": 8000,
+              "sha256": "04ce4534847f273fc84b6c0468063745280644e74f94c1a2efbd969a2932ab30"
+            },
+            {
+              "firstCharacter": 264000,
+              "lastCharacterExclusive": 272000,
+              "bytes": 8000,
+              "sha256": "a21eafaf973cd7eaa04066515e7cee1b7853ddeee924a6b5197b6853022c45c9"
+            },
+            {
+              "firstCharacter": 272000,
+              "lastCharacterExclusive": 280000,
+              "bytes": 8000,
+              "sha256": "02e586c6b97347f3ec0385f922e2e6e1a473f66142c70069d22db8ab933554e6"
+            },
+            {
+              "firstCharacter": 280000,
+              "lastCharacterExclusive": 288000,
+              "bytes": 8000,
+              "sha256": "9bb8fa72d2e8854c87f84042885bb76075fef55d06b4ada89b0fc64ccb4ee8e5"
+            },
+            {
+              "firstCharacter": 288000,
+              "lastCharacterExclusive": 296000,
+              "bytes": 8000,
+              "sha256": "d0ded235f214543530d5829fd6ad3d509acec99d2bf6dcafb3194caf0911b999"
+            },
+            {
+              "firstCharacter": 296000,
+              "lastCharacterExclusive": 304000,
+              "bytes": 8006,
+              "sha256": "b8f9780b28e941db88ea9e7a633f4c254e5e450a0984328e8a9031dd7ac8fcd5"
+            },
+            {
+              "firstCharacter": 304000,
+              "lastCharacterExclusive": 312000,
+              "bytes": 8000,
+              "sha256": "b26c4e94ad1ce214c474a512a0f06184397f8cc53d9feded44c9f33beaf42e88"
+            },
+            {
+              "firstCharacter": 312000,
+              "lastCharacterExclusive": 320000,
+              "bytes": 8000,
+              "sha256": "14906e1553417460f0d6b7b067943d18442e9aef8b164479736599c028afe538"
+            },
+            {
+              "firstCharacter": 320000,
+              "lastCharacterExclusive": 328000,
+              "bytes": 8000,
+              "sha256": "0b04590a418d459616a9cd40f6ddf6373ae8c113d41aadc104266c936b57f9d2"
+            },
+            {
+              "firstCharacter": 328000,
+              "lastCharacterExclusive": 336000,
+              "bytes": 8000,
+              "sha256": "0fb7266699823b4f1a064384e31cd75bb6a476d6caff2a2a7a379814746b5082"
+            },
+            {
+              "firstCharacter": 336000,
+              "lastCharacterExclusive": 344000,
+              "bytes": 8000,
+              "sha256": "1c7921daaa401ebb382ed851c0a3545815d2d867b9e33e5b552668985cde2851"
+            },
+            {
+              "firstCharacter": 344000,
+              "lastCharacterExclusive": 352000,
+              "bytes": 8000,
+              "sha256": "b4fdc2119bb27401f587ac2d970a4ea5366c2ec7e40f48c2f1388974c3dd88de"
+            },
+            {
+              "firstCharacter": 352000,
+              "lastCharacterExclusive": 360000,
+              "bytes": 8000,
+              "sha256": "f462d1d5ad65dc1ef6f52d61903fb57c8b1e7f60819d62363dd28b03505ccabc"
+            },
+            {
+              "firstCharacter": 360000,
+              "lastCharacterExclusive": 368000,
+              "bytes": 8000,
+              "sha256": "73768444b264a27d465ec92a7830ec56e528ed80f27f7af4a2c447dca5e8ce84"
+            },
+            {
+              "firstCharacter": 368000,
+              "lastCharacterExclusive": 376000,
+              "bytes": 8000,
+              "sha256": "12dcd1991af13c0f32e79fa1a1ec95ec02fa433d85ae33af3973d3543038a93f"
+            },
+            {
+              "firstCharacter": 376000,
+              "lastCharacterExclusive": 384000,
+              "bytes": 8000,
+              "sha256": "62880e7c63211abb2e9d5c360ab587454c727a8b3a7a07fac2fad877d28f3645"
+            },
+            {
+              "firstCharacter": 384000,
+              "lastCharacterExclusive": 392000,
+              "bytes": 8000,
+              "sha256": "b7fc6327b63283874615f4e2eec7385e1405a3d78d272724be4dbae2b3ab62b1"
+            },
+            {
+              "firstCharacter": 392000,
+              "lastCharacterExclusive": 400000,
+              "bytes": 8000,
+              "sha256": "7a97a8bc6670ec1d89aa35df72185c8647cea23e3ab175f6b7dda816ea233198"
+            },
+            {
+              "firstCharacter": 400000,
+              "lastCharacterExclusive": 408000,
+              "bytes": 8000,
+              "sha256": "7679e4f2032208e6a325112beef31476d63aff1775dd6cf5b00d3719647ec55a"
+            },
+            {
+              "firstCharacter": 408000,
+              "lastCharacterExclusive": 416000,
+              "bytes": 8000,
+              "sha256": "454e4a560dc5d9b65c0b3a88399690612c0cca01765a662d917c1164807dec3a"
+            },
+            {
+              "firstCharacter": 416000,
+              "lastCharacterExclusive": 424000,
+              "bytes": 8000,
+              "sha256": "dce84f0121aec21db1d6fb5255eb0a2e59c22fe7733a3507a174f6ed02f2b5c3"
+            },
+            {
+              "firstCharacter": 424000,
+              "lastCharacterExclusive": 432000,
+              "bytes": 8000,
+              "sha256": "ec2bde9a10faa051fde4440b84a3290004d4d0f1c7d0a9f8ae990280e6ba8964"
+            },
+            {
+              "firstCharacter": 432000,
+              "lastCharacterExclusive": 440000,
+              "bytes": 8000,
+              "sha256": "d81bc77de1d8f6ef92828ebbf15cd05fc51c390daf9300f35afd1beafc1e98b9"
+            },
+            {
+              "firstCharacter": 440000,
+              "lastCharacterExclusive": 448000,
+              "bytes": 8000,
+              "sha256": "99f247a2166210fc2343e6e9693d32daea1916bc6001155da547c2bc6a400d2c"
+            },
+            {
+              "firstCharacter": 448000,
+              "lastCharacterExclusive": 456000,
+              "bytes": 8000,
+              "sha256": "7b0d947a3d032d5f2a720a0df2207488fd1de67506addced204fe90628ad51d9"
+            },
+            {
+              "firstCharacter": 456000,
+              "lastCharacterExclusive": 464000,
+              "bytes": 8000,
+              "sha256": "fcc1ec77d09b831dae8d6b5b035d902f95e6a8db9bab39121b1236c5c25658ae"
+            },
+            {
+              "firstCharacter": 464000,
+              "lastCharacterExclusive": 472000,
+              "bytes": 8000,
+              "sha256": "38a1e51574d2ca7babbce8ddbb9e9e807ddfd03e2adf8c907113bda70dcbe92e"
+            },
+            {
+              "firstCharacter": 472000,
+              "lastCharacterExclusive": 480000,
+              "bytes": 8000,
+              "sha256": "efec7d8abc548df567992556e329f9b79137ebbdd97d4f81f6087220168cfb6e"
+            },
+            {
+              "firstCharacter": 480000,
+              "lastCharacterExclusive": 488000,
+              "bytes": 8000,
+              "sha256": "133bcc8b010a124e7f8af8b8c24881c8289555afda54bb9b615ba92289884233"
+            },
+            {
+              "firstCharacter": 488000,
+              "lastCharacterExclusive": 496000,
+              "bytes": 8000,
+              "sha256": "cb5b161f00c17a3e1ee34eb3e9a41860beea902f3960f5247b4aedc2846827e0"
+            },
+            {
+              "firstCharacter": 496000,
+              "lastCharacterExclusive": 504000,
+              "bytes": 8000,
+              "sha256": "cd1a9dfb3117e5bdf97d7f2d48f0d5e48a78b2e7bdb8967d13d6a5f481159caa"
+            },
+            {
+              "firstCharacter": 504000,
+              "lastCharacterExclusive": 512000,
+              "bytes": 9276,
+              "sha256": "7c2d83e0b800fbd813a5b036f1438ba3acf4b41b2db06333cbe35ee92c973caf"
+            },
+            {
+              "firstCharacter": 512000,
+              "lastCharacterExclusive": 520000,
+              "bytes": 10722,
+              "sha256": "e5a97d01d862b264af268ccbf2f8fa40adc518f4a6258993c6c3998cbcb348ad"
+            },
+            {
+              "firstCharacter": 520000,
+              "lastCharacterExclusive": 528000,
+              "bytes": 9277,
+              "sha256": "55f1fa452215a9bd906994b188e7fe3a7a4fc42516cc3fefae5e9051607c2e39"
+            },
+            {
+              "firstCharacter": 528000,
+              "lastCharacterExclusive": 536000,
+              "bytes": 10495,
+              "sha256": "343e01e6e3de0ef154e8bc0127e5c438c09cf28c94554438da9b7908b38fde31"
+            },
+            {
+              "firstCharacter": 536000,
+              "lastCharacterExclusive": 544000,
+              "bytes": 10387,
+              "sha256": "f4d4a87cf6cb01aa57d4be708481cfe9692ef0ac58d2f1e305ef9581a97ba0e5"
+            },
+            {
+              "firstCharacter": 544000,
+              "lastCharacterExclusive": 552000,
+              "bytes": 10187,
+              "sha256": "d7b509282c13750689d28469f2090e9243b02e5c179efad3d4e42a202f7be9f0"
+            },
+            {
+              "firstCharacter": 552000,
+              "lastCharacterExclusive": 560000,
+              "bytes": 8554,
+              "sha256": "204d52c9b8bf6deed30a905fa1f1bfc7ac31db4881113de130fc4c75eccbd40e"
+            },
+            {
+              "firstCharacter": 560000,
+              "lastCharacterExclusive": 568000,
+              "bytes": 8021,
+              "sha256": "104fc507bf2507a08245e6b94b3e0d754c7bedf9ab1932a65acab0b2433dfe70"
+            },
+            {
+              "firstCharacter": 568000,
+              "lastCharacterExclusive": 576000,
+              "bytes": 8460,
+              "sha256": "ff2959a9b93289ee58e4deb1727835ade6b7c420849bcf2f2f316e0a0fbb1b53"
+            },
+            {
+              "firstCharacter": 576000,
+              "lastCharacterExclusive": 584000,
+              "bytes": 8412,
+              "sha256": "459e4a798a523dc7da53435093b2d67a5724132b19fe9a926bc25e6208ae895c"
+            },
+            {
+              "firstCharacter": 584000,
+              "lastCharacterExclusive": 592000,
+              "bytes": 8921,
+              "sha256": "533c3a9089056ca1e6f281839725055daf6e6d6064b3daf083243fa2129cc8b2"
+            },
+            {
+              "firstCharacter": 592000,
+              "lastCharacterExclusive": 600000,
+              "bytes": 8747,
+              "sha256": "80cb3372973b7abfcdb526e22b8d8fa40284d07777852949ccb088a4b1d2da89"
+            },
+            {
+              "firstCharacter": 600000,
+              "lastCharacterExclusive": 608000,
+              "bytes": 8989,
+              "sha256": "ffa2a35f221a4a45e6721d336c67432c643afcc0daa1fc1d9f813bd10ff9cab1"
+            },
+            {
+              "firstCharacter": 608000,
+              "lastCharacterExclusive": 613630,
+              "bytes": 6332,
+              "sha256": "8e1161d7ae9a4e755ce8c6f5145ae3502d5c0fcae2c8df13c94636260b9a517b"
+            }
+          ],
+          "edgePages": [
+            {
+              "start": 0,
+              "stopExclusive": 11
+            }
+          ],
+          "reason": "mandatory ≥65536 source bytes or ≥40 edges"
+        }
+      ],
+      "fileCount": 1,
+      "edges": 11,
+      "indivisibleLargeFile": true
+    }
+  ],
+  "sourcePaging": "All source characters in consecutive 8000-character pages, including bundled vendor code and embedded source; no skipped bytes. Edge fields ≤50 edges/page. One whole-file verdict per record.",
+  "reviewStatus": "pending independent Lead-dispatched review"
+}

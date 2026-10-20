@@ -1,0 +1,56 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "sets": [
+    {
+      "set": "batch-123",
+      "files": 6,
+      "inventoryEdges": 9,
+      "addedEdges": 0,
+      "edges": 9,
+      "patchedFiles": 1,
+      "dispositions": {
+        "preserve": 7,
+        "patch": 2
+      },
+      "parks": {}
+    },
+    {
+      "set": "batch-124",
+      "files": 11,
+      "inventoryEdges": 8,
+      "addedEdges": 0,
+      "edges": 8,
+      "patchedFiles": 0,
+      "dispositions": {
+        "preserve": 8
+      },
+      "parks": {}
+    },
+    {
+      "set": "batch-125",
+      "files": 17,
+      "inventoryEdges": 33,
+      "addedEdges": 0,
+      "edges": 33,
+      "patchedFiles": 12,
+      "dispositions": {
+        "patch": 14,
+        "preserve": 8,
+        "parked": 11
+      },
+      "parks": {
+        "step5-parity": 11
+      }
+    }
+  ],
+  "files": 34,
+  "edges": 50,
+  "patchedFiles": 13,
+  "dispositions": {
+    "preserve": 23,
+    "patch": 16,
+    "parked": 11
+  },
+  "authorBoundary": "Completed in order 125,124,123. Stop before 122 at whole-file context budget; 105–122 remain unauthored.",
+  "acceptance": "AUTHOR checkpoint only; no independent review, actual-commit accounting or set closure."
+}
