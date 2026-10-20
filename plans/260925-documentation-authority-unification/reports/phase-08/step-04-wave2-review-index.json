@@ -1,0 +1,279 @@
+[
+  {
+    "part": 1,
+    "set": "step04-017",
+    "files": [
+      "CHANGELOG.md"
+    ],
+    "edges": 1,
+    "bytes": 379790,
+    "payload": "step-04-wave2-p01.json",
+    "payloadSha256": "e0472f7347cfaaa463cbbf59b9260e9c780a7406e7781e7a9358265e5ebcb46d",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p01.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 2,
+    "set": "step04-018",
+    "files": [
+      "plans/reports/fork-260928-1017-panel-depth-experiment-design-research-report.md",
+      "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md"
+    ],
+    "edges": 2,
+    "bytes": 31335,
+    "payload": "step-04-wave2-p02.json",
+    "payloadSha256": "137f9da5ddbbf8e179990958703799cbeba1989ac414a8212240702dea3ba54a",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p02.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 3,
+    "set": "step04-019",
+    "files": [
+      "packages/distribution/rust/src/init.rs",
+      "packages/distribution/rust/src/manifest.rs",
+      "packages/distribution/rust/src/workspace.rs"
+    ],
+    "edges": 4,
+    "bytes": 150403,
+    "payload": "step-04-wave2-p03.json",
+    "payloadSha256": "f4c159f9253c9e6132ee096701ef94d9702655cec10be93203acc99890d056b2",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p03.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 4,
+    "set": "step04-020",
+    "files": [
+      "packages/herdr-fgos-common/rust/src/fgos.rs",
+      "packages/herdr-fgos-common/rust/src/settings.rs"
+    ],
+    "edges": 4,
+    "bytes": 85134,
+    "payload": "step-04-wave2-p04.json",
+    "payloadSha256": "a2201fe29bfb72a172d7aa16e167789b63b9b26a0b77b3c751f3f05fb3fae2f2",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p04.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 5,
+    "set": "step04-021",
+    "files": [
+      "packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs"
+    ],
+    "edges": 1,
+    "bytes": 46456,
+    "payload": "step-04-wave2-p05.json",
+    "payloadSha256": "f84939599107afb8ea85a5a98b47b879bf9d0f487ca6518627ee30d95147bc20",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p05.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 6,
+    "set": "step04-022",
+    "files": [
+      "src/runner/claim-liveness.mjs",
+      "src/runner/dispatch/assignment-runner.mjs"
+    ],
+    "edges": 2,
+    "bytes": 155681,
+    "payload": "step-04-wave2-p06.json",
+    "payloadSha256": "401281dd86b660ded5152a0960db2793fe16aa6169ed45c1925a66cd5606b930",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p06.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 7,
+    "set": "step04-023",
+    "files": [
+      "src/runner/dispatch/config.mjs",
+      "src/runner/dispatch/confinement/authority.mjs",
+      "src/runner/dispatch/confinement/request.mjs",
+      "src/runner/dispatch/execution-contract.mjs"
+    ],
+    "edges": 10,
+    "bytes": 283607,
+    "payload": "step-04-wave2-p07.json",
+    "payloadSha256": "3ea1ec56f9474ba5fe767bda852a2dc7efff84c9420b83e0667c56b50b2a7a8b",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p07.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 8,
+    "set": "step04-024",
+    "files": [
+      "src/runner/dispatch/resolve.mjs",
+      "src/runner/dispatch/trust-store.mjs",
+      "src/runner/loop.mjs"
+    ],
+    "edges": 11,
+    "bytes": 202508,
+    "payload": "step-04-wave2-p08.json",
+    "payloadSha256": "0351ba0a404834c9b8ed948d42a3d940ee214623a32e791bc2a6e0e6ce4e859e",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p08.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 9,
+    "set": "step04-025",
+    "files": [
+      "src/runner/merge.mjs",
+      "src/runner/work-compat.mjs",
+      "src/runner/worktree.mjs"
+    ],
+    "edges": 32,
+    "bytes": 338429,
+    "payload": "step-04-wave2-p09.json",
+    "payloadSha256": "53876133e25c8f6e75daa801dc22eab62c6b4400be583ac4a437221122ddc9c4",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p09.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 10,
+    "set": "step04-026",
+    "files": [
+      "src/state/frontier.mjs",
+      "src/state/graph-harness.mjs",
+      "src/state/priority-formula.mjs"
+    ],
+    "edges": 12,
+    "bytes": 94779,
+    "payload": "step-04-wave2-p10.json",
+    "payloadSha256": "1eb8d11548ce85c8f0d3f74255923472e248e17a049cde6a47acc98e10eb94ac",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p10.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 11,
+    "set": "step04-027",
+    "files": [
+      "src/state/store.mjs",
+      "src/state/work.mjs"
+    ],
+    "edges": 22,
+    "bytes": 229634,
+    "payload": "step-04-wave2-p11.json",
+    "payloadSha256": "03fc2332253166311c8708fb82b0a8b2e675f3c1d950c11ac9c16aae4d652e84",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p11.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 12,
+    "set": "step04-028",
+    "files": [
+      "src/util/format-duration.mjs"
+    ],
+    "edges": 2,
+    "bytes": 9586,
+    "payload": "step-04-wave2-p12.json",
+    "payloadSha256": "25ff4534065565f1340a5f59d480212c9b4b7a440703a581a3748a4cf19d0b9b",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p12.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 13,
+    "set": "step04-029",
+    "files": [
+      "src/verbs/merge/approve.mjs"
+    ],
+    "edges": 8,
+    "bytes": 76128,
+    "payload": "step-04-wave2-p13.json",
+    "payloadSha256": "ecb3e16485da87b12ebf8572ff8953b7a3cfc4983a6ce0804a32d29c51de7048",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p13.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 14,
+    "set": "step04-030",
+    "files": [
+      ".claude/skills/ui-spec/CONVENTION.md",
+      ".claude/skills/ui-spec/SKILL.md",
+      "core/skills/fgos-clarifying/SKILL.md"
+    ],
+    "edges": 8,
+    "bytes": 127522,
+    "payload": "step-04-wave2-p14.json",
+    "payloadSha256": "737174dbd1c15109df96ee4500268e9674a1c814dde6c6923ba6e63e0738892f",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p14.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 15,
+    "set": "step04-031",
+    "files": [
+      "core/skills/fgos-researching/SKILL.md",
+      "src/runner/prompt-templates/worker-prompt-discovery.txt"
+    ],
+    "edges": 7,
+    "bytes": 91386,
+    "payload": "step-04-wave2-p15.json",
+    "payloadSha256": "9ad56ad66a9c115a5d4ab647fd235edaf47940e6d86ad735ecb77c459096b140",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p15.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 16,
+    "set": "step04-032",
+    "files": [
+      "core/skills/_shared/ak-cook-worker-contract.md"
+    ],
+    "edges": 3,
+    "bytes": 31458,
+    "payload": "step-04-wave2-p16.json",
+    "payloadSha256": "25fe07d8f2968a22dfa9f4416dba9eff51c23c776fda7a10a8956cf155258818",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p16.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 17,
+    "set": "step04-033",
+    "files": [
+      "plans/261020-1250-debate-pattern-and-judge-role/plan.md",
+      "plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md",
+      "plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md",
+      "plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md",
+      "plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md"
+    ],
+    "edges": 7,
+    "bytes": 118150,
+    "payload": "step-04-wave2-p17.json",
+    "payloadSha256": "4c9b48a08e4ff6ed15f1a1deb8a5dff26c808197b8d3cfc26b1c2c269f8e36d3",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p17.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  }
+]

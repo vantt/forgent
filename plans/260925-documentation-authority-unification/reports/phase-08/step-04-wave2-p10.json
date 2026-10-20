@@ -1,0 +1,960 @@
+{
+  "authorInputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+  "reviewerRule": "Never run checker/probes/resolver/author scripts. Read every assigned file through EOF and independently verify targets. One verdict per whole file, even when streamed.",
+  "set": "step04-026",
+  "files": [
+    "src/state/frontier.mjs",
+    "src/state/graph-harness.mjs",
+    "src/state/priority-formula.mjs"
+  ],
+  "joinedSlots": 12,
+  "items": [
+    {
+      "file": "src/state/frontier.mjs",
+      "sourceDigest": "dca56e29f4928eb025fb2bf085c75a7d1969d59b3b645754b3dc6b44e3db47d7",
+      "sourceContext": "// frontier.mjs — derive the \"ready to start\" work items from a view (per D1\n// Epic 2, A2 FIFO). PURE: no fs import, no side effects — this module only\n// reads the `view` object it is handed (built by replay.mjs's `foldEvents`\n// / `rebuildView`, or a literal view in tests) and returns a derived array.\n// It never mutates `view` and never writes an event (the one exception is a\n// diagnostic `console.warn` via domain-registry.mjs on a genuinely unrecognized\n// `item.domain` value — never a throw, see base-workflow-model D2/D3).\nimport { getDomain, stepForPhase } from './domain-registry.mjs';\n//\n// Ready = status 'todo' AND every dep's status is RESOLVED (per D5: 'done'\n// means \"accepted into the main tree\" — a dep sitting at 'awaiting-approval',\n// 'doing', or 'blocked' does NOT unblock its dependents; per\n// wontfix-terminal-status-filter-consistency D1, a dep at 'wontfix' DOES\n// unblock its dependents — abandoned, nothing further will ever land for\n// it, so waiting on it forever would be a silent permanent deadlock) AND\n// stage at the\n// item's own domain's Execute-mapped stage ('executing' for the 'coding'\n// domain — per stage-clarify D1: an item still at stage `clarify` is not\n// yet \"ready to start\" no matter its status — `fgos ready` would otherwise\n// lie about items that have not passed context-discovery; domain-aware per\n// base-workflow-model D2/D3, domain-registry.mjs) AND no open descendant (per\n// stage-decompose D4/D5: an item that was decomposed stays\n// anchored — excluded from the frontier — for as long as any item reachable\n// through the `parent` chain below it is not yet 'done'; this is a lineage\n// filter DERIVED from `parent`, never `deps` — a child is never written into\n// its parent's `deps`). `stage` is read lazily — `item.stage ?? <the item's\n// domain's Execute stage>` (D8; domain-aware per base-workflow-model D2/D3)\n// — so an item predating this field behaves exactly as before, and an\n// item with no `parent` anywhere in the view is likewise never blocked by\n// this filter (backward-compat). Frontier is a derived read (R5 — \"derive,\n// no danh sách tay\"), never a stored list.\n//\n// FIFO order (per A2, cold-pickup reliance — deliberately spelled out, not\n// left implicit):\n//   - `view.work` is a plain object built by replay.mjs's `foldEvents`,\n//     which assigns `view.work[item.id] = ...` in the order `work.add`\n//     events are folded — i.e. declaration order.\n//   - `work.move` (see replay.mjs) only ever does `item.status = to` on the\n//     existing entry; it never deletes/re-inserts the key, so a status\n//     change never moves an id's position in iteration order.\n//   - Every work id is validated kebab-case, starting with a letter\n//     (work.mjs ID_PATTERN) — never an all-digit / numeric-looking string —\n//     so none of these keys fall into the \"integer index\" bucket the JS\n//     spec special-cases (those would iterate in ascending numeric order\n//     ahead of insertion-order string keys, which would silently break\n//     FIFO). `Object.keys(view.work)` therefore always iterates in\n//     declaration (insertion) order, which is what `frontier` relies on for\n//     FIFO — it never sorts by id.\n// TIE-BREAK CONTRACT (work-graph-intelligence S4, bumped to v2 by\n// str7-str8-priority-intent D2). `frontier(view)` is the single, versioned\n// surface that decides claim order: the order it returns IS the order the\n// runner claims and dispatches in (consumers `readyWork` in store.mjs and\n// `steerFrontier` in the runner take this order as given, never re-sorting).\n// `FRONTIER_ORDER_VERSION` names that order so a change to it is deliberate\n// and visible, never an accidental reorder of a cold-pickup-critical\n// invariant.\n//\n//   - v1 (superseded): the SOLE ordering key was FIFO by `work.add`\n//     declaration order — exactly the insertion-order iteration argued for\n//     in the header comment above. No priority, no intent, no re-sort.\n//   - v2 (current, per D1/D2/D6): three ordering keys, applied in order —\n//     (1) `priority` ASCENDING, absent-last (an item with no `priority`\n//     sorts strictly after every item that has one, regardless of the\n//     latter's magnitude); (2) among ties on (1), `intent` DESCENDING, same\n//     absent-last bucketing; (3) among ties on (1) and (2), declaration\n//     order — the v1 tie-break, preserved for free by\n//     `Array.prototype.sort`'s spec-guaranteed stability on Node >=18 (this\n//     repo's engines requirement): a comparator that returns 0 once both\n//     keys tie never reorders those items relative to each other, so no\n//     third key is hand-written here.\n//\n// A view where no item has `priority` or `intent` set produces the exact v1\n// order (every comparison short-circuits both absent-last branches to a tie,\n// i.e. \"keep declaration order\") — v2 is a strict backward-compatible\n// superset of v1, not a behavior change for existing data.\nexport const FRONTIER_ORDER_VERSION = 2;\n\n// `phase` (generalized for fgos-coding-driving's own loop): which Workflow phase\n// counts as \"ready to start\" — defaults to `'execute'` (every unparameterized\n// caller gets that behavior). A driver loop wanting the frontier for an earlier\n// phase (e.g. `'clarify'`/`'plan'`, mirroring discover-loop/planning-loop's own\n// pools) passes it explicitly; `isDepsAndLineageReady` below already covers the\n// step-independent half of readiness this parameterizes the step half of.\nexport function frontier(view, { phase = 'execute' } = {}) {\n  const work = view?.work ?? {};\n  const childrenByParent = indexChildrenByParent(work);\n  const ready = [];\n  for (const id of Object.keys(work)) {\n    const item = work[id];\n    if (!isTodoStatus(item)) continue;\n    // Domain-aware: an unrecognized item.domain never throws here\n    // (domain-registry.mjs's fail-safe) — it folds to 'coding' with a\n    // diagnostic warning, so a corrupt/rolled-back domain value can never\n    // wedge the frontier derive itself.\n    const domain = getDomain(item.domain);\n    const phaseStep = stepForPhase(domain, phase, item.kind);\n    // A domain that never declares a step for `phase` at all (e.g. `synthetic`\n    // has no clarify/plan, only execute -> `assembling`) has NO item ready for\n    // it, full stop -- guarded separately from the `??` fallback below, which\n    // would otherwise wrongly admit an item with no `workflowStep` at all\n    // (undefined ?? undefined === undefined, a false tie).\n    if (phaseStep === undefined) continue;\n    if ((item.workflowStep ?? stepForPhase(domain, 'execute', item.kind)) !== phaseStep) continue;\n    if (hasOpenDescendant(id, work, childrenByParent)) continue;\n    const depsReady = item.deps.every((dep) => isResolvedStatus(work[dep]));\n    if (depsReady) ready.push(item);\n  }\n  ready.sort(compareReadyOrder);\n  return ready;\n}\n\n// Union of `frontier(view, {phase})` across multiple phases (tsk-4so D1,\n// docs/history/execution-fanout/CONTEXT-tsk-4so.md): a footprint-overlap\n// advisory that only ever looks at one step is structurally blind to two\n// items at DIFFERENT steps sharing a footprint — the real gap this exists\n// to close (tsk-1ug at `decompose` vs tsk-4fg/tsk-59x at `executing`, all\n// three declaring the same file, `fgos conflicts` reporting zero pairs).\n// Dedupes by id: an item with no `workflowStep` field matches EVERY phase's\n// execute-step fallback (`item.workflowStep ?? <execute step>` above), so without\n// dedup it would appear once per step in `steps` instead of once overall.\n// Re-sorts the deduped set once with `compareReadyOrder` — concatenating\n// three already-sorted arrays would NOT preserve `FRONTIER_ORDER_VERSION`'s\n// priority/intent ordering across the combined set. PURE: same read-only\n// contract as `frontier`.\nexport function frontierAcrossSteps(view, phases = ['clarify', 'plan', 'execute']) {\n  const seen = new Map();\n  for (const phase of phases) {\n    for (const item of frontier(view, { phase })) {\n      if (!seen.has(item.id)) seen.set(item.id, item);\n    }\n  }\n  return [...seen.values()].sort(compareReadyOrder);\n}\n\n// True when `item` is at the front-segment \"not yet started\" bucket (per\n// decision record 0027, D2/D3: statusCategory 'todo') — used by the `ready`\n// filter above so a domain that relabels its \"not started\" status away from\n// the literal string 'todo' is still picked up correctly (frontier.mjs:92\n// row of 0027's own audit table). Reads `item.statusCategory` when present;\n// falls back to the literal `item.status === 'todo'` comparison when it is\n// NOT present (an item written before tsk-38t-2 stamped this field at all,\n// or an item whose domain declares no `statusLabels` at all, e.g.\n// `synthetic`/`triage` today) — this is a fallback to the pre-existing\n// field, never a derive-on-read of the category table itself (which\n// platform-foundations.md's L3 forbids, see STATUS_CATEGORIES's own doc\n// comment in work.mjs), so it stays safe under replay-from-zero.\nfunction isTodoStatus(item) {\n  if (item.statusCategory !== undefined) return item.statusCategory === 'todo';\n  return item.status === 'todo';\n}\n\n// Stage-independent readiness (choke-point-take-vs-pick-claim-eligibility):\n// the same deps-done + no-open-descendant clauses `frontier` enforces,\n// minus its stage clause — for a caller that intentionally wants to claim\n// an item still at `clarify`/`decompose` (status and stage are independent\n// axes, status-fsm.mjs; the same stance `pick`'s explicit-`--id` branch already\n// takes) while still refusing a genuinely-blocked item (unmet dep, or\n// anchored by an open decomposed child) — those two reasons stay real\n// \"not dispatchable\" regardless of stage.\nexport function isDepsAndLineageReady(view, id) {\n  const work = view?.work ?? {};\n  const item = work[id];\n  if (!item) return false;\n  const childrenByParent = indexChildrenByParent(work);\n  if (hasOpenDescendant(id, work, childrenByParent)) return false;\n  return item.deps.every((dep) => isResolvedStatus(work[dep]));\n}\n\n// v2 comparator (D2/D6): priority ASC absent-last, then intent DESC\n// absent-last, then declaration order — the last key falls out of\n// Array.prototype.sort's guaranteed stability (see header comment above),\n// so returning 0 on a full tie is the entire tie-break, not an omission.\nfunction compareReadyOrder(a, b) {\n  if (a.priority !== b.priority) {\n    if (a.priority === undefined) return 1;\n    if (b.priority === undefined) return -1;\n    return a.priority - b.priority;\n  }\n  if (a.intent !== b.intent) {\n    if (a.intent === undefined) return 1;\n    if (b.intent === undefined) return -1;\n    return b.intent - a.intent;\n  }\n  return 0;\n}\n\n// Reverse index of `parent` -> direct children ids. Items with no `parent`\n// field never contribute an entry, so a view with no lineage at all yields\n// an empty index and `hasOpenDescendant` below short-circuits to `false` for\n// every id — the exact no-op this filter must be on a parent-less log.\nexport function indexChildrenByParent(work) {\n  const index = {};\n  for (const id of Object.keys(work)) {\n    const parent = work[id].parent;\n    if (!parent) continue;\n    if (!index[parent]) index[parent] = [];\n    index[parent].push(id);\n  }\n  return index;\n}\n\n// An item is RESOLVED when nothing further will happen to it that could\n// still change the CODE/graph state a dependent or lineage check cares\n// about. Per decision record 0027 (D1/D2, `docs/decisions/0027-domain-so-\n// huu-status-doan-truoc-delivered-supersede-base-workflow-model-d1-d3.md`)\n// this is now a HYBRID read, not a flat literal Set, because the 10\n// statuses split into two groups with different rules (0027's own audit,\n// §\"Hệ quả 1 chi tiết\", `docs/history/phase-2-status-category-schema/\n// DISCUSSION.md` §6):\n//   - the FOUR tail-segment statuses (`delivered`/`retrospective`/\n//     `cleanup`/`done`) never get relabeled by any domain (D1) — literal\n//     status is sufficient for them forever, checked first below;\n//   - `wontfix` is a front-segment, domain-OWNED label that always maps to\n//     `statusCategory: 'canceled'` (D2) — a domain that relabels it (e.g.\n//     `declined`) must still be recognized as resolved, which a literal\n//     `'wontfix'` string match could never do. Reading `item.statusCategory\n//     === 'canceled'` instead is the whole point of this migration\n//     (tsk-38t-4): every domain-agnostic consumer that used to `.has()` a\n//     flat Set now calls `isResolvedStatus(item)` (the WHOLE item, not just\n//     a status string — reading category needs the item) instead.\n// `item.statusCategory` is frozen at write time only (store.mjs's\n// addWork/moveWork) and NEVER derived on read (platform-foundations.md's L3\n// — see STATUS_CATEGORIES's own doc comment, work.mjs) — an item written\n// before tsk-38t-2 landed this field, or whose domain declares no\n// `statusLabels` at all (`synthetic`/`triage` today), carries no\n// `statusCategory`. For those, this falls back to the literal `'wontfix'`\n// string — the ONLY front-segment status this set has ever recognized —\n// so pre-migration data keeps replaying exactly as before (never a\n// derive-on-read of the category table itself, only a fallback to the\n// pre-existing `status` field, the same lazy-default shape every other\n// optional-additive field in this codebase already uses).\n//\n// `fgos rollup`'s progress-reporting count is a SEPARATE mechanism and\n// intentionally does NOT share this function — it still counts strict\n// `done` only. Exported so every other consumer that needs \"is this item\n// resolved enough to stop counting it as open\" (deps-readiness in this\n// module's own `depsReady`/`isDepsAndLineageReady`, plus claim-port.mjs/\n// impact.mjs/graph-metrics.mjs/entropy.mjs/graph-harness.mjs/\n// drift-status.mjs — see wontfix-terminal-status-filter-consistency D1/D2/D3\n// and 0027's own audit §2) shares this one function instead of separate\n// ad-hoc re-declarations.\nconst TAIL_RESOLVED_STATUSES = new Set(['delivered', 'retrospective', 'cleanup', 'done']);\nconst LEGACY_CANCELED_STATUS = 'wontfix';\n\n/** The canceled-only half of `isResolvedStatus` below, extracted (tsk-4bh)\n * for a caller that needs to tell \"abandoned, never had content\" apart from\n * \"successfully resolved\" — `isResolvedStatus` itself treats both as\n * equally fine to stop waiting on (deps-readiness, frontier lineage), but\n * `cleanup-harness.mjs`'s own merge-still-resolves ancestry check needs the\n * opposite split: skip a canceled/wontfix child entirely (it never had\n * content to merge, so there is nothing to check), while STILL verifying a\n * `done`/`delivered` child's recorded sha really is an ancestor (that\n * verification is the whole point of the check — `isResolvedStatus` alone\n * would wrongly skip it too). Never returns true for a tail-resolved status\n * (`done`/`delivered`/`retrospective`/`cleanup`) — those are the opposite\n * case this function exists to distinguish. */\nexport function isCanceledStatus(item) {\n  if (!item) return false;\n  if (TAIL_RESOLVED_STATUSES.has(item.status)) return false;\n  if (item.statusCategory !== undefined) return item.statusCategory === 'canceled';\n  return item.status === LEGACY_CANCELED_STATUS;\n}\n\nexport function isResolvedStatus(item) {\n  if (!item) return false;\n  if (TAIL_RESOLVED_STATUSES.has(item.status)) return true;\n  return isCanceledStatus(item);\n}\n\n/**\n * Resolve the root of the lineage tree `id` belongs to: walk `view.work[id].parent`\n * upward until reaching an item with no `parent` (or whose `parent` does not\n * resolve to a known item), and return THAT item's id. An item with no\n * `parent` is its own root and resolves to itself.\n *\n * Defensive backstop, mirroring `hasOpenDescendant` below: a `seen` set\n * guards against a cyclic or malformed parent chain turning this into an\n * infinite walk. Should not occur on real decompose-produced data — if a\n * cycle is detected, the walk stops and returns the current id rather than\n * looping forever.\n *\n * Lives here rather than in `runner/root-affinity.mjs` (its original home,\n * tsk-49i D1): it is a pure read over the same `view.work` parent chain the\n * rest of this module walks, and `state/` modules needing it had to import\n * across into `runner/` to get it — one of the import edges that made the\n * two folders mutually dependent.\n *\n * @param {{work: Record<string, {parent?: string|null}>}} view\n * @param {string} id\n * @returns {string}\n */\nexport function resolveRoot(view, id) {\n  const work = view?.work ?? {};\n  const seen = new Set();\n  let current = id;\n  while (true) {\n    if (seen.has(current)) return current;\n    seen.add(current);\n    const item = work[current];\n    const parent = item?.parent;\n    if (!parent || !work[parent]) return current;\n    current = parent;\n  }\n}\n\n// True when `id` has any descendant (direct child, or a descendant reachable\n// through further `parent` chains below a child) whose status is not yet\n// RESOLVED. `seen` guards against a malformed/cyclic parent chain turning\n// this into an infinite walk — it never occurs on data produced by the\n// decompose engine, only a defensive backstop.\n// See `loop.mjs`'s `hasStillNeededDescendant` for a deliberately BROADER\n// 'still needed' variant used by `startupReap`'s orphan-branch pruning — the\n// two intentionally answer different questions, do not consolidate.\n\nexport function hasOpenDescendant(id, work, childrenByParent, seen = new Set()) {\n  const children = childrenByParent[id];\n  if (!children) return false;\n  for (const childId of children) {\n    if (seen.has(childId)) continue;\n    seen.add(childId);\n    const child = work[childId];\n    if (!child) continue;\n    if (!isResolvedStatus(child)) return true;\n    if (hasOpenDescendant(childId, work, childrenByParent, seen)) return true;\n  }\n  return false;\n}\n",
+      "record": {
+        "file": "src/state/frontier.mjs",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+        "inventoryFileDigest": "dca56e29f4928eb025fb2bf085c75a7d1969d59b3b645754b3dc6b44e3db47d7",
+        "digest": "dca56e29f4928eb025fb2bf085c75a7d1969d59b3b645754b3dc6b44e3db47d7",
+        "inventoryEdgeIds": [
+          "class6-l-000416",
+          "class6-l-000417",
+          "class6-l-000417",
+          "class6-l-000418",
+          "class6-l-000418"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000416",
+            "slotKey": "{\"edgeId\":\"class6-l-000416\",\"file\":\"src/state/frontier.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000416\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":113}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000416",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 113
+              }
+            ],
+            "consumerFile": "src/state/frontier.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 113,
+                "columnStart": 4,
+                "columnEndExclusive": 52,
+                "text": "docs/history/execution-fanout/CONTEXT-tsk-4so.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 113,
+                "columnStart": 4,
+                "columnEndExclusive": 52,
+                "text": "docs/history/execution-fanout/CONTEXT-tsk-4so.md"
+              }
+            ],
+            "matchedExpression": "docs/history/execution-fanout/CONTEXT-tsk-4so.md",
+            "logicalReference": "docs/history/execution-fanout/CONTEXT-tsk-4so.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '// docs/history/execution-fanout/CONTEXT-tsk-4so.md): a footprint-overlap'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/execution-fanout/CONTEXT-tsk-4so.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000416",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 113,
+                "matchedExpression": "docs/history/execution-fanout/CONTEXT-tsk-4so.md",
+                "originalLineText": "// docs/history/execution-fanout/CONTEXT-tsk-4so.md): a footprint-overlap"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000417",
+            "slotKey": "{\"edgeId\":\"class6-l-000417\",\"file\":\"src/state/frontier.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000417\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":204}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000417",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 204
+              }
+            ],
+            "consumerFile": "src/state/frontier.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 204,
+                "columnStart": 45,
+                "columnEndExclusive": 75,
+                "text": "docs/decisions/0027-domain-so-"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 204,
+                "columnStart": 45,
+                "columnEndExclusive": 75,
+                "text": "docs/decisions/0027-domain-so-"
+              },
+              {
+                "line": 205,
+                "columnStart": 1,
+                "columnEndExclusive": 74,
+                "text": "// huu-status-doan-truoc-delivered-supersede-base-workflow-model-d1-d3.md"
+              }
+            ],
+            "matchedExpression": "docs/decisions/0027-domain-so-\n// huu-status-doan-truoc-delivered-supersede-base-workflow-model-d1-d3.md",
+            "logicalReference": "docs/decisions/0027-domain-so-huu-status-doan-truoc-delivered-supersede-base-workflow-model-d1-d3.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-26/38: surviving native path, literal example, implementation provenance or captured contract reference; its runtime/reader behavior is outside this comment-only record and remains with Step 5. No authority-path rewrite is made. Exact passage: '// about. Per decision record 0027 (D1/D2, `docs/decisions/0027-domain-so-\\n// huu-status-doan-truoc-delivered-supersede-base-workflow-model-d1-d3.md`)' Non-executable successor note: docs/platform/work-state/decisions/retired-decision-history.md#12-adr-0027-domain-owns-the-pre-delivered-status-vocabulary.",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/decisions/0027-domain-so-huu-status-doan-truoc-delivered-supersede-base-workflow-model-d1-d3.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000417",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 204,
+                "matchedExpression": "docs/decisions/0027-domain-so-\n// huu-status-doan-truoc-delivered-supersede-base-workflow-model-d1-d3.md",
+                "originalLineText": "// about. Per decision record 0027 (D1/D2, `docs/decisions/0027-domain-so-"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000417",
+            "slotKey": "{\"edgeId\":\"class6-l-000417\",\"file\":\"src/state/frontier.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000417\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":205}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000417",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 205
+              }
+            ],
+            "consumerFile": "src/state/frontier.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 205,
+                "columnStart": 1,
+                "columnEndExclusive": 74,
+                "text": "// huu-status-doan-truoc-delivered-supersede-base-workflow-model-d1-d3.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 204,
+                "columnStart": 45,
+                "columnEndExclusive": 75,
+                "text": "docs/decisions/0027-domain-so-"
+              },
+              {
+                "line": 205,
+                "columnStart": 1,
+                "columnEndExclusive": 74,
+                "text": "// huu-status-doan-truoc-delivered-supersede-base-workflow-model-d1-d3.md"
+              }
+            ],
+            "matchedExpression": "docs/decisions/0027-domain-so-\n// huu-status-doan-truoc-delivered-supersede-base-workflow-model-d1-d3.md",
+            "logicalReference": "docs/decisions/0027-domain-so-huu-status-doan-truoc-delivered-supersede-base-workflow-model-d1-d3.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-26/38: surviving native path, literal example, implementation provenance or captured contract reference; its runtime/reader behavior is outside this comment-only record and remains with Step 5. No authority-path rewrite is made. Exact passage: '// about. Per decision record 0027 (D1/D2, `docs/decisions/0027-domain-so-\\n// huu-status-doan-truoc-delivered-supersede-base-workflow-model-d1-d3.md`)' Non-executable successor note: docs/platform/work-state/decisions/retired-decision-history.md#12-adr-0027-domain-owns-the-pre-delivered-status-vocabulary.",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/decisions/0027-domain-so-huu-status-doan-truoc-delivered-supersede-base-workflow-model-d1-d3.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000417",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 205,
+                "matchedExpression": "docs/decisions/0027-domain-so-\n// huu-status-doan-truoc-delivered-supersede-base-workflow-model-d1-d3.md",
+                "originalLineText": "// huu-status-doan-truoc-delivered-supersede-base-workflow-model-d1-d3.md`)"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000418",
+            "slotKey": "{\"edgeId\":\"class6-l-000418\",\"file\":\"src/state/frontier.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000418\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":208}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000418",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 208
+              }
+            ],
+            "consumerFile": "src/state/frontier.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 208,
+                "columnStart": 27,
+                "columnEndExclusive": 71,
+                "text": "docs/history/phase-2-status-category-schema/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 208,
+                "columnStart": 27,
+                "columnEndExclusive": 71,
+                "text": "docs/history/phase-2-status-category-schema/"
+              },
+              {
+                "line": 209,
+                "columnStart": 1,
+                "columnEndExclusive": 17,
+                "text": "// DISCUSSION.md"
+              }
+            ],
+            "matchedExpression": "docs/history/phase-2-status-category-schema/\n// DISCUSSION.md",
+            "logicalReference": "docs/history/phase-2-status-category-schema/DISCUSSION.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '// §\"Hệ quả 1 chi tiết\", `docs/history/phase-2-status-category-schema/\\n// DISCUSSION.md` §6):'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/phase-2-status-category-schema/DISCUSSION.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000418",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 208,
+                "matchedExpression": "docs/history/phase-2-status-category-schema/\n// DISCUSSION.md",
+                "originalLineText": "// §\"Hệ quả 1 chi tiết\", `docs/history/phase-2-status-category-schema/"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000418",
+            "slotKey": "{\"edgeId\":\"class6-l-000418\",\"file\":\"src/state/frontier.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000418\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":209}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000418",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 209
+              }
+            ],
+            "consumerFile": "src/state/frontier.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 209,
+                "columnStart": 1,
+                "columnEndExclusive": 17,
+                "text": "// DISCUSSION.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 208,
+                "columnStart": 27,
+                "columnEndExclusive": 71,
+                "text": "docs/history/phase-2-status-category-schema/"
+              },
+              {
+                "line": 209,
+                "columnStart": 1,
+                "columnEndExclusive": 17,
+                "text": "// DISCUSSION.md"
+              }
+            ],
+            "matchedExpression": "docs/history/phase-2-status-category-schema/\n// DISCUSSION.md",
+            "logicalReference": "docs/history/phase-2-status-category-schema/DISCUSSION.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '// §\"Hệ quả 1 chi tiết\", `docs/history/phase-2-status-category-schema/\\n// DISCUSSION.md` §6):'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/phase-2-status-category-schema/DISCUSSION.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000418",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 209,
+                "matchedExpression": "docs/history/phase-2-status-category-schema/\n// DISCUSSION.md",
+                "originalLineText": "// DISCUSSION.md` §6):"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-026",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "src/state/frontier.mjs",
+          "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+          "digest": "dca56e29f4928eb025fb2bf085c75a7d1969d59b3b645754b3dc6b44e3db47d7",
+          "bytes": 17901,
+          "lines": 327,
+          "headings": [],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "renderContexts": {},
+      "populationGapFindings": [],
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "src/state/graph-harness.mjs",
+      "sourceDigest": "6d93e939f7d13ec8f24957eca8b02bc66aad00573c4369175bcb426915ac789b",
+      "sourceContext": "// graph-harness.mjs — merge-order ranking (tsk-4j9-2, docs/history/\n// merge-standardization/). PURE: takes a work-state view (as returned by\n// store.mjs's listWork/rebuildView) and returns which `proposed` items are\n// actually ready to merge right now, in the order they should merge, plus\n// which ones are waiting or conflicting. No fs, no Date.now(), no event\n// append, no mutation — same read-only discipline as impact.mjs/\n// graph-metrics.mjs.\n//\n// Composes three signals, each reused rather than reimplemented (CONTEXT.md\n// D1/D3/D4-revised):\n//   - dependency-wait gate: a `proposed` item whose own `deps` are not ALL\n//     RESOLVED (frontier.mjs — delivered/retrospective/cleanup/done/wontfix)\n//     yet waits — genuinely new, `approve` has no such check today.\n//   - conflict detection: `footprintOverlapAmong` (extracted out of\n//     `footprintOverlap`, D4-revised) over the dep-clear candidate set,\n//     instead of `footprintOverlap`'s own frontier-only candidate set.\n//   - impact ordering: `rankImpact`'s existing blocking-fan-out + goalTier\n//     ordering (D3), filtered down to the conflict-free candidates rather\n//     than re-implemented.\nimport { rankImpact } from './impact.mjs';\nimport { footprintOverlapAmong } from './graph-metrics.mjs';\nimport { isResolvedStatus, resolveRoot } from './frontier.mjs';\nimport { effectiveStep, getDomain } from './domain-registry.mjs';\n\n/**\n * Rank `proposed` items by merge-readiness.\n *\n * `opts.drift` (tsk-2u0, docs/history/tsk-3bn-merge-conductor-harness-v2/):\n * an OPTIONAL pre-computed `driftStatus()` result (`{[rootId]: {needsSync,\n * ...}}`). This function stays PURE — it never calls `driftStatus` itself\n * (that module shells real git subprocesses, a different purity class,\n * per its own header comment) — a caller that wants `blockedOnSync`\n * populated computes drift separately and passes the result in. Omitting\n * `opts.drift` (every existing caller today) leaves `blockedOnSync` always\n * empty — a pure additive opt-in, zero behavior change for callers that\n * don't know about it yet.\n *\n * Returns `{ ready, waiting, conflicts, mergeSets, blockedOnSync,\n * mergeTier, supersededOut }`:\n *   - `ready` — ids of `proposed` items whose `deps`/`mergeAfter` are all\n *     RESOLVED, whose resolved root has no unresolved sync drift, and\n *     which are not part of any footprint conflict, ordered by\n *     `rankImpact` (highest blocking fan-out first, tie-broken by\n *     `goalTier` then id — `rankImpact`'s own order, not re-derived here).\n *     UNCHANGED shape/membership rule from before mergeSets existed for\n *     any caller that never opts into `opts.drift` — footprint-conflicted\n *     items were already excluded from `ready` before this cell, shared-\n *     root siblings stay IN `ready` (mergeSets is additive visibility on\n *     top, never a second exclusion).\n *   - `waiting` — ids of `proposed` items with at least one `deps` or\n *     `mergeAfter` target not yet RESOLVED — merge-ready in isolation, but\n *     blocked on merge ORDER. `mergeAfter` (D4/D5) extends this SAME gate\n *     `deps` already used, never a new bucket — it is read ONLY here,\n *     never by `frontier.mjs`'s start-eligibility.\n *   - `conflicts` — the same `{a, b, shared, suggestions}` shape\n *     `footprintOverlapAmong`/`footprintOverlap` already produce, computed\n *     over the dep-clear, sync-clear candidate set. Unchanged shape.\n *   - `mergeSets` — D2's replacement for \"silently drop a conflicting pair\n *     from ready\": `{items, order, reason}` entries, `reason:\n *     'footprint-overlap' | 'shared-root'` (`'deps-chain'` stays\n *     conceptually inside `waiting` per this cell's own locked\n *     assumption, plan.md). `footprint-overlap` sets are the connected\n *     components of `conflicts` (a chain of overlapping pairs becomes ONE\n *     set, not several) — items here are NOT in `ready` (same exclusion\n *     `conflicts` already caused). `shared-root` sets are 2+ `ready`\n *     candidates resolving to the same root — items here STAY in `ready`\n *     too (informational ordering, not a new exclusion). `order` is\n *     `rankImpact`'s own relative order within the set (D2's permissive\n *     default: auto-serialize in that order; only escalate if a\n *     serialized re-check itself still conflicts — the re-check itself is\n *     Layer 2's job, not this pure function's).\n *   - `blockedOnSync` — ids of otherwise-candidate items whose resolved\n *     root shows `needsSync: true` in the supplied `opts.drift` — always\n *     empty when `opts.drift` is omitted.\n *   - `strandedByResolvedRoot` (tsk-4s0, piece 2 of tsk-4qu's leaf-merge-\n *     into-resolved-root fix) — ids of otherwise-candidate items whose\n *     resolved root (`resolveRoot`) is already RESOLVED\n *     (`isResolvedStatus` — delivered/retrospective/cleanup/done/wontfix).\n *     `approve` now refuses these (`bin/fgos.mjs`'s resolved-root guard),\n *     so they are pulled out of `ready` here too rather than reported as\n *     plainly mergeable — a DIFFERENT hazard from `blockedOnSync` (that\n *     bucket means \"the root branch itself needs syncing,\" not \"the root\n *     is closed out and nothing will ever sync it\"), kept as its own\n *     bucket rather than folded into `blockedOnSync` so that name's\n *     existing cross-language contract (`packages/herdr-fgos-common/rust/src/fgos.rs`\n *     deserializes it by name) keeps its current meaning unchanged.\n *     Checked independently of `opts.drift` (item status, not a git-shelled\n *     drift computation) — never empty just because `opts.drift` was\n *     omitted, unlike `blockedOnSync`.\n *   - `mergeTier` — `{[id]: 'leaf-to-root' | 'root-to-main'}` for every\n *     `proposed` item, derived from `item.parent` alone (an item with a\n *     parent always merges into SOME `fgw/<root>`, never straight to\n *     `main`) — matches the design report's own §G table split. Named\n *     `mergeTier`, not the canonical reports' bare `tier` (D7): work scale\n *     already exists as a different, unrelated field (`work.size`).\n *   - `supersededOut` — ids of otherwise-`ready` candidates carrying a\n *     `supersededBy` target that is RESOLVED, or itself present in this\n *     same call's ready-set (tsk-2ie D2, docs/history/\n *     tsk-2ie-duplicate-superseded-guard/ — a different D2 than mergeSets'\n *     own above, distinct decision doc). Excluded from `ready`, never\n *     placed in `waiting` (permanently superseded, not \"eventually\n *     mergeable once a dep resolves\" — a different semantic). Always empty\n *     for every item that never sets `supersededBy` — pure additive\n *     exclusion, same backward-compatible shape `blockedOnSync`/`mergeSets`\n *     already established.\n */\nexport function mergeReadiness(view, opts = {}) {\n  const work = view?.work ?? {};\n  const drift = opts.drift ?? {};\n  const proposed = Object.values(work).filter((item) => item.status === 'awaiting-approval');\n\n  const waiting = [];\n  const candidates = [];\n  for (const item of proposed) {\n    const deps = Array.isArray(item.deps) ? item.deps : [];\n    // work-item-status-delivered-retrospective-cleanup D13: shares\n    // frontier.mjs's isResolvedStatus (per decision record 0027) instead of\n    // a literal 'done' check — a dep merged (delivered) but not yet fully\n    // closed out (retrospective/cleanup) no longer holds up merge-ordering.\n    const depsClear = deps.every((dep) => isResolvedStatus(work[dep]));\n    const mergeAfter = Array.isArray(item.mergeAfter) ? item.mergeAfter : [];\n    const mergeAfterClear = mergeAfter.every((target) => isResolvedStatus(work[target]));\n    if (depsClear && mergeAfterClear) {\n      candidates.push(item);\n    } else {\n      waiting.push(item.id);\n    }\n  }\n\n  const blockedOnSync = [];\n  const strandedByResolvedRoot = [];\n  const syncClear = [];\n  for (const item of candidates) {\n    const root = resolveRoot(view, item.id);\n    if (drift[root]?.needsSync) {\n      blockedOnSync.push(item.id);\n    } else if (root !== item.id && isResolvedStatus(work[root])) {\n      strandedByResolvedRoot.push(item.id);\n    } else {\n      syncClear.push(item);\n    }\n  }\n\n  const conflicts = footprintOverlapAmong(syncClear);\n  const conflictedIds = new Set();\n  for (const { a, b } of conflicts) {\n    conflictedIds.add(a);\n    conflictedIds.add(b);\n  }\n\n  const rankedIds = rankImpact(view).map((row) => row.id);\n  const orderByRank = (ids) => rankedIds.filter((id) => ids.includes(id));\n\n  const readyIdSet = new Set(\n    syncClear.map((item) => item.id).filter((id) => !conflictedIds.has(id)),\n  );\n\n  // supersededOut (tsk-2ie D2, docs/history/tsk-2ie-duplicate-superseded-\n  // guard/): exclude any readyIdSet member whose supersededBy target is\n  // RESOLVED (isResolvedStatus, same gate deps/mergeAfter already reuse)\n  // OR itself present in this SAME readyIdSet snapshot (about to merge this\n  // same round) -- a single pass against the ORIGINAL readyIdSet, checked\n  // before any deletion, so a mutual pair (A supersededBy B, B supersededBy\n  // A) is excluded on both sides deterministically rather than depending on\n  // iteration order. `duplicates` is read by nothing here (D4 --\n  // informational only).\n  const supersededOutIds = [];\n  for (const id of readyIdSet) {\n    const target = work[id]?.supersededBy;\n    if (typeof target !== 'string') continue;\n    if (isResolvedStatus(work[target]) || readyIdSet.has(target)) {\n      supersededOutIds.push(id);\n    }\n  }\n  for (const id of supersededOutIds) {\n    readyIdSet.delete(id);\n  }\n  const supersededOut = orderByRank(supersededOutIds);\n\n  const ready = orderByRank([...readyIdSet]);\n\n  const mergeSets = [];\n\n  if (conflictedIds.size > 0) {\n    // Connected components over `conflicts`' pairs (a chain of overlapping\n    // pairs becomes ONE mergeSet, not several) — a minimal union-find,\n    // scoped to this call, never persisted.\n    const find = (parents, x) => {\n      while (parents.get(x) !== x) x = parents.get(x);\n      return x;\n    };\n    const parents = new Map();\n    for (const id of conflictedIds) parents.set(id, id);\n    for (const { a, b } of conflicts) {\n      const ra = find(parents, a);\n      const rb = find(parents, b);\n      if (ra !== rb) parents.set(ra, rb);\n    }\n    const components = new Map();\n    for (const id of conflictedIds) {\n      const root = find(parents, id);\n      if (!components.has(root)) components.set(root, []);\n      components.get(root).push(id);\n    }\n    for (const ids of components.values()) {\n      const order = orderByRank(ids);\n      mergeSets.push({ items: order, order, reason: 'footprint-overlap' });\n    }\n  }\n\n  const rootGroups = new Map();\n  for (const id of readyIdSet) {\n    const root = resolveRoot(view, id);\n    if (!rootGroups.has(root)) rootGroups.set(root, []);\n    rootGroups.get(root).push(id);\n  }\n  for (const ids of rootGroups.values()) {\n    if (ids.length < 2) continue;\n    const order = orderByRank(ids);\n    mergeSets.push({ items: order, order, reason: 'shared-root' });\n  }\n\n  const mergeTier = {};\n  for (const item of proposed) {\n    mergeTier[item.id] = item.parent ? 'leaf-to-root' : 'root-to-main';\n  }\n\n  // tsk-4zj D6: `ready`/`waiting`/`blockedOnSync`/`supersededOut`/\n  // `mergeSets`/`mergeTier` above are all id-referencing, never full item\n  // objects (unlike this function's own internal `candidates`/`syncClear`\n  // locals, which never reach the return) — so, same as `graphMetrics`'s\n  // own `stepByItem` (graph-metrics.mjs), this adds one flat side-map\n  // rather than changing any existing id-array shape to an object-array.\n  // Covers every id in `work`, not just ids already surfaced in one of the\n  // buckets above, so a reader never has to guess which sub-shape an id\n  // came from before looking its step up here.\n  const stepByItem = Object.fromEntries(\n    Object.keys(work).map((id) => [id, effectiveStep(work[id], getDomain(work[id].domain))]),\n  );\n\n  return {\n    ready,\n    waiting,\n    conflicts,\n    mergeSets,\n    // tsk-173: rank-ordered same as ready/mergeSets/supersededOut above --\n    // merge next's auto-sync-root branch (bin/fgos.mjs) picks blockedOnSync[0]\n    // as \"the top-ranked blocked root\", a claim only meaningful once this\n    // bucket is ordered like every other one already is.\n    blockedOnSync: orderByRank(blockedOnSync),\n    strandedByResolvedRoot: orderByRank(strandedByResolvedRoot),\n    mergeTier,\n    supersededOut,\n    stepByItem,\n  };\n}\n\n/**\n * Group `mergeReadiness`'s own buckets into a nested merge tree (tsk-2x9k,\n * docs/history/merge-list-tree-bottleneck-priority/). PURE, same read-only\n * discipline as `mergeReadiness` itself — takes the SAME view plus the\n * `mergeReadiness` result already computed for it, never recomputes\n * `footprintOverlapAmong`/the dep-wait gate internally.\n *\n * D1/D4 (docs/history/merge-list-tree-bottleneck-priority/CONTEXT.md):\n * `mergeReadiness`'s own return shape is NEVER touched by this function —\n * a separate, additive view over the same computed buckets, meant to be\n * composed by a caller (`bin/fgos.mjs`'s `merge list` sub-verb) as\n * `{ ...mergeReadiness(...), tree: mergeTree(...) }`, never spread INTO\n * `mergeReadiness`'s own object. Four existing tests in this module's own\n * test file do an exact `assert.deepEqual` against `mergeReadiness`'s full\n * return shape — adding a field there directly would break them.\n *\n * D2: every id `mergeReadiness` surfaces in ANY bucket (`ready`, `waiting`,\n * `blockedOnSync`, `strandedByResolvedRoot` (tsk-4s0), every id inside a\n * `footprint-overlap` `mergeSets` entry, `supersededOut`) gets a node here\n * — never just `ready`. A `shared-root` `mergeSets` entry is informational\n * only (its items are already in `ready`) and adds no separate status.\n *\n * D3: every nesting level — the top-level root set AND every parent's own\n * children group — is sorted by the SAME order `mergeReadiness` already\n * uses for `ready` (`rankImpact`'s `blocks` descending, tie-broken by\n * `goalTier` then id), never a bespoke per-level sort.\n *\n * D7: a blocked/conflicted node carries a `reason` string naming the\n * specific cause and counterpart item, not just a bare status word.\n *\n * Nesting needs more than the direct candidate ids: a leaf's own immediate\n * parent is very often NOT itself a merge candidate — a decomposed root/\n * intermediate item never merges itself (`cleanup-harness.mjs`'s own\n * \"decompose-into-children never itself merges\"), so it never appears in\n * any of `mergeReadiness`'s buckets — but it still has to exist as a node\n * for its children to nest under, or the tree cannot show \"child merges\n * into parent\" at all. This function walks each candidate's `parent`\n * chain and materializes those real ancestors as plain container nodes\n * (`status: 'container'`, no `reason`) — real items, just not themselves\n * proposed for merge right now. An ancestor id not itself present in\n * `view.work` (a dangling/stale `parent` reference) stops the walk there\n * and the child surfaces at the top level instead of being silently\n * dropped — the same \"never hide\" principle D2 already established.\n */\nexport function mergeTree(view, readiness, opts = {}) {\n  const work = view?.work ?? {};\n  const drift = opts.drift ?? {};\n\n  const statusById = new Map();\n  for (const id of readiness.waiting) statusById.set(id, { status: 'waiting' });\n  for (const id of readiness.blockedOnSync) {\n    const root = resolveRoot(view, id);\n    const d = drift[root];\n    statusById.set(id, {\n      status: 'blocked-sync',\n      reason: d\n        ? `root cần sync: ${d.branch} lệch ${d.aheadOfTarget} ahead / ${d.behindTarget} behind ${d.target}`\n        : 'root cần sync',\n    });\n  }\n  for (const set of readiness.mergeSets) {\n    if (set.reason !== 'footprint-overlap') continue;\n    for (const id of set.items) {\n      const conflict = readiness.conflicts.find((c) => c.a === id || c.b === id);\n      const counterpart = conflict ? (conflict.a === id ? conflict.b : conflict.a) : null;\n      const sharedFiles = conflict?.shared?.length ? conflict.shared.join(', ') : null;\n      statusById.set(id, {\n        status: 'conflicted',\n        reason: counterpart\n          ? `conflict với ${counterpart}${sharedFiles ? ` qua ${sharedFiles}` : ''}`\n          : 'footprint conflict',\n      });\n    }\n  }\n  for (const id of readiness.supersededOut) {\n    const target = work[id]?.supersededBy;\n    statusById.set(id, {\n      status: 'superseded',\n      reason: target ? `superseded bởi ${target}` : 'superseded',\n    });\n  }\n  // tsk-4s0 (piece 2 of tsk-4qu's leaf-merge-into-resolved-root fix): a\n  // strandedByResolvedRoot id would otherwise get NO node at all here (it\n  // is deliberately excluded from `ready` and was never in any other\n  // bucket) — violates D2's own \"never hide\" invariant. Same shape as\n  // blockedOnSync just above: a distinct status naming the real cause.\n  for (const id of readiness.strandedByResolvedRoot) {\n    const root = resolveRoot(view, id);\n    const rootItem = work[root];\n    statusById.set(id, {\n      status: 'stranded-resolved-root',\n      reason: rootItem\n        ? `root ${root} đã ${rootItem.status} — sẽ không được sync lên main`\n        : 'root đã resolved',\n    });\n  }\n  // `ready` last -- mergeReadiness's own membership rule already keeps\n  // `ready` disjoint from every exclusion bucket above, so plain\n  // assignment here never overwrites a real blocked/conflicted status.\n  for (const id of readiness.ready) statusById.set(id, { status: 'ready' });\n\n  const nodeIds = new Set(statusById.keys());\n  for (const id of statusById.keys()) {\n    let current = work[id];\n    const seen = new Set([id]); // cycle guard against a malformed parent loop\n    while (current?.parent && work[current.parent] && !seen.has(current.parent)) {\n      nodeIds.add(current.parent);\n      seen.add(current.parent);\n      current = work[current.parent];\n    }\n  }\n\n  // tsk-4s0: `{ includeDone: true }` (unlike mergeReadiness's own\n  // `orderByRank` above, which only ever ranks already-open `candidates`)\n  // -- a RESOLVED item can now legitimately need a container node here\n  // (an open leaf nesting under its own resolved root is exactly the\n  // strandedByResolvedRoot case just above), and `rankImpact`'s default\n  // `openIds`-only ranking would silently drop that container id out of\n  // `orderByRank`'s filter, hiding every child nested under it -- the\n  // same D2 \"never hide\" invariant this whole function exists to uphold.\n  const rankedIds = rankImpact(view, { includeDone: true }).map((row) => row.id);\n  const orderByRank = (ids) => rankedIds.filter((id) => ids.includes(id));\n\n  const childrenByParent = new Map();\n  const topLevelIds = [];\n  for (const id of nodeIds) {\n    const parentId = work[id]?.parent;\n    if (parentId && work[parentId] && nodeIds.has(parentId)) {\n      if (!childrenByParent.has(parentId)) childrenByParent.set(parentId, []);\n      childrenByParent.get(parentId).push(id);\n    } else {\n      topLevelIds.push(id);\n    }\n  }\n\n  const buildNode = (id) => {\n    const info = statusById.get(id) ?? { status: 'container' };\n    const kids = childrenByParent.get(id) ?? [];\n    return {\n      id,\n      title: work[id]?.title ?? id,\n      ...info,\n      children: orderByRank(kids).map(buildNode),\n    };\n  };\n\n  return orderByRank(topLevelIds).map(buildNode);\n}\n\n/**\n * The still-open items that merge into the SAME target ref as `landedId` —\n * the only branches a land can possibly have put behind. An item's target is\n * `fgw/<parent>` when it has a parent and the trunk otherwise, so \"same\n * target\" is exactly \"same parent\", with two parentless items both aimed at\n * the trunk.\n *\n * Two exclusions, both because the excluded item has nothing to compare:\n * a RESOLVED item (`isResolvedStatus`) has already merged or been dropped,\n * and a pre-claim (`todo`) item's `fgw/<id>` branch is created back at\n * decompose carrying no commit of its own — its changed-file set is empty,\n * so running a diff for it buys a guaranteed-empty answer. Refreshing that\n * decompose→pick gap is `pick`-time refresh's job, not this detection's.\n */\nexport function openLeavesSharingTarget(view, landedId) {\n  const work = view?.work ?? {};\n  const landed = work[landedId];\n  if (!landed) return [];\n  const target = landed.parent ?? null;\n  return Object.values(work)\n    .filter((item) => item.id !== landedId\n      && (item.parent ?? null) === target\n      && item.status !== 'todo'\n      && !isResolvedStatus(item))\n    .map((item) => item.id)\n    .sort();\n}\n\n/**\n * D4's three-way split over REAL changed-file sets — never declared\n * `footprint`, which an item fills in by hand and can leave stale or empty\n * (`footprintOverlapAmong` above compares exactly that weaker signal; here\n * git has already given the ground truth, so nothing needs to stand in for\n * it).\n *\n * A leaf sharing no path with what just landed produces NOTHING — no\n * notification, no mark. That silence is the point: a root landing 13\n * children sequentially would otherwise pay ~78 catchup+verify rounds, and\n * most of them discover nothing collided. A leaf that does share a path\n * either goes to the session that owns it — cheapest to fix while that\n * context is still in someone's head, and the owner is the only party\n * allowed to touch that branch — or, with no session behind it, is marked\n * stale for the lazy catchup it will get when it reaches the merge queue.\n *\n * `leaves` entries are `{id, files, sessionIds}`; the caller supplies the\n * real diffs and the real session registry, keeping this half pure.\n */\nexport function classifyPostLandDrift({ landedFiles = [], leaves = [] } = {}) {\n  const landed = new Set(landedFiles);\n  const notify = [];\n  const stale = [];\n  for (const leaf of leaves) {\n    const shared = (leaf.files ?? []).filter((file) => landed.has(file)).sort();\n    if (shared.length === 0) continue;\n    const sessionIds = leaf.sessionIds ?? [];\n    if (sessionIds.length > 0) {\n      notify.push({ id: leaf.id, shared, sessionIds });\n    } else {\n      stale.push({ id: leaf.id, shared });\n    }\n  }\n  return { notify, stale };\n}\n",
+      "record": {
+        "file": "src/state/graph-harness.mjs",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+        "inventoryFileDigest": "6d93e939f7d13ec8f24957eca8b02bc66aad00573c4369175bcb426915ac789b",
+        "digest": "6d93e939f7d13ec8f24957eca8b02bc66aad00573c4369175bcb426915ac789b",
+        "inventoryEdgeIds": [
+          "class6-l-000427",
+          "class6-l-000428",
+          "class6-l-000429",
+          "class6-l-000430",
+          "class6-l-000431",
+          "class6-l-000432"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000427",
+            "slotKey": "{\"edgeId\":\"class6-l-000427\",\"file\":\"src/state/graph-harness.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000427\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000427",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1
+              }
+            ],
+            "consumerFile": "src/state/graph-harness.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1,
+                "columnStart": 56,
+                "columnEndExclusive": 69,
+                "text": "docs/history/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1,
+                "columnStart": 56,
+                "columnEndExclusive": 69,
+                "text": "docs/history/"
+              }
+            ],
+            "matchedExpression": "docs/history/",
+            "logicalReference": "docs/history/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '// graph-harness.mjs — merge-order ranking (tsk-4j9-2, docs/history/'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000427",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1,
+                "matchedExpression": "docs/history/",
+                "originalLineText": "// graph-harness.mjs — merge-order ranking (tsk-4j9-2, docs/history/"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000428",
+            "slotKey": "{\"edgeId\":\"class6-l-000428\",\"file\":\"src/state/graph-harness.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000428\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":28}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000428",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 28
+              }
+            ],
+            "consumerFile": "src/state/graph-harness.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 28,
+                "columnStart": 27,
+                "columnEndExclusive": 75,
+                "text": "docs/history/tsk-3bn-merge-conductor-harness-v2/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 28,
+                "columnStart": 27,
+                "columnEndExclusive": 75,
+                "text": "docs/history/tsk-3bn-merge-conductor-harness-v2/"
+              }
+            ],
+            "matchedExpression": "docs/history/tsk-3bn-merge-conductor-harness-v2/",
+            "logicalReference": "docs/history/tsk-3bn-merge-conductor-harness-v2/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: ' * `opts.drift` (tsk-2u0, docs/history/tsk-3bn-merge-conductor-harness-v2/):'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/tsk-3bn-merge-conductor-harness-v2/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000428",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 28,
+                "matchedExpression": "docs/history/tsk-3bn-merge-conductor-harness-v2/",
+                "originalLineText": " * `opts.drift` (tsk-2u0, docs/history/tsk-3bn-merge-conductor-harness-v2/):"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000429",
+            "slotKey": "{\"edgeId\":\"class6-l-000429\",\"file\":\"src/state/graph-harness.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000429\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":98}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000429",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 98
+              }
+            ],
+            "consumerFile": "src/state/graph-harness.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 98,
+                "columnStart": 43,
+                "columnEndExclusive": 56,
+                "text": "docs/history/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 98,
+                "columnStart": 43,
+                "columnEndExclusive": 56,
+                "text": "docs/history/"
+              }
+            ],
+            "matchedExpression": "docs/history/",
+            "logicalReference": "docs/history/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: \" *     same call's ready-set (tsk-2ie D2, docs/history/\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000429",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 98,
+                "matchedExpression": "docs/history/",
+                "originalLineText": " *     same call's ready-set (tsk-2ie D2, docs/history/"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000430",
+            "slotKey": "{\"edgeId\":\"class6-l-000430\",\"file\":\"src/state/graph-harness.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000430\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":158}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000430",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 158
+              }
+            ],
+            "consumerFile": "src/state/graph-harness.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 158,
+                "columnStart": 33,
+                "columnEndExclusive": 75,
+                "text": "docs/history/tsk-2ie-duplicate-superseded-"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 158,
+                "columnStart": 33,
+                "columnEndExclusive": 75,
+                "text": "docs/history/tsk-2ie-duplicate-superseded-"
+              }
+            ],
+            "matchedExpression": "docs/history/tsk-2ie-duplicate-superseded-",
+            "logicalReference": "docs/history/tsk-2ie-duplicate-superseded-",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '  // supersededOut (tsk-2ie D2, docs/history/tsk-2ie-duplicate-superseded-'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/tsk-2ie-duplicate-superseded-",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000430",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 158,
+                "matchedExpression": "docs/history/tsk-2ie-duplicate-superseded-",
+                "originalLineText": "  // supersededOut (tsk-2ie D2, docs/history/tsk-2ie-duplicate-superseded-"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000431",
+            "slotKey": "{\"edgeId\":\"class6-l-000431\",\"file\":\"src/state/graph-harness.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000431\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":260}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000431",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 260
+              }
+            ],
+            "consumerFile": "src/state/graph-harness.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 260,
+                "columnStart": 4,
+                "columnEndExclusive": 53,
+                "text": "docs/history/merge-list-tree-bottleneck-priority/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 260,
+                "columnStart": 4,
+                "columnEndExclusive": 53,
+                "text": "docs/history/merge-list-tree-bottleneck-priority/"
+              }
+            ],
+            "matchedExpression": "docs/history/merge-list-tree-bottleneck-priority/",
+            "logicalReference": "docs/history/merge-list-tree-bottleneck-priority/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: ' * docs/history/merge-list-tree-bottleneck-priority/). PURE, same read-only'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/merge-list-tree-bottleneck-priority/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000431",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 260,
+                "matchedExpression": "docs/history/merge-list-tree-bottleneck-priority/",
+                "originalLineText": " * docs/history/merge-list-tree-bottleneck-priority/). PURE, same read-only"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000432",
+            "slotKey": "{\"edgeId\":\"class6-l-000432\",\"file\":\"src/state/graph-harness.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000432\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":265}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000432",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 265
+              }
+            ],
+            "consumerFile": "src/state/graph-harness.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 265,
+                "columnStart": 11,
+                "columnEndExclusive": 70,
+                "text": "docs/history/merge-list-tree-bottleneck-priority/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 265,
+                "columnStart": 11,
+                "columnEndExclusive": 70,
+                "text": "docs/history/merge-list-tree-bottleneck-priority/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/merge-list-tree-bottleneck-priority/CONTEXT.md",
+            "logicalReference": "docs/history/merge-list-tree-bottleneck-priority/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: ' * D1/D4 (docs/history/merge-list-tree-bottleneck-priority/CONTEXT.md):'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/merge-list-tree-bottleneck-priority/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000432",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 265,
+                "matchedExpression": "docs/history/merge-list-tree-bottleneck-priority/CONTEXT.md",
+                "originalLineText": " * D1/D4 (docs/history/merge-list-tree-bottleneck-priority/CONTEXT.md):"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-026",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "src/state/graph-harness.mjs",
+          "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+          "digest": "6d93e939f7d13ec8f24957eca8b02bc66aad00573c4369175bcb426915ac789b",
+          "bytes": 22259,
+          "lines": 469,
+          "headings": [],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "renderContexts": {},
+      "populationGapFindings": [],
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "src/state/priority-formula.mjs",
+      "sourceDigest": "5a1767b93f0155567472eb059899aa993a147ecc0e0aaf75dafe8e93da72d6fe",
+      "sourceContext": "// priority-formula.mjs — pure calculation for work-item-priority-matrix\n// (tsk-4y5, D6). No fs/Date.now/mutation — same discipline as\n// src/state/impact.mjs and src/state/graph-metrics.mjs.\n//\n// priority = invert((impact * weight(urgent)) / max(effort, floor) * discount(risk))\n//\n// `invert()` matters: work.priority's schema/sort contract is ASC with\n// absent-last (Data Dictionary #25) — smaller number = higher priority —\n// while impact/urgent/effort/risk combine into a raw score where BIGGER\n// means MORE important. Getting this backwards silently reorders every\n// item's priority; see CONTEXT.md D6 for why this is called out as the\n// single highest-consequence correctness risk in this feature.\n\nexport const URGENCY_WEIGHTS = Object.freeze({ low: 0.5, medium: 1, high: 2, critical: 4 });\nexport const RISK_DISCOUNTS = Object.freeze({ light: 1, standard: 0.85, heavy: 0.6 });\nexport const EFFORT_FLOOR = 1;\nexport const PRIORITY_SCALE = 10000;\n\n// D5: reuses fgos-coding-planning's own mode vocabulary (SKILL.md step 2's mode\n// gate: tiny/small/standard/high-risk/spike) rather than a bespoke numeric\n// estimator with no precedent in the repo. `spike` gets a low number\n// deliberately: a spike's own effort (answering one yes/no question) is\n// typically small even though its OUTCOME is high-stakes for what comes\n// after -- that stakes signal belongs to `risk`/`impact`, not `effort`.\nexport const MODE_EFFORT = Object.freeze({ tiny: 1, small: 2, standard: 4, 'high-risk': 8, spike: 2 });\n\nexport function effortForMode(mode) {\n  return MODE_EFFORT[mode] ?? MODE_EFFORT.standard;\n}\n\nexport function weightForUrgency(urgent) {\n  return URGENCY_WEIGHTS[urgent] ?? URGENCY_WEIGHTS.medium;\n}\n\nexport function discountForRisk(risk) {\n  return RISK_DISCOUNTS[risk] ?? RISK_DISCOUNTS.standard;\n}\n\n// tsk-4hb: `risk` is free text (Data Dictionary #6, docs/specs/work-state.md),\n// so a value outside RISK_DISCOUNTS is spec-legal, not a data error --\n// discountForRisk's own `?? standard` fallback cannot tell \"absent\" (a\n// legitimate default) apart from \"present but unrecognized\" (silently\n// masked, same discount either way). This pure query lets a caller that\n// already does side effects (addDecision) log the distinction instead of\n// leaving it invisible.\nexport function isRecognizedRisk(risk) {\n  return Object.hasOwn(RISK_DISCOUNTS, risk);\n}\n\n// D8: de-risking value feeds `impact` as a bonus (never `risk`) — sub-linear\n// (sqrt) so a very large blast radius still yields a bounded bonus rather\n// than dominating the whole score. 0 when no measurement exists yet (the\n// clarify rough pass, before a code target is known).\nexport function derisknBonus(blastRadius) {\n  if (!Number.isFinite(blastRadius) || blastRadius <= 0) return 0;\n  return Math.sqrt(blastRadius);\n}\n\n// D4/D8: the SAME blast-radius measurement also discounts `risk` further —\n// never boosts, only ever shrinks the multiplier further below the\n// keyword-based baseline. Reading the same number twice for two different\n// roles is not circular (see CONTEXT.md D8): neither role depends on the\n// other's *output*, both read the same upstream measurement independently.\nexport function discountForRiskWithBlastRadius(risk, blastRadius) {\n  const base = discountForRisk(risk);\n  if (!Number.isFinite(blastRadius) || blastRadius <= 0) return base;\n  return base / (1 + Math.sqrt(blastRadius) / 10);\n}\n\n// D3: impact = blocks (STR21 rankImpact, always available) + semantic\n// relatedness (judge-estimated, always available) + de-risk bonus (only\n// once a real blast-radius measurement exists — 0 at the clarify rough\n// pass, per D8).\nexport function computeImpact({ blocks = 0, semanticRelatedness = 0, blastRadius } = {}) {\n  return blocks + semanticRelatedness + derisknBonus(blastRadius);\n}\n\n/**\n * D6's calculated `priority`. `effort`/`blastRadius` are optional (absent\n * at the clarify rough pass, per plan.md's phased design) — `effort`\n * defaults to `EFFORT_FLOOR` (assume the cheapest case until decompose\n * knows better, never divide-by-zero), `blastRadius` defaults to no bonus\n * / no extra discount (handled inside `derisknBonus`/\n * `discountForRiskWithBlastRadius`).\n */\nexport function computePriority({ impact = 0, urgent, effort = EFFORT_FLOOR, risk, blastRadius } = {}) {\n  const w = weightForUrgency(urgent);\n  const e = Math.max(effort, EFFORT_FLOOR);\n  const d = discountForRiskWithBlastRadius(risk, blastRadius);\n  const raw = (impact * w * d) / e;\n  return Math.round(PRIORITY_SCALE / (raw + 1));\n}\n",
+      "record": {
+        "file": "src/state/priority-formula.mjs",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+        "inventoryFileDigest": "5a1767b93f0155567472eb059899aa993a147ecc0e0aaf75dafe8e93da72d6fe",
+        "digest": "5a1767b93f0155567472eb059899aa993a147ecc0e0aaf75dafe8e93da72d6fe",
+        "inventoryEdgeIds": [
+          "class6-l-000447"
+        ],
+        "diff": "--- a/src/state/priority-formula.mjs\n+++ b/src/state/priority-formula.mjs\n@@ -36,7 +36,7 @@\n   return RISK_DISCOUNTS[risk] ?? RISK_DISCOUNTS.standard;\n }\n \n-// tsk-4hb: `risk` is free text (Data Dictionary #6, docs/specs/work-state.md),\n+// tsk-4hb: `risk` is free text (Data Dictionary #6, docs/platform/work-state/spec.md#3-work-item-data-dictionary),\n // so a value outside RISK_DISCOUNTS is spec-legal, not a data error --\n // discountForRisk's own `?? standard` fallback cannot tell \"absent\" (a\n // legitimate default) apart from \"present but unrecognized\" (silently\n",
+        "edges": [
+          {
+            "edgeId": "class6-l-000447",
+            "slotKey": "{\"edgeId\":\"class6-l-000447\",\"file\":\"src/state/priority-formula.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000447\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":39}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000447",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 39
+              }
+            ],
+            "consumerFile": "src/state/priority-formula.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 39,
+                "columnStart": 54,
+                "columnEndExclusive": 78,
+                "text": "docs/specs/work-state.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 39,
+                "columnStart": 54,
+                "columnEndExclusive": 78,
+                "text": "docs/specs/work-state.md"
+              }
+            ],
+            "matchedExpression": "docs/specs/work-state.md",
+            "logicalReference": "docs/specs/work-state.md",
+            "disposition": "patch",
+            "diffHunk": "@@ -36,7 +36,7 @@",
+            "reason": "A51, L12-7/30/31/32/58: The candidate Data Dictionary retains risk as free text. That exact field-6 row supports the existing fallback, with no changed risk enum or runtime behavior. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/platform/work-state/spec.md",
+            "anchor": "3-work-item-data-dictionary",
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/specs/work-state.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000447",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 39,
+                "matchedExpression": "docs/specs/work-state.md",
+                "originalLineText": "// tsk-4hb: `risk` is free text (Data Dictionary #6, docs/specs/work-state.md),"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {
+              "{\"edgeId\":\"class6-l-000447\",\"file\":\"src/state/priority-formula.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000447\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":39}]}": "read-only citation; no writer/default-root/schema/identity change"
+            },
+            "descriptionTruth": {
+              "{\"edgeId\":\"class6-l-000447\",\"file\":\"src/state/priority-formula.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000447\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":39}]}": {
+                "sourcePassage": "// tsk-4hb: `risk` is free text (Data Dictionary #6, docs/specs/work-state.md),",
+                "adjacentPassage": "// tsk-4hb: `risk` is free text (Data Dictionary #6, docs/specs/work-state.md),\n// so a value outside RISK_DISCOUNTS is spec-legal, not a data error --\n// discountForRisk's own `?? standard` fallback cannot tell \"absent\" (a\n// legitimate default) apart from \"present but unrecognized\" (silently\n// masked, same discount either way). This pure query lets a caller that\n// already does side effects (addDecision) log the distinction instead of\n// leaving it invisible.\nexport function isRecognizedRisk(risk) {\n  return Object.hasOwn(RISK_DISCOUNTS, risk);\n}",
+                "target": "docs/platform/work-state/spec.md",
+                "targetCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+                "targetDigest": "d16dcf325bdc34ad722fcd35f08beb3977487a8b226889fd85dbdbb1ec5a9469",
+                "targetEvidence": [
+                  {
+                    "line": 67,
+                    "text": "| 6 | risk | Mức rủi ro của việc (câu 4) | free text | yes | — |"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "The candidate Data Dictionary retains risk as free text. That exact field-6 row supports the existing fallback, with no changed risk enum or runtime behavior. Source claim checked in its complete adjacent comment/unit."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "The candidate Data Dictionary retains risk as free text. That exact field-6 row supports the existing fallback, with no changed risk enum or runtime behavior. Source claim checked in its complete adjacent comment/unit."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "The candidate Data Dictionary retains risk as free text. That exact field-6 row supports the existing fallback, with no changed risk enum or runtime behavior. Source claim checked in its complete adjacent comment/unit."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "The candidate Data Dictionary retains risk as free text. That exact field-6 row supports the existing fallback, with no changed risk enum or runtime behavior. Source claim checked in its complete adjacent comment/unit."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "The candidate Data Dictionary retains risk as free text. That exact field-6 row supports the existing fallback, with no changed risk enum or runtime behavior. Source claim checked in its complete adjacent comment/unit."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "The candidate Data Dictionary retains risk as free text. That exact field-6 row supports the existing fallback, with no changed risk enum or runtime behavior. Source claim checked in its complete adjacent comment/unit."
+                  }
+                },
+                "assessment": "The candidate Data Dictionary retains risk as free text. That exact field-6 row supports the existing fallback, with no changed risk enum or runtime behavior."
+              }
+            },
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {
+            "{\"edgeId\":\"class6-l-000447\",\"file\":\"src/state/priority-formula.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000447\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":39}]}": {
+              "targetCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+              "targetDigest": "d16dcf325bdc34ad722fcd35f08beb3977487a8b226889fd85dbdbb1ec5a9469",
+              "passage": "| 6 | risk | Mức rủi ro của việc (câu 4) | free text | yes | — |",
+              "targetEvidenceLine": 67,
+              "targetLines": [
+                67
+              ],
+              "targetLineText": [
+                "| 6 | risk | Mức rủi ro của việc (câu 4) | free text | yes | — |"
+              ],
+              "sourceLocatorTokens": [],
+              "locatorScopeReason": "The candidate Data Dictionary retains risk as free text. That exact field-6 row supports the existing fallback, with no changed risk enum or runtime behavior."
+            }
+          },
+          "relativeResolution": {
+            "{\"edgeId\":\"class6-l-000447\",\"file\":\"src/state/priority-formula.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000447\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":39}]}": {
+              "replacement": "docs/platform/work-state/spec.md#3-work-item-data-dictionary",
+              "resolvedTarget": "docs/platform/work-state/spec.md",
+              "targetCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+              "authorityStatus": "cutover-patch-only"
+            }
+          },
+          "labelForm": {
+            "{\"edgeId\":\"class6-l-000447\",\"file\":\"src/state/priority-formula.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000447\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":39}]}": {
+              "source": "docs/specs/work-state.md",
+              "replacement": "docs/platform/work-state/spec.md#3-work-item-data-dictionary",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            }
+          }
+        },
+        "reviewSet": "step04-026",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "src/state/priority-formula.mjs",
+          "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+          "digest": "5a1767b93f0155567472eb059899aa993a147ecc0e0aaf75dafe8e93da72d6fe",
+          "bytes": 4539,
+          "lines": 92,
+          "headings": [],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {
+        "docs/platform/work-state/spec.md": [
+          {
+            "edgeSlot": "{\"edgeId\":\"class6-l-000447\",\"file\":\"src/state/priority-formula.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000447\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":39}]}",
+            "targetCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+            "targetDigest": "d16dcf325bdc34ad722fcd35f08beb3977487a8b226889fd85dbdbb1ec5a9469",
+            "passage": "| 6 | risk | Mức rủi ro của việc (câu 4) | free text | yes | — |",
+            "targetEvidenceLine": 67,
+            "targetLines": [
+              67
+            ],
+            "targetLineText": [
+              "| 6 | risk | Mức rủi ro của việc (câu 4) | free text | yes | — |"
+            ],
+            "sourceLocatorTokens": [],
+            "locatorScopeReason": "The candidate Data Dictionary retains risk as free text. That exact field-6 row supports the existing fallback, with no changed risk enum or runtime behavior."
+          }
+        ]
+      },
+      "renderContexts": {},
+      "populationGapFindings": [],
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    }
+  ]
+}

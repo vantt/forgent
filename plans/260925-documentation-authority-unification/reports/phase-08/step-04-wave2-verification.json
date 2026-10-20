@@ -1,0 +1,505 @@
+{
+  "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+  "completedBatches": [
+    "step04-017",
+    "step04-018",
+    "step04-019",
+    "step04-020",
+    "step04-021",
+    "step04-022",
+    "step04-023",
+    "step04-024",
+    "step04-025",
+    "step04-026",
+    "step04-027",
+    "step04-028",
+    "step04-029",
+    "step04-030",
+    "step04-031",
+    "step04-032",
+    "step04-033"
+  ],
+  "fullCheckerBatches": [
+    "step04-001",
+    "step04-002",
+    "step04-003",
+    "step04-004",
+    "step04-005",
+    "step04-006",
+    "step04-007",
+    "step04-008",
+    "step04-009",
+    "step04-010",
+    "step04-011",
+    "step04-012",
+    "step04-013",
+    "step04-014",
+    "step04-015",
+    "step04-016",
+    "step04-017",
+    "step04-018",
+    "step04-019",
+    "step04-020",
+    "step04-021",
+    "step04-022",
+    "step04-023",
+    "step04-024",
+    "step04-025",
+    "step04-026",
+    "step04-027",
+    "step04-028",
+    "step04-029",
+    "step04-030",
+    "step04-031",
+    "step04-032",
+    "step04-033"
+  ],
+  "stopBoundary": "step04-033 authored; all 17 requested batches complete as records. Census admission blocks closure of the ten supplemental slots in 032/033. No consumer application or independent acceptance.",
+  "records": 94,
+  "consumerFiles": 106,
+  "slots": 291,
+  "dispositions": {
+    "preserve": 224,
+    "parked": 47,
+    "patch": 20
+  },
+  "fullCheckerFiles": 268,
+  "fullCheckerSlots": 833,
+  "fullCheckerDispositions": {
+    "preserve": 694,
+    "patch": 66,
+    "parked": 73
+  },
+  "checkerFailureCount": 0,
+  "openLeadRulingEdges": [
+    {
+      "set": "step04-032",
+      "file": "core/skills/_shared/ak-cook-worker-contract.md",
+      "edgeId": null,
+      "slotKey": "{\"edgeId\":null,\"file\":\".agents/skills/_shared/ak-cook-worker-contract.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":26,\"columnStart\":6,\"file\":\".agents/skills/_shared/ak-cook-worker-contract.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":7,\"text\":\"docs/specs/runner.md\"}}"
+    },
+    {
+      "set": "step04-032",
+      "file": "core/skills/_shared/ak-cook-worker-contract.md",
+      "edgeId": null,
+      "slotKey": "{\"edgeId\":null,\"file\":\"core/skills/_shared/ak-cook-worker-contract.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":26,\"columnStart\":6,\"file\":\"core/skills/_shared/ak-cook-worker-contract.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":6,\"text\":\"docs/specs/runner.md\"}}"
+    },
+    {
+      "set": "step04-032",
+      "file": "core/skills/_shared/ak-cook-worker-contract.md",
+      "edgeId": null,
+      "slotKey": "{\"edgeId\":null,\"file\":\"plugins/fgOS/skills/_shared/ak-cook-worker-contract.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":26,\"columnStart\":6,\"file\":\"plugins/fgOS/skills/_shared/ak-cook-worker-contract.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":7,\"text\":\"docs/specs/runner.md\"}}"
+    },
+    {
+      "set": "step04-033",
+      "file": "plans/261020-1250-debate-pattern-and-judge-role/plan.md",
+      "edgeId": null,
+      "slotKey": "{\"edgeId\":null,\"file\":\"plans/261020-1250-debate-pattern-and-judge-role/plan.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":37,\"columnStart\":15,\"file\":\"plans/261020-1250-debate-pattern-and-judge-role/plan.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":38,\"text\":\"docs/specs/workflow.md\"}}"
+    },
+    {
+      "set": "step04-033",
+      "file": "plans/261020-1250-debate-pattern-and-judge-role/plan.md",
+      "edgeId": null,
+      "slotKey": "{\"edgeId\":null,\"file\":\"plans/261020-1250-debate-pattern-and-judge-role/plan.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":72,\"columnStart\":52,\"file\":\"plans/261020-1250-debate-pattern-and-judge-role/plan.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":38,\"text\":\"docs/specs/runner.md\"}}"
+    },
+    {
+      "set": "step04-033",
+      "file": "plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md",
+      "edgeId": null,
+      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":68,\"columnStart\":48,\"file\":\"plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":35,\"text\":\"docs/specs/runner.md\"}}"
+    },
+    {
+      "set": "step04-033",
+      "file": "plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md",
+      "edgeId": null,
+      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":157,\"columnStart\":137,\"file\":\"plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":28,\"text\":\"docs/specs/runner.md\"}}"
+    },
+    {
+      "set": "step04-033",
+      "file": "plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md",
+      "edgeId": null,
+      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":33,\"columnStart\":11,\"file\":\"plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":16,\"text\":\"docs/specs/workflow.md\"}}"
+    },
+    {
+      "set": "step04-033",
+      "file": "plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md",
+      "edgeId": null,
+      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":97,\"columnStart\":77,\"file\":\"plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":16,\"text\":\"docs/specs/runner.md\"}}"
+    },
+    {
+      "set": "step04-033",
+      "file": "plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md",
+      "edgeId": null,
+      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":121,\"columnStart\":95,\"file\":\"plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":125,\"text\":\"docs/specs/workflow.md:195\"}}"
+    }
+  ],
+  "probes": {
+    "passed": 13,
+    "total": 13,
+    "allPassed": true
+  },
+  "sourceFilesWithDiff": 12,
+  "sourcePatchSlots": 16,
+  "renderPatchJoins": 4,
+  "A51": {
+    "patchedPopulation": 12,
+    "patchedSample": 7,
+    "unpatchedSample": 17,
+    "mandatorySources": 16,
+    "distinctSelectedSources": 39,
+    "perSet": "step-04-wave2-selection.json",
+    "independentReviewed": 0,
+    "reworkNumerator": null,
+    "reworkDenominator": null
+  },
+  "reviewParts": [
+    {
+      "part": 1,
+      "bytes": 379790,
+      "slots": 1,
+      "pass": true
+    },
+    {
+      "part": 2,
+      "bytes": 31335,
+      "slots": 2,
+      "pass": true
+    },
+    {
+      "part": 3,
+      "bytes": 150403,
+      "slots": 4,
+      "pass": true
+    },
+    {
+      "part": 4,
+      "bytes": 85134,
+      "slots": 4,
+      "pass": true
+    },
+    {
+      "part": 5,
+      "bytes": 46456,
+      "slots": 1,
+      "pass": true
+    },
+    {
+      "part": 6,
+      "bytes": 155681,
+      "slots": 2,
+      "pass": true
+    },
+    {
+      "part": 7,
+      "bytes": 283607,
+      "slots": 10,
+      "pass": true
+    },
+    {
+      "part": 8,
+      "bytes": 202508,
+      "slots": 11,
+      "pass": true
+    },
+    {
+      "part": 9,
+      "bytes": 338429,
+      "slots": 32,
+      "pass": true
+    },
+    {
+      "part": 10,
+      "bytes": 94779,
+      "slots": 12,
+      "pass": true
+    },
+    {
+      "part": 11,
+      "bytes": 229634,
+      "slots": 22,
+      "pass": true
+    },
+    {
+      "part": 12,
+      "bytes": 9586,
+      "slots": 2,
+      "pass": true
+    },
+    {
+      "part": 13,
+      "bytes": 76128,
+      "slots": 8,
+      "pass": true
+    },
+    {
+      "part": 14,
+      "bytes": 127522,
+      "slots": 8,
+      "pass": true
+    },
+    {
+      "part": 15,
+      "bytes": 91386,
+      "slots": 7,
+      "pass": true
+    },
+    {
+      "part": 16,
+      "bytes": 31458,
+      "slots": 3,
+      "pass": true
+    },
+    {
+      "part": 17,
+      "bytes": 118150,
+      "slots": 7,
+      "pass": true
+    }
+  ],
+  "commands": [
+    {
+      "name": "whitespace",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.01,
+      "stdout": "step-04-wave2-whitespace.stdout.log",
+      "stderr": "step-04-wave2-whitespace.stderr.log",
+      "CLAUDE_CODE_SESSION_ID": "unset",
+      "TMPDIR": "/tmp/fgos-work"
+    },
+    {
+      "name": "legacy-ratchet",
+      "argv": [
+        "node",
+        "scripts/check-legacy-docs-ratchet.mjs"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.066,
+      "stdout": "step-04-wave2-legacy-ratchet.stdout.log",
+      "stderr": "step-04-wave2-legacy-ratchet.stderr.log",
+      "CLAUDE_CODE_SESSION_ID": "unset",
+      "TMPDIR": "/tmp/fgos-work"
+    },
+    {
+      "name": "citation-drift",
+      "argv": [
+        "node",
+        "scripts/check-decision-citation-drift.mjs"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.04,
+      "stdout": "step-04-wave2-citation-drift.stdout.log",
+      "stderr": "step-04-wave2-citation-drift.stderr.log",
+      "CLAUDE_CODE_SESSION_ID": "unset",
+      "TMPDIR": "/tmp/fgos-work"
+    },
+    {
+      "name": "light-tests",
+      "argv": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "--test",
+        "test/scripts/doc-link-pass.test.mjs",
+        "test/scripts/check-doc-candidate-status.test.mjs",
+        "test/scripts/check-doc-constitution.test.mjs",
+        "test/scripts/generate-shipped-path-inventory.test.mjs",
+        "test/setup/instruction-registry.test.mjs",
+        "test/setup/instruction-composition.test.mjs",
+        "test/setup/instruction-projections.test.mjs"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 1.682,
+      "stdout": "step-04-wave2-light-tests.stdout.log",
+      "stderr": "step-04-wave2-light-tests.stderr.log",
+      "CLAUDE_CODE_SESSION_ID": "unset",
+      "TMPDIR": "/tmp/fgos-work"
+    }
+  ],
+  "writes": [
+    "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+    "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-check.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-017.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-018.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-019.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-020.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-021.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-022.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-023.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-024.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-025.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-027.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-028.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-029.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-030.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-031.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-032.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-033.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-author-times.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-author.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-check-result.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-check.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-citation-drift.stderr.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-citation-drift.stdout.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-initial-check-result.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-lead-ruling-gaps.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-legacy-ratchet.stderr.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-legacy-ratchet.stdout.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-light-tests.stderr.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-light-tests.stdout.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-manifest.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p01.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p02.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p03.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p04.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p05.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p06.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p07.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p08.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p09.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p10.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p11.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p12.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p13.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p14.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p15.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p16.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p17.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-packet.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-population-gaps.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-probes-result.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-probes.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-review-accounting.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-review-index.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-review-request.md",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-second-check-result.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-selection.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-step0-binding-check.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-step0.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-verify.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-whitespace.stderr.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-whitespace.stdout.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-whole-file-reads.json"
+  ],
+  "outOfScopeWrites": [],
+  "protectedBindingCount": 1740,
+  "protectedDrift": [],
+  "sourceReadReceipts": 107,
+  "inheritedWave1ZeroEdgeCoverage": "step-04-wave1-zero-edge-coverage.json remains unchanged",
+  "noConsumerEdits": true,
+  "generatorRuns": 0,
+  "gitMutations": 0,
+  "fgosCliInvocations": 0,
+  "reviewersStarted": 0,
+  "pairAccountingParts": 0,
+  "committedByteAcceptance": "Pending runner commit and ordinary L12-11 Lead accounting; no guessed commit or post-commit reproduction claim",
+  "knownLeadBaseline": "L12-59: main fixed the former backlog D6 citation; the standalone citation-drift command is replayed here. Both changed documentation files received the two-extractor Step 0 check. Post-commit L12-11 reproduction acceptance remains separate.",
+  "preview": "Not started: MDView MCP unavailable, and CLI preview was omitted to honor the assignment’s strict write scope. Markdown is available directly.",
+  "reviewerBudget": {
+    "elapsedSeconds": 0,
+    "remainingSeconds": null,
+    "status": "Lead must allocate; no independent review started"
+  },
+  "inputIntegrity": {
+    "step-04-check.py": "c7297e26759dc09d8b1b81bb8fb00cd496d13856b97bc1a457263d8ae1fbe855",
+    "step-04-wave2-author.py": "dfe7a2fe9009437a88b0b1d9102535ded643e0dad68438825e3a0fe709e39284",
+    "step-04-wave2-check.py": "bb4127065e6f46562abfa48afbf149121a10062011d2cf1d883f03c5f86165db",
+    "step-04-wave2-probes.py": "9137a41941a09b01b5d2b074ef75a6eff75b75e0e5828cb666868b7d546a5ddb",
+    "step-04-wave2-packet.py": "c340daf89e21a38c5bf90a46ebf9b0afc5eb9026547a99ff2e0dd6901fa32a1a",
+    "step-04-wave2-selection.json": "6422472433f1aaf869634e04788e0992580995fa1eefe2205032ead5fe9d05e2",
+    "step-04-wave2-manifest.json": "d31dd0fcfefd00fa907c4c5df3eec0a0dcccae94137fede1cf7f1e06f3f2dfc4"
+  },
+  "recordFilesBoundToFullChecker": true,
+  "verifiedAt": "2026-10-20T10:59:15.458839+00:00",
+  "pass": true,
+  "finalWriteScope": {
+    "writes": [
+      "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-check.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-017.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-018.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-019.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-020.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-021.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-022.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-023.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-024.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-025.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-027.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-028.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-029.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-030.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-031.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-032.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-033.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-author-times.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-author.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-check-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-check.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-citation-drift.stderr.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-citation-drift.stdout.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-initial-check-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-lead-ruling-gaps.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-legacy-ratchet.stderr.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-legacy-ratchet.stdout.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-light-tests.stderr.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-light-tests.stdout.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-manifest.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p01.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p02.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p03.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p04.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p05.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p06.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p07.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p08.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p09.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p10.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p11.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p12.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p13.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p14.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p15.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p16.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-p17.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-packet.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-population-gaps.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-probes-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-probes.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-protected-bindings.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-review-accounting.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-review-index.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-review-request.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-second-check-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-selection.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-step0-binding-check.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-step0.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-verification.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-verify.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-whitespace.stderr.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-whitespace.stdout.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-whole-file-reads.json"
+    ],
+    "outOfScope": [],
+    "bytecodeCaches": [],
+    "progressSha256": "601a6d11185d1eb7e888ca930f4cd1a8f71d4d0005d653f2cd264359e2f0008d",
+    "recordAndManifestHashesRechecked": true,
+    "allPythonParses": true
+  },
+  "lightTestCounts": {
+    "tests": 178,
+    "passed": 178,
+    "failed": 0,
+    "skipped": 0
+  },
+  "unadmittedPopulationGapCount": 3
+}

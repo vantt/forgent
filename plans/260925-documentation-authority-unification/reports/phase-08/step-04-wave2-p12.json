@@ -1,0 +1,181 @@
+{
+  "authorInputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+  "reviewerRule": "Never run checker/probes/resolver/author scripts. Read every assigned file through EOF and independently verify targets. One verdict per whole file, even when streamed.",
+  "set": "step04-028",
+  "files": [
+    "src/util/format-duration.mjs"
+  ],
+  "joinedSlots": 2,
+  "items": [
+    {
+      "file": "src/util/format-duration.mjs",
+      "sourceDigest": "aa3d4629659f6b635267965013716b45e71120cce5282f6b2a4503148c616ce9",
+      "sourceContext": "// format-duration.mjs — humanize a millisecond count into a short string\n// (`1d 3h`, `5h 12m`, `2m 30s`, `45s`). PURE: no fs, no `.fgos/` read.\n//\n// First occupant of `src/util/`, the repo's cross-cutting pure-utility\n// location: this belongs to none of the 9 domain subsystems under `src/`\n// (docs/history/parallel-dispatch-demo-format-utils/plan.md, Approach).\n\nconst SECOND = 1000;\nconst MINUTE = 60 * SECOND;\nconst HOUR = 60 * MINUTE;\nconst DAY = 24 * HOUR;\n\n/**\n * Humanize `ms` into at most two units, starting from the largest non-zero\n * one and descending day -> hour -> minute -> second (D2,\n * docs/history/parallel-dispatch-demo-format-utils/CONTEXT.md). Remainders\n * below the smaller shown unit are truncated, never rounded, so the result\n * never claims more elapsed time than actually passed.\n */\nexport function formatDuration(ms) {\n  const days = Math.floor(ms / DAY);\n  const hours = Math.floor(ms / HOUR) % 24;\n  const minutes = Math.floor(ms / MINUTE) % 60;\n  const seconds = Math.floor(ms / SECOND) % 60;\n\n  if (days > 0) return hours > 0 ? `${days}d ${hours}h` : `${days}d`;\n  if (hours > 0) return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;\n  if (minutes > 0) return seconds > 0 ? `${minutes}m ${seconds}s` : `${minutes}m`;\n  return `${seconds}s`;\n}\n",
+      "record": {
+        "file": "src/util/format-duration.mjs",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+        "inventoryFileDigest": "aa3d4629659f6b635267965013716b45e71120cce5282f6b2a4503148c616ce9",
+        "digest": "aa3d4629659f6b635267965013716b45e71120cce5282f6b2a4503148c616ce9",
+        "inventoryEdgeIds": [
+          "class6-l-000479",
+          "class6-l-000480"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000479",
+            "slotKey": "{\"edgeId\":\"class6-l-000479\",\"file\":\"src/util/format-duration.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000479\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":6}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000479",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 6
+              }
+            ],
+            "consumerFile": "src/util/format-duration.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 6,
+                "columnStart": 5,
+                "columnEndExclusive": 61,
+                "text": "docs/history/parallel-dispatch-demo-format-utils/plan.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 6,
+                "columnStart": 5,
+                "columnEndExclusive": 61,
+                "text": "docs/history/parallel-dispatch-demo-format-utils/plan.md"
+              }
+            ],
+            "matchedExpression": "docs/history/parallel-dispatch-demo-format-utils/plan.md",
+            "logicalReference": "docs/history/parallel-dispatch-demo-format-utils/plan.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '// (docs/history/parallel-dispatch-demo-format-utils/plan.md, Approach).'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/parallel-dispatch-demo-format-utils/plan.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000479",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 6,
+                "matchedExpression": "docs/history/parallel-dispatch-demo-format-utils/plan.md",
+                "originalLineText": "// (docs/history/parallel-dispatch-demo-format-utils/plan.md, Approach)."
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000480",
+            "slotKey": "{\"edgeId\":\"class6-l-000480\",\"file\":\"src/util/format-duration.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000480\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":16}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000480",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 16
+              }
+            ],
+            "consumerFile": "src/util/format-duration.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 16,
+                "columnStart": 4,
+                "columnEndExclusive": 63,
+                "text": "docs/history/parallel-dispatch-demo-format-utils/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 16,
+                "columnStart": 4,
+                "columnEndExclusive": 63,
+                "text": "docs/history/parallel-dispatch-demo-format-utils/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/parallel-dispatch-demo-format-utils/CONTEXT.md",
+            "logicalReference": "docs/history/parallel-dispatch-demo-format-utils/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: ' * docs/history/parallel-dispatch-demo-format-utils/CONTEXT.md). Remainders'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/parallel-dispatch-demo-format-utils/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000480",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 16,
+                "matchedExpression": "docs/history/parallel-dispatch-demo-format-utils/CONTEXT.md",
+                "originalLineText": " * docs/history/parallel-dispatch-demo-format-utils/CONTEXT.md). Remainders"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-028",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "src/util/format-duration.mjs",
+          "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+          "digest": "aa3d4629659f6b635267965013716b45e71120cce5282f6b2a4503148c616ce9",
+          "bytes": 1292,
+          "lines": 30,
+          "headings": [],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "renderContexts": {},
+      "populationGapFindings": [],
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    }
+  ]
+}

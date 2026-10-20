@@ -1,0 +1,2526 @@
+[
+  {
+    "file": "CHANGELOG.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "6edda75bd4f92d5be267754e05e91530bba2bd4d895bd20a4c5e02258e5f2715",
+    "bytes": 366929,
+    "lines": 2049,
+    "headings": [
+      {
+        "line": 1,
+        "text": "# Changelog"
+      },
+      {
+        "line": 8,
+        "text": "## [Unreleased]"
+      },
+      {
+        "line": 146,
+        "text": "### Added"
+      },
+      {
+        "line": 195,
+        "text": "### Changed"
+      },
+      {
+        "line": 273,
+        "text": "### Removed"
+      },
+      {
+        "line": 286,
+        "text": "### Fixed"
+      },
+      {
+        "line": 320,
+        "text": "### Security"
+      },
+      {
+        "line": 324,
+        "text": "## [v0.2.0-rc.5] - 2026-10-14"
+      },
+      {
+        "line": 326,
+        "text": "### Added"
+      },
+      {
+        "line": 333,
+        "text": "### Changed"
+      },
+      {
+        "line": 339,
+        "text": "### Fixed"
+      },
+      {
+        "line": 357,
+        "text": "### Added"
+      },
+      {
+        "line": 361,
+        "text": "## [v0.2.0-rc.4] - 2026-10-13"
+      },
+      {
+        "line": 363,
+        "text": "### Added"
+      },
+      {
+        "line": 366,
+        "text": "## [v0.2.0-rc.3] - 2026-10-13"
+      },
+      {
+        "line": 368,
+        "text": "### Fixed"
+      },
+      {
+        "line": 371,
+        "text": "## [v0.2.0-rc.2] - 2026-10-13"
+      },
+      {
+        "line": 373,
+        "text": "### Added"
+      },
+      {
+        "line": 378,
+        "text": "## [v0.2.0-rc.1] - 2026-10-12"
+      },
+      {
+        "line": 380,
+        "text": "### Added"
+      },
+      {
+        "line": 424,
+        "text": "### Changed"
+      },
+      {
+        "line": 446,
+        "text": "### Fixed"
+      },
+      {
+        "line": 642,
+        "text": "### Added"
+      },
+      {
+        "line": 698,
+        "text": "### Changed"
+      },
+      {
+        "line": 708,
+        "text": "### Fixed"
+      },
+      {
+        "line": 749,
+        "text": "### Deprecated"
+      },
+      {
+        "line": 758,
+        "text": "### Security"
+      },
+      {
+        "line": 768,
+        "text": "### Capability catalog `serves` (Unit I19)"
+      },
+      {
+        "line": 794,
+        "text": "## [v0.1.0] - 2026-09-18"
+      },
+      {
+        "line": 796,
+        "text": "### Changed"
+      },
+      {
+        "line": 835,
+        "text": "### Fixed"
+      },
+      {
+        "line": 847,
+        "text": "### Added"
+      },
+      {
+        "line": 1118,
+        "text": "### Changed"
+      },
+      {
+        "line": 1176,
+        "text": "### Added"
+      },
+      {
+        "line": 1214,
+        "text": "### Fixed"
+      },
+      {
+        "line": 1309,
+        "text": "### Added"
+      },
+      {
+        "line": 1393,
+        "text": "### Changed"
+      },
+      {
+        "line": 1397,
+        "text": "### Fixed"
+      },
+      {
+        "line": 1438,
+        "text": "### Changed"
+      },
+      {
+        "line": 1541,
+        "text": "### Added"
+      },
+      {
+        "line": 1617,
+        "text": "### Fixed"
+      },
+      {
+        "line": 1630,
+        "text": "### Changed"
+      },
+      {
+        "line": 1746,
+        "text": "### Fixed"
+      },
+      {
+        "line": 1793,
+        "text": "### Changed"
+      },
+      {
+        "line": 1808,
+        "text": "### Removed"
+      },
+      {
+        "line": 1827,
+        "text": "### Added"
+      },
+      {
+        "line": 1874,
+        "text": "### Changed"
+      },
+      {
+        "line": 1933,
+        "text": "### Changed"
+      },
+      {
+        "line": 1945,
+        "text": "### Fixed"
+      },
+      {
+        "line": 1974,
+        "text": "### Removed"
+      },
+      {
+        "line": 1988,
+        "text": "### Added"
+      },
+      {
+        "line": 2031,
+        "text": "### Changed"
+      },
+      {
+        "line": 2039,
+        "text": "## [0.1.0]"
+      },
+      {
+        "line": 2043,
+        "text": "### Added"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "docs/history/p03-3-proof2-work-lookup-proto-guard/CONTEXT.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "53025ccab0ea02e33df9f8ca038b5272d01133004b9c9825eb0f242f2ba72d67",
+    "bytes": 3462,
+    "lines": 45,
+    "headings": [
+      {
+        "line": 1,
+        "text": "# CONTEXT: throwaway planning Work — guard `--work <id>` lookup against JS prototype property names"
+      },
+      {
+        "line": 12,
+        "text": "## Feature boundary"
+      },
+      {
+        "line": 23,
+        "text": "## Locked decisions"
+      },
+      {
+        "line": 31,
+        "text": "## Scout evidence"
+      },
+      {
+        "line": 43,
+        "text": "## Outstanding questions"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "docs/history/tsk-43q/iron-law-evidence.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "4a995d3b84383eaef283f607233c70a3dbafe80be0ba8785248da24c121fa11b",
+    "bytes": 3472,
+    "lines": 72,
+    "headings": [
+      {
+        "line": 1,
+        "text": "# Iron Law evidence — tsk-43q"
+      },
+      {
+        "line": 10,
+        "text": "## Why `matchedFlags` names \"migration\" even though this item never touches a migration module"
+      },
+      {
+        "line": 42,
+        "text": "## Real evidence in place of failing-test-first proof"
+      },
+      {
+        "line": 53,
+        "text": "# -> 21 pass, 0 fail (19 pre-existing + 2 new: the docs/knowledge scan's"
+      },
+      {
+        "line": 54,
+        "text": "#    positive case and its defensive no-mode/invalid-mode case)"
+      },
+      {
+        "line": 57,
+        "text": "# -> count: 446 (was 4 before this fix)"
+      },
+      {
+        "line": 60,
+        "text": "# -> 5199 tests, 5189 pass, 3 fail -- all three independently confirmed"
+      },
+      {
+        "line": 61,
+        "text": "#    pre-existing and unrelated to this diff:"
+      },
+      {
+        "line": 62,
+        "text": "#    1. test/cli/fgos-intake-4.test.mjs:318 -- explicitly documented as a"
+      },
+      {
+        "line": 63,
+        "text": "#       known baseline failure by a concurrent workstream"
+      },
+      {
+        "line": 64,
+        "text": "#       (docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/current-cell.md)"
+      },
+      {
+        "line": 65,
+        "text": "#    2. test/runner/codex-cli-glm-cli-live-executors.test.mjs -- a \"LIVE\""
+      },
+      {
+        "line": 66,
+        "text": "#       external-executor test, environment-dependent"
+      },
+      {
+        "line": 67,
+        "text": "#    3. test/runner/coordination-static.test.mjs -- fails only when run"
+      },
+      {
+        "line": 68,
+        "text": "#       from inside ANY linked worktree (its own path-substring check"
+      },
+      {
+        "line": 69,
+        "text": "#       matches the literal word \"worktree\" in .claude/worktrees/<id>-*),"
+      },
+      {
+        "line": 70,
+        "text": "#       confirmed by re-running the same file clean from the main"
+      },
+      {
+        "line": 71,
+        "text": "#       checkout: 2/2 pass there"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "herdr-dashboard/src/pane_scan.rs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "4e71fa33d2081c4e36bee7c0d90c5c85cbb7a203bce86117e9a43e408ad0ec10",
+    "bytes": 16712,
+    "lines": 405,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "plans/reports/fork-260928-1017-panel-depth-experiment-design-research-report.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "b9b9a8c8e87f1c9989f587d45feeb36e5917226bd53a7254adb0470d98be7369",
+    "bytes": 5229,
+    "lines": 99,
+    "headings": [
+      {
+        "line": 1,
+        "text": "# Panel-depth experiment (Unit I27) design research"
+      },
+      {
+        "line": 6,
+        "text": "## 1. Current protocol structure"
+      },
+      {
+        "line": 33,
+        "text": "## 2. Reduction candidates (evidence-based)"
+      },
+      {
+        "line": 52,
+        "text": "## 3. Evaluation-corpus/proof precedent"
+      },
+      {
+        "line": 65,
+        "text": "## 4. Cost estimate"
+      },
+      {
+        "line": 81,
+        "text": "## 5. Registration mechanics"
+      },
+      {
+        "line": 94,
+        "text": "## Unresolved (left to the implementer, not guessed here)"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "4d5af3639f5511770443d983afb52907184c40b0f1758fe031c451232938f2a9",
+    "bytes": 11691,
+    "lines": 230,
+    "headings": [
+      {
+        "line": 1,
+        "text": "# Architecture review brief — Dispatch Visibility V0"
+      },
+      {
+        "line": 13,
+        "text": "## 1. What the system is for"
+      },
+      {
+        "line": 43,
+        "text": "### The doctrine the whole design turns on"
+      },
+      {
+        "line": 64,
+        "text": "## 2. The entity chain"
+      },
+      {
+        "line": 84,
+        "text": "## 3. Shape of what was built"
+      },
+      {
+        "line": 115,
+        "text": "## 4. Files to read, in order"
+      },
+      {
+        "line": 117,
+        "text": "### Start here (the argument, before the code)"
+      },
+      {
+        "line": 125,
+        "text": "### The core (≈1 600 lines — this is the architecture)"
+      },
+      {
+        "line": 137,
+        "text": "### Confinement"
+      },
+      {
+        "line": 146,
+        "text": "### The seams into the rest of fgOS (where two defects hid)"
+      },
+      {
+        "line": 155,
+        "text": "### Observation surface"
+      },
+      {
+        "line": 160,
+        "text": "### Evidence — read at least one"
+      },
+      {
+        "line": 167,
+        "text": "### Tests worth reading as specification"
+      },
+      {
+        "line": 177,
+        "text": "## 5. What we would most like your judgement on"
+      },
+      {
+        "line": 222,
+        "text": "## 6. Ground rules"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "plans/reports/from-implementer-to-red-team-260907-1050-dispatch-visibility-v0-review-prompt.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "32c9cddf13d922a3466076e2940c845926d2d1bba40616a0e51fa513bb34855f",
+    "bytes": 12086,
+    "lines": 229,
+    "headings": [
+      {
+        "line": 1,
+        "text": "# Red-team review request — Dispatch Visibility V0"
+      },
+      {
+        "line": 9,
+        "text": "## Part 1 — What this work was for, and where it is going"
+      },
+      {
+        "line": 63,
+        "text": "## Part 2 — What was built"
+      },
+      {
+        "line": 110,
+        "text": "## Part 3 — What to judge"
+      },
+      {
+        "line": 112,
+        "text": "### A. Is it actually implemented, or does it only look implemented?"
+      },
+      {
+        "line": 130,
+        "text": "### B. Critical issues"
+      },
+      {
+        "line": 149,
+        "text": "### C. Design and architecture quality — the part that matters most here"
+      },
+      {
+        "line": 190,
+        "text": "## Part 4 — Already known; do not spend effort re-reporting"
+      },
+      {
+        "line": 213,
+        "text": "## Part 5 — How to answer"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "plans/reports/review-prompt-260911-1654-runtime-recovery-design-second-opinion.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "1f021f2d199b76e0838f554cbd1bdcd0095fc399f92e149e62ffcce640b4ed1a",
+    "bytes": 10981,
+    "lines": 152,
+    "headings": [
+      {
+        "line": 1,
+        "text": "# Prompt: Review độc lập thiết kế runtime recovery (RunHandle / Continuation Planner / Fallback Activation)"
+      },
+      {
+        "line": 14,
+        "text": "## Việc cần review"
+      },
+      {
+        "line": 26,
+        "text": "## Quyết định đã chốt — KHÔNG mở lại, chỉ kiểm xem doc có tuân thủ"
+      },
+      {
+        "line": 56,
+        "text": "## Câu hỏi review (trả lời từng câu, có dẫn file:dòng)"
+      },
+      {
+        "line": 90,
+        "text": "## Output"
+      },
+      {
+        "line": 102,
+        "text": "## Files — đọc theo thứ tự"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "plans/reports/review-prompt-260911-1805-runtime-recovery-detailed-design.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "72f6cf553b7baf82dc26269054a4e3620048e19f055a3a4f7afe8caac35e82c8",
+    "bytes": 13979,
+    "lines": 243,
+    "headings": [
+      {
+        "line": 1,
+        "text": "# Prompt: Independent Review Of Detailed Runtime Recovery Design"
+      },
+      {
+        "line": 15,
+        "text": "## Mục tiêu review"
+      },
+      {
+        "line": 39,
+        "text": "## Các điểm đã được chốt — không mở lại"
+      },
+      {
+        "line": 67,
+        "text": "## Câu hỏi review bắt buộc"
+      },
+      {
+        "line": 69,
+        "text": "### A. Đúng phạm vi và ownership"
+      },
+      {
+        "line": 80,
+        "text": "### B. Run admission, takeover và RunHandle"
+      },
+      {
+        "line": 97,
+        "text": "### C. Recovery material và checkpoint"
+      },
+      {
+        "line": 109,
+        "text": "### D. Fallback, effect và budget"
+      },
+      {
+        "line": 124,
+        "text": "### E. Continuation giữa session/protocol"
+      },
+      {
+        "line": 144,
+        "text": "### F. Hexagonal, SRP và agent ergonomics"
+      },
+      {
+        "line": 156,
+        "text": "### G. Migration và khả năng chứng minh"
+      },
+      {
+        "line": 169,
+        "text": "## Files phải đọc"
+      },
+      {
+        "line": 195,
+        "text": "### Code semantic sources"
+      },
+      {
+        "line": 212,
+        "text": "## Required output"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "plans/reports/reviewer-p03-1-260905-0251-skill-authoring-review-report.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "b944ffc8fc9daa3c09d4ed08480a1877a2173e09d841900192e9455c826a0045",
+    "bytes": 5583,
+    "lines": 101,
+    "headings": [
+      {
+        "line": 1,
+        "text": "# Reviewer Report — Cell P03.1 (R1-R4 only: Plan-Loop Skill Authoring)"
+      },
+      {
+        "line": 13,
+        "text": "## Verdict"
+      },
+      {
+        "line": 17,
+        "text": "## What was verified (independently, not by trusting the Doer's citations)"
+      },
+      {
+        "line": 81,
+        "text": "## Findings"
+      },
+      {
+        "line": 85,
+        "text": "## Notes"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "packages/distribution/rust/src/canonical.rs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "15ea0f48882aa65ed613554dea8a708618d84e94771deb1af2949fedfe682379",
+    "bytes": 9488,
+    "lines": 261,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "packages/distribution/rust/src/init.rs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "1cfecbbe025a6485495b6e76bf5076d1fa3238ae27a01cf755c83c085a4ebf1c",
+    "bytes": 89981,
+    "lines": 2185,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "packages/distribution/rust/src/manifest.rs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "cc45d293313bf2de2b912293a52dc1f76214eb4c06b56b28f90ab52d640d274a",
+    "bytes": 12120,
+    "lines": 338,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "packages/distribution/rust/src/verify.rs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "45abf2dc964ec6fe1687d1cac3bc46654a6b32552ffe8d12d0f1c5753f42b800",
+    "bytes": 25834,
+    "lines": 691,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "packages/distribution/rust/src/workspace.rs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "dc18facaa1515280f9f57f75c462376220a64acd778278fc7a8cf1f55805c49b",
+    "bytes": 4237,
+    "lines": 121,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "packages/herdr-fgos-common/rust/src/fgos.rs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "fcaaaa8f0beabf43e8d9e312da0dac0d2392d7bd52c38d5eaa8ee4a37bc286a9",
+    "bytes": 45009,
+    "lines": 1119,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "packages/herdr-fgos-common/rust/src/settings.rs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "4454b148e5e22b467b867c513ce6cc532cd63821e4ab54ea5f4d03cb23aae9d7",
+    "bytes": 7843,
+    "lines": 193,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "6deabc793f7f5ac9fc5ae5c91e1a18d466e1cca573b40988a75c44bd5fa794b0",
+    "bytes": 39814,
+    "lines": 861,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/agent-roster.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "bddc69ef02c932c8a05d8486a29c02c4188a3cb7e31f8706cf3ce360cc42ed31",
+    "bytes": 4721,
+    "lines": 118,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/anti-loop.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "d996232d9518a8fcf6f7017f781716f513eb3c0c9f80e17741b9507bda48ae49",
+    "bytes": 13300,
+    "lines": 256,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/claim-liveness.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "a4a01260422ce8eab25f67be7fcd47f0638230616e1e9237c881e8755ffdb538",
+    "bytes": 4830,
+    "lines": 107,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/claim-port.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "6e510ae19478f1ba71a2ab900f024d98b0150dd20da9fd255afdd407ae9c50c7",
+    "bytes": 14613,
+    "lines": 313,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/dispatch/assignment-policy.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "c0cff9ec45634a9a8164c10dd9cc944145776cbe51d04ccb0a5676419fdf667a",
+    "bytes": 28062,
+    "lines": 535,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/dispatch/assignment-runner.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "0fa987f013541a563fea17fde0a9f435a917bedc44f6c054a2ea53881ef67338",
+    "bytes": 137247,
+    "lines": 2676,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/dispatch/cli.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "f87f801077619893579bcebeb1643cdff9a32bd09652619e43d81599c2119969",
+    "bytes": 51941,
+    "lines": 1100,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/dispatch/config.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "6d32edc9d13ab80dbab237e71deb8beb971e7a94ac1bea547d1eb6c8ac2c6b2f",
+    "bytes": 96729,
+    "lines": 1842,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/dispatch/confinement/authority.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "e618d5997f85e200c50f6459c43f08f31852bbd6cefb6c27c128c4e845c78709",
+    "bytes": 76777,
+    "lines": 1923,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/dispatch/confinement/backend-registry.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "8c07146b675d4ad1086c88685de4a521c7004bc00de39e20d2dbb99d96bfa1ff",
+    "bytes": 15276,
+    "lines": 378,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/dispatch/confinement/policies.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "cc531111c8fc233ca9557d5ba89ab119ad3c4870145dc9ffcc865fcd87599d1f",
+    "bytes": 32264,
+    "lines": 750,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/dispatch/confinement/request.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "aba50726b489db9763742539c462cf269461943576472c71e84d2d7fe248f185",
+    "bytes": 22038,
+    "lines": 475,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/dispatch/execution-contract.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "fcc21d444c42d171838107a577de7487daf8a920c08a779a21fa0d7e2f22e4b6",
+    "bytes": 22946,
+    "lines": 438,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/dispatch/herdr-round.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "d964dcab21c72000fa01f4c37bc0a70f0124cc0812e4a94742f355f5b2fb0a20",
+    "bytes": 25234,
+    "lines": 493,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/dispatch/mechanism.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "964be5b92c651b0e5cd0cfef5e51b6f9e90e1e172b0ccba7c58c19fe42d32709",
+    "bytes": 5593,
+    "lines": 96,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/dispatch/operation-prompt-templates.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "932f932d239ccec0ef3debd919576d25ab068c50cb990d1f15afd03ff30f46af",
+    "bytes": 24048,
+    "lines": 590,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/dispatch/prepare.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "d2bc4e5bccce5db31c8a56a364d06d88916b4c108cb0191957e8989b44ff90ce",
+    "bytes": 2934,
+    "lines": 49,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/dispatch/resolve.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "2b4ef017b414383b5a0360b98f9eb420d709ee15d3b8acf83769fa1aec675375",
+    "bytes": 30537,
+    "lines": 561,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/dispatch/run-lock.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "4fe905899159baa52755203570a56efd376deb5262cbd6d0ee0a88cfd1c287e6",
+    "bytes": 18680,
+    "lines": 452,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/dispatch/transport.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "cc3af74ca5969fb9089c26c602d0c22bcac4ea73073c7b2986f81230b2f68b71",
+    "bytes": 33674,
+    "lines": 691,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/dispatch/trust-store.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "349ae77849e4f842da05c496b57d95f6ab5ab7cc7da125c90c859ffbbd9d2b10",
+    "bytes": 30730,
+    "lines": 634,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/dispatch/worker-home.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "88c48ce8a3d68f126ebaf6e98ef696e7a365e07f4a0b2b9b62ed0cf94b479b5a",
+    "bytes": 10447,
+    "lines": 215,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/frozen-judge.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "96265fab86a2a57ae4b191c83a864a4f285942f2c35318fbdae435a832bb75ed",
+    "bytes": 4805,
+    "lines": 101,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/goal-check.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "37c1a8a6c8983d2b71d261a19be3b6070f04fadba361590bbfb5d5d1fc5e35cf",
+    "bytes": 9785,
+    "lines": 202,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/loop.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "a0dad051957975f880a26ff6cf9f360535ad7b7603534e7007521b867c7d955f",
+    "bytes": 95497,
+    "lines": 1818,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/merge.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "8ccdb5441f10f806a1753d47394b4c74c655d02c5c7a03f7a1af56ce08024eb4",
+    "bytes": 92363,
+    "lines": 1778,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/paths.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "5da8aae9f0a8cec9e518e268cd88e8139e8dbd0a6768e08b961d291cf01fc799",
+    "bytes": 11535,
+    "lines": 250,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/promote-engine.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "623403dec319fdc5dfb94ea9a87d49368511fd168fbc8324528b33a3e82dfb65",
+    "bytes": 4694,
+    "lines": 97,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/promote-preflight.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "9e41b6d1cad288ab913ed591af5c5c02b13c065c171e22d964cf81c80e7748cd",
+    "bytes": 3981,
+    "lines": 87,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/work-compat.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "a804010f1992b05a28e07e11681c06919b1bc4a72fd1ab3e77bd2590bb020d25",
+    "bytes": 9089,
+    "lines": 177,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/worktree.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "8782458081f0512fb29b323ab1858aebc64adb029228703c8fe9a9f850a05fd9",
+    "bytes": 72077,
+    "lines": 1476,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/state/cleanup-harness.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "621b44fba812f9bf3ab4a368a32f0a55d2f3914c70ff86eb7936d1f0b705f993",
+    "bytes": 31184,
+    "lines": 595,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/state/cleanup-pool.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "46ce8b7bbd04d3da091cd9cb6a905c7d9149019028698587009b81d7d9444927",
+    "bytes": 2946,
+    "lines": 62,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/state/dep-graph.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "75f51cf42ac18bd405651145ee188ea5abee47f6161e72f3a75475f9694fa2fb",
+    "bytes": 11336,
+    "lines": 238,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/state/drift-status.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "ffdc80dfdd8956f975641eec39498d09b7e576b4f481540aa7f2703c9ff58771",
+    "bytes": 12045,
+    "lines": 256,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/state/events-compaction.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "c2ac54d19f7eeffd0dffc7e7ceda1389c3c36c0d550aef5f434ae585259c0e69",
+    "bytes": 12719,
+    "lines": 263,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/state/events-jsonl-truncation-guard.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "b4dd68558622a872395138a790bc63926ebdf60323b880c6f69b23ca3d7ee0ab",
+    "bytes": 22019,
+    "lines": 520,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/state/frontier.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "dca56e29f4928eb025fb2bf085c75a7d1969d59b3b645754b3dc6b44e3db47d7",
+    "bytes": 17901,
+    "lines": 327,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/state/gate-bypass.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "723e40beb662fb094a4ee832fa0755cfc554d01c7623cf411eeda1092e9247b8",
+    "bytes": 11646,
+    "lines": 262,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/state/graph-harness.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "6d93e939f7d13ec8f24957eca8b02bc66aad00573c4369175bcb426915ac789b",
+    "bytes": 22259,
+    "lines": 469,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/state/graph-metrics.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "ce0c9112f0a22ae408a442773fc91628eb225ef103bc9024a16ce926c1f0f167",
+    "bytes": 36522,
+    "lines": 779,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/state/knowledge-registry.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+    "bytes": 37623,
+    "lines": 812,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/state/postland-drift.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "a266644fd0caac9f2736850c6ef46307304c186a5a698793f17eb6d7861bf464",
+    "bytes": 3748,
+    "lines": 108,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/state/priority-formula.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "5a1767b93f0155567472eb059899aa993a147ecc0e0aaf75dafe8e93da72d6fe",
+    "bytes": 4539,
+    "lines": 92,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/state/replay.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "6fbdd0bd9867118cf3ce086ed45a6e3e9a6c61bcc5f99a086d86440be4f0d673",
+    "bytes": 51710,
+    "lines": 1048,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/state/retro-pool.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "bed4fe7e4a09ee49d3ae019e30dc21b73bc00bbbc8a20be3eec4cdf6352140ae",
+    "bytes": 2025,
+    "lines": 48,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/state/status-fsm.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "6853485189d2e25e6ee2a5997d11f0b2ae4e608cf5ed6332df010b2e703b76b0",
+    "bytes": 18932,
+    "lines": 329,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/state/store.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "b8eacaa22d2f17b04f494f9671b3bec2b883306aadb9ae0909298b94b20e11c4",
+    "bytes": 110859,
+    "lines": 2214,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/state/tool-registry.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "e713e0adcfe2398dd8d11c19d6cd1ddbf912222cb75410bdbdf1cdf3406e66f2",
+    "bytes": 13274,
+    "lines": 282,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/state/work.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "ae5f1599cf36963602efd1e8b13ee2ac883997ea747cd99877364d0162c05059",
+    "bytes": 46827,
+    "lines": 906,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/state/worker-slots.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "bc37bb0d995fe7339925c209c4e79232bdc5e3c079668f89c8f52313312dbf95",
+    "bytes": 8794,
+    "lines": 164,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/util/format-bytes.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "786e381e7581ddd1923305d3bb25e193aba99b84118728574c84280d5290966d",
+    "bytes": 825,
+    "lines": 22,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/util/format-duration.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "aa3d4629659f6b635267965013716b45e71120cce5282f6b2a4503148c616ce9",
+    "bytes": 1292,
+    "lines": 30,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/verbs/merge/approve.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "6e287f08f1d2b6386023a07722cc8010c98a3db8607ea1243f244077a057db8b",
+    "bytes": 49556,
+    "lines": 915,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/verbs/merge/iron-law-level.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "28037a676ec6f8533c2c8b0bcd66be0ec8dff1acfca0d656de7c5baa02043b73",
+    "bytes": 3520,
+    "lines": 57,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/verbs/merge/merge.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "0a453f93896685a77cf5494ff5d2f6f8106ff638e1b17079a368801fdb064f89",
+    "bytes": 10114,
+    "lines": 191,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/verbs/merge/sync-root.mjs",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "0ebead4914bf2a464d3f116655cf0713cef268be2a85871ba048cf35b148204d",
+    "bytes": 15540,
+    "lines": 284,
+    "headings": [],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": ".agents/skills/_shared/citation-format.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
+    "bytes": 4712,
+    "lines": 104,
+    "headings": [
+      {
+        "line": 2,
+        "text": "# Shared fragment: citation-format"
+      },
+      {
+        "line": 23,
+        "text": "## The rule"
+      },
+      {
+        "line": 89,
+        "text": "## The mechanical check"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": ".agents/skills/_shared/coding-worker-contract.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "8693dea64c22d19a0c09791d77910435cfeecba56eea387aff4854000eedafad",
+    "bytes": 12360,
+    "lines": 200,
+    "headings": [
+      {
+        "line": 2,
+        "text": "# Shared fragment: coding-worker-contract"
+      },
+      {
+        "line": 20,
+        "text": "## Two layers, two different scopes — do not blend them"
+      },
+      {
+        "line": 25,
+        "text": "### Layer 1 — GENERIC (applies to every unit: lifecycle-bearing AND ephemeral)"
+      },
+      {
+        "line": 86,
+        "text": "### Layer 2 — CODING-SPECIFIC (lifecycle-bearing units only: work + child-work)"
+      },
+      {
+        "line": 113,
+        "text": "## The negative rule (V3 — do not violate)"
+      },
+      {
+        "line": 128,
+        "text": "## Return-channel note (upstream `pi`, writing-style constraint)"
+      },
+      {
+        "line": 187,
+        "text": "## Precedent"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": ".agents/skills/distill/references/deep-dive-protocol.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "68b6d315bae45d3710dd2b3be685d8f1db11fe7369fdcdfa778e1ad72ab80536",
+    "bytes": 3503,
+    "lines": 63,
+    "headings": [
+      {
+        "line": 2,
+        "text": "# Deep-Dive Protocol — distill"
+      },
+      {
+        "line": 16,
+        "text": "## Cost pyramid — descend only where needed"
+      },
+      {
+        "line": 28,
+        "text": "## Output — `docs/distillery/deep-dives/<topic-slug>.md`"
+      },
+      {
+        "line": 38,
+        "text": "# Deep-dive: <topic>"
+      },
+      {
+        "line": 42,
+        "text": "## Câu hỏi"
+      },
+      {
+        "line": 43,
+        "text": "## Cách từng nguồn giải quyết   (per source: mechanism, evidence quotes, file refs,"
+      },
+      {
+        "line": 45,
+        "text": "## So sánh & trade-offs         (bảng đối chiếu chiều-by-chiều, không phải liệt kê)"
+      },
+      {
+        "line": 46,
+        "text": "## Giải pháp tổng hợp cho host  (BẮT BUỘC — design đề xuất ghép cái tốt nhất của từng"
+      },
+      {
+        "line": 49,
+        "text": "## Portable ideas               (mỗi ý → candidate row trong porting-log, kèm R/E/F)"
+      },
+      {
+        "line": 50,
+        "text": "## Open questions"
+      },
+      {
+        "line": 53,
+        "text": "## Rules"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": ".agents/skills/fgos-clarifying/SKILL.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "a3850c3acab72f5bc422c17b0a6f1a03b0e884872e65fe66c5b3caf22a226bf9",
+    "bytes": 9582,
+    "lines": 160,
+    "headings": [
+      {
+        "line": 21,
+        "text": "# fgos-clarifying"
+      },
+      {
+        "line": 31,
+        "text": "## Hard rules"
+      },
+      {
+        "line": 105,
+        "text": "## Flow"
+      },
+      {
+        "line": 139,
+        "text": "## Red flags"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": ".agents/skills/fgos-indexing/SKILL.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "8a9b3e7a4610124e763ec3440a87b6b3bd18d07f3fc178e1e19cf7d531eb3e96",
+    "bytes": 4016,
+    "lines": 85,
+    "headings": [
+      {
+        "line": 15,
+        "text": "# fgos-indexing"
+      },
+      {
+        "line": 23,
+        "text": "## When to run"
+      },
+      {
+        "line": 40,
+        "text": "## What it produces"
+      },
+      {
+        "line": 50,
+        "text": "## The quadrant → {purpose, audience} mapping"
+      },
+      {
+        "line": 60,
+        "text": "## Superseded pointer"
+      },
+      {
+        "line": 71,
+        "text": "## Red flags"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": ".claude/skills/ui-spec/CONVENTION.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "18c861503a1bcfe263d1d48c5763b95dcb39f61b477256ffed3d895af1729b68",
+    "bytes": 7751,
+    "lines": 212,
+    "headings": [
+      {
+        "line": 1,
+        "text": "# CONVENTION — Surface writing rules (contract between author and compiler)"
+      },
+      {
+        "line": 9,
+        "text": "## 1. Surface file structure"
+      },
+      {
+        "line": 13,
+        "text": "# (1) FRONTMATTER — surface meta, machine-readable"
+      },
+      {
+        "line": 25,
+        "text": "# S05 — Product List          ← (2) NARRATIVE: for humans, compiler ignores"
+      },
+      {
+        "line": 27,
+        "text": "## Purpose"
+      },
+      {
+        "line": 30,
+        "text": "## Layout"
+      },
+      {
+        "line": 33,
+        "text": "## Interactions               ← (3) human-readable heading; contract block follows immediately"
+      },
+      {
+        "line": 53,
+        "text": "## States"
+      },
+      {
+        "line": 59,
+        "text": "## 2. Hard rules (validator enforces)"
+      },
+      {
+        "line": 74,
+        "text": "## 3. Block variants by surface type"
+      },
+      {
+        "line": 130,
+        "text": "## 4. Domain rules cross-cutting"
+      },
+      {
+        "line": 144,
+        "text": "## 5. Action ID conventions"
+      },
+      {
+        "line": 157,
+        "text": "## 6. Compiler pipeline"
+      },
+      {
+        "line": 182,
+        "text": "## 7. PRD completeness warnings (for `generate` command)"
+      },
+      {
+        "line": 198,
+        "text": "## 8. `spec.config.yaml` reference"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": ".claude/skills/ui-spec/SKILL.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "afd4e1e3b050ea6771ae6bb3aaabe85f335b62cbf06ebca807f4ec91751e84f4",
+    "bytes": 18023,
+    "lines": 339,
+    "headings": [
+      {
+        "line": 11,
+        "text": "# ui-spec skill"
+      },
+      {
+        "line": 18,
+        "text": "## Commands"
+      },
+      {
+        "line": 20,
+        "text": "### `generate <prd-path> [--output docs/ui-spec]`"
+      },
+      {
+        "line": 31,
+        "text": "### `init <project-name> [--output docs/ui-spec]`"
+      },
+      {
+        "line": 44,
+        "text": "### `check [surface-id]`"
+      },
+      {
+        "line": 47,
+        "text": "### `validate`"
+      },
+      {
+        "line": 52,
+        "text": "### `build`"
+      },
+      {
+        "line": 59,
+        "text": "### `add-surface <type> <id> <name>`"
+      },
+      {
+        "line": 64,
+        "text": "### `interpret`"
+      },
+      {
+        "line": 72,
+        "text": "### `interpret:wf` (wireframe v2 — region-box layout)"
+      },
+      {
+        "line": 82,
+        "text": "### `context <surface-or-flow-id>`"
+      },
+      {
+        "line": 87,
+        "text": "## Methodology (brief)"
+      },
+      {
+        "line": 89,
+        "text": "### Surface file anatomy"
+      },
+      {
+        "line": 103,
+        "text": "# S05 — Product List"
+      },
+      {
+        "line": 105,
+        "text": "## Purpose"
+      },
+      {
+        "line": 108,
+        "text": "## Layout"
+      },
+      {
+        "line": 111,
+        "text": "## Interactions"
+      },
+      {
+        "line": 128,
+        "text": "## States"
+      },
+      {
+        "line": 132,
+        "text": "### Surface types"
+      },
+      {
+        "line": 142,
+        "text": "### Action IDs"
+      },
+      {
+        "line": 145,
+        "text": "### Domain rules"
+      },
+      {
+        "line": 148,
+        "text": "### Component event model"
+      },
+      {
+        "line": 151,
+        "text": "### `region` field (optional)"
+      },
+      {
+        "line": 156,
+        "text": "## Compiler pipeline"
+      },
+      {
+        "line": 169,
+        "text": "## Reader guide"
+      },
+      {
+        "line": 181,
+        "text": "## Multi-agent orchestration"
+      },
+      {
+        "line": 205,
+        "text": "## When to use"
+      },
+      {
+        "line": 212,
+        "text": "## When NOT to use"
+      },
+      {
+        "line": 222,
+        "text": "## Authoring & propagation workflows"
+      },
+      {
+        "line": 228,
+        "text": "### Mode 1 — Generate spec from a PRD"
+      },
+      {
+        "line": 258,
+        "text": "### Mode 2 — Update an existing surface"
+      },
+      {
+        "line": 292,
+        "text": "### Mode 3 — Add a surface or element"
+      },
+      {
+        "line": 312,
+        "text": "### Propagation model reference"
+      },
+      {
+        "line": 336,
+        "text": "## References"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": ".claude/skills/ui-spec/references/CONVENTION.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "18c861503a1bcfe263d1d48c5763b95dcb39f61b477256ffed3d895af1729b68",
+    "bytes": 7751,
+    "lines": 212,
+    "headings": [
+      {
+        "line": 1,
+        "text": "# CONVENTION — Surface writing rules (contract between author and compiler)"
+      },
+      {
+        "line": 9,
+        "text": "## 1. Surface file structure"
+      },
+      {
+        "line": 13,
+        "text": "# (1) FRONTMATTER — surface meta, machine-readable"
+      },
+      {
+        "line": 25,
+        "text": "# S05 — Product List          ← (2) NARRATIVE: for humans, compiler ignores"
+      },
+      {
+        "line": 27,
+        "text": "## Purpose"
+      },
+      {
+        "line": 30,
+        "text": "## Layout"
+      },
+      {
+        "line": 33,
+        "text": "## Interactions               ← (3) human-readable heading; contract block follows immediately"
+      },
+      {
+        "line": 53,
+        "text": "## States"
+      },
+      {
+        "line": 59,
+        "text": "## 2. Hard rules (validator enforces)"
+      },
+      {
+        "line": 74,
+        "text": "## 3. Block variants by surface type"
+      },
+      {
+        "line": 130,
+        "text": "## 4. Domain rules cross-cutting"
+      },
+      {
+        "line": 144,
+        "text": "## 5. Action ID conventions"
+      },
+      {
+        "line": 157,
+        "text": "## 6. Compiler pipeline"
+      },
+      {
+        "line": 182,
+        "text": "## 7. PRD completeness warnings (for `generate` command)"
+      },
+      {
+        "line": 198,
+        "text": "## 8. `spec.config.yaml` reference"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "core/skills/_shared/citation-format.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
+    "bytes": 4536,
+    "lines": 103,
+    "headings": [
+      {
+        "line": 1,
+        "text": "# Shared fragment: citation-format"
+      },
+      {
+        "line": 22,
+        "text": "## The rule"
+      },
+      {
+        "line": 88,
+        "text": "## The mechanical check"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "core/skills/_shared/coding-worker-contract.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "e76250e9dc79a8c161f6e7e4c22e85069461e4c4b29d919b10bbff6059185185",
+    "bytes": 12177,
+    "lines": 199,
+    "headings": [
+      {
+        "line": 1,
+        "text": "# Shared fragment: coding-worker-contract"
+      },
+      {
+        "line": 19,
+        "text": "## Two layers, two different scopes — do not blend them"
+      },
+      {
+        "line": 24,
+        "text": "### Layer 1 — GENERIC (applies to every unit: lifecycle-bearing AND ephemeral)"
+      },
+      {
+        "line": 85,
+        "text": "### Layer 2 — CODING-SPECIFIC (lifecycle-bearing units only: work + child-work)"
+      },
+      {
+        "line": 112,
+        "text": "## The negative rule (V3 — do not violate)"
+      },
+      {
+        "line": 127,
+        "text": "## Return-channel note (upstream `pi`, writing-style constraint)"
+      },
+      {
+        "line": 186,
+        "text": "## Precedent"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "core/skills/fgos-clarifying/SKILL.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "1eb6fe9cc19fa2e311b9f0a2a6eeb3810c12834f3c8bb59671b44b423be34bee",
+    "bytes": 9408,
+    "lines": 159,
+    "headings": [
+      {
+        "line": 20,
+        "text": "# fgos-clarifying"
+      },
+      {
+        "line": 30,
+        "text": "## Hard rules"
+      },
+      {
+        "line": 104,
+        "text": "## Flow"
+      },
+      {
+        "line": 138,
+        "text": "## Red flags"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "core/skills/fgos-indexing/SKILL.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "7356ec97cdc0532e3deb260faade56da41ea919cf704d2326e596a0f1f1c969e",
+    "bytes": 3844,
+    "lines": 84,
+    "headings": [
+      {
+        "line": 14,
+        "text": "# fgos-indexing"
+      },
+      {
+        "line": 22,
+        "text": "## When to run"
+      },
+      {
+        "line": 39,
+        "text": "## What it produces"
+      },
+      {
+        "line": 49,
+        "text": "## The quadrant → {purpose, audience} mapping"
+      },
+      {
+        "line": 59,
+        "text": "## Superseded pointer"
+      },
+      {
+        "line": 70,
+        "text": "## Red flags"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "plugins/fgOS/skills/_shared/citation-format.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
+    "bytes": 4712,
+    "lines": 104,
+    "headings": [
+      {
+        "line": 2,
+        "text": "# Shared fragment: citation-format"
+      },
+      {
+        "line": 23,
+        "text": "## The rule"
+      },
+      {
+        "line": 89,
+        "text": "## The mechanical check"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "plugins/fgOS/skills/_shared/coding-worker-contract.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "8693dea64c22d19a0c09791d77910435cfeecba56eea387aff4854000eedafad",
+    "bytes": 12360,
+    "lines": 200,
+    "headings": [
+      {
+        "line": 2,
+        "text": "# Shared fragment: coding-worker-contract"
+      },
+      {
+        "line": 20,
+        "text": "## Two layers, two different scopes — do not blend them"
+      },
+      {
+        "line": 25,
+        "text": "### Layer 1 — GENERIC (applies to every unit: lifecycle-bearing AND ephemeral)"
+      },
+      {
+        "line": 86,
+        "text": "### Layer 2 — CODING-SPECIFIC (lifecycle-bearing units only: work + child-work)"
+      },
+      {
+        "line": 113,
+        "text": "## The negative rule (V3 — do not violate)"
+      },
+      {
+        "line": 128,
+        "text": "## Return-channel note (upstream `pi`, writing-style constraint)"
+      },
+      {
+        "line": 187,
+        "text": "## Precedent"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "plugins/fgOS/skills/fgos-clarifying/SKILL.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "a3850c3acab72f5bc422c17b0a6f1a03b0e884872e65fe66c5b3caf22a226bf9",
+    "bytes": 9582,
+    "lines": 160,
+    "headings": [
+      {
+        "line": 21,
+        "text": "# fgos-clarifying"
+      },
+      {
+        "line": 31,
+        "text": "## Hard rules"
+      },
+      {
+        "line": 105,
+        "text": "## Flow"
+      },
+      {
+        "line": 139,
+        "text": "## Red flags"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "8a9b3e7a4610124e763ec3440a87b6b3bd18d07f3fc178e1e19cf7d531eb3e96",
+    "bytes": 4016,
+    "lines": 85,
+    "headings": [
+      {
+        "line": 15,
+        "text": "# fgos-indexing"
+      },
+      {
+        "line": 23,
+        "text": "## When to run"
+      },
+      {
+        "line": 40,
+        "text": "## What it produces"
+      },
+      {
+        "line": 50,
+        "text": "## The quadrant → {purpose, audience} mapping"
+      },
+      {
+        "line": 60,
+        "text": "## Superseded pointer"
+      },
+      {
+        "line": 71,
+        "text": "## Red flags"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "core/skills/distill/references/deep-dive-protocol.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "dc6c43de2ffdb23e581b19f2d46a72affbc2279d92f7ccb971fd567c5e7d9961",
+    "bytes": 3313,
+    "lines": 62,
+    "headings": [
+      {
+        "line": 1,
+        "text": "# Deep-Dive Protocol — distill"
+      },
+      {
+        "line": 15,
+        "text": "## Cost pyramid — descend only where needed"
+      },
+      {
+        "line": 27,
+        "text": "## Output — `docs/distillery/deep-dives/<topic-slug>.md`"
+      },
+      {
+        "line": 37,
+        "text": "# Deep-dive: <topic>"
+      },
+      {
+        "line": 41,
+        "text": "## Câu hỏi"
+      },
+      {
+        "line": 42,
+        "text": "## Cách từng nguồn giải quyết   (per source: mechanism, evidence quotes, file refs,"
+      },
+      {
+        "line": 44,
+        "text": "## So sánh & trade-offs         (bảng đối chiếu chiều-by-chiều, không phải liệt kê)"
+      },
+      {
+        "line": 45,
+        "text": "## Giải pháp tổng hợp cho host  (BẮT BUỘC — design đề xuất ghép cái tốt nhất của từng"
+      },
+      {
+        "line": 48,
+        "text": "## Portable ideas               (mỗi ý → candidate row trong porting-log, kèm R/E/F)"
+      },
+      {
+        "line": 49,
+        "text": "## Open questions"
+      },
+      {
+        "line": 52,
+        "text": "## Rules"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": ".agents/skills/fgos-researching/SKILL.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "6d05b64859a57d3363f8ae9b391db7cecf19e481bc06b9abc8748ed128ac2213",
+    "bytes": 8600,
+    "lines": 150,
+    "headings": [
+      {
+        "line": 18,
+        "text": "# fgos-researching"
+      },
+      {
+        "line": 27,
+        "text": "## Hard rules"
+      },
+      {
+        "line": 94,
+        "text": "## Flow"
+      },
+      {
+        "line": 132,
+        "text": "## Red flags"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "core/skills/fgos-researching/SKILL.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "a08b3797131892f339e15b18aba9792ff3fc5d448261cafd59264b2d5ce2f9c8",
+    "bytes": 8425,
+    "lines": 149,
+    "headings": [
+      {
+        "line": 17,
+        "text": "# fgos-researching"
+      },
+      {
+        "line": 26,
+        "text": "## Hard rules"
+      },
+      {
+        "line": 93,
+        "text": "## Flow"
+      },
+      {
+        "line": 131,
+        "text": "## Red flags"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "core/task-specs/fgos-indexing.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "4a23450a73f61c2cc9bc63a5b7eee88eb44d07855a76a8d37c5943edc27e63fd",
+    "bytes": 1246,
+    "lines": 26,
+    "headings": [
+      {
+        "line": 1,
+        "text": "# task-spec: fgos-indexing"
+      },
+      {
+        "line": 5,
+        "text": "## Input"
+      },
+      {
+        "line": 10,
+        "text": "## Output"
+      },
+      {
+        "line": 14,
+        "text": "## Gates"
+      },
+      {
+        "line": 18,
+        "text": "## Verify-template"
+      },
+      {
+        "line": 21,
+        "text": "## Collaboration"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "core/task-specs/fgos-researching.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "e0ddb50a83351347eeb60d3b345cd1ad9d7e827485ded1cb65aad134ee0f9226",
+    "bytes": 1558,
+    "lines": 29,
+    "headings": [
+      {
+        "line": 1,
+        "text": "# task-spec: fgos-researching"
+      },
+      {
+        "line": 5,
+        "text": "## Input"
+      },
+      {
+        "line": 9,
+        "text": "## Output"
+      },
+      {
+        "line": 15,
+        "text": "## Gates"
+      },
+      {
+        "line": 19,
+        "text": "## Verify-template"
+      },
+      {
+        "line": 23,
+        "text": "## Collaboration"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "plugins/fgOS/skills/fgos-researching/SKILL.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "6d05b64859a57d3363f8ae9b391db7cecf19e481bc06b9abc8748ed128ac2213",
+    "bytes": 8600,
+    "lines": 150,
+    "headings": [
+      {
+        "line": 18,
+        "text": "# fgos-researching"
+      },
+      {
+        "line": 27,
+        "text": "## Hard rules"
+      },
+      {
+        "line": 94,
+        "text": "## Flow"
+      },
+      {
+        "line": 132,
+        "text": "## Red flags"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/prompt-templates/worker-prompt-discovery.txt",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "c343469a6d604920e84a426dc1d72872d067b8aa83b5be6f420f9d580a06b9cb",
+    "bytes": 3507,
+    "lines": 67,
+    "headings": [
+      {
+        "line": 1,
+        "text": "# Goal"
+      },
+      {
+        "line": 4,
+        "text": "# Agent skill"
+      },
+      {
+        "line": 10,
+        "text": "# Description"
+      },
+      {
+        "line": 13,
+        "text": "# Worktree boundary"
+      },
+      {
+        "line": 18,
+        "text": "# How to finish"
+      },
+      {
+        "line": 50,
+        "text": "# Constraints"
+      },
+      {
+        "line": 57,
+        "text": "# Reporting discovered work (report, not write)"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "845861f6c8d55ab31e656fb6a54b6c3f6a51507fd02352de15146b7b08cd474a",
+    "bytes": 5196,
+    "lines": 96,
+    "headings": [
+      {
+        "line": 1,
+        "text": "# Goal"
+      },
+      {
+        "line": 4,
+        "text": "# Agent skill"
+      },
+      {
+        "line": 10,
+        "text": "# Description"
+      },
+      {
+        "line": 13,
+        "text": "# Directive"
+      },
+      {
+        "line": 16,
+        "text": "# Files to read first"
+      },
+      {
+        "line": 20,
+        "text": "# Worktree boundary"
+      },
+      {
+        "line": 25,
+        "text": "# Iron Law evidence"
+      },
+      {
+        "line": 61,
+        "text": "# How to finish"
+      },
+      {
+        "line": 74,
+        "text": "# Expected proof"
+      },
+      {
+        "line": 79,
+        "text": "# Constraints"
+      },
+      {
+        "line": 86,
+        "text": "# Reporting discovered work (report, not write)"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": ".agents/skills/_shared/ak-cook-worker-contract.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
+    "bytes": 2768,
+    "lines": 41,
+    "headings": [
+      {
+        "line": 2,
+        "text": "# ak:cook worker contract"
+      },
+      {
+        "line": 12,
+        "text": "## What the brief tells the worker"
+      },
+      {
+        "line": 29,
+        "text": "## What the Lead still does"
+      },
+      {
+        "line": 36,
+        "text": "## Where the skill comes from"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "core/skills/_shared/ak-cook-worker-contract.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "1fc127fcd70dc9232146771063dea6f729909277a98e3bcc1cdf2a4183aa03d0",
+    "bytes": 2584,
+    "lines": 40,
+    "headings": [
+      {
+        "line": 1,
+        "text": "# ak:cook worker contract"
+      },
+      {
+        "line": 11,
+        "text": "## What the brief tells the worker"
+      },
+      {
+        "line": 28,
+        "text": "## What the Lead still does"
+      },
+      {
+        "line": 35,
+        "text": "## Where the skill comes from"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "plugins/fgOS/skills/_shared/ak-cook-worker-contract.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
+    "bytes": 2768,
+    "lines": 41,
+    "headings": [
+      {
+        "line": 2,
+        "text": "# ak:cook worker contract"
+      },
+      {
+        "line": 12,
+        "text": "## What the brief tells the worker"
+      },
+      {
+        "line": 29,
+        "text": "## What the Lead still does"
+      },
+      {
+        "line": 36,
+        "text": "## Where the skill comes from"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "plans/261020-1250-debate-pattern-and-judge-role/plan.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "c5e83e6ad211216f2cfedf0edeb208d7495c2173fbb299b395ac0e4e4e5d3bd7",
+    "bytes": 3632,
+    "lines": 44,
+    "headings": [
+      {
+        "line": 6,
+        "text": "# Pattern `debate` and role `judge`"
+      },
+      {
+        "line": 10,
+        "text": "## Why"
+      },
+      {
+        "line": 14,
+        "text": "## Prior art"
+      },
+      {
+        "line": 19,
+        "text": "## Shape"
+      },
+      {
+        "line": 31,
+        "text": "## Units"
+      },
+      {
+        "line": 42,
+        "text": "## Reversal trigger"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "e888fcf7bbb67a8e6bc716b5359fd06a5022ef56f80139ce24ef21684fc3813a",
+    "bytes": 9048,
+    "lines": 106,
+    "headings": [
+      {
+        "line": 1,
+        "text": "# Model pool B1 phase 07: post-activation proof"
+      },
+      {
+        "line": 5,
+        "text": "## 1. Explain table"
+      },
+      {
+        "line": 21,
+        "text": "## 2. Real rounds"
+      },
+      {
+        "line": 25,
+        "text": "### 2a. `execute`: unit-run-1792469469655-6bf77878"
+      },
+      {
+        "line": 33,
+        "text": "### 2b. Forced rotation on pool openai (state key `openai-codex`), `code:review`"
+      },
+      {
+        "line": 61,
+        "text": "### 2c. Pinned seat"
+      },
+      {
+        "line": 65,
+        "text": "## 3. Refusal check"
+      },
+      {
+        "line": 80,
+        "text": "## 4. Panes"
+      },
+      {
+        "line": 84,
+        "text": "## 5. Deviations"
+      },
+      {
+        "line": 92,
+        "text": "## 6. Owner decisions, proven live?"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "b448582368aa6fdca0c97badf598f5e783540d508cec3f260a68a19fd2ae327a",
+    "bytes": 3675,
+    "lines": 48,
+    "headings": [
+      {
+        "line": 1,
+        "text": "## Outcome"
+      },
+      {
+        "line": 5,
+        "text": "## Cause"
+      },
+      {
+        "line": 9,
+        "text": "## Per-caller decision"
+      },
+      {
+        "line": 25,
+        "text": "## Changes"
+      },
+      {
+        "line": 30,
+        "text": "## Test changes"
+      },
+      {
+        "line": 42,
+        "text": "## Verification"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "d8e9dd76b56af721e93d98008fc64ae5f4fd8ba3c08aa610428443e624a700b9",
+    "bytes": 3556,
+    "lines": 28,
+    "headings": [
+      {
+        "line": 1,
+        "text": "# Phase lead report: pattern debate and role judge"
+      },
+      {
+        "line": 3,
+        "text": "## Result"
+      },
+      {
+        "line": 7,
+        "text": "## What changed"
+      },
+      {
+        "line": 18,
+        "text": "## Tests"
+      },
+      {
+        "line": 24,
+        "text": "## Not done / notes"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  },
+  {
+    "file": "plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md",
+    "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+    "digest": "d05a7a264c697d888a6beb1ced5e6dc9c73fa96a34a78734e8722071eb5a4cdc",
+    "bytes": 45366,
+    "lines": 231,
+    "headings": [
+      {
+        "line": 1,
+        "text": "# Mailbox: đơn vị giữ địa chỉ, bên dùng đầu tiên, và có nên nhắn thẳng subagent/teammate"
+      },
+      {
+        "line": 5,
+        "text": "## Tóm tắt"
+      },
+      {
+        "line": 21,
+        "text": "## 1. Q1 — Các địa chỉ đang có"
+      },
+      {
+        "line": 23,
+        "text": "### 1.1 Bảng định danh"
+      },
+      {
+        "line": 55,
+        "text": "### 1.2 Kiểm trên source (không chỉ docs)"
+      },
+      {
+        "line": 62,
+        "text": "### 1.3 Đo ở máy này: pane và env không nói đúng \"đầu\""
+      },
+      {
+        "line": 78,
+        "text": "### 1.4 Chọn khoá của registry (spec mục 5.1) và cái gì hỏng"
+      },
+      {
+        "line": 100,
+        "text": "## 2. Q2 — Bên dùng đầu tiên"
+      },
+      {
+        "line": 102,
+        "text": "### 2.1 Kiểm kê 24 trao đổi thật"
+      },
+      {
+        "line": 133,
+        "text": "### 2.2 Gom theo loại"
+      },
+      {
+        "line": 145,
+        "text": "### 2.3 Xếp hạng ứng viên bên dùng đầu tiên"
+      },
+      {
+        "line": 159,
+        "text": "## 3. Q3 — Có nên nhắn thẳng subagent và teammate?"
+      },
+      {
+        "line": 161,
+        "text": "### 3.1 Từng CLI (help của CLI, tài liệu chính thức, nghiên cứu cũ)"
+      },
+      {
+        "line": 171,
+        "text": "### 3.2 fgOS tự tạo worker thế nào (source)"
+      },
+      {
+        "line": 177,
+        "text": "### 3.3 Phương án"
+      },
+      {
+        "line": 188,
+        "text": "### 3.4 Khuyến nghị (một lựa chọn)"
+      },
+      {
+        "line": 192,
+        "text": "### 3.5 Cần từ agent đang đo Claude (không làm trùng)"
+      },
+      {
+        "line": 201,
+        "text": "## 4. Điều chưa đo, gom một chỗ"
+      },
+      {
+        "line": 211,
+        "text": "## 5. Giới hạn của nghiên cứu"
+      },
+      {
+        "line": 220,
+        "text": "## 6. Câu hỏi còn mở"
+      }
+    ],
+    "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+  }
+]

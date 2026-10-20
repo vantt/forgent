@@ -1,0 +1,1177 @@
+{
+  "authorInputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+  "authoredBatches": [
+    "step04-017",
+    "step04-018",
+    "step04-019",
+    "step04-020",
+    "step04-021",
+    "step04-022",
+    "step04-023",
+    "step04-024",
+    "step04-025",
+    "step04-026",
+    "step04-027",
+    "step04-028",
+    "step04-029",
+    "step04-030",
+    "step04-031",
+    "step04-032",
+    "step04-033"
+  ],
+  "records": [
+    {
+      "set": "step04-017",
+      "file": "CHANGELOG.md",
+      "digest": "6edda75bd4f92d5be267754e05e91530bba2bd4d895bd20a4c5e02258e5f2715",
+      "recordSha256": "2ade02da1135496a9006e781bbc5f66452b835946c24ce4b917107420c513221",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-018",
+      "file": "docs/history/p03-3-proof2-work-lookup-proto-guard/CONTEXT.md",
+      "digest": "53025ccab0ea02e33df9f8ca038b5272d01133004b9c9825eb0f242f2ba72d67",
+      "recordSha256": "ebee9f93380514fb4fec5859f8b843126d4bd2606912d399abd1c27243380084",
+      "edges": 5,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-018",
+      "file": "docs/history/tsk-43q/iron-law-evidence.md",
+      "digest": "4a995d3b84383eaef283f607233c70a3dbafe80be0ba8785248da24c121fa11b",
+      "recordSha256": "fffe996fe4d5a324a93f491551a61849e0daf735447443d784fb152c4757d7fb",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-018",
+      "file": "herdr-dashboard/src/pane_scan.rs",
+      "digest": "4e71fa33d2081c4e36bee7c0d90c5c85cbb7a203bce86117e9a43e408ad0ec10",
+      "recordSha256": "6e489de0832f8e94310353ef501fd8c148b480bf9b0496b22cfe1cbed76b7345",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-018",
+      "file": "plans/reports/fork-260928-1017-panel-depth-experiment-design-research-report.md",
+      "digest": "b9b9a8c8e87f1c9989f587d45feeb36e5917226bd53a7254adb0470d98be7369",
+      "recordSha256": "45eb320d361b289f9e31ef7e6a6e7068ed17cb896150891f05ead4578be9d3d4",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-018",
+      "file": "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md",
+      "digest": "4d5af3639f5511770443d983afb52907184c40b0f1758fe031c451232938f2a9",
+      "recordSha256": "5ec839fce70495bb043a16fe3656910703602b8d143cd3e1b0e2dacd31f4cc26",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-018",
+      "file": "plans/reports/from-implementer-to-red-team-260907-1050-dispatch-visibility-v0-review-prompt.md",
+      "digest": "32c9cddf13d922a3466076e2940c845926d2d1bba40616a0e51fa513bb34855f",
+      "recordSha256": "a7f37a7a99c0696546df817a8586135564d637af1573d4c999267ab55ab86a9e",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-018",
+      "file": "plans/reports/review-prompt-260911-1654-runtime-recovery-design-second-opinion.md",
+      "digest": "1f021f2d199b76e0838f554cbd1bdcd0095fc399f92e149e62ffcce640b4ed1a",
+      "recordSha256": "64392ff37b6759f2b7d964a9b2e3e8e189c2a26bcfba5ddbb181fe096de9cbfb",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-018",
+      "file": "plans/reports/review-prompt-260911-1805-runtime-recovery-detailed-design.md",
+      "digest": "72f6cf553b7baf82dc26269054a4e3620048e19f055a3a4f7afe8caac35e82c8",
+      "recordSha256": "2005bfa94c2437d68671187540e8eaead09574724a7937c99a15cefa6c7da50d",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-018",
+      "file": "plans/reports/reviewer-p03-1-260905-0251-skill-authoring-review-report.md",
+      "digest": "b944ffc8fc9daa3c09d4ed08480a1877a2173e09d841900192e9455c826a0045",
+      "recordSha256": "18d81fa95a96b0a3a58a2a3f5e08b4ed8dd1f0fbaf59980d21ff2304b7c40a93",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-019",
+      "file": "packages/distribution/rust/src/canonical.rs",
+      "digest": "15ea0f48882aa65ed613554dea8a708618d84e94771deb1af2949fedfe682379",
+      "recordSha256": "5eea90ba546e9286bc3e511a48f223bbc56545e3206127a12cc88f6cd04e492b",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-019",
+      "file": "packages/distribution/rust/src/init.rs",
+      "digest": "1cfecbbe025a6485495b6e76bf5076d1fa3238ae27a01cf755c83c085a4ebf1c",
+      "recordSha256": "2b391c7136e30a8eb61a3d1079e39d7376988ca91bc01eaabb43aa6498b5f6d7",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-019",
+      "file": "packages/distribution/rust/src/manifest.rs",
+      "digest": "cc45d293313bf2de2b912293a52dc1f76214eb4c06b56b28f90ab52d640d274a",
+      "recordSha256": "f9c3288da48ea2efcf2d6ea92c3be0740732b56593a3fdfd7afae3da0fbb37fd",
+      "edges": 1,
+      "diffBytes": 518
+    },
+    {
+      "set": "step04-019",
+      "file": "packages/distribution/rust/src/verify.rs",
+      "digest": "45abf2dc964ec6fe1687d1cac3bc46654a6b32552ffe8d12d0f1c5753f42b800",
+      "recordSha256": "51ae0be679c3a711976c7f78096a368a8c7d9c185d9984b7109b55761b0b89a5",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-019",
+      "file": "packages/distribution/rust/src/workspace.rs",
+      "digest": "dc18facaa1515280f9f57f75c462376220a64acd778278fc7a8cf1f55805c49b",
+      "recordSha256": "dc01b3c7d6c67345fd5c96b90382c0e98274c7cbf837595746b27105449c48a9",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-020",
+      "file": "packages/herdr-fgos-common/rust/src/fgos.rs",
+      "digest": "fcaaaa8f0beabf43e8d9e312da0dac0d2392d7bd52c38d5eaa8ee4a37bc286a9",
+      "recordSha256": "57f827d6cb0a72d2a09ea5ec4bfb62b7dc5cdb03fc0c7a602a8d86c4052d48cf",
+      "edges": 3,
+      "diffBytes": 651
+    },
+    {
+      "set": "step04-020",
+      "file": "packages/herdr-fgos-common/rust/src/settings.rs",
+      "digest": "4454b148e5e22b467b867c513ce6cc532cd63821e4ab54ea5f4d03cb23aae9d7",
+      "recordSha256": "f0a95bf2a3f404b8c60437314ccede6c80ad9ef18ef7808f203f43268102bfa8",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-021",
+      "file": "packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs",
+      "digest": "6deabc793f7f5ac9fc5ae5c91e1a18d466e1cca573b40988a75c44bd5fa794b0",
+      "recordSha256": "815ef491b1706344788845e0d176c45df500cbf3e865447f08e8c5ec28dd8d4f",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-022",
+      "file": "src/runner/agent-roster.mjs",
+      "digest": "bddc69ef02c932c8a05d8486a29c02c4188a3cb7e31f8706cf3ce360cc42ed31",
+      "recordSha256": "31f63aa85dffad1a612ae7af374e1234a5d931fe444ee0f473b3aa79108f3538",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-022",
+      "file": "src/runner/anti-loop.mjs",
+      "digest": "d996232d9518a8fcf6f7017f781716f513eb3c0c9f80e17741b9507bda48ae49",
+      "recordSha256": "b6a8c4678f993d6298d3ed64f2fabb06aa08a0319f539e872198b2e521504e88",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-022",
+      "file": "src/runner/claim-liveness.mjs",
+      "digest": "a4a01260422ce8eab25f67be7fcd47f0638230616e1e9237c881e8755ffdb538",
+      "recordSha256": "18bb6c0d69a40d5b0819ca82dd48d57bd084147578da55611f55f1219067a2bd",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-022",
+      "file": "src/runner/claim-port.mjs",
+      "digest": "6e510ae19478f1ba71a2ab900f024d98b0150dd20da9fd255afdd407ae9c50c7",
+      "recordSha256": "b9cdbfb07e2e4624ec170008e739cb4a8aad2073be26a6555efd1eb4a9c4c18f",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-022",
+      "file": "src/runner/dispatch/assignment-policy.mjs",
+      "digest": "c0cff9ec45634a9a8164c10dd9cc944145776cbe51d04ccb0a5676419fdf667a",
+      "recordSha256": "9f9e757cfe5b66ab9532d754174b2b4ee3feac1647c9437c5d3745fd2d4d5857",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-022",
+      "file": "src/runner/dispatch/assignment-runner.mjs",
+      "digest": "0fa987f013541a563fea17fde0a9f435a917bedc44f6c054a2ea53881ef67338",
+      "recordSha256": "ea6968fce3ac723d881c2cc1d308ec61caca2b1f7e0e868bb94fd8fdf446b414",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-022",
+      "file": "src/runner/dispatch/cli.mjs",
+      "digest": "f87f801077619893579bcebeb1643cdff9a32bd09652619e43d81599c2119969",
+      "recordSha256": "e2720ec14b2e496427512c29900a1ba41a9bb826f4a63e294d51015f6e06c7da",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-023",
+      "file": "src/runner/dispatch/config.mjs",
+      "digest": "6d32edc9d13ab80dbab237e71deb8beb971e7a94ac1bea547d1eb6c8ac2c6b2f",
+      "recordSha256": "0b189cfa784f0d0d2966bb8ff2b101878ff5ae0ab64973d30666f4170d653483",
+      "edges": 7,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-023",
+      "file": "src/runner/dispatch/confinement/authority.mjs",
+      "digest": "e618d5997f85e200c50f6459c43f08f31852bbd6cefb6c27c128c4e845c78709",
+      "recordSha256": "917b7079fe3cdab70c141ace0b5c667a5f5fc645f2bf9592457f369ef2930dc6",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-023",
+      "file": "src/runner/dispatch/confinement/backend-registry.mjs",
+      "digest": "8c07146b675d4ad1086c88685de4a521c7004bc00de39e20d2dbb99d96bfa1ff",
+      "recordSha256": "0616b9e58d544313c4c923db40016ebafe295349f97ba90ead03f6947465a17a",
+      "edges": 1,
+      "diffBytes": 661
+    },
+    {
+      "set": "step04-023",
+      "file": "src/runner/dispatch/confinement/policies.mjs",
+      "digest": "cc531111c8fc233ca9557d5ba89ab119ad3c4870145dc9ffcc865fcd87599d1f",
+      "recordSha256": "cdda81c6eaf7c0ae269b6eac2d0b0b5b4180f45b94bd553932ca4181a8724703",
+      "edges": 1,
+      "diffBytes": 636
+    },
+    {
+      "set": "step04-023",
+      "file": "src/runner/dispatch/confinement/request.mjs",
+      "digest": "aba50726b489db9763742539c462cf269461943576472c71e84d2d7fe248f185",
+      "recordSha256": "075fc6508c3cb9a8a24fabef8fb92c7a9b983e0de63a6b5aeb07c2e39c192fd0",
+      "edges": 1,
+      "diffBytes": 456
+    },
+    {
+      "set": "step04-023",
+      "file": "src/runner/dispatch/execution-contract.mjs",
+      "digest": "fcc21d444c42d171838107a577de7487daf8a920c08a779a21fa0d7e2f22e4b6",
+      "recordSha256": "6c5f393b785b48e088a6764cdfeda51e6b6d3254d8108a2877d16b267c368132",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-023",
+      "file": "src/runner/dispatch/herdr-round.mjs",
+      "digest": "d964dcab21c72000fa01f4c37bc0a70f0124cc0812e4a94742f355f5b2fb0a20",
+      "recordSha256": "793d950120ff5c5fb5b4b5dc592941654cc70ac80be37cbd3f3af375868b87d9",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-023",
+      "file": "src/runner/dispatch/mechanism.mjs",
+      "digest": "964be5b92c651b0e5cd0cfef5e51b6f9e90e1e172b0ccba7c58c19fe42d32709",
+      "recordSha256": "61469ee2f8dcb4e03f300ffde7911fad7b1a2b35e03aed70f92b2176f4308aea",
+      "edges": 5,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-023",
+      "file": "src/runner/dispatch/operation-prompt-templates.mjs",
+      "digest": "932f932d239ccec0ef3debd919576d25ab068c50cb990d1f15afd03ff30f46af",
+      "recordSha256": "6c7d11e0e9676af30c38f2762de4a212041f216595b8f052026a5e6e74eda8fa",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-023",
+      "file": "src/runner/dispatch/prepare.mjs",
+      "digest": "d2bc4e5bccce5db31c8a56a364d06d88916b4c108cb0191957e8989b44ff90ce",
+      "recordSha256": "ddd5d76892616a06b9adaa44f8c4e397abfa36df8996a331419c6494ad3d0728",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-024",
+      "file": "src/runner/dispatch/resolve.mjs",
+      "digest": "2b4ef017b414383b5a0360b98f9eb420d709ee15d3b8acf83769fa1aec675375",
+      "recordSha256": "1eac75fad5cde010e21f1d54ac1d0957583bfad537f4154d4e2b44da8b5625bc",
+      "edges": 5,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-024",
+      "file": "src/runner/dispatch/run-lock.mjs",
+      "digest": "4fe905899159baa52755203570a56efd376deb5262cbd6d0ee0a88cfd1c287e6",
+      "recordSha256": "e8337d7357ee4348183079bebe54d0f3528b973a5db07e82272e8ff849ef74b4",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-024",
+      "file": "src/runner/dispatch/transport.mjs",
+      "digest": "cc3af74ca5969fb9089c26c602d0c22bcac4ea73073c7b2986f81230b2f68b71",
+      "recordSha256": "461f5b0ed910f7e2b78deb90b464d7a67106c03781e9b0c3d5d959199fa73360",
+      "edges": 4,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-024",
+      "file": "src/runner/dispatch/trust-store.mjs",
+      "digest": "349ae77849e4f842da05c496b57d95f6ab5ab7cc7da125c90c859ffbbd9d2b10",
+      "recordSha256": "4c2526b59eedc78d6b73211168d7bb9273e1a9a2869371b172b12934a3b6f40d",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-024",
+      "file": "src/runner/dispatch/worker-home.mjs",
+      "digest": "88c48ce8a3d68f126ebaf6e98ef696e7a365e07f4a0b2b9b62ed0cf94b479b5a",
+      "recordSha256": "08cc8e6179f49c4ed10e8a362f04a49e203fcc597c9d1f649df3afc0c35b0630",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-024",
+      "file": "src/runner/frozen-judge.mjs",
+      "digest": "96265fab86a2a57ae4b191c83a864a4f285942f2c35318fbdae435a832bb75ed",
+      "recordSha256": "2679db9d968a76048e9ef1600ed34755cbc197d4716c9a277acee00651b8eeec",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-024",
+      "file": "src/runner/goal-check.mjs",
+      "digest": "37c1a8a6c8983d2b71d261a19be3b6070f04fadba361590bbfb5d5d1fc5e35cf",
+      "recordSha256": "76eaea7563acf2e6ddcb570c057bfa28369ae68f0cfe91853f6beea137ad0b33",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-024",
+      "file": "src/runner/loop.mjs",
+      "digest": "a0dad051957975f880a26ff6cf9f360535ad7b7603534e7007521b867c7d955f",
+      "recordSha256": "bdb4a5bf2a177b7efbf46668cf162e5ccbac85d42a31fde389988458216272f6",
+      "edges": 5,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-025",
+      "file": "src/runner/merge.mjs",
+      "digest": "8ccdb5441f10f806a1753d47394b4c74c655d02c5c7a03f7a1af56ce08024eb4",
+      "recordSha256": "f0353d997e18d0e8be360d7df781fa2b38e6530a0e45a9ef7ff696a8804901b6",
+      "edges": 18,
+      "diffBytes": 2978
+    },
+    {
+      "set": "step04-025",
+      "file": "src/runner/paths.mjs",
+      "digest": "5da8aae9f0a8cec9e518e268cd88e8139e8dbd0a6768e08b961d291cf01fc799",
+      "recordSha256": "9ff8de18b2188c93079983df24873fa25f6400e672e1d80e01b8821fb24ddffe",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-025",
+      "file": "src/runner/promote-engine.mjs",
+      "digest": "623403dec319fdc5dfb94ea9a87d49368511fd168fbc8324528b33a3e82dfb65",
+      "recordSha256": "7fd37ee18e816e37242f137f9ab92d2ec6f900ed64e26cf0983020de1600a738",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-025",
+      "file": "src/runner/promote-preflight.mjs",
+      "digest": "9e41b6d1cad288ab913ed591af5c5c02b13c065c171e22d964cf81c80e7748cd",
+      "recordSha256": "76ad9085cdb7dc73dc2c6e6c00cc3d9f30ad7f27e2e0af0a5485c3945fde7966",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-025",
+      "file": "src/runner/work-compat.mjs",
+      "digest": "a804010f1992b05a28e07e11681c06919b1bc4a72fd1ab3e77bd2590bb020d25",
+      "recordSha256": "fd1595be3125570daaabf09eab09dd83df71d1434d485630c4faa64082d5a0db",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-025",
+      "file": "src/runner/worktree.mjs",
+      "digest": "8782458081f0512fb29b323ab1858aebc64adb029228703c8fe9a9f850a05fd9",
+      "recordSha256": "641d05ed507c8f4c104a0dd3d74bf718b10dd629bc760a2d90cc9b672ebe6fe5",
+      "edges": 12,
+      "diffBytes": 750
+    },
+    {
+      "set": "step04-026",
+      "file": "src/state/cleanup-harness.mjs",
+      "digest": "621b44fba812f9bf3ab4a368a32f0a55d2f3914c70ff86eb7936d1f0b705f993",
+      "recordSha256": "9a456caa2968b0f2a2d7ea22fe8fa9045a232cd447dbcf76ed88bfa3cabf99da",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-026",
+      "file": "src/state/cleanup-pool.mjs",
+      "digest": "46ce8b7bbd04d3da091cd9cb6a905c7d9149019028698587009b81d7d9444927",
+      "recordSha256": "7bae78cf1318ab9142a7115b96558b1238e21e6218d8853091f0b391a2ffadf9",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-026",
+      "file": "src/state/dep-graph.mjs",
+      "digest": "75f51cf42ac18bd405651145ee188ea5abee47f6161e72f3a75475f9694fa2fb",
+      "recordSha256": "e2a1a377d54fed68acda87d052548c47b8e4f1b4d125f4fb55410c0f8f4f3de7",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-026",
+      "file": "src/state/drift-status.mjs",
+      "digest": "ffdc80dfdd8956f975641eec39498d09b7e576b4f481540aa7f2703c9ff58771",
+      "recordSha256": "3a7a480ce2c86df3ebaee9cf96e50e6cfbac3b31f9a7e7c6e2ec16c125e71932",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-026",
+      "file": "src/state/events-compaction.mjs",
+      "digest": "c2ac54d19f7eeffd0dffc7e7ceda1389c3c36c0d550aef5f434ae585259c0e69",
+      "recordSha256": "bbc412d2770957d4847423f35826f07c6cbf7c8c8daa2c441706d619d16c39a8",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-026",
+      "file": "src/state/events-jsonl-truncation-guard.mjs",
+      "digest": "b4dd68558622a872395138a790bc63926ebdf60323b880c6f69b23ca3d7ee0ab",
+      "recordSha256": "f9d4533e3c6d4df6f86ff957f602ec1cdcb35184998836487e00ec55d2ab5264",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-026",
+      "file": "src/state/frontier.mjs",
+      "digest": "dca56e29f4928eb025fb2bf085c75a7d1969d59b3b645754b3dc6b44e3db47d7",
+      "recordSha256": "6887648748b4efb63b8ce06e6eae05e353b9f8e59471e562710eba0311793991",
+      "edges": 5,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-026",
+      "file": "src/state/gate-bypass.mjs",
+      "digest": "723e40beb662fb094a4ee832fa0755cfc554d01c7623cf411eeda1092e9247b8",
+      "recordSha256": "1bdf937a4fb065e779cb8a68d683f24da842e09946c67c61d8ffa2342ff6ec68",
+      "edges": 9,
+      "diffBytes": 715
+    },
+    {
+      "set": "step04-026",
+      "file": "src/state/graph-harness.mjs",
+      "digest": "6d93e939f7d13ec8f24957eca8b02bc66aad00573c4369175bcb426915ac789b",
+      "recordSha256": "c8fef28ddbabf7117e10bf6be1d87fadd5f33fff134a8931f3a21435d1794c33",
+      "edges": 6,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-026",
+      "file": "src/state/graph-metrics.mjs",
+      "digest": "ce0c9112f0a22ae408a442773fc91628eb225ef103bc9024a16ce926c1f0f167",
+      "recordSha256": "35eb0ebb2bdad5d00072cc7c8bd14cd6ed886d3e0dce326b4fa54cc8fefe6c09",
+      "edges": 5,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-026",
+      "file": "src/state/knowledge-registry.mjs",
+      "digest": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+      "recordSha256": "3baaa3722ba9d88b3d39cc640e85fd4f62b04b53e56e124ef0702e8d9153b463",
+      "edges": 8,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-026",
+      "file": "src/state/postland-drift.mjs",
+      "digest": "a266644fd0caac9f2736850c6ef46307304c186a5a698793f17eb6d7861bf464",
+      "recordSha256": "e39454eeed84a6312cd74cb15100e05c0c70abb6a1ac521cddb4ad17c5b8f696",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-026",
+      "file": "src/state/priority-formula.mjs",
+      "digest": "5a1767b93f0155567472eb059899aa993a147ecc0e0aaf75dafe8e93da72d6fe",
+      "recordSha256": "c73e02d20cc3aac2f20298859b186a5b29f74658ec3411122f7943b5aaf9e725",
+      "edges": 1,
+      "diffBytes": 572
+    },
+    {
+      "set": "step04-026",
+      "file": "src/state/replay.mjs",
+      "digest": "6fbdd0bd9867118cf3ce086ed45a6e3e9a6c61bcc5f99a086d86440be4f0d673",
+      "recordSha256": "902fa7876732617ab458d5fd5089fe0f6c083c91d53dd2191fa4aa94aad903d6",
+      "edges": 4,
+      "diffBytes": 640
+    },
+    {
+      "set": "step04-026",
+      "file": "src/state/retro-pool.mjs",
+      "digest": "bed4fe7e4a09ee49d3ae019e30dc21b73bc00bbbc8a20be3eec4cdf6352140ae",
+      "recordSha256": "c72650735e8f6237ddb5ef9c3524cc94987b67014f53c8a718631c7187862306",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-026",
+      "file": "src/state/status-fsm.mjs",
+      "digest": "6853485189d2e25e6ee2a5997d11f0b2ae4e608cf5ed6332df010b2e703b76b0",
+      "recordSha256": "312aeca7f5ed32379c2e5fc5d6a23d98dbc2d45fb814d23a34c0e67c9e733a6a",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-027",
+      "file": "src/state/store.mjs",
+      "digest": "b8eacaa22d2f17b04f494f9671b3bec2b883306aadb9ae0909298b94b20e11c4",
+      "recordSha256": "0eeebd91b6ffcbca0569c8454a286c997d3efa8056c32f4838b6caa14617c259",
+      "edges": 11,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-027",
+      "file": "src/state/tool-registry.mjs",
+      "digest": "e713e0adcfe2398dd8d11c19d6cd1ddbf912222cb75410bdbdf1cdf3406e66f2",
+      "recordSha256": "5b81e5ea400cccf5b9cf0ca5d1f99f783ec2001c5abdc876c20a3ad85ad996e2",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-027",
+      "file": "src/state/work.mjs",
+      "digest": "ae5f1599cf36963602efd1e8b13ee2ac883997ea747cd99877364d0162c05059",
+      "recordSha256": "a977f056a149a2eb57b99de15ace6d3eacc83636c101a0f1477a17957f40af80",
+      "edges": 11,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-027",
+      "file": "src/state/worker-slots.mjs",
+      "digest": "bc37bb0d995fe7339925c209c4e79232bdc5e3c079668f89c8f52313312dbf95",
+      "recordSha256": "cea4472f2447a01d75670d9183fc52d2c7371b5dd1a50bebfa33e2e87f5481ab",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-028",
+      "file": "src/util/format-bytes.mjs",
+      "digest": "786e381e7581ddd1923305d3bb25e193aba99b84118728574c84280d5290966d",
+      "recordSha256": "0619a4c0170b5bc3796a5d139eb5f1918fa25371a9dd15cb6a4192963b5bdc9f",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-028",
+      "file": "src/util/format-duration.mjs",
+      "digest": "aa3d4629659f6b635267965013716b45e71120cce5282f6b2a4503148c616ce9",
+      "recordSha256": "7a547b809cce6f040cd885f43d3b573dfc30b22f283fe7bd9393b8337068e14e",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-029",
+      "file": "src/verbs/merge/approve.mjs",
+      "digest": "6e287f08f1d2b6386023a07722cc8010c98a3db8607ea1243f244077a057db8b",
+      "recordSha256": "549c5a1211ae822c7b4b542c0efd308993d06fba33c24ed3b23570aa59126d9d",
+      "edges": 8,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-029",
+      "file": "src/verbs/merge/iron-law-level.mjs",
+      "digest": "28037a676ec6f8533c2c8b0bcd66be0ec8dff1acfca0d656de7c5baa02043b73",
+      "recordSha256": "e44ac58985b65a9f209d75f591922258346f18e13bf7448fe7cde622c52bdbf3",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-029",
+      "file": "src/verbs/merge/merge.mjs",
+      "digest": "0a453f93896685a77cf5494ff5d2f6f8106ff638e1b17079a368801fdb064f89",
+      "recordSha256": "76ef0a4ec3d7f3551b00d4a881da83fb70ac65971b309f269c465507690e82b6",
+      "edges": 5,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-029",
+      "file": "src/verbs/merge/sync-root.mjs",
+      "digest": "0ebead4914bf2a464d3f116655cf0713cef268be2a85871ba048cf35b148204d",
+      "recordSha256": "ced6edb877ef6f6d96dad9ccffc060d5b1ec30adf12d8b5d9dbe4f634798eb51",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-030",
+      "file": ".claude/skills/ui-spec/CONVENTION.md",
+      "digest": "18c861503a1bcfe263d1d48c5763b95dcb39f61b477256ffed3d895af1729b68",
+      "recordSha256": "ebbfe802ac2e8658663840ff7fb8cfa4457af8d482046ba15d67e9d143c42eb8",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-030",
+      "file": ".claude/skills/ui-spec/SKILL.md",
+      "digest": "afd4e1e3b050ea6771ae6bb3aaabe85f335b62cbf06ebca807f4ec91751e84f4",
+      "recordSha256": "2ece847272888fbd9f8394cd834b9ea79e6ffcb29e1ac2631e5dc472d9f8e0cb",
+      "edges": 4,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-030",
+      "file": ".claude/skills/ui-spec/references/CONVENTION.md",
+      "digest": "18c861503a1bcfe263d1d48c5763b95dcb39f61b477256ffed3d895af1729b68",
+      "recordSha256": "51bf7d56c94a788759cc2943349282b8069eeb667b592a100a49a803275994b4",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-030",
+      "file": "core/skills/_shared/citation-format.md",
+      "digest": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
+      "recordSha256": "adb03e42d8ebdd417249e49c359a202018af45420d80f973e87462fff0c5b7c7",
+      "edges": 27,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-030",
+      "file": "core/skills/_shared/coding-worker-contract.md",
+      "digest": "e76250e9dc79a8c161f6e7e4c22e85069461e4c4b29d919b10bbff6059185185",
+      "recordSha256": "29342e48d062fbaa42382580cb09efb0ace3c1805323369e465fc3eb89869898",
+      "edges": 15,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-030",
+      "file": "core/skills/distill/references/deep-dive-protocol.md",
+      "digest": "dc6c43de2ffdb23e581b19f2d46a72affbc2279d92f7ccb971fd567c5e7d9961",
+      "recordSha256": "da86722a35f4f8139f2f9cc57fb28b5535aa759958cc52517b7e98e47a4e8c23",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-030",
+      "file": "core/skills/fgos-clarifying/SKILL.md",
+      "digest": "1eb6fe9cc19fa2e311b9f0a2a6eeb3810c12834f3c8bb59671b44b423be34bee",
+      "recordSha256": "3480cb085d7380319f5a88382af994c76ea51410bea4539270b4f6e78cd8dda7",
+      "edges": 3,
+      "diffBytes": 724
+    },
+    {
+      "set": "step04-030",
+      "file": "core/skills/fgos-indexing/SKILL.md",
+      "digest": "7356ec97cdc0532e3deb260faade56da41ea919cf704d2326e596a0f1f1c969e",
+      "recordSha256": "d542f5986c3325f477b86ca07bec43009e48b76c5b25eba86e947ecfd5a10e72",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-031",
+      "file": "core/skills/fgos-researching/SKILL.md",
+      "digest": "a08b3797131892f339e15b18aba9792ff3fc5d448261cafd59264b2d5ce2f9c8",
+      "recordSha256": "1b921b8f1edaca178073a5d4022159521526b6fddce4bee18dfa705d06f28fc0",
+      "edges": 6,
+      "diffBytes": 590
+    },
+    {
+      "set": "step04-031",
+      "file": "core/task-specs/fgos-indexing.md",
+      "digest": "4a23450a73f61c2cc9bc63a5b7eee88eb44d07855a76a8d37c5943edc27e63fd",
+      "recordSha256": "feeead6906b58f424658db8e0c0743b57e819c86699dda7a5b5fc1cbea9f4909",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-031",
+      "file": "core/task-specs/fgos-researching.md",
+      "digest": "e0ddb50a83351347eeb60d3b345cd1ad9d7e827485ded1cb65aad134ee0f9226",
+      "recordSha256": "f7e49b883ce78f76a69bf4c475b2e7ccb34dd580df8c4dfbc58cc342e8f7a15b",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-031",
+      "file": "src/runner/prompt-templates/worker-prompt-discovery.txt",
+      "digest": "c343469a6d604920e84a426dc1d72872d067b8aa83b5be6f420f9d580a06b9cb",
+      "recordSha256": "c2fe5fc28bc8aa1b51ff8644340d0423a98f6fd6cdbe80e1fd6471187dee9652",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-031",
+      "file": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+      "digest": "845861f6c8d55ab31e656fb6a54b6c3f6a51507fd02352de15146b7b08cd474a",
+      "recordSha256": "a49cc29bf56d1f927d9ae5164eb64aaaffd26775db20d96182f6d365b1f736c6",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-032",
+      "file": "core/skills/_shared/ak-cook-worker-contract.md",
+      "digest": "1fc127fcd70dc9232146771063dea6f729909277a98e3bcc1cdf2a4183aa03d0",
+      "recordSha256": "328d47458d842a867eed9b8a10a7c3050eede58805415c98a157f9c1859fa057",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-033",
+      "file": "plans/261020-1250-debate-pattern-and-judge-role/plan.md",
+      "digest": "c5e83e6ad211216f2cfedf0edeb208d7495c2173fbb299b395ac0e4e4e5d3bd7",
+      "recordSha256": "8feb806beef4634165bda0f4d51d3646fc9ca302731415f8e80a1a5deff9cde2",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-033",
+      "file": "plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md",
+      "digest": "e888fcf7bbb67a8e6bc716b5359fd06a5022ef56f80139ce24ef21684fc3813a",
+      "recordSha256": "00c5fb4af03f0363ff7fbd7394d41dd61079afc62a9168645612d4636dcf2483",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-033",
+      "file": "plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md",
+      "digest": "b448582368aa6fdca0c97badf598f5e783540d508cec3f260a68a19fd2ae327a",
+      "recordSha256": "aabf710b38f62ca46553c7af7e2fb195f98d2d46f64c28663f5224f5a7eea3ec",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-033",
+      "file": "plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md",
+      "digest": "d8e9dd76b56af721e93d98008fc64ae5f4fd8ba3c08aa610428443e624a700b9",
+      "recordSha256": "93201362ebec21b4816348e569eed2337ed4eea0af8ed0cdb326905a02e86a82",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-033",
+      "file": "plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md",
+      "digest": "d05a7a264c697d888a6beb1ced5e6dc9c73fa96a34a78734e8722071eb5a4cdc",
+      "recordSha256": "28f78bb6fade9c736418b1b31e5378185cc55541e40c2c9501369a34f8613c07",
+      "edges": 1,
+      "diffBytes": 0
+    }
+  ],
+  "recordFiles": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-017.jsonl",
+      "sha256": "27210e2839b80b09948691f6673087d02d2b159c2861c9dd4f9b4b87599c65e9",
+      "bytes": 5218
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-018.jsonl",
+      "sha256": "1714c00ac5de77a736ad6a4726ac62e216785812246be6cb45f0c1ee53c73888",
+      "bytes": 50263
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-019.jsonl",
+      "sha256": "841ac50dd33ae61fdb054381ea9163e5599192bd67ef265c496c29a96178bdaa",
+      "bytes": 41314
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-020.jsonl",
+      "sha256": "d401f67a90b4bac3001a217b5a54e4fd28964ff6ca415f33495f585daaf48f7f",
+      "bytes": 20205
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-021.jsonl",
+      "sha256": "40536b9cbb6a766b0798fb171ed07f3fc93cff3b1153ef1dc3122658282d52fb",
+      "bytes": 3314
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-022.jsonl",
+      "sha256": "1daf1560ac60980ba5929e163ea30e6997e27419b7ec7b69c80cafffd2c3949e",
+      "bytes": 29658
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-023.jsonl",
+      "sha256": "f7419740e8c9a60c353b012f00d97b4ac815bfaaac65c72c3e6424134f78c3ef",
+      "bytes": 84439
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-024.jsonl",
+      "sha256": "9a0767110c402de5df5552e1e8922ed0866fe0ba26a0d06e1b0d59e82b450454",
+      "bytes": 65915
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-025.jsonl",
+      "sha256": "13456b191df556e982ca182028e8297c116960ffa445bfbc395899ded993f465",
+      "bytes": 127050
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
+      "sha256": "e0e56c565bb1e9bc9d788a7ccd755d5a885563fd71f0d7461095ae7e31bc6c5b",
+      "bytes": 206995
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-027.jsonl",
+      "sha256": "82c5d01f2b90bb8806cef35da08edb94681a6b7311df901df00e2174119540dd",
+      "bytes": 58883
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-028.jsonl",
+      "sha256": "f5e2fb4248f318ccadc74be77d0a043a1e6889409e53c957f6108c9b1e38884e",
+      "bytes": 10695
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-029.jsonl",
+      "sha256": "a2e4469349137c08d54ee1531334f4f58901b3a04f847cf249709badcdbb7de6",
+      "bytes": 39618
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-030.jsonl",
+      "sha256": "063eecc7511e79cd5812f06949aefcadd05a703d28135f69a14ebceac1b4c4db",
+      "bytes": 182544
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-031.jsonl",
+      "sha256": "d3a98e12bca6db59a27a38ae628c0bb56c64344b7f172bf953e87028790f65cf",
+      "bytes": 50912
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-032.jsonl",
+      "sha256": "d00a3400e26b03c152c647d0992fa4ee642234814e6b2d8bd6a3c06740e78bc7",
+      "bytes": 15849
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-033.jsonl",
+      "sha256": "864083f421c5a904dc2a78e8c0c5e9273ea2302c57f943b84ea781cc5efadde8",
+      "bytes": 34325
+    }
+  ],
+  "inputs": [
+    {
+      "path": "step-04-batches.json",
+      "sha256": "b965adc71f57fe40b56ec8290d4f2f1779bfa76edf208cc4aa9c7d8daa9c1a45"
+    },
+    {
+      "path": "step-04-population.json",
+      "sha256": "ca9ece9e343f6b7c14b00a77207e5ff46c99082be054e52e1a397d45dbfde418"
+    },
+    {
+      "path": "step-04-source-render-provenance.json",
+      "sha256": "dc0fa31fd54dcdeae507ba65c57c7d59191c6534a51b537b99a7f9c9479fbf87"
+    },
+    {
+      "path": "step-04-population-gaps.json",
+      "sha256": "c4fb9bed895b2f3d43df5328208d6039b4c09c2422426c158450f25c9c781518"
+    },
+    {
+      "path": "owner-answers.md",
+      "sha256": "5cf527e766eaae140ce60ec0276c7cf6d384e7de13d417e6ac526a26d649b799"
+    },
+    {
+      "path": "step-04-wave2-population-gaps.json",
+      "sha256": "85ce62da87a9cb6d356759d70f504488a93dc2ac33148ab091ed59650976370b"
+    },
+    {
+      "path": "step-04-wave2-step0-binding-check.json",
+      "sha256": "d40409afc927de176714490209fa6435855c7fc5a84af589ed76f706cc964b26"
+    },
+    {
+      "path": "step-04-wave2-lead-ruling-gaps.json",
+      "sha256": "7c002560826dd873ff2195c1fcbd404bf80832dd4438dea4a0380ea45049800a"
+    }
+  ],
+  "selectionSha256": "6422472433f1aaf869634e04788e0992580995fa1eefe2205032ead5fe9d05e2",
+  "parts": [
+    {
+      "part": 1,
+      "set": "step04-017",
+      "files": [
+        "CHANGELOG.md"
+      ],
+      "edges": 1,
+      "bytes": 379790,
+      "payload": "step-04-wave2-p01.json",
+      "payloadSha256": "e0472f7347cfaaa463cbbf59b9260e9c780a7406e7781e7a9358265e5ebcb46d",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p01.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 2,
+      "set": "step04-018",
+      "files": [
+        "plans/reports/fork-260928-1017-panel-depth-experiment-design-research-report.md",
+        "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md"
+      ],
+      "edges": 2,
+      "bytes": 31335,
+      "payload": "step-04-wave2-p02.json",
+      "payloadSha256": "137f9da5ddbbf8e179990958703799cbeba1989ac414a8212240702dea3ba54a",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p02.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 3,
+      "set": "step04-019",
+      "files": [
+        "packages/distribution/rust/src/init.rs",
+        "packages/distribution/rust/src/manifest.rs",
+        "packages/distribution/rust/src/workspace.rs"
+      ],
+      "edges": 4,
+      "bytes": 150403,
+      "payload": "step-04-wave2-p03.json",
+      "payloadSha256": "f4c159f9253c9e6132ee096701ef94d9702655cec10be93203acc99890d056b2",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p03.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 4,
+      "set": "step04-020",
+      "files": [
+        "packages/herdr-fgos-common/rust/src/fgos.rs",
+        "packages/herdr-fgos-common/rust/src/settings.rs"
+      ],
+      "edges": 4,
+      "bytes": 85134,
+      "payload": "step-04-wave2-p04.json",
+      "payloadSha256": "a2201fe29bfb72a172d7aa16e167789b63b9b26a0b77b3c751f3f05fb3fae2f2",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p04.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 5,
+      "set": "step04-021",
+      "files": [
+        "packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs"
+      ],
+      "edges": 1,
+      "bytes": 46456,
+      "payload": "step-04-wave2-p05.json",
+      "payloadSha256": "f84939599107afb8ea85a5a98b47b879bf9d0f487ca6518627ee30d95147bc20",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p05.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 6,
+      "set": "step04-022",
+      "files": [
+        "src/runner/claim-liveness.mjs",
+        "src/runner/dispatch/assignment-runner.mjs"
+      ],
+      "edges": 2,
+      "bytes": 155681,
+      "payload": "step-04-wave2-p06.json",
+      "payloadSha256": "401281dd86b660ded5152a0960db2793fe16aa6169ed45c1925a66cd5606b930",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p06.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 7,
+      "set": "step04-023",
+      "files": [
+        "src/runner/dispatch/config.mjs",
+        "src/runner/dispatch/confinement/authority.mjs",
+        "src/runner/dispatch/confinement/request.mjs",
+        "src/runner/dispatch/execution-contract.mjs"
+      ],
+      "edges": 10,
+      "bytes": 283607,
+      "payload": "step-04-wave2-p07.json",
+      "payloadSha256": "3ea1ec56f9474ba5fe767bda852a2dc7efff84c9420b83e0667c56b50b2a7a8b",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p07.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 8,
+      "set": "step04-024",
+      "files": [
+        "src/runner/dispatch/resolve.mjs",
+        "src/runner/dispatch/trust-store.mjs",
+        "src/runner/loop.mjs"
+      ],
+      "edges": 11,
+      "bytes": 202508,
+      "payload": "step-04-wave2-p08.json",
+      "payloadSha256": "0351ba0a404834c9b8ed948d42a3d940ee214623a32e791bc2a6e0e6ce4e859e",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p08.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 9,
+      "set": "step04-025",
+      "files": [
+        "src/runner/merge.mjs",
+        "src/runner/work-compat.mjs",
+        "src/runner/worktree.mjs"
+      ],
+      "edges": 32,
+      "bytes": 338429,
+      "payload": "step-04-wave2-p09.json",
+      "payloadSha256": "53876133e25c8f6e75daa801dc22eab62c6b4400be583ac4a437221122ddc9c4",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p09.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 10,
+      "set": "step04-026",
+      "files": [
+        "src/state/frontier.mjs",
+        "src/state/graph-harness.mjs",
+        "src/state/priority-formula.mjs"
+      ],
+      "edges": 12,
+      "bytes": 94779,
+      "payload": "step-04-wave2-p10.json",
+      "payloadSha256": "1eb8d11548ce85c8f0d3f74255923472e248e17a049cde6a47acc98e10eb94ac",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p10.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 11,
+      "set": "step04-027",
+      "files": [
+        "src/state/store.mjs",
+        "src/state/work.mjs"
+      ],
+      "edges": 22,
+      "bytes": 229634,
+      "payload": "step-04-wave2-p11.json",
+      "payloadSha256": "03fc2332253166311c8708fb82b0a8b2e675f3c1d950c11ac9c16aae4d652e84",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p11.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 12,
+      "set": "step04-028",
+      "files": [
+        "src/util/format-duration.mjs"
+      ],
+      "edges": 2,
+      "bytes": 9586,
+      "payload": "step-04-wave2-p12.json",
+      "payloadSha256": "25ff4534065565f1340a5f59d480212c9b4b7a440703a581a3748a4cf19d0b9b",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p12.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 13,
+      "set": "step04-029",
+      "files": [
+        "src/verbs/merge/approve.mjs"
+      ],
+      "edges": 8,
+      "bytes": 76128,
+      "payload": "step-04-wave2-p13.json",
+      "payloadSha256": "ecb3e16485da87b12ebf8572ff8953b7a3cfc4983a6ce0804a32d29c51de7048",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p13.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 14,
+      "set": "step04-030",
+      "files": [
+        ".claude/skills/ui-spec/CONVENTION.md",
+        ".claude/skills/ui-spec/SKILL.md",
+        "core/skills/fgos-clarifying/SKILL.md"
+      ],
+      "edges": 8,
+      "bytes": 127522,
+      "payload": "step-04-wave2-p14.json",
+      "payloadSha256": "737174dbd1c15109df96ee4500268e9674a1c814dde6c6923ba6e63e0738892f",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p14.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 15,
+      "set": "step04-031",
+      "files": [
+        "core/skills/fgos-researching/SKILL.md",
+        "src/runner/prompt-templates/worker-prompt-discovery.txt"
+      ],
+      "edges": 7,
+      "bytes": 91386,
+      "payload": "step-04-wave2-p15.json",
+      "payloadSha256": "9ad56ad66a9c115a5d4ab647fd235edaf47940e6d86ad735ecb77c459096b140",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p15.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 16,
+      "set": "step04-032",
+      "files": [
+        "core/skills/_shared/ak-cook-worker-contract.md"
+      ],
+      "edges": 3,
+      "bytes": 31458,
+      "payload": "step-04-wave2-p16.json",
+      "payloadSha256": "25fe07d8f2968a22dfa9f4416dba9eff51c23c776fda7a10a8956cf155258818",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p16.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 17,
+      "set": "step04-033",
+      "files": [
+        "plans/261020-1250-debate-pattern-and-judge-role/plan.md",
+        "plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md",
+        "plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md",
+        "plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md",
+        "plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md"
+      ],
+      "edges": 7,
+      "bytes": 118150,
+      "payload": "step-04-wave2-p17.json",
+      "payloadSha256": "4c9b48a08e4ff6ed15f1a1deb8a5dff26c808197b8d3cfc26b1c2c269f8e36d3",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p17.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    }
+  ]
+}

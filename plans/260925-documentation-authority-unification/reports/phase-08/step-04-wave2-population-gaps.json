@@ -1,0 +1,88 @@
+{
+  "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+  "findings": [
+    {
+      "sourceOwner": "core/skills/fgos-clarifying/SKILL.md",
+      "file": "core/skills/fgos-clarifying/SKILL.md",
+      "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+      "digest": "1eb6fe9cc19fa2e311b9f0a2a6eeb3810c12834f3c8bb59671b44b423be34bee",
+      "sourceSpans": [
+        {
+          "line": 100,
+          "columnStart": 21,
+          "columnEndExclusive": 70,
+          "text": "docs/decisions/0026-vision-orchestrator-roottask-"
+        },
+        {
+          "line": 101,
+          "columnStart": 3,
+          "columnEndExclusive": 34,
+          "text": "capacity-native-vs-cli-spawn.md"
+        }
+      ],
+      "logicalReference": "docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md",
+      "edgeId": null,
+      "inventoryRefs": [],
+      "populationGap": true,
+      "reason": "Whole-file reading noticed the wrapped Native-First Dispatch Doctrine rule-2 decision citation outside the frozen Step 4 slot joins. No id is invented and no consumer edit is authorized.",
+      "status": "Lead census admission and content-bound authoring needed before Step 7 assembly; current record covers only the admitted RUL45 slot",
+      "candidateLookupOnly": "docs/platform/runner/decisions/h-36d872fbb0e5.md; title-matched 0026 with later 0033 narrowing; not an executable patch or accepted binding"
+    },
+    {
+      "sourceOwner": "core/skills/fgos-clarifying/SKILL.md",
+      "file": ".agents/skills/fgos-clarifying/SKILL.md",
+      "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+      "digest": "a3850c3acab72f5bc422c17b0a6f1a03b0e884872e65fe66c5b3caf22a226bf9",
+      "sourceSpans": [
+        {
+          "line": 101,
+          "columnStart": 21,
+          "columnEndExclusive": 70,
+          "text": "docs/decisions/0026-vision-orchestrator-roottask-"
+        },
+        {
+          "line": 102,
+          "columnStart": 3,
+          "columnEndExclusive": 34,
+          "text": "capacity-native-vs-cli-spawn.md"
+        }
+      ],
+      "logicalReference": "docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md",
+      "edgeId": null,
+      "inventoryRefs": [],
+      "populationGap": true,
+      "reason": "Whole-file reading noticed the wrapped Native-First Dispatch Doctrine rule-2 decision citation outside the frozen Step 4 slot joins. No id is invented and no consumer edit is authorized.",
+      "status": "Lead census admission and content-bound authoring needed before Step 7 assembly; current record covers only the admitted RUL45 slot",
+      "candidateLookupOnly": "docs/platform/runner/decisions/h-36d872fbb0e5.md; title-matched 0026 with later 0033 narrowing; not an executable patch or accepted binding"
+    },
+    {
+      "sourceOwner": "core/skills/fgos-clarifying/SKILL.md",
+      "file": "plugins/fgOS/skills/fgos-clarifying/SKILL.md",
+      "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+      "digest": "a3850c3acab72f5bc422c17b0a6f1a03b0e884872e65fe66c5b3caf22a226bf9",
+      "sourceSpans": [
+        {
+          "line": 101,
+          "columnStart": 21,
+          "columnEndExclusive": 70,
+          "text": "docs/decisions/0026-vision-orchestrator-roottask-"
+        },
+        {
+          "line": 102,
+          "columnStart": 3,
+          "columnEndExclusive": 34,
+          "text": "capacity-native-vs-cli-spawn.md"
+        }
+      ],
+      "logicalReference": "docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md",
+      "edgeId": null,
+      "inventoryRefs": [],
+      "populationGap": true,
+      "reason": "Whole-file reading noticed the wrapped Native-First Dispatch Doctrine rule-2 decision citation outside the frozen Step 4 slot joins. No id is invented and no consumer edit is authorized.",
+      "status": "Lead census admission and content-bound authoring needed before Step 7 assembly; current record covers only the admitted RUL45 slot",
+      "candidateLookupOnly": "docs/platform/runner/decisions/h-36d872fbb0e5.md; title-matched 0026 with later 0033 narrowing; not an executable patch or accepted binding"
+    }
+  ],
+  "frozenSlotsUnchanged": true,
+  "coverageLimit": "833 frozen slots mechanically replayed separately. These three noticed uncensused physical occurrences are not admitted or counted as invented record edges. This report is not a replacement census."
+}

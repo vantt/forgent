@@ -1,0 +1,883 @@
+[
+  {
+    "set": "step04-017",
+    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-017",
+    "population": [],
+    "ranks": [],
+    "sample": [],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-017",
+    "unpatchedRanks": [],
+    "unpatchedSample": [],
+    "mandatoryWitnesses": [
+      {
+        "file": "CHANGELOG.md",
+        "bytes": 366929,
+        "slots": 1,
+        "reasons": [
+          "source >=65536 bytes",
+          "prepared mandatory file",
+          "L12-57 changed binding"
+        ]
+      }
+    ],
+    "selected": [
+      "CHANGELOG.md"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+  },
+  {
+    "set": "step04-018",
+    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-018",
+    "population": [],
+    "ranks": [],
+    "sample": [],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-018",
+    "unpatchedRanks": [
+      {
+        "file": "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md",
+        "rankHash": "051006a7413287172a761c7e06e7fd76c7fa5601285694b1ce83ea0cf50d4c5c"
+      },
+      {
+        "file": "plans/reports/fork-260928-1017-panel-depth-experiment-design-research-report.md",
+        "rankHash": "0943efe148ac01a9263a4d59e129510f49b314744cd05a2cb448b6673205a8bd"
+      },
+      {
+        "file": "docs/history/tsk-43q/iron-law-evidence.md",
+        "rankHash": "0f9011b40e7d08476f865ddc92d04793cbf8ee6fe877906a0d6303c0e50a44e6"
+      },
+      {
+        "file": "docs/history/p03-3-proof2-work-lookup-proto-guard/CONTEXT.md",
+        "rankHash": "25b19ecb62c77b6af7cca661f5805b141c3b7d8a45f889424cb9ca6d17956b03"
+      },
+      {
+        "file": "plans/reports/reviewer-p03-1-260905-0251-skill-authoring-review-report.md",
+        "rankHash": "2c478a3bfa37b6217b688ffd3434fee747aef74c3c12f7eb1b2bb25329eeed6e"
+      },
+      {
+        "file": "herdr-dashboard/src/pane_scan.rs",
+        "rankHash": "8c5cfbcaa151b278bc7f71c9a808acee81997859828f5cd0561c4f8372209d51"
+      },
+      {
+        "file": "plans/reports/review-prompt-260911-1654-runtime-recovery-design-second-opinion.md",
+        "rankHash": "ab73d710b1df6526062c067d68a033e709cafff234b8dc5b4d82c408081e7388"
+      },
+      {
+        "file": "plans/reports/from-implementer-to-red-team-260907-1050-dispatch-visibility-v0-review-prompt.md",
+        "rankHash": "cac6c5963e679e33c1315ec679c3e601062bf4d90fd9e414031d509e639c2aef"
+      },
+      {
+        "file": "plans/reports/review-prompt-260911-1805-runtime-recovery-detailed-design.md",
+        "rankHash": "f59ea8a2ba3ee6c54587ea6e0f60f78d6ef8e94870f77b1903a5e8267e7383d8"
+      }
+    ],
+    "unpatchedSample": [
+      "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md",
+      "plans/reports/fork-260928-1017-panel-depth-experiment-design-research-report.md"
+    ],
+    "mandatoryWitnesses": [],
+    "selected": [
+      "plans/reports/fork-260928-1017-panel-depth-experiment-design-research-report.md",
+      "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+  },
+  {
+    "set": "step04-019",
+    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-019",
+    "population": [
+      "packages/distribution/rust/src/manifest.rs"
+    ],
+    "ranks": [
+      {
+        "file": "packages/distribution/rust/src/manifest.rs",
+        "rankHash": "be020aec5beb7ae9e57ba71b280f06d7cc4b718b7bec0f3f839cd11cb6d786ec"
+      }
+    ],
+    "sample": [
+      "packages/distribution/rust/src/manifest.rs"
+    ],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-019",
+    "unpatchedRanks": [
+      {
+        "file": "packages/distribution/rust/src/workspace.rs",
+        "rankHash": "0bc14cb36056a6fc4b5e38e2c75b96211fccd6e75a44fd40afffcbf22b162802"
+      },
+      {
+        "file": "packages/distribution/rust/src/verify.rs",
+        "rankHash": "359ad3deb6485ab2b3f0089d9b15409a3acbee6ba9af4b11ddc0354305be1024"
+      },
+      {
+        "file": "packages/distribution/rust/src/canonical.rs",
+        "rankHash": "72ae39716e74ad23176c235e6526d9f640dea386364751011a7a0ae28fb4bd18"
+      }
+    ],
+    "unpatchedSample": [
+      "packages/distribution/rust/src/workspace.rs"
+    ],
+    "mandatoryWitnesses": [
+      {
+        "file": "packages/distribution/rust/src/init.rs",
+        "bytes": 89981,
+        "slots": 1,
+        "reasons": [
+          "source >=65536 bytes",
+          "prepared mandatory file"
+        ]
+      }
+    ],
+    "selected": [
+      "packages/distribution/rust/src/init.rs",
+      "packages/distribution/rust/src/manifest.rs",
+      "packages/distribution/rust/src/workspace.rs"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+  },
+  {
+    "set": "step04-020",
+    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-020",
+    "population": [
+      "packages/herdr-fgos-common/rust/src/fgos.rs"
+    ],
+    "ranks": [
+      {
+        "file": "packages/herdr-fgos-common/rust/src/fgos.rs",
+        "rankHash": "6b05073423d052098ded86847da8c780d35a71e4033eb1e4ba795cdc4921342a"
+      }
+    ],
+    "sample": [
+      "packages/herdr-fgos-common/rust/src/fgos.rs"
+    ],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-020",
+    "unpatchedRanks": [
+      {
+        "file": "packages/herdr-fgos-common/rust/src/settings.rs",
+        "rankHash": "37de31cf2b0f753f59fdd6e401731e0729d96dc369b5c598c127916e66dccafb"
+      }
+    ],
+    "unpatchedSample": [
+      "packages/herdr-fgos-common/rust/src/settings.rs"
+    ],
+    "mandatoryWitnesses": [],
+    "selected": [
+      "packages/herdr-fgos-common/rust/src/fgos.rs",
+      "packages/herdr-fgos-common/rust/src/settings.rs"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+  },
+  {
+    "set": "step04-021",
+    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-021",
+    "population": [],
+    "ranks": [],
+    "sample": [],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-021",
+    "unpatchedRanks": [
+      {
+        "file": "packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs",
+        "rankHash": "3f8e3bb3395ed800492ca44f14107cec14ce8031792529d87268bc91cc6f5a6b"
+      }
+    ],
+    "unpatchedSample": [
+      "packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs"
+    ],
+    "mandatoryWitnesses": [],
+    "selected": [
+      "packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+  },
+  {
+    "set": "step04-022",
+    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-022",
+    "population": [],
+    "ranks": [],
+    "sample": [],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-022",
+    "unpatchedRanks": [
+      {
+        "file": "src/runner/claim-liveness.mjs",
+        "rankHash": "0b2690dc306cb70fd560c3c44e8a52e6fa4cb23afe3675c0eb6f2a5d901a0e0f"
+      },
+      {
+        "file": "src/runner/agent-roster.mjs",
+        "rankHash": "107041577ed9e700cf35f52c3c46244a8d6d64451887c0e219b12c5e101b46f7"
+      },
+      {
+        "file": "src/runner/anti-loop.mjs",
+        "rankHash": "4b0fd0f6fb5db254be5c809822c54a4b3aab7f89c4e13b6977fc3cfc9375ab5b"
+      },
+      {
+        "file": "src/runner/dispatch/assignment-policy.mjs",
+        "rankHash": "d61ada20256b8c518b604de8af5ca4f40b62e3aff356af69fd3e2d5075a93f9c"
+      },
+      {
+        "file": "src/runner/claim-port.mjs",
+        "rankHash": "e43ca060c532ac77c13b6d1e4748455003fecff76707a0cb5c9d2ff914673df9"
+      },
+      {
+        "file": "src/runner/dispatch/cli.mjs",
+        "rankHash": "f5046ac7342b30cf6f2b2420bdef6ce3b0f91a84a894667be2ff6cac8ebed1f8"
+      }
+    ],
+    "unpatchedSample": [
+      "src/runner/claim-liveness.mjs"
+    ],
+    "mandatoryWitnesses": [
+      {
+        "file": "src/runner/dispatch/assignment-runner.mjs",
+        "bytes": 137247,
+        "slots": 1,
+        "reasons": [
+          "source >=65536 bytes",
+          "prepared mandatory file"
+        ]
+      }
+    ],
+    "selected": [
+      "src/runner/claim-liveness.mjs",
+      "src/runner/dispatch/assignment-runner.mjs"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+  },
+  {
+    "set": "step04-023",
+    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-023",
+    "population": [
+      "src/runner/dispatch/confinement/backend-registry.mjs",
+      "src/runner/dispatch/confinement/policies.mjs",
+      "src/runner/dispatch/confinement/request.mjs"
+    ],
+    "ranks": [
+      {
+        "file": "src/runner/dispatch/confinement/request.mjs",
+        "rankHash": "30c7b004633d7207fae607d243d5ddb5f0d7159119c47dae6b6a250046c6fb3a"
+      },
+      {
+        "file": "src/runner/dispatch/confinement/backend-registry.mjs",
+        "rankHash": "cc712f3a85d85d15c197c55e10755e74ce621d87eabad44a01e42a37fc595283"
+      },
+      {
+        "file": "src/runner/dispatch/confinement/policies.mjs",
+        "rankHash": "ccd0715b7e970d5d289ea58384ef5674cff2f19d7745aee93b3bebdd65246398"
+      }
+    ],
+    "sample": [
+      "src/runner/dispatch/confinement/request.mjs"
+    ],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-023",
+    "unpatchedRanks": [
+      {
+        "file": "src/runner/dispatch/execution-contract.mjs",
+        "rankHash": "0cd907b16fd7b7848220323e0528b1c969c08adb8ea5506aca675317000b5266"
+      },
+      {
+        "file": "src/runner/dispatch/prepare.mjs",
+        "rankHash": "3087606f7e00f30f290581a5c626ff12757dab65f08f326f4cbcfb399178ac6c"
+      },
+      {
+        "file": "src/runner/dispatch/operation-prompt-templates.mjs",
+        "rankHash": "47d65aa7dbcbb7995f8d0cd4b0fcea40d7ccb1785fb8751e268a7078a447d2e3"
+      },
+      {
+        "file": "src/runner/dispatch/herdr-round.mjs",
+        "rankHash": "608d92e0ecbbcd9b2828d9d35839a0aff77f056b57ece44f7e3a0e44aa82f9a1"
+      },
+      {
+        "file": "src/runner/dispatch/mechanism.mjs",
+        "rankHash": "ed5a001b471cf345a1dac1a3588fe08b977d014a86af0f4833a3802cffc52022"
+      }
+    ],
+    "unpatchedSample": [
+      "src/runner/dispatch/execution-contract.mjs"
+    ],
+    "mandatoryWitnesses": [
+      {
+        "file": "src/runner/dispatch/config.mjs",
+        "bytes": 96729,
+        "slots": 7,
+        "reasons": [
+          "source >=65536 bytes",
+          "prepared mandatory file",
+          "L12-57 changed binding"
+        ]
+      },
+      {
+        "file": "src/runner/dispatch/confinement/authority.mjs",
+        "bytes": 76777,
+        "slots": 1,
+        "reasons": [
+          "source >=65536 bytes",
+          "prepared mandatory file"
+        ]
+      }
+    ],
+    "selected": [
+      "src/runner/dispatch/config.mjs",
+      "src/runner/dispatch/confinement/authority.mjs",
+      "src/runner/dispatch/confinement/request.mjs",
+      "src/runner/dispatch/execution-contract.mjs"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+  },
+  {
+    "set": "step04-024",
+    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-024",
+    "population": [],
+    "ranks": [],
+    "sample": [],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-024",
+    "unpatchedRanks": [
+      {
+        "file": "src/runner/dispatch/trust-store.mjs",
+        "rankHash": "01de28776fd1cb0c7ce5144fc710a757d189474c1f581a0746e9f2008be5ef51"
+      },
+      {
+        "file": "src/runner/dispatch/run-lock.mjs",
+        "rankHash": "1cee024234b0a93ec134878c12e90ceb791e08fcd5cfc8122f897b14afc92ff4"
+      },
+      {
+        "file": "src/runner/frozen-judge.mjs",
+        "rankHash": "3b65e0535fb066eb1fdde9c1b83cb17d75570cadbccbd80d31a3c59aa1ec5764"
+      },
+      {
+        "file": "src/runner/goal-check.mjs",
+        "rankHash": "3d5160fda7e433e8b0596c3f20f89f27fa00257e1dd8a9ac5f57f4899e4568e6"
+      },
+      {
+        "file": "src/runner/dispatch/transport.mjs",
+        "rankHash": "577527f775037798037839d7116c0f561e679373b5749f5006b5d81af8bba4c6"
+      },
+      {
+        "file": "src/runner/dispatch/worker-home.mjs",
+        "rankHash": "9d8b4343a371ae25bab4ffcb706149974c3411a2358a4bba5948b1776ccdcf91"
+      }
+    ],
+    "unpatchedSample": [
+      "src/runner/dispatch/trust-store.mjs"
+    ],
+    "mandatoryWitnesses": [
+      {
+        "file": "src/runner/dispatch/resolve.mjs",
+        "bytes": 30537,
+        "slots": 5,
+        "reasons": [
+          "L12-57 changed binding"
+        ]
+      },
+      {
+        "file": "src/runner/loop.mjs",
+        "bytes": 95497,
+        "slots": 5,
+        "reasons": [
+          "source >=65536 bytes",
+          "prepared mandatory file"
+        ]
+      }
+    ],
+    "selected": [
+      "src/runner/dispatch/resolve.mjs",
+      "src/runner/dispatch/trust-store.mjs",
+      "src/runner/loop.mjs"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+  },
+  {
+    "set": "step04-025",
+    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-025",
+    "population": [
+      "src/runner/merge.mjs",
+      "src/runner/worktree.mjs"
+    ],
+    "ranks": [
+      {
+        "file": "src/runner/worktree.mjs",
+        "rankHash": "50318e4f73b232d1046d160a47473f55d32646b2022d5fa75d68333680d68bc9"
+      },
+      {
+        "file": "src/runner/merge.mjs",
+        "rankHash": "7f3802d7b73379c7e76c0ea1593e8bd042ca9601093c0ffa7d78b2089d9bfc24"
+      }
+    ],
+    "sample": [
+      "src/runner/worktree.mjs"
+    ],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-025",
+    "unpatchedRanks": [
+      {
+        "file": "src/runner/work-compat.mjs",
+        "rankHash": "a6a783d3e87727fb012b65ca8003adcffd2f61066568de7b3994ac9dcd7eae32"
+      },
+      {
+        "file": "src/runner/promote-engine.mjs",
+        "rankHash": "aa2cc516cfbd49b1990c7852bbba9430b557254218efa77be362b1cceacd249a"
+      },
+      {
+        "file": "src/runner/promote-preflight.mjs",
+        "rankHash": "cf43e8b6145ba95e0bf68e0ccb1eca13006178f79f96042289aa15023faed9ec"
+      },
+      {
+        "file": "src/runner/paths.mjs",
+        "rankHash": "fe61e3a2ae670d8ccdb7a8c5cb7d3ec460c174d2813f01d7644f76d856ff9f9d"
+      }
+    ],
+    "unpatchedSample": [
+      "src/runner/work-compat.mjs"
+    ],
+    "mandatoryWitnesses": [
+      {
+        "file": "src/runner/merge.mjs",
+        "bytes": 92363,
+        "slots": 18,
+        "reasons": [
+          "source >=65536 bytes",
+          "prepared mandatory file"
+        ]
+      },
+      {
+        "file": "src/runner/worktree.mjs",
+        "bytes": 72077,
+        "slots": 12,
+        "reasons": [
+          "source >=65536 bytes",
+          "prepared mandatory file"
+        ]
+      }
+    ],
+    "selected": [
+      "src/runner/merge.mjs",
+      "src/runner/work-compat.mjs",
+      "src/runner/worktree.mjs"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+  },
+  {
+    "set": "step04-026",
+    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-026",
+    "population": [
+      "src/state/gate-bypass.mjs",
+      "src/state/priority-formula.mjs",
+      "src/state/replay.mjs"
+    ],
+    "ranks": [
+      {
+        "file": "src/state/priority-formula.mjs",
+        "rankHash": "3a12e711791d798e7b7e3bb91e5e57b6a05394543558026b37515a37f8bcb7d6"
+      },
+      {
+        "file": "src/state/replay.mjs",
+        "rankHash": "97be02a18dae1b484c3896cb09457f77b9552f83360b89a56e035417d45b37a9"
+      },
+      {
+        "file": "src/state/gate-bypass.mjs",
+        "rankHash": "9dfd8cea50a6b4faaa183056986cda786e74356a7afb3618b653caa45d7a19f1"
+      }
+    ],
+    "sample": [
+      "src/state/priority-formula.mjs"
+    ],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-026",
+    "unpatchedRanks": [
+      {
+        "file": "src/state/graph-harness.mjs",
+        "rankHash": "002e390bb530b457a5d48d35daefe66365c994b1ff3554b71d5f86c879e1b2ae"
+      },
+      {
+        "file": "src/state/frontier.mjs",
+        "rankHash": "0e0a269c95cd7266afd805edf8d67f88669a1405f4e96f9b373150d5cf155f59"
+      },
+      {
+        "file": "src/state/events-jsonl-truncation-guard.mjs",
+        "rankHash": "1efd6d1e03d168c8ab5d0d7f78a751648e9fc3112b279b0bd1a803606601f832"
+      },
+      {
+        "file": "src/state/cleanup-harness.mjs",
+        "rankHash": "2aee9a9589edd1e30a96a0dfea2d0a0d9e57e283e00357a0af562a508f0de8ad"
+      },
+      {
+        "file": "src/state/graph-metrics.mjs",
+        "rankHash": "3a4c83c2a58b5ee4cb244d8597571d4204aae1142c11461869ef0628d3125be3"
+      },
+      {
+        "file": "src/state/dep-graph.mjs",
+        "rankHash": "4f816937634dfbcb37c7df89e8e844e70fedbe3078c100b9b5ca0be5e6fd2560"
+      },
+      {
+        "file": "src/state/status-fsm.mjs",
+        "rankHash": "58b76ac4d4827ab681a81d57bb7236eb3a80176e38d0f8de1ce872925dfcaa4e"
+      },
+      {
+        "file": "src/state/retro-pool.mjs",
+        "rankHash": "6a8ef02d3177d7758e7bd5b857ee374e5d0ab30df21fb4a86c8e5b663291f6ad"
+      },
+      {
+        "file": "src/state/postland-drift.mjs",
+        "rankHash": "6b9669914986784be4f702913bb5d0598a9488afdff150313dd284bd6121b400"
+      },
+      {
+        "file": "src/state/events-compaction.mjs",
+        "rankHash": "784f0a3d6059213825403d47b9bba75e080b89bb9d8e29bc6698e68bd73089ca"
+      },
+      {
+        "file": "src/state/cleanup-pool.mjs",
+        "rankHash": "97b352046babbc443a9254eeccc5299a0ade4c6ec755a81a02f2a9565656a7a8"
+      },
+      {
+        "file": "src/state/drift-status.mjs",
+        "rankHash": "a3a8d921cd1ca10fd149635a59352d2596ee8198cda463f13a304705b056c263"
+      },
+      {
+        "file": "src/state/knowledge-registry.mjs",
+        "rankHash": "d99e1a17155377148c71ef64c5ad180b7e3e3f9ef589cfd2b4b2a3037bfc3b41"
+      }
+    ],
+    "unpatchedSample": [
+      "src/state/graph-harness.mjs",
+      "src/state/frontier.mjs"
+    ],
+    "mandatoryWitnesses": [],
+    "selected": [
+      "src/state/frontier.mjs",
+      "src/state/graph-harness.mjs",
+      "src/state/priority-formula.mjs"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+  },
+  {
+    "set": "step04-027",
+    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-027",
+    "population": [],
+    "ranks": [],
+    "sample": [],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-027",
+    "unpatchedRanks": [
+      {
+        "file": "src/state/work.mjs",
+        "rankHash": "683c456e514621026ddb09004a3d30be28191448a30a58025e17788ce676c8c2"
+      },
+      {
+        "file": "src/state/tool-registry.mjs",
+        "rankHash": "98ec3b868776926aa6c91b58583811472c63f8a83ab653e791846070654b2086"
+      },
+      {
+        "file": "src/state/worker-slots.mjs",
+        "rankHash": "ff3e501bab7e19cb8683fd8aaaebfb72288ba617ed2a2b34ff53ce33b6a5a157"
+      }
+    ],
+    "unpatchedSample": [
+      "src/state/work.mjs"
+    ],
+    "mandatoryWitnesses": [
+      {
+        "file": "src/state/store.mjs",
+        "bytes": 110859,
+        "slots": 11,
+        "reasons": [
+          "source >=65536 bytes",
+          "prepared mandatory file"
+        ]
+      }
+    ],
+    "selected": [
+      "src/state/store.mjs",
+      "src/state/work.mjs"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+  },
+  {
+    "set": "step04-028",
+    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-028",
+    "population": [],
+    "ranks": [],
+    "sample": [],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-028",
+    "unpatchedRanks": [
+      {
+        "file": "src/util/format-duration.mjs",
+        "rankHash": "a38c5a54be669c2ffadd0737c1abbbdb222ce30bf8786328850d0eaa1056fdb4"
+      },
+      {
+        "file": "src/util/format-bytes.mjs",
+        "rankHash": "c27926b983fb15fe0a798751ce87dbb2343b4d1669f5fb68cff88d9edad81d9c"
+      }
+    ],
+    "unpatchedSample": [
+      "src/util/format-duration.mjs"
+    ],
+    "mandatoryWitnesses": [],
+    "selected": [
+      "src/util/format-duration.mjs"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+  },
+  {
+    "set": "step04-029",
+    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-029",
+    "population": [],
+    "ranks": [],
+    "sample": [],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-029",
+    "unpatchedRanks": [
+      {
+        "file": "src/verbs/merge/approve.mjs",
+        "rankHash": "0aeede0deae596099cd6f0c0bbdbe142c1ad97f77743c338791f7714c4350de1"
+      },
+      {
+        "file": "src/verbs/merge/iron-law-level.mjs",
+        "rankHash": "501a961f04812021f61436bd2f6e68d5efbc20d9d44309478bcf8a886c00ba5c"
+      },
+      {
+        "file": "src/verbs/merge/sync-root.mjs",
+        "rankHash": "758ac6639f0e8fbbd14c49fb6b609a47856d14a640399cd937315c2ec1166188"
+      },
+      {
+        "file": "src/verbs/merge/merge.mjs",
+        "rankHash": "9f3e9f789757f6c7d05efeded9b9339fdaa988a361aa77a5672fbd0480743a23"
+      }
+    ],
+    "unpatchedSample": [
+      "src/verbs/merge/approve.mjs"
+    ],
+    "mandatoryWitnesses": [],
+    "selected": [
+      "src/verbs/merge/approve.mjs"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+  },
+  {
+    "set": "step04-030",
+    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-030",
+    "population": [
+      "core/skills/fgos-clarifying/SKILL.md"
+    ],
+    "ranks": [
+      {
+        "file": "core/skills/fgos-clarifying/SKILL.md",
+        "rankHash": "5c64f7388076645a1604f662f04ba65055f48756bc12683d7cc4e4fcd37746c6"
+      }
+    ],
+    "sample": [
+      "core/skills/fgos-clarifying/SKILL.md"
+    ],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-030",
+    "unpatchedRanks": [
+      {
+        "file": ".claude/skills/ui-spec/SKILL.md",
+        "rankHash": "154386e5b766de1a19181e08fdbf65e1bd9b52aac8a6a062ff538debf6203968"
+      },
+      {
+        "file": ".claude/skills/ui-spec/CONVENTION.md",
+        "rankHash": "23f8ec027fa5d02cbec7f60b159d9e5e88474bf286e18c2220aec06fc55359e6"
+      },
+      {
+        "file": "core/skills/_shared/citation-format.md",
+        "rankHash": "a6ac06cd5e9dec5d602927057f634576050741144ac3e29f1323d23033734441"
+      },
+      {
+        "file": "core/skills/fgos-indexing/SKILL.md",
+        "rankHash": "b360c9cbb64ba618d62cdc78bc8898b54cf7ee6b89c2eba693d97f1519293d39"
+      },
+      {
+        "file": "core/skills/distill/references/deep-dive-protocol.md",
+        "rankHash": "d12bb3c0c44ce3ea3ff9a7b88ca4ca63bb599b890e9762db9fe841fbf6e2d7fc"
+      },
+      {
+        "file": "core/skills/_shared/coding-worker-contract.md",
+        "rankHash": "e7c06f8b1f90a9618b4d1fd499ddcf123fff6971c87e5fde8606ccb00e238302"
+      },
+      {
+        "file": ".claude/skills/ui-spec/references/CONVENTION.md",
+        "rankHash": "f334935b5a34b2114fdf00360122085fa994937c1bc9f3895df785d22470fb82"
+      }
+    ],
+    "unpatchedSample": [
+      ".claude/skills/ui-spec/SKILL.md",
+      ".claude/skills/ui-spec/CONVENTION.md"
+    ],
+    "mandatoryWitnesses": [],
+    "selected": [
+      ".claude/skills/ui-spec/CONVENTION.md",
+      ".claude/skills/ui-spec/SKILL.md",
+      "core/skills/fgos-clarifying/SKILL.md"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+  },
+  {
+    "set": "step04-031",
+    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-031",
+    "population": [
+      "core/skills/fgos-researching/SKILL.md"
+    ],
+    "ranks": [
+      {
+        "file": "core/skills/fgos-researching/SKILL.md",
+        "rankHash": "49cb8540660b48344e4764dc6d092d9840ca3a4d1b8bebe6287868071a54b6d1"
+      }
+    ],
+    "sample": [
+      "core/skills/fgos-researching/SKILL.md"
+    ],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-031",
+    "unpatchedRanks": [
+      {
+        "file": "src/runner/prompt-templates/worker-prompt-discovery.txt",
+        "rankHash": "0c0224e506e35bbffe881101554fed612144831c62fa9acb239bc12dff0b8ff2"
+      },
+      {
+        "file": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+        "rankHash": "5b6d215cf013f53af71006a7cc39c09eb3f8e83304c0fc956f36a0d42a0cfb27"
+      },
+      {
+        "file": "core/task-specs/fgos-indexing.md",
+        "rankHash": "a1157871c3c15d9392b955bd7cf78f5ab2f0a43fc83bd1e266b85a04f48b70eb"
+      },
+      {
+        "file": "core/task-specs/fgos-researching.md",
+        "rankHash": "c7023f5a5181a35f9e3aad3f76d49ed27fa08203139fd34f77ba5657806d6b7d"
+      }
+    ],
+    "unpatchedSample": [
+      "src/runner/prompt-templates/worker-prompt-discovery.txt"
+    ],
+    "mandatoryWitnesses": [],
+    "selected": [
+      "core/skills/fgos-researching/SKILL.md",
+      "src/runner/prompt-templates/worker-prompt-discovery.txt"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+  },
+  {
+    "set": "step04-032",
+    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-032",
+    "population": [],
+    "ranks": [],
+    "sample": [],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-032",
+    "unpatchedRanks": [],
+    "unpatchedSample": [],
+    "mandatoryWitnesses": [
+      {
+        "file": "core/skills/_shared/ak-cook-worker-contract.md",
+        "bytes": 2584,
+        "slots": 3,
+        "reasons": [
+          "prepared mandatory file"
+        ]
+      }
+    ],
+    "selected": [
+      "core/skills/_shared/ak-cook-worker-contract.md"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+  },
+  {
+    "set": "step04-033",
+    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-033",
+    "population": [],
+    "ranks": [],
+    "sample": [],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-033",
+    "unpatchedRanks": [],
+    "unpatchedSample": [],
+    "mandatoryWitnesses": [
+      {
+        "file": "plans/261020-1250-debate-pattern-and-judge-role/plan.md",
+        "bytes": 3632,
+        "slots": 2,
+        "reasons": [
+          "prepared mandatory file"
+        ]
+      },
+      {
+        "file": "plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md",
+        "bytes": 9048,
+        "slots": 1,
+        "reasons": [
+          "prepared mandatory file"
+        ]
+      },
+      {
+        "file": "plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md",
+        "bytes": 3675,
+        "slots": 1,
+        "reasons": [
+          "prepared mandatory file"
+        ]
+      },
+      {
+        "file": "plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md",
+        "bytes": 3556,
+        "slots": 2,
+        "reasons": [
+          "prepared mandatory file"
+        ]
+      },
+      {
+        "file": "plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md",
+        "bytes": 45366,
+        "slots": 1,
+        "reasons": [
+          "prepared mandatory file"
+        ]
+      }
+    ],
+    "selected": [
+      "plans/261020-1250-debate-pattern-and-judge-role/plan.md",
+      "plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md",
+      "plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md",
+      "plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md",
+      "plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+  }
+]

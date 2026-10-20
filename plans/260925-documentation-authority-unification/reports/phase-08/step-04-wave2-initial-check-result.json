@@ -1,0 +1,242 @@
+{
+  "authorInputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+  "recordAuthorPins": {
+    "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e": 174,
+    "d4a07d57c4d146b482d4a9e632dc02d8df42af79": 94
+  },
+  "checkedBatches": [
+    "step04-001",
+    "step04-002",
+    "step04-003",
+    "step04-004",
+    "step04-005",
+    "step04-006",
+    "step04-007",
+    "step04-008",
+    "step04-009",
+    "step04-010",
+    "step04-011",
+    "step04-012",
+    "step04-013",
+    "step04-014",
+    "step04-015",
+    "step04-016",
+    "step04-017",
+    "step04-018",
+    "step04-019",
+    "step04-020",
+    "step04-021",
+    "step04-022",
+    "step04-023",
+    "step04-024",
+    "step04-025",
+    "step04-026",
+    "step04-027",
+    "step04-028",
+    "step04-029",
+    "step04-030",
+    "step04-031",
+    "step04-032",
+    "step04-033"
+  ],
+  "files": 268,
+  "consumerFiles": 309,
+  "edges": 833,
+  "dispositions": {
+    "preserve": 703,
+    "patch": 57,
+    "parked": 73
+  },
+  "failureCount": 25,
+  "failures": [
+    {
+      "file": "packages/herdr-fgos-common/rust/src/fgos.rs",
+      "check": "inherited-step3/renamed-alias-preserve",
+      "detail": ""
+    },
+    {
+      "file": "packages/herdr-fgos-common/rust/src/fgos.rs",
+      "check": "inherited-step3/renamed-alias-preserve",
+      "detail": ""
+    },
+    {
+      "file": "src/runner/dispatch/config.mjs",
+      "check": "inherited-step3/removed-decision-narrative-successor",
+      "detail": "removed decision missing computed narrative-holder successor: ('docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity',)"
+    },
+    {
+      "file": "src/runner/dispatch/mechanism.mjs",
+      "check": "inherited-step3/removed-decision-narrative-successor",
+      "detail": "removed decision missing computed narrative-holder successor: ('docs/platform/runner/decisions/h-36d872fbb0e5.md#0033-capacity-cli-spawn-shaped-thắng-haslivetaskaccess-thu-hẹp-0026-rule-2',)"
+    },
+    {
+      "file": "src/runner/dispatch/resolve.mjs",
+      "check": "inherited-step3/removed-decision-narrative-successor",
+      "detail": "removed decision missing computed narrative-holder successor: ('docs/platform/runner/decisions/h-36d872fbb0e5.md#0033-capacity-cli-spawn-shaped-thắng-haslivetaskaccess-thu-hẹp-0026-rule-2',)"
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "check": "inherited-step3/renamed-alias-preserve",
+      "detail": ""
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "check": "inherited-step3/renamed-alias-preserve",
+      "detail": ""
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "check": "inherited-step3/renamed-alias-preserve",
+      "detail": ""
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "check": "inherited-step3/renamed-alias-preserve",
+      "detail": ""
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "check": "inherited-step3/renamed-alias-preserve",
+      "detail": ""
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "check": "inherited-step3/removed-decision-narrative-successor",
+      "detail": "removed decision missing computed narrative-holder successor: ('docs/platform/runner/decisions/h-36d872fbb0e5.md#0022-khảo-sát-choke-point-fgos-quyết-định-lặplệch-xuyên-clirunnerskill',)"
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "check": "inherited-step3/renamed-alias-preserve",
+      "detail": ""
+    },
+    {
+      "file": "src/state/frontier.mjs",
+      "check": "inherited-step3/removed-decision-narrative-successor",
+      "detail": "removed decision missing computed narrative-holder successor: ('docs/platform/work-state/decisions/retired-decision-history.md#12-adr-0027-domain-owns-the-pre-delivered-status-vocabulary',)"
+    },
+    {
+      "file": "src/state/frontier.mjs",
+      "check": "inherited-step3/removed-decision-narrative-successor",
+      "detail": "removed decision missing computed narrative-holder successor: ('docs/platform/work-state/decisions/retired-decision-history.md#12-adr-0027-domain-owns-the-pre-delivered-status-vocabulary',)"
+    },
+    {
+      "file": "src/state/gate-bypass.mjs",
+      "check": "inherited-step3/renamed-alias-preserve",
+      "detail": ""
+    },
+    {
+      "file": "src/state/knowledge-registry.mjs",
+      "check": "inherited-step3/dependency-category",
+      "detail": ""
+    },
+    {
+      "file": "src/state/knowledge-registry.mjs",
+      "check": "inherited-step3/dependency-category",
+      "detail": ""
+    },
+    {
+      "file": "src/state/knowledge-registry.mjs",
+      "check": "inherited-step3/dependency-category",
+      "detail": ""
+    },
+    {
+      "file": "src/state/knowledge-registry.mjs",
+      "check": "inherited-step3/dependency-category",
+      "detail": ""
+    },
+    {
+      "file": "src/state/knowledge-registry.mjs",
+      "check": "inherited-step3/dependency-category",
+      "detail": ""
+    },
+    {
+      "file": "src/state/knowledge-registry.mjs",
+      "check": "inherited-step3/dependency-category",
+      "detail": ""
+    },
+    {
+      "file": "src/state/worker-slots.mjs",
+      "check": "inherited-step3/removed-decision-narrative-successor",
+      "detail": "removed decision missing computed narrative-holder successor: ('docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity',)"
+    },
+    {
+      "file": "core/skills/_shared/citation-format.md",
+      "check": "inherited-step3/unit-consistency",
+      "detail": "mixed computed unit lacks a source-bound per-edge distinct-claim reason"
+    },
+    {
+      "file": "core/skills/fgos-indexing/SKILL.md",
+      "check": "inherited-step3/dependency-category",
+      "detail": ""
+    },
+    {
+      "file": "core/task-specs/fgos-indexing.md",
+      "check": "inherited-step3/dependency-category",
+      "detail": ""
+    }
+  ],
+  "openLeadRulingEdges": [
+    {
+      "set": "step04-032",
+      "file": "core/skills/_shared/ak-cook-worker-contract.md",
+      "edgeId": null,
+      "slotKey": "{\"edgeId\":null,\"file\":\".agents/skills/_shared/ak-cook-worker-contract.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":26,\"columnStart\":6,\"file\":\".agents/skills/_shared/ak-cook-worker-contract.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":7,\"text\":\"docs/specs/runner.md\"}}"
+    },
+    {
+      "set": "step04-032",
+      "file": "core/skills/_shared/ak-cook-worker-contract.md",
+      "edgeId": null,
+      "slotKey": "{\"edgeId\":null,\"file\":\"core/skills/_shared/ak-cook-worker-contract.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":26,\"columnStart\":6,\"file\":\"core/skills/_shared/ak-cook-worker-contract.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":6,\"text\":\"docs/specs/runner.md\"}}"
+    },
+    {
+      "set": "step04-032",
+      "file": "core/skills/_shared/ak-cook-worker-contract.md",
+      "edgeId": null,
+      "slotKey": "{\"edgeId\":null,\"file\":\"plugins/fgOS/skills/_shared/ak-cook-worker-contract.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":26,\"columnStart\":6,\"file\":\"plugins/fgOS/skills/_shared/ak-cook-worker-contract.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":7,\"text\":\"docs/specs/runner.md\"}}"
+    },
+    {
+      "set": "step04-033",
+      "file": "plans/261020-1250-debate-pattern-and-judge-role/plan.md",
+      "edgeId": null,
+      "slotKey": "{\"edgeId\":null,\"file\":\"plans/261020-1250-debate-pattern-and-judge-role/plan.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":37,\"columnStart\":15,\"file\":\"plans/261020-1250-debate-pattern-and-judge-role/plan.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":38,\"text\":\"docs/specs/workflow.md\"}}"
+    },
+    {
+      "set": "step04-033",
+      "file": "plans/261020-1250-debate-pattern-and-judge-role/plan.md",
+      "edgeId": null,
+      "slotKey": "{\"edgeId\":null,\"file\":\"plans/261020-1250-debate-pattern-and-judge-role/plan.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":72,\"columnStart\":52,\"file\":\"plans/261020-1250-debate-pattern-and-judge-role/plan.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":38,\"text\":\"docs/specs/runner.md\"}}"
+    },
+    {
+      "set": "step04-033",
+      "file": "plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md",
+      "edgeId": null,
+      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":68,\"columnStart\":48,\"file\":\"plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":35,\"text\":\"docs/specs/runner.md\"}}"
+    },
+    {
+      "set": "step04-033",
+      "file": "plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md",
+      "edgeId": null,
+      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":157,\"columnStart\":137,\"file\":\"plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":28,\"text\":\"docs/specs/runner.md\"}}"
+    },
+    {
+      "set": "step04-033",
+      "file": "plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md",
+      "edgeId": null,
+      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":33,\"columnStart\":11,\"file\":\"plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":16,\"text\":\"docs/specs/workflow.md\"}}"
+    },
+    {
+      "set": "step04-033",
+      "file": "plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md",
+      "edgeId": null,
+      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":97,\"columnStart\":77,\"file\":\"plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":16,\"text\":\"docs/specs/runner.md\"}}"
+    },
+    {
+      "set": "step04-033",
+      "file": "plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md",
+      "edgeId": null,
+      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":121,\"columnStart\":95,\"file\":\"plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":125,\"text\":\"docs/specs/workflow.md:195\"}}"
+    }
+  ],
+  "checkerSha256": "5c0e168f058392bb5627aa56d5e122477c0b47296e69a602658592d98d32179d",
+  "reusedStep3Sha256": "20bbeca2b0b104df357de506e479062b589e6faa31164a80761deddc31578b2b"
+}

@@ -1,0 +1,326 @@
+{
+  "authorInputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+  "reviewerRule": "Never run checker/probes/resolver/author scripts. Read every assigned file through EOF and independently verify targets. One verdict per whole file, even when streamed.",
+  "set": "step04-018",
+  "files": [
+    "plans/reports/fork-260928-1017-panel-depth-experiment-design-research-report.md",
+    "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md"
+  ],
+  "joinedSlots": 2,
+  "items": [
+    {
+      "file": "plans/reports/fork-260928-1017-panel-depth-experiment-design-research-report.md",
+      "sourceDigest": "b9b9a8c8e87f1c9989f587d45feeb36e5917226bd53a7254adb0470d98be7369",
+      "sourceContext": "# Panel-depth experiment (Unit I27) design research\n\nRead-only research, no files written by the fork. Produced to draft Unit\nI27 in `plans/260919-coordination-skill-harness-simplification/plan.md`.\n\n## 1. Current protocol structure\n\n`core/coordination-protocols/architecture-advisory-panel-v1.yaml` (556\nlines): 9 roles — `lead-advisor`, `context-investigator`, `system-shaper`,\n`alternative-shaper`, `constraint-advocate`, `architecture-critic`,\n`synthesizer`, `red-team`, `specialist` (optional slot, not a named\nactor). Graph:\n\n- `phase-framing` — `interpret-request` + `investigate-context`, parallel,\n  unrestricted.\n- `phase-shaping` — 3 shapers, parallel, `framing-shaping-open` vacuous\n  window.\n- `phase-critique` — `critique-proposals` + `assess-constraints`, both\n  driver-authorized, gated by `post-shaping-open` (all 3 shapers settled);\n  plus the optional specialist slot.\n- `phase-synthesis` — `synthesize-recommendation`, gated by\n  `post-critique-open` (both critique ops settled).\n- `phase-redteam` — `red-team-packet`, gated by `post-synthesis-open`,\n  `minTier: flagship`, `distinctProviderFrom: [synthesizer]` preferred.\n- `phase-explanation` — `explain-recommendation`, gated by\n  `post-redteam-open`.\n- `phase-dialogue-reopen` — optional `revise-synthesis`/`revise-explanation`\n  (`maxInvocations: 2` each); required `close-dialogue`.\n\nMinimum required happy-path dispatch count with no reopen/specialist: 11\nreal operations (2+3+2+1+1+1+1).\n\n## 2. Reduction candidates (evidence-based)\n\n- **(a) Drop `phase-redteam` entirely** for a standard/low-risk profile —\n  removes 1 full node, 1 actor (`red-team-actor`), the `flagship`-tier\n  dispatch, and the `distinctProviderFrom` requirement. Cleanest,\n  most defensible: red-team is its own structurally-separable post-synthesis\n  phase, and the doctrine frames it as optional adversarial depth, not\n  correctness-required for a low-materiality decision. **Selected as the\n  standard variant's shape.**\n- **(b) Merge `critique-proposals` + `assess-constraints`** into one op —\n  both currently AND-gate `post-critique-open` together; a standard\n  variant could route both through the architecture-critic alone, saving 1\n  dispatch, but requires a new merged `contractTemplate` and changes the\n  visibility-window AND-gate shape — more invasive than (a).\n- **(c) Cap `phase-dialogue-reopen` at `maxInvocations: 1` (or 0)** instead\n  of 2 — reduces worst-case dispatch count but doesn't shrink the *typical*\n  happy-path critical path, since reopen is already optional/on-demand\n  today. Weakest candidate.\n\n## 3. Evaluation-corpus/proof precedent\n\nNo reusable \"run N real cases, record outcomes\" harness exists in this\nrepo. What exists is per-phase-cell **proof logs** (e.g.\n`docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/r8-live-proof-driver.mjs`\n+ its own log output, and similar one-off driver scripts under\n`step-08-standalone-coordination/proofs/P0*.*`, plus\n`architecture-advisory-panel/proofs/P05.1/crash-proof-log.txt`) — each is a\nbespoke, single-purpose script proving ONE mechanism once, not a reusable\nmulti-case corpus runner. Unit I27 must build the corpus/runner from\nscratch, borrowing the PATTERN (a driver `.mjs` script + a logged\n`.md`/`.log` proof artifact), not any code directly.\n\n## 4. Cost estimate\n\nExisting conformance tests\n(`test/verbs/coordination-architecture-advisory-panel-conformance.test.mjs`,\n15 tests) use fake/node executors and run in ~0.9-4.7s per test — synthetic\ndispatch with no real model reasoning, useless for measuring decision\nquality/dissent retention/factual error. A genuine experiment needs REAL\nLLM-backed executors for both profiles. Minimum defensible corpus: 3-5 real\ncases × 2 profiles (full vs. standard) = 6-10 real sessions, each with\n8-11 real model calls across mixed tiers (including `flagship`/`frontier`)\n— realistically several minutes of wall time per session, so **total\nexperiment wall time likely 1-5+ hours, plus real API spend across dozens\nof frontier/flagship-tier calls.** Not a cheap or quick unit. User\nexplicitly confirmed proceeding at this cost (2026-09-28) after being shown\nthis estimate.\n\n## 5. Registration mechanics\n\nA new \"standard\" variant needs its own FlowDefinition YAML (new\n`metadata.id`, e.g.\n`core.coordination-protocol.architecture-advisory-panel-standard-v1`),\nadded as a new member entry in `core/protocol-packs/group-thinking.json`'s\n`members` array (currently 5 flat `{id, version}` entries), and a new row\n(or an extended existing row) in\n`docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md`'s\n\"Surface Taxonomy\" table with its own selection trigger (today's\n`architecture-panel` row would need a second, distinguishable trigger\ncondition, e.g. keyed on a materiality/risk signal from the request).\n\n## Unresolved (left to the implementer, not guessed here)\n\nWhether the standard variant should be a genuinely new FlowDefinition file\n(selected) or a documented \"sub-mode\" was a real design choice — Phase 5's\nown wording (\"must remain a separate registered protocol/preset\") points\nto the new-file approach, which is what Unit I27's scope requires.\n",
+      "record": {
+        "file": "plans/reports/fork-260928-1017-panel-depth-experiment-design-research-report.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+        "inventoryFileDigest": "b9b9a8c8e87f1c9989f587d45feeb36e5917226bd53a7254adb0470d98be7369",
+        "digest": "b9b9a8c8e87f1c9989f587d45feeb36e5917226bd53a7254adb0470d98be7369",
+        "inventoryEdgeIds": [
+          "evidence-189"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-189",
+            "slotKey": "{\"edgeId\":\"evidence-189\",\"file\":\"plans/reports/fork-260928-1017-panel-depth-experiment-design-research-report.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-189\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":56}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-189",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 56
+              }
+            ],
+            "consumerFile": "plans/reports/fork-260928-1017-panel-depth-experiment-design-research-report.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 56,
+                "columnStart": 2,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 56,
+                "columnStart": 2,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/26/38/40/46/58: Dated release/plan/report or implementation evidence retains its original citation identity (captured evidence). No active navigation or cutover acceptance is inferred. Exact passage: '`docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/r8-live-proof-driver.mjs`' Exists at author pin; tree retires at Phase 9; preserve the historical evidence/lineage spelling, with no current-authority acceptance.",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-189",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 56,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "`docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/r8-live-proof-driver.mjs`"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-018",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "plans/reports/fork-260928-1017-panel-depth-experiment-design-research-report.md",
+          "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+          "digest": "b9b9a8c8e87f1c9989f587d45feeb36e5917226bd53a7254adb0470d98be7369",
+          "bytes": 5229,
+          "lines": 99,
+          "headings": [
+            {
+              "line": 1,
+              "text": "# Panel-depth experiment (Unit I27) design research"
+            },
+            {
+              "line": 6,
+              "text": "## 1. Current protocol structure"
+            },
+            {
+              "line": 33,
+              "text": "## 2. Reduction candidates (evidence-based)"
+            },
+            {
+              "line": 52,
+              "text": "## 3. Evaluation-corpus/proof precedent"
+            },
+            {
+              "line": 65,
+              "text": "## 4. Cost estimate"
+            },
+            {
+              "line": 81,
+              "text": "## 5. Registration mechanics"
+            },
+            {
+              "line": 94,
+              "text": "## Unresolved (left to the implementer, not guessed here)"
+            }
+          ],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "renderContexts": {},
+      "populationGapFindings": [],
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md",
+      "sourceDigest": "4d5af3639f5511770443d983afb52907184c40b0f1758fe031c451232938f2a9",
+      "sourceContext": "# Architecture review brief — Dispatch Visibility V0\n\n**Branch:** `dispatch-visibility-v0` @ `45281918` (= local `main`)\n**Repo:** fgOS (`/home/vantt/projects/forgentX`), worktree for this branch:\n`/home/vantt/projects/forgentX-worker-isolation`\n**What you are asked for:** an **architecture** judgement, not a correctness audit.\nTwo correctness reviews already ran and their findings are closed; the second one's\nreport is in this directory and is listed below as required reading so you do not\nre-derive what it already established.\n\n---\n\n## 1. What the system is for\n\nfgOS dispatches work to AI coding agents. Its core promise, from\n`docs/platform-foundations.md`, is **\"Release con người\"** — free the human from\nsitting and watching. A person should be able to leave, come back, and find out\nwhat happened.\n\nUntil this track, that promise had a hole in the middle. Dispatch ran an agent\n**headless** (`claude -p \"<prompt>\"`, `agy -p …`): a subprocess with a captured\nstdout and an exit code. Two consequences, both measured in production:\n\n1. **A multi-line prompt could not survive.** The prompt was substituted into an\n   argv element; a real implementation prompt is always multi-line, and it arrived\n   at the agent corrupted. Every real `fgos-coding-implement` dispatch was\n   destroyed this way, silently.\n2. **Nobody could see anything.** No pane to look at, no way to know whether a\n   30-minute round was working or wedged, no way to tell a run that ended an hour\n   ago from one killed mid-flight — `run.json` was written once as\n   `status: \"running\"` and never written again.\n\n**V0's goal:** make dispatch through **herdr** (a terminal-multiplexer daemon that\nruns real interactive agent TUIs in panes) actually work, be observable while it\nruns, and be safe enough that a worker cannot reach the operator's own cockpit.\n\n**Explicitly out of scope for V0:** *contact*. V0 grants **observation only** —\nany number of readers, no coordination. Talking to a running worker (answering its\nquestion, redirecting it, stopping it) is V1. Several design choices below only\nmake sense against that boundary, and one of the questions for you is whether the\nboundary is drawn in the right place.\n\n### The doctrine the whole design turns on\n\n> **A receipt is an artifact the receiver wrote.**\n\nTransport status is never proof. Concretely: a round concludes **only** when the\nworker's own `outbox/result-<round>.json` appears on disk. `agent_status` is never\nread as completion — that reading was wrong twice in production (reported `idle`\nbefore the agent had started at all, and again in a gap between two tool calls of\none turn).\n\nA second rule, stated three times in the code because it is the one that kills\nhealthy work when broken:\n\n> **A reading that could not be taken is not evidence.**\n\nA failed liveness probe reports `unknown`, never `absent`. `died` needs consecutive\nabsences and one `unknown` resets the count. Time in which the agent's status could\nnot be read does not count towards an idle timeout.\n\n---\n\n## 2. The entity chain\n\n```\nWork item  tsk-*          what needs doing            (fgos list)\n  └─ Assignment  asgn_*   who is doing which stage of it\n       └─ Run  runs/NN    one actual execution of an executor\n            └─ RunResult  result.json — what that execution produced\n```\n\nA retry is a **new Run**, never an edit of the old one. `run.json.status`\n(`running` | `settled` | `died` | `unknown`) is a statement about **the execution\nreaching its end** — never about whether the work succeeded, which lives in\n`result.json`'s `status`/`confidence`.\n\nThere is a second, flatter Run layout, `dispatch-runs/<workId>/<stamp>/`, used when\na runner dispatch has no Assignment of its own. **Two layouts for one concept is a\nthing worth your opinion.**\n\n---\n\n## 3. Shape of what was built\n\nThree boundaries, deliberately separate:\n\n- **Routing boundary** — the worker gets its own herdr *session*, so the socket\n  herdr hands it controls only worker panes.\n- **Namespace boundary** — the worker gets a private `HOME`, closing the\n  `$HOME/.config/herdr/herdr.sock` fallback.\n- **Neither closes the hole alone.** Measured: herdr injects `HERDR_SOCKET_PATH`\n  into every pane it creates and **overwrites any `--env` override**. A worker\n  cannot be denied a socket, only handed a different one.\n\nThe signal ladder, in strict order (`liveness.mjs`):\n\n```\n1. truth      the worker's result file — outranks even a process that has exited\n2. blocked    agent waiting on something only a person can answer\n3. died       consecutive absent readings only\n4. ceiling    absolute bound on the round\n5. stale      no progress; the ONLY rung that reads screen text\n```\n\nOne round, as a sequence (`herdr-round.mjs`):\n\n```\nprepareRunDir → establishConfinement → paneSplit → seedWorkspaceTrust\n  → startAgent → deliverBrief → pollForOutcome → concludeFailure | settleRound\n```\n\n---\n\n## 4. Files to read, in order\n\n### Start here (the argument, before the code)\n\n| file | why |\n|---|---|\n| `docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md` | the decision the design rests on |\n| `plans/260906-1831-dispatch-visibility-v0/plan.md` | the 7 phases, the definition of done, the named risks |\n| `plans/reports/from-red-team-to-implementer-260907-1853-dispatch-visibility-v0-review-report.md` | the second correctness review. **Read this before reviewing** — its findings are all closed, and it records what was probed and found sound (kill path, atomicity, collector, mock fidelity) so you need not repeat that work |\n\n### The core (≈1 600 lines — this is the architecture)\n\n| file | lines | what it owns |\n|---|---|---|\n| `src/runner/dispatch/herdr-round.mjs` | 704 | one round, as a named sequence. `runHerdrRound` is the sequence; `driveRound` is everything after confinement exists |\n| `src/runner/dispatch/liveness.mjs` | 207 | the signal ladder. **Pure** — no clock, no terminal, no I/O |\n| `src/runner/dispatch/visibility-session.mjs` | 305 | `run.json` + `visibility.json`; the only door onto both. Atomic write, merge-not-replace |\n| `src/runner/dispatch/herdr-agent.mjs` | 266 | the one door onto the herdr CLI |\n| `src/runner/dispatch/brief.mjs` | 103 | the brief and its pointer; teaches the worker one gesture (`.tmp` then rename) |\n| `src/runner/dispatch/worker-artifacts.mjs` | 58 | where a worker's claim is, under either name it may have used |\n| `src/runner/dispatch/dispatch-error.mjs` | 22 | the shared error type; exists so two adapter modules need not import each other |\n\n### Confinement\n\n| file | lines | |\n|---|---|---|\n| `src/runner/dispatch/worker-home.mjs` | 215 | provision / redact / remove a private HOME |\n| `src/runner/dispatch/worker-session.mjs` | 114 | session naming, socket paths, operator-session refusal |\n| `src/runner/dispatch/worker-session-boot.mjs` | 140 | bring the worker session up and give it a pane to split from |\n| `src/runner/dispatch/trust-store.mjs` | 287 | pre-seed workspace trust, both formats (claude JSON, codex TOML) |\n\n### The seams into the rest of fgOS (where two defects hid)\n\n| file | lines | read for |\n|---|---|---|\n| `src/runner/dispatch/cli.mjs` | 1324 | `spawnWorker` (175) and `executeExecutorCli` (380) — **the two production call sites.** Both once dropped fields the config declared |\n| `src/runner/dispatch/transport.mjs` | 695 | `resolveExecutorCommand`, the adapter registry, the cli-spawn/http adapters |\n| `src/runner/dispatch/config.mjs` | 1097 | the config door. `validateInteractiveModeShape` (579), `validateExecutionProfileShape` (713) |\n| `src/runner/dispatch/assignment-runner.mjs` | 1075 | the collector: Run → RunResult (line 862 on) |\n\n### Observation surface\n\n`src/verbs/dispatch/show-run.mjs` (131), `src/verbs/dispatch/watch.mjs` (90),\nand `bin/fgos.mjs`'s `stale` case (the orphaned-run advisory, 2946 on).\n\n### Evidence — read at least one\n\n`docs/architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md`\nplus `proofs/2026-09-07-v0/` (probe scripts + their result JSON). This is what was\nactually measured against a real herdr, a real claude and a real agy, rather than\nargued.\n\n### Tests worth reading as specification\n\n`test/runner/dispatch-liveness.test.mjs` (the ladder's contract),\n`test/runner/dispatch-production-call-sites.test.mjs` (starts at the config file —\nexists because everything else built the invocation by hand),\n`test/verbs/dispatch-observe.test.mjs` (walks the import graph to assert an\nobserver binds no writer).\n\n---\n\n## 5. What we would most like your judgement on\n\nNot a checklist to work through — the questions where a second architect is\nworth more than another correctness pass.\n\n1. **Is the entity chain right?** Work item → Assignment → Run → RunResult, with a\n   retry as a new Run. Is `Run` carrying its own status file the right shape, or\n   should run state be derived from the event log the rest of fgOS uses?\n\n2. **Two Run layouts.** `assignments/<id>/runs/NN` and\n   `dispatch-runs/<workId>/<stamp>`. Every reader now handles both. Is that a\n   boundary that should be collapsed, and if so which way?\n\n3. **Where the observation boundary sits.** V0 grants read-only observation and\n   defers contact to V1. An actor lease was written and then **removed** — it\n   promised one-driver-at-a-time that a check-then-write cannot deliver, and its\n   tests asserted the promise rather than the behaviour. The reasoning is in a\n   comment block in `visibility-session.mjs`. Was removing it right, and is the\n   heartbeat that replaced part of its job (`round.note({})` every 10s) the right\n   primitive for V1 to build the real lock on?\n\n4. **The purity of the ladder.** `evaluateLadder` is pure and asks the caller for\n   screen text via a `needsScreen` flag, answered by a second call. It stayed pure\n   against a review suggestion to inject a `readScreen` callback. Right call?\n\n5. **`herdr-round.mjs` at 704 lines.** It was 369 lines inside a 1100-line\n   `transport.mjs` and was split out and decomposed into named steps. Is the\n   current decomposition real, or is it one file that should be two or three?\n   Named remaining seams: `pollForOutcome` carries both ladder-polling and\n   brief-resend policy; `settleRound` does five things.\n\n6. **Config surface.** Four executor fields were just **deleted** (`receipt`, a\n   top-level `trustStore`, `confinement.sessionName`, and four transport\n   deadlines), and a config still declaring one is now refused by name rather than\n   ignored. Is \"refuse a removed field\" the right posture for a platform other\n   projects install, or should it warn and continue?\n\n7. **The thing we know is unproven.** Every live proof ran a trivial task with a\n   six-line prompt. What is established is **contract conformance** — the agent\n   reads the pointer, finds the brief, writes ack/report/result — not that an agent\n   does hard implementation work well. `capabilities.fgos-coding-implement.prefer`\n   is already flipped to `agy-herdr`, so the next real implement dispatch takes\n   this path. Does anything in the architecture make that flip riskier than it\n   needs to be?\n\n## 6. Ground rules\n\n- Do not send messages to, or interfere with, any running herdr session or agent.\n- Do not start a gateway by hand; `fgos gateway start` is the only door.\n- This is a review: **read and report, change nothing.**\n- Three tests fail on this branch (`fgos-intake-4`, `enduser-index`,\n  `coordination-doctor-check`). All three reproduce identically on `main` and\n  belong to other tracks; the branch touches none of their files. Suite otherwise:\n  5 739 pass.\n",
+      "record": {
+        "file": "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+        "inventoryFileDigest": "4d5af3639f5511770443d983afb52907184c40b0f1758fe031c451232938f2a9",
+        "digest": "4d5af3639f5511770443d983afb52907184c40b0f1758fe031c451232938f2a9",
+        "inventoryEdgeIds": [
+          "evidence-190"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-190",
+            "slotKey": "{\"edgeId\":\"evidence-190\",\"file\":\"plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-190\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":162}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-190",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 162
+              }
+            ],
+            "consumerFile": "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 162,
+                "columnStart": 2,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 162,
+                "columnStart": 2,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/26/38/40/46/58: Dated release/plan/report or implementation evidence retains its original citation identity (captured evidence). No active navigation or cutover acceptance is inferred. Exact passage: '`docs/architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md`' Exists at author pin; tree retires at Phase 9; preserve the historical evidence/lineage spelling, with no current-authority acceptance.",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-190",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 162,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "`docs/architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md`"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-018",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md",
+          "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+          "digest": "4d5af3639f5511770443d983afb52907184c40b0f1758fe031c451232938f2a9",
+          "bytes": 11691,
+          "lines": 230,
+          "headings": [
+            {
+              "line": 1,
+              "text": "# Architecture review brief — Dispatch Visibility V0"
+            },
+            {
+              "line": 13,
+              "text": "## 1. What the system is for"
+            },
+            {
+              "line": 43,
+              "text": "### The doctrine the whole design turns on"
+            },
+            {
+              "line": 64,
+              "text": "## 2. The entity chain"
+            },
+            {
+              "line": 84,
+              "text": "## 3. Shape of what was built"
+            },
+            {
+              "line": 115,
+              "text": "## 4. Files to read, in order"
+            },
+            {
+              "line": 117,
+              "text": "### Start here (the argument, before the code)"
+            },
+            {
+              "line": 125,
+              "text": "### The core (≈1 600 lines — this is the architecture)"
+            },
+            {
+              "line": 137,
+              "text": "### Confinement"
+            },
+            {
+              "line": 146,
+              "text": "### The seams into the rest of fgOS (where two defects hid)"
+            },
+            {
+              "line": 155,
+              "text": "### Observation surface"
+            },
+            {
+              "line": 160,
+              "text": "### Evidence — read at least one"
+            },
+            {
+              "line": 167,
+              "text": "### Tests worth reading as specification"
+            },
+            {
+              "line": 177,
+              "text": "## 5. What we would most like your judgement on"
+            },
+            {
+              "line": 222,
+              "text": "## 6. Ground rules"
+            }
+          ],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "renderContexts": {},
+      "populationGapFindings": [],
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    }
+  ]
+}

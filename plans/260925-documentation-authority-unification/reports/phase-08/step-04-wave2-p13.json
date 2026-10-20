@@ -1,0 +1,541 @@
+{
+  "authorInputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+  "reviewerRule": "Never run checker/probes/resolver/author scripts. Read every assigned file through EOF and independently verify targets. One verdict per whole file, even when streamed.",
+  "set": "step04-029",
+  "files": [
+    "src/verbs/merge/approve.mjs"
+  ],
+  "joinedSlots": 8,
+  "items": [
+    {
+      "file": "src/verbs/merge/approve.mjs",
+      "sourceDigest": "6e287f08f1d2b6386023a07722cc8010c98a3db8607ea1243f244077a057db8b",
+      "sourceContext": "// approve.mjs — use case behind `fgos approve <id>`.\n//\n// Cổng duyệt — approve (pr-lifecycle D3/D4): merges a runner item's\n// branch into main (spike-proven mechanics: --no-commit --no-ff, verify\n// on the staged tree, commit only on green — runner/merge.mjs's\n// mergeRunnerItem) or, for a pull-door/legacy item (code already on main),\n// re-runs the item's OWN verify directly against the current tree. Every\n// failure path (conflict, red verify) parks the item at `blocked` with a\n// reason instead of leaving main mid-merge or the item silently in\n// `proposed` (D3's \"merge sạch → done tự động; conflict/đỏ → hủy sạch +\n// blocked\"). `done`'s role is always \"human\" (D3: the person who ran\n// approve is the settlement, the merge itself is only the mechanical\n// consequence).\n//\n// Moved here whole from bin/fgos.mjs (tsk-49i D3) — a relocation, never a\n// decomposition: the CLI test suite asserts on individual payload fields\n// rather than deep-equalling the whole object, so every return branch has\n// to keep its exact shape and every guard its exact order.\nimport path from 'node:path';\nimport { execFileSync } from 'node:child_process';\nimport {\n  listWork,\n  moveWork,\n  recordFriction,\n  assertAcceptanceEvidence,\n  assertPlanEvidence,\n  StoreError,\n  categoryOf,\n} from '../../state/store.mjs';\nimport { EventLogError } from '../../state/events.mjs';\nimport { resolveRoot, isResolvedStatus } from '../../state/frontier.mjs';\nimport { driftStatus } from '../../state/drift-status.mjs';\nimport {\n  classifySource,\n  mergeRunnerItem,\n  withMergeSlot,\n  performCatchUp,\n  buildOwnFileSet,\n  isWorkingTreeClean as isMainTreeClean,\n  formatFgosWriteRejectedDetail,\n} from '../../runner/merge.mjs';\nimport {\n  branchNameFor,\n  branchExists,\n  createBranchRef,\n  withMergeEphemeralWorktree,\n  detectTrunk,\n  isMainWorktree,\n  currentHead,\n  resolveRefSha,\n  realpathOrSelf as realpathOr,\n} from '../../runner/worktree.mjs';\nimport { ironLawForItem, ironLawRefusal } from '../../runner/iron-law-gate.mjs';\nimport { readIronLawLevel, recordIronLawSkip, recordIronLawAcknowledge } from './iron-law-level.mjs';\nimport { withLockRetry } from '../../runner/lock-wait.mjs';\nimport { createLockScope } from '../../holder-lock/index.mjs';\nimport { listSessions } from '../../runner/session.mjs';\nimport { runGoalCheck } from '../../runner/goal-check.mjs';\nimport { mergeGitHubPR } from '../../runner/github-adapter.mjs';\nimport { recordApprovePostSuccessFault } from '../../cli/approve-fault-log.mjs';\nimport { checkDispatchAttestation } from '../../runner/attestation-guard.mjs';\n\n// tsk-480: approve's own success paths (merge landed, or verify-only\n// passed) call `moveWork(...to:'delivered'...)` as their very last\n// step. That write can throw on state-lock contention even though\n// the precondition it's recording already succeeded permanently —\n// without a guard, the exception would propagate uncaught, and (per\n// `invocation-fault-log.mjs`'s own documented scope) a fault raised\n// this deep inside a verb's handler is deliberately never recorded by\n// that mechanism either, so nothing at all would be left to explain\n// why a real merge landed while the item stayed `awaiting-approval`\n// forever (CONTEXT.md D1). This wraps exactly that one call: on\n// success, returns the real event; on failure, records a diagnostic\n// through `approve-fault-log.mjs` (D2 — no shared lock with\n// `events.jsonl`) and returns `event: null` instead of throwing, so\n// every call site can still finish its own cleanup and return a\n// truthful envelope.\nfunction moveDeliveredOrRecordFault(dir, id, phase, testForceLockTimeoutId, { mergedSha, mergedInto } = {}) {\n  try {\n    recordApprovePostSuccessFault(dir, { id, phase, mergedSha, mergedInto });\n    // Test-only failure seam (tsk-480 D3), same shape as\n    // FGOS_GH_COMMAND: the env var itself is read by the CLI adapter and\n    // arrives here as `testForceLockTimeoutId` (a use case never reads\n    // process.env), scoped to the exact item id so it can never affect\n    // any other item in the same process, inert unless a test\n    // explicitly sets it. Production code never sets that variable.\n    if (testForceLockTimeoutId === id) {\n      throw new EventLogError('lock-timeout', `approve: simulated lock-timeout for \"${id}\" (FGOS_TEST_FORCE_APPROVE_LOCK_TIMEOUT)`);\n    }\n    const { event } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human', mergedSha, mergedInto });\n    return { event, error: null, diagnosticLog: null };\n  } catch (err) {\n    // Only an EventLogError (the write itself failing — e.g.\n    // 'lock-timeout', src/state/events.mjs) is the class of failure\n    // this guard exists for. A StoreError from transitionWork's own\n    // precondition/CAS check (e.g. a missing-evidence acceptance\n    // clause) is a legitimate refusal that must keep propagating\n    // exactly as before — swallowing it here would silently accept an\n    // item transitionWork correctly refused.\n    if (!(err instanceof EventLogError)) {\n      throw err;\n    }\n    const diagnosticLog = recordApprovePostSuccessFault(dir, { id, phase, detail: err.message, mergedSha, mergedInto });\n    process.stderr.write(\n      `fgos: warning: \"${id}\" ${phase} succeeded but its status write failed (${err.message}); `\n        + `item status remains \"awaiting-approval\" pending manual reconciliation; `\n        + `diagnostic recorded to ${diagnosticLog ?? '(unrecorded — see this stderr line)'}.\\n`,\n    );\n    return { event: null, error: err, diagnosticLog };\n  }\n}\n\nfunction moveBlockedOrConflict(dir, { id, reason, role = 'system' }) {\n  try {\n    moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason, role });\n    return null;\n  } catch (err) {\n    if (categoryOf(err) === 'conflict') {\n      const work = listWork(dir).work[id];\n      const actual = work ? work.status : 'unknown';\n      return {\n        outcome: 'blocked',\n        reason: 'state-changed-concurrently',\n        expected: 'awaiting-approval',\n        actual,\n      };\n    }\n    throw err;\n  }\n}\n\n/**\n * @param {{dir: string, repoRoot: string}} ctx - `repoRoot` follows this\n *   verb's own `--trust-dir` policy, resolved by the adapter.\n * @param {{id: string, resolveTimeoutMs: () => number|undefined, resolveWaitFlags: () => {noWait: boolean, waitMs: number|undefined},\n *   github: boolean, prNumber: string|undefined, ghCommand: string,\n *   acknowledgeIronLaw: boolean, acknowledgeDrift: boolean,\n *   testForceLockTimeoutId: string|null}} options\n */\nexport async function approveUseCase(\n  { dir, repoRoot },\n  { id, resolveTimeoutMs, resolveWaitFlags, github, prNumber, ghCommand, acknowledgeIronLaw, acknowledgeDrift, testForceLockTimeoutId },\n) {\n  // Both resolved first, before any guard, and in this order — the exact\n  // positions `case 'approve'` resolved them in before the use-case split,\n  // so a run that then refuses still touches the runner config, and still\n  // refuses a malformed flag, exactly when it always did.\n  const timeoutMs = resolveTimeoutMs();\n  const { noWait, waitMs } = resolveWaitFlags();\n  // Every merge into the target runs under the target's merge slot, taken\n  // through `runMerge` (a single try under --no-wait, a wait otherwise).\n  const scope = createLockScope('approve');\n  const runMerge = (mergeFn) => (noWait ? mergeFn({}) : withLockRetry(mergeFn, { waitMs }));\n\n  const view = listWork(dir);\n  const item = view.work[id];\n  if (!item) {\n    throw new StoreError('validation', `approve: work \"${id}\" not found.`);\n  }\n  if (item.status !== 'awaiting-approval') {\n    throw new StoreError('precondition', `approve: work \"${id}\" is \"${item.status}\", not \"awaiting-approval\" — nothing to approve.`);\n  }\n\n  const source = classifySource(repoRoot, item);\n\n  // Multi-session guard (fgos-multi-session-checkout Epic 2): approve must\n  // never run with cwd inside a registered session worktree. One refusal,\n  // covering BOTH non-github source paths, each dangerous for its own reason:\n  //   - runner: the merge below lands on the session's own detached HEAD,\n  //     never main (spike-proven) — a silent \"approved\" item whose code\n  //     never reaches main.\n  //   - pull/legacy: runGoalCheck below verifies whatever cwd has checked\n  //     out; a session worktree sits at its startCommit, which may predate\n  //     later advances to main, so this would verify STALE code while the\n  //     \"verified on main\" message claims otherwise, marking the item done\n  //     regardless — a silent false verification.\n  // Refuses BEFORE any git command or verify run: the item stays proposed,\n  // main untouched. Runs BEFORE the --github branch too (approve-worktree-\n  // guard-github-fix D1): a GitHub-side merge is server-side and never\n  // touches the local tree, but the local checkout's own IDENTITY — is\n  // this even the main worktree? — is a more fundamental precondition than\n  // which transport approve uses, so it is checked first for every source.\n  // Registry-based: an ad-hoc `git worktree add` never created through\n  // `fgos session start` is invisible to this guard (CONTEXT.md Deferred\n  // Ideas — ad-hoc unregistered worktree residual risk); the structural\n  // check right below catches that case.\n  const approveCwdReal = realpathOr(repoRoot);\n  for (const session of listSessions(repoRoot)) {\n    const wtReal = realpathOr(session.worktreePath);\n    if (approveCwdReal === wtReal || approveCwdReal.startsWith(`${wtReal}${path.sep}`)) {\n      throw new StoreError(\n        'validation',\n        `approve: refusing to run from inside session \"${session.sessionId}\" worktree at \"${wtReal}\" — approve must land on the main checkout, which a session worktree structurally is not. Run approve from the main checkout, or end the session first with \"fgos session end ${session.sessionId}\".`,\n      );\n    }\n  }\n\n  // Structural guard (P44): the registry loop above only catches a\n  // worktree registered via `fgos session start`. A plain `git worktree\n  // add` run by hand is invisible to sessions.json, so it slipped through\n  // untouched — same false-verification risk (merge lands on that\n  // worktree's own checkout, or goal-check verifies its own possibly-stale\n  // tree, while the item is reported \"done\"/\"verified on main\"), just\n  // unregistered instead of registered. isMainWorktree reads git's own\n  // common-dir structure, so it catches ANY linked worktree regardless of\n  // how it was created. Also runs BEFORE the --github branch, same\n  // rationale as the registry loop above (approve-worktree-guard-github-\n  // fix D1).\n  if (!isMainWorktree(repoRoot)) {\n    throw new StoreError(\n      'validation',\n      `approve: refusing to run from \"${repoRoot}\" — this is a git worktree, not the repository's main working tree, whether or not it was created through \"fgos session start\". Run approve from the main checkout.`,\n    );\n  }\n\n  // Close-out drift guard (tsk-62y, docs/history/\n  // tsk-3bn-merge-conductor-harness-v2/): tsk-3bn's own origin incident\n  // was closing a milestone (a `targets`-bearing item) while ONE of its\n  // targets' resolved root branches had drifted ahead of main from a\n  // later leaf merge — nothing warned or blocked it. `targets` is the\n  // real, already-existing field a milestone uses (\"a milestone's\n  // targets are ordinary work ids\", work.mjs). Only runs when `targets`\n  // is a non-empty array — an ordinary (non-milestone) approve is\n  // completely unaffected. Refuses BEFORE any git mutation, same\n  // \"acknowledge to override\" shape as the Iron Law gate right below —\n  // `--acknowledge-drift` is a deliberate human override, not a bypass\n  // to route around silently.\n  if (Array.isArray(item.targets) && item.targets.length > 0) {\n    const drift = driftStatus(repoRoot, view, { trunk: detectTrunk(repoRoot) });\n    const driftedTargets = [];\n    for (const targetId of item.targets) {\n      if (!view.work[targetId]) continue;\n      const targetRoot = resolveRoot(view, targetId);\n      const status = drift[targetRoot];\n      if (status?.needsSync) {\n        driftedTargets.push({ targetId, root: targetRoot, ...status });\n      }\n    }\n    if (driftedTargets.length > 0 && acknowledgeDrift !== true) {\n      const summary = driftedTargets\n        .map((d) => `${d.targetId} (root ${d.root}: ${d.branch} is ${d.aheadOfTarget} commit(s) ahead of ${d.target})`)\n        .join(', ');\n      throw new StoreError(\n        'validation',\n        `approve: \"${id}\" targets item(s) whose root branch has unsynced drift: ${summary}. `\n          + `Run \"fgos sync-root <root-id>\" first, or re-run with --acknowledge-drift to close anyway.`,\n      );\n    }\n  }\n\n  // Resolved-root guard (tsk-4s0, piece 2 of tsk-4qu's leaf-merge-into-\n  // resolved-root fix): a leaf approved after its own resolved root\n  // (walked via resolveRoot, same as the Iron Law/targets checks below)\n  // has already gone delivered/retrospective/cleanup/done/wontfix would\n  // land on a branch nothing else will ever sync to main (driftStatus's\n  // needsSync is deliberately false for a resolved root, so nothing\n  // else catches this — docs/history/leaf-merge-into-resolved-root/\n  // CONTEXT.md D2). Hoisted here, ahead of the --github branch, for the\n  // exact same reason the Iron Law gate right below was hoisted (f01):\n  // a check that only lived in the local-merge branch let --github\n  // bypass it entirely. Same \"acknowledge to override\" shape as the\n  // targets drift guard just above — --acknowledge-drift is reused\n  // rather than a new flag, since this is the same class of hazard\n  // (an unsynced/closed-out root branch) just keyed on the leaf's own\n  // parent chain instead of item.targets.\n  {\n    const ownRootId = resolveRoot(view, id);\n    if (ownRootId !== id) {\n      const ownRoot = view.work[ownRootId];\n      if (isResolvedStatus(ownRoot) && acknowledgeDrift !== true) {\n        throw new StoreError(\n          'validation',\n          `approve: \"${id}\"'s root \"${ownRootId}\" is already \"${ownRoot?.status}\" — merging into \"${branchNameFor(ownRootId)}\" would strand this work on a branch nothing else will sync to main. `\n            + `Run \"fgos sync-root ${ownRootId}\" first, or re-run with --acknowledge-drift to merge anyway.`,\n        );\n      }\n    }\n  }\n\n  // Iron Law gate (D16/D17), hoisted ahead of the --github branch —\n  // review-20260718-self-improve-loop finding f01: this check previously\n  // lived only inside the local-merge branch further below, so `approve\n  // --github` could land the exact same self-modifying diff without ever\n  // consulting it — a complete, structural bypass of the loop's own hard\n  // gate, contradicting D16's \"one common point for every runner-sourced\n  // proposal, not just the local path\". One check point now guards BOTH\n  // merge transports identically, before either can run. changedFiles\n  // diffs the item's own branch against its resolved root's branch (the\n  // same D3 leaf-vs-root split already used for the human-viewable diff,\n  // the GitHub PR base, the real merge target, and `catchup`'s target —\n  // never blind trunk for a leaf) so the file set reflects the item's\n  // own real diff, not every ancestor commit's files too\n  // (tsk-4voj-iron-law-leaf-scope CONTEXT.md D1; previously a leaf\n  // over-reported its file set, which is why this comment used to call\n  // that the \"fail-safe direction, accepted as-is\" — superseded, see\n  // CONTEXT.md D1). Refuses BEFORE any git mutation or GitHub call: the\n  // item stays `proposed`, nothing is touched, neither transport is\n  // reached. Hoisted alongside the Iron Law gate (tsk-598 D1/D2): the\n  // local-merge branch's own clean-tree check, further below, reuses\n  // this exact array as its ownFileSet source instead of recomputing\n  // the same diff a second time.\n  let runnerOwnDiff;\n  if (source === 'runner') {\n    // The gate resolves the diff base itself (iron-law-gate.mjs): the\n    // item's own resolved-root branch when it exists, the repo trunk\n    // otherwise — a resolved root without its own branch (e.g. a\n    // milestone root still at stage `clarify`/`todo`, never itself\n    // taken/executed) has no `fgw/<root>` ref to diff against.\n    const ironLaw = ironLawForItem(repoRoot, item, { view });\n    runnerOwnDiff = ironLaw.filesChanged;\n    // Trunk-boundary scoping (docs/decisions/0032, tsk-1y6-1 D1): the gate\n    // only guards the merge that actually lands on trunk. A leaf merges\n    // into `fgw/<root>` (the `rootId !== id` path further below), where\n    // nothing reaches main and no unreviewed self-modifying diff can land\n    // — so the gate stays quiet there and asks only where it still\n    // matters. `resolveRoot(view, id) === id` is exactly the condition\n    // under which this call instead merges root-into-trunk.\n    if (resolveRoot(view, id) === id) {\n      // review-20260718-self-improve-loop finding f02: only the bare flag\n      // (parsed as boolean `true`, no following value) counts as\n      // acknowledgment; any value form (e.g. a stray \"false\") fails closed.\n      if (ironLaw.required) {\n        if (acknowledgeIronLaw === true) {\n          // tsk-sdr: the acknowledge path used to record nothing at all,\n          // leaving a later audit unable to tell \"never tripped\" apart from\n          // \"tripped, human acknowledged\" for this item.\n          recordIronLawAcknowledge(dir, { verb: 'approve', id, ironLaw });\n        } else if (readIronLawLevel(repoRoot) === 'warn') {\n          recordIronLawSkip(dir, { verb: 'approve', id, ironLaw });\n          process.stderr.write(\n            `fgos: approve: \"${id}\" trips the Iron Law, proceeding at ironLaw.level = \"warn\". `\n              + `Matched flags: [${ironLaw.matchedFlags.join(', ') || 'none'}]; matched modules: [${ironLaw.matchedModules.join(', ') || 'none'}].\\n`,\n          );\n        } else {\n          throw new StoreError('validation', ironLawRefusal('approve', id, ironLaw));\n        }\n      }\n    }\n  }\n\n  // GitHub transport (github-adapter D1/D3/D5): `approve <id> --github --pr\n  // <n>` merges a prior `review --github` PR through GitHub instead of a\n  // local git merge. Dispatched BEFORE the runner block's dirty-main-tree\n  // gate: a GitHub-side merge never touches the local working tree, so\n  // `isMainTreeClean` (which exists only because a LOCAL merge mutates\n  // the tree) must not gate it. The Iron Law gate above DOES gate this\n  // branch now (hoisted, f01). The source gate is checked BEFORE the\n  // --pr presence check so a pull/legacy item always gets the\n  // runner-sourced error, never a misleading \"missing --pr\" message for an\n  // item that could never have a PR. Runs AFTER the worktree-identity\n  // guards above (approve-worktree-guard-github-fix D1/D3): environment\n  // validity (is this even a valid worktree to approve from) is checked\n  // before business-logic validity (is this item's source compatible with\n  // --github) — an accepted, documented precedence change for the narrow\n  // combination of --github + a non-runner-sourced item + a linked\n  // worktree, which now sees the worktree-identity refusal instead of this\n  // block's own source-mismatch message.\n  if (github) {\n    throw new StoreError('validation', 'approve --github is explicitly forbidden (test suite bypass not allowed for trunk merges).');\n  }\n\n  if (source === 'runner') {\n    // Iron Law check now runs earlier (hoisted above the --github branch,\n    // f01) so it guards both merge transports identically — see that\n    // block for the full rationale.\n    //\n    // tsk-kv3 (Q1): the main-checkout clean-tree gate USED to run here,\n    // unconditionally, covering both the leaf->root and root->main\n    // paths below. Removed for leaf->root specifically: that merge runs\n    // entirely inside a DETACHED ephemeral worktree\n    // (withMergeEphemeralWorktree, a few lines down) and never reads or\n    // writes repoRoot's own working tree at all — gating on its\n    // cleanliness protected a resource that path never touches. The\n    // gate is re-added below, scoped to the root->main branch only,\n    // which genuinely does merge onto the shared checkout.\n    const ownFileSet = buildOwnFileSet(runnerOwnDiff, item.footprint);\n\n    // Acceptance-evidence pre-flight (tsk-396 D1): covers both merge\n    // paths below (leaf->root and root->main share this one branch\n    // point) — checked BEFORE mergeRunnerItem's real git merge, not\n    // caught after the fact inside moveWork's own `to === 'delivered'`\n    // check (store.mjs). A merge that's about to be refused here never\n    // touches the target branch.\n    assertAcceptanceEvidence(id, item);\n    assertPlanEvidence(id, item, repoRoot);\n\n    // D3 leaf-vs-root split: a leaf's resolved root is a DIFFERENT item\n    // (resolveRoot walks item.parent up to the top); a root's resolved\n    // root is itself.\n    const rootId = resolveRoot(view, id);\n\n    if (source === 'runner') {\n      const branch = branchNameFor(id);\n      const attestation = checkDispatchAttestation(dir, repoRoot, id, branch);\n      if (!attestation.ok) {\n        const targetBranch = rootId !== id ? branchNameFor(rootId) : detectTrunk(repoRoot);\n        const conflict = moveBlockedOrConflict(dir, { id, reason: attestation.reason, role: 'system' });\n        if (conflict) return conflict;\n        recordFriction(dir, {\n          id,\n          disposition: 'blocked',\n          errorClass: attestation.reason,\n          layer: 'attestation',\n          attempts: 1,\n          detail: attestation.detail,\n        });\n        return { id, mode: 'merge', to: 'blocked', reason: attestation.reason, target: targetBranch };\n      }\n    }\n\n    if (rootId !== id) {\n      const rootBranch = branchNameFor(rootId);\n      // A root only ever driven by a live session/pick (never the\n      // runner's own dispatch loop, which creates fgw/<rootId> early,\n      // D17) can reach this point before its own branch exists — seed\n      // it from the repo's own detected trunk here (tsk-386: no longer\n      // a hardcoded 'main' -- createBranchRef's own default already\n      // resolves through detectTrunk(repoRoot)), the same fallback\n      // createDetachedMergeWorktree already applies at its own later\n      // call site below.\n      if (!branchExists(repoRoot, rootBranch)) {\n        createBranchRef(repoRoot, rootId);\n      }\n      // Ephemeral worktree checked out on fgw/<rootId> (now guaranteed to\n      // exist, either from dispatch-side wiring or the fallback just\n      // above) — never the human's own main\n      // checkout, and never a literal checkout of fgw/<rootId> itself:\n      // withMergeEphemeralWorktree stands up a DETACHED checkout at the\n      // branch's current tip commit, merges there, then lands the\n      // result via a plain `git branch -f` ref update (worktree.mjs,\n      // docs/history/merge-worktree-reclaim-clobbers-kept-checkout/\n      // CONTEXT.md D1 — this replaces an earlier version of this\n      // comment that attributed the race below to createWorktree's\n      // branch-reuse path force-reclaiming any existing checkout of\n      // fgw/<rootId>; that mechanism no longer runs here). This still\n      // races a concurrent approval of a sibling leaf of the same\n      // root, or the runner's own dispatch of that root — D16's\n      // per-root merge-mutex lives in the runner's write-queue, not\n      // this human-driven CLI verb, so nothing here prevents two such\n      // merges from overlapping. What changed (tsk-46a, docs/history/\n      // merge-ephemeral-branch-force-race/CONTEXT.md):\n      // withMergeEphemeralWorktree's own CAS guard now catches the\n      // overlap at the ref-move step and makes the losing side fail\n      // loudly instead of silently overwriting the winner's commit —\n      // the race can still happen, but it is no longer a silent\n      // data-loss risk; the losing `approve` call just needs a retry\n      // against the new tip. A long-lived claim worktree checked out\n      // on fgw/<rootId> falling behind this same ref update is a\n      // separate, guarded concern — see resyncClaimWorktree\n      // (worktree.mjs), which runs when that worktree is next\n      // reattached to.\n      //\n      // withMergeEphemeralWorktree's own finally (worktree.mjs) removes\n      // the checkout on every exit path below (conflict, verify-fail,\n      // merged) — per D4/D17 that never deletes the branch itself.\n      // mergeRunnerItem's own conflict/verify-fail outcomes already\n      // leave the ephemeral checkout clean via `git merge --abort`, so\n      // no cleanupMergedBranch call is needed on those paths.\n      // tsk-xyr (§E): the target's own slot is held OUTSIDE\n      // withMergeEphemeralWorktree — createDetachedMergeWorktree reads\n      // the target's tip BEFORE this callback runs, so the slot must\n      // already be held by the time that read happens, not acquired\n      // from inside it (that would leave the tip read unprotected).\n      // The wait budget goes to the slot's own acquire, the only call here\n      // that can throw lock-held for contention on this target.\n      return await runMerge(({ waitMs: slotWaitMs }) => withMergeSlot(scope, repoRoot, rootBranch, async () => {\n        // tsk-4ax (D3): catchup as a STANDARD step, not only a recovery\n        // from `blocked` — if the target isn't yet an ancestor of the\n        // branch, catch it up FIRST, still inside the slot (so the\n        // target provably cannot move between this check and the land\n        // below — the whole invariant D3 depends on). Once caught up,\n        // the branch itself is now an ancestor and carries a commit\n        // this call JUST verified green; `effectiveItem` threads that\n        // fresh tip into the land below in-memory only (never persisted\n        // via moveWork — awaiting-approval -> awaiting-approval is not\n        // a valid FSM edge, and there is nothing to persist: this same\n        // call is about to consume the proof immediately).\n        let effectiveItem = item;\n        let alreadyAncestor = false;\n        try {\n          execFileSync('git', ['merge-base', '--is-ancestor', rootBranch, branchNameFor(id)], { cwd: repoRoot, encoding: 'utf8', shell: false });\n          alreadyAncestor = true;\n        } catch (ancestorErr) {\n          if (ancestorErr.status !== 1) throw ancestorErr;\n        }\n        if (!alreadyAncestor) {\n          const catchupResult = await performCatchUp(repoRoot, id, item, rootBranch, timeoutMs);\n          if (catchupResult.outcome === 'conflict') {\n            const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-conflict', role: 'system' });\n            if (conflict) return conflict;\n            recordFriction(dir, {\n              id,\n              disposition: 'blocked',\n              errorClass: 'merge-conflict',\n              layer: 'state',\n              attempts: 1,\n              detail: `catchup (inbound gate): git merge --no-commit --no-ff ${rootBranch} into ${branchNameFor(id)} conflicted; merge aborted, ${branchNameFor(id)} unchanged`,\n            });\n            return { id, mode: 'merge', to: 'blocked', reason: 'merge-conflict', target: rootBranch, conflictedFiles: catchupResult.conflictedFiles };\n          }\n          if (catchupResult.outcome === 'merge-refused') {\n            const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-failed-unclassified', role: 'system' });\n            if (conflict) return conflict;\n            recordFriction(dir, {\n              id,\n              disposition: 'blocked',\n              errorClass: 'merge-fail',\n              layer: 'state',\n              attempts: 1,\n              detail: `catchup (inbound gate): git merge --no-commit --no-ff ${rootBranch} into ${branchNameFor(id)} refused: ${catchupResult.reason}`,\n            });\n            return { id, mode: 'merge', to: 'blocked', reason: 'merge-failed-unclassified', target: rootBranch, detail: catchupResult.reason };\n          }\n          if (catchupResult.outcome === 'verify-fail') {\n            const mergeReason = catchupResult.timedOut ? 'verify-timeout-post-merge' : 'verify-fail-post-merge';\n            const conflict = moveBlockedOrConflict(dir, { id, reason: mergeReason, role: 'system' });\n            if (conflict) return conflict;\n            recordFriction(dir, {\n              id,\n              disposition: 'blocked',\n              errorClass: catchupResult.timedOut ? 'verify-timeout' : 'verify-miss',\n              layer: 'verification',\n              attempts: 1,\n              detail: catchupResult.timedOut\n                ? `catchup (inbound gate): goal-check timed out on staged merge into ${branchNameFor(id)} after ${timeoutMs}ms — not a verify failure; merge aborted, ${branchNameFor(id)} unchanged, rerun catchup`\n                : `catchup (inbound gate): goal-check failed on staged merge into ${branchNameFor(id)} (exit ${catchupResult.exitStatus}); merge aborted, ${branchNameFor(id)} unchanged`,\n            });\n            return { id, mode: 'merge', to: 'blocked', reason: mergeReason, target: rootBranch, timedOut: catchupResult.timedOut, exitStatus: catchupResult.exitStatus, output: catchupResult.output };\n          }\n          // 'merged' or 'already-caught-up'.\n          effectiveItem = { ...item, branchHeadAtReturn: catchupResult.catchupHead };\n        }\n        return await withMergeEphemeralWorktree(repoRoot, rootId, async (ephemeral) => {\n        // lockRoot pins the lock files to the real repo root — ephemeral.path\n        // stays the git-op cwd but is never the lock's own root, since it's\n        // a throwaway worktree with no writable .fgos/ (ADR0020). The merge\n        // runs in that detached worktree under the target's slot, which is\n        // already held in `scope`.\n        const result = await mergeRunnerItem(ephemeral.path, effectiveItem, { timeoutMs, lockRoot: repoRoot, scope, waitMs: slotWaitMs });\n\n        if (result.outcome === 'conflict') {\n          const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-conflict', role: 'system' });\n          if (conflict) return conflict;\n          recordFriction(dir, {\n            id,\n            disposition: 'blocked',\n            errorClass: 'merge-conflict',\n            layer: 'state',\n            attempts: 1,\n            detail: `git merge --no-commit --no-ff ${result.branch} into ${rootBranch} conflicted; merge aborted, ${rootBranch} unchanged`,\n          });\n          return { id, mode: 'merge', to: 'blocked', reason: 'merge-conflict', target: rootBranch };\n        }\n\n        if (result.outcome === 'merge-failed-unclassified') {\n          // tsk-18a D1: git merge --no-commit --no-ff failed but never\n          // created MERGE_HEAD -- not a real textual conflict, so this\n          // gets its own reason instead of being folded into\n          // 'merge-conflict'. Real stderr/exit-code carried through so\n          // this is actually diagnosable, unlike the static\n          // 'merge-conflict' detail string.\n          const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-failed-unclassified', role: 'system' });\n          if (conflict) return conflict;\n          recordFriction(dir, {\n            id,\n            disposition: 'blocked',\n            errorClass: 'merge-failed-unclassified',\n            layer: 'state',\n            attempts: 1,\n            detail: `git merge --no-commit --no-ff ${result.branch} into ${rootBranch} failed without a real conflict (exit ${result.error.status}): ${result.error.stderr || result.error.message}; merge aborted, ${rootBranch} unchanged`,\n          });\n          return { id, mode: 'merge', to: 'blocked', reason: 'merge-failed-unclassified', target: rootBranch, error: result.error };\n        }\n\n        if (result.outcome === 'merge-blocked-other-item') {\n          // tsk-4hj D1/D2/D3: a MERGE_HEAD already existed BEFORE this\n          // call's own merge attempt ran -- a different item's\n          // in-progress or abandoned merge, not this branch's conflict.\n          // git merge --no-commit --no-ff was never attempted and\n          // git merge --abort was never called, so ${rootBranch}'s own\n          // merge state (if any) is exactly as this call found it.\n          const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-blocked-other-item', role: 'system' });\n          if (conflict) return conflict;\n          recordFriction(dir, {\n            id,\n            disposition: 'blocked',\n            errorClass: 'merge-blocked-other-item',\n            layer: 'state',\n            attempts: 1,\n            detail: `main checkout already has a MERGE_HEAD from another item's in-progress merge; ${rootBranch}'s own merge of ${result.branch} was never attempted`,\n          });\n          return { id, mode: 'merge', to: 'blocked', reason: 'merge-blocked-other-item', target: rootBranch };\n        }\n\n        if (result.outcome === 'fgos-write-rejected') {\n          const conflict = moveBlockedOrConflict(dir, { id, reason: 'fgos-write-rejected', role: 'system' });\n          if (conflict) return conflict;\n          recordFriction(dir, {\n            id,\n            disposition: 'blocked',\n            errorClass: 'fgos-write-blocked',\n            layer: 'state',\n            attempts: 1,\n            detail: formatFgosWriteRejectedDetail(result.branch, result.paths, rootBranch),\n          });\n          return { id, mode: 'merge', to: 'blocked', reason: 'fgos-write-rejected', target: rootBranch, paths: result.paths };\n        }\n\n        if (result.outcome === 'verify-fail') {\n          // tsk-53o: a timeout during the post-merge check is not proof\n          // the merge is bad — park under a distinct, catchup-resolvable\n          // reason instead of the misleading merge-fail label.\n          const mergeReason = result.check.timedOut ? 'verify-timeout-post-merge' : 'verify-fail-post-merge';\n          const conflict = moveBlockedOrConflict(dir, { id, reason: mergeReason, role: 'system' });\n          if (conflict) return conflict;\n          recordFriction(dir, {\n            id,\n            disposition: 'blocked',\n            errorClass: result.check.timedOut ? 'verify-timeout' : 'verify-miss',\n            layer: 'verification',\n            attempts: 1,\n            detail: result.check.timedOut\n              ? `goal-check timed out on staged merge into ${rootBranch} after ${timeoutMs}ms — not a verify failure; merge aborted, ${rootBranch} unchanged, rerun catchup`\n              : `goal-check failed on staged merge into ${rootBranch} (exit ${result.check.status}); merge aborted, ${rootBranch} unchanged`,\n          });\n          return { id, mode: 'merge', to: 'blocked', reason: mergeReason, target: rootBranch, timedOut: result.check.timedOut, exitStatus: result.check.status, output: result.check.output };\n        }\n\n        // Merged: land the leaf's work on its root's branch. The\n        // leaf's own branch (and any stray worktree checkout of it) is\n        // NO LONGER torn down here (tsk-1p9, restore-to-decision, D1):\n        // teardown is deferred to the `cleanup` verb, gated by D7's TTL\n        // and D8's harness (which now resolves the correct root-aware\n        // git context for a leaf branch, tsk-1p9 D7/D8 — the exact\n        // constraint that used to force this call to run from the\n        // ephemeral worktree right here no longer applies, since the\n        // deferred call resolves its own correct ref).\n        // tsk-480: the merge above is already real and permanent —\n        // status recording is best-effort from here regardless of\n        // outcome (previously: also gated cleanup on this write\n        // succeeding; cleanup no longer happens on this path at all).\n        // tsk-5dk: read the ephemeral worktree's OWN HEAD, not\n        // rootBranch's ref on repoRoot — withMergeEphemeralWorktree\n        // (worktree.mjs) only force-moves the real branch AFTER this\n        // callback returns (`git branch -f branch endCommit`), so\n        // reading repoRoot's ref here would still see the PRE-merge\n        // sha. `ephemeral.path`'s HEAD is correct in both the fresh-\n        // merge case (it IS the just-created endCommit) and the\n        // idempotent-already-merged case (HEAD never advanced past\n        // rootBranch's existing tip, which is exactly right there too).\n        const mergedSha = currentHead(ephemeral.path);\n        const moveResult = moveDeliveredOrRecordFault(dir, id, 'leaf-into-root merge', testForceLockTimeoutId, { mergedSha, mergedInto: rootBranch });\n        if (!moveResult.event) {\n          return {\n            id,\n            mode: 'merge',\n            to: 'awaiting-approval',\n            deliveryUnrecorded: true,\n            target: rootBranch,\n            branch: result.branch,\n            output: result.check.output,\n            error: moveResult.error.message,\n            diagnosticLog: moveResult.diagnosticLog,\n            postLand: result.postLand,\n          };\n        }\n        return {\n          id,\n          mode: 'merge',\n          to: 'delivered',\n          target: rootBranch,\n          branch: result.branch,\n          seq: moveResult.event.seq,\n          output: result.check.output,\n          postLand: result.postLand,\n        };\n        });\n      }, { waitMs: slotWaitMs }));\n    }\n\n\n    // Root merge into main — unchanged except for D8: a root that\n    // actually had children (was a decomposed root, per replay.mjs's\n    // fold which never clears `parent` on a child that reached `done`)\n    // gets the distinguishing reason `integration-drift` instead of the\n    // existing reason strings on a conflict/verify-fail, plus a\n    // `main@<sha>` ref in the friction detail. A standalone (no\n    // children) root keeps today's exact reason strings and message —\n    // zero behavior change for the common case.\n    const hadChildren = Object.values(view.work).some((w) => w.parent === id);\n\n    // Unlike leaf->root above, this path still lands on the shared main\n    // checkout: the CAS merge verifies in an isolated worktree, but its\n    // final land step's `update-ref` moves the branch repoRoot has checked\n    // out and then syncs repoRoot's working tree to it. A dirty path inside\n    // the item's own file set (committed diff + declared footprint) would\n    // make that sync fail and leave repoRoot's index behind the new HEAD,\n    // so refuse before merging.\n    if (!isMainTreeClean(repoRoot, ownFileSet)) {\n      throw new StoreError('validation', `approve: working tree at \"${repoRoot}\" is not clean — commit or stash pending changes before approving \"${id}\".`);\n    }\n\n    // Not wrapped in runMerge: the CAS merge takes the trunk's merge slot\n    // itself, the main checkout mutex only for its final land step, and waits\n    // on each (or fails fast under --no-wait) without redoing the verify run.\n    const { mergeRootIntoMainCas } = await import('../../runner/merge.mjs');\n    const result = await mergeRootIntoMainCas(repoRoot, item, branchNameFor(id), {\n      timeoutMs,\n      ownFileSet,\n      ...(noWait ? { lockWaitMs: 0 } : waitMs !== undefined ? { lockWaitMs: waitMs } : {}),\n    });\n\n    if (result.outcome === 'conflict') {\n      const reason = hadChildren ? 'integration-drift' : 'merge-conflict';\n      const detail = hadChildren\n        ? `cross-root integration drift at main@${currentHead(repoRoot)}; git merge --no-commit --no-ff ${result.branch} conflicted; merge aborted, main unchanged`\n        : `git merge --no-commit --no-ff ${result.branch} conflicted; merge aborted, main unchanged`;\n      const conflict = moveBlockedOrConflict(dir, { id, reason, role: 'system' });\n      if (conflict) return conflict;\n      recordFriction(dir, {\n        id,\n        disposition: 'blocked',\n        errorClass: 'merge-conflict',\n        layer: 'state',\n        attempts: 1,\n        detail,\n      });\n      return { id, mode: 'merge', to: 'blocked', reason, target: 'main' };\n    }\n\n    if (result.outcome === 'merge-failed-unclassified') {\n      // tsk-18a D1: same non-genuine-conflict class as the leaf→root\n      // call site above — never folded into 'merge-conflict'/\n      // 'integration-drift', regardless of hadChildren, since neither\n      // reason is accurate for a failure that never staged a real\n      // conflict in the first place.\n      const detail = hadChildren\n        ? `cross-root integration attempt at main@${currentHead(repoRoot)}; git merge --no-commit --no-ff ${result.branch} failed without a real conflict (exit ${result.error.status}): ${result.error.stderr || result.error.message}; merge aborted, main unchanged`\n        : `git merge --no-commit --no-ff ${result.branch} failed without a real conflict (exit ${result.error.status}): ${result.error.stderr || result.error.message}; merge aborted, main unchanged`;\n      const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-failed-unclassified', role: 'system' });\n      if (conflict) return conflict;\n      recordFriction(dir, {\n        id,\n        disposition: 'blocked',\n        errorClass: 'merge-failed-unclassified',\n        layer: 'state',\n        attempts: 1,\n        detail,\n      });\n      return { id, mode: 'merge', to: 'blocked', reason: 'merge-failed-unclassified', target: 'main', error: result.error };\n    }\n\n    if (result.outcome === 'merge-blocked-other-item') {\n      // tsk-4hj D1/D2/D3: same non-genuine-conflict, non-genuine-drift\n      // class as merge-failed-unclassified above — reason stays constant\n      // regardless of hadChildren, since a pre-existing MERGE_HEAD from a\n      // DIFFERENT item is neither this branch's own conflict nor cross-root\n      // integration drift. git merge --no-commit --no-ff was never\n      // attempted and git merge --abort was never called.\n      const detail = hadChildren\n        ? `cross-root integration attempt at main@${currentHead(repoRoot)}; main checkout already has a MERGE_HEAD from another item's in-progress merge; merge of ${result.branch} was never attempted`\n        : `main checkout already has a MERGE_HEAD from another item's in-progress merge; merge of ${result.branch} was never attempted`;\n      const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-blocked-other-item', role: 'system' });\n      if (conflict) return conflict;\n      recordFriction(dir, {\n        id,\n        disposition: 'blocked',\n        errorClass: 'merge-blocked-other-item',\n        layer: 'state',\n        attempts: 1,\n        detail,\n      });\n      return { id, mode: 'merge', to: 'blocked', reason: 'merge-blocked-other-item', target: 'main' };\n    }\n\n    if (result.outcome === 'main-checkout-dirty-mid-merge') {\n      // A path in the item's own file set was clean at the pre-check above\n      // (before the CAS worktree merge+verify, which can take minutes) but\n      // was found dirty again by the second check taken under\n      // main-checkout.lock, right before update-ref -- the exact same\n      // real-conflict shape the pre-check refuses, just caught later.\n      // Nothing was moved: no ref update, no working-tree sync attempted.\n      const dirtied = result.stagedPaths\n        ? `staged changes on the main checkout (${result.stagedPaths.join(', ')}) would be discarded by the working-tree sync`\n        : 'a path in this item\\'s own file set was dirtied on the main checkout between the pre-merge check and the land step';\n      const detail = hadChildren\n        ? `cross-root integration attempt at main@${currentHead(repoRoot)}; ${dirtied}; merge of ${result.branch} was stopped before update-ref`\n        : `${dirtied}; merge of ${result.branch} was stopped before update-ref`;\n      const conflict = moveBlockedOrConflict(dir, { id, reason: 'main-checkout-dirty-mid-merge', role: 'system' });\n      if (conflict) return conflict;\n      recordFriction(dir, {\n        id,\n        disposition: 'blocked',\n        errorClass: 'main-checkout-dirty-mid-merge',\n        layer: 'state',\n        attempts: 1,\n        detail,\n      });\n      return { id, mode: 'merge', to: 'blocked', reason: 'main-checkout-dirty-mid-merge', target: 'main' };\n    }\n\n    if (result.outcome === 'fgos-write-rejected') {\n      const conflict = moveBlockedOrConflict(dir, { id, reason: 'fgos-write-rejected', role: 'system' });\n      if (conflict) return conflict;\n      recordFriction(dir, {\n        id,\n        disposition: 'blocked',\n        errorClass: 'fgos-write-blocked',\n        layer: 'state',\n        attempts: 1,\n        detail: formatFgosWriteRejectedDetail(result.branch, result.paths, 'main'),\n      });\n      return { id, mode: 'merge', to: 'blocked', reason: 'fgos-write-rejected', target: 'main', paths: result.paths };\n    }\n\n    if (result.outcome === 'verify-fail') {\n      // tsk-53o: a timeout is neither a real verify failure nor evidence\n      // of cross-root drift — it gets its own reason regardless of\n      // hadChildren, distinct from both branches below.\n      const reason = result.check.timedOut ? 'verify-timeout-post-merge' : hadChildren ? 'integration-drift' : 'verify-fail-post-merge';\n      const detail = result.check.timedOut\n        ? `goal-check timed out on staged merge after ${timeoutMs}ms — not a verify failure; merge aborted, main unchanged, rerun catchup`\n        : hadChildren\n          ? `cross-root integration drift at main@${currentHead(repoRoot)}; goal-check failed on staged merge (exit ${result.check.status}); merge aborted, main unchanged`\n          : `goal-check failed on staged merge (exit ${result.check.status}); merge aborted, main unchanged`;\n      const conflict = moveBlockedOrConflict(dir, { id, reason, role: 'system' });\n      if (conflict) return conflict;\n      recordFriction(dir, {\n        id,\n        disposition: 'blocked',\n        errorClass: result.check.timedOut ? 'verify-timeout' : 'verify-miss',\n        layer: 'verification',\n        attempts: 1,\n        detail,\n      });\n      return { id, mode: 'merge', to: 'blocked', reason, target: 'main', timedOut: result.check.timedOut, exitStatus: result.check.status, output: result.check.output };\n    }\n\n    // tsk-480: cleanup used to run either way relative to this write\n    // (already real and permanent) — now moot on this path, since\n    // cleanup no longer happens here at all (tsk-1p9 D1: deferred to\n    // the `cleanup` verb, gated by D7's TTL and D8's harness).\n    // tsk-5dk: same resolveRefSha-of-the-target-branch approach as the\n    // leaf-into-root path above, kept uniform even though this merge\n    // already ran directly on repoRoot (no ephemeral worktree here) —\n    // still correct, and still robust for an idempotent already-merged\n    // re-approve (see the leaf-into-root comment above for why).\n    const mergedSha = resolveRefSha(repoRoot, 'main');\n    const moveResult = moveDeliveredOrRecordFault(dir, id, 'root-into-main merge', testForceLockTimeoutId, { mergedSha, mergedInto: 'main' });\n    if (!moveResult.event) {\n      return {\n        id,\n        mode: 'merge',\n        to: 'awaiting-approval',\n        deliveryUnrecorded: true,\n        target: 'main',\n        branch: result.branch,\n        output: result.check.output,\n        error: moveResult.error.message,\n        diagnosticLog: moveResult.diagnosticLog,\n        postLand: result.postLand,\n      };\n    }\n    return {\n      id,\n      mode: 'merge',\n      to: 'delivered',\n      target: 'main',\n      branch: result.branch,\n      seq: moveResult.event.seq,\n      output: result.check.output,\n      postLand: result.postLand,\n    };\n  }\n\n  // pull-door or legacy proposal: code is already on main (D4) — no\n  // merge step, just re-run the item's own verify against the current\n  // tree, exactly the goal-check contract `return` already uses.\n  const check = await runGoalCheck(item, repoRoot, timeoutMs);\n  if (!check.passed) {\n    // tsk-53o: same timeout/fail distinction as `return` — a timeout is\n    // not proof the item's verify failed.\n    const conflict = moveBlockedOrConflict(dir, { id, reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });\n    if (conflict) return conflict;\n    recordFriction(dir, {\n      id,\n      disposition: 'blocked',\n      errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss',\n      layer: 'verification',\n      attempts: 1,\n      detail: check.timedOut\n        ? `goal-check on main timed out after ${timeoutMs}ms — not a verify failure, rerun approve`\n        : `goal-check failed on main (exit ${check.status})`,\n    });\n    return { id, mode: 'verify-only', to: 'blocked', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', timedOut: check.timedOut, exitStatus: check.status, output: check.output };\n  }\n  // tsk-480: no real merge lands on this path (code is already on\n  // main), so a moveWork failure here only desyncs status rather than\n  // hiding a permanent mutation — still guarded for consistency with\n  // the two merge paths above (CONTEXT.md D1: all three success\n  // paths share the same silent-throw shape).\n  const moveResult = moveDeliveredOrRecordFault(dir, id, 'pull-door verify-only', testForceLockTimeoutId);\n  if (!moveResult.event) {\n    return {\n      id,\n      mode: 'verify-only',\n      to: 'awaiting-approval',\n      deliveryUnrecorded: true,\n      output: check.output,\n      error: moveResult.error.message,\n      diagnosticLog: moveResult.diagnosticLog,\n    };\n  }\n  return { id, mode: 'verify-only', to: 'delivered', seq: moveResult.event.seq, output: check.output };\n}\n",
+      "record": {
+        "file": "src/verbs/merge/approve.mjs",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+        "inventoryFileDigest": "6e287f08f1d2b6386023a07722cc8010c98a3db8607ea1243f244077a057db8b",
+        "digest": "6e287f08f1d2b6386023a07722cc8010c98a3db8607ea1243f244077a057db8b",
+        "inventoryEdgeIds": [
+          "class6-l-000481",
+          "class6-l-000482",
+          "class6-l-000482",
+          "class6-l-000483",
+          "class6-l-000484",
+          "class6-l-000484",
+          "class6-l-000485",
+          "class6-l-000485"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000481",
+            "slotKey": "{\"edgeId\":\"class6-l-000481\",\"file\":\"src/verbs/merge/approve.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000481\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":216}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000481",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 216
+              }
+            ],
+            "consumerFile": "src/verbs/merge/approve.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 216,
+                "columnStart": 38,
+                "columnEndExclusive": 51,
+                "text": "docs/history/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 216,
+                "columnStart": 38,
+                "columnEndExclusive": 51,
+                "text": "docs/history/"
+              }
+            ],
+            "matchedExpression": "docs/history/",
+            "logicalReference": "docs/history/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '  // Close-out drift guard (tsk-62y, docs/history/'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000481",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 216,
+                "matchedExpression": "docs/history/",
+                "originalLineText": "  // Close-out drift guard (tsk-62y, docs/history/"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000482",
+            "slotKey": "{\"edgeId\":\"class6-l-000482\",\"file\":\"src/verbs/merge/approve.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000482\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":257}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000482",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 257
+              }
+            ],
+            "consumerFile": "src/verbs/merge/approve.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 257,
+                "columnStart": 26,
+                "columnEndExclusive": 69,
+                "text": "docs/history/leaf-merge-into-resolved-root/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 257,
+                "columnStart": 26,
+                "columnEndExclusive": 69,
+                "text": "docs/history/leaf-merge-into-resolved-root/"
+              },
+              {
+                "line": 258,
+                "columnStart": 1,
+                "columnEndExclusive": 16,
+                "text": "  // CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/leaf-merge-into-resolved-root/\n  // CONTEXT.md",
+            "logicalReference": "docs/history/leaf-merge-into-resolved-root/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '  // else catches this — docs/history/leaf-merge-into-resolved-root/\\n  // CONTEXT.md D2). Hoisted here, ahead of the --github branch, for the'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/leaf-merge-into-resolved-root/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000482",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 257,
+                "matchedExpression": "docs/history/leaf-merge-into-resolved-root/\n  // CONTEXT.md",
+                "originalLineText": "  // else catches this — docs/history/leaf-merge-into-resolved-root/"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000482",
+            "slotKey": "{\"edgeId\":\"class6-l-000482\",\"file\":\"src/verbs/merge/approve.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000482\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":258}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000482",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 258
+              }
+            ],
+            "consumerFile": "src/verbs/merge/approve.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 258,
+                "columnStart": 1,
+                "columnEndExclusive": 16,
+                "text": "  // CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 257,
+                "columnStart": 26,
+                "columnEndExclusive": 69,
+                "text": "docs/history/leaf-merge-into-resolved-root/"
+              },
+              {
+                "line": 258,
+                "columnStart": 1,
+                "columnEndExclusive": 16,
+                "text": "  // CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/leaf-merge-into-resolved-root/\n  // CONTEXT.md",
+            "logicalReference": "docs/history/leaf-merge-into-resolved-root/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '  // else catches this — docs/history/leaf-merge-into-resolved-root/\\n  // CONTEXT.md D2). Hoisted here, ahead of the --github branch, for the'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/leaf-merge-into-resolved-root/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000482",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 258,
+                "matchedExpression": "docs/history/leaf-merge-into-resolved-root/\n  // CONTEXT.md",
+                "originalLineText": "  // CONTEXT.md D2). Hoisted here, ahead of the --github branch, for the"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000483",
+            "slotKey": "{\"edgeId\":\"class6-l-000483\",\"file\":\"src/verbs/merge/approve.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000483\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":311}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000483",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 311
+              }
+            ],
+            "consumerFile": "src/verbs/merge/approve.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 311,
+                "columnStart": 32,
+                "columnEndExclusive": 51,
+                "text": "docs/decisions/0032"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 311,
+                "columnStart": 32,
+                "columnEndExclusive": 51,
+                "text": "docs/decisions/0032"
+              }
+            ],
+            "matchedExpression": "docs/decisions/0032",
+            "logicalReference": "docs/decisions/0032",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-26/38: surviving native path, literal example, implementation provenance or captured contract reference; its runtime/reader behavior is outside this comment-only record and remains with Step 5. No authority-path rewrite is made. Exact passage: '    // Trunk-boundary scoping (docs/decisions/0032, tsk-1y6-1 D1): the gate'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/decisions/0032",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000483",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 311,
+                "matchedExpression": "docs/decisions/0032",
+                "originalLineText": "    // Trunk-boundary scoping (docs/decisions/0032, tsk-1y6-1 D1): the gate"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000484",
+            "slotKey": "{\"edgeId\":\"class6-l-000484\",\"file\":\"src/verbs/merge/approve.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000484\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":431}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000484",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 431
+              }
+            ],
+            "consumerFile": "src/verbs/merge/approve.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 431,
+                "columnStart": 10,
+                "columnEndExclusive": 69,
+                "text": "docs/history/merge-worktree-reclaim-clobbers-kept-checkout/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 431,
+                "columnStart": 10,
+                "columnEndExclusive": 69,
+                "text": "docs/history/merge-worktree-reclaim-clobbers-kept-checkout/"
+              },
+              {
+                "line": 432,
+                "columnStart": 1,
+                "columnEndExclusive": 20,
+                "text": "      // CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/merge-worktree-reclaim-clobbers-kept-checkout/\n      // CONTEXT.md",
+            "logicalReference": "docs/history/merge-worktree-reclaim-clobbers-kept-checkout/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '      // docs/history/merge-worktree-reclaim-clobbers-kept-checkout/\\n      // CONTEXT.md D1 — this replaces an earlier version of this'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/merge-worktree-reclaim-clobbers-kept-checkout/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000484",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 431,
+                "matchedExpression": "docs/history/merge-worktree-reclaim-clobbers-kept-checkout/\n      // CONTEXT.md",
+                "originalLineText": "      // docs/history/merge-worktree-reclaim-clobbers-kept-checkout/"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000484",
+            "slotKey": "{\"edgeId\":\"class6-l-000484\",\"file\":\"src/verbs/merge/approve.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000484\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":432}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000484",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 432
+              }
+            ],
+            "consumerFile": "src/verbs/merge/approve.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 432,
+                "columnStart": 1,
+                "columnEndExclusive": 20,
+                "text": "      // CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 431,
+                "columnStart": 10,
+                "columnEndExclusive": 69,
+                "text": "docs/history/merge-worktree-reclaim-clobbers-kept-checkout/"
+              },
+              {
+                "line": 432,
+                "columnStart": 1,
+                "columnEndExclusive": 20,
+                "text": "      // CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/merge-worktree-reclaim-clobbers-kept-checkout/\n      // CONTEXT.md",
+            "logicalReference": "docs/history/merge-worktree-reclaim-clobbers-kept-checkout/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '      // docs/history/merge-worktree-reclaim-clobbers-kept-checkout/\\n      // CONTEXT.md D1 — this replaces an earlier version of this'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/merge-worktree-reclaim-clobbers-kept-checkout/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000484",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 432,
+                "matchedExpression": "docs/history/merge-worktree-reclaim-clobbers-kept-checkout/\n      // CONTEXT.md",
+                "originalLineText": "      // CONTEXT.md D1 — this replaces an earlier version of this"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000485",
+            "slotKey": "{\"edgeId\":\"class6-l-000485\",\"file\":\"src/verbs/merge/approve.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000485\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":440}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000485",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 440
+              }
+            ],
+            "consumerFile": "src/verbs/merge/approve.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 440,
+                "columnStart": 58,
+                "columnEndExclusive": 71,
+                "text": "docs/history/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 440,
+                "columnStart": 58,
+                "columnEndExclusive": 71,
+                "text": "docs/history/"
+              },
+              {
+                "line": 441,
+                "columnStart": 1,
+                "columnEndExclusive": 54,
+                "text": "      // merge-ephemeral-branch-force-race/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/\n      // merge-ephemeral-branch-force-race/CONTEXT.md",
+            "logicalReference": "docs/history/merge-ephemeral-branch-force-race/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '      // merges from overlapping. What changed (tsk-46a, docs/history/\\n      // merge-ephemeral-branch-force-race/CONTEXT.md):'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/merge-ephemeral-branch-force-race/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000485",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 440,
+                "matchedExpression": "docs/history/\n      // merge-ephemeral-branch-force-race/CONTEXT.md",
+                "originalLineText": "      // merges from overlapping. What changed (tsk-46a, docs/history/"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000485",
+            "slotKey": "{\"edgeId\":\"class6-l-000485\",\"file\":\"src/verbs/merge/approve.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000485\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":441}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000485",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 441
+              }
+            ],
+            "consumerFile": "src/verbs/merge/approve.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 441,
+                "columnStart": 1,
+                "columnEndExclusive": 54,
+                "text": "      // merge-ephemeral-branch-force-race/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 440,
+                "columnStart": 58,
+                "columnEndExclusive": 71,
+                "text": "docs/history/"
+              },
+              {
+                "line": 441,
+                "columnStart": 1,
+                "columnEndExclusive": 54,
+                "text": "      // merge-ephemeral-branch-force-race/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/\n      // merge-ephemeral-branch-force-race/CONTEXT.md",
+            "logicalReference": "docs/history/merge-ephemeral-branch-force-race/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '      // merges from overlapping. What changed (tsk-46a, docs/history/\\n      // merge-ephemeral-branch-force-race/CONTEXT.md):'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/merge-ephemeral-branch-force-race/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000485",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 441,
+                "matchedExpression": "docs/history/\n      // merge-ephemeral-branch-force-race/CONTEXT.md",
+                "originalLineText": "      // merge-ephemeral-branch-force-race/CONTEXT.md):"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-029",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "src/verbs/merge/approve.mjs",
+          "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+          "digest": "6e287f08f1d2b6386023a07722cc8010c98a3db8607ea1243f244077a057db8b",
+          "bytes": 49556,
+          "lines": 915,
+          "headings": [],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "renderContexts": {},
+      "populationGapFindings": [],
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    }
+  ]
+}
