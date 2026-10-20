@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Added explicit Event Store host proof modes for settle-write faults and ext4 store-increment/zero-spawn/lock-convoy acceptance, with machine-readable verdicts.
+
 - Work transactions read their staged claim/file changes before acknowledgement; malformed shared project config no longer blocks claims through optional Event Store settings.
 
 - Event history moves from tracked JSONL files to the Event Store; every existing fgOS project must run `fgos events migrate` with its writers stopped. `fgos repair` is removed.

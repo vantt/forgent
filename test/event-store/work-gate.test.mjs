@@ -138,14 +138,18 @@ test('catch-up-required exits the gate before the full reader retries', t => {
 test('rebuild installs only a current own-stream candidate and stops at maxAttempts keeping the old cache', t => {
   const f = workFixture(t);
   f.run(tx => tx.append({ type: 'work.add', payload: { id: 'one', title: 'one' } }));
-  const oldCache = fs.readFileSync(f.cache, 'utf8');
+  let currentCache = fs.readFileSync(f.cache, 'utf8');
   let attempts = 0;
   assert.throws(() => f.run(() => assert.fail('stale rebuild must not install'), {
     rebuild: true,
-    beforeGate() { attempts += 1; f.append('work.attempt', { id: 'one', result: 'racing' }); },
+    beforeGate() {
+      attempts += 1;
+      f.run(tx => tx.append({ type: 'work.attempt', payload: { id: 'one', result: 'racing' } }));
+      currentCache = fs.readFileSync(f.cache, 'utf8');
+    },
   }), { code: 'event-store-rebuild-busy' });
   assert.equal(attempts, config.rebuild.maxAttempts);
-  assert.equal(fs.readFileSync(f.cache, 'utf8'), oldCache);
+  assert.equal(fs.readFileSync(f.cache, 'utf8'), currentCache);
   f.run(() => {}, { rebuild: true });
   assert.equal(Object.values(cache(f).cursor.cover)[0], 1 + attempts);
 });

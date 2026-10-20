@@ -2,17 +2,29 @@ import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
+import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { fixture, addon, loaderOptions } from './phase07-fixture.mjs';
 import { openStore } from '../../src/event-store/index.mjs';
 import { readWorkState } from '../../src/state/work-event-store.mjs';
 import { foldEvents } from '../../src/state/replay.mjs';
 
 const contracts = [path.resolve('packages/work-state/contracts/event-streams.v1.json')];
-test('two real stores with crossing moves replay the same winner and conflict', t => {
-  const a = fixture(t), b = fixture(t);
-  for (const f of [a, b]) {
-    f.git('commit', '--allow-empty', '-qm', 'initial');
-    f.store = openStore(addon.resolveEventStore(f.repo, f.stateRoot, f.repo), 'phase-seven', contracts, loaderOptions);
+test('three independent machine stores with crossing moves replay the same winner and recorded conflict', t => {
+  const a = fixture(t, { machine: false }), b = fixture(t, { machine: false }), c = fixture(t, { machine: false });
+  a.git('commit', '--allow-empty', '-qm', 'shared project');
+  for (const f of [b,c]) {
+    fs.rmSync(f.repo,{recursive:true,force:true});
+    execFileSync('git',['clone','-q',a.repo,f.repo]);
+    fs.mkdirSync(f.locks,{recursive:true,mode:0o700});
+    const fence=path.join(f.repo,'.fgos/locks/activation.lock');
+    fs.mkdirSync(fence,{recursive:true});
+    fs.writeFileSync(path.join(fence,'TOMBSTONE'),JSON.stringify({lock:'activation',by:'fgos git',at:'fixture'}));
+  }
+  for (const [i,f] of [a,b,c].entries()) {
+    const machine=`proof-machine-${i}`;
+    f.git('config','fgos.machineId',machine);
+    f.store=openStore(addon.resolveEventStore(f.repo,f.stateRoot,f.repo),machine,contracts,loaderOptions);
   }
   const add = a.store.append('project', [{ eventType: 'work.add', schemaVersion: 1, ts: '2026-10-20T00:00:00.000Z', payload: { id: 'one', status: 'todo', precondition: { exists: false } } }], {}, 'a', []);
   a.store.seal('project', []);
@@ -24,7 +36,10 @@ test('two real stores with crossing moves replay the same winner and conflict', 
   }
   a.git('fetch', b.repo, '+refs/fgos/events/*:refs/fgos/remotes/b/events/*');
   b.git('fetch', a.repo, '+refs/fgos/events/*:refs/fgos/remotes/a/events/*');
+  c.git('fetch', a.repo, '+refs/fgos/events/*:refs/fgos/remotes/a/events/*');
+  c.git('fetch', b.repo, '+refs/fgos/events/*:refs/fgos/remotes/b/events/*');
   const av = readWorkState(a.store).view, bv = readWorkState(b.store).view;
+  assert.deepEqual(av, readWorkState(c.store).view);
   assert.deepEqual(av, bv);
   assert.equal(av.conflicts.length, 1);
   assert.equal(av.conflicts[0].reason, 'expected-status');
