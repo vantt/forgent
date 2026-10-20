@@ -300,13 +300,13 @@ An adapter passes these before it is enabled; the core passes the first four wit
 
 ## 15. Open questions for the owner
 
-1. **Language.** Principle 4 says platform foundations are built in Rust. Dispatch, config loading and the lease code are Node today. A Rust core needs a bridge from a Node caller; a Node core breaks the principle. Which, and is a Node first version with a stable contract acceptable?
+1. **Language.** Answered 2026-10-20: Rust. What stays open is the bridge from the Node callers (dispatch, config loading, the lease code): a host verb or a Node addon like the event store. The first slice report recommends a host verb; this is decided when the Node cutover starts.
 2. **Encryption adapter.** `pass`, `gpg` or `systemd-creds` behind the `SecretSource` port, with a non-interactive unlock for cron. Which, and when? The port is built so the file adapter can be replaced without a caller change.
 3. **Per-provider spend-capped keys.** Does the owner create a dedicated, capped, revocable key per provider and accept rotating them? Without it, section 7.3 gives no bound.
 4. **Agent read protection for unconfined interactive sessions.** Options: deny rules for the secret paths in the agent CLI's own settings, extending the privacy patterns of section 7.4 to `secrets.local.env` and `auth.json`, and extending confinement `hostRead: blind` to secret paths. The first two are safety nets only; the third needs the confinement owner. Which of them, and in what order?
-5. **One name for the shared key.** `OPENROUTER_API_KEY` or keep `GLM_OPENROUTER_API_KEY`? The first names the provider and is what pi expects; the second names one executor.
+5. **One name for the shared key.** Answered 2026-10-20: `OPENROUTER_API_KEY`.
 6. **Scope of the expansion function.** Does it also take over the three `${HOME}`-only expansions of section 2, or stay for secrets and environment references only?
-7. **Resolver order.** Is environment first, then project file, then global file, the right order given that the shell export is removed?
+7. **Resolver order.** Answered 2026-10-20: environment, then project file, then global file.
 8. **herdr argv.** `76d8539d1` recorded the accepted risk; the comment is no longer in `src/runner/dispatch/transport.mjs` and a search for `--env` there finds nothing. Does the risk still apply, and where?
 
 ## 16. Decision history
@@ -317,14 +317,19 @@ An adapter passes these before it is enabled; the core passes the first four wit
 | 2026-10-19 | Threat model: a secret must not leak through git, and an agent must not read it by deliberately trying, within what is physically possible | owner | accepted |
 | 2026-10-19 | Credentials and config loading are separate components; `secrets` is lower; config loading depends on it; consolidating the loaders is a separate item | owner | accepted in direction |
 | 2026-10-19 | Runs are non-interactive; no prompt for a password | owner | accepted |
-| 2026-10-19 | One name for the shared OpenRouter key is wanted | owner | accepted; the name is question 5 |
+| 2026-10-19 | One name for the shared OpenRouter key is wanted | owner | accepted; the name is decided on 2026-10-20 (next row) |
+| 2026-10-20 | The shared key is named `OPENROUTER_API_KEY` (question 5, answered) | owner | accepted; the rename is migration step 4 |
+| 2026-10-20 | Resolver order is environment, then project file, then global file (question 7, answered) | owner | accepted |
+| 2026-10-20 | The core and verbs are Rust (question 1, answered); the Node bridge is a later step, and the first slice only reports the options | owner | accepted; first slice landed on main as the crate `fgos-secrets` |
+| 2026-10-20 | Run the read probe of step X1 from a confined worker | owner | accepted |
 | 2026-10-17 to 2026-10-19 | The OpenRouter key variable leaves the pi invocation env; the key is read from the login store | maintainer | landed in `4f6fc44d7`; kept by this spec |
 | 2026-08-25 | Secret values in `herdr pane --env` argv are an accepted risk | owner | recorded in `76d8539d1`; reopened as question 8 |
 
 ## 17. Evidence and limits
 
 - Read: the source files and commits named in section 2; the names and modes of the machine files; the privacy patterns.
-- Not tested: whether a confined worker can read `.fgos/secrets.local.env` today (read from policy and spec only); whether `pi auth check --provider openrouter` accepts an entry materialized into a per-run private home; whether the lease point allows a writer step without a change to the lease code.
+- Tested on 2026-10-20 (step X1, one confined `claude` worker under bwrap, read-only, `test -r` and a presence check of variable names; no content or value was read): the worker CAN read `.fgos/secrets.local.env`, `~/.pi/accounts/openrouter/auth.json` and `~/.zshrc`, and `GLM_OPENROUTER_API_KEY` was SET in the worker's environment while `OPENROUTER_API_KEY` and `DEEPSEEK_API_KEY` were not. The variable reached the worker because the parent process carried it; the zsh hook export (section 7.1 rule 1) is the likely source. This confirms both the open `hostRead` limit and the shell-export leak. Scope of the evidence: one worker, one run; the `pi` workers' environment is a whitelist (checked in a prepared invocation) and was not probed this way.
+- Not tested: whether `pi auth check --provider openrouter` accepts an entry materialized into a per-run private home; whether the lease point allows a writer step without a change to the lease code.
 - Correction recorded: the earlier claim that bwrap hides the file from workers was wrong (section 2).
 - The brief for this spec spoke of three copies of `${VAR}` expansion. Two copies expand environment variables and blank a missing one; three more expand `${HOME}` only. The table in section 2 states what was found.
 - The names in a machine file were read; no secret value is reproduced in this document.
