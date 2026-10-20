@@ -68,7 +68,7 @@ function assertNoLeakedPaths(afterSnapshot, leakedPaths, contextLabel) {
   }
 }
 
-test('e2e: npm pack -> npm install -g -> fgos init from a fresh external cwd', () => {
+test('e2e: npm pack -> npm install -g -> fgos init from a fresh external cwd refuses, naming fgctl init', () => {
   // Three separate scratch dirs, per the cell's proof design: pack output,
   // install --prefix, and a fresh external cwd distinct from the repo, the
   // pack scratch dir, and the install prefix.
@@ -147,15 +147,18 @@ test('e2e: npm pack -> npm install -g -> fgos init from a fresh external cwd', (
     // Windows can't exec a .cmd shim directly through the OS loader --
     // shell:true is required there (Node child_process gotcha); posix
     // binaries need no shell.
+    // This channel ships no native Git addon and Git has one door: `fgos init` refuses and names
+    // `fgctl init`, and writes nothing, neither in the external cwd nor in the install prefix.
     const init = spawnSync(fgosBin, ['init'], {
       cwd: externalCwd,
       encoding: 'utf8',
       shell: process.platform === 'win32',
     });
-    assert.equal(init.status, 0, `fgos init failed: ${init.stderr}`);
+    assert.notEqual(init.status, 0, 'fgos init must refuse on a channel that ships no addon');
+    assert.match(init.stderr, /git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`/);
 
     const externalFgosDir = path.join(externalCwd, '.fgos');
-    assert.ok(fs.existsSync(externalFgosDir), '.fgos/ must be created in the external cwd, not the repo or install prefix');
+    assert.equal(fs.existsSync(externalFgosDir), false, 'a refused init must not create .fgos/ in the external cwd');
     assert.equal(fs.existsSync(path.join(installPrefix, '.fgos')), false, '.fgos/ must not be created inside the install prefix');
 
     const repoFgosAfter = snapshotDir(path.join(REPO_ROOT, '.fgos'));

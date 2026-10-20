@@ -57,7 +57,7 @@ export function checkGit(cwd, kind, loaderOptions) {
     }
   } catch (err) {
     if (kind === 'git-transport-config' && /repository-config-untrusted: credential\.helper/.test(err.message)) return { passed: false, message: `${err.message}; ${transportRemedy}` };
-    return { passed: err.code === 'git-addon-not-shipped', message: err.code === 'git-addon-not-shipped' ? 'info: addon not shipped on this channel until M10' : err.message }; }
+    return { passed: err.code === 'git-addon-not-shipped', message: err.code === 'git-addon-not-shipped' ? 'info: addon not shipped on this channel: onboard this project with `fgctl init`' : err.message }; }
 }
 /** The release's mutation census (built from its own payload) lists no Git spawn outside the driver. */
 export function checkMutationOneDoor(payloadRoot = OWN_PAYLOAD_ROOT) {
