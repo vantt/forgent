@@ -43,16 +43,20 @@ One authority answers, per agent seat: executor, invocation, model, effort, tier
 1. **One track branch** `seat-binding-wave`. Phases 00–11 merge into the track, green after each merge. Main gets two things: the small pre-wave phase (-01) ahead of the wave [RT-10, RT-15], and one merge at landing (12). The converted config breaks every older activation (the fence), so no partial cutover can sit on main.
 2. **One route op `bind`** runs stage 1 and stage 2 in one exec and returns the stage-1 result for the client to cache per seat + config digest; op `ladder` returns the tier text. Exec count = seats × (1 + walk steps + lease conflicts).
 3. **Machine facts are inputs.** Node collects `launchView` (confinement answers; CLI effort levels from `provider-adapter.mjs:255`) and `accountView` (outside the provider lock; per-account CLI names, never homes [RT-16h]).
-4. **Conversion keeps today's capability-rigor tiers only** [RT-16d]: a capability with `rigor` gets `tier = rigorToTier[rigor]` when ≠ `defaults.tier` and `maxTier` when above global; unit `rigor`, `--rigor`, guide `rigorFloor` and Work `risk: heavy` stop raising tier (D2), listed in the diff, dry-bind output and CHANGELOG. **Bare verbs** [RT-1]: a bare-verb entry in either layer (the global file has `advise`, `execute`, `review`) is copied into the project file for every registered `<prefix>:v` lacking its own entry; the global bare entries stay as exact keys for capabilities literally named `v`. The global file is never edited; its `rigorToTier` is dropped at load by the sanitizer.
+4. **Conversion keeps today's capability-rigor tiers only** [RT-16d]: a capability with `rigor` gets `tier = rigorToTier[rigor]` when ≠ `defaults.tier` and `maxTier` when above global; unit `rigor`, `--rigor`, guide `rigorFloor` and Work `risk: heavy` stop raising tier (D2), listed in the diff, dry-bind output and CHANGELOG. **Bare verbs** [RT-1, P00-C15]: no `<prefix>:v` takes `prefer` from a bare verb on any workspace, and the global bare entries (`advise`, `execute`, `review`) carry only `description`, `confinement`, `serves`. Setup copies **only `confinement`** from a bare-verb entry into a new project entry for a registered `<prefix>:v` that has none; any other inherited key is reported, not copied. The global bare entries stay as exact keys for capabilities literally named `v`. The global file is never edited; its `rigorToTier` is dropped at load by the sanitizer.
 5. **forgentX's own config** = generic conversion + the D13 taste lines of spec §10.1/§10.4, committed in 06 on the track.
 6. **`acceptDependence` in wave 1** is refused at the door (`dependence-acceptance-unauthorized`) and ignored by the crate unless `raiseAuthorized` [RT-11]. Override `origin` strings stop being synthesised.
 7. **Workflow-declared `prefer` is refused**; `seats[].tier` is honoured only from registered, loader-sourced workflows and refused in `--units`/`--unit` files [RT-11]. `fgos run --provider` keeps its executor-keyed meaning.
 8. **`tester` is a checker seat** with role `reviewer` for taste lookup only; it keeps today's result contract and receipt treatment through a non-verdict posture; composition is stated by checker seat [RT-8]. Spec errata in 11.
-9. **Deleted doctor rows**: `capability-rigor-ceiling` and `runner-rigor-config` (06, with the code they import) [RT-16a]; `model-policy-tier-coverage` and `workflow-pools-satisfy-independence` (10).
+9. **Deleted doctor rows**: `capability-rigor-ceiling` and `runner-rigor-config` (06, with the code they import) [RT-16a]; `model-policy-tier-coverage` and `workflow-pools-satisfy-independence` (10); `mutating-assignment-binding-snapshot` (08) [P00-C1, D-c].
 10. **Effective rigor and checker composition are owned by the Node seat resolver** (one function, prefix inheritance); the crate takes `effectiveRigor` as input [RT-13].
 11. **Fence sentinel is `runner.patterns.seatBinding.schema`** [RT-3]: the old validator rejects unknown `patterns` keys (`config.mjs:1389-1393`) in every converted file, even after the global layer supplies `rigorToTier`. Requirement and `rigorToTier` refusal apply to the project layer only [RT-1].
-12. **`bindingInput` is an allowlisted, non-secret subset extending `configSnapshot` by digest**; replay recomputes stage 1 from the committed config at that digest and checks the receipt against provider-capacity's record [RT-9].
+12. **`bindingInput` is an allowlisted, non-secret subset with its own semantic config digest, not built on `configSnapshot`** [RT-9, P00-C10, D-e]; replay recomputes stage 1 from the committed config at that digest and checks the receipt against provider-capacity's record. New `configSnapshot`s stop storing `llmAccounts`/`providers` (replay does not need them); old records are left as they are; the gate's live-config fallback is removed.
 13. **`bind.mjs` walk exports**: `walkBindings`, `listCandidates`, `nextCandidate`, `retrySameCandidate` are deleted; consumers use `bind` with walk state or `explainSeat` [RT-16c].
+14. **Pre-fence records are not drained by resuming them** [D-a, D-b, D-f]: the 28 dead `awaiting-resume`, 2 `legacy-run` and 81 no-`execution` records on forgentX are not resumed before the wave; after landing they are refused by name (`record-predates-seat-binding`) and stay readable through the legacy read path. `seat-binding-drain` blocks only on records with a live controller; dead ones are info. No abandon verb is added (RUL104).
+15. **`mutating-assignment-binding-snapshot` is retired** for the phase 08 gate replay [P00-C1, D-c]: it replays nothing today and adds no execs.
+16. **Exec-under-lock criterion is scoped to Seat Binding** [P00-C5, D-d]: Seat Binding adds zero execs under the provider lock; the existing `reclaimDeadLeases` probe exec inside the lock is pre-existing and outside this wave, recorded in the 08 report.
+17. **Rigor no longer sets a default effort** [P00-C14]: `REASONING_EFFORT_DEFAULT_FROM_RIGOR` goes with `assignment-policy.mjs` in 06; effort comes from the cell or the invocation default (spec §5.3, D2).
 
 ## Phases
 
@@ -61,7 +65,7 @@ Owner for every phase except 12: a Sonnet lead in its own worktree (from the tra
 | # | Phase | Size | Depends on | Files (owned) |
 |---|---|---|---|---|
 | -01 | [Pre-wave: dev-door host resolution, forward record fence (on main)](phase-pre-wave-host-resolution-and-record-fence.md) | S (0.5d) | — | `src/util/host-bin-path.mjs` (or dev-door script), `run.mjs` resume refusal |
-| 00 | [Facts and prior art](phase-00-facts-and-prior-art.md) | M (0.5d) | — | report only |
+| 00 | [Facts and prior art](phase-00-facts-and-prior-art.md) — **done**, [report](../reports/phase-lead-261020-2215-seat-binding-phase-00-facts.md) | M (0.5d) | — | report only |
 | 01 | [Crate with two pure stages](phase-01-seat-binding-crate.md) | L (1.5d) | 00 | `packages/seat-binding/**`, root `Cargo.toml` |
 | 02 | [Seat identity, resolver, patterns as seats, role-keyed readers, legacy read path](phase-02-seat-identity-and-patterns.md) | XL (2.5d) | 00 | execution, patterns, workflow and setup files listed in the phase; Convention seat-id rule; observe/run-result seat keys; `core/workflows/*.yaml` |
 | 03 | [Persona scope](phase-03-persona-scope.md) | M (0.5d) | 02 | `loader.mjs`, `agent-definitions.mjs`, Convention persona rule, persona call sites |
@@ -111,7 +115,7 @@ door (fgos run / workflow handoff / work-dispatch / operation-choice / fanout-ba
   launch batch in parallel
   per attempt: acquireNamedAccountLease (CLI filter, under lock) → leaseReceipt | lease-conflict → serialized rebind, hard rules re-checked
   failure → walk step → bind again with walk state (single walker)
-write gate (assignment-runner.mjs:466-500) / doctor replay: stage 1 from committed config at the run's digest, receipt vs provider-capacity record
+write gate (assignment-runner.mjs:466-500): stage 1 from committed config at the bindingInput digest, receipt vs provider-capacity record (doctor replay row retired [P00-C1])
 ```
 
 ## Coverage map (requested items → phases)
@@ -133,7 +137,7 @@ write gate (assignment-runner.mjs:466-500) / doctor replay: stage 1 from committ
 | Core workflows to explicit `seats:` | 02 |
 | Doctor dry-bind replacing two rows | 10 |
 | Docs, component-boundary row | 11 |
-| Measured exec budget | 04 (per exec + per surface), 08 (count, zero under lock), 10 (doctor surface) |
+| Measured exec budget | 04 (per exec + per surface), 08 (count, zero seat-binding execs under lock), 10 (doctor surface) |
 | Live proof | 12 |
 
 ## Proof list (spec §11) → test
@@ -154,7 +158,7 @@ write gate (assignment-runner.mjs:466-500) / doctor replay: stage 1 from committ
 | gate replay survives a later quarantine | 08 | gate replay test at `assignment-runner.mjs:466-500`, `account-rotation.test.mjs` |
 | adjacent persona shadows only its own workflow/domain | 03 | loader + agent-definitions tests |
 | stance still records with explicit seats | 02 | role-tasks test |
-| host exec count matches and is zero under the provider lock | 04, 08 | `test/seat-binding/exec-budget.test.mjs` |
+| host exec count matches; Seat Binding adds zero execs under the provider lock [P00-C5] | 04, 08 | `test/seat-binding/exec-budget.test.mjs` |
 | conversion idempotent; older activation refuses; global still loads on old activation | 09 | conversion + old-loader fence tests (real-shaped global file) |
 
 ## Test matrix
@@ -174,7 +178,8 @@ write gate (assignment-runner.mjs:466-500) / doctor replay: stage 1 from committ
 | Exec cost too high | M×H | Measured per exec and per surface in 04 before any cutover |
 | Fixture churn hides a semantic change | H×M | Classified in 00; codemod for fixture-only, hand rewrite for asserting tests [RT-16f] |
 | Track drifts from main | H×M | Main merged before every phase; conversion drift check from 06 on [RT-15] |
-| In-flight records across the cutover | M×H | Drain on real statuses + liveness + parked gates [RT-4]; record fence (02); forward fence on main (-01) [RT-15] |
+| In-flight records across the cutover | M×H | Drain blocks on live controllers only; dead pre-fence records refused by name and readable [D-a, D-b, D-f]; record fence (02); forward fence on main (-01) [RT-15] |
+| Pre-fence history unreadable after landing | M×M | One legacy read path with goldens covers role-keyed panel/debate records, no-`execution` records and parked-gate refs [RT-6, D-a] |
 | Role-keyed reader missed | M×H | 00 grep list owned by 02; legacy read path with goldens [RT-6] |
 | Worker tampers with `unit.json` to steer replay or host | L×H | Allowlisted `bindingInput`, digest-checked replay, receipt vs provider record, `FGOS_HOST_BIN` stripped, activation host [RT-9, RT-10] |
 | `max-tier-cap` silently degrades quality | M×M | Visible in explain/evidence; dry-bind info lines; board reversal trigger |
@@ -185,7 +190,7 @@ write gate (assignment-runner.mjs:466-500) / doctor replay: stage 1 from committ
 1. Pre-check: the -01 release is active on forgentX, mdview, mcp-skill-hub and the second machine.
 2. Final sync: main → track, conversion drift check, full `npm test`, criterion-1 grep.
 3. Freeze; owner picks the hour.
-4. Drain each workspace with the track's `seat-binding-drain` row (`npm --prefix <track> run fgos:dev -- doctor` from the workspace; JSON by default); settle dead records with the verb the row names.
+4. Drain each workspace with the track's `seat-binding-drain` row (`npm --prefix <track> run fgos:dev -- doctor` from the workspace; JSON by default): wait only for records with a live controller; dead pre-fence records are info, refused after landing and readable [D-a].
 5. Live fence check on all three converted configs with the old activation and the real HOME.
 6. Merge the track into main inside the main checkout (Land/Sync verbs if GIT 07 has landed).
 7. **Release first** on forgentX: build, stage, activate; `fgos setup` (heal or no-op); doctor green.
@@ -197,14 +202,14 @@ write gate (assignment-runner.mjs:466-500) / doctor replay: stage 1 from committ
 ## Rollback
 
 - Before landing: drop the track branch; -01 on main is inert and can stay.
-- After landing, per workspace, together: activate the prior release **and** restore the setup backup; forgentX also `git revert -m 1 <landing merge>`. Because -01 is in the prior release, new-release records (with `seatSchema`) are refused (`record-from-newer-release`) rather than misread; they settle or are abandoned, no drain needed to re-activate. The global file needs nothing.
+- After landing, per workspace, together: activate the prior release **and** restore the setup backup; forgentX also `git revert -m 1 <landing merge>`. Because -01 is in the prior release, new-release records (with `seatSchema`) are refused (`record-from-newer-release`) rather than misread; one still running at rollback stays unfinished, refused by name and readable (the mirror of D-a), so no drain is needed to re-activate. Pre-fence records refused by the new release become resumable again on the prior release. The global file needs nothing.
 
 ## Acceptance criteria
 
 1. [RT-6, RT-12, RT-15] `rg -n "rigorToTier|DEFAULT_RIGOR_TO_TIER|attemptProviderCapacityFallback|resolveFallback|session-lead-inline|CHECKER_ROLES|VALID_CHECKER_ROLES|resolveTierCeiling|resolveSeatTier|lookupCapabilityConfig|resolveAssignmentDispatchPolicy|resolveTierModel|resolveTierCandidates|tierFallbackOf|resolveStrongerTier|TIER_STRENGTH|rankProviderAccounts|walkBindings|listCandidates|nextCandidate|retrySameCandidate|role-ledger|panelist-" src bin core domains scripts packages apps` returns only: `packages/seat-binding/**` (`TIER_STRENGTH`), `src/runner/execution/legacy-seat-read.mjs` (`panelist-`), and `rigorToTier` inside `RETIRED_RUNNER_KEYS` in `config.mjs` and in `src/setup/seat-binding-conversion.mjs`. Regenerated baselines (`scripts/check-decision-codes.baseline.json`) carry none.
 2. No JS code computes tier, model, executor order, account order or fallback for an agent seat (reviewed in 11 against the boundary row).
 3. Every §11 proof has a passing test named above; `npm test` green on main after landing.
-4. Exec budget: count per seat × round × walk step = `1 + walkSteps + leaseConflicts`; zero execs under the provider lock; per-exec p95 ≤ 2× `identity mint-attempt` p95; per-surface before/after wall times (run, explain, doctor, preflight, replay) recorded with a ~22 KB config [RT-16e].
+4. Exec budget: count per seat × round × walk step = `1 + walkSteps + leaseConflicts`; **Seat Binding adds zero execs under the provider lock** (the pre-existing `reclaimDeadLeases` probe is recorded, not counted) [P00-C5, D-d]; per-exec p95 ≤ 2× `identity mint-attempt` p95; per-surface before/after wall times (run, explain, doctor, preflight, replay) recorded with a ~22 KB config [RT-16e].
 5. `fgos doctor` green on forgentX, mdview, mcp-skill-hub and the second machine after landing, including `seat-binding-route`, `seat-binding-config`, `seat-binding-drain` and `seat-binding-dry-bind` (expected info lines only).
 6. Live runs match spec §10.2/§10.3; evidence carries `tierSource` and any `loweredFrom`.
 7. Old activations refuse all three converted configs with the real HOME (09 test, 12 live check).
@@ -212,7 +217,7 @@ write gate (assignment-runner.mjs:466-500) / doctor replay: stage 1 from committ
 ## Reversal triggers
 
 - Measured exec budget fails or the owner rejects no-exec-under-lock → stop after 04, ask S vs B (spec §4.2) with panelist-2's cost table; the in-process Node addon (`packages/git/node-addon` precedent) is information for that question, not an option this plan prices or builds.
-- A pre-fence record cannot be settled or abandoned by any existing verb → switch to a read-only role-key reader shim for that record class.
+- The owner asks to **resume** a pre-fence record after landing [D-b] → add a read-only role-key reader shim for that record class (a separate item); until then pre-fence records are refused by name and readable.
 - After landing, `maxTier` lowering hurts quality unnoticed → doctor warning, never change authority.
 - Live proof shows a seat bound for a reason not in its explain line → stop rollout to the other workspaces.
 
@@ -235,12 +240,12 @@ Source: [red-team-adjudication.md](red-team-adjudication.md). 16 accepted, appli
 | RT-1 global layer (`rigorToTier`, bare verbs) | accepted: sanitizer before merge, project-only refusal, global bare-verb rule (decision 4), real-global tests | 00, 05, 06, 09, 12, plan |
 | RT-2 fill-missing writers | accepted: default removed in 06, setup converts first, trigger on `rigorToTier` present or marker absent, pull+activate as one step | 00, 05, 06, 09, 12 |
 | RT-3 fence sentinel | accepted: `patterns.seatBinding.schema`, proven on three workspace shapes with real HOME | 00, 05, 09, 12, plan |
-| RT-4 drain predicate | accepted: real statuses + liveness + parked gates, named settling verbs, live run in 00 | 00, 09, 12 |
-| RT-5 replay sites | accepted: gate at `assignment-runner.mjs:466-500`; `mutating-assignment-binding-snapshot` post-fence only with exec count; `probe-account` outside | 00, 06, 07, 08 |
+| RT-4 drain predicate | accepted: real statuses + liveness + parked gates, live run in 00; settling-verb part superseded by D-a/D-b/D-f (see Phase 00 corrections) | 00, 09, 12 |
+| RT-5 replay sites | accepted: gate at `assignment-runner.mjs:466-500`; `mutating-assignment-binding-snapshot` part superseded: retired (P00-C1, D-c); `probe-account` outside | 00, 06, 07, 08 |
 | RT-6 role-keyed readers and history | accepted: full grep list owned by 02; one legacy read path with goldens; grep widened | 00, 02, plan |
 | RT-7 seat id rule | accepted: Convention-owned charset + reserved names, traversal test | 02 |
 | RT-8 `tester` | accepted (big lead's decision): composition by checker seat, non-verdict posture, one checker set, spec errata | 00, 02, 11, plan |
-| RT-9 replay trust | accepted: allowlisted `bindingInput`, digest-checked stage-1 replay, receipt vs provider record, extends `configSnapshot` | 08, plan |
+| RT-9 replay trust | accepted: allowlisted `bindingInput`, digest-checked stage-1 replay, receipt vs provider record; "extends `configSnapshot`" superseded (P00-C10, D-e) | 08, plan |
 | RT-10 host binary trust | accepted: activation host, `FGOS_HOST_BIN` stripped from workers, host version recorded, 5 s timeout; dev-door fix pre-wave | -01, 04, 08 |
 | RT-11 other raise doors | accepted: loader-only `seats[].tier`, selector raises refused, crate ignores `acceptDependence`, all `runUnit` doors listed | 00, 01, 02, 06 |
 | RT-12 JS model choice | accepted: `resolveTierModel` ×7, `resolveTierCandidates`, `tierFallbackOf`, `resolveStrongerTier`, `TIER_STRENGTH`, barrel, `project-agents.mjs` moved or deleted; grep widened | 00, 06, 07, plan |
@@ -256,7 +261,7 @@ Re-read `plan.md` and all 14 phase files after the edits. Stale-term search (`rg
 
 | Term | Result |
 |---|---|
-| drain on `doing`/`paused` | gone; 09 and 12 use `execution.status` ∈ {running, pending, pending-inline} + liveness + parked gates |
+| drain on `doing`/`paused` | gone; (superseded after phase 00 by D-a/D-b/D-f: the drain blocks only on live controllers, see Phase 00 corrections) |
 | `commit-unit-work` as the gate | gone as gate; 07/08 cite `assignment-runner.mjs:466-500`; `commit-unit-work.mjs` appears only in 00 and 07 as "has no bind, not the gate" |
 | `rigorToTier` refusal without a layer | every refusal says project layer; global dropped by the sanitizer (05, 06, 09, plan) |
 | draft section numbers (§3.3, §4.x, §5.x, §8, §9.x, §11.x, §12, §13 of the draft) | re-cited to `docs/specs/seat-binding.md`; the draft is linked as history only |
@@ -317,3 +322,49 @@ Result: zero unresolved contradictions.
 - Re-checked: the -01/00 order in "Phases", "Dependency graph" and "Landing recipe" agree.
 - The single owner question matches "Owner questions".
 - 0 unresolved contradictions.
+
+### Phase 00 corrections
+
+Source: [phase 00 report](../reports/phase-lead-261020-2215-seat-binding-phase-00-facts.md) §2 (C1–C17), merged on main. Big-lead decisions D-a to D-f (inside the approved frame, reported to the owner) applied as given. Edits are tagged `[P00-Cn]` or `[D-x]` in place.
+
+| Item | Disposition | Phases touched |
+|---|---|---|
+| C1 replay row asserts nothing (0 of 2,278 results carry `binding`) | D-c: `mutating-assignment-binding-snapshot` retired for the 08 gate replay; no execs | 00, 08, 11, plan (decisions 9, 15; data flow; RT-5 row) |
+| C2 81 records without `execution` | D-f: info only, refused on resume, readable through the legacy read path | 02, 09, 12, plan (decision 14) |
+| C3 no abandon verb for a unit record | D-a: 28 dead `awaiting-resume` records not resumed; refused by name after landing; no abandon verb (RUL104) | 02, 09, 12, plan (decision 14, landing step 4, rollback) |
+| C4 2 `legacy-run` records have no proven settling path | D-b: same as D-a; reader-shim trigger reworded to "owner asks to resume a pre-fence record after landing" | 09, 12, plan (reversal triggers) |
+| C5 lease reclaim already execs inside the provider lock | D-d: criterion is "Seat Binding adds zero execs under the provider lock"; `reclaimDeadLeases` probe recorded as pre-existing | 08, plan (decision 16, criterion 4, proof table, coverage) |
+| C6 14 `ensureRunnerConfigForDir` callers; only setup writes the global file | applied: full caller list; sanitizer named as the only protection before setup re-runs | 00, 06, 09 |
+| C7 `resolveAssignmentDispatchPolicy` runtime callers are `plan.mjs` only | applied: import/comment work list corrected | 06 |
+| C8 `work-dispatch.mjs:379`, `case-admission.mjs:108,173` are not role readers | applied: removed from the reader list; kept as seat-id format consumers | 00, 02 |
+| C9 role-name branch list | applied: `case-admission-port` dropped; `case-projection.mjs:242-246`, `settlement.mjs:290` and the rest of report §3.11 added | 00, 02 |
+| C10 `configSnapshot.runner` stores `llmAccounts`/`providers` | D-e: `bindingInput` not built on `configSnapshot`; new snapshots stop storing them; replay does not need them; live-config fallback removed; old records unchanged | 08, 11, plan (decision 12, RT-9 row) |
+| C11 `maxTier`/`tierFallback` not hashed today | applied: new hash asserted, not a regression | 06 |
+| C12 `tier-cell` has 3 test files | applied (count) | 00 |
+| C13 `agent-definitions` importers | applied (list) | 00 |
+| C14 effective rigor has 9+ sites; rigor-derived effort default | applied: all routed through `effectiveRigorOf`; `REASONING_EFFORT_DEFAULT_FROM_RIGOR` deleted in 06 (effort from cell or invocation default, spec §5.3, D2) | 00, 02, 06, 07, 11, plan (decision 17) |
+| C15 global bare verbs carry no `prefer` | applied: bare-verb copy reduced to `confinement` only; other keys reported | 05, plan (decision 4) |
+| C16 registration line `:1455` | applied (cosmetic) | 00 |
+| C17 `bind.mjs` imported by 12 test files | applied (cosmetic) | 00 |
+| Report name mismatch with convention | ignored per big lead | — |
+
+### Whole-Plan Consistency Sweep (after Phase 00 corrections)
+
+Re-read `plan.md` and all 15 phase files. Stale-term search over the plan dir:
+
+| Term | Result |
+|---|---|
+| "settle or abandon dead records", settling verbs as a drain exit | gone; drain blocks on live controllers only (09, 12, plan landing step 4, rollback); remaining mentions are history rows marked superseded |
+| `2,275` replays / doctor replay of `bind()` | gone; row retired (08, plan) |
+| "zero execs under the provider lock" unscoped | every mention reads "Seat Binding adds zero" with the `reclaimDeadLeases` note |
+| `bindingInput` "extends `configSnapshot`" | gone except the RT-9 history row marked superseded |
+| bare-verb taste copy (`prefer`, `persona`, `minCheckers`) | gone; `confinement` only (05, plan decision 4) |
+| 10 fill-missing callers | now 14 (00, 06, 09) |
+| `resolveAssignmentDispatchPolicy` callers in `cli.mjs`/`loop.mjs` | gone (06) |
+| `work-dispatch.mjs:379`, `case-admission.mjs:108,173` as role readers; `case-admission-port` role branch | gone from 02's work list; annotated in the 00 brief |
+| rigor-derived effort | deleted in 06; 02, 06, 07 agree; CHANGELOG line in 11 |
+| reader-shim reversal trigger | reworded to D-b |
+
+Reconciled: phase table (00 marked done), merge order and dependency graph unchanged (no phase added or removed); decisions 1–17 consistent with the phases; acceptance criteria 1–7, proof table, landing recipe and rollback agree with 02, 08, 09 and 12. Parallel windows still have disjoint files: 02 now also owns `settlement.mjs`, `work-dispatch.mjs`, `case-admission.mjs`, `assignment-runner.mjs` role keys and `bin/fgos.mjs:743`, none touched by 01; 03 runs after 02, so its `bin/fgos.mjs` edit is sequential.
+
+Result: zero unresolved contradictions. No item changes an owner decision; no new owner question.
