@@ -72,6 +72,7 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions, remote 
   const facade = {
     commonDir: resolvedRoot.commonDir,
     machineId,
+    get ownOrigin() { return call(() => native.ownOrigin); },
     append(stream, events, cursor, writer, heldRanks) {
       available();
       const ranks = ranksOf(heldRanks);
@@ -82,9 +83,9 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions, remote 
       const ranks = outsideGate(heldRanks);
       return historical(call(() => native.read(streams, cursor, folded, project, ranks, hotLockDepth())), 'legacy');
     },
-    seal(stream, heldRanks) {
+    seal(stream, heldRanks, { opportunistic = false } = {}) {
       const ranks = outsideGate(heldRanks);
-      return call(() => native.seal(stream, ranks, hotLockDepth()));
+      return call(() => native.seal(stream, ranks, hotLockDepth(), opportunistic));
     },
     sealIfDue(stream, intervalSec, heldRanks) {
       const ranks = outsideGate(heldRanks);

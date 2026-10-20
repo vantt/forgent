@@ -348,6 +348,7 @@
     "src/git/restore.mjs": "infra",
     "src/git/config.mjs": "infra",
     "src/git/native-lock.mjs": "infra",
-    "src/git/recovery.mjs": "infra"
+    "src/git/recovery.mjs": "infra",
+    "src/state/work-event-store.mjs": "infra"
   }
 }

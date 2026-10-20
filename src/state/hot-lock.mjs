@@ -276,9 +276,13 @@ function underDir(fgosDir, target) {
   return rel !== '' && !rel.startsWith('..') && !path.isAbsolute(rel);
 }
 
-function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eventStore = null, extraRoots = [] } = {}) {
+function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eventStore = null, extraRoots = [], stageEffects = false, commitEvents = null, afterApply = null } = {}) {
   let live = true;
   const roots = [fgosDir, ...extraRoots];
+  const effects = [];
+  const events = [];
+  let staging = stageEffects;
+  const effect = (apply) => { if (staging) effects.push(apply); else return apply(); };
   const guard = (target) => {
     if (!live) throw new HotLockError('state-tx-revoked', 'the state transaction was used after its callback returned');
     if (target !== undefined && !roots.some((root) => underDir(root, target))) {
@@ -291,14 +295,24 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eve
     eventStore,
     head,
     writer,
-    /** Append one event; same seq/hash derivation as the plain append. */
+    /** Work stages typed events; the legacy porting gate still appends a log. */
     append(logPath, opts) {
-      guard(logPath);
-      return appendEventCore(logPath, opts, fgosDir, tx);
+      if (staging && opts === undefined && logPath && typeof logPath === 'object') {
+        opts = logPath;
+        guard();
+      } else {
+        guard(logPath);
+      }
+      if (!staging) return appendEventCore(logPath, opts, fgosDir, tx);
+      if (typeof opts?.type !== 'string' || !opts.type.trim()) throw new HotLockError('validation', 'event type is required');
+      const event = { type: opts.type.trim(), payload: structuredClone(opts.payload ?? null), ts: new Date().toISOString() };
+      events.push(event);
+      return event;
     },
     /** One already-built log line (the primitive `append` writes through). */
     appendLine(logPath, line) {
       guard(logPath);
+      if (staging) throw new HotLockError('state-tx-raw-append', 'staged transactions append typed events only');
       fs.mkdirSync(path.dirname(logPath), { recursive: true });
       fs.appendFileSync(logPath, line, 'utf8');
     },
@@ -308,10 +322,12 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eve
     /** Replace `target` with `text` atomically (temp file, then rename). */
     writeText(target, text) {
       guard(target);
-      fs.mkdirSync(path.dirname(target), { recursive: true });
-      const tmp = `${target}.tmp-${uniqueTmpTag()}`;
-      fs.writeFileSync(tmp, text, 'utf8');
-      fs.renameSync(tmp, target);
+      effect(() => {
+        fs.mkdirSync(path.dirname(target), { recursive: true });
+        const tmp = `${target}.tmp-${uniqueTmpTag()}`;
+        fs.writeFileSync(tmp, text, 'utf8');
+        fs.renameSync(tmp, target);
+      });
     },
     readJson(target) {
       guard(target);
@@ -326,21 +342,35 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eve
     rename(from, to) {
       guard(from);
       guard(to);
-      fs.mkdirSync(path.dirname(to), { recursive: true });
-      fs.renameSync(from, to);
+      effect(() => {
+        fs.mkdirSync(path.dirname(to), { recursive: true });
+        fs.renameSync(from, to);
+      });
     },
     unlink(target) {
       guard(target);
-      try {
-        fs.unlinkSync(target);
-        return true;
-      } catch (err) {
-        if (err.code === 'ENOENT') return false;
-        throw err;
-      }
+      const existed = staging ? fs.existsSync(target) : undefined;
+      const removed = effect(() => {
+        try { fs.unlinkSync(target); return true; }
+        catch (err) { if (err.code !== 'ENOENT') throw err; return false; }
+      });
+      return staging ? existed : removed;
     },
   };
-  return { tx, revoke: () => { live = false; } };
+  return {
+    tx,
+    commit() {
+      // A refusal leaves every effect unapplied. Only the consumer knows how
+      // to acknowledge its staged event batch; the mutex owns effect ordering.
+      if (stageEffects) {
+        commitEvents?.(tx, events);
+        staging = false;
+        for (const apply of effects) apply();
+        afterApply?.(tx);
+      }
+    },
+    revoke: () => { live = false; },
+  };
 }
 
 /**
@@ -362,10 +392,15 @@ export function withStateTx(fgosDir, fn, { resource = 'state', prefetched = {} }
   const paths = acquireRecord(fgosDir, resource, recordOfSelf(writer, fgosDir));
   const leaveHotLock = enterHotLock();
   noteLockHeld();
-  const { tx, revoke } = createTx(fgosDir, { ...prefetched, writer });
+  const { tx, commit, revoke } = createTx(fgosDir, { ...prefetched, writer });
   let result;
   try {
     result = fn(tx);
+    if (result && typeof result.then === 'function') {
+      result.then(undefined, () => {});
+      throw new HotLockError('state-tx-async', `${resource}: the transaction callback must be synchronous`);
+    }
+    commit();
   } finally {
     revoke();
     leaveHotLock();
@@ -374,10 +409,6 @@ export function withStateTx(fgosDir, fn, { resource = 'state', prefetched = {} }
     } finally {
       noteLockReleased();
     }
-  }
-  if (result && typeof result.then === 'function') {
-    result.then(undefined, () => {});
-    throw new HotLockError('state-tx-async', `${resource}: the transaction callback returned a promise; it must be synchronous (the lock is already released)`);
   }
   return result;
 }

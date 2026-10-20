@@ -1,34 +1,15 @@
-// store.mjs — the single write door onto `.fgos/` (per D3/D5).
-//
-// This is the sole module that resolves `.fgos/` paths; byte-level append is
-// delegated to events.mjs. Every other module here is a pure lib that takes
-// an explicit path (events.mjs) or no path at all (status-fsm.mjs, replay.mjs,
-// work.mjs) — this module is what wires "some directory" to the two files
-// that live in it: `events.jsonl` (truth, per D3) and `state.json` (view,
-// per D4).
-//
-// Write order, always: append the event to the log FIRST, then rebuild and
-// overwrite the view SECOND. If a crash lands between the two, the log (the
-// only truth) already has the event — the view is merely stale, and
-// `rebuild()` below is the documented recovery path (per the plan's risk
-// map). The view is never written before the event that produced it exists.
-//
-// This module is also the CLI's single facade for the error-classification
-// contract (R4): EXIT_CODES + categoryOf are the one source for
-// category -> exit code, and the four error classes raised anywhere in the
-// state layer are re-exported from here so bin/fgos.mjs never needs to
-// import status-fsm.mjs/work.mjs/events.mjs directly.
-//
-// SIBLING FACADE (D3, worker-dispatch-log): `.fgos/logs/` is written by a
-// separate narrow facade, worker-log.mjs — NOT this door. This module's
-// single-write-door scope stays exactly `events.jsonl` + `state.json` (the
-// event-sourced FSM truth and its view); unstructured worker dispatch output
-// is a different concern and never flows through moveWork/appendEvent.
+// Work's single mutation door. Its consumer gate catches up before locking,
+// folds the bounded own-stream tail, validates, and acknowledges one staged
+// Event Store batch before applying claim/file effects and writing the cache.
+// Reducers remain in replay.mjs; runtime claims remain a separate overlay.
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { viewRevision, serializeView, readAllEventsFromDir, rebuildViewFromDir, buildSnapshotFromDir, VIEW_SCHEMA_VERSION } from './replay.mjs';
+import { viewRevision } from './replay.mjs';
+import { prepareWorkStore, readWorkState } from './work-event-store.mjs';
+import { hotLockDepth } from './hot-lock.mjs';
+import { readEventStoreConfig } from '../event-store/index.mjs';
 import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlapAmong, goalScopedCriticalPath, goalScopedGreedyTopUnblock, computeSchedule, detectCycles } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './status-fsm.mjs';
 import { transitionStep } from './step-fsm.mjs';
@@ -43,7 +24,7 @@ import { KnowledgeValidationError, applyKnowledgeEvent } from './knowledge-regis
 import { resolveFriction, recordFriction } from '../observe/friction-client.mjs';
 export { recordFriction, resolveFriction };
 import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
-import { readClaim, readClaims, releaseClaimTx, withMainState, buildEffectiveView, getItemDurableRevision } from './runtime-coordination.mjs';
+import { readClaim, readClaims, releaseClaimTx, withMainState, getMainFgosDir, buildEffectiveView, getItemDurableRevision } from './runtime-coordination.mjs';
 
 export { FsmError, WorkValidationError, EventLogError, KnowledgeValidationError };
 
@@ -124,19 +105,8 @@ export function categoryOf(err) {
   return err && typeof err.category === 'string' ? err.category : 'unexpected';
 }
 
-function paths(dir) {
-  return { logPath: path.join(dir, 'events.jsonl'), viewPath: resolveFgosFile(dir, FGOS_FILE.STATE) };
-}
-
-// Tầng A / T2 (TA-D2, TA-D11, TA-D14): new writes go under `.fgos/events/`,
-// one open file per writer, instead of the single top-level `events.jsonl`.
-// `paths(dir).logPath` (above) is untouched and stays load-bearing for two
-// unrelated things: it is baseline-0, the pre-cutover log frozen in place
-// (TA-D12, read but never appended to below), and its OWN dirname is what
-// `withStateAndRefresh` used to derive the cross-process lock from — the
-// state lock is now one per main checkout, covering the whole `.fgos/` dir
-// exactly as before (TA-D14: a per-file lock would no longer serialize the CAS
-// preconditions every mutation here depends on).
+// Compatibility path for legacy appenders scheduled for the later removal
+// unit. Work's gated appenders no longer call this resolver.
 const EVENTS_SUBDIR = 'events';
 
 function eventsDirOf(dir) {
@@ -153,7 +123,7 @@ function formatCompactTs(date) {
 // Resolves the ONE currently-open file for this writer under
 // `.fgos/events/` (TA-D2/TA-D11): reuse it if a prior write in this same
 // writer identity already opened one, otherwise open a new one now. Never
-// writes to `paths(dir).logPath` (baseline-0 is frozen, TA-D12).
+// writes to the frozen baseline events.jsonl (TA-D12).
 export function resolveWriterLogPath(dir) {
   const dirPath = eventsDirOf(dir);
   fs.mkdirSync(dirPath, { recursive: true });
@@ -175,99 +145,31 @@ export function resolveWriterLogPath(dir) {
   return path.join(dirPath, `${prefix}${formatCompactTs(new Date())}.jsonl`);
 }
 
-// Tầng A/T3: the multi-file discovery + total-order + dedupe step now
-// lives in replay.mjs (`readAllEventsFromDir`/`rebuildViewFromDir`) — this
-// module only ever passes `dir` through. `readAllEvents`/`currentView` are
-// the ONE pair of names every reader below still calls, unchanged from T2,
-// so this handoff touched no call site.
+// Full readers are forbidden under the hot mutex. Gate callbacks use tx.view.
 function readAllEvents(dir) {
-  return readAllEventsFromDir(dir);
+  if (hotLockDepth() > 0) throw new StoreError('event-store-full-read-under-state', 'full Work history read inside state gate');
+  const { store } = prepareWorkStore(dir, getMainFgosDir(dir));
+  return readWorkState(store).events;
 }
 
 function currentView(dir) {
-  return rebuildViewFromDir(dir);
+  if (hotLockDepth() > 0) throw new StoreError('event-store-full-read-under-state', 'currentView inside state gate');
+  const { store } = prepareWorkStore(dir, getMainFgosDir(dir));
+  return readWorkState(store, { cachePath: resolveFgosFile(getMainFgosDir(dir), FGOS_FILE.STATE) }).view;
 }
 
-function writeView(viewPath, view, snapshot, tx = null) {
-  // work-graph-intelligence S3: stamp a deterministic revision-hash onto the
-  // ON-DISK derived view only. `view` (what refreshView returns to store
-  // callers) stays the pure fold shape rebuildView produces — the revision is
-  // a sibling field written to state.json, never folded back into the view a
-  // rebuild returns. Determinism (same log -> same revision) keeps the
-  // rebuild-determinism e2e's before/after deep-equal green.
-  // tsk-49e: `snapshot` ({size, mtimeMs, lastLine} of events.jsonl as of
-  // this write) is the same kind of additive sibling field — read back only
-  // by replay.mjs's own incremental-rebuild fast path, never folded into the
-  // view a rebuild returns.
-  // tsk-37d: reuse the once-serialized view string to derive the revision hash
-  // and construct the persisted JSON without a second JSON.stringify pass over
-  // view.
-  const { viewStr, revision } = serializeView(view);
-  const snapshotPart = snapshot !== undefined ? `,"snapshot":${JSON.stringify(snapshot)}` : '';
-  const persistedContent = `${viewStr.slice(0, -1)},"revision":${JSON.stringify(revision)},"viewSchemaVersion":${VIEW_SCHEMA_VERSION}${snapshotPart}}\n`;
-  // tsk-4mx: temp file, then rename(2) onto viewPath -- an atomic replace on
-  // POSIX, so a reader can never observe a truncated/partial state.json.
-  // Inside a state transaction the write goes through `tx`, which does exactly
-  // that and refuses it once the transaction is revoked.
-  if (tx) {
-    tx.writeText(viewPath, persistedContent);
-    return;
-  }
-  fs.mkdirSync(path.dirname(viewPath), { recursive: true });
-  const tmpPath = `${viewPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  fs.writeFileSync(tmpPath, persistedContent, 'utf8');
-  fs.renameSync(tmpPath, viewPath);
+function withStateAndRefresh(dir, fn, options) {
+  let transaction;
+  const event = withMainState(dir, tx => {
+    transaction = tx;
+    return fn(tx);
+  }, options);
+  return { event, view: transaction.view };
 }
 
-// Shared tail of every mutation: rebuild the view fresh from the (now
-// updated) log and overwrite state.json. Always called AFTER the event that
-// caused the change has already been appended — never before.
-function refreshView(dir, tx = null) {
-  const { viewPath } = paths(dir);
-  const view = currentView(dir); // tries T4's incremental fast path first, falls back to a full multi-file fold
-  // T4's per-file anchor ({files: {name: {size, lastLine}}, maxTs}) --
-  // cheap stat + tail-read per file, never a full-content read. Safe to
-  // build here uncontended: refreshView always runs inside
-  // withStateAndRefresh's held lock (tsk-1q5), so no concurrent append
-  // can land between currentView's own read above and this snapshot build.
-  const snapshot = buildSnapshotFromDir(dir);
-  writeView(viewPath, view, snapshot, tx);
-  return view;
-}
-
-// tsk-1q5: every mutation below used to call `refreshView(dir)` AFTER
-// releasing the state lock (append-then-refresh, per the header comment
-// above, but as two SEPARATE critical sections). Two processes finishing
-// their own correctly-locked appends close together could then race their
-// unlocked `refreshView` calls: whichever one's whole-file `state.json`
-// write happened to land last won, even if its own log read was captured
-// before the other process's append — silently overwriting a fresher view
-// with a staler one (a lost-update on the derived cache, not the log
-// itself). Folding `refreshView` into the SAME held lock as the append
-// closes that window structurally, the same way `withStateTx`'s own doc
-// comment already describes for a precondition read ahead of an append.
-function withStateAndRefresh(dir, fn) {
-  let view;
-  const event = withMainState(dir, (tx) => {
-    const result = fn(tx);
-    view = refreshView(dir, tx);
-    return result;
-  });
-  return { event, view };
-}
-
-/**
- * Create `dir` (e.g. `.fgos/`) if missing, ensure the event log file exists,
- * and (re)write the view from it. Safe to call on an already-initialized
- * dir — idempotent.
- */
+/** Initialize the derived cache through the same bounded installation gate. */
 export function initStore(dir) {
-  const { logPath } = paths(dir);
-  fs.mkdirSync(dir, { recursive: true });
-  if (!fs.existsSync(logPath)) {
-    fs.writeFileSync(logPath, '', 'utf8');
-  }
-  return refreshView(dir);
+  return rebuild(dir);
 }
 
 /**
@@ -284,7 +186,7 @@ export function initStore(dir) {
  */
 export function addWork(dir, work) {
   return withStateAndRefresh(dir, (tx) => {
-    const before = currentView(dir);
+    const before = tx.view;
 
     if (before.work[work?.id]) {
       throw new StoreError('validation', `work "${work.id}" already exists.`);
@@ -369,7 +271,7 @@ export function addWork(dir, work) {
     assertNoUnifiedCycle(item, before.work);
 
     item.writer = resolveWriterIdentity(dir);
-    return tx.append(resolveWriterLogPath(dir), { type: 'work.add', payload: item });
+    return tx.append({ type: 'work.add', payload: item });
   });
 }
 
@@ -448,10 +350,10 @@ function validateWorkPatch(view, dir, id, patch, role, writer) {
 
 export function editWork(dir, { id, patch, role } = {}) {
   return withStateAndRefresh(dir, (tx) => {
-    const before = currentView(dir);
+    const before = tx.view;
     const writer = resolveWriterIdentity(dir);
     const payload = validateWorkPatch(before, dir, id, patch, role, writer);
-    return tx.append(resolveWriterLogPath(dir), { type: 'work.edit', payload });
+    return tx.append({ type: 'work.edit', payload });
   });
 }
 
@@ -461,7 +363,7 @@ export function editWork(dir, { id, patch, role } = {}) {
  */
 export function resolveParkReason(dir, { id, note, role } = {}) {
   return withStateAndRefresh(dir, (tx) => {
-    const before = currentView(dir);
+    const before = tx.view;
     const work = before.work[id];
     if (!work) {
       throw new StoreError('validation', `work "${id}" not found.`);
@@ -484,7 +386,7 @@ export function resolveParkReason(dir, { id, note, role } = {}) {
       payload.role = role;
     }
     payload.writer = resolveWriterIdentity(dir);
-    return tx.append(resolveWriterLogPath(dir), { type: 'work.resolve-park-reason', payload });
+    return tx.append({ type: 'work.resolve-park-reason', payload });
   });
 }
 
@@ -529,7 +431,7 @@ function composeLearning(view, id, closingSettlement) {
  */
 export function setFocus(dir, { id, role } = {}) {
   return withStateAndRefresh(dir, (tx) => {
-    const before = currentView(dir);
+    const before = tx.view;
     const work = before.work[id];
     if (!work) {
       throw new StoreError('validation', `work "${id}" not found.`);
@@ -541,7 +443,7 @@ export function setFocus(dir, { id, role } = {}) {
       );
     }
     const payload = role !== undefined ? { id, role } : { id };
-    return tx.append(resolveWriterLogPath(dir), { type: 'goal.focus', payload });
+    return tx.append({ type: 'goal.focus', payload });
   });
 }
 
@@ -737,7 +639,7 @@ export function moveWork(dir, args = {}) {
 
 function moveWorkOnce(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger, rationale, alternatives, source, askSource, approved, mergedSha, mergedInto } = {}, planSnapshot = null) {
   const result = withStateAndRefresh(dir, (tx) => {
-  const before = currentView(dir);
+  const before = tx.view;
   const work = before.work[id];
   if (!work) {
     throw new StoreError('validation', `work "${id}" not found.`);
@@ -986,7 +888,7 @@ function moveWorkOnce(dir, { id, to, expectedStatus, reason, ask, answer, role, 
       // best-effort — see comment above.
     }
   }
-  return tx.append(resolveWriterLogPath(dir), rawEvent); // captures the real seq; rawEvent itself has none
+  return tx.append(rawEvent); // captures the real seq; rawEvent itself has none
   });
   if (answer) {
     try {
@@ -1108,15 +1010,13 @@ const SIDE_LOG_ONLY_EVENT_TYPES = new Set([
  * `claim.writerId` absent (a claim written before that field existed) is
  * never reconciled either — no positive evidence exists to reconcile
  * against, the same "never a false positive on old data" floor the
- * writer-identity check above already holds to. `readRawEvents` is a
- * plain read (see its own doc comment) — safe to call here, already inside
- * the held state-lock critical section.
+ * writer-identity check above already holds to. This analysis runs before
+ * the gate; its result is bound to the item revision checked inside it.
  */
-function revisionDriftIsSelfCaused(dir, id, claim) {
+function revisionDriftIsSelfCaused(events, id, claim) {
   if (!claim.writerId) return false;
   const acquiredAtMs = new Date(claim.acquiredAt).getTime();
   if (!Number.isFinite(acquiredAtMs)) return false;
-  const events = readRawEvents(dir);
   // Require POSITIVE evidence, never a vacuous pass: a preClaimRevision that
   // was simply wrong to begin with (corrupt data, a fabricated value) has NO
   // events explaining the drift at all -- `.every()` on an empty filtered
@@ -1249,7 +1149,7 @@ export function settleClaim(dir, {
         throw new StoreError('conflict', `settleClaim: writer identity for "${id}" changed while waiting for the write lock.`);
       }
 
-      const before = currentView(dir);
+      const before = tx.view;
       const work = before.work[id];
       if (!work) {
         throw new StoreError('validation', `settleClaim: work "${id}" not found.`);
@@ -1263,7 +1163,7 @@ export function settleClaim(dir, {
       if (freshClaim.preClaimRevision) {
         const curRev = getItemDurableRevision(before, id);
         if (curRev !== freshClaim.preClaimRevision) {
-          if (!revisionDriftIsSelfCaused(dir, id, freshClaim)) {
+          if (!tx.evidence?.allowed || tx.evidence.revision !== curRev) {
             throw new StoreError('conflict', `settleClaim: item "${id}" durable revision changed from "${freshClaim.preClaimRevision}" to "${curRev}".`);
           }
           process.stderr.write(`fgos: settleClaim reconciled a same-writer revision drift for "${id}" (writer "${freshClaim.writerId}") -- preClaimRevision "${freshClaim.preClaimRevision}" -> "${curRev}"\n`);
@@ -1323,11 +1223,10 @@ export function settleClaim(dir, {
         }
       }
 
-      const writerLogPath = resolveWriterLogPath(dir);
 
       if (patch && typeof patch === 'object' && !Array.isArray(patch) && Object.keys(patch).length > 0) {
         const editPayload = validateWorkPatch(before, dir, id, patch, role, writer);
-        tx.append(writerLogPath, { type: 'work.edit', payload: editPayload });
+        tx.append({ type: 'work.edit', payload: editPayload });
       }
 
       // work.attempt: the complete durable record of this attempt —
@@ -1358,7 +1257,7 @@ export function settleClaim(dir, {
       // NO work.move at all, and this marker must still survive somewhere
       // durable for claim-port.mjs's reclaim check to read (tsk-40m).
       if (releaseTrigger !== undefined) attemptPayload.releaseTrigger = releaseTrigger;
-      const attemptEvent = tx.append(writerLogPath, { type: 'work.attempt', payload: attemptPayload });
+      const attemptEvent = tx.append({ type: 'work.attempt', payload: attemptPayload });
 
       // tsk-40m code-review finding (blocker, fixed): return the raw event
       // directly — matching moveWork's own `return tx.append(...)`
@@ -1371,7 +1270,7 @@ export function settleClaim(dir, {
       // for its own CLI output; a same-state settle has no move, so the
       // work.attempt (still a real, seq-bearing event) is the final event
       // instead.
-      const writeResult = move3Raw ? tx.append(writerLogPath, move3Raw) : attemptEvent;
+      const writeResult = move3Raw ? tx.append(move3Raw) : attemptEvent;
 
       // Release the claim right after the durable write succeeds, in the same
       // transaction — never on a failed settle (a conflict thrown above leaves
@@ -1380,7 +1279,10 @@ export function settleClaim(dir, {
       releaseClaimTx(tx, { id, claimId: targetClaimId });
 
       return writeResult;
-    });
+    }, { beforeGate: candidate => ({
+      revision: getItemDurableRevision(candidate.view, id),
+      allowed: revisionDriftIsSelfCaused(candidate.events, id, claim),
+    }) });
 
     if (finalStatus === 'delivered') {
       try {
@@ -1530,7 +1432,7 @@ export function answerAwaiting(dir, { id, answer, expectedStatus, role, rational
 export function moveStep(dir, { id, to, expectedStep, verify, role } = {}) {
   let shouldResolveClarify = false;
   const result = withStateAndRefresh(dir, (tx) => {
-    const before = currentView(dir);
+    const before = tx.view;
     const work = before.work[id];
     if (!work) {
       throw new StoreError('validation', `work "${id}" not found.`);
@@ -1553,7 +1455,7 @@ export function moveStep(dir, { id, to, expectedStep, verify, role } = {}) {
     // moveStep call records who wrote it, never blocking on a malformed
     // identity (D18).
     rawEvent.payload.writer = resolveWriterIdentity(dir);
-    return tx.append(resolveWriterLogPath(dir), rawEvent);
+    return tx.append(rawEvent);
   });
 
   if (shouldResolveClarify) {
@@ -1624,7 +1526,7 @@ function openCallStack(callThreadEntries) {
  */
 export function recordCall(dir, { id, toRole, reason, note, outcome, openSyncDepth = 0 } = {}) {
   return withStateAndRefresh(dir, (tx) => {
-    const before = currentView(dir);
+    const before = tx.view;
     const work = before.work[id];
     if (!work) {
       throw new StoreError('validation', `work "${id}" not found.`);
@@ -1654,7 +1556,7 @@ export function recordCall(dir, { id, toRole, reason, note, outcome, openSyncDep
       ? { type: 'work.handoff', payload: { id, from: fromRole, to: toRole, reason, mode: 'async', note } }
       : { type: 'work.call-summary', payload: { id, calleeRole: toRole, reason, outcome } };
     rawEvent.payload.writer = resolveWriterIdentity(dir);
-    return tx.append(resolveWriterLogPath(dir), rawEvent);
+    return tx.append(rawEvent);
   });
 }
 
@@ -1675,7 +1577,7 @@ export function recordCall(dir, { id, toRole, reason, note, outcome, openSyncDep
  */
 export function recordCallReturn(dir, { id, note } = {}) {
   return withStateAndRefresh(dir, (tx) => {
-    const before = currentView(dir);
+    const before = tx.view;
     const work = before.work[id];
     if (!work) {
       throw new StoreError('validation', `work "${id}" not found.`);
@@ -1690,7 +1592,7 @@ export function recordCallReturn(dir, { id, note } = {}) {
       payload: { id, from: work.holder, to: openCall.from, reason: openCall.reason, mode: 'async', returning: true, note },
     };
     rawEvent.payload.writer = resolveWriterIdentity(dir);
-    return tx.append(resolveWriterLogPath(dir), rawEvent);
+    return tx.append(rawEvent);
   });
 }
 
@@ -1705,7 +1607,7 @@ export function addDiscovery(dir, payload) {
   if (!payload || typeof payload.id !== 'string' || !payload.id.trim()) {
     throw new StoreError('validation', 'discovery requires a non-empty "id".');
   }
-  return withStateAndRefresh(dir, (tx) => tx.append(resolveWriterLogPath(dir), { type: 'work.discovery', payload }));
+  return withStateAndRefresh(dir, (tx) => tx.append({ type: 'work.discovery', payload }));
 }
 
 // Gate approve record shape (tsk-19j D1/D11): the 3 skill-embedded Gates
@@ -1740,7 +1642,7 @@ export function recordGateApprove(dir, { id, gate, actor, verify } = {}) {
     throw new StoreError('validation', 'gate-approve requires a non-empty "verify".');
   }
   return withStateAndRefresh(dir, (tx) =>
-    tx.append(resolveWriterLogPath(dir), { type: 'work.gate-approve', payload: { id, gate, actor, verify } }));
+    tx.append({ type: 'work.gate-approve', payload: { id, gate, actor, verify } }));
 }
 
 /**
@@ -1792,12 +1694,12 @@ export function addDecision(dir, payload) {
     // legitimate, e.g. `fgos decision` with no --id) — only validated when
     // present.
     if (payload.id !== undefined && payload.id !== null) {
-      const before = currentView(dir);
+      const before = tx.view;
       if (!before.work[payload.id]) {
         throw new StoreError('validation', `work "${payload.id}" not found.`);
       }
     }
-    return tx.append(resolveWriterLogPath(dir), { type: 'decision', payload: eventPayload });
+    return tx.append({ type: 'decision', payload: eventPayload });
   });
 }
 
@@ -1903,7 +1805,7 @@ export function addOutcome(dir, payload) {
     throw new StoreError('validation', 'outcome requires a non-empty "id".');
   }
   assertValidDocType(payload);
-  return withStateAndRefresh(dir, (tx) => tx.append(resolveWriterLogPath(dir), { type: 'work.outcome', payload }));
+  return withStateAndRefresh(dir, (tx) => tx.append({ type: 'work.outcome', payload }));
 }
 
 /**
@@ -1930,7 +1832,7 @@ export function recordClaimAttempt(dir, { id, phase, result, claimId, actor, end
     throw new StoreError('validation', 'recordClaimAttempt: "phase" is required.');
   }
   const payload = { id, phase, result, claimId, actor: actor || 'unknown', endedAt: endedAt || new Date().toISOString() };
-  return withStateAndRefresh(dir, (tx) => tx.append(resolveWriterLogPath(dir), { type: 'work.attempt', payload }));
+  return withStateAndRefresh(dir, (tx) => tx.append({ type: 'work.attempt', payload }));
 }
 
 export function currentEffectiveView(dir) {
@@ -2126,8 +2028,7 @@ export function computedSchedule(dir, candidateIds) {
  * from raw events WITHOUT resolving `.fgos/` paths itself — this module
  * stays the one place that maps a dir to its files, and the single write
  * door is untouched (this accessor never appends, never rebuilds the view).
- * Same failure surface as any read here: a missing log reads as `[]`, a
- * corrupt log throws EventLogError('corrupt-log').
+ * Reads through the Event Store full reader outside the Work mutex.
  */
 export function readRawEvents(dir) {
   return readAllEvents(dir);
@@ -2139,20 +2040,30 @@ export function readRawEvents(dir) {
  * zero, and never itself the truth).
  */
 export function rebuild(dir) {
-  return refreshView(dir);
+  let transaction;
+  withMainState(dir, tx => { transaction = tx; }, { rebuild: true });
+  return transaction.view;
+}
+
+/** The consumer registry's existing rebuild port, using prepared authority. */
+export function rebuildFromStore({ cwd, repoRoot, store, maxAttempts, heldRanks = [], globalConfigPath }) {
+  const root = cwd ?? repoRoot;
+  const dir = getMainFgosDir(path.join(root, '.fgos'));
+  const config = readEventStoreConfig(path.dirname(dir), globalConfigPath);
+  if (maxAttempts !== undefined) config.rebuild.maxAttempts = maxAttempts;
+  let transaction;
+  withMainState(dir, tx => { transaction = tx; }, { store, config, heldRanks, rebuild: true });
+  return transaction.view;
 }
 
 /**
  * Append a knowledge event after validating payload and invariants inside lock.
  */
 export function appendKnowledgeEvent(dir, type, payload) {
-  const logPath = resolveWriterLogPath(dir);
   return withStateAndRefresh(dir, (tx) => {
-    const before = currentView(dir);
-    const event = { type, payload, ts: Date.now() };
-    applyKnowledgeEvent(before, event);
-    tx.append(logPath, { type, payload });
-    return event;
+    const before = tx.view;
+    applyKnowledgeEvent(structuredClone(before), { type, payload, ts: new Date().toISOString() });
+    return tx.append({ type, payload });
   });
 }
 

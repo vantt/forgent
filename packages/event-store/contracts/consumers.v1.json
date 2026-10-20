@@ -1,4 +1,11 @@
 {
   "v": 1,
-  "consumers": []
+  "consumers": [
+    {
+      "id": "work",
+      "contractFile": "packages/work-state/contracts/event-streams.v1.json",
+      "cachePath": ".fgos/cache/state.json",
+      "rebuildModule": "src/state/store.mjs"
+    }
+  ]
 }

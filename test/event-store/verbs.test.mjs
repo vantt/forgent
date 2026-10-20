@@ -43,13 +43,17 @@ test('JSONL export writes canonical reader order, cursors and refuses existing o
   assert.equal(fs.readFileSync(path.join(next, 'events.jsonl'), 'utf8'), '');
   assert.throws(() => exportUseCase(f.ctx, { out: path.join(f.temp, 'bad'), format: 'other' }), /format/);
 });
-test('config merges project over global and validates integer boundaries; dormant rebuild has no consumers', async t => {
+test('config merges project over global and validates integer boundaries; the Work consumer rebuilds its cache', async t => {
   const f = fixture(t);
   fs.writeFileSync(f.ctx.globalConfigPath, JSON.stringify({ eventStore: { seal: { intervalSec: 10 }, sync: { intervalSec: 20 }, remote: 'backup' } }));
   fs.writeFileSync(path.join(f.repo, '.fgos/config.json'), JSON.stringify({ eventStore: { seal: { intervalSec: 30 }, remote: 'origin' } }));
   assert.deepEqual(readEventStoreConfig(f.repo, f.ctx.globalConfigPath), { seal: { intervalSec: 30 }, sync: { intervalSec: 20 }, rebuild: { maxAttempts: 5 }, remote: 'origin' });
   for (const eventStore of [{ seal: { intervalSec: 0 } }, { sync: { intervalSec: -1 } }, { rebuild: { maxAttempts: 1.5 } }, { remote: '../bad' }]) assert.throws(() => eventStoreConfig({ eventStore }), /event-store-config/);
-  assert.deepEqual(await rebuildStoreUseCase(f.ctx), { rebuilt: [] });
+  assert.deepEqual(await rebuildStoreUseCase(f.ctx), { rebuilt: [{ consumer: 'work', result: { work: {}, decisions: [] } }] });
+  const cache = JSON.parse(fs.readFileSync(path.join(f.repo, '.fgos/cache/state.json')));
+  assert.deepEqual(cache.work, {});
+  assert.equal(typeof cache.revision, 'string');
+  assert.equal('snapshot' in cache, false);
 });
 
 test('status identifies deferred predecessors explicitly and exports no deferred event', t => {

@@ -10,7 +10,7 @@ import crypto from 'node:crypto';
 import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
 import { resolveMainCheckoutRoot, fgosDirFromRoot } from '../runner/paths.mjs';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
-import { withStateTx } from './hot-lock.mjs';
+import { withWorkState } from './work-event-store.mjs';
 import { hotLockDepth } from '../holder-lock/hot-guard.mjs';
 
 const mainFgosDirCache = new Map();
@@ -42,12 +42,11 @@ export function getMainFgosDir(dir) {
  * `dirInput` is the `.fgos` the caller operates on; the transaction may write
  * there too when it is not the main one.
  */
-export function withMainState(dirInput, fn) {
+export function withMainState(dirInput, fn, options) {
   const mainFgosDir = getMainFgosDir(dirInput);
   const writer = resolveWriterIdentity(dirInput).id;
   if (mainFgosDir !== dirInput) resolveWriterIdentity(mainFgosDir);
-  const extraRoots = path.resolve(mainFgosDir) === path.resolve(dirInput) ? [] : [dirInput];
-  return withStateTx(mainFgosDir, fn, { prefetched: { mainFgosDir, writer, extraRoots } });
+  return withWorkState(dirInput, mainFgosDir, writer, fn, options);
 }
 
 export class ClaimError extends Error {

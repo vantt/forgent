@@ -85,6 +85,18 @@ impl EventStore {
             json!({"ack": result.ack, "events": result.events, "guarantee": guarantee(&result.guarantee)}),
         )
     }
+    #[napi(getter)]
+    pub fn own_origin(&self) -> Result<String> {
+        available()?;
+        match std::fs::symlink_metadata(self.layout.store()) {
+            Ok(_) => Ok(StoreIdentity::open(&self.layout, &self.machine)
+                .map_err(error)?
+                .store_id),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(String::new()),
+            Err(e) => Err(error(e)),
+        }
+    }
+
     #[napi]
     pub fn read_in_gate(&self, origin: String, stream: String, cursor_seq: f64) -> Result<Value> {
         available()?;
@@ -205,7 +217,13 @@ impl EventStore {
 #[napi]
 impl EventStore {
     #[napi]
-    pub fn seal(&self, stream: String, held_ranks: Vec<u32>, hot_lock_depth: u32) -> Result<Value> {
+    pub fn seal(
+        &self,
+        stream: String,
+        held_ranks: Vec<u32>,
+        hot_lock_depth: u32,
+        opportunistic: Option<bool>,
+    ) -> Result<Value> {
         let (driver, repo, machine) = self.context(&held_ranks, hot_lock_depth)?;
         let stream = StreamId::parse(&stream).map_err(error)?;
         Ok(sealed(
@@ -218,7 +236,7 @@ impl EventStore {
                     stream: &stream,
                     held_ranks: &held_ranks,
                     hot_lock_depth,
-                    opportunistic: false,
+                    opportunistic: opportunistic.unwrap_or(false),
                 },
             )
             .map_err(error)?,
@@ -527,7 +545,8 @@ impl EventStore {
         if check {
             fgos_event_store::legacy_import::ensure_clean(driver, repo, &inv).map_err(error)?;
         }
-        let (data_tree, legacy_oid) = fgos_event_store::legacy_import::import_identity(driver, repo, &inv).map_err(error)?;
+        let (data_tree, legacy_oid) =
+            fgos_event_store::legacy_import::import_identity(driver, repo, &inv).map_err(error)?;
         let existing_legacy = match driver
             .resolve_ref(
                 repo,

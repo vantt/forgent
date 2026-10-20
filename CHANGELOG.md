@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Work mutations use one acknowledged Event Store batch per state gate, stage claim/file effects until acknowledgement, and cache the folded view with its coverage cursor. Returned `seq` is now per store and stream; event identity includes `origin` and the full hash. Work store access requires Linux and a Git repository.
+
 - Git typed commit and recovery reads ignore user signature/display settings; suite subprocess census no longer requires strace.
 
 - Git typed operations batch storage and commit-header reads, reuse operation-local checkout facts and index evidence, and expose paired per-phase Git/holder-lock census diagnostics.

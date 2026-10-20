@@ -237,7 +237,7 @@ export async function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoo
   // claim write are one `state` transaction: no other durable write or claim
   // can land between the read and the claim file being written.
   const runtimeClaim = withMainState(dir, (tx) => {
-    const freshDurableView = foldEvents(readRawEvents(dir));
+    const freshDurableView = tx.view;
     const freshStatus = freshDurableView.work[id]?.status;
     if (freshStatus !== expectedStatus) {
       throw new ClaimError(
