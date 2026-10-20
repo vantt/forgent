@@ -4,6 +4,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { computeArtifactDigest, hashFile, nativeAddonLibraryName, nativeAddonComponent } from './build-rust-distribution.mjs';
+import { processesInside } from '../src/runner/dispatch/stop-processes-inside.mjs';
 
 const checkoutRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -36,6 +37,34 @@ function atomicWrite(destination, writeTemporary) {
     if (created) fs.rmSync(temporary, { force: true });
   }
 }
+// A staged run directory left behind is pruned only once it is this old, so a run still being staged
+// by a concurrent invocation (no process runs from it yet) is never taken from under it.
+export const STALE_RUN_DIR_MS = 10 * 60 * 1000;
+
+/**
+ * Remove one invocation's staged host, unless a process still runs from it: a detached run supervisor
+ * (or its gate) started by the host keeps executing it, and its attempt steps run it again by path.
+ * @returns {boolean} whether the directory was removed
+ */
+export function releaseRunDir(runtimeDir) {
+  if (processesInside(runtimeDir).length > 0) return false;
+  fs.rmSync(runtimeDir, { recursive: true, force: true });
+  return true;
+}
+
+/** Remove the staged run directories that were kept for a process which has since ended. */
+export function pruneRunDirs(runtimeBase, { now = Date.now(), staleMs = STALE_RUN_DIR_MS } = {}) {
+  let names;
+  try { names = fs.readdirSync(runtimeBase); } catch { return; }
+  for (const name of names.filter((n) => n.startsWith('run-'))) {
+    const dir = path.join(runtimeBase, name);
+    let stat;
+    try { stat = fs.lstatSync(dir); } catch { continue; }
+    if (!stat.isDirectory() || now - stat.mtimeMs < staleMs) continue;
+    releaseRunDir(dir);
+  }
+}
+
 function forwardResult(result, description) {
   if (result.error) {
     throw new Error(`${description}: ${result.error.message}`);
@@ -64,6 +93,7 @@ function main() {
   assertLocalPath('bin/fgos.mjs');
   const runtimeBase = path.join(checkoutRoot, runtimeBaseRelative);
   fs.mkdirSync(runtimeBase, { recursive: true });
+  pruneRunDirs(runtimeBase);
   const runtimeDir = fs.mkdtempSync(path.join(runtimeBase, 'run-'));
   let child;
   const binaryRelative = `${runtimeBaseRelative}/${path.basename(runtimeDir)}/${binaryName}`;
@@ -123,8 +153,9 @@ function main() {
       },
     });
   } finally {
-    // Remove only this invocation's artifacts, never another run or user file.
-    fs.rmSync(runtimeDir, { recursive: true, force: true });
+    // Remove only this invocation's artifacts, never another run or user file, and not while a
+    // process it started still runs from them; a later invocation prunes them once it has ended.
+    releaseRunDir(runtimeDir);
   }
   // In particular, forward a child signal only after cleaning its run directory.
   return forwardResult(child, `Failed to execute ${fgosBin}`);

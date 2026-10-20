@@ -881,12 +881,18 @@
                 "models-store.json",
                 "settings.json",
                 "trust.json",
-                "bin/fd"
+                "bin/fd",
+                "models.json"
               ]
             }
           }
         ],
-        "providerModel": "z-ai"
+        "providerModel": "z-ai",
+        "supports": {
+          "skills": [
+            "ak:cook"
+          ]
+        }
       },
       "gitnexus": {
         "kind": "tool",
@@ -1011,7 +1017,12 @@
               ]
             }
           }
-        ]
+        ],
+        "supports": {
+          "skills": [
+            "ak:cook"
+          ]
+        }
       },
       "gemini": {
         "kind": "agent",
@@ -1085,7 +1096,12 @@
               ]
             }
           }
-        ]
+        ],
+        "supports": {
+          "skills": [
+            "ak:cook"
+          ]
+        }
       },
       "xai": {
         "kind": "agent",
@@ -1161,7 +1177,12 @@
               ]
             }
           }
-        ]
+        ],
+        "supports": {
+          "skills": [
+            "ak:cook"
+          ]
+        }
       },
       "deepseek": {
         "kind": "agent",
@@ -1198,7 +1219,8 @@
                 "models-store.json",
                 "settings.json",
                 "trust.json",
-                "bin/fd"
+                "bin/fd",
+                "models.json"
               ]
             }
           },
@@ -1231,11 +1253,17 @@
                 "models-store.json",
                 "settings.json",
                 "trust.json",
-                "bin/fd"
+                "bin/fd",
+                "models.json"
               ]
             }
           }
-        ]
+        ],
+        "supports": {
+          "skills": [
+            "ak:cook"
+          ]
+        }
       }
     },
     "timeoutMs": 2100000,
@@ -1266,8 +1294,14 @@
         "frontier": "gpt-6-astra"
       },
       "z-ai": {
-        "nano": "z-ai/glm-5.3-flash@openrouter",
-        "standard": "z-ai/glm-5.3-flash@openrouter",
+        "nano": [
+          "thehive/zai-org/glm-5.3-flash@thehive",
+          "z-ai/glm-5.3-flash@openrouter"
+        ],
+        "standard": [
+          "thehive/zai-org/glm-5.3-flash@thehive",
+          "z-ai/glm-5.3-flash@openrouter"
+        ],
         "advanced": "z-ai/glm-5.3@openrouter",
         "flagship": "z-ai/glm-5.3@openrouter",
         "frontier": "z-ai/glm-5.3@openrouter"
@@ -1280,8 +1314,14 @@
         "frontier": "grok-4.6"
       },
       "deepseek": {
-        "nano": "deepseek/deepseek-v4.1-flash@openrouter",
-        "standard": "deepseek/deepseek-v4.1-flash@openrouter",
+        "nano": [
+          "thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive",
+          "deepseek/deepseek-v4.1-flash@openrouter"
+        ],
+        "standard": [
+          "thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive",
+          "deepseek/deepseek-v4.1-flash@openrouter"
+        ],
         "advanced": "deepseek/deepseek-v4-pro@openrouter",
         "flagship": "deepseek/deepseek-v4-pro@openrouter",
         "frontier": "deepseek/deepseek-v4-pro@openrouter"

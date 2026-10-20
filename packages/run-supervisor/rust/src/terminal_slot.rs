@@ -83,16 +83,27 @@ pub fn now_ms() -> u64 {
     SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_millis() as u64).unwrap_or(0)
 }
 
-/// What the `release-slot` step does for an attempt: close the pane when the
-/// attempt ended cleanly and every earlier step has its receipt, keep it for a
-/// person otherwise.
-pub fn disposition_for(receipt: Option<&Value>, earlier_steps_done: bool) -> Disposition {
-    let clean = receipt.is_some_and(|r| r["outcome"] == "exited" && r["outboxPresent"] == true && r.get("reason").is_none_or(Value::is_null));
-    if clean && earlier_steps_done {
-        Disposition::Close
-    } else {
-        Disposition::Retain
-    }
+/// Close for a recognized gate exit with both captured streams; the step runner asks only once every
+/// settlement step has its receipt. Missing facts or a lost gate/carrier retain the live diagnostics.
+pub fn disposition_for(receipt: Option<&Value>) -> Disposition {
+    let captured_exit = receipt.is_some_and(|r| {
+        let exit = &r["gateExit"];
+        let ended = match r["outcome"].as_str() {
+            Some("exited") => exit["stoppedBy"] == "agent"
+                || (exit["stoppedBy"] == "orphan" && exit["cause"] == "orphan-result" && r["outboxPresent"] == true),
+            Some("cancelled") => exit["stoppedBy"] == "cancel",
+            Some("timeout") => matches!(exit["stoppedBy"].as_str(), Some("soft-deadline" | "idle" | "hard-ceiling")),
+            Some("output-limit") => exit["stoppedBy"] == "output-limit",
+            _ => false,
+        };
+        let captured = ["stdout", "stderr"].iter().all(|stream| {
+            r["captureDigests"][stream].as_str().is_some_and(|digest| {
+                digest.strip_prefix("sha256:").is_some_and(|hex| hex.len() == 64 && hex.bytes().all(|b| b.is_ascii_hexdigit()))
+            })
+        });
+        ended && captured
+    });
+    if captured_exit { Disposition::Close } else { Disposition::Retain }
 }
 
 /// Why `release-slot` has no receipt.
@@ -130,15 +141,8 @@ mod tests {
     }
 
     #[test]
-    fn only_a_clean_exit_with_every_step_done_closes_the_pane() {
-        let clean = json!({"outcome": "exited", "outboxPresent": true});
-        assert_eq!(disposition_for(Some(&clean), true), Disposition::Close);
-        assert_eq!(disposition_for(Some(&clean), false), Disposition::Retain);
-        assert_eq!(disposition_for(None, true), Disposition::Retain);
-        for outcome in ["timeout", "cancelled", "gate-lost", "carrier-lost", "abandoned-not-started", "abandoned-before-brief"] {
-            assert_eq!(disposition_for(Some(&json!({"outcome": outcome, "outboxPresent": true})), true), Disposition::Retain, "{outcome}");
-        }
-        assert_eq!(disposition_for(Some(&json!({"outcome": "exited", "outboxPresent": false})), true), Disposition::Retain);
-        assert_eq!(disposition_for(Some(&json!({"outcome": "exited", "outboxPresent": true, "reason": "terminal:needs-human"})), true), Disposition::Retain);
+    fn missing_receipt_or_missing_facts_retain() {
+        assert_eq!(disposition_for(None), Disposition::Retain);
+        assert_eq!(disposition_for(Some(&json!({"outcome": "exited", "outboxPresent": true}))), Disposition::Retain);
     }
 }
