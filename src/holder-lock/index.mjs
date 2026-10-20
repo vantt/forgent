@@ -80,7 +80,7 @@ export class LockHandle {
     this.scope = scope;
     this.projectRoot = projectRoot;
     this.killWaitMs = killWaitMs;
-    descriptions.set(this, { fd: claim.fd ?? null, hold: claim.hold ?? null, borrows: 0, released: false });
+    descriptions.set(this, { fd: claim.fd ?? null, hold: claim.hold ?? null, borrows: 0, borrowRoots: new Set(), sweeps: 0, released: false, reachFloorTicks: claim.reachFloorTicks ?? null });
     Object.freeze(this);
   }
 
@@ -175,8 +175,8 @@ function prepareAcquire(scope, name, params) {
   const killWaitMs = readPredecessorKillWaitMs({ projectRoot });
   const bin = hostBin({ fgosDir: params.fgosDir });
   ensureLockFile(lock);
-  assertDriverUsable(lock.v3Path, { fgosDir: params.fgosDir });
-  return { lock, bin, projectRoot, killWaitMs, predecessorKinds: params.predecessorKinds, env: routeEnv() };
+  const { reachFloorTicks } = assertDriverUsable(lock.v3Path, { fgosDir: params.fgosDir });
+  return { lock, bin, projectRoot, killWaitMs, reachFloorTicks, predecessorKinds: params.predecessorKinds, env: routeEnv() };
 }
 
 /** The lock file exists (created once, never removed while the resource
@@ -198,7 +198,7 @@ function routeTimeoutMs(wait, killWaitMs) {
 /** `claim` is what the lock lives in: `{ fd }` or `{ hold }`. */
 function makeHandle(prepared, scope, claim) {
   const { lock, projectRoot, killWaitMs } = prepared;
-  const handle = new LockHandle({ name: lock.name, path: lock.v3Path, rank: lock.rank, kind: lock.kind, scope, projectRoot, killWaitMs, claim }, handleAuthority);
+  const handle = new LockHandle({ name: lock.name, path: lock.v3Path, rank: lock.rank, kind: lock.kind, scope, projectRoot, killWaitMs, claim: { ...claim, reachFloorTicks: prepared.reachFloorTicks } }, handleAuthority);
   scope.track(handle);
   return handle;
 }
@@ -431,7 +431,7 @@ function sweepAnswer(handle, answer) {
 function sweepRequest(handle, childPid) {
   return {
     bin: hostBin({ fgosDir: handle.projectRoot && path.join(handle.projectRoot, '.fgos') }),
-    args: ['--drain-child', String(childPid), '--kill-wait-ms', String(handle.killWaitMs)],
+    args: ['--drain-child', String(childPid), '--kill-wait-ms', String(handle.killWaitMs), '--protected-roots', [...descriptionOf(handle).borrowRoots].filter(pid => pid !== childPid).join(',') || '-', '--reach-floor-ticks', String(descriptionOf(handle).reachFloorTicks ?? '-')],
     fd: descriptionOf(handle).fd,
     timeoutMs: handle.killWaitMs + ROUTE_SLACK_MS,
   };
@@ -442,7 +442,10 @@ function sweepLeftoversSync(handle, childPid) {
 }
 async function sweepLeftovers(handle, childPid) {
   if (leftoverSweep() !== 'holders') return sweepProcessGroup(childPid);
-  return sweepAnswer(handle, await runLockRoute(sweepRequest(handle, childPid)));
+  const entry = descriptionOf(handle);
+  entry.sweeps += 1;
+  try { return sweepAnswer(handle, await runLockRoute(sweepRequest(handle, childPid))); }
+  finally { entry.sweeps -= 1; }
 }
 
 function sweepProcessGroup(childPid) {
@@ -538,6 +541,8 @@ export function runBorrowed(handle, spec, { sync = true } = {}) {
   const stdio = [spec.stdin ?? 'ignore', 'pipe', 'pipe', entry.fd];
   // The group sweep needs the child to lead a process group; a caller that
   // signals the child's group itself asks for one everywhere.
+  // A drain's protected-root snapshot must not miss a newly spawned sibling.
+  if (entry.sweeps > 0) throw new HolderLockError('borrow-drain-in-progress', `${handle.name}: borrow drain in progress`, { lock: handle.name, retryable: true });
   const detached = borrowLeadsGroup(spec);
 
   if (sync) {
@@ -564,10 +569,12 @@ export function runBorrowed(handle, spec, { sync = true } = {}) {
 
   const child = spawn(spec.command, argv, { cwd: spec.cwd, env: childEnv, stdio, detached, windowsHide: true });
   entry.borrows += 1;
+  if (child.pid) entry.borrowRoots.add(child.pid);
   let settled = false;
   const finish = () => {
     if (settled) return false;
     settled = true;
+    entry.borrowRoots.delete(child.pid);
     entry.borrows -= 1;
     return true;
   };
@@ -577,6 +584,7 @@ export function runBorrowed(handle, spec, { sync = true } = {}) {
       reject(new HolderLockError('borrow-spawn-failed', `${handle.name}: cannot run ${spec.command}: ${err.message}`, { lock: handle.name, cause: err.code ?? null }));
     });
     child.once('exit', (exit, signal) => {
+      entry.borrowRoots.delete(child.pid);
       sweepLeftovers(handle, child.pid).then((sweep) => {
         if (!finish()) return;
         if (sweep.remaining.length > 0) reject(leftoverError(handle, sweep.remaining, { exit, signal }));
@@ -610,6 +618,7 @@ export function spawnWithLocks(handles, spec) {
   const fds = handles.map((handle) => {
     const entry = descriptionOf(handle);
     if (entry.released) throw new HolderLockError('lock-handle-released', `${handle.name}: cannot hand over a released lock`, { lock: handle.name });
+    if (entry.sweeps > 0) throw new HolderLockError('borrow-drain-in-progress', `${handle.name}: borrow drain in progress`, { lock: handle.name, retryable: true });
     if (entry.fd === null) throw new HolderLockError('lock-transport-hold', `${handle.name}: this platform keeps the lock in a helper; the child must take it itself`, { lock: handle.name });
     return entry.fd;
   });
@@ -687,6 +696,7 @@ export function registerNativeHandover(mint, dispose) {
     const entries = handles.map(handle => {
       const entry = descriptionOf(handle);
       if (entry.released) throw new HolderLockError('lock-handle-released', 'cannot hand over a released lock', {});
+      if (entry.sweeps > 0) throw new HolderLockError('borrow-drain-in-progress', `${handle.name}: borrow drain in progress`, { lock: handle.name, retryable: true });
       if (entry.fd === null) throw new HolderLockError('git-lock-handover-unsupported', 'description unavailable', {});
       return entry;
     });
@@ -695,7 +705,7 @@ export function registerNativeHandover(mint, dispose) {
     try {
       for (let i = 0; i < handles.length; i += 1) {
         const handle = handles[i];
-        loans.push(mint(entries[i].fd, handle.name, handle.path, handle.killWaitMs));
+        loans.push(mint(entries[i].fd, handle.name, handle.path, handle.killWaitMs, entries[i].reachFloorTicks, [...entries[i].borrowRoots]));
       }
       // Native calls are synchronous; Externals are consumed once and closed
       // before this guard ends, including marshaling/validation failures.

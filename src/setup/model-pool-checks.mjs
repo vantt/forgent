@@ -7,7 +7,7 @@
 import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
 import { deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { parseTierCell, isExtendedTierCell } from '../runner/dispatch/tier-cell.mjs';
-import { readLlmAccounts, compareWithLegacyInventory } from '../runner/dispatch/llm-accounts.mjs';
+import { readLlmAccounts, compareWithLegacyInventory, deriveLegacyInventory } from '../runner/dispatch/llm-accounts.mjs';
 import { readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
 import { resolveTierCeiling } from '../runner/execution/bind.mjs';
 import { resolveTierModel } from '../runner/dispatch/resolve.mjs';
@@ -41,6 +41,30 @@ export function checkExecutorFamilyUnique(cwd) {
   return { passed: true, message: `each of ${byFamily.size} agent families has one executor` };
 }
 
+/**
+ * A family a tier's fallback list names but that has no cell at that tier, or no agent executor, is
+ * skipped by the walk and recorded. Warns, never fails: the list still works for the families that serve it.
+ */
+export function checkTierFallback(cwd) {
+  const { runnerConfig, skip } = loadOrExplain(cwd);
+  if (skip) return skip;
+  const declared = Object.entries(runnerConfig.tierFallback ?? {});
+  if (declared.length === 0) return { passed: true, message: 'runner.tierFallback not declared; every tier walks its capability prefer order after a failure' };
+  const served = new Set();
+  for (const entry of Object.values(runnerConfig.executors ?? {})) {
+    if (entry?.kind === 'agent') served.add(deriveProviderFamily(entry));
+  }
+  const problems = [];
+  for (const [tier, families] of declared) {
+    for (const family of families) {
+      if (runnerConfig.modelPolicies?.[family]?.[tier] === undefined) problems.push(`${tier}: ${family} has no modelPolicies cell at ${tier}`);
+      else if (!served.has(family)) problems.push(`${tier}: no agent executor serves ${family}`);
+    }
+  }
+  if (problems.length > 0) return { passed: true, message: `warning: tier fallback entries the walk skips: ${problems.join('; ')}` };
+  return { passed: true, message: `runner.tierFallback declares the walk order of ${declared.length} tier(s): ${declared.map(([tier]) => tier).join(', ')}` };
+}
+
 /** A tier cell entry served by a pool runner.llmAccounts does not declare cannot run once pools route. */
 export function checkModelPolicyPools(cwd) {
   const { runnerConfig, skip } = loadOrExplain(cwd);
@@ -59,7 +83,7 @@ export function checkModelPolicyPools(cwd) {
   if (missing.length > 0) {
     return {
       passed: true,
-      message: `warning: tier cells name pools runner.llmAccounts does not declare: ${missing.map((e) => `${e.cell}@${e.pool}`).join(', ')}; these entries cannot run until the pool has accounts`,
+      message: `warning: tier cells name pools runner.llmAccounts does not declare: ${missing.map((e) => `${e.cell}@${e.pool}`).join(', ')}; the walk skips these entries until the pool has an enabled account holding a login store for the CLI of the invocation (fgos dispatch explain shows each)`,
     };
   }
   return { passed: true, message: `${explicit.length} tier cell entries name a pool declared in runner.llmAccounts` };
@@ -74,11 +98,18 @@ export function checkLlmAccountsShape(cwd) {
     return { passed: false, message: problems.map((p) => `${p.at}: ${p.detail}`).join('; ') };
   }
   if (runnerConfig.llmAccounts === undefined) return { passed: true, message: 'runner.llmAccounts not declared; accounts come from runner.providers' };
+  const { unusable } = deriveLegacyInventory(runnerConfig);
+  if (unusable.length > 0) {
+    return { passed: true, message: `warning: login stores no invocation declares files for, so those accounts cannot run on that CLI: ${unusable.map((u) => `${u.pool}/${u.account} (${u.cli})`).join(', ')}` };
+  }
   const count = Object.values(pools).reduce((n, p) => n + Object.keys(p.accounts).length, 0);
   return { passed: true, message: `runner.llmAccounts declares ${count} accounts in ${Object.keys(pools).length} pools` };
 }
 
-/** While the lease reads runner.providers, an account declared on one side only is a surprise later. */
+/**
+ * The lease reads a pool from runner.llmAccounts when it declares it and from runner.providers
+ * otherwise (the transition read), so an account declared on one side only is a surprise later.
+ */
 export function checkLlmAccountsVsLegacy(cwd) {
   const { runnerConfig, skip } = loadOrExplain(cwd);
   if (skip) return skip;
@@ -88,7 +119,7 @@ export function checkLlmAccountsVsLegacy(cwd) {
   if (onlyLegacy.length > 0) parts.push(`only in runner.providers: ${onlyLegacy.map((a) => `${a.pool}/${a.account}`).join(', ')}`);
   if (onlyNew.length > 0) parts.push(`only in runner.llmAccounts: ${onlyNew.map((a) => `${a.pool}/${a.account}`).join(', ')}`);
   if (storeMismatch.length > 0) parts.push(`different login directories: ${storeMismatch.map((a) => `${a.pool}/${a.account}`).join(', ')}`);
-  if (parts.length > 0) return { passed: true, message: `warning: the lease still reads runner.providers; ${parts.join('; ')}` };
+  if (parts.length > 0) return { passed: true, message: `warning: the lease reads runner.llmAccounts for a pool it declares and runner.providers for the rest; ${parts.join('; ')}` };
   return { passed: true, message: 'runner.llmAccounts matches runner.providers' };
 }
 

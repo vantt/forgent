@@ -17,7 +17,7 @@ import { renderReasoningEffortArgs, checkLaunchedModel, collectModelWarnings } f
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { bind } from '../../src/runner/execution/bind.mjs';
-import { runUnit } from '../../src/runner/execution/run.mjs';
+import { runUnitWithPort as runUnit } from '../helpers/run-unit-with-port.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 
@@ -342,7 +342,7 @@ test('fgos run --effort still reaches a role that a scoped --override does not n
   const runner = {
     rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     modelPolicies: { claude: { standard: 'sonnet' } },
-    executors: { claude: { kind: 'agent', supports: { reasoningEffort: ['low', 'medium', 'high'] }, invocations: [{ id: 'c', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: 'fgos-test-no-such-cli', args: ['-p', '{prompt}'] }] } },
+    executors: { claude: { kind: 'agent', providerModel: 'claude', supports: { reasoningEffort: ['low', 'medium', 'high'] }, invocations: [{ id: 'c', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: 'fgos-test-no-such-cli', args: ['-p', '{prompt}'] }] } },
     capabilities: { 'docs:write': { prefer: [{ executor: 'claude' }], rigor: 'standard' } },
   };
   fs.mkdirSync(path.join(repo, '.fgos'));

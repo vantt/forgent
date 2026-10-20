@@ -87,7 +87,7 @@
       "fence": "tombstone",
       "fenceNote": "every run that exists at cutover; not placed lazily",
       "owner": "4.2",
-      "note": "v1 source: src/verbs/dispatch/recover.mjs withRunLock"
+      "note": "Dispatch recovery uses its runDir; Git recovery reuses this entry with runDir=<common>/fgos/git. v1 source: src/verbs/dispatch/recover.mjs withRunLock"
     },
     {
       "name": "full-suite",

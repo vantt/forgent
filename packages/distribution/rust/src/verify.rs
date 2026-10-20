@@ -181,8 +181,28 @@ pub fn verify_release_files(
     Ok(())
 }
 
+/// Phase-05 activation admission, independent of the installed target OS.
+pub fn require_git_addon(manifest: &ReleaseManifest) -> Result<(), VerificationError> {
+    if manifest.target.os == "linux"
+        && matches!(manifest.target.arch.as_str(), "x64" | "x86_64")
+        && manifest
+            .components
+            .native_addon
+            .as_ref()
+            .is_none_or(|a| !a.capabilities.iter().any(|c| c == "git-wal-v1"))
+    {
+        return Err(VerificationError::Canonical(
+            CanonicalError::MalformedSegment(
+                "git-addon-missing: linux-x64 requires components.nativeAddon with git-wal-v1"
+                    .into(),
+            ),
+        ));
+    }
+    Ok(())
+}
+
 /// Verifies a present native addon through the existing canonical file verifier.
-/// The component stays optional until Git phase 05 (M10).
+/// Windows remains optional until the phase-07 switch.
 pub fn verify_native_addon(
     release_root: &Path,
     manifest: &ReleaseManifest,

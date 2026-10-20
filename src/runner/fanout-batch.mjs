@@ -7,6 +7,7 @@ import { listWork } from '../state/store.mjs';
 import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
 import { compileDispatchPlan } from './dispatch/plan.mjs';
 import { runUnit } from './execution/run.mjs';
+import { createCaseAdmissionPort } from '../workflow/case-admission-port.mjs';
 import { workDispatchHint, workUnitFor } from './work-dispatch.mjs';
 import fs from 'node:fs';
 import { resolveFgosBin } from '../setup/bin-discovery.mjs';
@@ -114,6 +115,7 @@ export async function fanoutBatchExecutorCli(
           worktree: wtPath,
           cwd: wtPath,
           repoRoot: root,
+          caseAdmission: createCaseAdmissionPort({ repoRoot: root }),
           session: { headless: true, herdrPresent: false },
           onUnitRunCreated: (id) => { unitRunId = id; },
         });

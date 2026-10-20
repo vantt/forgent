@@ -116,3 +116,14 @@ test('sync warns for real unpublished project events', t => {
   append(f.store, [{}]);
   assert.match(checkEventStore(f.repo, 'event-store-sync', f.ctx).message, /^warning:/);
 });
+
+test('doctor warns about a tracked porting log outside consumer roots', t => {
+  const f = fixture(t);
+  const name = 'custom/intake/porting/events.jsonl';
+  fs.mkdirSync(path.dirname(path.join(f.repo, name)), { recursive: true });
+  fs.writeFileSync(path.join(f.repo, name), '{}\n');
+  f.git('add', name); f.git('commit', '-qm', 'nonstandard legacy porting log');
+  const result = checkEventStore(f.repo, 'event-store-legacy-layout', f.ctx);
+  assert.equal(result.passed, true);
+  assert.match(result.message, /warning:.*fgos events migrate/);
+});

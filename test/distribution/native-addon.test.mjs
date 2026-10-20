@@ -11,6 +11,11 @@ import {ensureGitAddon, root} from '../helpers/git-addon.mjs';
 import {buildRustDistribution, nativeAddonLibraryName, nativeAddonComponent, computeArtifactDigest, gitCapabilitiesForHost} from '../../scripts/build-rust-distribution.mjs';
 const built = ensureGitAddon();
 
+test('test addon descriptor uses the release capability producer', () => {
+  const manifest = JSON.parse(fs.readFileSync(built.manifest));
+  assert.deepEqual(manifest.components.nativeAddon.capabilities, gitCapabilitiesForHost());
+});
+
 test('release staging carries a real combined addon resolved from its release manifest', () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-release-addon-'));
   const oldTarget = process.env.CARGO_TARGET_DIR;
@@ -33,6 +38,7 @@ test('release staging carries a real combined addon resolved from its release ma
     const manifest = JSON.parse(fs.readFileSync(result.manifestPath));
     const addon = manifest.components.nativeAddon;
     assert.equal(addon.napiVersion, 8);
+    assert.deepEqual(addon.capabilities, gitCapabilitiesForHost());
     assert.equal(addon.target, `${process.platform}-${process.arch}`);
     assert.equal(Object.keys(addon.crateChecksums).length, 3);
     assert.deepEqual(manifest.capabilities, gitCapabilitiesForHost());
@@ -118,6 +124,7 @@ fs.copyFileSync(process.env.DEV_ADDON_BYTES,path.join(output,${JSON.stringify(na
     const result = JSON.parse(output);
     assert.equal(result.versions.napi, 8);
     assert.equal(result.component.napiVersion, 8);
+    assert.deepEqual(result.component.capabilities, gitCapabilitiesForHost());
     assert.equal(result.files.find(f => f.path === result.component.path).digest, `sha256:${result.component.digest}`);
     assert.deepEqual(fs.readdirSync(path.join(repo, '.fgos/runtime/dev-host')), []);
   } finally { fs.rmSync(temp, {recursive: true, force: true}); }

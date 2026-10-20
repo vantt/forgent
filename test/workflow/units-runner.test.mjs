@@ -112,6 +112,7 @@ function useTwoFamilies(tmp) {
       kind: 'agent', allowCrossProvider: true, command, args, providerModel: name,
       invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args }],
     };
+    cfg.runner.modelPolicies[name] = { nano: `${name}-nano`, standard: `${name}-std`, advanced: `${name}-adv`, flagship: `${name}-flagship`, frontier: `${name}-frontier` };
   }
   cfg.runner.defaultExecutor = 'alpha';
   cfg.runner.capabilities['docs:write'].prefer = [{ executor: 'alpha' }, { executor: 'beta' }];
@@ -474,20 +475,20 @@ test('--account pins provider account on every unit of the workflow run, kept fo
         { id: 's', dependsOn: ['gate'], units: [{ id: 'u', template: { capability: 'docs:write', objective: 'Read' } }] },
       ],
     });
-    const state = await startWorkflow({ workflow, account: 'acct-test', ...opts(tmp) });
+    const state = await startWorkflow({ workflow, account: 'node/acct-test', ...opts(tmp) });
     assert.equal(state.status, 'parked');
-    assert.equal(state.account, 'acct-test');
-    assert.equal(readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId })[0].payload.account, 'acct-test');
+    assert.equal(state.account, 'node/acct-test');
+    assert.equal(readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId })[0].payload.account, 'node/acct-test');
 
     const { answerWorkflow } = await import('../../src/workflow/index.mjs');
     const answered = await answerWorkflow(state.workflowRunId, { stepId: 'gate', answer: 'yes', approved: true, ...opts(tmp) });
     assert.equal(answered.status, 'completed', JSON.stringify(answered.steps));
-    assert.equal(answered.account, 'acct-test');
+    assert.equal(answered.account, 'node/acct-test');
 
     const unitRunId = answered.steps.s.units.u.unitRunId;
     const binding = producerAssignment(tmp, unitRunId).binding;
-    assert.deepEqual(binding.account, { provider: 'node', id: 'acct-test' });
-    assert.deepEqual(binding.provenance.account, { value: 'acct-test', source: 'override:human-cli' });
+    assert.deepEqual(binding.account, { pool: 'node', id: 'acct-test' });
+    assert.deepEqual(binding.provenance.account, { value: 'node/acct-test', source: 'override:human-cli' });
   } finally {
     if (prevHome === undefined) delete process.env.HOME;
     else process.env.HOME = prevHome;
@@ -507,7 +508,10 @@ test('workflow start with invalid --timeout or --account is refused before run e
   await assert.rejects(() => startWorkflow({ workflow, account: '', ...opts(tmp) }), /account/);
   assert.equal(fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs')), false);
 
-  await assert.rejects(() => startWorkflow({ workflow, account: 'unknown-acct', ...opts(tmp) }), /not configured in runner\.providers/);
+  await assert.rejects(() => startWorkflow({ workflow, account: 'node/unknown-acct', ...opts(tmp) }), /not configured: pool "node" has no account "unknown-acct"/);
+  assert.equal(fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs')), false);
+
+  await assert.rejects(() => startWorkflow({ workflow, account: 'unknown-acct', ...opts(tmp) }), /written pool\/account/);
   assert.equal(fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs')), false);
 });
 
@@ -541,6 +545,7 @@ test('workflow with two units on different providers pins account only on matchi
       kind: 'agent', allowCrossProvider: true, command, args, providerModel: name,
       invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args }],
     };
+    cfg.runner.modelPolicies[name] = { nano: `${name}-nano`, standard: `${name}-std`, advanced: `${name}-adv`, flagship: `${name}-flagship`, frontier: `${name}-frontier` };
   }
   cfg.runner.capabilities = {
     'cap-alpha': { prefer: [{ executor: 'alpha' }], rigor: 'standard' },
@@ -558,7 +563,7 @@ test('workflow with two units on different providers pins account only on matchi
         { id: 's2', dependsOn: ['s1'], units: [{ id: 'u2', template: { capability: 'cap-beta', objective: 'Task 2' } }] },
       ],
     });
-    const state = await startWorkflow({ workflow, account: 'acct-alpha', ...opts(tmp) });
+    const state = await startWorkflow({ workflow, account: 'alpha/acct-alpha', ...opts(tmp) });
     assert.equal(state.status, 'completed', JSON.stringify(state.steps));
 
     const u1RunId = state.steps.s1.units.u1.unitRunId;
@@ -567,12 +572,12 @@ test('workflow with two units on different providers pins account only on matchi
     const b1 = producerAssignment(tmp, u1RunId).binding;
     const b2 = producerAssignment(tmp, u2RunId).binding;
 
-    assert.deepEqual(b1.account, { provider: 'alpha', id: 'acct-alpha' });
+    assert.deepEqual(b1.account, { pool: 'alpha', id: 'acct-alpha' });
     assert.equal(b2.account, undefined);
     // The unit the account did not reach is recorded, not dropped silently.
     const unpinned = readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId })
       .filter((e) => e.type === 'unit.account-unpinned');
-    assert.deepEqual(unpinned.map((e) => [e.payload.unitId, e.payload.account]), [['u2', 'acct-alpha']]);
+    assert.deepEqual(unpinned.map((e) => [e.payload.unitId, e.payload.account]), [['u2', 'alpha/acct-alpha']]);
   } finally {
     if (prevHome === undefined) delete process.env.HOME;
     else process.env.HOME = prevHome;
@@ -605,14 +610,14 @@ test('CLI workflow start accepts --timeout and --account, while resume refuses t
     path.resolve('bin/fgos.mjs'), 'workflow', 'start',
     '--units', file,
     '--timeout', '90m',
-    '--account', 'acct-cli',
+    '--account', 'node/acct-cli',
     '--foreground',
     '--dir', tmp,
   ], { cwd: tmp, env: cliEnv, encoding: 'utf8' });
   const state = JSON.parse(out).data;
   assert.equal(state.status, 'completed');
   assert.equal(state.timeoutMs, 5400000);
-  assert.equal(state.account, 'acct-cli');
+  assert.equal(state.account, 'node/acct-cli');
 
   // resume with --timeout or --account is refused
   assert.throws(() => execFileSync(process.execPath, [
@@ -623,7 +628,7 @@ test('CLI workflow start accepts --timeout and --account, while resume refuses t
 
   assert.throws(() => execFileSync(process.execPath, [
     path.resolve('bin/fgos.mjs'), 'workflow', 'resume', state.workflowRunId,
-    '--account', 'acct-cli',
+    '--account', 'node/acct-cli',
     '--dir', tmp,
   ], { cwd: tmp, env: cliEnv, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }), /--account cannot change a resumed workflow run/);
 });

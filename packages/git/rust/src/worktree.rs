@@ -23,6 +23,61 @@ pub struct WorktreeHandle {
     pub tip: Oid,
     pub creation_identity: String,
 }
+/// The pid a `git worktree lock` reason names: the number after a `pid`
+/// token (`pid 42`, `(pid=42`, `pid:42`). Generic, not tied to any harness.
+fn pid_named_by(reason: &str) -> Option<u32> {
+    let lower = reason.to_ascii_lowercase();
+    let mut from = 0;
+    while let Some(at) = lower[from..].find("pid") {
+        let rest = lower[from + at + 3..].trim_start_matches([' ', ':', '=']);
+        let digits: String = rest.chars().take_while(char::is_ascii_digit).collect();
+        if let Ok(pid) = digits.parse() {
+            return Some(pid);
+        }
+        from += at + 3;
+    }
+    None
+}
+/// True when the lock reason names a process that was already running when the
+/// lock file was written and still is (pid plus start time, never a bare pid:
+/// a process started after the lock is a reused pid). Unknown is false, so the
+/// registration stays a finding.
+#[cfg(target_os = "linux")]
+fn lock_names_live_process(lock: &Path) -> bool {
+    use fgos_process::facts::{boot_ticks_now, observe, Observed};
+    use fgos_process::ProcId;
+    let Some(pid) = fs::read_to_string(lock)
+        .ok()
+        .as_deref()
+        .and_then(pid_named_by)
+    else {
+        return false;
+    };
+    let Observed::Live { start_time } = observe(ProcId(pid)) else {
+        return false;
+    };
+    let (Ok(started), Some(now_ticks)) = (start_time.parse::<u64>(), boot_ticks_now()) else {
+        return false;
+    };
+    let Some(age) = fs::metadata(lock)
+        .and_then(|m| m.modified())
+        .ok()
+        .and_then(|t| t.elapsed().ok())
+    else {
+        return false;
+    };
+    // SAFETY: sysconf only reads a limit.
+    let hz = unsafe { libc::sysconf(libc::_SC_CLK_TCK) };
+    if hz <= 0 {
+        return false;
+    }
+    let lock_ticks = now_ticks.saturating_sub(age.as_secs() * hz as u64);
+    started <= lock_ticks + hz as u64
+}
+#[cfg(not(target_os = "linux"))]
+fn lock_names_live_process(_lock: &Path) -> bool {
+    false
+}
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct WorktreeIssue {
@@ -393,7 +448,18 @@ impl GitDriver {
         if writer.is_empty() {
             return Err(failure("writer-required"));
         }
-        let resource_set = wal::worktree_resources(&kind).map_err(failure)?;
+        let mut resource_set = wal::worktree_resources(&kind).map_err(failure)?;
+        let existing = match &kind {
+            OperationKind::WorktreeRemove { path, .. } => Some(path.as_ref()),
+            OperationKind::WorktreeMove { source, .. } => Some(source.as_ref()),
+            _ => None,
+        };
+        #[cfg(unix)]
+        if let Some(path) = existing {
+            let custody = crate::refs::custody_lock_path(repo, Path::new(path))?;
+            resource_set.push(format!("worktree:{path}:custody:{}", custody.display()));
+            resource_set.sort();
+        }
         admission(wal, id, &resource_set)?;
         let request_digest =
             wal::canonical_digest(&(&kind, &old, &next, writer)).map_err(failure)?;
@@ -747,6 +813,19 @@ impl GitDriver {
         writer: &str,
         id: &str,
     ) -> Result<()> {
+        self.remove_land_candidate(repo, held, path, proof, writer, id, None)
+    }
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn remove_land_candidate(
+        &self,
+        repo: &RepoHandle,
+        held: Vec<BorrowedHandle<'_>>,
+        path: &Path,
+        proof: &WorktreeDelivery,
+        writer: &str,
+        id: &str,
+        discarded_land: Option<&str>,
+    ) -> Result<()> {
         let scope = self.worktree_scope(repo, held)?;
         let path = canonical_destination(path)?;
         let wal = Wal::open(repo).map_err(failure)?;
@@ -814,6 +893,17 @@ impl GitDriver {
         self.worktree_not_live(&path, &mut warned)?;
         self.worktree_custody(repo, &scope, &path)?;
         self.worktree_clean(repo, &path)?;
+        let discarded = if let Some(land_id) = discarded_land {
+            let land = wal.inspect(land_id).map_err(failure)?;
+            matches!(&land.intent().kind, OperationKind::Land(p) if p.candidate.worktree == path && p.candidate.candidate == handle.tip.as_str())
+                && land.intent().writer_identity == writer
+                && matches!(
+                    land.outcome(),
+                    Some(Outcome::AbandonedBeforeAttempt | Outcome::Loss { .. })
+                )
+        } else {
+            false
+        };
         if proof.evidence_digest.len() != 64
             || !proof.evidence_digest.bytes().all(|b| b.is_ascii_hexdigit())
             || proof.expected_tip != handle.tip
@@ -830,9 +920,10 @@ impl GitDriver {
             ],
             Policy::Inspect,
         )?;
-        if !reachable
-            .split(|b| *b == b'\n')
-            .any(|name| name.starts_with(b"refs/") && !name.starts_with(b"refs/fgos/"))
+        if !discarded
+            && !reachable
+                .split(|b| *b == b'\n')
+                .any(|name| name.starts_with(b"refs/") && !name.starts_with(b"refs/fgos/"))
         {
             return Err(failure("worktree-delivery-unreachable"));
         }
@@ -1080,7 +1171,11 @@ impl GitDriver {
             } else if missing(&path)? {
                 Some("missing-worktree-preserved")
             } else if !missing(&admin.join("locked"))? {
-                Some("locked-registration")
+                Some(if lock_names_live_process(&admin.join("locked")) {
+                    "locked-by-live-process"
+                } else {
+                    "locked-registration"
+                })
             } else {
                 match self.worktree_handle(repo, &path) {
                     Err(_) => Some("registration-backlink-mismatch"),
@@ -1226,7 +1321,8 @@ impl GitDriver {
         if held.iter().any(|h| h.as_ref().name() == "dispatch-cwd") {
             return Err(failure("worktree-repair-custody-not-allowed"));
         }
-        let scope = self.worktree_scope(repo, held)?;
+        let mut scope = self.worktree_scope(repo, held)?;
+        crate::recovery::leaf(&mut scope, repo)?;
         self.repair_worktree_locked(repo, &scope, id)
     }
     fn repair_worktree_locked(

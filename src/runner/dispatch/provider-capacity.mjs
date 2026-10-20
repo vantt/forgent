@@ -2,11 +2,11 @@
 // leases, classifier, and credential facts. This module deliberately stays
 // inside an already-resolved provider; it never chooses provider/model/executor.
 
-import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { normalizeProviderFamily } from './provider-adapter.mjs';
+import { deriveLegacyInventory } from './llm-accounts.mjs';
 import { AUTH_FAILURE_TAIL_LINES, matchAuthFailureLine, matchQuotaLimitLine } from './provider-auth-failure.mjs';
 import { getProcessStartTime, pidExists, resolveHolderLiveness } from './process-identity.mjs';
 import { acquire, acquireSync, createLockScope, lockHolders, resolveLock, resolveLockRoot, runBorrowed } from '../../holder-lock/index.mjs';
@@ -156,6 +156,10 @@ function validateAccountId(accountId, label) {
   if (typeof accountId !== 'string' || !/^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/.test(accountId)) {
     throw new ProviderCapacityConfigError(`runner config (${label}) account id must be a non-empty safe key, got ${JSON.stringify(accountId)}.`);
   }
+  // The account order is the key order of the object, and a JS object lists a digits-only key before every other.
+  if (/^\d+$/.test(accountId)) {
+    throw new ProviderCapacityConfigError(`runner config (${label}) account id ${JSON.stringify(accountId)} is digits only; such a key sorts before the others and would break the declared account order. Add a letter.`);
+  }
 }
 
 const CLI_KEY = /^[a-z0-9][a-z0-9_-]*$/;
@@ -220,6 +224,19 @@ export function accountCredentialSources(account) {
 }
 
 /**
+ * An account's credential home as an absolute path: a leading `~`, `${HOME}` or `$HOME` is the user's home
+ * directory. Null when the value is empty, not a string, or not absolute once expanded.
+ */
+export function expandCredentialHome(home) {
+  if (typeof home !== 'string' || !home.trim()) return null;
+  const expanded = home
+    .replace(/^\$\{HOME\}(?=\/|$)/, os.homedir())
+    .replace(/^\$HOME(?=\/|$)/, os.homedir())
+    .replace(/^~(?=\/|$)/, os.homedir());
+  return path.isAbsolute(expanded) ? expanded : null;
+}
+
+/**
  * Why `store` is not a valid `credentialStore` declaration, or null when it is. One reading of the shape for
  * the config door and the confinement request door.
  */
@@ -268,8 +285,17 @@ export function providerCapacityForInvocation(selection, invocation) {
   return { ...selection, credentialCli: store.use, credentialSource: credentialSourceForCli(selection, store.use) };
 }
 
+/**
+ * The accounts the lease, probe, pin and renewal read, per state key. A pool declared in
+ * `runner.llmAccounts` supplies its own accounts; a pool it does not declare keeps reading
+ * `runner.providers.<provider>.accounts`. That second read is the transition read: it goes, with the
+ * `runner.providers` key, once every fgOS release on the machine reads `runner.llmAccounts`.
+ */
 export function providerAccountInventory(runnerConfig) {
-  return validateProviderAccountInventory(runnerConfig, 'runner config');
+  const legacy = validateProviderAccountInventory(runnerConfig, 'runner config');
+  const section = isPlainObject(runnerConfig?.runner) ? runnerConfig.runner : runnerConfig;
+  if (section?.llmAccounts === undefined) return legacy;
+  return Object.freeze({ ...legacy, ...deriveLegacyInventory(section).inventory });
 }
 
 export function hasProviderAccounts(runnerConfig, provider) {
@@ -500,11 +526,6 @@ export async function acquireAccountLock({ runtimeDir, provider, accountId, wait
   throw busy();
 }
 
-export function stableHash(seed, accountId) {
-  const digest = crypto.createHash('sha256').update(`${seed}\0${accountId}`).digest('hex');
-  return digest.slice(0, 16);
-}
-
 function accountState(providerState, accountId) {
   providerState.accounts ??= {};
   providerState.accounts[accountId] ??= {};
@@ -565,31 +586,24 @@ function reclaimDeadLeases(providerState, { runIsDead = () => false, isRunWorker
   }
 }
 
-export function rankProviderAccounts({ provider, inventory, state, assignmentId, seed, runIsDead, isRunWorkerAlive, now = Date.now() }) {
+/**
+ * The accounts of `provider` the next lease may take, best first: the account this assignment already
+ * holds while it is usable, otherwise the pool's accounts in the order the config declares them. An
+ * account that is quarantined or disabled is left out; load does not reorder the list, so the first
+ * account takes every lease until it cannot.
+ */
+export function rankProviderAccounts({ provider, inventory, state, assignmentId, runIsDead, isRunWorkerAlive, now = Date.now() }) {
   const accounts = inventory?.[provider]?.accounts ?? {};
   const providerState = state.providers?.[provider] ?? { accounts: {} };
   reclaimDeadLeases(providerState, { runIsDead, isRunWorkerAlive });
+  const usable = (accountId) => accounts[accountId]?.disabled !== true && !isQuarantined(accountState(providerState, accountId), now);
   const stickyAccountId = assignmentId ? state.assignments?.[`${provider}:${assignmentId}`]?.accountId : null;
-  const sticky = stickyAccountId && accounts[stickyAccountId] ? accountState(providerState, stickyAccountId) : null;
-  if (stickyAccountId && accounts[stickyAccountId] && sticky && !isQuarantined(sticky, now)) {
-    return [stickyAccountId];
-  }
-  return Object.keys(accounts)
-    .filter((accountId) => !isQuarantined(accountState(providerState, accountId), now))
-    .sort((a, b) => {
-      const aState = accountState(providerState, a);
-      const bState = accountState(providerState, b);
-      const leaseDelta = Object.keys(aState.leases ?? {}).length - Object.keys(bState.leases ?? {}).length;
-      if (leaseDelta !== 0) return leaseDelta;
-      const aLast = aState.lastSelectedAt ?? '';
-      const bLast = bState.lastSelectedAt ?? '';
-      if (aLast !== bLast) return aLast < bLast ? -1 : 1;
-      return stableHash(seed, a).localeCompare(stableHash(seed, b));
-    });
+  if (stickyAccountId && accounts[stickyAccountId] && usable(stickyAccountId)) return [stickyAccountId];
+  return Object.keys(accounts).filter(usable);
 }
 
 export function acquireProviderAccountLease({
-  runnerConfig, provider, assignmentId, runId, seed, runtimeDir, runIsDead, isRunWorkerAlive,
+  runnerConfig, provider, assignmentId, runId, runtimeDir, runIsDead, isRunWorkerAlive,
   // The CLI the launch is known to run, when the caller knows it (a pinned invocation): only an account
   // that declares a login store for that CLI is leased. Null leaves every account eligible.
   cli = null,
@@ -612,7 +626,7 @@ export function acquireProviderAccountLease({
     const providerState = state.providers[provider];
     reclaimDeadLeases(providerState, { runIsDead, isRunWorkerAlive, nowIso: now.toISOString() });
     const ranked = rankProviderAccounts({
-      provider, inventory, state, assignmentId, seed: seed ?? runId, runIsDead, isRunWorkerAlive, now: now.getTime(),
+      provider, inventory, state, assignmentId, runIsDead, isRunWorkerAlive, now: now.getTime(),
     });
     if (ranked.length === 0) {
       return { status: 'refused', provider, reason: 'provider-capacity.exhausted-or-quarantined' };
@@ -754,10 +768,11 @@ export async function probeQuarantinedAccounts({
   const claimed = withProviderStateLock(() => {
     const state = readState(statePath);
     const providerState = state.providers?.[provider];
+    const enabled = Object.keys(accounts).filter((accountId) => accounts[accountId].disabled !== true);
     const isUsable = (accountId) => !isQuarantined(providerState?.accounts?.[accountId] ?? {}, now);
-    if (Object.keys(accounts).some(isUsable)) return [];
+    if (enabled.some(isUsable)) return [];
     const picked = [];
-    for (const accountId of Object.keys(accounts)) {
+    for (const accountId of enabled) {
       const quarantine = providerState?.accounts?.[accountId]?.quarantine;
       if (quarantine?.kind !== 'manual-clear' || quarantine.reasonCode !== 'auth-token') continue;
       const last = Date.parse(quarantine.probe?.attemptedAt ?? '');
@@ -831,6 +846,8 @@ export function inspectProviderCapacity({ runnerConfig, provider, accountId, run
       providers[providerId].accounts[id] = {
         accountId: id,
         label: account.label,
+        ...(account.disabled === true ? { disabled: true } : {}),
+        ...(account.unusableFor ? { unusableFor: account.unusableFor } : {}),
         healthy: !isQuarantined(acctState),
         quarantine: acctState.quarantine ?? null,
         openLeases: Object.values(acctState.leases ?? {}).map((lease) => ({

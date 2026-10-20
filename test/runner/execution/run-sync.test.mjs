@@ -12,7 +12,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-import { runUnit } from '../../../src/runner/execution/run.mjs';
+import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
 import { validateUnit } from '../../../src/runner/execution/unit.mjs';
 import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
@@ -478,4 +478,16 @@ test('a conflicted file the worker turned into a directory refuses the conclusio
   assert.equal(res.results[0].commit.reason, 'staged-set-mismatch');
   assert.doesNotMatch(gitIn(worktree, 'diff', '--cached', '--name-only'), /inner\.txt/);
   assert.equal(mergeHeadOf(worktree), headOf(repoRoot), 'the merge stays open for a person');
+});
+
+
+test('sync aggregation preserves receipt warnings in existing result fields', async () => {
+  const { runPendingSync, commitRoundWithSync, syncSummary } = await import('../../../src/runner/execution/unit-sync.mjs');
+  const warning = 'checkout-compaction-deferred: retained evidence';
+  const record = { unit: { syncOnly: true }, sync: { status: 'merged', warnings: [warning], commit: { sha: 'abc', subject: 'merge' } } };
+  const result = runPendingSync(record, '', () => {});
+  assert.deepEqual(result.results[0].commit.warnings, [warning]);
+  assert.deepEqual(syncSummary(record.sync).warnings, [warning]);
+  const commit = { status: 'committed', warnings: [warning] };
+  assert.equal(commitRoundWithSync(record, '', () => commit, []), commit);
 });

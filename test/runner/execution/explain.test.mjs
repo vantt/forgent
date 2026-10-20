@@ -1,5 +1,5 @@
 // fgos dispatch explain: the binding a run would get for a capability, laid beside the tier cell and
-// the accounts of the family's pool. It binds through bind() and reads nothing else that decides.
+// the accounts of the pools on the walk. It binds through bind() and reads nothing else that decides.
 
 import '../../helpers/process-tmp-root.mjs';
 import test from 'node:test';
@@ -37,7 +37,7 @@ function deepseekConfig() {
   };
 }
 
-test('explain reports the entry of the family pool as used and an entry of another pool as pending', () => {
+test('explain reports the entry that runs, the entries that follow it and the pools of the walk', () => {
   const result = explainCapability(deepseekConfig(), { capability: 'research', session: headless });
   assert.equal(result.family, 'deepseek');
   assert.equal(result.executor.id, 'deepseek');
@@ -45,16 +45,34 @@ test('explain reports the entry of the family pool as used and an entry of anoth
   assert.equal(result.invocation, 'pi-cli-bwrap');
   assert.deepEqual(result.credentialStore, { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR', files: ['auth.json'], source: 'declared' });
   assert.deepEqual(result.tier, { value: 'standard', source: 'rigor:standard', ceiling: null });
-  assert.equal(result.model.value, 'deepseek/deepseek-v4-flash');
+  assert.equal(result.model.value, 'deepseek-v4-flash', 'the first entry of the cell whose pool can run it');
+  assert.equal(result.pool, 'deepseek-api');
   assert.deepEqual(result.cell.entries, [
-    { model: 'deepseek-v4-flash', pool: 'deepseek-api', status: 'pending-pool-routing' },
-    { model: 'deepseek/deepseek-v4-flash', pool: 'deepseek', status: 'used' },
+    { model: 'deepseek-v4-flash', pool: 'deepseek-api', status: 'used' },
+    { model: 'deepseek/deepseek-v4-flash', pool: 'deepseek', status: 'fallback' },
   ]);
+  assert.deepEqual(result.walk.map((step) => [step.pool, step.model, step.store]), [
+    ['deepseek-api', 'deepseek-v4-flash', 'pi'],
+    ['deepseek', 'deepseek/deepseek-v4-flash', 'pi'],
+  ]);
+});
+
+test('explain names why an entry is out: a pool with no account holding the CLI\'s store', () => {
+  const cfg = deepseekConfig();
+  delete cfg.llmAccounts['deepseek-api'];
+  const result = explainCapability(cfg, { capability: 'research', session: headless });
+  assert.equal(result.model.value, 'deepseek/deepseek-v4-flash');
+  assert.deepEqual(result.cell.entries.map((e) => [e.pool, e.status]), [['deepseek-api', 'unusable'], ['deepseek', 'used']]);
+  assert.match(result.cell.entries[0].reason, /pool "deepseek-api" has no account/);
+  const out = result.candidates.find((c) => c.pool === 'deepseek-api');
+  assert.equal(out.state, 'out');
+  assert.equal(out.reason, 'pool-unusable');
 });
 
 test('explain names the store an older config implies, and none for an invocation that reads no store', () => {
   const cfg = deepseekConfig();
   const [inv] = cfg.executors.deepseek.invocations;
+  delete cfg.llmAccounts;
   delete inv.credentialStore;
   inv.resourceBindings = [{ resource: 'private-home', target: { kind: 'env', name: 'PI_CODING_AGENT_DIR' } }];
   assert.deepEqual(explainCapability(cfg, { capability: 'research', session: headless }).credentialStore, { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR', source: 'inferred' });
@@ -62,12 +80,22 @@ test('explain names the store an older config implies, and none for an invocatio
   assert.equal(explainCapability(cfg, { capability: 'research', session: headless }).credentialStore, null);
 });
 
-test('explain lists the pool accounts of both inventories and which old ones the new one declares', () => {
-  const { accounts } = explainCapability(deepseekConfig(), { capability: 'research', session: headless });
-  assert.equal(accounts.pool, 'deepseek');
-  assert.deepEqual(accounts.legacy, [{ id: 'openrouter', llmAccounts: 'missing' }]);
-  assert.deepEqual(accounts.llmAccounts, [{ id: 'direct', disabled: false, clis: ['pi'], inLegacy: false }]);
-  assert.deepEqual(accounts.problems, []);
+test('explain lists the accounts of each pool on the walk in declared order, with what keeps one from running', () => {
+  const cfg = deepseekConfig();
+  cfg.llmAccounts['deepseek-api'] = {
+    key1: { credentialStore: { pi: '/srv/pi-a' } },
+    key2: { credentialStore: { pi: '/srv/pi-b' }, disabled: true },
+    key3: { credentialStore: { omp: '/srv/omp-c' } },
+  };
+  const { accounts } = explainCapability(cfg, { capability: 'research', session: headless });
+  assert.deepEqual(accounts.map((a) => a.pool), ['deepseek-api', 'deepseek']);
+  assert.equal(accounts[0].source, 'llmAccounts');
+  assert.deepEqual(accounts[0].accounts, [
+    { id: 'key1', usable: true },
+    { id: 'key2', usable: false, reason: 'disabled' },
+    { id: 'key3', usable: false, reason: 'no "pi" login store' },
+  ]);
+  assert.deepEqual(accounts[1].accounts, [{ id: 'direct', usable: true }]);
 });
 
 test('explain carries a refusal instead of a binding', () => {
@@ -92,7 +120,8 @@ test('explain on the committed config agrees with bind() for every capability', 
       assert.equal(explained.invocation, bound.invocation, capability);
       assert.equal(explained.model.value, bound.model, capability);
       assert.equal(explained.tier.value, bound.tier, capability);
-      assert.ok(explained.cell.entries.some((e) => e.status === 'used' && e.model === bound.model), `${capability}: the model that runs is marked used`);
+      assert.equal(explained.pool, bound.pool, capability);
+      if (explained.cell.entries.length > 0) assert.ok(explained.cell.entries.some((e) => e.status === 'used' && e.model === bound.model), `${capability}: the model that runs is marked used`);
     }
   }
 });

@@ -2253,3 +2253,26 @@ fn ordinary_fetch_and_pull_survive_absent_legacy_and_repair_exact_mapping() {
         .unwrap();
     assert_eq!(fs::read(repo.common_dir().join("config")).unwrap(), bytes);
 }
+
+#[test]
+fn event_publication_recovery_ignores_unrelated_recovery_leaf() {
+    let t = Temp::new();
+    let root = t.0.join("repo");
+    init(&root, "sha1", "files");
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let _wal = wal::Wal::open(&repo).unwrap();
+    fs::create_dir_all(root.join("fgos/git/locks")).unwrap();
+    let leaf = match acquire(&Resource::new("recovery", root.join("fgos/git/locks/recovery.lock")), Mode::Ex, Wait::Try, 2000) {
+        Acquire::Acquired(h) => h, e => panic!("{e:?}"),
+    };
+    let mut h = handle(&t.0.join("seal.lock"));
+    let port = PublicationPort::new(&driver, authority(&repo, &mut h));
+    let a = commit(&port, &repo, vec![], "event");
+    port.compare_and_swap(&repo, &reference(), &ExpectedTip::Absent, &ExpectedTip::Oid(a.clone()), "live-recovery").unwrap();
+    port.recover(&repo, "live-recovery").unwrap();
+    // Same-id publication invokes recover on the live Event Store path too.
+    port.compare_and_swap(&repo, &reference(), &ExpectedTip::Absent, &ExpectedTip::Oid(a), "live-recovery").unwrap();
+    assert!(port.recover_publications(&repo).unwrap().is_empty());
+    drop(leaf);
+}

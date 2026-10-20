@@ -1,5 +1,7 @@
 # Phase 06 — Playbook proposer on admission, Shape C, case verbs (F6, F12)
 
+Status: done (report: plans/reports/phase-lead-261019-1814-workflow-case-p05-p06.md); the live `council-lite` run and the stored-run cross-check are the big lead's step 4.
+
 ## Context
 
 - Spec RUL-WF-9, -10, -18, -19, -20, -24, §5.4 Shape C (owner 2026-10-19 12:20), §7.1, §7.4–7.6, §8 rows `workflow start <playbook>`, `--units`, `answer` while proposer lives, `status`/`resume`, `close`; §9 row "vòng `advanceWorkflowRun` … viết lại … tách `src/workflow/runner.mjs` theo vai trong cùng commit"; §2.1 (physical name `src/workflow/runner.mjs` stays until a separate L10 step); battery 8, 9 (playbook half), 10, 12, 14, 22, 25.

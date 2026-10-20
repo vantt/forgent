@@ -542,7 +542,7 @@ Stop-everything cutover, one change, on all three machines and every workspace (
 6. On the other machines: pull main, run setup (refspec, machine id), fetch, rebuild, compare the view.
 7. Doctor green on every workspace; resume writers. Old binaries are fenced by activation (plain `fgos` runs the activated release) and by `event-store-legacy-layout`, which fails if `.fgos/events/` or a tracked event file reappears.
 
-Rollback is not "point the facade back": an old release reads files in `(ts, file, seq)` order and cannot read refs, and v4 events written after the cutover sort differently under that rule. Rollback is `fgos events export --format legacy-layout`: it writes the legacy files byte for byte from `refs/fgos/legacy`, writes v4 events as one file per stream with legacy field names (batch commit markers are dropped), runs a port of the legacy fold (`src/state/replay.mjs:870-889`) on the result, and reports every entity whose view differs from the v4 view. A person decides with that report; then writers stop, the files are committed, and the previous release is activated. Before step 5 is pushed, rollback is reverting the commit.
+Rollback is not "point the facade back": an old release reads files in `(ts, file, seq)` order and cannot read refs, and v4 events written after the cutover sort differently under that rule. Rollback is `fgos events export --format legacy-layout`: it writes the legacy files byte for byte from `refs/fgos/legacy`, writes v4 events as one file per stream with legacy field names (batch commit markers are dropped), runs a port of the legacy fold (`src/state/replay.mjs:870-889`) on the result, and reports every entity whose view differs from the v4 view. A person decides with that report; then writers stop, the files are committed, and the previous release is activated. Before step 5 is pushed, rollback is reverting the commit; a later migrate owns replacement of the resulting unfenced stale import under event-seal, using CAS from the observed OID. For a local-only stale import, no manual ref deletion is required. Before any local ref write, migration checks local and mirror legacy refs under the same event-seal guard. A disagreeing mirror, or a local import also observed on a mirror, refuses with `EventStoreLegacyMismatch`: pull the fenced main. If main has no fence because cutover was reverted after the ref was pushed, the remote legacy ref needs an owner decision. `--check` reports the same disagreement. For rollback files, copy Work `events.jsonl` and `events/` into `.fgos/`, remove the tracked `.fgos/events` fence first, and map `porting/<original tracked path>` back to `<original tracked path>`. When one historical porting log exists, new porting lines append to that exact exported log; with none, restore `porting/events.jsonl` directly. Review the parity report before committing the restored layout and activating the previous release.
 
 ## 19. What this removes
 
@@ -574,6 +574,10 @@ Not removed here: stripping `.fgos` from worktrees and the general `fgos-write-r
 **Porting store.** It writes `<dir>/porting/events.jsonl` under its own gate (`src/state/porting-store.mjs:28`, `:89`). It becomes an Event Store consumer in the same cutover (its existing log imported into `refs/fgos/legacy`), so no second write path survives. Its scope is declared by its owner.
 
 ## 21. Setup, doctor and configuration
+
+Migration selects its attempt id inside `import_legacy` under event-seal and returns it with the pin as execution metadata; the tracked fence keeps only `legacyRefOid`, `sealDigest` and `fromCommit`. The quiesce gate excludes another running `fgos events migrate` process; the seal is released before ScopedCommit, and Git's known-id refusal remains the final arbiter. A settled committed attempt whose HEAD was subsequently reset by hand retains its id and fails closed into Git recovery; it is not silently retried. This checkout predates Git 05's `Outcome::CommitRejected` variant, so attempt selection decodes the existing serialized outcome tag until integration permits a direct enum match.
+
+Routine consumers use fixed roots (`.fgos/`, `docs/distillery/state/porting/`, `porting/`) plus porting roots discovered by a previous import. There is no configured porting-directory setting. Before cutover, doctor's `event-store-legacy-layout` warning is the guard for a tracked porting log outside those roots; run the full migration before admitting v4 writes on that layout.
 
 Config defaults merged by `fgos setup` (added only when missing, global then project):
 
@@ -878,7 +882,7 @@ log remains an unchanged prefix), including with `--stream` or `--since`.
 
 Rollback accepts only project scope; local and branch streams are refused even
 when explicitly selected, and the default excludes them. Work v4 records go to
-`events/v4-project.jsonl`; porting v4 records append to `porting/events.jsonl`
+`events/v4-project.jsonl`; porting v4 records append to the sole historical porting log (or `porting/events.jsonl` when none exists)
 after its unchanged historical prefix (inserting a separator LF when needed).
 Tree entries emitted by `ls-tree -t` are accepted only as mode 040000 directories
 on allowed paths; symlinks, gitlinks and unrelated trees remain forbidden.
@@ -888,8 +892,9 @@ legacy extension that preserves distinct identities without incompatible `h`.
 Rust returns the frozen legacy Work order (baseline tag empty, shard tag basename)
 and v4 Work order. Porting keeps its separate log discovery directory and reducer:
 the adapter uses the production `listPorting` reader on the exported log and a
-scratch log containing the v4 porting order. Nested historical porting directories
-are preserved unchanged; new porting records target the root porting store only.
+scratch log containing the v4 porting order. When exactly one historical porting log exists, new porting records append
+to that log, including nested paths; with none they target `porting/events.jsonl`.
+Multiple historical porting logs refuse rollback pending an owner decision.
 The verb adapter applies Work's existing `foldEvents` and porting's existing
 reducer separately, then writes `parity-report.json` with differences for each
 changed keyed entity or array position. A partial rollback export is compared with the selected
@@ -938,3 +943,88 @@ second rebuild verb or new consumer registration mechanism.
 
 Evidence and reproduction commands:
 `plans/reports/phase-lead-261019-0929-es-p07-verbs-setup-doctor.md`.
+
+
+## Phase 08 dormant migration contracts
+
+`legacy_import::{inventory, read_legacy_from_head, import_legacy}` in the Rust
+crate use Git Inspect and Publication. The combined addon exposes
+`readLegacyFromHead({check}, heldRanks)`, `importLegacy({expectedHead}, heldRanks)`
+and `legacyLayout(heldRanks)` through the existing facade. Migration remains
+unregistered until phase 09. The approved plan's Q5(a) applies: the reviewed
+code commit lands first, then migration uses Git 05 ScopedCommit for data.
+There is no source-commit materialization route (A2/M9 is not required).
+
+Inventory reads only the main checkout's HEAD tree, discovers one tracked
+`**/porting/events.jsonl` and its tracked sibling view, and refuses multiple
+porting directories. Work names lose only the `.fgos/` prefix in the import;
+porting bytes live at `porting/<original tracked path>`. Work keeps the frozen
+`(ts, file, seq)` sort and identity dedupe. The Node facade reparses authenticated raw legacy lines to preserve property
+insertion order and the previous release's serialized view/revision. Historical
+porting keeps its physical log order, including clock rollback, and is folded by the production porting
+reader independently of Work. Rollback appends new porting lines to the sole
+historical log, and measures parity from the exported restorable bytes.
+
+`--check` computes the inventory, reader order, parity and commit plan without
+writing objects or refs. It reports the computed legacy commit OID and whether
+the observed ref will be created, reused or replaced as an unfenced stale import;
+its three setup repairs can create local identity/lock
+state and Git mapping provenance. Publication validates the expected HEAD,
+regular-file paths, event records and clean inputs again under `event-seal`.
+It writes a deterministic parentless legacy commit and CASes an absent ref;
+an identical existing commit is reused. Without a tracked fence, a stale direct
+legacy ref is replaced by CAS from its observed OID under event-seal. Symbolic
+refs refuse. Reuse invokes Git publication recovery to release retained WAL pins. The canonical
+legacy seal retains the existing header contract; `treeOfFgosEvents` identifies
+the complete imported data tree **without** `seal.json`. Doctor compares every
+path, mode and object id of that tree with the legacy commit sans seal.
+
+The dormant `migrateUseCase` requires the real holder-lock quiesce result to be
+clean, runs the three existing setup-fix bodies, and compares production Work
+and porting folds in a temporary directory. An explicit baseline is checked;
+a previous cache is checked only when its snapshot equals the tracked input
+anchor. Parity failures carry entity differences. Before deleting anything,
+non-check migration authenticates the published import data tree against the
+tree computed from HEAD, requires every listed local/mirror legacy ref to equal
+the computed commit, and compares Publication identity with the dry-run plan.
+Unfenced consumer reads always use HEAD bytes. Inventory pages use the Git
+maximum of 100,000 entries; routine admission/read lists only `.fgos/` and the
+existing consumer porting roots (plus paths discovered in a prior import),
+without whole-project listings. Migration and layout diagnosis retain broad
+porting discovery. Git 05 is called via `createGitScopedCommit`, `preflight`,
+and `commit` with the documented exact deletion grant and seal digest; no Git
+subprocess or replacement writer exists in the adapter.
+
+Preparation records write admission before any hot gate: tracked legacy data
+without a fence refuses `event-store-migration-required`; a pinned clone without
+the matching legacy ref or configured publication-remote mapping refuses
+`event-store-refspec-missing`. Prepared admission is valid for that process
+lifetime: stop-everything migration requires ending old writer processes.
+
+A normal cutover failure restores tracked input bytes only for explicit Git
+pre-attempt refusal codes or `commit-rejected` after Git's snapshot restoration,
+and only while HEAD is unchanged. Every recovery-class or unknown code leaves
+the worktree untouched and surfaces the operation id. Success requires
+`committed` and a moved HEAD; `unchanged` is not a successful cutover.
+
+Attempts use `event-store-cutover-<first 32 hex of fromCommit>-<attempt>` after
+inspecting retained Git WAL outcomes. Only settled rejection/abandonment permits
+the next attempt; unresolved attempts retain their id for Git recovery.
+The trusted main root is checked before quiesce and setup repairs. Only exact
+historical event attribute patterns lose `merge=union`; an otherwise empty
+`.gitattributes` is deleted. Baseline-only cutover uses Git 05's validated fence
+selection, just like a shard cutover.
+
+Doctor passes when neither fence nor retired paths exist (including unborn
+repositories), warns `event-store-migration-required: run fgos events migrate`
+when retired paths exist without a fence, and fails on fence/ref/seal disagreement
+or retired-layout coexistence with a fence. Missing legacy objects become a
+layout problem; the shared fence validator checks sealDigest and fromCommit.
+The check uses the configured Event Store remote.
+
+The real-hook cutover and rejected-then-retried baseline-only proof self-enable
+when Git 05 exports ScopedCommit. Unexpected quiesce refusal fails with the host
+requirement; only the exact documented PID-namespace-unprovable refusal skips.
+The coordinator's host gate requires zero skips. No migrated workspace may
+resume writers before that gate passes. Export paths refuse Windows reserved
+names, colon, trailing dot/space, and other Windows-invalid characters.

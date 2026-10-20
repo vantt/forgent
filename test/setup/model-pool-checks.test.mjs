@@ -121,3 +121,23 @@ test('capability-rigor-ceiling names a capability whose rigor lifts it above run
   const unset = runCheck('capability-rigor-ceiling', { ...runner, maxTier: undefined });
   assert.match(unset.message, /runner\.maxTier not set/);
 });
+
+test('tier-fallback is quiet without a list, passes a served list and warns about a family the walk would skip', () => {
+  const none = runCheck('tier-fallback', {});
+  assert.equal(none.passed, true);
+  assert.match(none.message, /not declared/);
+
+  const executors = { claude: agent('claude'), gemini: agent('gemini', 'agy') };
+  const modelPolicies = { claude: { advanced: 'sonnet' }, gemini: { advanced: 'gemini-flash' } };
+  const served = runCheck('tier-fallback', { executors, modelPolicies, tierFallback: { advanced: ['gemini', 'claude'] } });
+  assert.equal(served.passed, true);
+  assert.match(served.message, /declares the walk order of 1 tier\(s\): advanced/);
+
+  const skipped = runCheck('tier-fallback', { executors, modelPolicies, tierFallback: { advanced: ['gemini', 'z-ai', 'claude'], flagship: ['claude'] } });
+  assert.equal(skipped.passed, true);
+  assert.match(skipped.message, /^warning: .*advanced: z-ai has no modelPolicies cell at advanced/);
+  assert.match(skipped.message, /flagship: claude has no modelPolicies cell at flagship/);
+
+  const unserved = runCheck('tier-fallback', { executors: { claude: agent('claude') }, modelPolicies, tierFallback: { advanced: ['gemini'] } });
+  assert.match(unserved.message, /advanced: no agent executor serves gemini/);
+});

@@ -27,7 +27,7 @@ import {
   resumeWorkflowDetached,
   preflightWorkflowSeats,
 } from '../../src/workflow/index.mjs';
-import { acquireAdvanceLock } from '../../src/workflow/runner.mjs';
+import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { normalizeContextRefs, WorkflowDefinitionError } from '../../src/workflow/definition.mjs';
 import { withProviderFamilies } from '../helpers/provider-families.mjs';
@@ -507,7 +507,7 @@ async function holdAdvanceInChild(tmp, id) {
   return { child, exited };
 }
 
-test('a run already being advanced by a live process refuses a second advance and records nothing', async () => {
+test('a run already being advanced by a live process refuses a second advance; an answer is kept for the live proposer and the ledger is left to it', async () => {
   const tmp = setupTestRepo();
   const parked = await startWorkflow({ workflow: validateWorkflow(GATE_WORKFLOW), repoRoot: tmp, cwd: tmp });
   const id = parked.workflowRunId;
@@ -520,15 +520,24 @@ test('a run already being advanced by a live process refuses a second advance an
   const answer = { stepId: 'step-gate', answer: 'yes', approved: true, ...opts };
 
   assert.throws(() => resumeWorkflowDetached(id, opts), new RegExp(`already being advanced by process ${process.pid}`));
-  assert.throws(() => answerWorkflowDetached(id, answer), /already being advanced/);
   await assert.rejects(resumeWorkflow(id, opts), /already being advanced/);
-  await assert.rejects(answerWorkflow(id, answer), /already being advanced/);
-  assert.equal(eventCount(), before, 'a refused advance must not record the gate answer');
-  assert.equal(probe('advance', advanceParams(tmp, id)).result, 'held', 'a refused advance leaves the holder lock alone');
+  assert.equal(eventCount(), before, 'a refused resume records nothing');
+
+  // An answer never writes the ledger itself: it is kept as a file and the live holder records it.
+  const kept = answerWorkflowDetached(id, answer);
+  assert.equal(kept.recorded, true);
+  assert.equal(kept.appliedBy, 'live proposer');
+  assert.equal(kept.detached, undefined, 'no second process is started');
+  assert.equal(eventCount(), before, 'the answer reached no ledger line while a holder lives');
+  await assert.rejects(answerWorkflow(id, answer), (err) => err.code === 'gate-already-answered', 'a second answer to the same gate is refused by name');
+  assert.equal(probe('advance', advanceParams(tmp, id)).result, 'held', 'the holder lock is left alone');
   held.release();
 
-  const state = await answerWorkflow(id, answer);
+  // The next holder of advance folds the kept answer in before it acts on anything.
+  const state = await resumeWorkflow(id, opts);
   assert.equal(state.status, 'completed');
+  const types = readWorkflowEvents({ repoRoot: tmp, workflowRunId: id }).map((e) => e.type);
+  assert.ok(types.indexOf('gate.answer') < types.lastIndexOf('step.complete'), 'gate.answer is on the ledger before the step it releases completes');
   assert.equal(probe('advance', advanceParams(tmp, id)).result, 'free');
 });
 
@@ -540,7 +549,7 @@ test('an advance holder killed right after it took the lock does not block the n
   const answer = { stepId: 'step-gate', answer: 'yes', approved: true, repoRoot: tmp, cwd: tmp };
 
   const { child, exited } = await holdAdvanceInChild(tmp, id);
-  await assert.rejects(answerWorkflow(id, answer), new RegExp(`already being advanced by process ${child.pid}`));
+  await assert.rejects(resumeWorkflow(id, { repoRoot: tmp, cwd: tmp }), new RegExp(`already being advanced by process ${child.pid}`));
   child.kill('SIGKILL');
   await exited;
 
@@ -934,6 +943,7 @@ test('a step after a panel step is handed the report of every panelist and of th
       providerModel: name,
       invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args: [script, '{prompt}'] }],
     };
+    cfg.runner.modelPolicies[name] = { nano: `${name}-nano`, standard: `${name}-std`, advanced: `${name}-adv`, flagship: `${name}-flagship`, frontier: `${name}-frontier` };
   }
   cfg.runner.defaultExecutor = 'alpha';
   for (const capability of Object.values(cfg.runner.capabilities)) {
@@ -980,6 +990,7 @@ test('anonymizeInputs hands a later unit neutral copies and a brief that names n
       providerModel: name,
       invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args: [script, '{prompt}'] }],
     };
+    cfg.runner.modelPolicies[name] = { nano: `${name}-nano`, standard: `${name}-std`, advanced: `${name}-adv`, flagship: `${name}-flagship`, frontier: `${name}-frontier` };
   }
   cfg.runner.defaultExecutor = 'alpha';
   for (const capability of Object.values(cfg.runner.capabilities)) {
@@ -1039,6 +1050,7 @@ test('a unit template that declares inputs gets only those steps, and its own se
       providerModel: name,
       invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args: [script, '{prompt}'] }],
     };
+    cfg.runner.modelPolicies[name] = { nano: `${name}-nano`, standard: `${name}-std`, advanced: `${name}-adv`, flagship: `${name}-flagship`, frontier: `${name}-frontier` };
   }
   cfg.runner.defaultExecutor = 'alpha';
   for (const capability of Object.values(cfg.runner.capabilities)) {
@@ -1313,6 +1325,7 @@ function useDistinctFamilies(tmp, names) {
       providerModel: name,
       invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args: [script, '{prompt}'] }],
     };
+    cfg.runner.modelPolicies[name] = { nano: `${name}-nano`, standard: `${name}-std`, advanced: `${name}-adv`, flagship: `${name}-flagship`, frontier: `${name}-frontier` };
   }
   cfg.runner.defaultExecutor = names[0];
   for (const capability of Object.values(cfg.runner.capabilities)) {
@@ -1434,7 +1447,8 @@ test('workflow and unit CLI options reach the actually dispatched prompts and dr
   const unitDir = path.join(tmp, '.fgos', 'assignments', unitRunId);
   const unitRecord = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8'));
   const summary = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit-summary.json'), 'utf8'));
-  const expectedLink = { runId: state.workflowRunId, stepId: 'opinions', unitId: 'question' };
+  const expectedLink = { caseId: state.workflowRunId, activity: 'opinions', reservationId: unitRecord.workflow.reservationId };
+  assert.match(expectedLink.reservationId, /^rsv-/, 'the Unit run names the reservation that admitted it');
   assert.deepEqual(unitRecord.workflow, expectedLink);
   assert.deepEqual(summary.workflow, expectedLink);
   assert.deepEqual(summary.stanceOptions, ['incremental', 'full']);

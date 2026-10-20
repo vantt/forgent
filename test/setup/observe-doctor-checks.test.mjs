@@ -12,6 +12,10 @@ import {
   checkObserveRunCoverage,
   checkMutatingAssignmentBindingSnapshot,
 } from '../../src/setup/registrations.mjs';
+import { bind } from '../../src/runner/execution/bind.mjs';
+import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
+
+seedFileLocalBwrapRegistry();
 
 function mkTempDir() {
   const dir = path.join(tmpdir(), 'fgos-doctor-observe-test-' + Math.random().toString(36).slice(2));
@@ -355,6 +359,74 @@ test('binding snapshot check detects mismatches in later nested attempts', () =>
     const result = checkMutatingAssignmentBindingSnapshot(cwd);
     assert.equal(result.passed, false);
     assert.match(result.message, /attempt "02" binding mismatches/);
+  } finally {
+    fs.rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+// A writing seat that walked from its primary to the next family: every attempt is recorded in
+// unit.json and settles a result.json of its own.
+function recordWalkedSeat(cwd, { secondExecutor }) {
+  const family = (name) => ({
+    kind: 'agent',
+    providerModel: name,
+    command: `${name}-bin`,
+    invocations: [{
+      id: `${name}-cli`, via: 'cli', adapter: 'cli-spawn', command: `${name}-bin`,
+      confinement: { backend: 'bwrap' },
+      credentialStore: { use: name, homeEnv: `${name.toUpperCase()}_HOME`, files: ['login'] },
+    }],
+  });
+  const runner = {
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    modelPolicies: { alpha: { standard: 'alpha-m' }, beta: { standard: 'beta-m' } },
+    capabilities: { 'docs:write': { prefer: [{ executor: 'alpha' }, { executor: 'beta' }] } },
+    executors: { alpha: family('alpha'), beta: family('beta') },
+  };
+  const unit = { id: 'walked', capability: 'docs:write', rigor: 'standard', mode: 'mutating', writes: ['docs/x.md'] };
+  const ask = { unit, role: 'producer', readOnly: false, overrides: [] };
+  const first = bind(ask, { runnerConfig: runner, session: {} });
+  const second = bind(ask, { runnerConfig: runner, session: {} }, { tried: [first] });
+  assert.deepEqual([first.executor, second.executor], ['alpha', 'beta'], 'fixture: the walk moves to the next family');
+
+  const unitDir = path.join(cwd, '.fgos/assignments/walked');
+  fs.mkdirSync(unitDir, { recursive: true });
+  fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify({
+    unit,
+    overrides: [],
+    configSnapshot: { runner },
+    bindings: {
+      'producer/1': [
+        { role: 'producer', round: 1, assignmentId: 'walked/producer/1', binding: first, boundAt: '2026-10-20T01:00:00.000Z' },
+        { role: 'producer', round: 1, assignmentId: 'walked/producer/1-fb1', binding: second, fallbackFrom: { kind: 'next-candidate' }, boundAt: '2026-10-20T01:01:00.000Z' },
+      ],
+    },
+  }));
+  for (const [dir, binding] of [['1', first], ['1-fb1', { ...second, executor: secondExecutor }]]) {
+    const runDir = path.join(unitDir, 'producer', dir, 'runs/01');
+    fs.mkdirSync(runDir, { recursive: true });
+    fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({ role: 'producer', binding }));
+  }
+}
+
+test('binding snapshot check recomputes a fallback attempt with the seat earlier bindings', () => {
+  const cwd = mkTempDir();
+  try {
+    recordWalkedSeat(cwd, { secondExecutor: 'beta' });
+    const result = checkMutatingAssignmentBindingSnapshot(cwd);
+    assert.equal(result.passed, true, result.message);
+  } finally {
+    fs.rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test('binding snapshot check still fails a fallback attempt whose binding differs from the walk', () => {
+  const cwd = mkTempDir();
+  try {
+    recordWalkedSeat(cwd, { secondExecutor: 'alpha' });
+    const result = checkMutatingAssignmentBindingSnapshot(cwd);
+    assert.equal(result.passed, false);
+    assert.match(result.message, /round "1-fb1" attempt "01" binding mismatches/);
   } finally {
     fs.rmSync(cwd, { recursive: true, force: true });
   }

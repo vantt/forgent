@@ -196,8 +196,8 @@ fn deadline_kills_and_drains_even_when_child_never_reads_stdin() {
         &io,
     )
     .unwrap_err();
-    assert!(matches!(error, BorrowError::Deadline), "{error}");
-    assert_eq!(error.to_string(), "borrow-deadline");
+    assert!(matches!(error, BorrowError::Deadline { .. }), "{error}");
+    assert_eq!(error.to_string(), "borrow-deadline: terminated");
     pids_gone(&dir);
     assert!(matches!(release(handle), fgos_holder_lock::Release::Released { .. }));
     assert!(matches!(release(held(&res)), fgos_holder_lock::Release::Released { .. }));
@@ -732,6 +732,91 @@ fn release_waits_or_reports_stuck_without_killing_pre_exec_child_and_shared_plai
             }
             assert!(child.join().unwrap().success());
         });
+        fs::remove_dir_all(dir).unwrap();
+    }
+}
+
+#[cfg(target_os = "linux")]
+#[test]
+fn adopted_direct_child_is_drained_on_borrow_and_release() {
+    // Isolate PR_SET_CHILD_SUBREAPER from the test harness's other processes.
+    const ROLE: &str = "FGOS_TEST_ADOPTED_HOLDER";
+    if std::env::var_os(ROLE).is_none() {
+        assert!(Command::new(std::env::current_exe().unwrap())
+            .args(["--exact", "adopted_direct_child_is_drained_on_borrow_and_release", "--nocapture"])
+            .env(ROLE, "1").status().unwrap().success());
+        return;
+    }
+    // SAFETY: the isolated fixture process adopts only its own descendants.
+    assert_eq!(unsafe { libc::prctl(libc::PR_SET_CHILD_SUBREAPER, 1, 0, 0, 0) }, 0);
+    for at_release in [false, true] {
+        let dir = temp_dir("adopted-holder");
+        let res = resource(&dir, "io");
+        let handle = held(&res);
+        let script = "setsid sh -c 'echo $$ > adopted; exec sleep 30' </dev/null >/dev/null 2>&1 & while [ ! -s adopted ]; do sleep 0.01; done";
+        if at_release {
+            use std::os::unix::process::CommandExt;
+            let lock_fd: i32 = fs::read_dir("/proc/self/fd").unwrap().flatten().find_map(|e| {
+                (fs::read_link(e.path()).ok()? == res.path).then(|| e.file_name().to_str().unwrap().parse().unwrap())
+            }).unwrap();
+            let mut cmd = Command::new("sh");
+            cmd.args(["-c", script]).current_dir(&dir);
+            // SAFETY: explicit borrowing of the test-owned held description.
+            unsafe { cmd.pre_exec(move || {
+                if libc::dup2(lock_fd, 3) < 0 || libc::fcntl(3, libc::F_SETFD, 0) < 0 {
+                    return Err(std::io::Error::last_os_error());
+                }
+                Ok(())
+            }); }
+            assert!(cmd.status().unwrap().success());
+        } else {
+            let out = run_borrowed_io(&handle, &shell(script, &dir), &bounds(vec![])).unwrap();
+            assert_eq!(out.outcome.exit, Some(0));
+            assert!(out.outcome.leftovers_killed > 0);
+        }
+        let pid = fs::read_to_string(dir.join("adopted")).unwrap().trim().parse::<u32>().unwrap();
+        let result = release(handle);
+        // Always clean up our fixture, including a failing release regression.
+        let state = fgos_process::facts::observe(fgos_process::ProcId(pid));
+        unsafe { libc::kill(pid as i32, libc::SIGKILL); libc::waitpid(pid as i32, std::ptr::null_mut(), 0); }
+        assert!(matches!(result, Release::Released { .. }), "{result:?}");
+        assert!(matches!(state, fgos_process::facts::Observed::Absent | fgos_process::facts::Observed::Zombie));
+        assert!(matches!(release(held(&res)), Release::Released { .. }));
+        fs::remove_dir_all(dir).unwrap();
+    }
+}
+
+#[test]
+fn deadline_reports_cooperative_cleanup_or_forced_residue() {
+    let _serial = serial();
+    for cooperative in [true, false] {
+        let dir = temp_dir("io-term-lock");
+        let handle = held(&resource(&dir, "io"));
+        let script = format!(r#"import os,signal,time
+fd=os.open('index.lock',os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
+def cleanup(sig,frame):
+ os.unlink('index.lock')
+ os._exit(0)
+signal.signal(signal.SIGTERM,{})
+open('ready','w').close()
+while True: time.sleep(.01)
+"#, if cooperative { "cleanup" } else { "signal.SIG_IGN" });
+        let spec = BorrowSpec {
+            argv: vec!["python3".into(), "-c".into(), script],
+            cwd: Some(dir.clone()),
+            ..Default::default()
+        };
+        let mut io = bounds(vec![]);
+        io.deadline = Instant::now() + Duration::from_secs(5);
+        let started = Instant::now();
+        let error = run_borrowed_io(&handle, &spec, &io).unwrap_err();
+        assert!(dir.join("ready").exists(), "handler was not installed");
+        let expected = if cooperative { Termination::Terminated } else { Termination::KilledAfterGrace };
+        assert!(matches!(error, BorrowError::Deadline { termination } if termination == expected), "{error}");
+        assert_eq!(dir.join("index.lock").exists(), !cooperative);
+        if !cooperative { assert!(started.elapsed() >= Duration::from_secs(8)); }
+        assert!(started.elapsed() < Duration::from_secs(15));
+        assert!(matches!(release(handle), Release::Released { .. }));
         fs::remove_dir_all(dir).unwrap();
     }
 }

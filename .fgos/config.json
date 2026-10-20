@@ -1218,8 +1218,8 @@
         "frontier": "grok-4.6"
       },
       "deepseek": {
-        "nano": "deepseek/deepseek-v4-flash",
-        "standard": "deepseek/deepseek-v4-flash",
+        "nano": "deepseek/deepseek-v4.1-flash",
+        "standard": "deepseek/deepseek-v4.1-flash",
         "advanced": "deepseek/deepseek-v4-pro",
         "flagship": "deepseek/deepseek-v4-pro",
         "frontier": "deepseek/deepseek-v4-pro"

@@ -1,4 +1,5 @@
 import { checkGit, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories } from './git-checks.mjs';
+import { checkWorkflowCaseBindingSentinel, checkWorkflowCaseBindings, fixWorkflowCaseBindings } from './workflow-case-checks.mjs';
 // registrations.mjs — the doctor-check / config-default registry (CONTEXT.md
 // D1/D2, docs/history/setup-doctor-config-registry/): the one place a module
 // declares a doctor check and/or a config-default shape. `checks.mjs` never
@@ -63,6 +64,7 @@ import {
 } from './workflow-pool-independence.mjs';
 import {
   checkExecutorFamilyUnique,
+  checkTierFallback,
   checkModelPolicyPools,
   checkLlmAccountsShape,
   checkLlmAccountsVsLegacy,
@@ -90,6 +92,7 @@ import { RIGOR_VALUES } from '../runner/rigor.mjs';
 import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { bind, hasUsablePrefer } from '../runner/execution/bind.mjs';
+import { walkStateOf } from '../runner/execution/account-rotation.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
 import { listWork, StoreError } from '../state/store.mjs';
@@ -665,6 +668,9 @@ export function checkMutatingAssignmentBindingSnapshot(cwd) {
               runnerConfig: unitRecord.configSnapshot?.runner,
               session: {},
             },
+            // A fallback attempt lives at `<round>-fb<n>`; its walk state is read from the seat's
+            // `<role>/<round>` chain exactly as the write gate reads it.
+            walkStateOf(unitRecord, { role, round: round.replace(/-fb\d+$/, ''), assignmentId: run.assignmentId }),
           );
           if (recomputed.refused || recomputed.executor !== resultData.binding.executor) {
             problems.push(`unit run "${unitId}" role "${role}" round "${round}" attempt "${run.attempt}" binding mismatches unit.json snapshot`);
@@ -1469,8 +1475,14 @@ registerCheck({
 });
 
 registerCheck({
+  id: 'tier-fallback',
+  description: 'every family runner.tierFallback lists for a tier has a modelPolicies cell at that tier and an agent executor; warns otherwise',
+  check: (cwd) => checkTierFallback(cwd),
+});
+
+registerCheck({
   id: 'model-policy-pools',
-  description: 'every pool a runner.modelPolicies cell names (model@pool) is declared in runner.llmAccounts; warns otherwise',
+  description: 'every pool a runner.modelPolicies cell names (model@pool) is declared in runner.llmAccounts, since a pool with no account is skipped by the walk; warns otherwise',
   check: (cwd) => checkModelPolicyPools(cwd),
 });
 
@@ -1482,7 +1494,7 @@ registerCheck({
 
 registerCheck({
   id: 'llm-accounts-vs-legacy',
-  description: 'when runner.llmAccounts is declared, it carries the same accounts and login directories as runner.providers, which the lease still reads; warns otherwise',
+  description: 'when runner.llmAccounts is declared, it carries the same accounts and login directories as runner.providers, which the lease still reads for a pool llmAccounts does not declare; warns otherwise',
   check: (cwd) => checkLlmAccountsVsLegacy(cwd),
 });
 
@@ -6637,6 +6649,19 @@ for (const id of ['git-worktree-recovery', 'git-component-compatible', 'git-tran
     'git-durability-capability': 'Measured Git durability guarantees',
   }[id], check: (cwd) => checkGit(cwd, id) });
 }
+// Workflow case bindings (docs/specs/workflow.md RUL-WF-27): the binding records are a view of each
+// case's ledger. Bodies live in workflow-case-checks.mjs.
+registerCheck({
+  id: 'workflow-case-binding-sentinel',
+  description: 'the worktree binding directory carries the host sentinel that tells a reader it is not a masked view',
+  check: (cwd) => checkWorkflowCaseBindingSentinel(cwd),
+});
+registerCheck({
+  id: 'workflow-case-bindings',
+  description: 'every worktree binding record matches the ledger of its case, and every bound open case has its record',
+  check: (cwd) => checkWorkflowCaseBindings(cwd),
+});
+registerFix({ id: 'workflow-case-bindings', fix: (cwd) => fixWorkflowCaseBindings(cwd) });
 registerFix({ id: 'git-driver-directories', fix: fixGitDriverDirectories });
 registerFix({ id: 'git-wal-dir', fix: fixGitWal });
 registerFix({ id: 'git-publication-refspecs', fix: fixGitFetchMapping });

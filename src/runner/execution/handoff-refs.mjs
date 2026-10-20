@@ -41,6 +41,17 @@ export class HandoffRefError extends RunnerConfigError {
 const sha256OfFile = (file) => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 
 /**
+ * Whether a settled report whose bytes are `actual` may still be handed over though it is not the
+ * bytes settlement recorded. `accept` is the caller's own authority for that, never this module's:
+ * `'any'` (a caller that only digests what lies there now) or the sha256 hex of the revisions it
+ * stands behind (a Workflow that holds a fresh approval bound to those bytes). Nothing else passes.
+ */
+function acceptsBytes(accept, actual) {
+  if (accept === 'any') return true;
+  return accept !== undefined && accept !== null && typeof accept[Symbol.iterator] === 'function' && new Set(accept).has(actual);
+}
+
+/**
  * The path of the account one role record left behind, absolute.
  *
  * Settlement lists a report only when it was substantive, with the sha256 of its bytes; that file
@@ -52,7 +63,7 @@ const sha256OfFile = (file) => crypto.createHash('sha256').update(fs.readFileSyn
  * @param {{mainRoot: string, worktree?: string}} where repo-relative artifact paths are relative to `mainRoot`
  * @returns {string}
  */
-export function reportRefOf(record, { mainRoot, worktree = mainRoot }) {
+export function reportRefOf(record, { mainRoot, worktree = mainRoot, accept }) {
   const subject = `role "${record?.role}" round ${record?.round}`;
   const runResult = record?.runResult ?? {};
 
@@ -65,7 +76,7 @@ export function reportRefOf(record, { mainRoot, worktree = mainRoot }) {
     } catch {
       actual = null;
     }
-    if (actual !== settled.sha256) throw new HandoffRefError(subject, 'report-changed-after-settle');
+    if (actual !== settled.sha256 && !(actual !== null && acceptsBytes(accept, actual))) throw new HandoffRefError(subject, 'report-changed-after-settle');
     return file;
   }
 
@@ -109,7 +120,7 @@ function resolveGateAnswerRef(input, mainRoot) {
   return file;
 }
 
-function resolveUnitRunRef(input, mainRoot, seat) {
+function resolveUnitRunRef(input, mainRoot, seat, accept) {
   const [unitRunId, named] = input.slice(UNIT_RUN_PREFIX.length).split('/');
   const role = seat ?? named;
   const fail = (reason) => new HandoffRefError(input, seat && reason === 'no-such-role' ? 'no-such-seat' : reason);
@@ -131,7 +142,7 @@ function resolveUnitRunRef(input, mainRoot, seat) {
     // an inline record's refs fall back to the main checkout
   }
   try {
-    return reportRefOf(latest, { mainRoot, worktree });
+    return reportRefOf(latest, { mainRoot, worktree, accept });
   } catch (err) {
     if (err instanceof HandoffRefError) throw fail(err.reason);
     throw err;
@@ -175,11 +186,11 @@ export function refIsHiddenFromBlind(ref, mainRoot) {
  * in that run, as an entry for `copyHandoffsInto` (`own-previous.md`, `own-previous-2.md`, ...).
  * A seat the earlier run did not have is refused as `no-such-seat`.
  */
-function resolveSeatInputs(inputs, mainRoot, seat) {
+function resolveSeatInputs(inputs, mainRoot, seat, accept) {
   const inputMap = [];
   for (const input of inputs.filter(isSeatInput)) {
     if (inputMap.some((e) => e.input === input)) continue;
-    const source = resolveUnitRunRef(input, mainRoot, seat);
+    const source = resolveUnitRunRef(input, mainRoot, seat, accept);
     let sha256;
     try {
       sha256 = sha256OfFile(source);
@@ -216,11 +227,15 @@ function resolveSeatInputs(inputs, mainRoot, seat) {
  *
  * @param {readonly string[]} inputs
  * @param {string} mainRoot main checkout root
- * @param {{anonymizeInto?: string, blind?: boolean, anonymize?: boolean, seat?: string}} [options]
+ * `accept` says which settled reports may be handed over although their bytes changed after settlement:
+ * `'any'` or the sha256 hex of the revisions the caller stands behind (see `acceptsBytes`). Without it a
+ * changed report is refused as `report-changed-after-settle`.
+ *
+ * @param {{anonymizeInto?: string, blind?: boolean, anonymize?: boolean, seat?: string, accept?: 'any' | Iterable<string>}} [options]
  * @returns {{refs: string[], inputMap: Array<{name: string, input: string, source: string, sha256?: string}>}}
  */
-export function resolveUnitInputs(inputs, mainRoot, { anonymizeInto, blind = false, anonymize = false, seat } = {}) {
-  if (seat !== undefined) return resolveSeatInputs(inputs ?? [], mainRoot, seat);
+export function resolveUnitInputs(inputs, mainRoot, { anonymizeInto, blind = false, anonymize = false, seat, accept } = {}) {
+  if (seat !== undefined) return resolveSeatInputs(inputs ?? [], mainRoot, seat, accept);
   inputs = (inputs ?? []).filter((input) => !isSeatInput(input));
   const refs = [];
   const sources = [];
@@ -230,7 +245,7 @@ export function resolveUnitInputs(inputs, mainRoot, { anonymizeInto, blind = fal
     let ref = input;
     const isUnitRun = input.startsWith(UNIT_RUN_PREFIX);
     if (isUnitRun) {
-      ref = resolveUnitRunRef(input, mainRoot);
+      ref = resolveUnitRunRef(input, mainRoot, undefined, accept);
       if (anonymizeInto && !blind) {
         if (!sources.some((s) => s.input === input)) sources.push({ input, source: ref });
         continue;

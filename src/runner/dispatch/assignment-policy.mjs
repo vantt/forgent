@@ -22,7 +22,7 @@
 // omit `policyProvenance`, so the field is purely additive.
 
 import { MODEL_POLICY_TIERS, RunnerConfigError, REASONING_EFFORT_VALUES, DEFAULT_RIGOR_TO_TIER, assertReasoningEffort } from './config.mjs';
-import { resolveTierModel, deriveProviderFamily } from './resolve.mjs';
+import { resolveTierModel, deriveProviderFamily, tierCellMissingDetail } from './resolve.mjs';
 import { REPEAT_MODE_VALUES } from './execution-contract.mjs';
 import { checkProviderDisallowed } from './provider-adapter.mjs';
 import { RIGOR_VALUES, RIGOR_RANK, resolveStrongerRigor } from '../rigor.mjs';
@@ -445,7 +445,11 @@ export function resolveAssignmentDispatchPolicy({
     // Direct tier resolution fails closed when the provider/tier pair is
     // unsupported. The previous fallback repeated the identical lookup and
     // could never recover from a missing mapping.
-    resolvedModel = resolveTierModel(runnerConfig, effectiveTier, resolvedProvider);
+    try {
+      resolvedModel = resolveTierModel(runnerConfig, effectiveTier, resolvedProvider);
+    } catch (err) {
+      throw new RunnerConfigError(`tier-cell-missing: ${tierCellMissingDetail(resolvedProvider, effectiveTier)}`, { code: 'tier-cell-missing' });
+    }
     modelSource = { scope: 'placement-policy', id: `${resolvedProvider}.${effectiveTier}` };
   }
 

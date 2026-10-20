@@ -2303,11 +2303,18 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           // --effort <level>: every unit of the run asks for this reasoning effort (kept for resume).
           effort: flags.effort === undefined ? undefined : requireField(flags.effort, '--effort requires a level (low, medium, high, max)'),
           timeout: flags.timeout === undefined ? undefined : requireField(flags.timeout, '--timeout requires a duration, e.g. 90m or 5400s'),
-          account: flags.account === undefined ? undefined : requireField(flags.account, '--account requires an account id (an entry of providers.<provider>.accounts in ~/.fgos/config.json)'),
+          account: flags.account === undefined ? undefined : requireField(flags.account, '--account requires pool/account (an account of a pool in runner.llmAccounts of ~/.fgos/config.json, for example openai/work)'),
           request: typeof flags.request === 'string' ? flags.request : undefined,
           stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),
           contextRefs: flags['context-ref'],
+          // --frame k=v,k=v: narrows the guide's frame defaults for this case, never widens them.
+          frame: flags.frame === undefined ? undefined : Object.fromEntries(requireField(flags.frame, '--frame requires key=value pairs, e.g. dispatches=3,rigorFloor=high').split(',').map((pair) => {
+            const [key, ...value] = pair.split('=');
+            return [key.trim(), value.join('=').trim()];
+          })),
           seats: flags.seats === undefined ? undefined : requireField(flags.seats, '--seats requires pipe-separated lenses').split('|'),
+          // --case <parentCaseId>: open this case or wave under a conductor case, charged to its frame.
+          parentCase: flags.case === undefined ? undefined : requireField(flags.case, '--case requires the id of the parent case'),
           repoRoot: flags.dir,
           worktree: flags.worktree,
         };
@@ -2336,6 +2343,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const answerParams = { stepId, answer, approved, repoRoot: flags.dir, worktree: flags.worktree };
         const answerWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
         return attachDirWarning(foreground ? await answerWorkflow(workflowRunId, answerParams) : answerWorkflowDetached(workflowRunId, answerParams), answerWarning);
+      }
+      if (sub === 'close') {
+        const { closeWorkflow } = await import('../src/workflow/index.mjs');
+        const workflowRunId = requireField(positional[1] ?? flags.id ?? swallowedId, 'workflow close requires a workflowRunId: fgos workflow close <id>');
+        return closeWorkflow(workflowRunId, { repoRoot: flags.dir, reason: typeof flags.reason === 'string' ? flags.reason : undefined });
       }
       if (sub === 'resume') {
         const { resumeWorkflow, resumeWorkflowDetached } = await import('../src/workflow/index.mjs');
@@ -2867,12 +2879,12 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           if (ov.timeoutMs === undefined) ov.timeoutMs = timeoutMs;
         }
       }
-      // `--account <id>` pins the provider account the same way: an `account` key on every override
+      // `--account <pool/account>` pins the account the same way: an `account` key on every override
       // that does not name one. runUnit checks it against each seat's bound executor before the unit
       // run exists; a resumed run keeps the account its bindings already carry.
       if (flags.account !== undefined) {
         if (resumeUnitRunId) throw new StoreError('validation', '--account cannot change a resumed unit run: it keeps the account its seats were bound to');
-        const account = requireField(flags.account, '--account requires an account id (an entry of providers.<provider>.accounts in ~/.fgos/config.json)');
+        const account = requireField(flags.account, '--account requires pool/account (an account of a pool in runner.llmAccounts of ~/.fgos/config.json, for example openai/work)');
         if (!overrides.some((ov) => ov && typeof ov === 'object' && !ov.scope)) overrides.push({ origin: 'human-cli' });
         for (const ov of overrides) {
           if (ov.account === undefined) ov.account = account;
@@ -2888,9 +2900,35 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         isLinkedWorktree: () => resolveGitRoots(worktree ? path.resolve(worktree) : process.cwd()).isLinkedWorktree,
       });
 
+      // `--case <id> --activity <id>` names the case this run is an activity of: it is admitted into that
+      // case (entry, MUST rules, write overlap, frame) before anything exists. Without them the run is
+      // standalone, and a writing one goes on only into a worktree no case owns.
+      const caseFlagsGiven = ['case', 'activity', 'route', 'reason'].filter((f) => flags[f] !== undefined);
+      let caseRef;
+      if (caseFlagsGiven.length > 0) {
+        if (resumeUnitRunId) throw new StoreError('validation', '--case cannot change a resumed unit run: it keeps the case it was admitted into');
+        const caseId = requireField(flags.case, `--${caseFlagsGiven.find((f) => f !== 'case') ?? 'case'} needs --case <caseId>: ${caseFlagsGiven.join(', ')} only apply to a run that names a case`);
+        const activity = requireField(flags.activity, '--case needs --activity <id>: the activity of the case\'s guide this run is');
+        if (flags.route !== undefined && !['should', 'may-instead', 'unlisted'].includes(flags.route)) {
+          throw new StoreError('validation', '--route must be should, may-instead or unlisted');
+        }
+        caseRef = {
+          caseId,
+          activity,
+          ...(flags.route !== undefined ? { route: flags.route } : {}),
+          ...(flags.reason !== undefined ? { reason: requireField(flags.reason, '--reason requires text') } : {}),
+        };
+      }
+      // The Workflow's port, injected here so the Execution Core never imports the Workflow: a writing
+      // run goes on only into a worktree no case owns.
+      const { createCaseAdmissionPort } = await import('../src/workflow/case-admission-port.mjs');
+      const portRoot = repoRoot ? path.resolve(repoRoot) : (() => { try { return resolveGitRoots(process.cwd()).mainCheckoutRoot; } catch { return null; } })();
+
       return attachDirWarning(await runUnit({
         unitPath,
         unitData,
+        ...(portRoot ? { caseAdmission: createCaseAdmissionPort({ repoRoot: portRoot }) } : {}),
+        ...(caseRef ? { caseRef } : {}),
         pattern,
         stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),
         overrides,

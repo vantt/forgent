@@ -56,7 +56,7 @@
         "handle": "handle returned by acquire (EX)",
         "spec": { "argv": "string[]", "cwd": "string", "env": "string map" }
       },
-      "rule": "the only way a child command passes with the holder's authority. POSIX: hands the description to exactly one child through an explicit fd mapping (default slot 3, env FGOS_LOCK_FD=<name>:3). Windows: runs the child inside a named kill-on-close job the locking process creates, with env FGOS_LOCK_JOB=<lock name>:<job name>; no handle is passed. When argv[0] is git, the call prepends -c gc.auto=0 -c maintenance.auto=false. After the child exits: kill what is left in the domain, wait for the domain to be empty, only then return.",
+      "rule": "the only way a child command passes with the holder's authority. POSIX: hands the description to exactly one child through an explicit fd mapping (default slot 3, env FGOS_LOCK_FD=<name>:3). Windows: runs the child inside a named kill-on-close job the locking process creates, with env FGOS_LOCK_JOB=<lock name>:<job name>; no handle is passed. When argv[0] is git, the call prepends -c gc.auto=0 -c maintenance.auto=false. After the child exits: kill what is left in the domain, wait for the domain to be empty, only then return. Node fd borrows and native loans carry live async sibling roots into the same Rust drain; siblings are waited on/fail closed, never signalled. Starting a borrow or minting a native loan while a drain snapshot is active refuses before spawn with retryable borrow-drain-in-progress.",
       "output": { "exit": "integer|null", "signal": "string|null", "leftoversKilled": "integer >= 0" }
     },
     "run_borrowed_io": {
@@ -70,7 +70,7 @@
           "deadline": "absolute monotonic execution deadline"
         }
       },
-      "rule": "Extended 2026-10-18 for Git Publication: run_borrowed with explicit input, bounded capture and deadline; same lifecycle as run_borrowed. Synchronous scoped lifecycle: no child, pipe or lock description escapes. Unix uses the same explicit fd mapping, preparation, predecessor handling and leftover cleanup as run_borrowed. Output overflow or deadline kills the child, waits without reaping, drains the existing borrow domain and reaps before returning the named refusal. Cleanup failure takes precedence as borrow-leftover-not-killed, as for run_borrowed. No new containment guarantee or admission barrier.",
+      "rule": "Extended 2026-10-18 for Git Publication: run_borrowed with explicit input, bounded capture and deadline; same lifecycle as run_borrowed. Synchronous scoped lifecycle: no child, pipe or lock description escapes. Unix uses the same explicit fd mapping, preparation, predecessor handling and leftover cleanup as run_borrowed. Output overflow, deadline or I/O failure sends SIGTERM to the child group with the unreaped root pinning its group id, waits at most the internal terminate_grace_ms (3000 ms by default, beside kill_wait_ms), then SIGKILL if needed. Deadline reports terminated or killed-after-grace. It waits without reaping, drains the existing borrow domain and reaps before returning the named refusal. Cleanup failure takes precedence as borrow-leftover-not-killed, as for run_borrowed. No new containment guarantee or admission barrier.",
       "platforms": {
         "unix": "implemented",
         "windows": "borrow-io-unsupported before spawn; existing run_borrowed behavior unchanged"
@@ -83,7 +83,8 @@
       "refusals": [
         "borrow-output-limit: stdout",
         "borrow-output-limit: stderr",
-        "borrow-deadline",
+        "borrow-deadline: terminated",
+        "borrow-deadline: killed-after-grace",
         "borrow-io-failed",
         "borrow-io-unsupported",
         "borrow-leftover-not-killed"

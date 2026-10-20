@@ -21,6 +21,7 @@ import { workUnitFor } from './work-dispatch.mjs';
 import { isReadOnlyAssignment, validateAgentResultClaim } from './dispatch/assignment.mjs';
 import { isSubstantiveReportText, resolveRunWorkerArtifactPath } from './dispatch/assignment-runner.mjs';
 import { runUnit, snapshotRunnerConfig } from './execution/run.mjs';
+import { createCaseAdmissionPort } from '../workflow/case-admission-port.mjs';
 import { interpretRunResult, runOutcome } from './dispatch/run-result.mjs';
 import { stampDeclaredAssignment } from './dispatch/assignment-normalizer.mjs';
 import { detectTrunk } from './worktree.mjs';
@@ -2337,6 +2338,7 @@ export async function executeDriverOperationChoice(work, choice, opts = {}) {
       repoRoot: stateRoot,
       cwd: built.worktree,
       worktree: built.worktree,
+      caseAdmission: createCaseAdmissionPort({ repoRoot: stateRoot }),
       // A background step: no Lead to fall back on, and the worker runs as a direct spawn.
       session: { headless: true, herdrPresent: false },
       ...(opts.onUnitRunCreated ? { onUnitRunCreated: opts.onUnitRunCreated } : {}),

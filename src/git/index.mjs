@@ -21,3 +21,15 @@ export { createGitInspect } from './inspect.mjs';
 export { createGitRefs } from './refs.mjs';
 export { createGitRemote } from './remote.mjs';
 export { createGitWorktree } from './worktree.mjs';
+
+export { createGitScopedCommit } from './scoped-commit.mjs';
+export { createGitSync } from './sync.mjs';
+
+export { createGitLand } from './land.mjs';
+
+export { createGitSafeRestore } from './restore.mjs';
+
+export { createGitRepositoryConfig } from './config.mjs';
+export { createGitNativeLockRepair } from './native-lock.mjs';
+
+export { createGitRecovery } from "./recovery.mjs";

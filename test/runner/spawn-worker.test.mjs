@@ -228,7 +228,7 @@ test('spawnWorker throws worker-timeout past the time budget and keeps what the 
 
 test('spawnWorker throws worker-spawn-fail when the configured command does not exist', async () => {
   const fx = fixture({
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+    executor: { providerModel: 'claude', allowCrossProvider: true, command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 20000,
   });

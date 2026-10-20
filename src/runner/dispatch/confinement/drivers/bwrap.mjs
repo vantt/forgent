@@ -14,7 +14,7 @@ import path from 'node:path';
 import * as cleanup from '../cleanup.mjs';
 import { cleanupConfinementResource, writeOwnershipMarker, extendOwnershipMarker, ensurePrivateDir } from '../cleanup.mjs';
 import { copyCredentialFiles, credentialWriteBackMarker } from '../../provider-credential-renewal.mjs';
-import { expandCredentialHome } from '../../provider-credential-probe.mjs';
+import { expandCredentialHome } from '../../provider-capacity.mjs';
 import { resolveConfinementResources, isInsideRoot, requestIsBlind } from '../resources.mjs';
 import { assertAttestationStoreIsolated } from '../attestation-store.mjs';
 import { computeSha256Digest } from '../../proof-helpers.mjs';
