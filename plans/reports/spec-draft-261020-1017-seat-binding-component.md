@@ -214,6 +214,13 @@ Doctor có một dòng kiểm "mọi ghế của mọi preset đã đăng ký đ
 10. **Tầng persona theo workflow/use case (3.0.2):** khối `personas:` trong file workflow hay thư mục `agents/` cạnh workflow? Persona domain chỉ thấy trong domain?
 11. **Pattern `debate` + role `judge`:** làm cùng Seat Binding hay để backlog?
 
+### Owner trả lời (2026-10-20)
+
+- Câu 1 (bỏ `rigorToTier`): 12:05 "không phản đối", 12:10 xác nhận rigor chỉ còn quyết số checker và khác họ; tier khai trực tiếp.
+- Câu 9 (bỏ role `panelist`, panel = N `producer` + `synthesizer`, ghế khai tường minh): 12:38 đồng ý.
+- Câu 11 (pattern `debate` + role `judge`): 12:37 **làm ngay** (trước Seat Binding).
+- Còn mở: 2, 3, 4, 5, 6, 7, 10.
+
 ## Phụ lục: phát hiện thêm khi chứng minh MP-B1 (2026-10-20 11:15)
 
 - `code:review` khai `prefer` ghim `openai#codex-cli-bwrap`, nhưng trong phiên herdr ghế bind `codex-herdr` ([phase 07](phase-lead-261020-1110-model-pool-b1-p07-proof.md)): ghim invocation trong capability bị lựa chọn transport đè. Spec phải nói rõ ghim invocation (`họ#invocation`) là cứng hay chỉ là gợi ý, và `explain` phải in lý do khi nó bị đổi.
