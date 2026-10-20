@@ -9,11 +9,11 @@
 // fgos-coding-validating's gate) — never a second bespoke merge mechanism.
 // Unlike `approve`'s root-into-main path, this never deletes fgw/<id>
 // afterward: the root stays open for further leaf merges.
-import { execFileSync } from 'node:child_process';
 import { listWork, addDecision, recordFriction, StoreError } from '../../state/store.mjs';
 import {
   landRunnerItem,
   acknowledgeLand,
+  isAlreadyMerged,
   performCatchUp,
   buildOwnFileSet,
   isWorkingTreeClean as isMainTreeClean,
@@ -104,6 +104,28 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
   // budget (no wait under --no-wait, Land's default when no --wait is given).
   const lockWait = noWait ? { lockWaitMs: 0 } : waitMs !== undefined ? { lockWaitMs: waitMs } : {};
 
+  // Land keeps a candidate until Work durably records its result: a decision
+  // for every result of this verb, since sync-root never moves `id` (Git
+  // spec §9, M4). A retained candidate never negates that result.
+  const releaseLand = (landSettlement, event, state) => {
+    if (!landSettlement) return;
+    for (const warning of acknowledgeLand(repoRoot, landSettlement.operationId, `work-decision:${id}:${event.seq}`)) {
+      process.stderr.write(`fgos: warning: "${id}" is ${state}; its Land candidate was retained (${warning}).\n`);
+    }
+  };
+  const blocked = (result, response) => {
+    if (result.landSettlement) {
+      const { event } = addDecision(dir, {
+        text: `sync-root: Land operation ${result.landSettlement.operationId} of ${branch} into ${targetBranch} published nothing (${response.reason})`,
+        rationale: `fgos sync-root ${id} — records the unpublished result so Land can release its candidate`,
+        id,
+        kind: 'engine',
+      });
+      releaseLand(result.landSettlement, event, 'not synced');
+    }
+    return response;
+  };
+
   const runAndReport = async (itemOverride, ownFileSet = null) => {
     const result = await landRunnerItem(repoRoot, itemOverride, { target: targetBranch, timeoutMs, ownFileSet, ...lockWait });
 
@@ -116,7 +138,7 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
         attempts: 1,
         detail: `sync-root: git merge --no-commit --no-ff ${branch} into ${targetBranch} conflicted; merge aborted, ${targetBranch} unchanged`,
       });
-      return { id, mode: 'sync-root', outcome: 'blocked', reason: 'merge-conflict', target: targetBranch, branch };
+      return blocked(result, { id, mode: 'sync-root', outcome: 'blocked', reason: 'merge-conflict', target: targetBranch, branch });
     }
     if (result.outcome === 'fgos-write-rejected') {
       recordFriction(dir, {
@@ -141,7 +163,7 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
           ? `sync-root: goal-check timed out on staged merge of ${branch} into ${targetBranch} after ${timeoutMs}ms — not a verify failure; merge aborted, ${targetBranch} unchanged`
           : `sync-root: goal-check failed on staged merge of ${branch} into ${targetBranch} (exit ${result.check.status}); merge aborted, ${targetBranch} unchanged`,
       });
-      return { id, mode: 'sync-root', outcome: 'blocked', reason: result.check.timedOut ? 'verify-timeout' : 'verify-fail', timedOut: result.check.timedOut, target: targetBranch, branch, exitStatus: result.check.status, output: result.check.output };
+      return blocked(result, { id, mode: 'sync-root', outcome: 'blocked', reason: result.check.timedOut ? 'verify-timeout' : 'verify-fail', timedOut: result.check.timedOut, target: targetBranch, branch, exitStatus: result.check.status, output: result.check.output });
     }
 
     if (result.outcome !== 'merged') {
@@ -168,7 +190,7 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
         attempts: 1,
         detail: `sync-root: landRunnerItem returned unrecognized outcome "${result.outcome}" for ${branch} into ${targetBranch}${errText} — refusing to report success`,
       });
-      return {
+      return blocked(result, {
         id,
         mode: 'sync-root',
         outcome: 'blocked',
@@ -176,7 +198,7 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
         target: targetBranch,
         branch,
         ...(result.error ? { error: result.error } : {}),
-      };
+      });
     }
 
     // Success — status/stage of `id` is deliberately UNTOUCHED (the
@@ -197,13 +219,7 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
       // no retrospective document behind it.
       kind: 'engine',
     });
-    // The decision is Work's durable record of this sync: only now may Land
-    // release the candidate it kept for that acknowledgement (Git spec §9).
-    if (result.landSettlement) {
-      for (const warning of acknowledgeLand(repoRoot, result.landSettlement.operationId, `work-decision:${id}:${event.seq}`)) {
-        process.stderr.write(`fgos: warning: "${id}" is synced; its Land candidate was retained (${warning}).\n`);
-      }
-    }
+    releaseLand(result.landSettlement, event, 'synced');
     return { id, mode: 'sync-root', outcome: 'synced', target: targetBranch, branch, seq: event.seq, output: result.check.output, postLand: result.postLand };
   };
 
@@ -214,14 +230,7 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
       // target's slot: Land pins the target only at prepare and merges from
       // that pin, so whatever lands on it meanwhile is included.
       let effectiveItem = item;
-      let alreadyAncestor = false;
-      try {
-        execFileSync('git', ['merge-base', '--is-ancestor', targetBranch, branch], { cwd: repoRoot, encoding: 'utf8', shell: false });
-        alreadyAncestor = true;
-      } catch (ancestorErr) {
-        if (ancestorErr.status !== 1) throw ancestorErr;
-      }
-      if (!alreadyAncestor) {
+      if (!isAlreadyMerged(repoRoot, targetBranch, branch)) {
         const catchupResult = await performCatchUp(repoRoot, id, item, targetBranch, timeoutMs);
         if (catchupResult.outcome === 'conflict') {
           recordFriction(dir, {

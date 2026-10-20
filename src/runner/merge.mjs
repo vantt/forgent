@@ -40,12 +40,10 @@ import crypto from 'node:crypto';
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 import { branchNameFor, branchExists, reclaimOrphanedCheckout, detectTrunk, inspectGit, resolveRefSha, checkoutPathForBranch, provisionDependencies, runWorktreeSetupCommands, createVerifyCheckout, removeWorktree, deleteBranchRef, gitWorktrees, realpathOrSelf } from './worktree.mjs';
 import { runGoalCheck, runInvariantChecks, invariantFailureAsCheck } from './goal-check.mjs';
 import { readInvariantCheckCommands } from '../config/shared-config-file.mjs';
 import { normalizePath } from '../util/normalize-path.mjs';
-import { nulPaths, GIT_LIST_MAX_BUFFER } from '../util/git-paths.mjs';
 import { listSessions } from './session.mjs';
 import { listWork } from '../state/store.mjs';
 import { openLeavesSharingTarget, classifyPostLandDrift } from '../state/graph-harness.mjs';
@@ -74,22 +72,30 @@ export class MergeError extends Error {
   }
 }
 
-// stdio: pipe (tsk-56t): explicit, not execFileSync's own default — without
-// it, a failing git call (e.g. "not a git repository" from a non-git cwd)
-// prints straight through to this process's real stderr in addition to
-// landing on the thrown error's own `.stderr`/`.message`, which every caller
-// here already reads instead. Found via isMainWorktree(process.cwd()) newly
-// reachable from a plain non-git dir (tsk-56t D2's read-verb warning) —
-// no caller's behavior changes, since none relied on the live leak.
-//
-function git(repoRoot, args, { maxBuffer } = {}) {
-  return execFileSync('git', args, {
-    cwd: repoRoot,
-    encoding: 'utf8',
-    shell: false,
-    stdio: ['ignore', 'pipe', 'pipe'],
-    ...(maxBuffer === undefined ? {} : { maxBuffer }),
-  });
+/** Every path Inspect `diff` reports between `before` and `after` (commits
+ * or trees), across all pages, as text. `scope` passes `prefix`/`renames`. */
+function diffPaths(port, before, after, scope = {}) {
+  const paths = [];
+  let cursor;
+  do {
+    const page = port.diff({ before, after, ...scope, maxEntries: 4096, cursor });
+    paths.push(...page.entries.map(entry => Buffer.from(entry.path).toString('utf8')));
+    cursor = page.nextCursor;
+  } while (cursor);
+  return paths;
+}
+
+/** Every file path starting with the literal `prefix` at the commit or tree
+ * `revision`. */
+function treePaths(port, revision, prefix) {
+  const paths = [];
+  let cursor;
+  do {
+    const page = port.listTree({ revision, prefix, maxEntries: 4096, cursor });
+    paths.push(...page.entries.filter(entry => entry.kind !== 'tree').map(entry => Buffer.from(entry.path).toString('utf8')));
+    cursor = page.nextCursor;
+  } while (cursor);
+  return paths;
 }
 
 // Review patches retain the existing 50 MiB ceiling and caller override.
@@ -386,14 +392,7 @@ export function changedFiles(repoRoot, item, opts = {}) {
     const port = inspectGit(repoRoot);
     const after = resolveRefSha(repoRoot, branch);
     const before = port.compareCommits({ left: resolveRefSha(repoRoot, trunk), right: after }).mergeBase;
-    const files = [];
-    let cursor;
-    do {
-      const page = port.diff({ before, after, maxEntries: 4096, cursor });
-      files.push(...page.entries.map(entry => Buffer.from(entry.path).toString('utf8')));
-      cursor = page.nextCursor;
-    } while (cursor);
-    return files;
+    return diffPaths(port, before, after);
   } catch (err) {
     throw new MergeError(`computing changed files for branch "${branch}" failed: ${err.message}`, { branch });
   }
@@ -537,10 +536,10 @@ function classifyDecisionIndexText(raw) {
  * person reading just one tree by hand. */
 export function nextFreeDecisionId(repoRoot, refs) {
   const refList = Array.isArray(refs) ? refs : [refs];
+  const port = inspectGit(repoRoot);
   let max = 0;
   for (const ref of refList) {
-    const files = nulPaths(git(repoRoot, ['ls-tree', '-r', '--name-only', '-z', ref, '--', 'docs/decisions/']));
-    for (const f of files) {
+    for (const f of treePaths(port, resolveRefSha(repoRoot, ref), 'docs/decisions/')) {
       const m = f.match(DECISION_FILE_RE);
       if (m && m[1] !== '0000') {
         max = Math.max(max, parseInt(m[1], 10));
@@ -668,7 +667,7 @@ export function toMergeLockError(err, details = {}) {
 // already happened. Checked BEFORE attempting the merge, not inferred
 // after the fact from an empty staged diff (fragile: commit-failure
 // wording is locale/git-version dependent, `is-ancestor` is not).
-function isAlreadyMerged(repoRoot, branch, ref) {
+export function isAlreadyMerged(repoRoot, branch, ref) {
   try {
     return inspectGit(repoRoot).ancestry({ ancestor: resolveRefSha(repoRoot, branch), descendant: resolveRefSha(repoRoot, ref) }).answer === 'yes';
   } catch (err) {
@@ -718,16 +717,7 @@ function mergedTreeAlreadyVerified(repoRoot, item, branch, target = 'HEAD') {
     const head = resolveRefSha(repoRoot, target);
     const mergeBase = port.compareCommits({ left: branchTip, right: head }).mergeBase;
     if (!mergeBase) return false;
-    const pathsSinceBase = (after) => {
-      const paths = new Set();
-      let cursor;
-      do {
-        const page = port.diff({ before: mergeBase, after, maxEntries: 4096, cursor });
-        for (const entry of page.entries) paths.add(Buffer.from(entry.path).toString('utf8'));
-        cursor = page.nextCursor;
-      } while (cursor);
-      return paths;
-    };
+    const pathsSinceBase = (after) => new Set(diffPaths(port, mergeBase, after));
     const introducedPaths = pathsSinceBase(branchTip);
     const mainAdvancedPaths = pathsSinceBase(head);
     for (const path of introducedPaths) {
@@ -765,19 +755,17 @@ function mergedTreeAlreadyVerified(repoRoot, item, branch, target = 'HEAD') {
 // `--no-ff` merges) means there was nothing to discard in the first place —
 // trusts ancestry unchanged, matching pre-existing behavior.
 function branchContentMismatch(repoRoot, branch, ref) {
-  const mergeCommits = git(repoRoot, ['log', '--merges', '--ancestry-path', '--reverse', '--format=%H', `${branch}..${ref}`])
-    .split('\n')
-    .filter((line) => line !== '');
-  if (mergeCommits.length === 0) {
+  const port = inspectGit(repoRoot);
+  const branchTip = resolveRefSha(repoRoot, branch);
+  const firstMerge = port.firstAncestryMerge({ ancestor: branchTip, descendant: resolveRefSha(repoRoot, ref) });
+  if (!firstMerge) {
     return [];
   }
-  const firstMerge = mergeCommits[0];
-  const port = inspectGit(repoRoot);
   let mainline;
   let base;
   try {
     mainline = port.resolveCommit({ name: `${firstMerge}^1` });
-    base = mainline && port.compareCommits({ left: resolveRefSha(repoRoot, branch), right: mainline }).mergeBase;
+    base = mainline && port.compareCommits({ left: branchTip, right: mainline }).mergeBase;
   } catch {
     base = null;
   }
@@ -792,8 +780,8 @@ function branchContentMismatch(repoRoot, branch, ref) {
   // discarded content, just an expected, permanent divergence from HEAD.
   // Rename detection stays on here (a rename names only its new path): a branch that renamed
   // `a -> b` after main already deleted `a` leaves the merge no change to make on `a`, and the
-  // source half would read as discarded content. Pathspecs are literal: a name may hold `*` or `[`.
-  const introducedPaths = nulPaths(git(repoRoot, ['diff', '--name-only', '--no-relative', '-z', `${base}..${branch}`], { maxBuffer: GIT_LIST_MAX_BUFFER }))
+  // source half would read as discarded content.
+  const introducedPaths = diffPaths(port, base, branchTip, { renames: true })
     .filter((p) => p !== '.fgos' && !p.startsWith('.fgos/'));
   if (introducedPaths.length === 0) {
     return [];
@@ -808,13 +796,7 @@ function branchContentMismatch(repoRoot, branch, ref) {
   // touched it.
   // Without rename folding a renamed path names both of its ends, so either
   // end counts as changed by the merge.
-  const changedByMerge = new Set();
-  let cursor;
-  do {
-    const page = port.diff({ before: mainline, after: firstMerge, maxEntries: 4096, cursor });
-    for (const entry of page.entries) changedByMerge.add(Buffer.from(entry.path).toString('utf8'));
-    cursor = page.nextCursor;
-  } while (cursor);
+  const changedByMerge = new Set(diffPaths(port, mainline, firstMerge));
   return introducedPaths.filter((p) => !changedByMerge.has(p));
 }
 
@@ -1021,26 +1003,27 @@ function readPathsAt(repoRoot, revision, paths) {
   return found;
 }
 
-/** The read-only `git merge-tree` of `source` onto `target` (two exact
- * OIDs): the merged tree and the paths it left conflicted. */
+/** Inspect's `mergeTree` of `source` onto `target` (two exact OIDs): the
+ * merged tree and the paths it left conflicted. */
 function readMergeTree(repoRoot, target, source) {
-  let out;
-  let conflicted = false;
+  let fact;
   try {
-    out = execFileSync('git', ['merge-tree', '--write-tree', '-z', '--name-only', '--no-messages', target, source], { cwd: repoRoot, encoding: 'utf8', maxBuffer: GIT_LIST_MAX_BUFFER, stdio: ['ignore', 'pipe', 'pipe'] });
+    fact = inspectGit(repoRoot).mergeTree({ target, source });
   } catch (err) {
-    if (err.status !== 1) throw new MergeError(`reading the merge of ${source} onto ${target} failed: ${err.message}`, { stderr: err.stderr ?? null, status: err.status ?? null });
-    out = err.stdout;
-    conflicted = true;
+    throw new MergeError(`reading the merge of ${source} onto ${target} failed: ${err.message}`);
   }
-  const [tree, ...rest] = String(out).split('\0');
-  return { tree, conflictedPaths: conflicted ? [...new Set(rest.filter(Boolean))] : [] };
+  return { tree: fact.tree, conflictedPaths: fact.conflictedPaths.map(p => Buffer.from(p).toString('utf8')) };
 }
 
 /** The `.fgos` paths whose bytes differ between two trees (or commits). */
-const changedStorePaths = (repoRoot, before, after) => nulPaths(git(repoRoot, ['diff-tree', '-r', '--name-only', '--no-renames', '-z', before, after, '--', '.fgos'], { maxBuffer: GIT_LIST_MAX_BUFFER }));
+const changedStorePaths = (repoRoot, before, after) => diffPaths(inspectGit(repoRoot), before, after, { prefix: '.fgos' });
 
-const isUnionAt = (repoRoot, target, relPath) => git(repoRoot, ['check-attr', `--source=${target}`, 'merge', '--', relPath]).trim().endsWith(': union');
+/** Which of `paths` carry `merge=union` in `target`'s attributes. */
+function unionPathsAt(repoRoot, target, paths) {
+  if (paths.length === 0) return new Set();
+  const facts = inspectGit(repoRoot).attributes({ revision: target, attribute: 'merge', paths: paths.map(p => [...Buffer.from(p)]) });
+  return new Set(facts.filter(f => f.value === 'union').map(f => Buffer.from(f.path).toString('utf8')));
+}
 
 /**
  * The one fgOS store rule for a merge of `source` onto `target` (ADR0020: a
@@ -1054,7 +1037,8 @@ const isUnionAt = (repoRoot, target, relPath) => git(repoRoot, ['check-attr', `-
  */
 function declareStoreFiles(repoRoot, item, { target, source, tree, conflictedPaths }, files) {
   const declare = (relPath, bytes) => files.set(relPath, { path: relPath, bytes: bytes === null ? null : [...bytes] });
-  const unresolved = conflictedPaths.filter((p) => !isFgosPath(p) || !isUnionAt(repoRoot, target, p));
+  const conflictedUnion = unionPathsAt(repoRoot, target, conflictedPaths.filter(isFgosPath));
+  const unresolved = conflictedPaths.filter((p) => !conflictedUnion.has(p));
   const resolvable = conflictedPaths.filter((p) => !unresolved.includes(p));
   const kept = readPathsAt(repoRoot, target, resolvable);
   for (const p of resolvable) declare(p, kept.get(p));
@@ -1074,11 +1058,12 @@ function declareStoreFiles(repoRoot, item, { target, source, tree, conflictedPat
     }
   }
   const sameBytes = (a, b) => (a === null || b === null ? a === b : a.equals(b));
+  const union = unionPathsAt(repoRoot, target, changed);
   const written = [];
   for (const p of changed) {
     const unchangedOnBranch = atTake !== null && sameBytes(atTake.get(p), atSource.get(p));
     const kept = keptBytes.get(p);
-    if (kept !== null && (unchangedOnBranch || isUnionAt(repoRoot, target, p))) declare(p, kept);
+    if (kept !== null && (unchangedOnBranch || union.has(p))) declare(p, kept);
     else if (kept === null && unchangedOnBranch) declare(p, null);
     else written.push(p);
   }
@@ -1102,8 +1087,9 @@ export function declareLandFiles(repoRoot, item, target, source) {
   if (conflictedPaths.length === 1 && conflictedPaths[0] === DECISION_INDEX_PATH) {
     const classification = classifyDecisionIndexText(readPathsAt(repoRoot, tree, [DECISION_INDEX_PATH]).get(DECISION_INDEX_PATH)?.toString('utf8') ?? '');
     if (!classification) return { outcome: 'conflict' };
-    const targetFiles = new Set(nulPaths(git(repoRoot, ['ls-tree', '-r', '--name-only', '-z', target, '--', 'docs/decisions/'])));
-    const sourceFiles = nulPaths(git(repoRoot, ['ls-tree', '-r', '--name-only', '-z', source, '--', 'docs/decisions/']));
+    const port = inspectGit(repoRoot);
+    const targetFiles = new Set(treePaths(port, target, 'docs/decisions/'));
+    const sourceFiles = treePaths(port, source, 'docs/decisions/');
     const idRenames = new Map();
     let nextId = nextFreeDecisionId(repoRoot, [target, source]);
     for (const oldId of classification.collidingIds) {
@@ -1181,6 +1167,13 @@ export async function landRunnerItem(repoRoot, item, {
   });
   const options = gitPortOptions(repoRoot, { mutation: true });
   const port = createGitLand(options);
+  // A result that published nothing carries the `abandoned` settlement, so
+  // its candidate is released like a delivered one once Work durably records
+  // that result (Git spec §9, M4).
+  const settled = (result, settlementKind = 'abandoned') => {
+    const landSettlement = landSettlementFor(options, operationId, settlementKind);
+    return landSettlement ? { ...result, landSettlement } : result;
+  };
   let phase = 'prepare';
   try {
     const { candidate, receipt: previous } = await port.prepare({
@@ -1198,11 +1191,9 @@ export async function landRunnerItem(repoRoot, item, {
       },
     });
     if (previous) {
-      const operation = createGitRecovery(options).inspectOperation({ operationId });
-      return withPostLand({ outcome: 'merged', branch,
+      return withPostLand(settled({ outcome: 'merged', branch,
         check: { passed: true, status: 0, timedOut: false, skipped: true, output: `publication already verified and recorded by Land operation ${operationId}; awaiting Work settlement` },
-        receipt: previous,
-        landSettlement: { repoIdentity: operation.repoIdentity ?? operation.intent?.repoIdentity, operationId, settlementKind: 'delivered' } });
+        receipt: previous }, 'delivered'));
     }
     // Eligibility still belongs to Work, decided against the exact source and
     // target Land pinned for this candidate, never a target read before it.
@@ -1213,13 +1204,13 @@ export async function landRunnerItem(repoRoot, item, {
         provisionDependencies(candidate.worktree);
         runWorktreeSetupCommands(candidate.worktree, repoRoot);
       } catch (err) {
-        return { outcome: 'verify-fail', branch, check: { passed: false, status: 1, timedOut: false, output: err.message } };
+        return settled({ outcome: 'verify-fail', branch, check: { passed: false, status: 1, timedOut: false, output: err.message } });
       }
       check = await runGoalCheck(item, candidate.worktree, timeoutMs);
       if (check.passed) {
         // The repo-invariant gate runs on the exact tree about to land.
         const invariant = await runInvariantChecks(readInvariantCheckCommands(repoRoot), candidate.worktree, timeoutMs);
-        if (!invariant.passed) return { outcome: 'verify-fail', branch, check: invariantFailureAsCheck(invariant), ...(selfResolved && { selfResolved }) };
+        if (!invariant.passed) return settled({ outcome: 'verify-fail', branch, check: invariantFailureAsCheck(invariant), ...(selfResolved && { selfResolved }) });
       }
     } else {
       check = {
@@ -1227,16 +1218,14 @@ export async function landRunnerItem(repoRoot, item, {
         output: `verify skipped: the merged tree is identical to ${item.branchHeadAtReturn}, already verified green at return (${target} is an ancestor of "${branch}" or advanced only on paths it never touched, and the branch tip has not moved since)`,
       };
     }
-    if (!check.passed) return { outcome: 'verify-fail', branch, check, ...(selfResolved && { selfResolved }) };
+    if (!check.passed) return settled({ outcome: 'verify-fail', branch, check, ...(selfResolved && { selfResolved }) });
     phase = 'publish';
     const receipt = await port.publish({
       source: candidate.source, target: candidate.target,
       candidate: candidate.candidate, treeDigest: candidate.treeDigest,
       evidenceDigest: crypto.createHash('sha256').update(JSON.stringify({ item: item.id, check })).digest('hex'),
     }, { waitMs: lockWaitMs });
-    const operation = createGitRecovery(options).inspectOperation({ operationId });
-    return withPostLand({ outcome: 'merged', branch, check, receipt, ...(selfResolved && { selfResolved }),
-      landSettlement: { repoIdentity: operation.intent.repoIdentity, operationId, settlementKind: 'delivered' } });
+    return withPostLand(settled({ outcome: 'merged', branch, check, receipt, ...(selfResolved && { selfResolved }) }, 'delivered'));
   } catch (err) {
     let detail;
     try { detail = JSON.parse(err.message); } catch { detail = {}; }
@@ -1256,8 +1245,8 @@ export async function landRunnerItem(repoRoot, item, {
       });
       return verified.outcome === 'merged' ? withPostLand(verified) : verified;
     }
-    if (cause === 'land-conflict-aborted') return { outcome: 'conflict', branch };
-    if (cause === 'main-checkout-dirty-mid-merge') return { outcome: cause, branch };
+    if (cause === 'land-conflict-aborted') return settled({ outcome: 'conflict', branch });
+    if (cause === 'main-checkout-dirty-mid-merge') return settled({ outcome: cause, branch });
     if (cause === 'foreign-target-checkout') {
       throw new MergeError(`cannot merge "${branch}" into "${target}": "${target}" is checked out in another worktree, and Land never moves a branch behind another index. Finish or remove that checkout, then retry.`, {
         branch, targetRef: target, code: cause,
@@ -1276,21 +1265,35 @@ export async function landRunnerItem(repoRoot, item, {
     // Preserve Land's stale result, including operation identity and recovery
     // evidence. Never re-run verification or CAS against a different target.
     if (detail.errorClass === 'stale' || cause === 'land-target-changed' || cause === 'land-cas-lost') throw err;
-    return {
+    return settled({
       outcome: 'merge-failed-unclassified', branch,
       error: { message: err.message, stderr: err.stderr ?? null, status: err.status ?? null },
-    };
+    });
   } finally {
     port.close();
   }
 }
 
+/** Work's unique settlement identity `(repoIdentity, operationId,
+ * settlementKind)` for a Land operation (Git spec §9 step 6, M4), or null
+ * when Land journalled nothing under `operationId`: then there is no
+ * candidate to release, and an unreadable journal keeps whatever it holds. */
+function landSettlementFor(options, operationId, settlementKind) {
+  let operation;
+  try {
+    operation = createGitRecovery(options).inspectOperation({ operationId });
+  } catch {
+    return null;
+  }
+  return { repoIdentity: operation.repoIdentity, operationId, settlementKind };
+}
+
 /**
- * Release a published Land operation's candidate, pins and journal once Work
- * has durably recorded the delivery (Git spec §9 cleanup admission, M4):
- * `acknowledgement` names that durable record. Cleanup never negates the
- * land, so a failure comes back as a warning, and Land itself retains
- * whatever it cannot prove safe to remove.
+ * Release a Land operation's candidate, pins and journal once Work has
+ * durably recorded its result, delivered or abandoned (Git spec §9 cleanup
+ * admission, M4): `acknowledgement` names that durable record. Cleanup
+ * never negates the result, so a failure comes back as a warning, and Land
+ * itself retains whatever it cannot prove safe to remove.
  */
 export function acknowledgeLand(repoRoot, operationId, acknowledgement) {
   let port;

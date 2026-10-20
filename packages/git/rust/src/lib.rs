@@ -511,6 +511,16 @@ pub struct TreeCursor {
     pub(crate) prefix: Vec<u8>,
     pub(crate) after: Vec<u8>,
 }
+impl TreeCursor {
+    /// A transport resumes the same query from the last path it was given;
+    /// the listing still refuses a cursor of another revision or prefix.
+    pub fn resume(revision: &Oid, prefix: &[u8], after: Vec<u8>) -> Self {
+        Self { revision: revision.clone(), prefix: prefix.to_vec(), after }
+    }
+    pub fn after(&self) -> &[u8] {
+        &self.after
+    }
+}
 #[derive(Debug)]
 pub struct ListedTreeEntry {
     pub path: Vec<u8>,

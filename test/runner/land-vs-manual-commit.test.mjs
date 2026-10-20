@@ -253,5 +253,7 @@ test('promoting a member does not hold the main mutex during verify: another wit
   assert.equal(probe('merge-slot', { fgosDir, ref: encodeURIComponent('refs/heads/fgw/root-x') }).result, 'held', 'the integration branch\'s slot is held');
   const entered = await withMainCheckout(createLockScope('concurrent'), 'concurrent', () => 'in', { fgosDir });
   assert.equal(entered, 'in');
-  assert.deepEqual(await promoting, { id: 'member-a', outcome: 'merged' });
+  const { landSettlement, ...promoted } = await promoting;
+  assert.deepEqual(promoted, { id: 'member-a', outcome: 'merged' });
+  assert.equal(landSettlement.settlementKind, 'delivered');
 });

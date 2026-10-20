@@ -14,6 +14,7 @@ import { listWork, addWork, editWork, addDecision, StoreError } from '../../stat
 import { generateId } from '../../intake/classify.mjs';
 import { isMainWorktree } from '../../runner/worktree.mjs';
 import { resolveIntegrationBranch, retargetMember } from '../../runner/promote-engine.mjs';
+import { acknowledgeLand } from '../../runner/merge.mjs';
 
 /**
  * @param {{dir: string, repoRoot: string}} ctx
@@ -119,7 +120,7 @@ export async function promoteToComponentUseCase({ dir, repoRoot }, { ids, rootId
         editWork(dir, { id, patch: { parent: rootId } });
         results.push(outcome);
       } catch (err) {
-        results.push({ id, outcome: 'merged-parent-rejected', reason: err.message });
+        results.push({ id, outcome: 'merged-parent-rejected', reason: err.message, landSettlement: outcome.landSettlement });
       }
     } else {
       results.push(outcome);
@@ -138,5 +139,17 @@ export async function promoteToComponentUseCase({ dir, repoRoot }, { ids, rootId
     kind: 'engine',
   });
 
-  return { rootId, rootCreated, results, seq: event.seq };
+  // The decision is Work's durable record of every member's outcome: only now
+  // may Land release the candidates it kept for that acknowledgement (Git
+  // spec §9, M4). A retained candidate never negates the recorded outcome.
+  const report = [];
+  for (const { landSettlement, ...result } of results) {
+    report.push(result);
+    if (!landSettlement) continue;
+    for (const warning of acknowledgeLand(repoRoot, landSettlement.operationId, `work-decision:${rootId}:${event.seq}`)) {
+      process.stderr.write(`fgos: warning: "${result.id}" promote result is recorded; its Land candidate was retained (${warning}).\n`);
+    }
+  }
+
+  return { rootId, rootCreated, results: report, seq: event.seq };
 }

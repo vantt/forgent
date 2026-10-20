@@ -198,7 +198,7 @@ impl GitDriver {
         repo: &RepoHandle,
         held: Vec<BorrowedHandle<'a>>,
     ) -> Result<LockScope<'a>> {
-        crate::refs::acquire_worktree_admin(repo, held)
+        crate::refs::adopt_worktree_admin(repo, held)
     }
     fn worktree_call(&self, repo: &RepoHandle, scope: &LockScope<'_>, args: &[&str]) -> Result<()> {
         scope.validate().map_err(failure)?;

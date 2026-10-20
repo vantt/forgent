@@ -315,7 +315,7 @@ test('root-into-main merge gate: an UNRELATED path dirtied mid-merge (outside ow
 
 // approve's --no-wait / --wait against a held merge slot, through the use case
 // itself on a real repo and a real other process holding the slot.
-async function approvableRootRepo(id) {
+async function approvableRootRepo(id, { verify = 'true' } = {}) {
   const cwd = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-approve-wait-')));
   execGit(cwd, ['init', '--initial-branch=main']);
   execGit(cwd, ['config', 'user.name', 'Test']);
@@ -323,7 +323,7 @@ async function approvableRootRepo(id) {
   execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
   const fgosDir = path.join(cwd, '.fgos');
   fs.mkdirSync(fgosDir);
-  addTestWork(fgosDir, id, { status: 'awaiting-approval', verify: 'true' });
+  addTestWork(fgosDir, id, { status: 'awaiting-approval', verify });
   execGit(cwd, ['add', '.fgos']);
   execGit(cwd, ['commit', '-m', 'add work']);
   prepareActivatedGitFixture(cwd);
@@ -452,4 +452,65 @@ test('approve lands a leaf on its root branch through Land, with the delivery se
   const { landOperation } = listWork(fgosDir).decisions.find((d) => d.id === 'tsk-leaf' && d.landOperation);
   assert.equal(landOperation.destination, 'refs/heads/fgw/tsk-root');
   assert.equal(item.landSettlement.operationId, landOperation.operationId);
+});
+
+// Land keeps a candidate, its pins and its journal until Work durably records
+// the result; a result that published nothing is released the same way.
+function assertNoLandCandidate(cwd) {
+  const candidates = path.join(cwd, '.fgos/runtime/git-candidates');
+  assert.deepEqual(fs.existsSync(candidates) ? fs.readdirSync(candidates) : [], [], 'no candidate is left once the result is acknowledged');
+  assert.equal(execGit(cwd, ['for-each-ref', 'refs/fgos/git-operations']), '', 'no candidate pin is left');
+}
+
+test('approve releases a red Land candidate once Work has recorded the block', async () => {
+  const { listWork } = await import('../../src/state/store.mjs');
+  const { cwd, fgosDir } = await approvableRootRepo('tsk-red', { verify: 'false' });
+  const mainBefore = execGit(cwd, ['rev-parse', 'main']).trim();
+  const result = await approveUseCase({ dir: fgosDir, repoRoot: cwd }, approveOptions('tsk-red', { noWait: false, waitMs: 15000 }));
+  assert.equal(result.to, 'blocked', JSON.stringify(result));
+  assert.equal(listWork(fgosDir).work['tsk-red'].status, 'blocked');
+  assert.equal(execGit(cwd, ['rev-parse', 'main']).trim(), mainBefore, 'nothing was published');
+  assertNoLandCandidate(cwd);
+});
+
+test('sync-root records a red Land result as a decision and releases its candidate', async () => {
+  const { listWork } = await import('../../src/state/store.mjs');
+  const { syncRootUseCase } = await import('../../src/verbs/merge/sync-root.mjs');
+  const { cwd, fgosDir } = await approvableRootRepo('tsk-sync-red', { verify: 'false' });
+  const mainBefore = execGit(cwd, ['rev-parse', 'main']).trim();
+  const result = await syncRootUseCase({ dir: fgosDir, repoRoot: cwd }, { id: 'tsk-sync-red', resolveTimeoutMs: () => 60000, resolveWaitFlags: () => ({ noWait: false, waitMs: 15000 }), acknowledgeIronLaw: true });
+  assert.equal(result.outcome, 'blocked', JSON.stringify(result));
+  assert.equal(result.reason, 'verify-fail');
+  assert.equal(execGit(cwd, ['rev-parse', 'main']).trim(), mainBefore, 'nothing was published');
+  assert.ok(listWork(fgosDir).decisions.some((d) => d.id === 'tsk-sync-red' && d.kind === 'engine' && /published nothing \(verify-fail\)/.test(d.text)),
+    'Work records the unpublished result before the candidate is released');
+  assertNoLandCandidate(cwd);
+});
+
+test('promote-to-component releases every member\'s Land candidate, merged or red, once its decision is recorded', async () => {
+  const { promoteToComponentUseCase } = await import('../../src/verbs/merge/promote-to-component.mjs');
+  const cwd = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-promote-')));
+  execGit(cwd, ['init', '--initial-branch=main']);
+  execGit(cwd, ['config', 'user.name', 'Test']);
+  execGit(cwd, ['config', 'user.email', 'test@example.com']);
+  execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
+  const fgosDir = path.join(cwd, '.fgos');
+  fs.mkdirSync(fgosDir);
+  addTestWork(fgosDir, 'ptc-green', { status: 'awaiting-approval', verify: 'true' });
+  addTestWork(fgosDir, 'ptc-red', { status: 'awaiting-approval', verify: 'false', deps: ['ptc-green'] });
+  execGit(cwd, ['add', '.fgos']);
+  execGit(cwd, ['commit', '-m', 'add work']);
+  prepareActivatedGitFixture(cwd);
+  for (const id of ['ptc-green', 'ptc-red']) {
+    execGit(cwd, ['branch', `fgw/${id}`, 'HEAD']);
+    execGit(cwd, ['checkout', `fgw/${id}`]);
+    fs.writeFileSync(path.join(cwd, `${id}.txt`), `${id}\n`);
+    execGit(cwd, ['add', `${id}.txt`]);
+    execGit(cwd, ['commit', '-m', id]);
+    execGit(cwd, ['checkout', 'main']);
+  }
+  const result = await promoteToComponentUseCase({ dir: fgosDir, repoRoot: cwd }, { ids: ['ptc-green', 'ptc-red'], rootTitle: 'Promoted component', timeoutMs: 60000 });
+  assert.deepEqual(result.results.map((r) => [r.id, r.outcome]), [['ptc-green', 'merged'], ['ptc-red', 'blocked']]);
+  assert.ok(result.results.every((r) => !('landSettlement' in r)), 'settlement identities stay internal to the verb');
+  assertNoLandCandidate(cwd);
 });

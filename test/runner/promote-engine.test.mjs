@@ -72,8 +72,9 @@ test('retargetMember merges a clean member branch into the integration branch, r
   makeBranchWithCommit(repoRoot, 'fgw/member-a', 'member-a.txt', 'member a work\n');
   resolveIntegrationBranch(repoRoot, 'root-x');
 
-  const result = await retargetMember(repoRoot, makeItem('member-a'), 'root-x');
+  const { landSettlement, ...result } = await retargetMember(repoRoot, makeItem('member-a'), 'root-x');
   assert.deepEqual(result, { id: 'member-a', outcome: 'merged' });
+  assert.equal(landSettlement.settlementKind, 'delivered', 'the caller acknowledges the delivered Land under this identity');
 
   const rootFiles = git(repoRoot, ['ls-tree', '-r', '--name-only', 'fgw/root-x']);
   assert.match(rootFiles, /member-a\.txt/);
@@ -155,8 +156,9 @@ test('retargetMember waits while another process holds the integration branch\'s
   const holder = await holdLockInChild('merge-slot', { fgosDir: path.join(repoRoot, '.fgos'), ref: encodeURIComponent('refs/heads/fgw/root-x') });
   setTimeout(() => holder.child.kill('SIGKILL'), 300);
 
-  const result = await retargetMember(repoRoot, makeItem('member-a'), 'root-x');
+  const { landSettlement, ...result } = await retargetMember(repoRoot, makeItem('member-a'), 'root-x');
   await holder.exited;
   assert.deepEqual(result, { id: 'member-a', outcome: 'merged' });
+  assert.equal(landSettlement.settlementKind, 'delivered');
   assert.equal(git(repoRoot, ['show', 'fgw/root-x:member-a.txt']), 'member a work\n');
 });

@@ -119,9 +119,49 @@ impl GitInspect {
                 let bytes = self.driver.diff_text(&repo, &oid("before")?, &oid("after")?, bound).map_err(operation)?;
                 Ok(json!(String::from_utf8_lossy(&bytes)))
             }
-            "diff" => Ok(json!(self
+            "diff" => {
+                let prefix = args.get("prefix").filter(|v| !v.is_null())
+                    .map(|v| v.as_str().ok_or_else(|| error("expected prefix string")))
+                    .transpose()?;
+                let renames = args.get("renames").filter(|v| !v.is_null())
+                    .map(|v| v.as_bool().ok_or_else(|| error("expected renames boolean")))
+                    .transpose()?
+                    .unwrap_or(false);
+                Ok(json!(self
+                    .driver
+                    .diff(&repo, &oid("before")?, &oid("after")?, &DiffScope { prefix, renames }, cursor()?, max()?)
+                    .map_err(operation)?))
+            }
+            "mergeTree" => Ok(json!(self
                 .driver
-                .diff(&repo, &oid("before")?, &oid("after")?, cursor()?, max()?)
+                .merge_tree(&repo, &oid("target")?, &oid("source")?)
+                .map_err(operation)?)),
+            "listTree" => {
+                // The cursor crossing Node is the last path returned.
+                let (revision, prefix) = (oid("revision")?, text(&args, "prefix")?.as_bytes());
+                let cursor = args
+                    .get("cursor")
+                    .filter(|v| !v.is_null())
+                    .map(|v| serde_json::from_value::<Vec<u8>>(v.clone()).map_err(error))
+                    .transpose()?
+                    .map(|after| TreeCursor::resume(&revision, prefix, after));
+                let page = self
+                    .driver
+                    .list_tree(&repo, &revision, prefix, cursor, max()?)
+                    .map_err(operation)?;
+                Ok(json!({
+                    "entries": page.entries.iter().map(|e| json!({"path": e.path, "mode": e.mode, "kind": format!("{:?}", e.kind).to_lowercase(), "oid": e.oid})).collect::<Vec<_>>(),
+                    "complete": page.complete,
+                    "nextCursor": page.next_cursor.as_ref().map(TreeCursor::after),
+                }))
+            }
+            "attributes" => Ok(json!(self
+                .driver
+                .attributes(&repo, &oid("revision")?, text(&args, "attribute")?, &paths()?)
+                .map_err(operation)?)),
+            "firstAncestryMerge" => Ok(json!(self
+                .driver
+                .first_ancestry_merge(&repo, &oid("ancestor")?, &oid("descendant")?)
                 .map_err(operation)?)),
             "ancestry" => Ok(
                 json!({"answer":if self.driver.ancestry(&repo,&oid("ancestor")?,&oid("descendant")?).map_err(operation)? {"yes"} else {"no"}}),

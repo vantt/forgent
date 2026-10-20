@@ -57,6 +57,39 @@ pub struct StatusEntry {
 pub struct DiffEntry {
     pub path: Vec<u8>,
     pub change: u8,
+    /// The old path of a detected rename; only with `DiffScope::renames`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub from: Option<Vec<u8>>,
+}
+/// What a `diff` compares beyond its two objects: an optional literal path
+/// prefix, and whether a rename is reported once under its new path.
+#[derive(Debug, Default)]
+pub struct DiffScope<'a> {
+    pub prefix: Option<&'a str>,
+    pub renames: bool,
+}
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MergeTreeFact {
+    pub tree: Oid,
+    pub conflicted_paths: Vec<Vec<u8>>,
+}
+#[derive(Debug, Serialize)]
+pub struct AttributeFact {
+    pub path: Vec<u8>,
+    pub value: String,
+}
+/// A canonical repository-relative prefix (a trailing `/` is accepted), never
+/// pathspec magic, a glob or a traversal.
+fn literal_prefix(raw: &str) -> Result<&str> {
+    let prefix = raw.strip_suffix('/').unwrap_or(raw);
+    if prefix.is_empty()
+        || prefix.chars().any(char::is_control)
+        || fgos_write_scope::canonicalize(prefix).as_deref() != Ok(prefix)
+    {
+        return Err(refused("invalid-literal-path"));
+    }
+    Ok(prefix)
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -278,47 +311,59 @@ impl GitDriver {
         }
         page(entries, &bytes, cursor, max)
     }
-    /// Changes between two pinned objects, with renames disabled so both paths
-    /// of a move appear independently. No cwd-relative or text conversion rules.
+    /// Changes between two pinned commits or trees. Renames are disabled
+    /// unless the scope asks for them, so both paths of a move appear
+    /// independently. No cwd-relative or text conversion rules.
     pub fn diff(
         &self,
         repo: &RepoHandle,
         before: &Oid,
         after: &Oid,
+        scope: &DiffScope<'_>,
         cursor: Option<InspectCursor>,
         max: usize,
     ) -> Result<InspectPage<DiffEntry>> {
-        self.require_commit(repo, before)?;
-        self.require_commit(repo, after)?;
-        let bytes = self.checked(
-            repo,
-            &[
-                "diff",
-                "--name-status",
-                "--no-relative",
-                "--no-renames",
-                "--no-ext-diff",
-                "--no-textconv",
-                "-z",
-                before.as_str(),
-                after.as_str(),
-                "--",
-            ],
-            Policy::Inspect,
-        )?;
+        self.require_tree_ish(repo, before)?;
+        self.require_tree_ish(repo, after)?;
+        let pathspec = scope
+            .prefix
+            .map(|p| literal_prefix(p).map(|p| format!(":(literal){p}")))
+            .transpose()?;
+        let mut args = vec![
+            "diff",
+            "--name-status",
+            "--no-relative",
+            if scope.renames { "--find-renames" } else { "--no-renames" },
+            "--no-ext-diff",
+            "--no-textconv",
+            "-z",
+            before.as_str(),
+            after.as_str(),
+            "--",
+        ];
+        args.extend(pathspec.as_deref());
+        let bytes = self.checked(repo, &args, Policy::Inspect)?;
         let fields = records(&bytes)?;
-        if fields.len() % 2 != 0 {
-            return Err(refused("invalid-diff-protocol"));
-        }
         let mut entries = vec![];
-        for pair in fields.chunks(2) {
-            if pair[0].len() != 1 || !b"ACDMTUXB".contains(&pair[0][0]) || pair[1].is_empty() {
+        let mut rest = fields.as_slice();
+        while let Some((status, tail)) = rest.split_first() {
+            let renamed = scope.renames
+                && status.len() > 1
+                && status[0] == b'R'
+                && status[1..].iter().all(u8::is_ascii_digit);
+            let arity = if renamed { 2 } else { 1 };
+            if tail.len() < arity
+                || tail[..arity].iter().any(|p| p.is_empty())
+                || (!renamed && (status.len() != 1 || !b"ACDMTUXB".contains(&status[0])))
+            {
                 return Err(refused("invalid-diff-protocol"));
             }
             entries.push(DiffEntry {
-                path: pair[1].to_vec(),
-                change: pair[0][0],
+                path: tail[arity - 1].to_vec(),
+                change: status[0],
+                from: renamed.then(|| tail[0].to_vec()),
             });
+            rest = &tail[arity..];
         }
         page(entries, &bytes, cursor, max)
     }
@@ -336,6 +381,15 @@ impl GitDriver {
         )?;
         if !output.success { return Err(output.error("diff-read-failed")); }
         Ok(output.stdout)
+    }
+    fn require_tree_ish(&self, repo: &RepoHandle, value: &Oid) -> Result<()> {
+        Oid::parse(value.as_str(), repo.object_format())
+            .map_err(|_| refused("object-format-mismatch"))?;
+        let kind = self.checked(repo, &["cat-file", "-t", value.as_str()], Policy::Inspect)?;
+        if kind != b"commit\n" && kind != b"tree\n" {
+            return Err(refused("expected-commit-or-tree"));
+        }
+        Ok(())
     }
     fn require_commit(&self, repo: &RepoHandle, value: &Oid) -> Result<()> {
         Oid::parse(value.as_str(), repo.object_format())
@@ -991,5 +1045,114 @@ impl GitDriver {
             None
         };
         Ok(serde_json::json!({"branch":name,"upstream":upstream,"url":url}))
+    }
+}
+
+/// Bounded merge facts for the Land consumer's trusted-side resolutions.
+impl GitDriver {
+    /// The tree `git merge-tree --write-tree` produces for two commits and the
+    /// paths it left conflicted. Exit 1 is the conflicted answer. The command
+    /// may add unreferenced objects; it changes no ref, index or checkout.
+    pub fn merge_tree(&self, repo: &RepoHandle, target: &Oid, source: &Oid) -> Result<MergeTreeFact> {
+        self.require_commit(repo, target)?;
+        self.require_commit(repo, source)?;
+        let out = self.inspect_command(
+            repo,
+            &[
+                "merge-tree",
+                "--write-tree",
+                "-z",
+                "--name-only",
+                "--no-messages",
+                target.as_str(),
+                source.as_str(),
+            ],
+        )?;
+        let conflicted = match (out.success, out.code) {
+            (true, _) => false,
+            (false, Some(1)) => true,
+            _ => return Err(out.error("merge-tree-failed")),
+        };
+        let fields = records(&out.stdout)?;
+        let (tree, paths) = fields
+            .split_first()
+            .ok_or_else(|| refused("invalid-merge-tree-protocol"))?;
+        let tree = oid(repo, tree)?;
+        let mut conflicted_paths: Vec<Vec<u8>> = vec![];
+        for path in paths.iter().filter(|p| !p.is_empty()) {
+            if !conflicted_paths.iter().any(|p| p == path) {
+                conflicted_paths.push(path.to_vec());
+            }
+        }
+        if conflicted != !conflicted_paths.is_empty() {
+            return Err(refused("invalid-merge-tree-protocol"));
+        }
+        Ok(MergeTreeFact { tree, conflicted_paths })
+    }
+    /// One named attribute of literal paths, from the `.gitattributes` of a
+    /// commit or tree, exactly as Git reports it.
+    pub fn attributes(
+        &self,
+        repo: &RepoHandle,
+        revision: &Oid,
+        attribute: &str,
+        paths: &[Vec<u8>],
+    ) -> Result<Vec<AttributeFact>> {
+        self.require_tree_ish(repo, revision)?;
+        if attribute.is_empty()
+            || attribute.starts_with('-')
+            || !attribute.bytes().all(|b| b.is_ascii_alphanumeric() || b"-_.".contains(&b))
+        {
+            return Err(refused("invalid-attribute-name"));
+        }
+        if paths.is_empty()
+            || paths.len() > 4096
+            || paths.iter().any(|p| p.is_empty() || p.contains(&0))
+            || paths.iter().map(|p| p.len() + 1).sum::<usize>() > LIMIT
+        {
+            return Err(refused("invalid-literal-path"));
+        }
+        let mut input = Vec::new();
+        for path in paths {
+            input.extend_from_slice(path);
+            input.push(0);
+        }
+        let source = format!("--source={}", revision.as_str());
+        let bytes = self.inspect_input(repo, &["check-attr", "-z", "--stdin", &source, attribute], &input)?;
+        let fields = records(&bytes)?;
+        if fields.len() != paths.len() * 3 {
+            return Err(refused("invalid-check-attr-protocol"));
+        }
+        fields
+            .chunks(3)
+            .zip(paths)
+            .map(|(record, path)| {
+                if record[0] != path.as_slice() || record[1] != attribute.as_bytes() {
+                    return Err(refused("invalid-check-attr-protocol"));
+                }
+                Ok(AttributeFact {
+                    path: path.clone(),
+                    value: String::from_utf8(record[2].to_vec())
+                        .map_err(|_| refused("invalid-check-attr-protocol"))?,
+                })
+            })
+            .collect()
+    }
+    /// The earliest merge commit on the ancestry path from `ancestor` to
+    /// `descendant` (both commits), or none.
+    pub fn first_ancestry_merge(&self, repo: &RepoHandle, ancestor: &Oid, descendant: &Oid) -> Result<Option<Oid>> {
+        self.require_commit(repo, ancestor)?;
+        self.require_commit(repo, descendant)?;
+        let range = format!("{}..{}", ancestor.as_str(), descendant.as_str());
+        let bytes = self.checked(
+            repo,
+            &["rev-list", "--merges", "--ancestry-path", "--reverse", &range, "--"],
+            Policy::Inspect,
+        )?;
+        bytes
+            .split(|b| *b == b'\n')
+            .find(|line| !line.is_empty())
+            .map(|line| oid(repo, line))
+            .transpose()
     }
 }

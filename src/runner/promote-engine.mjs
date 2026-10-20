@@ -45,8 +45,8 @@ export function resolveIntegrationBranch(repoRoot, rootId) {
  * @returns {Promise<
  *   {id: string, outcome: 'skipped', reason: 'is-root'} |
  *   {id: string, outcome: 'bailed', reason: string, detail: string} |
- *   {id: string, outcome: 'merged'} |
- *   {id: string, outcome: 'blocked', reason: string, detail: string|null}
+ *   {id: string, outcome: 'merged', landSettlement?: object} |
+ *   {id: string, outcome: 'blocked', reason: string, detail: string|null, landSettlement?: object}
  * >}
  */
 export async function retargetMember(repoRoot, memberItem, rootId, opts = {}) {
@@ -77,13 +77,17 @@ export async function retargetMember(repoRoot, memberItem, rootId, opts = {}) {
     ...(opts.timeoutMs ? { timeoutMs: opts.timeoutMs } : {}),
   });
 
+  // The caller releases a Land candidate under `landSettlement` once it has
+  // durably recorded this member's outcome (Git spec §9, M4).
+  const settlement = result.landSettlement ? { landSettlement: result.landSettlement } : {};
   if (result.outcome !== 'merged') {
     return {
       id: memberItem.id,
       outcome: 'blocked',
       reason: result.outcome,
       detail: result.check?.output ?? (result.paths ? `staged .fgos write: ${result.paths.join(', ')}` : null),
+      ...settlement,
     };
   }
-  return { id: memberItem.id, outcome: 'merged' };
+  return { id: memberItem.id, outcome: 'merged', ...settlement };
 }

@@ -19,7 +19,6 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { gitPortOptions } from '../../git/inspect.mjs';
 import { createGitRecovery } from '../../git/recovery.mjs';
-import { execFileSync } from 'node:child_process';
 import {
   listWork,
   addDecision,
@@ -37,6 +36,7 @@ import {
   classifySource,
   landRunnerItem,
   acknowledgeLand,
+  isAlreadyMerged,
   performCatchUp,
   buildOwnFileSet,
   isWorkingTreeClean as isMainTreeClean,
@@ -110,19 +110,21 @@ function moveDeliveredOrRecordFault(dir, id, phase, testForceLockTimeoutId, { me
   }
 }
 
-/** Once Work durably recorded the delivery, Land may release the candidate,
- * pins and journal it kept for that acknowledgement (Git spec §9, M4). A
- * retained candidate never negates the delivery; it is only reported. */
-function releaseDeliveredLand(repoRoot, id, landSettlement, event) {
+/** Once Work durably recorded a Land result (`state`: delivered or blocked),
+ * Land may release the candidate, pins and journal it kept for that
+ * acknowledgement (Git spec §9, M4). A retained candidate never negates the
+ * recorded result; it is only reported. */
+function releaseLand(repoRoot, id, landSettlement, acknowledgement, state) {
   if (!landSettlement) return;
-  for (const warning of acknowledgeLand(repoRoot, landSettlement.operationId, `work-delivered:${id}:${event.seq}`)) {
-    process.stderr.write(`fgos: warning: "${id}" is delivered; its Land candidate was retained (${warning}).\n`);
+  for (const warning of acknowledgeLand(repoRoot, landSettlement.operationId, acknowledgement)) {
+    process.stderr.write(`fgos: warning: "${id}" is ${state}; its Land candidate was retained (${warning}).\n`);
   }
 }
 
-function moveBlockedOrConflict(dir, { id, reason, role = 'system' }) {
+function moveBlockedOrConflict(dir, { id, reason, role = 'system' }, { repoRoot, landSettlement } = {}) {
   try {
-    moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason, role });
+    const { event } = moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason, role });
+    releaseLand(repoRoot, id, landSettlement, `work-blocked:${id}:${event.seq}`, 'blocked');
     return null;
   } catch (err) {
     if (categoryOf(err) === 'conflict') {
@@ -477,14 +479,7 @@ export async function approveUseCase(
       // consume the proof immediately).
       {
         let effectiveItem = item;
-        let alreadyAncestor = false;
-        try {
-          execFileSync('git', ['merge-base', '--is-ancestor', rootBranch, branchNameFor(id)], { cwd: repoRoot, encoding: 'utf8', shell: false });
-          alreadyAncestor = true;
-        } catch (ancestorErr) {
-          if (ancestorErr.status !== 1) throw ancestorErr;
-        }
-        if (!alreadyAncestor) {
+        if (!isAlreadyMerged(repoRoot, rootBranch, branchNameFor(id))) {
           const catchupResult = await performCatchUp(repoRoot, id, item, rootBranch, timeoutMs);
           if (catchupResult.outcome === 'conflict') {
             const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-conflict', role: 'system' });
@@ -535,7 +530,7 @@ export async function approveUseCase(
         const result = await landRunnerItem(repoRoot, effectiveItem, { target: rootBranch, operationId, timeoutMs, ...lockWait });
 
         if (result.outcome === 'conflict') {
-          const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-conflict', role: 'system' });
+          const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-conflict', role: 'system' }, { repoRoot, landSettlement: result.landSettlement });
           if (conflict) return conflict;
           recordFriction(dir, {
             id,
@@ -555,7 +550,7 @@ export async function approveUseCase(
           // 'merge-conflict'. Real stderr/exit-code carried through so
           // this is actually diagnosable, unlike the static
           // 'merge-conflict' detail string.
-          const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-failed-unclassified', role: 'system' });
+          const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-failed-unclassified', role: 'system' }, { repoRoot, landSettlement: result.landSettlement });
           if (conflict) return conflict;
           recordFriction(dir, {
             id,
@@ -575,7 +570,7 @@ export async function approveUseCase(
           // git merge --no-commit --no-ff was never attempted and
           // git merge --abort was never called, so ${rootBranch}'s own
           // merge state (if any) is exactly as this call found it.
-          const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-blocked-other-item', role: 'system' });
+          const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-blocked-other-item', role: 'system' }, { repoRoot, landSettlement: result.landSettlement });
           if (conflict) return conflict;
           recordFriction(dir, {
             id,
@@ -589,7 +584,7 @@ export async function approveUseCase(
         }
 
         if (result.outcome === 'fgos-write-rejected') {
-          const conflict = moveBlockedOrConflict(dir, { id, reason: 'fgos-write-rejected', role: 'system' });
+          const conflict = moveBlockedOrConflict(dir, { id, reason: 'fgos-write-rejected', role: 'system' }, { repoRoot, landSettlement: result.landSettlement });
           if (conflict) return conflict;
           recordFriction(dir, {
             id,
@@ -607,7 +602,7 @@ export async function approveUseCase(
           // the merge is bad — park under a distinct, catchup-resolvable
           // reason instead of the misleading merge-fail label.
           const mergeReason = result.check.timedOut ? 'verify-timeout-post-merge' : 'verify-fail-post-merge';
-          const conflict = moveBlockedOrConflict(dir, { id, reason: mergeReason, role: 'system' });
+          const conflict = moveBlockedOrConflict(dir, { id, reason: mergeReason, role: 'system' }, { repoRoot, landSettlement: result.landSettlement });
           if (conflict) return conflict;
           recordFriction(dir, {
             id,
@@ -654,7 +649,7 @@ export async function approveUseCase(
             postLand: result.postLand,
           };
         }
-        releaseDeliveredLand(repoRoot, id, result.landSettlement, moveResult.event);
+        releaseLand(repoRoot, id, result.landSettlement, `work-delivered:${id}:${moveResult.event.seq}`, 'delivered');
         return {
           id,
           mode: 'merge',
@@ -701,7 +696,7 @@ export async function approveUseCase(
       const detail = hadChildren
         ? `cross-root integration drift at main@${currentHead(repoRoot)}; git merge --no-commit --no-ff ${result.branch} conflicted; merge aborted, main unchanged`
         : `git merge --no-commit --no-ff ${result.branch} conflicted; merge aborted, main unchanged`;
-      const conflict = moveBlockedOrConflict(dir, { id, reason, role: 'system' });
+      const conflict = moveBlockedOrConflict(dir, { id, reason, role: 'system' }, { repoRoot, landSettlement: result.landSettlement });
       if (conflict) return conflict;
       recordFriction(dir, {
         id,
@@ -723,7 +718,7 @@ export async function approveUseCase(
       const detail = hadChildren
         ? `cross-root integration attempt at main@${currentHead(repoRoot)}; git merge --no-commit --no-ff ${result.branch} failed without a real conflict (exit ${result.error.status}): ${result.error.stderr || result.error.message}; merge aborted, main unchanged`
         : `git merge --no-commit --no-ff ${result.branch} failed without a real conflict (exit ${result.error.status}): ${result.error.stderr || result.error.message}; merge aborted, main unchanged`;
-      const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-failed-unclassified', role: 'system' });
+      const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-failed-unclassified', role: 'system' }, { repoRoot, landSettlement: result.landSettlement });
       if (conflict) return conflict;
       recordFriction(dir, {
         id,
@@ -746,7 +741,7 @@ export async function approveUseCase(
       const detail = hadChildren
         ? `cross-root integration attempt at main@${currentHead(repoRoot)}; main checkout already has a MERGE_HEAD from another item's in-progress merge; merge of ${result.branch} was never attempted`
         : `main checkout already has a MERGE_HEAD from another item's in-progress merge; merge of ${result.branch} was never attempted`;
-      const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-blocked-other-item', role: 'system' });
+      const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-blocked-other-item', role: 'system' }, { repoRoot, landSettlement: result.landSettlement });
       if (conflict) return conflict;
       recordFriction(dir, {
         id,
@@ -772,7 +767,7 @@ export async function approveUseCase(
       const detail = hadChildren
         ? `cross-root integration attempt at main@${currentHead(repoRoot)}; ${dirtied}; merge of ${result.branch} was stopped before update-ref`
         : `${dirtied}; merge of ${result.branch} was stopped before update-ref`;
-      const conflict = moveBlockedOrConflict(dir, { id, reason: 'main-checkout-dirty-mid-merge', role: 'system' });
+      const conflict = moveBlockedOrConflict(dir, { id, reason: 'main-checkout-dirty-mid-merge', role: 'system' }, { repoRoot, landSettlement: result.landSettlement });
       if (conflict) return conflict;
       recordFriction(dir, {
         id,
@@ -786,7 +781,7 @@ export async function approveUseCase(
     }
 
     if (result.outcome === 'fgos-write-rejected') {
-      const conflict = moveBlockedOrConflict(dir, { id, reason: 'fgos-write-rejected', role: 'system' });
+      const conflict = moveBlockedOrConflict(dir, { id, reason: 'fgos-write-rejected', role: 'system' }, { repoRoot, landSettlement: result.landSettlement });
       if (conflict) return conflict;
       recordFriction(dir, {
         id,
@@ -809,7 +804,7 @@ export async function approveUseCase(
         : hadChildren
           ? `cross-root integration drift at main@${currentHead(repoRoot)}; goal-check failed on staged merge (exit ${result.check.status}); merge aborted, main unchanged`
           : `goal-check failed on staged merge (exit ${result.check.status}); merge aborted, main unchanged`;
-      const conflict = moveBlockedOrConflict(dir, { id, reason, role: 'system' });
+      const conflict = moveBlockedOrConflict(dir, { id, reason, role: 'system' }, { repoRoot, landSettlement: result.landSettlement });
       if (conflict) return conflict;
       recordFriction(dir, {
         id,
@@ -849,7 +844,7 @@ export async function approveUseCase(
         postLand: result.postLand,
       };
     }
-    releaseDeliveredLand(repoRoot, id, result.landSettlement, moveResult.event);
+    releaseLand(repoRoot, id, result.landSettlement, `work-delivered:${id}:${moveResult.event.seq}`, 'delivered');
     return {
       id,
       mode: 'merge',

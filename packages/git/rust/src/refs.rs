@@ -962,12 +962,14 @@ impl GitDriver {
     }
 }
 
-pub(crate) fn acquire_worktree_admin<'a>(
+/// Worktree effects only (§5 Worktree rows): a caller that already holds this
+/// repository's verified worktree-admin, with nothing above 40, lends it.
+pub(crate) fn adopt_worktree_admin<'a>(
     repo: &RepoHandle,
     held: Vec<BorrowedHandle<'a>>,
 ) -> Result<LockScope<'a>> {
     require_lock_scope_platform()?;
-    let mut scope = LockScope::seeded(held).map_err(failure)?;
+    let scope = LockScope::seeded(held).map_err(failure)?;
     if let Some(admin) = scope.handle("worktree-admin") {
         let expected = repo
             .trusted_main_root()
@@ -984,6 +986,20 @@ pub(crate) fn acquire_worktree_admin<'a>(
         scope.validate().map_err(failure)?;
         return Ok(scope);
     }
+    acquire_admin(repo, scope)
+}
+
+/// Refs, Land, Remote and their recovery take worktree-admin themselves; a
+/// held 40 (or anything above it) is a `lock-order-violation` (§5 Refs row).
+pub(crate) fn acquire_worktree_admin<'a>(
+    repo: &RepoHandle,
+    held: Vec<BorrowedHandle<'a>>,
+) -> Result<LockScope<'a>> {
+    require_lock_scope_platform()?;
+    acquire_admin(repo, LockScope::seeded(held).map_err(failure)?)
+}
+
+fn acquire_admin<'a>(repo: &RepoHandle, mut scope: LockScope<'a>) -> Result<LockScope<'a>> {
     scope
         .assert_can_acquire("worktree-admin")
         .map_err(failure)?;
