@@ -43,3 +43,9 @@ Summary: Fixed benchmark cursor races and reduced measured steady outside reads 
 Concerns/Blockers: Host latency/namespace gates and the out-of-scope program-board update remain with the coordinator; no 50 ms acceptance claim.
 Context refs:
 - (none)
+
+## Host acceptance (coordinator, 2026-10-20 14:46)
+
+The official traced bench (`node scripts/event-store/v-spawn-bench.mjs --store-increment --strace --sessions 1,10,15,20 --seed-items 1000`, realistic 1,000-item / 8.46 MB seed, ext4, i7-13700, powersave) returns **PASS**. At 20 sessions the store increment is p50 34.8 ms / p95 43.5 ms, 0 spawns inside the gate, 200 mutations in 11.8 s, and appends use 3 fsyncs (4 once for recovery cleanup). The steady outside read is about 150-160 ms with 4-5 Git execs per mutation.
+
+The bench previously applied the 60 s exhaustion bound at every level. Spec section 17(a) states it at 20 sessions only ("no exhaustion at 20 sessions by 200 mutations in 60 s"), so the bench now enforces 60 s and the 50 ms p95 at 20 sessions and keeps a 900 s safety bound for the measuring levels. At 1 session the 200 serial traced mutations take about 75 s; that level is measured, not gated.
