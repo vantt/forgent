@@ -285,3 +285,15 @@ fn immediate_close_with_a_foreign_foreground_is_kept_without_a_release_marker() 
     assert!(matches!(core.release("a", Disposition::Close, None).unwrap(), ReleaseOutcome::Released { disposition: Disposition::Close }));
     assert!(!driver.panes.borrow().contains_key(&slot.pane_id));
 }
+
+#[test]
+fn immediate_close_without_process_info_is_kept_without_a_release_marker() {
+    let driver = MemDriver::with_caps(352, 69, all_caps().into_iter().filter(|c| *c != "process.info").collect());
+    let core = core(&driver, &MeasuredSplit, state_dir("close-no-process-info"));
+    let slot = core.allocate(&request("a", "g")).unwrap().slot;
+    // Even a shell-only foreground cannot be read without the capability: nothing proves the close is safe.
+    driver.set_foreground(&slot.pane_id, 900, vec![ForegroundProcess { pid: 900, argv: vec!["bash".into()] }], 900);
+    assert!(matches!(core.release("a", Disposition::Close, None).unwrap(), ReleaseOutcome::KeptUnknown { .. }));
+    assert!(driver.panes.borrow().contains_key(&slot.pane_id));
+    assert!(driver.calls("pane.close").is_empty());
+}

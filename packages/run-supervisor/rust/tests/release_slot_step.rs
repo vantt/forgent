@@ -86,13 +86,20 @@ fn a_failed_attempt_keeps_the_pane() {
 }
 
 #[test]
-fn an_earlier_step_without_a_receipt_keeps_the_pane_and_its_failure_is_the_one_reported() {
-    let case = case("rs-step-failed", "exit 3");
-    case.receipt("exited", true);
-    assert_eq!(case.run(), StepsOutcome::Failed { step_id: "settle-attempt".into(), reason: "step exited 3".into() });
+fn a_pending_settlement_leaves_the_slot_undecided_until_it_completes() {
+    // The settlement step fails until its host is back (a payload-missing exit), as a pruned host does.
+    let case = case("rs-step-pending", "test -f host-back || exit 66");
+    case.receipt("cancelled", false);
+    assert_eq!(case.run(), StepsOutcome::Failed { step_id: "settle-attempt".into(), reason: "step exited 66".into() });
     assert!(!case.dir.join("steps/settle-attempt.json").exists());
-    assert_eq!(case.release_detail().unwrap()["disposition"], "retain");
+    assert!(case.release_detail().is_none(), "no final retain while settlement is pending");
     assert!(case.herdr.calls_starting("pane close").is_empty());
+
+    // The next pass (resume or adopt) completes settlement and decides with the full facts.
+    fs::write(case.dir.join("host-back"), "").unwrap();
+    assert_eq!(case.run(), StepsOutcome::Done(vec!["settle-attempt".into(), "release-slot".into()]));
+    assert_eq!(case.release_detail().unwrap()["disposition"], "close");
+    assert_eq!(case.herdr.calls_starting("pane close").len(), 1);
 }
 
 #[test]
@@ -116,6 +123,20 @@ fn a_step_that_asks_for_a_retry_leaves_the_slot_undecided() {
     assert!(matches!(&outcome, StepsOutcome::Retry { step_id, .. } if step_id == "settle-attempt"), "{outcome:?}");
     assert!(case.release_detail().is_none(), "the slot waits for the retried step");
     assert!(case.herdr.calls_starting("pane close").is_empty());
+}
+
+#[test]
+fn a_cancellation_not_stopped_by_cancel_retains() {
+    for stopped_by in ["agent", "orphan", "soft-deadline", "unknown"] {
+        let case = case(&format!("rs-cancel-by-{stopped_by}"), "true");
+        case.receipt("cancelled", false);
+        let mut receipt: Value = serde_json::from_str(&fs::read_to_string(case.dir.join("receipt.json")).unwrap()).unwrap();
+        receipt["gateExit"]["stoppedBy"] = json!(stopped_by);
+        fs::write(case.dir.join("receipt.json"), receipt.to_string()).unwrap();
+        assert!(matches!(case.run(), StepsOutcome::Done(_)));
+        assert_eq!(case.release_detail().unwrap()["disposition"], "retain", "{stopped_by}");
+        assert!(case.herdr.calls_starting("pane close").is_empty(), "{stopped_by}");
+    }
 }
 
 #[test]

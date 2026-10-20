@@ -83,9 +83,9 @@ pub fn now_ms() -> u64 {
     SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_millis() as u64).unwrap_or(0)
 }
 
-/// Close only after settlement, a recognized gate exit and both captured streams.
-/// Missing facts, a lost gate/carrier or failed settlement retain the live diagnostics.
-pub fn disposition_for(receipt: Option<&Value>, earlier_steps_done: bool) -> Disposition {
+/// Close for a recognized gate exit with both captured streams; the step runner asks only once every
+/// settlement step has its receipt. Missing facts or a lost gate/carrier retain the live diagnostics.
+pub fn disposition_for(receipt: Option<&Value>) -> Disposition {
     let captured_exit = receipt.is_some_and(|r| {
         let exit = &r["gateExit"];
         let ended = match r["outcome"].as_str() {
@@ -103,7 +103,7 @@ pub fn disposition_for(receipt: Option<&Value>, earlier_steps_done: bool) -> Dis
         });
         ended && captured
     });
-    if captured_exit && earlier_steps_done { Disposition::Close } else { Disposition::Retain }
+    if captured_exit { Disposition::Close } else { Disposition::Retain }
 }
 
 /// Why `release-slot` has no receipt.
@@ -141,8 +141,8 @@ mod tests {
     }
 
     #[test]
-    fn missing_receipt_or_unfinished_settlement_retains() {
-        assert_eq!(disposition_for(None, true), Disposition::Retain);
-        assert_eq!(disposition_for(Some(&json!({"outcome": "exited", "outboxPresent": true})), true), Disposition::Retain);
+    fn missing_receipt_or_missing_facts_retain() {
+        assert_eq!(disposition_for(None), Disposition::Retain);
+        assert_eq!(disposition_for(Some(&json!({"outcome": "exited", "outboxPresent": true}))), Disposition::Retain);
     }
 }
