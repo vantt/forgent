@@ -22,3 +22,26 @@ Census (branch): ScopedCommit 30 Git execs (8 preflight + 22 commit; main 37) vs
 Per-spawn cost (`git rev-parse HEAD`, 100 samples, interleaved): uncontained 3.1 ms, borrowed 3.7 ms, contained (bwrap pid namespace) 10.8 ms. Containment ≈ 0.5 s (37%) of Land; all spawns ≈ 0.82 s (60%); the rest is WAL, fsync barriers and locks. With free containment Land would still be ≈ 4.6×.
 
 Verdict: ScopedCommit passes its budget; Land fails; publication rows unchanged; owner decision brief: brief-261020-0653-land-latency-budget-decision.md.
+
+## Merge gate (2026-10-20 06:54–07:25)
+
+Tree: e27df5b27, which already contains origin/main e44e1d5bd (the merge was a no-op). Baseline: detached origin/main e44e1d5bd. Each tree used a private Cargo dir with the release workspace built. Suites ran with `FGOS_HOST_BIN` set to that tree's release `fgos`, and with `FGOS_STATE_ROOT` and the session ids unset. Logs: /home/vantt/.claude/jobs/e1505f04/tmp/gate-p06b2/.
+
+| Check | Result |
+|---|---|
+| `cargo test --workspace` | 1157 pass / 0 fail / 11 ignored |
+| `cargo clippy --workspace --all-targets -D warnings` | clean |
+| `cargo test -p fgos-git --test borrow_deadline -- --ignored` | ran, 1/1 pass (bwrap `--as-pid-1`) |
+| `npm test` branch | 8661 tests, 8556 pass, 8 fail, 0 `fgos-*` temp dirs left |
+| `npm test` main e44e1d5bd | 8659 tests, 8555 pass, 7 fail |
+
+Failures, classified:
+
+- Pre-existing on main (7, the same tests fail in both runs):
+  - `fences-v1-tombstone` (1): `yaml` missing from a temp copy.
+  - `run-supervisor-checks` (4): socket path length under the nested temp root.
+  - `spawn-worker` env test (1): `tier-cell-missing` for the test's node "family".
+  - `skill-wrappers` (1): env. A fresh worktree has no `.claude/skills` render.
+- Flaky (1), branch only: `test/state/hot-lock-multiprocess` fast-path ratio was 1.104 against the 1.10 limit. The same test passed 3/3 when rerun alone on the branch (ratios 1.07–1.08). The branch does not touch holder-lock or state code.
+
+Introduced: none.
