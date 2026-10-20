@@ -1294,6 +1294,10 @@ export function createDispatchWorktree(repoRoot, id, opts = {}) {
 /** Cleanup half of the runner-dispatch pair — see `createDispatchWorktree`. */
 export function removeDispatchWorktree(repoRoot, worktreePath, log = () => {}) {
   try {
+    // What a failed round left in its own dispatch checkout is producer output the Worktree port
+    // preserves (it never removes a dirty checkout). SafeRestore pins it in a snapshot before the
+    // checkout is reset to its own HEAD, so the removal below can proceed and the retry starts clean.
+    if (isCheckoutDirty(repoRoot, worktreePath)) resetDispatchWorktree(repoRoot, worktreePath, currentHead(worktreePath));
     removeWorktree(repoRoot, worktreePath, { force: true });
   } catch (err) {
     if (typeof log === 'function') {
