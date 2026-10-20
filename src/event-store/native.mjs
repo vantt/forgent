@@ -72,6 +72,7 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions, remote 
   const facade = {
     commonDir: resolvedRoot.commonDir,
     machineId,
+    // null means this clone has no local store identity yet (no append).
     get ownOrigin() { return call(() => native.ownOrigin); },
     append(stream, events, cursor, writer, heldRanks) {
       available();

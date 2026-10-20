@@ -101,7 +101,7 @@ test('store-only worker measures append and cache without a Work consumer',t=>{
   }
   assert.equal(spawns,0);assert.equal(syncs.length,3);
   // The first append after a seal may durably remove old segment files.
-  assert.ok(syncs[0]>=2);assert.deepEqual(syncs.slice(1),[2,2]);
+  assert.ok(syncs[0]>=3);assert.deepEqual(syncs.slice(1),[3,3]);
 });
 
 test('facade promotion publishes registered branch events through the crate',t=>{

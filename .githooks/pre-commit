@@ -342,8 +342,13 @@ function stagedFgosModificationsRegressLineCount(committingToplevel) {
 
 // Retired event data cannot re-enter the checkout. Only the exact fence is allowed.
 function addedEventPathRefusal(cwd) {
+  // A directory is legacy Work; only the indexed/HEAD regular-file fence activates this rule.
+  const index = execFileSync('git', ['ls-files', '-s', '--', '.fgos/events'], { cwd, encoding: 'utf8' });
+  let head = '';
+  try { head = execFileSync('git', ['ls-tree', 'HEAD', '--', '.fgos/events'], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }); } catch {}
+  if (![index, head].some(text => text.split('\n').some(line => /^100(?:644|755) /.test(line) && line.split('\t')[1] === '.fgos/events'))) return null;
   const added = execFileSync('git', ['diff', '--cached', '--name-only', '--no-renames', '--diff-filter=ACRT', '-z'], { cwd, encoding: 'utf8' }).split('\0');
-  const forbidden = added.filter(p => p.startsWith('.fgos/events') && p !== '.fgos/events');
+  const forbidden = added.filter(p => p.startsWith('.fgos/events.jsonl') || p.startsWith('.fgos/events/'));
   return forbidden.length ? `commit refused: retired event paths cannot be added: ${forbidden.join(', ')}` : null;
 }
 

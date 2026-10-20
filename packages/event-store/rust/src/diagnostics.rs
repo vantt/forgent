@@ -1,4 +1,4 @@
-//! Read-only observations. No recovery, receipt writes, locks or configuration writes.
+//! Read-only observations. No recovery, receipt writes or configuration writes; age reads hold the append lock.
 use crate::{
     errors::{io, Error},
     layout::{Layout, StreamId},

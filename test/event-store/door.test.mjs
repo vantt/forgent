@@ -4,7 +4,6 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
 import { lexSource } from '../helpers/js-source-lexer.mjs';
 
 const dangerous = /(['"`])(?:update-ref|push|fetch|commit)\1|refs\/fgos/;
@@ -487,82 +486,84 @@ test('large literals and shared assignment graphs are fully inspected in bounded
   for(const file of ['src/large.mjs','src/cycle.mjs','src/graph.mjs'])assert.ok(found.some(v=>v.startsWith(file)),file);
 });
 
-// Main still owns the legacy Work consumer. These exact pre-cutover bytes
-// remain visible debt; changing them requires the WORK lane to remove/update
-// the proof. This is not an invocationViolations/publicationCensus exemption.
-const dormantWorkOwners = {
-  "src/runner/main-fgos-checkpoint.mjs": "616e675cf4835eb19773494a9e514ada3ca50eefedadf5d03eef24eae971537f",
-  "src/runner/execution/commit-unit-work.mjs": "99d209fc52268484064bf9c4654e71044a1ae3898c855edbf5f54a5780b3e9af",
-  "src/runner/execution/partial-writes.mjs": "0051dc354c166ef7d6e90c49ed0ff7dea63a50ba38b5d9f6eb50b57b60330bca",
-  "bin/fgos.mjs": "64ace4da89dbc1222c6d3c0d634272c9b043d1c268a257ed2e2e09385a5eb198",
-  "scripts/measure-verify-cost.mjs": "314c461c359f54f978a64494ea87884db14e563be96920387601e47c74bc37c4",
-  "scripts/probe-storytelling-material.mjs": "360c13abeff9239f891f38cb829d901f0e331f98c42ee9cd2e81d3e49437d39a",
-  "src/runner/attestation-guard.mjs": "0c065ea506e4768fc295d47160d94003711cf896106ed519506d3a14b965123d",
-  "src/setup/registrations.mjs": "41568dad5cf20aa73fcbb09e08fab084bb77faea5638fa43e3e7bbe5806b3ce6",
-  "src/state/replay.mjs": "6fbdd0bd9867118cf3ce086ed45a6e3e9a6c61bcc5f99a086d86440be4f0d673",
-  "src/state/events-compaction.mjs": "c2ac54d19f7eeffd0dffc7e7ceda1389c3c36c0d550aef5f434ae585259c0e69",
-  "src/state/store.mjs": "b8eacaa22d2f17b04f494f9671b3bec2b883306aadb9ae0909298b94b20e11c4",
-  "src/state/porting-store.mjs": "ee409980f27d11a0b67c55ae18b2510fa98183103035a4c9202737e0dc90d519",
-  "src/state/events-jsonl-truncation-guard.mjs": "b4dd68558622a872395138a790bc63926ebdf60323b880c6f69b23ca3d7ee0ab"
+// Shrink-only dormant debt: identities are file + call kind + target family,
+// with a count for distinct sites. No source hashes or source coordinates.
+export function stableFindings(sites, family) {
+  const counts = {};
+  for (const site of sites) {
+    const key = `${site.replace(/:\d+: /, ': ')}: ${family}`;
+    counts[key] = (counts[key] ?? 0) + 1;
+  }
+  return Object.fromEntries(Object.entries(counts).sort(([a], [b]) => a.localeCompare(b)));
+}
+export function readerFindings(sources) {
+  const owned = file => file.startsWith('src/event-store/') || file.startsWith('packages/event-store/') || file.startsWith('packages/git/node-addon/');
+  const sites = invocationViolations(sources, {reader:true}).filter(site => !owned(site.split(':')[0]));
+  for (const [file, source] of Object.entries(sources)) {
+    if (owned(file)) continue;
+    const code = model(file, source).code;
+    for (const match of code.matchAll(/import\s*\{([^}]*)\}\s*from/g)) {
+      for (const name of ['readEvents', 'readEventsFromByte', 'readAllEventsFromDir']) {
+        if (new RegExp(`\\b${name}\\b`).test(match[1])) sites.push(`${file}:0: import ${name}`);
+      }
+    }
+  }
+  return stableFindings(sites, 'retired-event');
+}
+const dormantInvocationFindings = {
+  "bin/fgos-runner.mjs: runOnce: event-publication": 1,
+  "bin/fgos-runner.mjs: runWatch: event-publication": 1,
+  "bin/fgos.mjs: runVerb: event-publication": 1,
+  "src/runner/execution/commit-unit-work.mjs: withPaths: event-publication": 1,
+  "src/runner/execution/run.mjs: commitPending: event-publication": 1,
+  "src/runner/execution/run.mjs: commitWork: event-publication": 2,
+  "src/runner/execution/run.mjs: preflightUnitWorktree: event-publication": 2,
+  "src/runner/execution/run.mjs: worktreeSnapshot: event-publication": 1,
+  "src/runner/execution/run.mjs: writesSince: event-publication": 1,
+  "src/runner/fanout-batch.mjs: fanoutBatchExecutorCli: event-publication": 1,
+  "src/runner/main-fgos-checkpoint.mjs: runBorrowed: event-publication": 1,
+  "src/workflow/case-verbs.mjs: advanceWorkflowRun: event-publication": 3
+};
+const dormantReaderFindings = {
+  "bin/fgos.mjs: repairTruncatedLastLine: retired-event": 1,
+  "scripts/backfill-unit-summaries.mjs: readFileSync: retired-event": 1,
+  "scripts/measure-verify-cost.mjs: import readEvents: retired-event": 1,
+  "scripts/measure-verify-cost.mjs: readEvents: retired-event": 1,
+  "scripts/measure-verify-cost.mjs: readFileSync: retired-event": 1,
+  "scripts/migration-proof-2a.mjs: readFileSync: retired-event": 1,
+  "scripts/probe-storytelling-material.mjs: import readEvents: retired-event": 1,
+  "scripts/probe-storytelling-material.mjs: readEvents: retired-event": 1,
+  "src/runner/attestation-guard.mjs: import readEvents: retired-event": 1,
+  "src/runner/attestation-guard.mjs: readEvents: retired-event": 1,
+  "src/setup/registrations.mjs: readEventsJsonLines: retired-event": 2,
+  "src/setup/registrations.mjs: readFileSync: retired-event": 1,
+  "src/state/events-compaction.mjs: import readEvents: retired-event": 1,
+  "src/state/events-compaction.mjs: readEvents: retired-event": 1,
+  "src/state/events-jsonl-truncation-guard.mjs: advanceEventsJsonlTruncationGuard: retired-event": 1,
+  "src/state/events.mjs: import readEvents: retired-event": 1,
+  "src/state/events.mjs: import readEventsFromByte: retired-event": 1,
+  "src/state/porting-store.mjs: import readEvents: retired-event": 1,
+  "src/state/replay.mjs: import readEvents: retired-event": 1,
+  "src/state/replay.mjs: import readEventsFromByte: retired-event": 1,
+  "src/state/store.mjs: import readAllEventsFromDir: retired-event": 1,
+  "src/verbs/events/migrate.mjs: import readAllEventsFromDir: retired-event": 1
 };
 
-// This is a dormant-foundation regression census, not a passing cutover gate.
-// Assert every existing finding exactly; no reader or invocation check is skipped.
-const dormantInvocationFindings = [
-  "bin/fgos-runner.mjs:120: runWatch",
-  "bin/fgos-runner.mjs:150: runOnce",
-  "bin/fgos.mjs:5177: runVerb",
-  "src/runner/execution/commit-unit-work.mjs:279: withPaths",
-  "src/runner/execution/run.mjs:1026: preflightUnitWorktree",
-  "src/runner/execution/run.mjs:1079: worktreeSnapshot",
-  "src/runner/execution/run.mjs:1108: commitWork",
-  "src/runner/execution/run.mjs:1153: writesSince",
-  "src/runner/execution/run.mjs:972: commitPending",
-  "src/runner/execution/run.mjs:973: preflightUnitWorktree",
-  "src/runner/execution/run.mjs:980: commitWork",
-  "src/runner/fanout-batch.mjs:217: fanoutBatchExecutorCli",
-  "src/runner/main-fgos-checkpoint.mjs:17: runBorrowed",
-  "src/workflow/case-verbs.mjs:133: advanceWorkflowRun",
-  "src/workflow/case-verbs.mjs:230: advanceWorkflowRun",
-  "src/workflow/case-verbs.mjs:303: advanceWorkflowRun"
-];
-const dormantReaderFindings = [
-  "bin/fgos.mjs: retired event reader",
-  "scripts/measure-verify-cost.mjs: retired event reader",
-  "scripts/probe-storytelling-material.mjs: retired event reader",
-  "src/runner/attestation-guard.mjs: retired event reader",
-  "src/setup/registrations.mjs: retired event reader",
-  "src/state/events-compaction.mjs: retired event reader",
-  "src/state/events-jsonl-truncation-guard.mjs: retired event reader",
-  "src/state/porting-store.mjs: retired event reader",
-  "src/state/replay.mjs: retired event reader",
-  "src/state/store.mjs: retired event reader"
-];
-
-test('dormant repository census retains the exact pre-cutover Work findings and no new bypass',t=>{
+test('dormant repository census retains declared sites and rejects additions or stale debt',t=>{
   const files=execFileSync('rg',['--files','src','bin','scripts','packages','apps'],{encoding:'utf8'}).trim().split('\n')
     .filter(f=>/\.(?:mjs|js|rs)$/.test(f)&&!/(?:^|\/)(?:test|tests|examples)\//.test(f));
   const sources=Object.fromEntries(files.map(f=>[f,fs.readFileSync(f,'utf8')]));
   const census=publicationCensus(sources);
-  for(const [file,digest] of Object.entries(dormantWorkOwners))assert.equal(createHash('sha256').update(sources[file]).digest('hex'),digest,`WORK owner changed: ${file}`);
-  for(const site of census.violations)t.diagnostic(`pending cutover invocation proof: ${site}`);
-  assert.deepEqual([...census.violations].sort(),dormantInvocationFindings);
-  const violations=[];
+  assert.deepEqual(stableFindings(census.violations, 'event-publication'),dormantInvocationFindings,
+    'new bypasses are forbidden; removed findings must also leave the declared debt list');
   assert.equal(census.exemptions.length,4,'each E3 legacy fixture site is enumerated');
-  for(const entry of census.exemptions)t.diagnostic(`${entry.class}: ${entry.site}`);
-  for(const site of census.bounded.filter(s=>/src\/runner\/(?:worktree|merge)/.test(s)))t.diagnostic(`bounded non-event refs (Git 07 V-GATE): ${site}`);
-  const readerSites=invocationViolations(sources,{reader:true});
-  // Named ownership classes only: owning facade/crate, immutable migration
-  // inventory, pure parsers and independent journals. No arbitrary bypasses.
-  for(const [file,source] of Object.entries(sources)) {
-    const code=model(file,source).code;
-    const retired=readerSites.some(site=>site.startsWith(`${file}:`))||/import\s*\{[^}]*\b(?:readEvents|readEventsFromByte|readAllEventsFromDir)\b[^}]*\}\s*from/.test(code);
-    if(!retired)continue;
-    if(file.startsWith('src/event-store/')||file.startsWith('packages/event-store/')||file.startsWith('packages/git/node-addon/'))continue;
-    if(/^(?:src\/state\/(?:events|event-log|main-checkout-guard-warnings)|src\/verbs\/events\/(?:migrate|export)|src\/workflow\/(?:store|case-admission-port)|scripts\/(?:backfill-unit-summaries|migration-proof-2a|regenerate-observe-fixtures))\.mjs$/.test(file))continue;
-    if(file==='packages/observe/rust/src/friction.rs')continue;
-    violations.push(`${file}: retired event reader`);
-  }
-  for(const site of violations)t.diagnostic(`pending Work reader cutover: ${site}`);
-  assert.deepEqual(violations.sort(),dormantReaderFindings);
+  assert.deepEqual(readerFindings(sources),dormantReaderFindings,
+    'reader debt is site-specific, including legacy owner files');
+});
+
+test('dormant identity ignores unrelated edits but detects a new reader inside a legacy owner',()=>{
+  const file='src/state/event-log.mjs';
+  const source="fs.readFileSync('.fgos/events.jsonl');";
+  assert.deepEqual(readerFindings({[file]:source}),readerFindings({[file]:`// unrelated edit\nconst other = 1;\n${source}`}));
+  assert.notDeepEqual(readerFindings({[file]:source}),readerFindings({[file]:`${source}\nfs.readFileSync('.fgos/events.jsonl');`}));
 });

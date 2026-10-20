@@ -73,7 +73,7 @@ fn garbage_hint_is_rewritten_and_stray_closed_path_is_named() {
     assert!(format!("{err:?}").contains(stray.to_str().unwrap()));
 }
 #[test]
-fn steady_append_performs_two_real_fsyncs_and_no_hint_replacement() {
+fn steady_append_performs_three_real_fsyncs_and_no_hint_replacement() {
     struct Count(Cell<usize>);
     impl FileSystem for Count {
         fn sync_file(&self, f: &fs::File) -> io::Result<()> {
@@ -107,7 +107,7 @@ fn steady_append_performs_two_real_fsyncs_and_no_hint_replacement() {
             &count,
         )
         .unwrap();
-        assert_eq!(count.0.get(), 2); // active file + predecessor-safe stream directory
+        assert_eq!(count.0.get(), 3); // active file + stream directory + store root
     }
 }
 #[test]
@@ -141,4 +141,146 @@ fn vanished_already_folded_range_does_not_bounce_the_gate() {
             assert_eq!(got.unwrap_err().code.as_str(), "catch-up-required");
         }
     }
+}
+
+#[test]
+fn interrupted_stream_creation_requires_root_barrier_before_ack() {
+    struct RootBarrier<'a> {
+        root: &'a Path,
+        fail: bool,
+        synced: Cell<bool>,
+    }
+    impl FileSystem for RootBarrier<'_> {
+        fn sync_directory(&self, p: &Path) -> io::Result<()> {
+            if p == self.root {
+                if self.fail {
+                    return Err(io::Error::other("interrupted root barrier"));
+                }
+                self.synced.set(true);
+            }
+            fgos_durable_file::sync_directory(p)
+        }
+        fn checkpoint(&self, p: Point) -> io::Result<()> {
+            if p == Point::BeforeAppendWrite {
+                assert!(
+                    self.synced.get(),
+                    "root barrier precedes acknowledged bytes"
+                );
+            }
+            Ok(())
+        }
+    }
+    let r = Repo::new();
+    // State left by a creator killed immediately after create_dir_all(closed).
+    fs::create_dir_all(r.layout.stream(&r.stream).closed()).unwrap();
+    for fail in [true, false] {
+        let barrier = RootBarrier {
+            root: &r.layout.root,
+            fail,
+            synced: Cell::new(false),
+        };
+        let result = append_with_fs(
+            &r.layout,
+            &r.registry,
+            AppendRequest {
+                stream: &r.stream,
+                events: &inputs(1),
+                cursor: &Positions::new(),
+                writer: "writer",
+                machine: "test-aa2345",
+                held_ranks: &[],
+            },
+            &barrier,
+        );
+        if fail {
+            assert!(result.is_err());
+        } else {
+            let ack = result.unwrap().ack;
+            assert!(barrier.synced.get());
+            assert_eq!(ack.first_seq, 1);
+            assert_eq!(
+                read_own(&r.layout, &ack.origin, &r.stream)
+                    .unwrap()
+                    .events
+                    .len(),
+                1
+            );
+        }
+    }
+}
+
+#[test]
+fn maintenance_reads_only_complete_header_snapshot() {
+    let r = Repo::new();
+    let paths = r.layout.stream(&r.stream);
+    fs::create_dir_all(paths.closed()).unwrap();
+    fs::write(paths.active(), b"{\"v\":4,").unwrap();
+    let facts = fgos_event_store::diagnostics::maintenance(&r.layout).unwrap();
+    assert_eq!(facts["streams"][0]["oldestUnsealedAgeSec"], 0);
+    fs::remove_file(paths.active()).unwrap();
+    r.append(1);
+    let mut bytes = fs::read(paths.active()).unwrap();
+    let first_end = bytes.iter().position(|b| *b == b'\n').unwrap() + 1;
+    bytes.truncate(first_end);
+    bytes.extend(vec![b'!'; 1024 * 1024]);
+    fs::write(paths.active(), bytes).unwrap();
+    // Malformed megabyte tail is irrelevant to an age observation.
+    assert!(fgos_event_store::diagnostics::maintenance(&r.layout).is_ok());
+}
+
+#[test]
+fn maintenance_waits_for_writer_mid_header() {
+    use std::{io::Write, sync::mpsc, time::Duration};
+    struct PausedWriter {
+        partial: mpsc::Sender<()>,
+        resume: mpsc::Receiver<()>,
+    }
+    impl FileSystem for PausedWriter {
+        fn write_batch(&self, file: &mut fs::File, bytes: &[u8]) -> io::Result<usize> {
+            file.write_all(&bytes[..12])?;
+            self.partial.send(()).unwrap();
+            self.resume.recv().unwrap();
+            file.write_all(&bytes[12..])?;
+            Ok(bytes.len())
+        }
+    }
+    let r = Repo::new();
+    let (partial, ready) = mpsc::channel();
+    let (resume, proceed) = mpsc::channel();
+    let (done, observed) = mpsc::channel();
+    std::thread::scope(|scope| {
+        let writer = scope.spawn(|| {
+            let paused = PausedWriter {
+                partial,
+                resume: proceed,
+            };
+            append_with_fs(
+                &r.layout,
+                &r.registry,
+                AppendRequest {
+                    stream: &r.stream,
+                    events: &inputs(1),
+                    cursor: &Positions::new(),
+                    writer: "writer",
+                    machine: "test-aa2345",
+                    held_ranks: &[],
+                },
+                &paused,
+            )
+            .unwrap();
+        });
+        ready.recv_timeout(Duration::from_secs(5)).unwrap();
+        scope.spawn(|| {
+            done.send(fgos_event_store::diagnostics::maintenance(&r.layout))
+                .unwrap();
+        });
+        let early = observed.recv_timeout(Duration::from_millis(100));
+        resume.send(()).unwrap();
+        writer.join().unwrap();
+        assert!(matches!(early, Err(mpsc::RecvTimeoutError::Timeout)));
+        assert!(observed
+            .recv_timeout(Duration::from_secs(5))
+            .unwrap()
+            .is_ok());
+    });
 }

@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { ensureGitAddon } from '../helpers/git-addon.mjs';
+import { ensureGitAddon } from '../../scripts/git-addon.mjs';
 const built = ensureGitAddon();
 const probe = fileURLToPath(new URL('./gate-probe.mjs', import.meta.url));
 

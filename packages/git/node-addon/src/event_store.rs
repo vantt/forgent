@@ -86,13 +86,15 @@ impl EventStore {
         )
     }
     #[napi(getter)]
-    pub fn own_origin(&self) -> Result<String> {
+    pub fn own_origin(&self) -> Result<Option<String>> {
         available()?;
         match std::fs::symlink_metadata(self.layout.store()) {
-            Ok(_) => Ok(StoreIdentity::open(&self.layout, &self.machine)
-                .map_err(error)?
-                .store_id),
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(String::new()),
+            Ok(_) => Ok(Some(
+                StoreIdentity::open(&self.layout, &self.machine)
+                    .map_err(error)?
+                    .store_id,
+            )),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
             Err(e) => Err(error(e)),
         }
     }

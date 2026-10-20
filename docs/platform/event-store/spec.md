@@ -1035,7 +1035,9 @@ names, colon, trailing dot/space, and other Windows-invalid characters.
 The consumer registry remains empty. These store/facade operations do not wire
 Work, porting or command lifecycle triggers.
 
-- Append keeps the active-file and stream-directory durability barriers. Recovery
+- Append keeps the active-file, stream-directory and store-root durability barriers.
+  The store root is synced on every append: an existing stream directory may
+  have been created by a predecessor killed before its parent was synced. Recovery
   cleanup syncs the identity directory only after removing a temporary file.
   Repeated decoding reuses one thread-local verified frame only for exact bytes,
   origin, stream and strictness (at most 4 MiB of input); changed bytes always
@@ -1047,9 +1049,15 @@ Work, porting or command lifecycle triggers.
   `oldestUnsealedAgeSec`, plus `lastPush` from the sync receipt. It uses no Git
   ref walk, worktree listing or legacy read, and runs outside hot gates. Full
   `status` remains the integrity/diagnostic operation. Future trigger consumers
-  must use maintenance facts rather than full status.
+  must use maintenance facts rather than full status. Age reads hold the append
+  lock against recovery/truncation and rotation, open each file once and read only
+  its first line, treating an incomplete first line as no age observation. The
+  open handle retains the header snapshot across a concurrent sealing unlink;
+  a file already removed by sealing is skipped. Later batch bytes are not parsed.
 - `branchKey(branch, loaderOptions)` exposes the crate's single branch-key rule.
-  `ownOrigin`, opportunistic seal and promotion are available on the facade;
+  `ownOrigin` is `null` when this clone has no local store identity yet (before
+  its first append); otherwise it is the local origin string. Opportunistic seal
+  and promotion are available on the facade;
   policy and lifecycle wiring remain consumer-owned.
 - `read({cursor, folded, ...}, heldRanks)` forwards the supplied coverage and
   retained envelopes into the certified walk. A cursor without retained history
@@ -1058,8 +1066,11 @@ Work, porting or command lifecycle triggers.
   and tip metadata from the returned cursor; these checks never replace the
   reader's fold/rebuild decision for changed foreign history.
 - The pre-commit hook refuses staged added, renamed, copied and type-changed
-  retired event paths using `--no-renames --diff-filter=ACRT`; only the exact
-  `.fgos/events` fence path is admitted. Existing Work guards remain installed.
+  retired event paths using `--no-renames --diff-filter=ACRT`, **only when** the
+  exact `.fgos/events` regular-file fence is in the index or HEAD. Without that
+  fence, legacy shard/checkpoint commits keep their existing behavior. Enforced
+  families are `.fgos/events.jsonl*` and `.fgos/events/`; unrelated prefixes are
+  admitted, as is the exact fence path. Existing Work guards remain installed.
 
 The store-increment benchmark uses the facade directly and its existing kernel
 state gate, independently of a Work consumer. `--seed-items 1000` (the default)
@@ -1071,7 +1082,10 @@ power-loss qualification and the parked Work cutover remain separate gates.
 
 The dormant branch's repository door test is a regression census, not evidence
 that cutover V-DOOR-01 is complete: it asserts the exact pre-cutover invocation
-and retired-reader findings and fingerprints their existing Work/Git consumer
-sources. The generic scanner still returns those findings; E3 remains its only
-fixture exemption class. WORK/Git caller cutover must remove these findings and
-the frozen baseline before claiming the whole-repository zero-legacy gate.
+and retired-reader findings as a shrink-only declared list keyed by file, call
+kind and target family, with counts for distinct sites. It pins neither hashes
+nor line numbers. Reader debt includes exact sites in legacy owner files rather
+than exempting those files. New findings fail; removed findings must be removed
+from the list. The generic scanner still returns those findings; E3 remains its
+only fixture exemption class. WORK/Git caller cutover must remove these findings
+before claiming the whole-repository zero-legacy gate.

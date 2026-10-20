@@ -85,7 +85,7 @@ async function storeIncrementBenchmark({root,out,sessions,filesystem,checkout,st
   if (JSON.stringify(sessions)!==JSON.stringify([1,10,15,20])) throw Error('store acceptance requires --sessions 1,10,15,20');
   execFileSync('strace',['-V'],{stdio:'pipe'}); // Missing tool is a hard failure.
   // Build/load the working-tree combined addon, never the activated payload.
-  const {ensureGitAddon}=await import('../../test/helpers/git-addon.mjs');
+  const {ensureGitAddon}=await import('../git-addon.mjs');
   const built=ensureGitAddon();
   fs.mkdirSync(root);
   const stateRoot=path.join(root,'state');fs.mkdirSync(stateRoot,{mode:0o700});
