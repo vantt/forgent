@@ -48,6 +48,9 @@ test('release staging carries a real combined addon resolved from its release ma
     const loader = pathToFileURL(path.join(release, 'libexec/legacy-node/src/git/native.mjs')).href;
     const probe = `import {loadNativeAddon} from ${JSON.stringify(loader)}; console.log(loadNativeAddon({hostBin:${JSON.stringify(path.join(release, 'bin/fgos'))}}).versions().napi);`;
     assert.equal(execFileSync(process.execPath, ['--input-type=module', '-e', probe], {cwd: os.tmpdir(), encoding: 'utf8'}).trim(), '8');
+    const storeLoader = pathToFileURL(path.join(release, 'libexec/legacy-node/src/event-store/native.mjs')).href;
+    const storeProbe = `import {eventStoreAddonAvailable} from ${JSON.stringify(storeLoader)}; console.log(eventStoreAddonAvailable({hostBin:${JSON.stringify(path.join(release, 'bin/fgos'))}}));`;
+    assert.equal(execFileSync(process.execPath, ['--input-type=module', '-e', storeProbe], {cwd: os.tmpdir(), encoding: 'utf8'}).trim(), 'true', 'the staged release carries the Event Store exports');
     fs.writeFileSync(path.join(repo, 'Cargo.lock'), '');
     assert.throws(() => nativeAddonComponent(built.addon, 'native/fgos.node', repo), /three locked napi/);
     fs.rmSync(path.join(output, 'release', nativeAddonLibraryName()));

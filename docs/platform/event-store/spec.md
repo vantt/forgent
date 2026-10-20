@@ -5,13 +5,13 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: Define the single authority for how an fgOS event becomes durable, how it is sealed into git objects on per-machine refs, how it is shared across machines, and how it is read back
 Design status: Signed by the owner on 2026-10-17 (D-ADR0055). It is the contract for starting implementation under the gates of section 23; it does not claim the design is proven.
-Implementation status: Not started
+Implementation status: Dormant on main: crate, Node facade and combined addon present, consumer registry empty. Store layer proven by the store part of the section 23.2 gate on 2026-10-20 (plans/reports/verification-261020-2012-event-store-store-proof-gate.md); the Work consumer, its cutover and the gate items that need it are pending in the WORK lane
 Canonical: Yes (D-ADR0055, 2026-10-17)
 
 Owner: Event Store component
 Source (planned): packages/event-store/rust (crate fgos-event-store); Node facade src/event-store/ over the one combined N-API addon that links fgos-event-store and fgos-git (section 17)
 Contracts (planned): packages/event-store/contracts/
-Last reviewed: 2026-10-18
+Last reviewed: 2026-10-20
 Supersedes: L3 clauses 1 and 4 in docs/platform-foundations.md (D-ID ae461c8b, superseded by D-ADR0055); D-ADR0003 data layout
 Related:
 - docs/platform-foundations.md (L3, L7, L10)
@@ -154,6 +154,7 @@ Rank order today (`docs/platform/holder-lock/spec.md:114-126`): `main-checkout` 
 | Machine id | Names the published ref `refs/fgos/events/<machine-id>` | 1. repository-local git config `fgos.machineId` (per clone, never tracked); 2. `<stateRoot>/machine-id`, minted once by the setup fix as `<hostname-slug>-<6 random base32>`. Format `^[a-z0-9][a-z0-9-]{1,62}$`. `stateRoot` is holder-lock's (`docs/platform/holder-lock/spec.md:168-178`), so a process with another state root is another machine, as holder-lock already defines |
 | Store id (`origin`) | Ordering identity of one open root; one per clone | Minted at first append, random 128-bit, written once to `<eventOpenRoot>/store.json` with the machine id at creation. Moving the clone moves the file, so the store keeps its id |
 | Stream | One sequence space inside a store: `project`, `local`, or `branch:<branch-key>` | Scope of the registered type; branch key below |
+| Project consumer stream (clarification, 2026-10-20) | `project:<name>`: a `project`-scope sequence space of its own for one consumer, for example `project:porting` (plan D9; Work keeps `project`). It has its own `seq` and open log but is sealed onto the same `refs/fgos/events/<machine-id>` and shared exactly like `project`. `<name>` follows the branch-key slug grammar | Declared by the consumer's registry entry; no protocol change |
 | Writer | Who wrote the event (`src`) | Session Identity `{id, source}`; recorded, never used for order or lock authority |
 
 The ref is per machine because that is the unit of sharing; the store id is per clone because two clones on one machine have independent open logs and must not share a sequence space (section 14).
@@ -200,7 +201,7 @@ Branch key: a slug of the worktree's branch name at the stream's first append, r
 
 ## 8. Open root (storage-location port)
 
-`<eventOpenRoot>` is `<git-common-dir>/fgos/events`, resolved once per process with `git rev-parse --path-format=absolute --git-common-dir` (git 2.31 or newer), environment scrubbed of `GIT_*`. Every linked worktree of a clone resolves the same root, so all sessions of one clone share one store. There is no environment or config override; tests use real temporary repositories. This removes the two-override precedence gap the council found in the draft.
+`<eventOpenRoot>` is `<git-common-dir>/fgos/events`, resolved once per process with `git rev-parse --path-format=absolute --git-common-dir` (Git's floor applies, section 21), environment scrubbed of `GIT_*`. Every linked worktree of a clone resolves the same root, so all sessions of one clone share one store. There is no environment or config override; tests use real temporary repositories. This removes the two-override precedence gap the council found in the draft.
 
 Layout:
 
@@ -214,7 +215,7 @@ Layout:
   <stream>/sealed.json             {lastSeq, commit, cover, certified} the last verified receipt, the coverage map and the certified commits of the last complete walk of the stream's ref (section 11); written durably before any segment is deleted; a cache, verified against the ref
 ```
 
-Topologies: a plain repository, a linked worktree (also on another filesystem, because the open root is in the common dir), `--separate-git-dir`, and a bare repository with worktrees resolve to one valid root (measured by experiment 1, `N-2`). A submodule has its own common dir and therefore its own store; that is correct and documented. A directory that is not a git repository is refused with `event-store-no-repository`; fgOS Work already depends on git worktrees and merges, so this spec does not add a second, non-git storage form. The open root must be on a local filesystem with atomic `rename` and directory `fsync`; holder-lock's `guarantee(path)` is asked for `<eventOpenRoot>/locks`, and `none` (NFS, SMB, CIFS) refuses with `event-store-unsupported-filesystem`.
+Topologies: a plain repository, a linked worktree (also on another filesystem, because the open root is in the common dir), `--separate-git-dir`, and a bare repository with worktrees resolve to one valid root (measured by experiment 1, `N-2`). Implementation result (2026-10-20, `test/event-store/topologies.test.mjs`): a plain repository, a linked worktree on another filesystem, a bare repository with a worktree (the bare repository is the trusted main) and a submodule with its own git directory resolve as stated. `--separate-git-dir` and an absorbed submodule (a `.git` file pointing into the superproject's `modules/`) are refused before any store exists with Git's `trusted-main-gitfile-unsupported` (Git spec sections 3 and 17), because Git's resolver does not trust a gitfile main checkout; support for them follows Git. A submodule has its own common dir and therefore its own store; that is correct and documented. A directory that is not a git repository is refused with `event-store-no-repository`; fgOS Work already depends on git worktrees and merges, so this spec does not add a second, non-git storage form. The open root must be on a local filesystem with atomic `rename` and directory `fsync`; holder-lock's `guarantee(path)` is asked for `<eventOpenRoot>/locks`, and `none` (NFS, SMB, CIFS) refuses with `event-store-unsupported-filesystem`. Decision (coordinator, 2026-10-20, within the approved frame): these two layouts are unsupported for now; Git's trusted-main model is revisited only if a workspace on the owner's machine list uses a gitfile layout.
 
 Deleting a clone deletes its unsealed events. That is the price of keeping open logs with the repository they belong to; the seal cadence bounds it (section 16).
 
@@ -266,7 +267,7 @@ One open log per stream, not per writer: the per-writer files of today (`src/sta
       - blob `seal.json`: canonical `{v: 1, kind: "seal", origin, stream, scope, machineId, firstSeq, lastSeq, count, sha256}` where `count` is the number of events and `sha256` is that of the segment bytes;
       - tree with exactly those two entries;
       - commit: first parent is the ref's current tip (none for the first); a commit whose segment carries a `store.promote` event has the promoted branch ref's tip as second parent; author and committer `fgOS Event Store <event-store@fgos.invalid>`; message `fgos-events seal <origin>:<stream> <first>..<last>`.
-   3. Compare-and-swap the ref with `update-ref <ref> <new> <old>`, where `<old>` is the tip read in step 2.1 (the all-zero id when the ref is new). The call goes through the publication port: either `gix` in process, or `git` plumbing with `-c core.fsync=objects,reference -c gc.auto=0 -c maintenance.auto=false`, with no index, no work tree and no porcelain.
+   3. Compare-and-swap the ref with `update-ref <ref> <new> <old>`, where `<old>` is the tip read in step 2.1 (the all-zero id when the ref is new). The call goes through Git's Publication port (`docs/platform/git/spec.md` section 4), with no index, no work tree and no porcelain. Durability of the objects, the ref and their directories is the port's job: Git fsyncs the object fan-out directories, the directory chain of the ref and its WAL itself, and treats `core.fsync` only as a backend input (Git spec section 10, "Directory durability is Git's own job"). The store passes no fsync configuration.
 
       A failed compare-and-swap exits non-zero and changes nothing. In V-REF-01, eight concurrent swaps had one winner, and the seven losers each succeeded after rereading the tip. A caller rereads the tip and runs step 2.1 again from it before any retry; it never retries with the stale `<old>`. Inside the store, `event-seal` serializes seal and sync, so the reread tip either is the commit of the store's own receipt (crash recovery, table below) or was moved by an actor outside the store. In the second case, stop with `event-store-ref-moved`, keep the segment, and doctor fails.
    4. Receipt: read the ref back, then read the blob `<new>:events.jsonl`. The ref must equal `<new>`, and the blob's SHA-256 must equal the segment's. The receipt `{ref, commit, sha256, firstSeq, lastSeq}` goes to `sealed.json` together with the walk's `cover` and `certified`, with `lastSeq` kept apart from the emitted coverage. `<new>` is added to `certified` only when every event in `<new>` and its ancestors has been emitted, the coverage has been raised to match, and nothing is deferred (sections 11 and 12); otherwise the receipt is still written, so the deletion of step 2.5 may proceed, but `<new>` is not certified. The file is written with tmp, `fsync`, rename and `fsync` dir, so that it is durable before step 2.5.
@@ -455,7 +456,7 @@ A forge may hide custom refs in its UI; reading them goes through `fgos events e
 
 ## 15. Views, cursors and verbs
 
-A view is a cache owned by its consumer (Work: `.fgos/cache/state.json`, `src/state/fgos-file-registry.mjs:36`), never tracked, never truth, rebuildable from zero. A consumer may choose another engine, SQLite included, without touching this spec; that engine's concurrency is the consumer's concern.
+A view is a cache owned by its consumer (Work: `.fgos/cache/state.json`, `src/state/fgos-file-registry.mjs:35`), never tracked, never truth, rebuildable from zero. A consumer may choose another engine, SQLite included, without touching this spec; that engine's concurrency is the consumer's concern.
 
 The cursor is the cache key, and it records coverage, not a position in a global order (section 12). It holds:
 
@@ -477,7 +478,7 @@ The usual verbs (`fgos list`, `show`, `ready` and the others) read the consumer'
 | `fgos events sync` | Section 14 |
 | `fgos events status [--json]` | Store id, machine id, every ref and tip, per stream unsealed count and oldest unsealed age, closed segments pending, last receipt, last fetch and push with result, own ref ahead/behind its mirror, a missing fetch refspec, orphan branch streams, deferred events and their missing predecessors (section 12), the guarantee level of the open root |
 | `fgos events export [--stream <s>] [--since <cursor>] [--format jsonl|legacy-layout] --out <dir>` | Canonical-order JSONL, or the legacy file layout with a parity report (section 18) |
-| `fgos rebuild` | The existing rebuild verb (`src/cli/command-registry.mjs:1393`) stays the one rebuild door: it drops every registered consumer cache and refolds from the store |
+| `fgos rebuild` | The existing rebuild verb (`src/cli/command-registry.mjs:1427`) stays the one rebuild door: it drops every registered consumer cache and refolds from the store |
 
 ## 16. Seal cadence and loss budget
 
@@ -550,14 +551,14 @@ Each item is deleted in the cutover change (section 18), with every consumer mov
 
 | Mechanism | Code | Why it goes |
 |---|---|---|
-| Tracked event files and per-writer shard naming | `src/state/store.mjs:146-180` (`resolveWriterLogPath`) | Events live in open logs and refs |
+| Tracked event files and per-writer shard naming | `src/state/store.mjs:157-176` (`resolveWriterLogPath`) | Events live in open logs and refs |
 | `merge=union` for events | `.gitattributes:15` | No event file is merged |
-| Truncation guard, its sidecar and its fallback `git commit` (a second git caller beside the main door) | `src/state/events-jsonl-truncation-guard.mjs` (536 lines, commit at `:514`); doctor `events-jsonl-not-truncated` (`src/setup/registrations.mjs:1965-2031`) | Nothing tracked is appended; the seal verifies hashes and contiguity |
-| File compaction and its verifier | `src/state/events-compaction.mjs` (263 lines, no production caller); doctor `events-compaction-verified` (`registrations.mjs:2035-2126`) | It moves tracked files; ref-chain compaction is a later item |
-| Event-shard handling in `fgos-write-rejected` restore and self-heal | `src/runner/merge.mjs:686-1164` (event parts only), sweep at `:1565` | Branches never carry event files |
-| `events.lock` as a file lock | `src/state/events.mjs:26-52`, `:416` | Its read-check-append role moves to the `state` gate (section 13); its byte role to `event-append` |
-| File discovery, `(ts, file, seq)` ordering for new events and the T4 fast path | `src/state/replay.mjs:838-889` and the fast path below it | The store reader and cursor replace them; the legacy order survives only as the legacy rule |
-| Direct readers of `.fgos/events` | `src/setup/registrations.mjs:1993`, `:2050`, `:6180`; `scripts/regenerate-observe-fixtures.mjs:106`; `packages/work-state/rust/src/work_source.rs:470-480` | They read through the crate or the facade |
+| Truncation guard, its sidecar and its fallback `git commit` (a second git caller beside the main door) | `src/state/events-jsonl-truncation-guard.mjs` (520 lines, commit at `:502`); doctor `events-jsonl-not-truncated` (`src/setup/registrations.mjs:2034-2102`) | Nothing tracked is appended; the seal verifies hashes and contiguity |
+| File compaction and its verifier | `src/state/events-compaction.mjs` (263 lines, no production caller); doctor `events-compaction-verified` (`registrations.mjs:2104-2197`) | It moves tracked files; ref-chain compaction is a later item |
+| Event-shard handling in `fgos-write-rejected` restore and self-heal | `src/runner/merge.mjs:683-1077` (event parts only), sweep at `:1362` | Branches never carry event files |
+| `events.lock` as a file lock | Already replaced on main by the `state` hot mutex (`lockOfLog`, `src/state/events.mjs:102`; wave S of plan 4.3) | Its read-check-append role is the `state` gate (section 13); what goes at cutover is its byte role on event files, which moves to `event-append` |
+| File discovery, `(ts, file, seq)` ordering for new events and the T4 fast path | `src/state/replay.mjs:838-912` (`discoverEventFilePaths`, `readAllEventsFromDir`) and the fast path `:913-998` | The store reader and cursor replace them; the legacy order survives only as the legacy rule |
+| Direct readers of `.fgos/events` | `src/setup/registrations.mjs:2064`, `:2121`, `:6275`; `scripts/regenerate-observe-fixtures.mjs:100`; `packages/work-state/rust/src/work_source.rs:470-491` | They read through the crate or the facade |
 | Tracked stale view and backups | `.fgos/state.json`, two `events.jsonl.backup-*` | Views are never tracked; backups are not truth |
 | Event duty of the `.fgos` checkpoint adapter | plan 4.3 P03 `checkpointMainFgos` | No event file needs a checkpoint; the adapter stays null for events |
 
@@ -598,7 +599,7 @@ Doctor checks, registered in `src/setup/registrations.mjs`:
 
 | Check | Fails when |
 |---|---|
-| `event-store-git-version` | git older than the floor of the chosen publication driver (2.31 for path resolution; 2.36 for `core.fsync` when plumbing runs as subprocess) |
+| `event-store-git-version` | Git's floor verdict is unsupported or a required probe failed. The floor is Git's (`packages/git/contracts/git-floor.v1.json`, Git phase 01 req 3), read through `gitFloorVerdict`; this spec keeps no version number of its own |
 | `event-store-open-root` | root does not resolve, not a git repository, or guarantee `none`; prints the guarantee level |
 | `event-store-machine-id` | missing or malformed; warns `event-store-machine-ref-shared` (section 14) |
 | `event-store-refspec` | remote configured but fetch refspec missing; a positive push refspec whose source can match `refs/fgos/`; a positive fetch refspec matching `refs/fgos/local-events` or `refs/fgos/branch-events` (negative exclusions are safe) |
@@ -1124,3 +1125,13 @@ append and records `outsideReadMs` for every mutation and outside-read p50/p95
 per session count. Its 60-second limit and 50 ms p95 budget are unchanged. Host
 acceptance still requires all 1/10/15/20-session rows; sandbox diagnostics do not
 establish that acceptance. Work remains unwired.
+
+## Store proof gate clarifications (2026-10-20, dormant)
+
+Dated clarifications with no protocol change, made with the store part of the section 23.2 gate ([report](../../../plans/reports/verification-261020-2012-event-store-store-proof-gate.md)):
+
+- Section 5 names `project:<name>` consumer streams (plan D9: porting uses `project:porting`, Work keeps `project`). The crate already accepted them and seals them onto the machine's `events` ref with their own `seq` (`seal_publication.rs`, `project_consumer_streams_share_one_ref_without_false_move_or_sequence_reuse`).
+- Section 10 step 2.3 now names Git's Publication port instead of `gix` or `git -c core.fsync=...`: Git fsyncs directories itself and treats `core.fsync` only as a backend input (Git spec section 10). The store's own barriers (step 1, step 2.4 and 2.5) are unchanged.
+- Section 21 `event-store-git-version` points to Git's floor (`git-floor.v1.json` through `gitFloorVerdict`, 2.53.0 with four required probes today) instead of 2.31 and 2.36; section 8's "git 2.31 or newer" likewise. The check body already read Git's verdict.
+- Section 8 records the measured topology result: `--separate-git-dir` and absorbed submodules are refused by Git's resolver (`trusted-main-gitfile-unsupported`), not resolved as experiment 1 suggested.
+- Sections 15 and 19 cite current source lines; the `events.lock` row says its read-check-append role already moved to the `state` hot mutex.
