@@ -887,7 +887,12 @@
             }
           }
         ],
-        "providerModel": "z-ai"
+        "providerModel": "z-ai",
+        "supports": {
+          "skills": [
+            "ak:cook"
+          ]
+        }
       },
       "gitnexus": {
         "kind": "tool",
@@ -1012,7 +1017,12 @@
               ]
             }
           }
-        ]
+        ],
+        "supports": {
+          "skills": [
+            "ak:cook"
+          ]
+        }
       },
       "gemini": {
         "kind": "agent",
@@ -1086,7 +1096,12 @@
               ]
             }
           }
-        ]
+        ],
+        "supports": {
+          "skills": [
+            "ak:cook"
+          ]
+        }
       },
       "xai": {
         "kind": "agent",
@@ -1162,7 +1177,12 @@
               ]
             }
           }
-        ]
+        ],
+        "supports": {
+          "skills": [
+            "ak:cook"
+          ]
+        }
       },
       "deepseek": {
         "kind": "agent",
@@ -1238,7 +1258,12 @@
               ]
             }
           }
-        ]
+        ],
+        "supports": {
+          "skills": [
+            "ak:cook"
+          ]
+        }
       }
     },
     "timeoutMs": 2100000,
