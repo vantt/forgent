@@ -621,3 +621,36 @@ All seven new findings have text dispositions; implementation, actual accounting
 - **Step 0:** both unchanged protected reproduction extractors agree on complete historical/current units for all seven changed documentation targets, including targets with zero inbound bindings. Checked 34 direct bindings and 128 contextual group members. Applied **six content rebindings** in five authorized shards (distribution table: three; install-how-to passage: one; runner source-rule block: two). Full before/after text, actual heading ancestry, main hunks and removed review fields are journaled; source identities remain unchanged. All six are **pending independent review**, no approval carries. Group identities/member text/anchors remain unchanged, zero group repairs. Zero remaining target drift (`step-00-l12-61-binding-check.json`).
 - **Step 3:** `step-00-l12-61-step3-deferred-rebinds.json` lists 19 physical overlap-record instances, including canonical and retained revision copies, with exact pin/record digest/current source digest. They are **deferred once to Step 7 final atomic assembly**, together with L12-44/L12-57 obligations, under L12-58(1); no Step 3 record or old review request changed. At assembly relocate the actual source span/hunk/target and review changed bindings; retiring records recheck conservation.
 - **Step 4:** merged-pin source/render re-authoring and all-33-batch L12-60 sweeps are recorded in `step-04-l12-60-sweep.json`; consumer bytes, skills, tests, frozen censuses, switchboard, gates, extractor/comparator and baselines remain unchanged. Final mechanical verification and independent A51 wave 2 request are separate author receipts, never semantic acceptance. The runner supplies the real author commit; Lead owes ordinary L12-11 committed-byte accounting and independent binding/content review.
+
+## L12-62 — Step 4 wave 2 review result and the last sweep (Lead, A42/A51, 2026-10-20)
+
+- **Scope (Lead):** the authored wave 2 packet had 44 parts. The Lead reviewed 30 of them: every 001–016 file whose disposition, target, anchor, timing, diff or park reason changed in `05862286c`, plus the A51 sample of 017–033. Render-join relabels and other text-only changes are checker-verified (L12-55 precedent). Reports: `review-a38-step-04-wave2-*.md`. At `f5a19e2dc`, accounting appended 275 pairs per manifest; audit 0, 67/67, ratchet 0.
+- **Outcome rework (12 files):**
+  - `AGENTS.md` lacks the line-74 `docs/decisions/` Phase 9 slot (L12-60(5)).
+  - `bin/fgos.mjs` cli-006 → patch to `docs/platform/packaging-distribution/spec.md` RUL9.
+  - `src/runner/dispatch/confinement/authority.mjs` class6-l-000263 → one patch whose replacement carries both live holders (agent-confinement spec §1/§5.2 and confinement-authority contract §6.6/§6.9); the record lists both targets.
+  - `src/runner/dispatch/run-lock.mjs` class6-l-000279 → patch to `docs/platform/agent-coordination/architecture/runtime-recovery-design.md` §6.
+  - `packages/distribution/rust/src/manifest.rs` class6-l-000194 → anchor by passage (`2-frozen-schema-v1-shape`), not by section number; remove the duplicate citation.
+  - `src/runner/dispatch/assignment-policy.mjs` class6-l-000255 → park as a dead link (the path never existed), with a successor note.
+  - `core/task-specs/fgos-indexing.md` skills-088 and `core/skills/fgos-indexing/SKILL.md` skills-085 → patch to `docs/reading-map.md` §5. The `docs/<quadrant>/` retiring-root pattern at line 6 gets a Phase 9 slot.
+  - `core/skills/_shared/executor-dispatch-fallback.md` line 224 needs its source preserve slot; the render joins dangle.
+  - `src/runner/merge.mjs` class6-l-000293 → dead-link park; lines 215–216 need the missed wrapped slot (preserve); class6-l-000307's anchor must cover all six precedents or be dropped.
+  - `src/runner/worktree.mjs` class6-l-000328 → patch to `docs/platform/git/spec.md` §7 "No hardcoded trunk".
+- **Systemic causes, fixed mechanically across all 33 batches:**
+  1. **Live-holder search by passage content** (section titles, rule ids, symbols, key phrases) over `docs/platform/**` non-carriage and `docs/knowledge/**`, for every parked slot, with the search witness recorded. A live holder means a Phase 9 patch.
+  2. **Existence check (tree and history) of every preserved path.** A path that never existed and is cited with "see X" navigation wording parks as a dead link (L12-60(4)).
+  3. **Complete wrapped-path scan** (join comment-continuation and markdown line breaks). Every hit is slotted or listed in `stepFiveExcluded`.
+  4. **Anchors are chosen by passage** and computed with the repository slug function, never by section number and never by hand.
+- **Rulings:**
+  1. A dead link to a document moved verbatim (same basename at a live, non-carriage location, `docs/knowledge/` included) is a Phase 9 patch. A name-drifted or uncertain successor parks with a successor note. `class4-l-002026`/`002095` (cleanup-loop/retro-loop) and the line-292 how-to in `executor-dispatch-fallback.md` therefore become patches.
+  2. A design-origin provenance citation preserves under L12-47 even when a live statement of the behavior exists; only navigation pointers patch (`store.mjs` doing-coordination §7.3/§9.2).
+  3. The candidate runner subcomponent spec is a valid Phase 9 target (Step 3 precedent).
+  4. A comment pointer to the generated `docs/decisions/` index preserves, while a writer instruction to put decisions there is a Phase 9 edge.
+  5. A bare root-file name (`CLAUDE.md`) is not an edge.
+  6. Census edge `wrapped-0106` gets a preserve slot.
+  7. `skills-192` preserves (the runbook is a retained root and exists), superseding L12-20.
+  8. `canonical.rs` patches only if "Release Tree Canonicalization" is live (not carriage) per the resolver.
+  9. Paths moved from `plans/` to `archive/` are out of scope.
+- **Checker additions:** a render-join must reference an existing source slot whose passage equals the join's passage (`instructions-025` joins the wrong source slot); successor notes are added for every removed decision id (0032 in `approve.mjs`).
+- **Expansion:** sets 010, 019, 022, 023, 024, 025, 030 and 031 breached 3%. After the sweep, every file in those sets not yet reviewed in its final state, plus every file whose outcome changes in the sweep, is reviewed.
+- **Local main merge `16da41a31`** (9 commits; `docs/backlog.md` and the candidate `docs/platform/agent-mailbox/spec.md` only; ratchet 0, drift 0; Step 3 overlaps deferred to Step 7).
