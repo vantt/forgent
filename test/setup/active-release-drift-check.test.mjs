@@ -62,7 +62,7 @@ function fixture(t) {
     }
     fs.rmSync(temp, { recursive: true, force: true });
   });
-  return { temp, source, release, outside, manifest, writeManifest, activate };
+  return { temp, source, release, outside, manifest, writeManifest, activate, suiteEnv: env };
 }
 
 function run(source) {
@@ -177,6 +177,9 @@ test('linked worktree skips activation owned only by main, including inherited s
   execFileSync('git', ['-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', 'fixture'], { cwd: f.source });
   const linked = path.join(f.temp, 'linked');
   execFileSync('git', ['worktree', 'add', '-q', '-b', 'linked', linked], { cwd: f.source });
+  // Resolving the main checkout goes through the Git addon, which this process finds through the
+  // suite's manifest variable; the check itself reads only the release variable below.
+  process.env.FGOS_ACTIVE_MANIFEST_PATH = f.suiteEnv.FGOS_ACTIVE_MANIFEST_PATH;
   put(linked, 'src/one.mjs', 'different worktree');
   for (const explicit of [false, true]) {
     if (explicit) process.env.FGOS_ACTIVE_RELEASE_PATH = f.release;
