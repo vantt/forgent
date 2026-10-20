@@ -1,0 +1,171 @@
+{
+  "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "reviewerRule": "Never run checker/probes/resolver/author scripts. Read every assigned file through EOF and independently verify targets. One verdict per whole file, even when streamed.",
+  "set": "step04-030",
+  "files": [
+    "core/skills/fgos-run/SKILL.md"
+  ],
+  "joinedSlots": 0,
+  "items": [
+    {
+      "file": "core/skills/fgos-run/SKILL.md",
+      "sourceDigest": "1e1ebada1abc36f8d1313f78d28cbe6fd9cbfb160ae7f1f2aa2031bb349c2afc",
+      "sourceContext": "---\nname: fgos-run\nuser-invocable: false\ndescription: >-\n  Single execution driver for all domains: runs free-form requests, AgentKit plans,\n  or specific phases through the Workflow runner and P1 Execution Core.\n---\n\n# fgos-run — Single Execution Driver\n\n`fgos-run` is the thin driver for executing work across all domains. It does not own scheduling, merging, or execution mechanics directly — it delegates completely to the **Workflow runner** (`src/workflow/runner.mjs`) and the **P1 Execution Core** (`src/runner/execution/run.mjs`).\n\n---\n\n## 1. Input Modes\n\n### Mode A: Free-form Prompt / Natural Language Task\nWhen the user gives a natural language task or ad-hoc request:\n1. Understand intent, scope, and affected files.\n2. **One task → the one-liner.** Run it as one Unit straight from the prompt:\n   ```sh\n   fgos run \"<prompt>\" [--provider <id>[,<id>...]] [--persona <name>] [--capability <c>] [--rigor <r>] [--effort <level>]\n   fgos run \"<prompt>\" --writes <path>[,<path>...] --worktree <linked-worktree> [--pattern code-change] [--input <path>[,<path>...]] [--verify \"<cmd>\"]\n   ```\n   Without `--writes` the Unit is read-only (sandboxed). `--writes` needs a linked worktree (create one with `fgos worktree create <path> --branch <name>` or `fgos worktree create <path> --detach`); from the main checkout it is refused before anything runs. `--provider` is a soft preference that `bind()` tries first and fails over from; `--capability` defaults to `execute`. `--input` hands the Unit repo-relative files to read; `--verify` is the command a reviewed run executes after each producing round (the preset pins none, so a reviewed run without `--verify` says it verified nothing).\n3. **Several tasks → `--units`.** Formulate the **Unit** objects (schema: `src/runner/execution/unit.mjs`):\n   - `id`: descriptive kebab-case identifier (a safe branch-name segment)\n   - `objective`: concise semantic description of what must be done\n   - `capability`: domain:verb (e.g. `docs:write`, `code:implement`)\n   - `rigor`: `low` | `standard` | `high` | `critical`\n   - `writes`: list of repo-relative paths or `*`/`**` globs the unit may modify (empty = read-only)\n   - `dependsOn`: array of prerequisite unit IDs\n   - `pattern`: `solo` | `reviewed` | `panel` (optional, defaults to config rule)\n   - `verify` (optional): shell command a reviewed unit runs after each producing round; `skills` (optional): skill names the work needs, served only by executors whose `supports.skills` lists them\n   - `prefer` / `persona` (optional, ad-hoc Units only): a soft executor preference and a persona name\n4. Save Units to a temporary or workspace YAML file (`{ id?, title?, units: [...] }` or a list) and start them through the Workflow runner:\n   ```sh\n   fgos workflow start --units <units-file.yaml> [--effort <level>]\n   ```\n   A writing Unit that depends on exactly one writing Unit starts from that Unit's branch; nothing is merged automatically (`fgos workflow status` lists `writeBranches`).\n\n### Mode B: AgentKit Plan Execution\nWhen the user asks to run a plan, a phase (\"run phase 2\"), or a phase range (\"run phase 1..3\"), the plan is an input you read, not something the runner translates:\n1. Read the plan and the phase files as artifacts. Verify the phase's units with plan-lint:\n   ```sh\n   fgos plan-lint <planPath> --phase <N> --json\n   ```\n2. Choose a bounded wave of Units for the phase yourself (what can run now, in what order, what each one may write) and run them through one of the two doors:\n   ```sh\n   fgos run \"<objective>\" --writes <paths> --worktree <linked-worktree>\n   fgos workflow start --units <file> [--foreground]\n   ```\n   `--units` takes a YAML or JSON list of Units, one step per Unit, ordered by each Unit's `dependsOn`.\n   `start` returns at once with the `workflowRunId` and a `detached` block; the run continues in a\n   detached process. Read progress with `fgos workflow status <workflowRunId>` (or pass `--foreground`\n   to wait in place); `fgos workflow answer` and `fgos workflow resume` return the same way. Do not treat\n   the output of `start`, `answer` or `resume` as the final state.\n3. Each Unit runs via `fgos run` in its own isolated worktree and integrates changes cleanly using pure git. `fgos workflow start --plan` no longer exists; a later conductor skill (`fgos-cook`) will own whole-plan execution on a case.\n\n---\n\n## 2. Human Review Gates & Question Batching\n\nWhen a workflow step declares a human gate (`gate: { kind: \"human\" }`) or when an owner review is required:\n1. The Workflow runner parks at the gate with outcome `parked` and records the pending question(s).\n2. `fgos-run` gathers **all open questions across all parked steps** into a single structured batch; each question follows the decision-question template (`../_shared/decision-question.md`).\n3. The user answers all questions in one interaction.\n4. Answers are recorded via:\n   ```sh\n   fgos workflow answer <workflowRunId> --step <stepId> --answer \"<response>\"\n   ```\n5. The runner resumes execution automatically.\n\n---\n\n## 3. Execution Invariants\n\n- **G2 Non-Infrastructure:** Units, presets, plans, and driver prompts never pin executors, providers, models, tiers, or invocations; an ad-hoc Unit (one-liner `--provider`, `prefer` in a `--units` file) may carry a soft `prefer` that `bind()` tries first and fails over from. Only a human `--override` pins; everything else is resolved by `bind()`.\n- **Runner Commits, Worker Does Not:** A writing Unit's brief lists its write scope; the worker edits files and stops, never running `git add`/`git commit`. After a passing round the runner commits only paths inside the Unit's `writes` (subject from the first line of the worker's `summary`); a path the worker needs outside that scope goes in `needsWrites`, not on disk.\n- **G7 Herdr Default:** All out-of-process unit runs default to spawning in a watched `herdr` terminal pane when herdr is available, falling back to `cli` when headless.\n- **Fail-Closed Mutating Gate:** Every file mutation runs strictly inside an isolated linked git worktree matching the Unit run specification.\n- **Honest Outcomes:** Reviewer findings are tracked as `findings`, not execution failures, and fix rounds are bounded by the collaboration pattern.\n\n---\n\n## 4. Reviewing a Change That Touches Tests\n\nEvery behaviour has one owning proof (AGENTS.md L5 question 5, design principle 8 **One proof**). Whoever reviews a Unit's result, or accepts a lead's report, checks these four lines and returns a finding for each one that fails; a report that adds tests without reasons, or deletes a mechanism without a retired list, is not accepted:\n\n1. **Every new test file:** why not the existing file for this module? Only a new module or a new boundary gets a new file.\n2. **Every new test:** its title names the behaviour in plain words (no task ids), the owning proof was searched for (`rg` the behaviour's words and the symbol), and the report gives the reason no existing test proves it.\n3. **Every deleted or replaced mechanism:** its tests are retired in the same change and listed, each with the test that now owns the behaviour or the statement that the behaviour is gone.\n4. **Every Node test in a Rust-ported area** (git, holder-lock, event-store, run-supervisor, terminal-control): it is the one route proof for its port or a Node-only behaviour, never a copy of a case a Rust test owns.\n\nThe report quotes the `suite:` line `npm test` prints (files, `test()` calls, wall time against `test/suite-baseline.json`).\n",
+      "record": {
+        "file": "core/skills/fgos-run/SKILL.md",
+        "inventoryInputCommit": null,
+        "inventoryInputs": [],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": null,
+        "digest": "1e1ebada1abc36f8d1313f78d28cbe6fd9cbfb160ae7f1f2aa2031bb349c2afc",
+        "inventoryEdgeIds": [],
+        "diff": "",
+        "edges": [],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "L12-60: main-changed source and renders read whole; zero census/doc-path hits."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-030",
+        "authoringRules": [
+          "L12-58",
+          "L12-60"
+        ],
+        "sourceRenderProvenance": [
+          {
+            "sourcePath": "core/skills/fgos-run/SKILL.md",
+            "sourceDigest": "1e1ebada1abc36f8d1313f78d28cbe6fd9cbfb160ae7f1f2aa2031bb349c2afc",
+            "renderFiles": [
+              {
+                "path": ".agents/skills/fgos-run/SKILL.md",
+                "digest": "ada46a1bde59383e81d92b734fbc8f15ebb6b6cd0860f4aa965cea642eeda8a2",
+                "sourceDigest": "1e1ebada1abc36f8d1313f78d28cbe6fd9cbfb160ae7f1f2aa2031bb349c2afc",
+                "headerWitnesses": [
+                  {
+                    "line": 8,
+                    "text": "<!-- Generated by fgOS skill assembly from core/skills/fgos-run/SKILL.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->"
+                  }
+                ],
+                "censusSourcePath": "core/skills/fgos-run/SKILL.md",
+                "existingEdgeJoins": [],
+                "renderOnly": true,
+                "generationDoor": "npm run build:skills",
+                "generationRun": null
+              },
+              {
+                "path": ".claude/skills/fgos-run/SKILL.md",
+                "digest": "05ece5535b9e53f089f095852b50030ba984fc64287935640fbb14f956989f9f",
+                "sourceDigest": "1e1ebada1abc36f8d1313f78d28cbe6fd9cbfb160ae7f1f2aa2031bb349c2afc",
+                "headerWitnesses": [],
+                "censusSourcePath": "core/skills/fgos-run/SKILL.md",
+                "existingEdgeJoins": [],
+                "renderOnly": true,
+                "generationDoor": "npm run build:skills",
+                "generationRun": null,
+                "generatorDoor": "npm run build:skills",
+                "wrapperProvenance": "L12-60(6): thin wrappers are build:skills outputs."
+              },
+              {
+                "path": "plugins/fgOS/skills/fgos-run/SKILL.md",
+                "digest": "ada46a1bde59383e81d92b734fbc8f15ebb6b6cd0860f4aa965cea642eeda8a2",
+                "sourceDigest": "1e1ebada1abc36f8d1313f78d28cbe6fd9cbfb160ae7f1f2aa2031bb349c2afc",
+                "headerWitnesses": [
+                  {
+                    "line": 8,
+                    "text": "<!-- Generated by fgOS skill assembly from core/skills/fgos-run/SKILL.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->"
+                  }
+                ],
+                "censusSourcePath": "core/skills/fgos-run/SKILL.md",
+                "existingEdgeJoins": [],
+                "renderOnly": true,
+                "generationDoor": "npm run build:skills",
+                "generationRun": null
+              }
+            ]
+          },
+          {
+            "sourcePath": "core/skills/fgos-run/SKILL.md",
+            "sourceDigest": "1e1ebada1abc36f8d1313f78d28cbe6fd9cbfb160ae7f1f2aa2031bb349c2afc",
+            "renderFiles": [
+              {
+                "path": ".agents/skills/fgos-run/SKILL.md",
+                "digest": "ada46a1bde59383e81d92b734fbc8f15ebb6b6cd0860f4aa965cea642eeda8a2",
+                "sourceDigest": "1e1ebada1abc36f8d1313f78d28cbe6fd9cbfb160ae7f1f2aa2031bb349c2afc",
+                "renderOnly": true,
+                "headerWitnesses": [
+                  {
+                    "line": 8,
+                    "text": "<!-- Generated by fgOS skill assembly from core/skills/fgos-run/SKILL.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->"
+                  }
+                ],
+                "existingEdgeJoins": [],
+                "bodyEqualsSource": true
+              },
+              {
+                "path": "plugins/fgOS/skills/fgos-run/SKILL.md",
+                "digest": "ada46a1bde59383e81d92b734fbc8f15ebb6b6cd0860f4aa965cea642eeda8a2",
+                "sourceDigest": "1e1ebada1abc36f8d1313f78d28cbe6fd9cbfb160ae7f1f2aa2031bb349c2afc",
+                "renderOnly": true,
+                "headerWitnesses": [
+                  {
+                    "line": 8,
+                    "text": "<!-- Generated by fgOS skill assembly from core/skills/fgos-run/SKILL.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->"
+                  }
+                ],
+                "existingEdgeJoins": [],
+                "bodyEqualsSource": true
+              },
+              {
+                "path": ".claude/skills/fgos-run/SKILL.md",
+                "digest": "05ece5535b9e53f089f095852b50030ba984fc64287935640fbb14f956989f9f",
+                "sourceDigest": "1e1ebada1abc36f8d1313f78d28cbe6fd9cbfb160ae7f1f2aa2031bb349c2afc",
+                "renderOnly": true,
+                "headerWitnesses": [
+                  {
+                    "line": 9,
+                    "text": "This is a generated thin wrapper (tsk-1qi) -- do not edit directly, edit the source instead."
+                  }
+                ],
+                "existingEdgeJoins": [],
+                "bodyEqualsSource": false,
+                "generatorDoor": "npm run build:skills",
+                "wrapperProvenance": "L12-60(6): thin wrappers are build:skills outputs."
+              }
+            ],
+            "generationDoor": "npm run build:skills",
+            "determinismReceipt": null,
+            "installedPackageLimit": "Pinned repo bytes only; no generator or installed parity claim."
+          }
+        ],
+        "wholeFileRead": {
+          "file": "core/skills/fgos-run/SKILL.md",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "1e1ebada1abc36f8d1313f78d28cbe6fd9cbfb160ae7f1f2aa2031bb349c2afc",
+          "bytes": 7533,
+          "lines": 95,
+          "method": "Whole pinned source and all renders through EOF; no docs/ edge."
+        },
+        "stepFiveExcluded": [],
+        "zeroEdgeCoverage": "L12-60: all census occurrences are Step 5 code/message examples; no Step 4 prose slot remains."
+      },
+      "targetEvidence": {},
+      "renderContexts": {
+        ".agents/skills/fgos-run/SKILL.md": "---\nname: fgos-run\nuser-invocable: false\ndescription: >-\n  Single execution driver for all domains: runs free-form requests, AgentKit plans,\n  or specific phases through the Workflow runner and P1 Execution Core.\n---\n<!-- Generated by fgOS skill assembly from core/skills/fgos-run/SKILL.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->\n\n# fgos-run — Single Execution Driver\n\n`fgos-run` is the thin driver for executing work across all domains. It does not own scheduling, merging, or execution mechanics directly — it delegates completely to the **Workflow runner** (`src/workflow/runner.mjs`) and the **P1 Execution Core** (`src/runner/execution/run.mjs`).\n\n---\n\n## 1. Input Modes\n\n### Mode A: Free-form Prompt / Natural Language Task\nWhen the user gives a natural language task or ad-hoc request:\n1. Understand intent, scope, and affected files.\n2. **One task → the one-liner.** Run it as one Unit straight from the prompt:\n   ```sh\n   fgos run \"<prompt>\" [--provider <id>[,<id>...]] [--persona <name>] [--capability <c>] [--rigor <r>] [--effort <level>]\n   fgos run \"<prompt>\" --writes <path>[,<path>...] --worktree <linked-worktree> [--pattern code-change] [--input <path>[,<path>...]] [--verify \"<cmd>\"]\n   ```\n   Without `--writes` the Unit is read-only (sandboxed). `--writes` needs a linked worktree (create one with `fgos worktree create <path> --branch <name>` or `fgos worktree create <path> --detach`); from the main checkout it is refused before anything runs. `--provider` is a soft preference that `bind()` tries first and fails over from; `--capability` defaults to `execute`. `--input` hands the Unit repo-relative files to read; `--verify` is the command a reviewed run executes after each producing round (the preset pins none, so a reviewed run without `--verify` says it verified nothing).\n3. **Several tasks → `--units`.** Formulate the **Unit** objects (schema: `src/runner/execution/unit.mjs`):\n   - `id`: descriptive kebab-case identifier (a safe branch-name segment)\n   - `objective`: concise semantic description of what must be done\n   - `capability`: domain:verb (e.g. `docs:write`, `code:implement`)\n   - `rigor`: `low` | `standard` | `high` | `critical`\n   - `writes`: list of repo-relative paths or `*`/`**` globs the unit may modify (empty = read-only)\n   - `dependsOn`: array of prerequisite unit IDs\n   - `pattern`: `solo` | `reviewed` | `panel` (optional, defaults to config rule)\n   - `verify` (optional): shell command a reviewed unit runs after each producing round; `skills` (optional): skill names the work needs, served only by executors whose `supports.skills` lists them\n   - `prefer` / `persona` (optional, ad-hoc Units only): a soft executor preference and a persona name\n4. Save Units to a temporary or workspace YAML file (`{ id?, title?, units: [...] }` or a list) and start them through the Workflow runner:\n   ```sh\n   fgos workflow start --units <units-file.yaml> [--effort <level>]\n   ```\n   A writing Unit that depends on exactly one writing Unit starts from that Unit's branch; nothing is merged automatically (`fgos workflow status` lists `writeBranches`).\n\n### Mode B: AgentKit Plan Execution\nWhen the user asks to run a plan, a phase (\"run phase 2\"), or a phase range (\"run phase 1..3\"), the plan is an input you read, not something the runner translates:\n1. Read the plan and the phase files as artifacts. Verify the phase's units with plan-lint:\n   ```sh\n   fgos plan-lint <planPath> --phase <N> --json\n   ```\n2. Choose a bounded wave of Units for the phase yourself (what can run now, in what order, what each one may write) and run them through one of the two doors:\n   ```sh\n   fgos run \"<objective>\" --writes <paths> --worktree <linked-worktree>\n   fgos workflow start --units <file> [--foreground]\n   ```\n   `--units` takes a YAML or JSON list of Units, one step per Unit, ordered by each Unit's `dependsOn`.\n   `start` returns at once with the `workflowRunId` and a `detached` block; the run continues in a\n   detached process. Read progress with `fgos workflow status <workflowRunId>` (or pass `--foreground`\n   to wait in place); `fgos workflow answer` and `fgos workflow resume` return the same way. Do not treat\n   the output of `start`, `answer` or `resume` as the final state.\n3. Each Unit runs via `fgos run` in its own isolated worktree and integrates changes cleanly using pure git. `fgos workflow start --plan` no longer exists; a later conductor skill (`fgos-cook`) will own whole-plan execution on a case.\n\n---\n\n## 2. Human Review Gates & Question Batching\n\nWhen a workflow step declares a human gate (`gate: { kind: \"human\" }`) or when an owner review is required:\n1. The Workflow runner parks at the gate with outcome `parked` and records the pending question(s).\n2. `fgos-run` gathers **all open questions across all parked steps** into a single structured batch; each question follows the decision-question template (`../_shared/decision-question.md`).\n3. The user answers all questions in one interaction.\n4. Answers are recorded via:\n   ```sh\n   fgos workflow answer <workflowRunId> --step <stepId> --answer \"<response>\"\n   ```\n5. The runner resumes execution automatically.\n\n---\n\n## 3. Execution Invariants\n\n- **G2 Non-Infrastructure:** Units, presets, plans, and driver prompts never pin executors, providers, models, tiers, or invocations; an ad-hoc Unit (one-liner `--provider`, `prefer` in a `--units` file) may carry a soft `prefer` that `bind()` tries first and fails over from. Only a human `--override` pins; everything else is resolved by `bind()`.\n- **Runner Commits, Worker Does Not:** A writing Unit's brief lists its write scope; the worker edits files and stops, never running `git add`/`git commit`. After a passing round the runner commits only paths inside the Unit's `writes` (subject from the first line of the worker's `summary`); a path the worker needs outside that scope goes in `needsWrites`, not on disk.\n- **G7 Herdr Default:** All out-of-process unit runs default to spawning in a watched `herdr` terminal pane when herdr is available, falling back to `cli` when headless.\n- **Fail-Closed Mutating Gate:** Every file mutation runs strictly inside an isolated linked git worktree matching the Unit run specification.\n- **Honest Outcomes:** Reviewer findings are tracked as `findings`, not execution failures, and fix rounds are bounded by the collaboration pattern.\n\n---\n\n## 4. Reviewing a Change That Touches Tests\n\nEvery behaviour has one owning proof (AGENTS.md L5 question 5, design principle 8 **One proof**). Whoever reviews a Unit's result, or accepts a lead's report, checks these four lines and returns a finding for each one that fails; a report that adds tests without reasons, or deletes a mechanism without a retired list, is not accepted:\n\n1. **Every new test file:** why not the existing file for this module? Only a new module or a new boundary gets a new file.\n2. **Every new test:** its title names the behaviour in plain words (no task ids), the owning proof was searched for (`rg` the behaviour's words and the symbol), and the report gives the reason no existing test proves it.\n3. **Every deleted or replaced mechanism:** its tests are retired in the same change and listed, each with the test that now owns the behaviour or the statement that the behaviour is gone.\n4. **Every Node test in a Rust-ported area** (git, holder-lock, event-store, run-supervisor, terminal-control): it is the one route proof for its port or a Node-only behaviour, never a copy of a case a Rust test owns.\n\nThe report quotes the `suite:` line `npm test` prints (files, `test()` calls, wall time against `test/suite-baseline.json`).\n",
+        ".claude/skills/fgos-run/SKILL.md": "---\nname: fgos-run\nuser-invocable: false\ndescription: >-\n  Single execution driver for all domains: runs free-form requests, AgentKit plans,\n  or specific phases through the Workflow runner and P1 Execution Core.\n---\n\nThis is a generated thin wrapper (tsk-1qi) -- do not edit directly, edit the source instead.\nThe real skill content lives at `../../../.agents/skills/fgos-run/SKILL.md`, an assembled projection whose generated header identifies its canonical source.\nRead that file and follow it directly.\n",
+        "plugins/fgOS/skills/fgos-run/SKILL.md": "---\nname: fgos-run\nuser-invocable: false\ndescription: >-\n  Single execution driver for all domains: runs free-form requests, AgentKit plans,\n  or specific phases through the Workflow runner and P1 Execution Core.\n---\n<!-- Generated by fgOS skill assembly from core/skills/fgos-run/SKILL.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->\n\n# fgos-run — Single Execution Driver\n\n`fgos-run` is the thin driver for executing work across all domains. It does not own scheduling, merging, or execution mechanics directly — it delegates completely to the **Workflow runner** (`src/workflow/runner.mjs`) and the **P1 Execution Core** (`src/runner/execution/run.mjs`).\n\n---\n\n## 1. Input Modes\n\n### Mode A: Free-form Prompt / Natural Language Task\nWhen the user gives a natural language task or ad-hoc request:\n1. Understand intent, scope, and affected files.\n2. **One task → the one-liner.** Run it as one Unit straight from the prompt:\n   ```sh\n   fgos run \"<prompt>\" [--provider <id>[,<id>...]] [--persona <name>] [--capability <c>] [--rigor <r>] [--effort <level>]\n   fgos run \"<prompt>\" --writes <path>[,<path>...] --worktree <linked-worktree> [--pattern code-change] [--input <path>[,<path>...]] [--verify \"<cmd>\"]\n   ```\n   Without `--writes` the Unit is read-only (sandboxed). `--writes` needs a linked worktree (create one with `fgos worktree create <path> --branch <name>` or `fgos worktree create <path> --detach`); from the main checkout it is refused before anything runs. `--provider` is a soft preference that `bind()` tries first and fails over from; `--capability` defaults to `execute`. `--input` hands the Unit repo-relative files to read; `--verify` is the command a reviewed run executes after each producing round (the preset pins none, so a reviewed run without `--verify` says it verified nothing).\n3. **Several tasks → `--units`.** Formulate the **Unit** objects (schema: `src/runner/execution/unit.mjs`):\n   - `id`: descriptive kebab-case identifier (a safe branch-name segment)\n   - `objective`: concise semantic description of what must be done\n   - `capability`: domain:verb (e.g. `docs:write`, `code:implement`)\n   - `rigor`: `low` | `standard` | `high` | `critical`\n   - `writes`: list of repo-relative paths or `*`/`**` globs the unit may modify (empty = read-only)\n   - `dependsOn`: array of prerequisite unit IDs\n   - `pattern`: `solo` | `reviewed` | `panel` (optional, defaults to config rule)\n   - `verify` (optional): shell command a reviewed unit runs after each producing round; `skills` (optional): skill names the work needs, served only by executors whose `supports.skills` lists them\n   - `prefer` / `persona` (optional, ad-hoc Units only): a soft executor preference and a persona name\n4. Save Units to a temporary or workspace YAML file (`{ id?, title?, units: [...] }` or a list) and start them through the Workflow runner:\n   ```sh\n   fgos workflow start --units <units-file.yaml> [--effort <level>]\n   ```\n   A writing Unit that depends on exactly one writing Unit starts from that Unit's branch; nothing is merged automatically (`fgos workflow status` lists `writeBranches`).\n\n### Mode B: AgentKit Plan Execution\nWhen the user asks to run a plan, a phase (\"run phase 2\"), or a phase range (\"run phase 1..3\"), the plan is an input you read, not something the runner translates:\n1. Read the plan and the phase files as artifacts. Verify the phase's units with plan-lint:\n   ```sh\n   fgos plan-lint <planPath> --phase <N> --json\n   ```\n2. Choose a bounded wave of Units for the phase yourself (what can run now, in what order, what each one may write) and run them through one of the two doors:\n   ```sh\n   fgos run \"<objective>\" --writes <paths> --worktree <linked-worktree>\n   fgos workflow start --units <file> [--foreground]\n   ```\n   `--units` takes a YAML or JSON list of Units, one step per Unit, ordered by each Unit's `dependsOn`.\n   `start` returns at once with the `workflowRunId` and a `detached` block; the run continues in a\n   detached process. Read progress with `fgos workflow status <workflowRunId>` (or pass `--foreground`\n   to wait in place); `fgos workflow answer` and `fgos workflow resume` return the same way. Do not treat\n   the output of `start`, `answer` or `resume` as the final state.\n3. Each Unit runs via `fgos run` in its own isolated worktree and integrates changes cleanly using pure git. `fgos workflow start --plan` no longer exists; a later conductor skill (`fgos-cook`) will own whole-plan execution on a case.\n\n---\n\n## 2. Human Review Gates & Question Batching\n\nWhen a workflow step declares a human gate (`gate: { kind: \"human\" }`) or when an owner review is required:\n1. The Workflow runner parks at the gate with outcome `parked` and records the pending question(s).\n2. `fgos-run` gathers **all open questions across all parked steps** into a single structured batch; each question follows the decision-question template (`../_shared/decision-question.md`).\n3. The user answers all questions in one interaction.\n4. Answers are recorded via:\n   ```sh\n   fgos workflow answer <workflowRunId> --step <stepId> --answer \"<response>\"\n   ```\n5. The runner resumes execution automatically.\n\n---\n\n## 3. Execution Invariants\n\n- **G2 Non-Infrastructure:** Units, presets, plans, and driver prompts never pin executors, providers, models, tiers, or invocations; an ad-hoc Unit (one-liner `--provider`, `prefer` in a `--units` file) may carry a soft `prefer` that `bind()` tries first and fails over from. Only a human `--override` pins; everything else is resolved by `bind()`.\n- **Runner Commits, Worker Does Not:** A writing Unit's brief lists its write scope; the worker edits files and stops, never running `git add`/`git commit`. After a passing round the runner commits only paths inside the Unit's `writes` (subject from the first line of the worker's `summary`); a path the worker needs outside that scope goes in `needsWrites`, not on disk.\n- **G7 Herdr Default:** All out-of-process unit runs default to spawning in a watched `herdr` terminal pane when herdr is available, falling back to `cli` when headless.\n- **Fail-Closed Mutating Gate:** Every file mutation runs strictly inside an isolated linked git worktree matching the Unit run specification.\n- **Honest Outcomes:** Reviewer findings are tracked as `findings`, not execution failures, and fix rounds are bounded by the collaboration pattern.\n\n---\n\n## 4. Reviewing a Change That Touches Tests\n\nEvery behaviour has one owning proof (AGENTS.md L5 question 5, design principle 8 **One proof**). Whoever reviews a Unit's result, or accepts a lead's report, checks these four lines and returns a finding for each one that fails; a report that adds tests without reasons, or deletes a mechanism without a retired list, is not accepted:\n\n1. **Every new test file:** why not the existing file for this module? Only a new module or a new boundary gets a new file.\n2. **Every new test:** its title names the behaviour in plain words (no task ids), the owning proof was searched for (`rg` the behaviour's words and the symbol), and the report gives the reason no existing test proves it.\n3. **Every deleted or replaced mechanism:** its tests are retired in the same change and listed, each with the test that now owns the behaviour or the statement that the behaviour is gone.\n4. **Every Node test in a Rust-ported area** (git, holder-lock, event-store, run-supervisor, terminal-control): it is the one route proof for its port or a Node-only behaviour, never a copy of a case a Rust test owns.\n\nThe report quotes the `suite:` line `npm test` prints (files, `test()` calls, wall time against `test/suite-baseline.json`).\n"
+      },
+      "populationGapFindings": [],
+      "L12-60-coverage": {
+        "stepFiveExcluded": [],
+        "authorAddedSlots": [],
+        "recordChangedThisTurn": true
+      },
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    }
+  ]
+}

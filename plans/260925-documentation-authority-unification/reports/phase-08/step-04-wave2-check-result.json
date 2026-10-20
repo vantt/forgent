@@ -1,8 +1,7 @@
 {
-  "authorInputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+  "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
   "recordAuthorPins": {
-    "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e": 174,
-    "d4a07d57c4d146b482d4a9e632dc02d8df42af79": 94
+    "dc24ce64527fbffd23e1643f35a7ddf808fd7b45": 275
   },
   "checkedBatches": [
     "step04-001",
@@ -39,113 +38,61 @@
     "step04-032",
     "step04-033"
   ],
-  "files": 268,
-  "consumerFiles": 309,
-  "edges": 833,
+  "files": 275,
+  "consumerFiles": 331,
+  "edges": 914,
   "dispositions": {
-    "preserve": 694,
-    "patch": 66,
-    "parked": 73
+    "preserve": 640,
+    "parked": 59,
+    "render-join": 173,
+    "patch": 42
   },
   "failureCount": 0,
   "failures": [],
-  "openLeadRulingEdges": [
-    {
-      "set": "step04-032",
-      "file": "core/skills/_shared/ak-cook-worker-contract.md",
-      "edgeId": null,
-      "slotKey": "{\"edgeId\":null,\"file\":\".agents/skills/_shared/ak-cook-worker-contract.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":26,\"columnStart\":6,\"file\":\".agents/skills/_shared/ak-cook-worker-contract.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":7,\"text\":\"docs/specs/runner.md\"}}"
-    },
-    {
-      "set": "step04-032",
-      "file": "core/skills/_shared/ak-cook-worker-contract.md",
-      "edgeId": null,
-      "slotKey": "{\"edgeId\":null,\"file\":\"core/skills/_shared/ak-cook-worker-contract.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":26,\"columnStart\":6,\"file\":\"core/skills/_shared/ak-cook-worker-contract.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":6,\"text\":\"docs/specs/runner.md\"}}"
-    },
-    {
-      "set": "step04-032",
-      "file": "core/skills/_shared/ak-cook-worker-contract.md",
-      "edgeId": null,
-      "slotKey": "{\"edgeId\":null,\"file\":\"plugins/fgOS/skills/_shared/ak-cook-worker-contract.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":26,\"columnStart\":6,\"file\":\"plugins/fgOS/skills/_shared/ak-cook-worker-contract.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":7,\"text\":\"docs/specs/runner.md\"}}"
-    },
-    {
-      "set": "step04-033",
-      "file": "plans/261020-1250-debate-pattern-and-judge-role/plan.md",
-      "edgeId": null,
-      "slotKey": "{\"edgeId\":null,\"file\":\"plans/261020-1250-debate-pattern-and-judge-role/plan.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":37,\"columnStart\":15,\"file\":\"plans/261020-1250-debate-pattern-and-judge-role/plan.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":38,\"text\":\"docs/specs/workflow.md\"}}"
-    },
-    {
-      "set": "step04-033",
-      "file": "plans/261020-1250-debate-pattern-and-judge-role/plan.md",
-      "edgeId": null,
-      "slotKey": "{\"edgeId\":null,\"file\":\"plans/261020-1250-debate-pattern-and-judge-role/plan.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":72,\"columnStart\":52,\"file\":\"plans/261020-1250-debate-pattern-and-judge-role/plan.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":38,\"text\":\"docs/specs/runner.md\"}}"
-    },
-    {
-      "set": "step04-033",
-      "file": "plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md",
-      "edgeId": null,
-      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":68,\"columnStart\":48,\"file\":\"plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":35,\"text\":\"docs/specs/runner.md\"}}"
-    },
-    {
-      "set": "step04-033",
-      "file": "plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md",
-      "edgeId": null,
-      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":157,\"columnStart\":137,\"file\":\"plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":28,\"text\":\"docs/specs/runner.md\"}}"
-    },
-    {
-      "set": "step04-033",
-      "file": "plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md",
-      "edgeId": null,
-      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":33,\"columnStart\":11,\"file\":\"plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":16,\"text\":\"docs/specs/workflow.md\"}}"
-    },
-    {
-      "set": "step04-033",
-      "file": "plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md",
-      "edgeId": null,
-      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":97,\"columnStart\":77,\"file\":\"plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":16,\"text\":\"docs/specs/runner.md\"}}"
-    },
-    {
-      "set": "step04-033",
-      "file": "plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md",
-      "edgeId": null,
-      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":121,\"columnStart\":95,\"file\":\"plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":125,\"text\":\"docs/specs/workflow.md:195\"}}"
-    }
-  ],
-  "checkerSha256": "c7297e26759dc09d8b1b81bb8fb00cd496d13856b97bc1a457263d8ae1fbe855",
+  "openLeadRulingEdges": [],
+  "checkerSha256": "51e49383b61e68935e9e09b5cd10e78548d5f3a20388cd815f472f34373c5cd8",
   "reusedStep3Sha256": "20bbeca2b0b104df357de506e479062b589e6faa31164a80761deddc31578b2b",
   "recordFileHashes": {
-    "step04-001.jsonl": "d28180831a879b98e68523d3d69b271cf03d284ecae8bbafac40a4c8a2e18eb0",
-    "step04-002.jsonl": "6916c45cfacdc1c96b57e37e43e9d32b7ad21beae18cf5e9998eb1e643019a56",
-    "step04-003.jsonl": "68fe0ed4b3ac07274f07efb6ea3da9c0d43bc817fc64e03e462e7cba4cf716b4",
-    "step04-004.jsonl": "f94e7910d9cfcf7528583500640e692024827851a826d138a30fead358a76e66",
-    "step04-005.jsonl": "d765dec6ca3c0ef1c3d6eab876dfcb64b8213eb895b02842ef82eb164692a85d",
-    "step04-006.jsonl": "5820f58d432f0168e59376a380a6f8ce8309c5c05682224da328e9abf3763f4a",
-    "step04-007.jsonl": "4132bda36424405b8ac0a817c2691c107fc03f8c97dcb386dce896c2efe1c17c",
-    "step04-008.jsonl": "52acab1dbb843d021a01e0a23e5540c6ecdd4e2370a2e44a4751c2ef6055aaa5",
-    "step04-009.jsonl": "a959661a917b582198d8ce567a6d16f792ab6f1b35f2a5c47a1a7772c09e5b83",
-    "step04-010.jsonl": "9b4ae6d7888f9210876d1654cf9507dc18b34fd7d9b8b13e7b65565d5d7a5726",
-    "step04-011.jsonl": "4d0976b23aa59244d7f7bb3156c7a1adc746911af7803d4286420b97b95d6429",
-    "step04-012.jsonl": "99db39bd44f336d0727d6c76554f48eb4f09143043118de35d745418b1b55316",
-    "step04-013.jsonl": "9b718bab862c0251aa4e84ddccafac2689de5794ed4975b6b3cc734c12b201fa",
-    "step04-014.jsonl": "88842e379c69db1a7f4484cf47c0f5d12a7e3bf0ba160d50b826cb714085e1a2",
-    "step04-015.jsonl": "efd84f14978925a8a995ea9c2d7a2d99c7482e56aa853a69473648f35d5de69a",
-    "step04-016.jsonl": "ebc02bc22ffd9fc4c4c7ff8d9ad1c4d2e79fc3cac3aa0e7f46c147028babc206",
-    "step04-017.jsonl": "27210e2839b80b09948691f6673087d02d2b159c2861c9dd4f9b4b87599c65e9",
-    "step04-018.jsonl": "1714c00ac5de77a736ad6a4726ac62e216785812246be6cb45f0c1ee53c73888",
-    "step04-019.jsonl": "841ac50dd33ae61fdb054381ea9163e5599192bd67ef265c496c29a96178bdaa",
-    "step04-020.jsonl": "d401f67a90b4bac3001a217b5a54e4fd28964ff6ca415f33495f585daaf48f7f",
-    "step04-021.jsonl": "40536b9cbb6a766b0798fb171ed07f3fc93cff3b1153ef1dc3122658282d52fb",
-    "step04-022.jsonl": "1daf1560ac60980ba5929e163ea30e6997e27419b7ec7b69c80cafffd2c3949e",
-    "step04-023.jsonl": "f7419740e8c9a60c353b012f00d97b4ac815bfaaac65c72c3e6424134f78c3ef",
-    "step04-024.jsonl": "9a0767110c402de5df5552e1e8922ed0866fe0ba26a0d06e1b0d59e82b450454",
-    "step04-025.jsonl": "13456b191df556e982ca182028e8297c116960ffa445bfbc395899ded993f465",
-    "step04-026.jsonl": "e0e56c565bb1e9bc9d788a7ccd755d5a885563fd71f0d7461095ae7e31bc6c5b",
-    "step04-027.jsonl": "82c5d01f2b90bb8806cef35da08edb94681a6b7311df901df00e2174119540dd",
-    "step04-028.jsonl": "f5e2fb4248f318ccadc74be77d0a043a1e6889409e53c957f6108c9b1e38884e",
-    "step04-029.jsonl": "a2e4469349137c08d54ee1531334f4f58901b3a04f847cf249709badcdbb7de6",
-    "step04-030.jsonl": "063eecc7511e79cd5812f06949aefcadd05a703d28135f69a14ebceac1b4c4db",
-    "step04-031.jsonl": "d3a98e12bca6db59a27a38ae628c0bb56c64344b7f172bf953e87028790f65cf",
-    "step04-032.jsonl": "d00a3400e26b03c152c647d0992fa4ee642234814e6b2d8bd6a3c06740e78bc7",
-    "step04-033.jsonl": "864083f421c5a904dc2a78e8c0c5e9273ea2302c57f943b84ea781cc5efadde8"
+    "step04-001.jsonl": "b625cf7c234e8ed0182a605bb9a9c1fc28c4362b8db87153d5af3586efa97bf7",
+    "step04-002.jsonl": "c657d02b0eb243f9ec6d028c0ad1c41dae30e9f1477ec30e5253d6d1385fb85d",
+    "step04-003.jsonl": "9a6aa3b2b930b97ebc68b4cff4834bb7df7b11c72163b0fef44b5b7cba52c941",
+    "step04-004.jsonl": "368cdb77e22cada0efa407b5f2e8378368f929a98fb68668e41c33951d32fcb1",
+    "step04-005.jsonl": "f02b0c3e7684b88d40a9ce3842a65e8170547ae842b034116b1851541288d879",
+    "step04-006.jsonl": "5b62793b010d0732044ccf4b1ee58fec6375f93ae2e097ea6473c3982d560497",
+    "step04-007.jsonl": "149a55be09e4293f3522a6b6a9b873f4ae47d6db10c85d563d0828d535810a50",
+    "step04-008.jsonl": "f034cccbca4fd8db4d42ad424cd94f63bd856a00529536e93eed27f9cd6e8dbe",
+    "step04-009.jsonl": "f7b568240d7ea2f4097a8837a160879b6e595b901bdc24a7980ae55be79cc773",
+    "step04-010.jsonl": "1ad1c175acfc9c844c3c8bd8aa85ae5d70c51560de7aa327245f085d821aac96",
+    "step04-011.jsonl": "5e20ab40b3ca62a568fb4c5d4d9857b05919c36e7373477f47f505af3385941f",
+    "step04-012.jsonl": "594bc326c1d46e615d513bd1e228734fca81b2d2b04d72c913f57dde49c8530c",
+    "step04-013.jsonl": "4957f82917edfb1be6e2234526e4ac85167db7c5427f85b49e98dd03245cfdaa",
+    "step04-014.jsonl": "d21ffa5fafbacc511ffb11946847d7f1f0603e3422c8b64d3268017719d37287",
+    "step04-015.jsonl": "21e4fbdedae76dae51c17efe9e9daa705161517d71dd2ebfc37eae6d2e69aaca",
+    "step04-016.jsonl": "e225a71a2a9b97acd252bc5bbb4217244a8b3f974025f6c81c79322f7c763cf3",
+    "step04-017.jsonl": "2298ab74cd4e7d285d1a093fe97bd108bef15f288a9e8eab4ed445f9839f1f23",
+    "step04-018.jsonl": "202d7a3dae5d553df4cfc466bee3d85b53937d50b3d5fabee2c3a1fbba530819",
+    "step04-019.jsonl": "629661c425cb9ee7f693a2871e8757358c810e8eb07453b64fcc00e046cc0c3f",
+    "step04-020.jsonl": "a07b589ec5fe0734b0942599f1d425b0b6fd5c3d34fc8c6e81349842201e51a0",
+    "step04-021.jsonl": "5a85a05dec0c945fc505c871af1e1feddca9e946642de77fb8c16102f9bf10a4",
+    "step04-022.jsonl": "3ccc4ed3d36cc64b2fa159366ec42bf96b1110e5ec9cd420d7cea17f1e29eb19",
+    "step04-023.jsonl": "cd93fac8705222fa84a3e0d69fad0367fe89e3d44dbd183ebbc1e96faace0c86",
+    "step04-024.jsonl": "642a3f22e5992d14240c3bd3cf9175f4b092a9980b70f490717a7e7807235c40",
+    "step04-025.jsonl": "a97f99a3d056a457c32e5e9826874cdc07740a98d35d803480c97028d4d6f55a",
+    "step04-026.jsonl": "eae84949775152dbb58cf22e06df69bf217c262452fe5d27c02b07e71256a169",
+    "step04-027.jsonl": "3ea1bea7fa6b9636be16397d594c100a35f94c0b0c8632076ede5f62f9c739b0",
+    "step04-028.jsonl": "c4ea3e35cc1e84d5166fff858f1e078a08d6803c1bf5d77a15b3ea792f0aeb46",
+    "step04-029.jsonl": "22a921b48b7932f3c51f8110575ea1fbf05458afb6835ea0936b9d94f263b423",
+    "step04-030.jsonl": "2493674bb7097527854a3521458cb4b6e9512138b51a519b225591a519613043",
+    "step04-031.jsonl": "bb00ede379e5fccd3e566da484e6a16bc6936a11f2ddf42c6efc83a214336f43",
+    "step04-032.jsonl": "e86f8f6418e2f1de15863ea12c300606f6cce09830c6d5d977d8fbe38c16708b",
+    "step04-033.jsonl": "b08f0cc30967c2c8eaecf874b1b2b2df8f16e8cf89fb78f204139eb776909a61"
+  },
+  "dependencyHashes": {
+    "step-03-check.py": "20bbeca2b0b104df357de506e479062b589e6faa31164a80761deddc31578b2b",
+    "step-03-resolve.py": "766f96d8417af71a275f37da64072277e04bf21608a83c67a5c52afdffb3b8ba",
+    "step-04-l12-60-lib.py": "14475e4e285b36926c8be4cff2f40eab1812fa771a809cd521e4370c0130783c",
+    "step-04-population.json": "910b23d677f3a88069724459d9c27da7da17cc6f2c9ff53f6d24c04628f849ef",
+    "step-04-batches.json": "fad816b3704d6dc045b52361270dee4bad1c69eab70391d1f8c0b077afb07b4c",
+    "step-04-source-render-provenance.json": "062a56597aa26b7ac11565faeb604e0f772d0783f7709efc56490b90383bc688"
   }
 }

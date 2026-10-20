@@ -1,17 +1,2517 @@
 [
   {
-    "set": "step04-017",
-    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-017",
+    "set": "step04-001",
+    "seed": "A51-step04-file-v1\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-001",
+    "population": [
+      "domains/coding/skills/fgos-coding-discovering/SKILL.md"
+    ],
+    "ranks": [
+      {
+        "file": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "rankHash": "8f39ce2b09c082d690ed61ba0b78d51ba41346af1080ae336dcfc300ea86ac5a"
+      }
+    ],
+    "sample": [
+      "domains/coding/skills/fgos-coding-discovering/SKILL.md"
+    ],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-001",
+    "unpatchedRanks": [
+      {
+        "file": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+        "rankHash": "0ff1cd4f1d3f91d1401a4b446b30002972df8c9ed49bc08ecbbaa7d1ba523d37"
+      },
+      {
+        "file": "domains/coding/skills/fgos-coding-implement/SKILL.md",
+        "rankHash": "44fbf46c09966c18f3879d96efd821153f931ee07c885ffba700f417efb5c725"
+      },
+      {
+        "file": "domains/coding/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+        "rankHash": "4fc37cf16c6c509f0f2e062fd955db77b4266aaf2f77b985b1d847bc4d00367b"
+      },
+      {
+        "file": "domains/coding/skills/fgos-coding-exploring/references/gate-mechanics.md",
+        "rankHash": "5c608f724ef7fb2a63e6b1d8123947e6760f515a5118a6f0bd17e4cb8e606524"
+      },
+      {
+        "file": "domains/coding/skills/fgos-coding-exploring/SKILL.md",
+        "rankHash": "5d5adc14881e418570d3b9b73ca7c80d20f1ffea95bdd9570e1646cbae17caa8"
+      },
+      {
+        "file": "domains/coding/AGENTS.md",
+        "rankHash": "afd4689f0b826a3b0a1e2c19ffddb2af68c5a80b01e18d5c63396c3219378045"
+      },
+      {
+        "file": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+        "rankHash": "b4ab66a64c8717641cb85fa432f3ba2f556f9b5d7b137b1a0716efd6d70f49eb"
+      },
+      {
+        "file": "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+        "rankHash": "dfeec3e15c1692e84c3c3eb115a4d206e6e6acaec77fbdbcff3e207e7bde8773"
+      }
+    ],
+    "unpatchedSample": [
+      "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+      "domains/coding/skills/fgos-coding-implement/SKILL.md"
+    ],
+    "mandatoryWitnesses": [
+      {
+        "file": "domains/coding/AGENTS.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "domains/coding/skills/fgos-coding-exploring/SKILL.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "domains/coding/skills/fgos-coding-exploring/references/gate-mechanics.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "domains/coding/skills/fgos-coding-implement/SKILL.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "domains/coding/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      }
+    ],
+    "selected": [
+      "domains/coding/AGENTS.md",
+      "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+      "domains/coding/skills/fgos-coding-exploring/SKILL.md",
+      "domains/coding/skills/fgos-coding-exploring/references/gate-mechanics.md",
+      "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+      "domains/coding/skills/fgos-coding-implement/SKILL.md",
+      "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "domains/coding/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+      "domains/coding/skills/fgos-coding-knowledge/SKILL.md"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "L12-60 mandatory targeted re-review; original wave1 A51 seeds/ranks retained as history, not reseeded",
+    "targetedReReview": [
+      "domains/coding/AGENTS.md",
+      "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+      "domains/coding/skills/fgos-coding-exploring/SKILL.md",
+      "domains/coding/skills/fgos-coding-exploring/references/gate-mechanics.md",
+      "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+      "domains/coding/skills/fgos-coding-implement/SKILL.md",
+      "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "domains/coding/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+      "domains/coding/skills/fgos-coding-knowledge/SKILL.md"
+    ]
+  },
+  {
+    "set": "step04-002",
+    "seed": "A51-step04-file-v1\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-002",
+    "population": [
+      "domains/coding/skills/fgos-coding-shaping/SKILL.md"
+    ],
+    "ranks": [
+      {
+        "file": "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+        "rankHash": "4b3f0e01fc28e48fdf385b698e0fe8d37f569ccf52dca64ed203570c85898b39"
+      }
+    ],
+    "sample": [
+      "domains/coding/skills/fgos-coding-shaping/SKILL.md"
+    ],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-002",
+    "unpatchedRanks": [
+      {
+        "file": "domains/coding/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+        "rankHash": "19b96d177a1ed226b60d33b1fd7beb0df7362432bea03681d4db7079e59083e5"
+      },
+      {
+        "file": "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+        "rankHash": "1e53fcce1de0ddb481d2900311ac531f3eb06112a6bd612829ac159dacae036e"
+      },
+      {
+        "file": "domains/coding/task-specs/lock-decisions.md",
+        "rankHash": "5f97b76d45ff32cca9cad31a83bb9af4ef122de43b9ac0b32c28ac8c3074dadb"
+      }
+    ],
+    "unpatchedSample": [
+      "domains/coding/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md"
+    ],
+    "mandatoryWitnesses": [
+      {
+        "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "bytes": 8099,
+        "slots": 2,
+        "reasons": [
+          "L12-10 source/render/companion join"
+        ]
+      },
+      {
+        "file": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+        "bytes": 7294,
+        "slots": 3,
+        "reasons": [
+          "L12-10 source/render/companion join"
+        ]
+      },
+      {
+        "file": "domains/coding/skills/fgos-coding-planning/SKILL.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "domains/coding/skills/fgos-coding-validating/SKILL.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "domains/coding/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "domains/coding/task-specs/lock-decisions.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "domains/coding/task-specs/shape-plan.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      }
+    ],
+    "selected": [
+      "domains/coding/skills/fgos-coding-planning/SKILL.md",
+      "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+      "domains/coding/skills/fgos-coding-validating/SKILL.md",
+      "domains/coding/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+      "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "domains/coding/task-specs/lock-decisions.md",
+      "domains/coding/task-specs/shape-plan.md"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "L12-60 mandatory targeted re-review; original wave1 A51 seeds/ranks retained as history, not reseeded",
+    "targetedReReview": [
+      "domains/coding/skills/fgos-coding-planning/SKILL.md",
+      "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+      "domains/coding/skills/fgos-coding-validating/SKILL.md",
+      "domains/coding/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+      "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "domains/coding/task-specs/lock-decisions.md",
+      "domains/coding/task-specs/shape-plan.md"
+    ]
+  },
+  {
+    "set": "step04-003",
+    "seed": "A51-step04-file-v1\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-003",
     "population": [],
     "ranks": [],
     "sample": [],
-    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-017",
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-003",
+    "unpatchedRanks": [
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P01.1-mvp3-recheck-disposition-report.md",
+        "rankHash": "00c78d74aa63efe35b5f23f09ecfb585ab540b8f5573517066f9455c2cb70d5c"
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-2050-GH-08-P01.1-coordination-store-report.md",
+        "rankHash": "08788f10b530d742933fdeb2568c11295e3e628a9474851dda1dd2cc3a55c51a"
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P01.1-test-coverage-fix-report.md",
+        "rankHash": "100d942038be7a85f3fb923e4e6421a12b1aca81897a30732fb9b55cae58ba03"
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P00.1-contract-promotion-report.md",
+        "rankHash": "14304a52d68221c79cca564cc318589e28631ccd356330f2efabc1b0d8243c09"
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/plan.md",
+        "rankHash": "196a1f0b5ecf9edb327d65debe060e152b784f602caa98d5a736194d5b5af688"
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-contract-promotion-review-report.md",
+        "rankHash": "19877c1298225c0598d33329834e555964dbfb0daecb4c0fbc898466e75a54e0"
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P00.1-redteam-findings-fix-report.md",
+        "rankHash": "23ceeb282a8546045a9b5fed1ad05e0ac9b37e16399b3f2109aa3afe70d15a9e"
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1702-GH-08-P00.2-dispatch-policy-review-report.md",
+        "rankHash": "28d36baa7abcddfeed545d2ab1fada5bd993720cc99d932b623c63e4db7cfabc"
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1609-GH-08-P00.1-canonical-docs-review-report.md",
+        "rankHash": "37301ba780b0c74e8d1bdb08b95ae3e2a01af9e0052b86cdaf577401d11ede77"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P00.1-handoff-consumption-report.md",
+        "rankHash": "3c0ee1470b3fa3cd7b1d98c88f057598809f70f61fad1ed25648c35f6cd33462"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P03.1-role-execution-policy-report.md",
+        "rankHash": "3d2a73787355680a79cdb0f052ab7eb0628c8f09b5c6c3e4e3815390a8248e94"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/plan.md",
+        "rankHash": "45627f8cb147c02d06a7867d802e57ebb434752867b8d31d070de0d6cb350e7e"
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1735-GH-08-P00.2-rt1-fix-recheck-report.md",
+        "rankHash": "4a643cc1537696266386ec05b5404ba406197ce1e36f51b51e1107582bb8777c"
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/plan.md",
+        "rankHash": "4f0e0d0b3356ebb8ebabb04fc84d0928ba8f3e06c503e3254d630e1a763fb071"
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P01.1-fix-recheck-report.md",
+        "rankHash": "4f3e6c5697d0ff777a24cc2748cffbb430e2aa54077b2f4673a6754c2a31f303"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P04.2-dogfood-handoff-report.md",
+        "rankHash": "522d5e73c73a5a8ba3e3efb5b96634e77616d037830aeef19220f64df396b28f"
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1815-GH-08-P00.3-cli-wiring-redteam-report.md",
+        "rankHash": "53c5ae748723668bee70565c2850f06260b7fa40a1d2131dda3871207d2cd694"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
+        "rankHash": "5cd602dab0fa0e7a918120f811ca1e994fff3afe7bbe04ee25d96f6b1e385405"
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/phase-03-recheck-disposition-live-proof.md",
+        "rankHash": "5cede2dd66d6388fcb7d272a290d1679f2fb217e977cb88de3c4ac9ea13e54a9"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/phase-00-consume-handoff-and-freeze-scope.md",
+        "rankHash": "64dc549d2f555f0dbbb14f7464d7b72d3efbdc521c0f9c9e0bfb88f52739f333"
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2200-GH-08-P01.1-round2-fix-recheck-report.md",
+        "rankHash": "6980b5511f6a3660760f53c4e59d8f70af84422d62a989da6325dc4398f3c820"
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P03.2-live-proof-negative-battery-report.md",
+        "rankHash": "6b1d28cfbce5198aaaf95eeef47015c3b86516b985dbc7b350fafaaed672a248"
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1650-GH-08-P00.2-dispatch-policy-fixes-report.md",
+        "rankHash": "6d5616701b1aa9cf7eece8a2092aa2b38d910827e765dd56ebfe693a39694602"
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2140-GH-08-P01.1-coordination-store-redteam-report.md",
+        "rankHash": "6e1f92b5bf9fa73eb559b360042cfbaadf50494765671933091b509052ad7f5c"
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1800-GH-08-P00.3-cli-wiring-review-report.md",
+        "rankHash": "7757a6e93553ebb2f938917c75a50eeb9bca80384306f1204a05496b63c05278"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.1-thin-launcher-core-report.md",
+        "rankHash": "7829e012b97f43154946dd3e235046feff1e9fb139d1bed958cea7761a50ceb5"
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1640-GH-08-P00.1-h1l1-fix-recheck-report.md",
+        "rankHash": "7b17179c2487c2ca089224a444b4e0c10b430409b2e52d51bdf770582c0845c4"
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P03.1-recheck-disposition-replay-report.md",
+        "rankHash": "8d8186e0d063bdd65796640cb049dc8a17fffecd6fa1e0739e9343be145254ab"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/phase-04-mvp5-usable-standalone-live-proof.md",
+        "rankHash": "926a516fa9fa0135684cbc9be1b6e47ec1d78b3da97573ba75fd6aa358db7cc5"
+      },
+      {
+        "file": "archive/plans/260831-1637-step07-inline-assignment-mvp/plan.md",
+        "rankHash": "97524a86deabc6f561a7709b43e4c530f7ee8213b7d6960b2329b46bcd2ba1f3"
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1840-GH-08-P00.4-provider-family-fix-report.md",
+        "rankHash": "9da35b2cd743576f063d1be253b4cc82a0febd54bfcc15c3c4de850248d2e8f8"
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P00.1-fix-recheck-report.md",
+        "rankHash": "9ebea78db66a97f3eeb3df2e0adf7bd271b31cc4ab974a4a118d5c34d24db66f"
+      },
+      {
+        "file": "archive/plans/260831-1637-step07-inline-assignment-mvp/phase-03-harness-seam-and-two-proofs.md",
+        "rankHash": "9fb601fe133eaa0be2d064f9c57b35b22595e6936ceebbe89dfc27f5b1f08c63"
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1745-GH-08-P00.3-cli-wiring-live-proof-report.md",
+        "rankHash": "a2ddea5f8996e3b7ed56c1f33ab3ee5aefc61dd710f9a2362235170602085db6"
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1720-GH-08-P00.2-dispatch-policy-redteam-report.md",
+        "rankHash": "ac6e8f15dd01ee82cac3bb451f1ff4295155651a1b2bc0b92f0405d2d02da50c"
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-fix-recheck-report.md",
+        "rankHash": "c82532bb515dfab7b712d3d05e77d28d3bd0a6ddf94b2d3bb230c67aa9544db4"
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P01.1-fixture-skeleton-report.md",
+        "rankHash": "c9b3fcfa3a82123b5bca93dd60f68b188fe4e26aa8f6f1b873840ec2c1063df5"
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P01.1-fixture-skeleton-review-report.md",
+        "rankHash": "cea3934655f46af60719b00f4724a0e005cd40c60f049d30f8656818d504dc07"
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-2115-GH-08-P01.1-coordination-store-review-report.md",
+        "rankHash": "cfad57c231895d5394b4a71fabb3c23ce480340e1c8ea519634d260b179ec38f"
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P01.1-fixture-skeleton-redteam-report.md",
+        "rankHash": "d319f507d6c6fe788670c66a4db911c8c632c65f7c21c421e4464ae4cb5e0c2a"
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P00.1-contract-promotion-redteam-report.md",
+        "rankHash": "dbef70e921be6dc6cac8609ef465eb952a71bacad4bd1ef3c1324baaa85be17b"
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P02.1-driver-authorization-review-report.md",
+        "rankHash": "e7dbac60ee2a8655b0780f55d154bc8bc9df19ef3236010cb1cc98241b5e3767"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P04.1-mvp5-resume-live-proof-report.md",
+        "rankHash": "ea23b14f41f7996bfd30ffb765954ac6085623e0ee73c8c4ac194272df44b452"
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P02.2-idempotency-bounds-authority-report.md",
+        "rankHash": "f4b32ef4b68c614c716af16bb3907ee04adf8d3d143c2f4977ea4f0be28136a6"
+      }
+    ],
+    "unpatchedSample": [
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P01.1-mvp3-recheck-disposition-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-2050-GH-08-P01.1-coordination-store-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P01.1-test-coverage-fix-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P00.1-contract-promotion-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/plan.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-contract-promotion-review-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P00.1-redteam-findings-fix-report.md"
+    ],
+    "mandatoryWitnesses": [
+      {
+        "file": "archive/plans/260831-1637-step07-inline-assignment-mvp/phase-03-harness-seam-and-two-proofs.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260831-1637-step07-inline-assignment-mvp/plan.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/plan.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1650-GH-08-P00.2-dispatch-policy-fixes-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1745-GH-08-P00.3-cli-wiring-live-proof-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1840-GH-08-P00.4-provider-family-fix-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-2050-GH-08-P01.1-coordination-store-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1640-GH-08-P00.1-h1l1-fix-recheck-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1720-GH-08-P00.2-dispatch-policy-redteam-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1735-GH-08-P00.2-rt1-fix-recheck-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1815-GH-08-P00.3-cli-wiring-redteam-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2140-GH-08-P01.1-coordination-store-redteam-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2200-GH-08-P01.1-round2-fix-recheck-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1609-GH-08-P00.1-canonical-docs-review-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1702-GH-08-P00.2-dispatch-policy-review-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1800-GH-08-P00.3-cli-wiring-review-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-2115-GH-08-P01.1-coordination-store-review-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/phase-03-recheck-disposition-live-proof.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/plan.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P00.1-contract-promotion-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P01.1-fixture-skeleton-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P02.2-idempotency-bounds-authority-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P03.1-recheck-disposition-replay-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P03.2-live-proof-negative-battery-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P00.1-redteam-findings-fix-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P01.1-test-coverage-fix-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P00.1-contract-promotion-redteam-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P00.1-fix-recheck-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P01.1-fix-recheck-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P01.1-fixture-skeleton-redteam-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-contract-promotion-review-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-fix-recheck-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P01.1-fixture-skeleton-review-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P02.1-driver-authorization-review-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/phase-00-consume-handoff-and-freeze-scope.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/phase-04-mvp5-usable-standalone-live-proof.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/plan.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P00.1-handoff-consumption-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P01.1-mvp3-recheck-disposition-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.1-thin-launcher-core-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P03.1-role-execution-policy-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P04.1-mvp5-resume-live-proof-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P04.2-dogfood-handoff-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      }
+    ],
+    "selected": [
+      "archive/plans/260831-1637-step07-inline-assignment-mvp/phase-03-harness-seam-and-two-proofs.md",
+      "archive/plans/260831-1637-step07-inline-assignment-mvp/plan.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/plan.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1650-GH-08-P00.2-dispatch-policy-fixes-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1745-GH-08-P00.3-cli-wiring-live-proof-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1840-GH-08-P00.4-provider-family-fix-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-2050-GH-08-P01.1-coordination-store-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1640-GH-08-P00.1-h1l1-fix-recheck-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1720-GH-08-P00.2-dispatch-policy-redteam-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1735-GH-08-P00.2-rt1-fix-recheck-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1815-GH-08-P00.3-cli-wiring-redteam-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2140-GH-08-P01.1-coordination-store-redteam-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2200-GH-08-P01.1-round2-fix-recheck-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1609-GH-08-P00.1-canonical-docs-review-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1702-GH-08-P00.2-dispatch-policy-review-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1800-GH-08-P00.3-cli-wiring-review-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-2115-GH-08-P01.1-coordination-store-review-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/phase-03-recheck-disposition-live-proof.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/plan.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P00.1-contract-promotion-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P01.1-fixture-skeleton-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P02.2-idempotency-bounds-authority-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P03.1-recheck-disposition-replay-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P03.2-live-proof-negative-battery-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P00.1-redteam-findings-fix-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P01.1-test-coverage-fix-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P00.1-contract-promotion-redteam-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P00.1-fix-recheck-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P01.1-fix-recheck-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P01.1-fixture-skeleton-redteam-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-contract-promotion-review-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-fix-recheck-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P01.1-fixture-skeleton-review-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P02.1-driver-authorization-review-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/phase-00-consume-handoff-and-freeze-scope.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/phase-04-mvp5-usable-standalone-live-proof.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/plan.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P00.1-handoff-consumption-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P01.1-mvp3-recheck-disposition-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.1-thin-launcher-core-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P03.1-role-execution-policy-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P04.1-mvp5-resume-live-proof-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P04.2-dogfood-handoff-report.md"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "L12-60 mandatory targeted re-review; original wave1 A51 seeds/ranks retained as history, not reseeded",
+    "targetedReReview": [
+      "archive/plans/260831-1637-step07-inline-assignment-mvp/phase-03-harness-seam-and-two-proofs.md",
+      "archive/plans/260831-1637-step07-inline-assignment-mvp/plan.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/plan.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1650-GH-08-P00.2-dispatch-policy-fixes-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1745-GH-08-P00.3-cli-wiring-live-proof-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1840-GH-08-P00.4-provider-family-fix-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-2050-GH-08-P01.1-coordination-store-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1640-GH-08-P00.1-h1l1-fix-recheck-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1720-GH-08-P00.2-dispatch-policy-redteam-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1735-GH-08-P00.2-rt1-fix-recheck-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1815-GH-08-P00.3-cli-wiring-redteam-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2140-GH-08-P01.1-coordination-store-redteam-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2200-GH-08-P01.1-round2-fix-recheck-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1609-GH-08-P00.1-canonical-docs-review-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1702-GH-08-P00.2-dispatch-policy-review-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1800-GH-08-P00.3-cli-wiring-review-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-2115-GH-08-P01.1-coordination-store-review-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/phase-03-recheck-disposition-live-proof.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/plan.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P00.1-contract-promotion-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P01.1-fixture-skeleton-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P02.2-idempotency-bounds-authority-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P03.1-recheck-disposition-replay-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P03.2-live-proof-negative-battery-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P00.1-redteam-findings-fix-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P01.1-test-coverage-fix-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P00.1-contract-promotion-redteam-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P00.1-fix-recheck-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P01.1-fix-recheck-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P01.1-fixture-skeleton-redteam-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-contract-promotion-review-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-fix-recheck-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P01.1-fixture-skeleton-review-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P02.1-driver-authorization-review-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/phase-00-consume-handoff-and-freeze-scope.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/phase-04-mvp5-usable-standalone-live-proof.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/plan.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P00.1-handoff-consumption-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P01.1-mvp3-recheck-disposition-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.1-thin-launcher-core-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P03.1-role-execution-policy-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P04.1-mvp5-resume-live-proof-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P04.2-dogfood-handoff-report.md"
+    ]
+  },
+  {
+    "set": "step04-004",
+    "seed": "A51-step04-file-v1\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-004",
+    "population": [],
+    "ranks": [],
+    "sample": [],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-004",
+    "unpatchedRanks": [
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/phase-02-chain-verb-and-pack-registration.md",
+        "rankHash": "07d1810871b759f3a0967677647150b5ccd1f25c5ddea6fd1f836353d76287f2"
+      },
+      {
+        "file": "archive/plans/260905-architecture-advisory-panel/phase-05-comparative-proof-and-promotion.md",
+        "rankHash": "081fdb415f36cbfaed9a6a71b8c5e52ca96ef3ae7ad2e27004c44e440a97f744"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-recheck-report.md",
+        "rankHash": "08c0ceec54fc8f889bf9158515bdaab96cc4275df25cbedce794294fe4d584ed"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P01.1-mvp3-recheck-disposition-review-report.md",
+        "rankHash": "0e2e69b6d5d6ee7e445591bc885092b902c77bc2cc056496aefce6b2a8181594"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P04.2-handoff-gaps-fix-report.md",
+        "rankHash": "173669dbd3cfb59d75a32476156f20b16b7e4a2c47ef1df1257bba96808df5c1"
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0730-p03-1-r5-live-proof-review-report.md",
+        "rankHash": "17a41249d55137f2c3054607c3f3bc45251e472dfc86694a467d0edf270b9ee7"
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/phase-01-mutation-unlock.md",
+        "rankHash": "1d78e9a80a9bf63f62bfc8ec471d4890be1bf6debec29650ef78758bf3f8d648"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P00.1-recheck-report.md",
+        "rankHash": "24425112ae97bf577138664d4b4cef1d6ad802fd66cadc13cb5c9f94d8252d90"
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/doer-260905-0245-p03-1-skill-authoring-report.md",
+        "rankHash": "25d81e548270460d698f0dee66252f54a1fb31e35c151b26bb75c292ecc5e46e"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-handoff-consumption-review-report.md",
+        "rankHash": "391a359f8c17d66861be1dd7a5d9784c0113c9e7f3f98bbc96c50a46b1f4c816"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.1-thin-launcher-core-review-report.md",
+        "rankHash": "3cae9b9768b7cae3e243c68c6596d8c2fd14c9fd0246b5003111156dd63727b2"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P03.1-role-execution-policy-redteam-report.md",
+        "rankHash": "577d33af7b44c6a86b02e4eaf83fa9baf34e17b7dd10f475f523c80fb6f3c50f"
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/phase-03-plan-loop-skill-and-live-proof.md",
+        "rankHash": "5aed9405fbf00800e94136a3269baaaaa9cb6341280cfbb6f32792a22a4c38e5"
+      },
+      {
+        "file": "archive/plans/260905-architecture-advisory-panel/phase-02-capability-fit-audit.md",
+        "rankHash": "5fc88a560c2912ebb1e08d8f1544a7aeb629e4e5cc5c604184c11304450cd5d7"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.1-recheck-report.md",
+        "rankHash": "6410537ec4cfe945bca9a666ebfd6292297bab719251ddac4ba87cb36fde3200"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P00.1-handoff-consumption-redteam-report.md",
+        "rankHash": "6a59a80673c19ccfb3e2ed560aad2fed6a725011cdec8375153180f5d419e593"
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0022-p02-1-chain-verb-review-report.md",
+        "rankHash": "72f0f450c308e66c96d2621021a62d15504e05601f5d990c980d09dc36db80b1"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.1-thin-launcher-core-redteam-report.md",
+        "rankHash": "7b960a45c016a0919f50934b869e6b03ed83e1da984c928d6f419f315d208e99"
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0053-p01-1-mutation-unlock-report.md",
+        "rankHash": "7ecc60577d3949102d5d428387d10d3ab841121056d995d1e8c7015cac8e80ee"
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/plan.md",
+        "rankHash": "8947f99da709e99630d3b26f8a5ae90f1f7a59235e600de4fe21a08d859e0698"
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0112-p01-1-fix-report.md",
+        "rankHash": "925d50b3a20fa767a0aca361279a10c911531cf8236787bbce112ad9fca94ac5"
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0225-wave1-integration-cwd-semantics-report.md",
+        "rankHash": "a3457984240a6546fd9369532c0a2c531b5c65a6480a8cc6f9d9ce6fe308e864"
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0053-p01-1-mutation-unlock-review-report.md",
+        "rankHash": "a771cb5f0bb872dd4f1ec6fb9dcf0f10c4c98ab87b4606b02402f85ae0b6dbf5"
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0022-p02-1-chain-verb-report.md",
+        "rankHash": "adc5e902f370b6000441c2c2dcd1eb0f41760971412e7d5e1ba0cecc709272f2"
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0320-p03-1-persona-fix-report.md",
+        "rankHash": "b33e1314e883535e03023b819112ce903da08a4b919164d52087582f615a5d96"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P04.2-dogfood-handoff-redteam-report.md",
+        "rankHash": "b5c8f657772dcbe6f9e70f2bc478b56e6babdfa4b980fdbc6a75206a1d77e8f0"
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0300-p03-1-skill-authoring-report.md",
+        "rankHash": "b8b4c4f9f4bd2efe33396fb6121d52a5b826269880fce548126c3e69117ff9a1"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P04.1-mvp5-resume-live-proof-redteam-report.md",
+        "rankHash": "bd112563449f5ddfc4cf35be16000e1ebf3199103dbe721e493e35f1c912254d"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.2-dogfood-handoff-review-report.md",
+        "rankHash": "be9548924a6eab66a66ca41e7a7a470445ebeb6430e0d1e52ac2d552ac439aa7"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.2-show-resume-setup-review-report.md",
+        "rankHash": "c05a42cf827edcc1d7615afd9e3667dffc8d6ee034c67aa345c32916069671d4"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P01.1-mvp3-recheck-disposition-redteam-report.md",
+        "rankHash": "c1c4ff4457c1e7be19116afd4b08db126586004b68dbcd779feb7bb8116888ab"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.1-mvp5-resume-live-proof-review-report.md",
+        "rankHash": "c2619cd6eee8480ba58445fcb85c98c1f0468ddc1585f101f05de5ae2cdd09e6"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P03.1-role-execution-policy-review-report.md",
+        "rankHash": "c35c2febeef054b06f11879895633084ecb3db0afa95d1791f116dfd78b0c0c8"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.2-show-resume-setup-redteam-report.md",
+        "rankHash": "cf5c55952fe46a2566827ed721fba03dcc5bf6921b3d72f8ca386460f735902e"
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0105-p02-1-fix-report.md",
+        "rankHash": "d35477d053e12fadce1e7bed67027d53bf2ba129559e992b79346a4ce89e66e2"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P00.1-review-redteam-findings-fix-report.md",
+        "rankHash": "d5dcf81f80b72d2fa2a1fa56a19828c9f8130dd958b87674f662fc7381f647b2"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P02.1-path-resolution-fix-report.md",
+        "rankHash": "f947d0316739831f4dba930325459047b0b90c524cb38b85fecb3b74bb4f6340"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.1-recheck-report.md",
+        "rankHash": "f9ff78974b48a4ac885705af8e239190af8436f872b0c60ece91e35d425cb21a"
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.1-recheck-report.md",
+        "rankHash": "fd27b3ff45cfd21ba9b4db4aa86fa6f557e8ca60c333b5619a4e067944fa6992"
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/doer-260905-0000-p01-1-mutation-unlock-report.md",
+        "rankHash": "fe8b27be13b7bd84f5833a3fa9fd58d0ed01e73021e908389a0d1fcbb5da6f1b"
+      }
+    ],
+    "unpatchedSample": [
+      "archive/plans/260904-2329-group-thinking-plan-loop/phase-02-chain-verb-and-pack-registration.md",
+      "archive/plans/260905-architecture-advisory-panel/phase-05-comparative-proof-and-promotion.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-recheck-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P01.1-mvp3-recheck-disposition-review-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P04.2-handoff-gaps-fix-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0730-p03-1-r5-live-proof-review-report.md"
+    ],
+    "mandatoryWitnesses": [
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P00.1-review-redteam-findings-fix-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P02.1-path-resolution-fix-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P04.2-handoff-gaps-fix-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P00.1-handoff-consumption-redteam-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P00.1-recheck-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P01.1-mvp3-recheck-disposition-redteam-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.1-recheck-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.1-thin-launcher-core-redteam-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.2-show-resume-setup-redteam-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P03.1-role-execution-policy-redteam-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P04.1-mvp5-resume-live-proof-redteam-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P04.2-dogfood-handoff-redteam-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-handoff-consumption-review-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-recheck-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P01.1-mvp3-recheck-disposition-review-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.1-recheck-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.1-thin-launcher-core-review-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.2-show-resume-setup-review-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P03.1-role-execution-policy-review-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.1-mvp5-resume-live-proof-review-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.1-recheck-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.2-dogfood-handoff-review-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/phase-01-mutation-unlock.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/phase-02-chain-verb-and-pack-registration.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/phase-03-plan-loop-skill-and-live-proof.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/plan.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/doer-260905-0000-p01-1-mutation-unlock-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/doer-260905-0245-p03-1-skill-authoring-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0105-p02-1-fix-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0112-p01-1-fix-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0225-wave1-integration-cwd-semantics-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0320-p03-1-persona-fix-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0022-p02-1-chain-verb-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0053-p01-1-mutation-unlock-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0300-p03-1-skill-authoring-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0022-p02-1-chain-verb-review-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0053-p01-1-mutation-unlock-review-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0730-p03-1-r5-live-proof-review-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260905-architecture-advisory-panel/phase-02-capability-fit-audit.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260905-architecture-advisory-panel/phase-05-comparative-proof-and-promotion.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      }
+    ],
+    "selected": [
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P00.1-review-redteam-findings-fix-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P02.1-path-resolution-fix-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P04.2-handoff-gaps-fix-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P00.1-handoff-consumption-redteam-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P00.1-recheck-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P01.1-mvp3-recheck-disposition-redteam-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.1-recheck-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.1-thin-launcher-core-redteam-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.2-show-resume-setup-redteam-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P03.1-role-execution-policy-redteam-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P04.1-mvp5-resume-live-proof-redteam-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P04.2-dogfood-handoff-redteam-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-handoff-consumption-review-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-recheck-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P01.1-mvp3-recheck-disposition-review-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.1-recheck-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.1-thin-launcher-core-review-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.2-show-resume-setup-review-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P03.1-role-execution-policy-review-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.1-mvp5-resume-live-proof-review-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.1-recheck-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.2-dogfood-handoff-review-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/phase-01-mutation-unlock.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/phase-02-chain-verb-and-pack-registration.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/phase-03-plan-loop-skill-and-live-proof.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/plan.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/doer-260905-0000-p01-1-mutation-unlock-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/doer-260905-0245-p03-1-skill-authoring-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0105-p02-1-fix-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0112-p01-1-fix-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0225-wave1-integration-cwd-semantics-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0320-p03-1-persona-fix-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0022-p02-1-chain-verb-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0053-p01-1-mutation-unlock-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0300-p03-1-skill-authoring-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0022-p02-1-chain-verb-review-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0053-p01-1-mutation-unlock-review-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0730-p03-1-r5-live-proof-review-report.md",
+      "archive/plans/260905-architecture-advisory-panel/phase-02-capability-fit-audit.md",
+      "archive/plans/260905-architecture-advisory-panel/phase-05-comparative-proof-and-promotion.md"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "L12-60 mandatory targeted re-review; original wave1 A51 seeds/ranks retained as history, not reseeded",
+    "targetedReReview": [
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P00.1-review-redteam-findings-fix-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P02.1-path-resolution-fix-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P04.2-handoff-gaps-fix-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P00.1-handoff-consumption-redteam-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P00.1-recheck-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P01.1-mvp3-recheck-disposition-redteam-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.1-recheck-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.1-thin-launcher-core-redteam-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.2-show-resume-setup-redteam-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P03.1-role-execution-policy-redteam-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P04.1-mvp5-resume-live-proof-redteam-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P04.2-dogfood-handoff-redteam-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-handoff-consumption-review-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-recheck-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P01.1-mvp3-recheck-disposition-review-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.1-recheck-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.1-thin-launcher-core-review-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.2-show-resume-setup-review-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P03.1-role-execution-policy-review-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.1-mvp5-resume-live-proof-review-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.1-recheck-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.2-dogfood-handoff-review-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/phase-01-mutation-unlock.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/phase-02-chain-verb-and-pack-registration.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/phase-03-plan-loop-skill-and-live-proof.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/plan.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/doer-260905-0000-p01-1-mutation-unlock-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/doer-260905-0245-p03-1-skill-authoring-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0105-p02-1-fix-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0112-p01-1-fix-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0225-wave1-integration-cwd-semantics-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0320-p03-1-persona-fix-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0022-p02-1-chain-verb-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0053-p01-1-mutation-unlock-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0300-p03-1-skill-authoring-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0022-p02-1-chain-verb-review-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0053-p01-1-mutation-unlock-review-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0730-p03-1-r5-live-proof-review-report.md",
+      "archive/plans/260905-architecture-advisory-panel/phase-02-capability-fit-audit.md",
+      "archive/plans/260905-architecture-advisory-panel/phase-05-comparative-proof-and-promotion.md"
+    ]
+  },
+  {
+    "set": "step04-005",
+    "seed": "A51-step04-file-v1\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-005",
+    "population": [],
+    "ranks": [],
+    "sample": [],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-005",
+    "unpatchedRanks": [
+      {
+        "file": "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md",
+        "rankHash": "1c5781e2fe695a8b69b4d04e512b49694150d2af5c14d18467c8142c82f35a61"
+      },
+      {
+        "file": "archive/plans/260906-1831-dispatch-visibility-v0/plan.md",
+        "rankHash": "24404bfde68f9019992fad393ee4063edde4c5736f1255e391447114973f579e"
+      },
+      {
+        "file": "archive/plans/260906-1831-dispatch-visibility-v0/phase-01-executor-profile-trust-home.md",
+        "rankHash": "5e4a086b35ed81806c3ee6641a310ef32efe6e21f4eb05dd51858516698507d6"
+      },
+      {
+        "file": "archive/plans/260906-1831-dispatch-visibility-v0/phase-06-live-proof-matrix.md",
+        "rankHash": "75e445047fca84991d1618dbfa12ae1256583fad17c5775572d31c8ef24f7598"
+      },
+      {
+        "file": "archive/plans/260910-1700-rust-host-r1-kernel/reports/p00-inventory.md",
+        "rankHash": "a3ba749c29fdc9e8449741371e549d16f75cf2880b483d76bbea948f421413b1"
+      },
+      {
+        "file": "archive/plans/260910-1700-rust-host-r1-kernel/plan.md",
+        "rankHash": "abcc4801b03d511f727b13ebd30e978d89e8fe5983cbd322b79387cac1abd5c5"
+      },
+      {
+        "file": "archive/plans/260905-architecture-advisory-panel/plan.md",
+        "rankHash": "c88e0c922676421981bc31130b933910ec558cc72ba4364113119145deb43b3f"
+      },
+      {
+        "file": "archive/plans/260910-1243-confinement-authority-implementation/plan.md",
+        "rankHash": "e21a496a4260bfb0ad880349ae4f3741859db5d519620bf86f87bb15bfd97cbe"
+      },
+      {
+        "file": "archive/plans/260910-1243-confinement-authority-implementation/reports/phase-07-strict-readiness-docs-closeout-report.md",
+        "rankHash": "fcdbf1d068c6faa68bac643e707407e718c8d0b17188f88a2dda8342b028e46d"
+      }
+    ],
+    "unpatchedSample": [
+      "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md",
+      "archive/plans/260906-1831-dispatch-visibility-v0/plan.md"
+    ],
+    "mandatoryWitnesses": [
+      {
+        "file": "archive/plans/260905-architecture-advisory-panel/plan.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260906-1831-dispatch-visibility-v0/phase-01-executor-profile-trust-home.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260906-1831-dispatch-visibility-v0/phase-06-live-proof-matrix.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260906-1831-dispatch-visibility-v0/plan.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260910-1243-confinement-authority-implementation/plan.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260910-1243-confinement-authority-implementation/reports/phase-07-strict-readiness-docs-closeout-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260910-1700-rust-host-r1-kernel/plan.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260910-1700-rust-host-r1-kernel/reports/p00-inventory.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      }
+    ],
+    "selected": [
+      "archive/plans/260905-architecture-advisory-panel/plan.md",
+      "archive/plans/260906-1831-dispatch-visibility-v0/phase-01-executor-profile-trust-home.md",
+      "archive/plans/260906-1831-dispatch-visibility-v0/phase-06-live-proof-matrix.md",
+      "archive/plans/260906-1831-dispatch-visibility-v0/plan.md",
+      "archive/plans/260910-1243-confinement-authority-implementation/plan.md",
+      "archive/plans/260910-1243-confinement-authority-implementation/reports/phase-07-strict-readiness-docs-closeout-report.md",
+      "archive/plans/260910-1700-rust-host-r1-kernel/plan.md",
+      "archive/plans/260910-1700-rust-host-r1-kernel/reports/p00-inventory.md",
+      "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "L12-60 mandatory targeted re-review; original wave1 A51 seeds/ranks retained as history, not reseeded",
+    "targetedReReview": [
+      "archive/plans/260905-architecture-advisory-panel/plan.md",
+      "archive/plans/260906-1831-dispatch-visibility-v0/phase-01-executor-profile-trust-home.md",
+      "archive/plans/260906-1831-dispatch-visibility-v0/phase-06-live-proof-matrix.md",
+      "archive/plans/260906-1831-dispatch-visibility-v0/plan.md",
+      "archive/plans/260910-1243-confinement-authority-implementation/plan.md",
+      "archive/plans/260910-1243-confinement-authority-implementation/reports/phase-07-strict-readiness-docs-closeout-report.md",
+      "archive/plans/260910-1700-rust-host-r1-kernel/plan.md",
+      "archive/plans/260910-1700-rust-host-r1-kernel/reports/p00-inventory.md",
+      "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md"
+    ]
+  },
+  {
+    "set": "step04-006",
+    "seed": "A51-step04-file-v1\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-006",
+    "population": [],
+    "ranks": [],
+    "sample": [],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-006",
+    "unpatchedRanks": [
+      {
+        "file": "archive/plans/260915-code-implementation-track-policy/reports/review-260915-0944-critical-design-review.md",
+        "rankHash": "01e99166c3134dd60ea7e2f39165d4e2530662a5c45dcef1788ef9489fc7fd8e"
+      },
+      {
+        "file": "archive/plans/260911-2305-runtime-recovery/reports/phase-00-baseline-report.md",
+        "rankHash": "1213f754189b52418ab45ee0906ffe431ba3fac3d82e7bd9e827d3ce6c1e54da"
+      },
+      {
+        "file": "archive/plans/260915-code-panel-multicell-facade/phase-05-live-proof-and-rollout.md",
+        "rankHash": "1234bbd7143696137283a9360b79a287d472cb561c389e4e7e21f0efa105dff0"
+      },
+      {
+        "file": "archive/plans/260915-code-panel-multicell-facade/plan.md",
+        "rankHash": "1780f9535b551d10747685bee024c026644a755bef2dd421d319326686b9d9de"
+      },
+      {
+        "file": "archive/plans/260911-2305-runtime-recovery/phase-designs/launch-reconciliation.md",
+        "rankHash": "384e519a84521fb963207cc3238034ee59ec12d72459af0a7804e6ef06aed8e5"
+      },
+      {
+        "file": "archive/plans/260915-code-implementation-track-policy/reports/track-closeout.md",
+        "rankHash": "43a3bf21638e5aa99317c50d2fa93ca2c8f3ae363b01f419cbe796c655b262d2"
+      },
+      {
+        "file": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-2/ground-truth.md",
+        "rankHash": "49ba2841894d00da16c58e3552546f3b3408437b80985b067e151652ac1386a3"
+      },
+      {
+        "file": "archive/plans/260915-dispatch-operability-implementation/plan.md",
+        "rankHash": "6296120c9b55fef202d5691de5cf5c5540cf2200d7098bbe3d9173b39bdff8ab"
+      },
+      {
+        "file": "archive/plans/260915-executor-policy-dispatch-seams/plan.md",
+        "rankHash": "679aef6fd6417f32d1b929de61d8bdbcc79118999f880d9ca59ccfba6f3f1cd8"
+      },
+      {
+        "file": "archive/plans/260915-code-panel-multicell-facade/phase-04-fix-orphaned-authorization.md",
+        "rankHash": "84800c4d85017e6358cf8b8ab642e46a58be9fd31534d3179c6631661dfcf8a8"
+      },
+      {
+        "file": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring-rubric.md",
+        "rankHash": "9709cfb0a2184cd43979990782df9881d1e6ea1c060adec8ad2873a15ffc528d"
+      },
+      {
+        "file": "archive/plans/260915-code-implementation-track-policy/plan.md",
+        "rankHash": "977aca3812d77968faef0b897ff5b6b63123da40474c87bd5ff74b0c0eb80f6a"
+      },
+      {
+        "file": "archive/plans/260911-2305-runtime-recovery/plan.md",
+        "rankHash": "9b3f03b04f8de8cec07d5130e7049b02e10910051597fc2879eeab784d5fd20e"
+      },
+      {
+        "file": "archive/plans/260915-code-panel-multicell-facade/phase-00-contract-and-baseline.md",
+        "rankHash": "a80b5fcf660a2c0cacb6ddbeaca89ba020fbcb3df9c72acebd4081b5ca172104"
+      },
+      {
+        "file": "archive/plans/260915-code-panel-multicell-facade/phase-03-resume-and-compatibility.md",
+        "rankHash": "aa2cc7b12837c9462667aa75d7e1c4b7ae83669ae816f5d4334daa5be1bd8c1c"
+      },
+      {
+        "file": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-1/ground-truth.md",
+        "rankHash": "c96fea029438f89a5de08388a74706fb00481e6af8fcf12609bce78a295fa7e0"
+      },
+      {
+        "file": "archive/plans/260917-cold-resumable-coordination-dag/phase-07-migration-and-release-proof.md",
+        "rankHash": "db78e4cfbb7c6840a7f7c0cb679fb9bbc3e456b4e8c0c9c7d43309565b5658a8"
+      },
+      {
+        "file": "archive/plans/260917-cold-resumable-coordination-dag/phase-00-baseline-and-migration-lock.md",
+        "rankHash": "e578fb8ab2937f9c5c3957c9996628ef3bfd556c448c05ed7b6a0c7dbe45b261"
+      },
+      {
+        "file": "archive/plans/260915-0455-test-suite-feedback-cost/plan.md",
+        "rankHash": "eeb9a01faf12f8c3d15e820ec7e964268148711fa164dc9cfcb1f88848907379"
+      }
+    ],
+    "unpatchedSample": [
+      "archive/plans/260915-code-implementation-track-policy/reports/review-260915-0944-critical-design-review.md",
+      "archive/plans/260911-2305-runtime-recovery/reports/phase-00-baseline-report.md",
+      "archive/plans/260915-code-panel-multicell-facade/phase-05-live-proof-and-rollout.md"
+    ],
+    "mandatoryWitnesses": [
+      {
+        "file": "archive/plans/260911-2305-runtime-recovery/phase-designs/launch-reconciliation.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260911-2305-runtime-recovery/plan.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260911-2305-runtime-recovery/reports/phase-00-baseline-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260915-0455-test-suite-feedback-cost/plan.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260915-code-implementation-track-policy/plan.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260915-code-implementation-track-policy/reports/review-260915-0944-critical-design-review.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260915-code-implementation-track-policy/reports/track-closeout.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260915-code-panel-multicell-facade/phase-00-contract-and-baseline.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260915-code-panel-multicell-facade/phase-03-resume-and-compatibility.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260915-code-panel-multicell-facade/phase-04-fix-orphaned-authorization.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260915-code-panel-multicell-facade/phase-05-live-proof-and-rollout.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260915-code-panel-multicell-facade/plan.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260915-dispatch-operability-implementation/plan.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260915-executor-policy-dispatch-seams/plan.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260917-cold-resumable-coordination-dag/phase-00-baseline-and-migration-lock.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260917-cold-resumable-coordination-dag/phase-07-migration-and-release-proof.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring-rubric.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-1/ground-truth.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-2/ground-truth.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      }
+    ],
+    "selected": [
+      "archive/plans/260911-2305-runtime-recovery/phase-designs/launch-reconciliation.md",
+      "archive/plans/260911-2305-runtime-recovery/plan.md",
+      "archive/plans/260911-2305-runtime-recovery/reports/phase-00-baseline-report.md",
+      "archive/plans/260915-0455-test-suite-feedback-cost/plan.md",
+      "archive/plans/260915-code-implementation-track-policy/plan.md",
+      "archive/plans/260915-code-implementation-track-policy/reports/review-260915-0944-critical-design-review.md",
+      "archive/plans/260915-code-implementation-track-policy/reports/track-closeout.md",
+      "archive/plans/260915-code-panel-multicell-facade/phase-00-contract-and-baseline.md",
+      "archive/plans/260915-code-panel-multicell-facade/phase-03-resume-and-compatibility.md",
+      "archive/plans/260915-code-panel-multicell-facade/phase-04-fix-orphaned-authorization.md",
+      "archive/plans/260915-code-panel-multicell-facade/phase-05-live-proof-and-rollout.md",
+      "archive/plans/260915-code-panel-multicell-facade/plan.md",
+      "archive/plans/260915-dispatch-operability-implementation/plan.md",
+      "archive/plans/260915-executor-policy-dispatch-seams/plan.md",
+      "archive/plans/260917-cold-resumable-coordination-dag/phase-00-baseline-and-migration-lock.md",
+      "archive/plans/260917-cold-resumable-coordination-dag/phase-07-migration-and-release-proof.md",
+      "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring-rubric.md",
+      "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-1/ground-truth.md",
+      "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-2/ground-truth.md"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "L12-60 mandatory targeted re-review; original wave1 A51 seeds/ranks retained as history, not reseeded",
+    "targetedReReview": [
+      "archive/plans/260911-2305-runtime-recovery/phase-designs/launch-reconciliation.md",
+      "archive/plans/260911-2305-runtime-recovery/plan.md",
+      "archive/plans/260911-2305-runtime-recovery/reports/phase-00-baseline-report.md",
+      "archive/plans/260915-0455-test-suite-feedback-cost/plan.md",
+      "archive/plans/260915-code-implementation-track-policy/plan.md",
+      "archive/plans/260915-code-implementation-track-policy/reports/review-260915-0944-critical-design-review.md",
+      "archive/plans/260915-code-implementation-track-policy/reports/track-closeout.md",
+      "archive/plans/260915-code-panel-multicell-facade/phase-00-contract-and-baseline.md",
+      "archive/plans/260915-code-panel-multicell-facade/phase-03-resume-and-compatibility.md",
+      "archive/plans/260915-code-panel-multicell-facade/phase-04-fix-orphaned-authorization.md",
+      "archive/plans/260915-code-panel-multicell-facade/phase-05-live-proof-and-rollout.md",
+      "archive/plans/260915-code-panel-multicell-facade/plan.md",
+      "archive/plans/260915-dispatch-operability-implementation/plan.md",
+      "archive/plans/260915-executor-policy-dispatch-seams/plan.md",
+      "archive/plans/260917-cold-resumable-coordination-dag/phase-00-baseline-and-migration-lock.md",
+      "archive/plans/260917-cold-resumable-coordination-dag/phase-07-migration-and-release-proof.md",
+      "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring-rubric.md",
+      "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-1/ground-truth.md",
+      "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-2/ground-truth.md"
+    ]
+  },
+  {
+    "set": "step04-007",
+    "seed": "A51-step04-file-v1\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-007",
+    "population": [],
+    "ranks": [],
+    "sample": [],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-007",
+    "unpatchedRanks": [
+      {
+        "file": "archive/plans/260919-coordination-skill-harness-simplification/reports/unit-I27-panel-depth-experiment-real-comparison-report.md",
+        "rankHash": "97be9695273ebc8deca430d507acd3fdfda2b3de8aa6b9d150eea7c01934dbbd"
+      }
+    ],
+    "unpatchedSample": [
+      "archive/plans/260919-coordination-skill-harness-simplification/reports/unit-I27-panel-depth-experiment-real-comparison-report.md"
+    ],
+    "mandatoryWitnesses": [
+      {
+        "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+        "bytes": 256055,
+        "slots": 1,
+        "reasons": [
+          "source >=65536 bytes",
+          "prepared mandatory file"
+        ]
+      },
+      {
+        "file": "archive/plans/260919-coordination-skill-harness-simplification/reports/unit-I27-panel-depth-experiment-real-comparison-report.md",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      }
+    ],
+    "selected": [
+      "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "archive/plans/260919-coordination-skill-harness-simplification/reports/unit-I27-panel-depth-experiment-real-comparison-report.md"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "L12-60 mandatory targeted re-review; original wave1 A51 seeds/ranks retained as history, not reseeded",
+    "targetedReReview": [
+      "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "archive/plans/260919-coordination-skill-harness-simplification/reports/unit-I27-panel-depth-experiment-real-comparison-report.md"
+    ]
+  },
+  {
+    "set": "step04-008",
+    "seed": "A51-step04-file-v1\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-008",
+    "population": [],
+    "ranks": [],
+    "sample": [],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-008",
+    "unpatchedRanks": [],
+    "unpatchedSample": [],
+    "mandatoryWitnesses": [
+      {
+        "file": "plugins/fgOS/skills/approve/SKILL.md",
+        "bytes": 13388,
+        "slots": 1,
+        "reasons": [
+          "L12-58(3) headerless source witness"
+        ]
+      },
+      {
+        "file": "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+        "bytes": 5165,
+        "slots": 2,
+        "reasons": [
+          "L12-58(3) headerless source witness"
+        ]
+      },
+      {
+        "file": "plugins/fgOS/skills/cleanup-next/SKILL.md",
+        "bytes": 6519,
+        "slots": 2,
+        "reasons": [
+          "L12-58(3) headerless source witness"
+        ]
+      },
+      {
+        "file": "plugins/fgOS/skills/coding-shape-distill/SKILL.md",
+        "bytes": 2992,
+        "slots": 1,
+        "reasons": [
+          "L12-58(3) headerless source witness"
+        ]
+      },
+      {
+        "file": "plugins/fgOS/skills/coding-shape/SKILL.md",
+        "bytes": 2118,
+        "slots": 2,
+        "reasons": [
+          "L12-58(3) headerless source witness"
+        ]
+      },
+      {
+        "file": "plugins/fgOS/skills/deliver/SKILL.md",
+        "bytes": 12234,
+        "slots": 3,
+        "reasons": [
+          "L12-58(3) headerless source witness"
+        ]
+      },
+      {
+        "file": "plugins/fgOS/skills/discover-next/SKILL.md",
+        "bytes": 6333,
+        "slots": 1,
+        "reasons": [
+          "L12-58(3) headerless source witness"
+        ]
+      },
+      {
+        "file": "plugins/fgOS/skills/discover/SKILL.md",
+        "bytes": 10559,
+        "slots": 4,
+        "reasons": [
+          "L12-58(3) headerless source witness"
+        ]
+      },
+      {
+        "file": "plugins/fgOS/skills/merge-loop/SKILL.md",
+        "bytes": 8095,
+        "slots": 1,
+        "reasons": [
+          "L12-58(3) headerless source witness"
+        ]
+      },
+      {
+        "file": "plugins/fgOS/skills/merge-next/SKILL.md",
+        "bytes": 7059,
+        "slots": 2,
+        "reasons": [
+          "L12-58(3) headerless source witness"
+        ]
+      },
+      {
+        "file": "plugins/fgOS/skills/plan/SKILL.md",
+        "bytes": 6416,
+        "slots": 2,
+        "reasons": [
+          "L12-58(3) headerless source witness"
+        ]
+      },
+      {
+        "file": "plugins/fgOS/skills/retro-loop/SKILL.md",
+        "bytes": 5455,
+        "slots": 2,
+        "reasons": [
+          "L12-58(3) headerless source witness"
+        ]
+      },
+      {
+        "file": "plugins/fgOS/skills/retro-next/SKILL.md",
+        "bytes": 7755,
+        "slots": 4,
+        "reasons": [
+          "L12-58(3) headerless source witness"
+        ]
+      },
+      {
+        "file": "plugins/fgOS/skills/terminal-close/SKILL.md",
+        "bytes": 2522,
+        "slots": 1,
+        "reasons": [
+          "L12-58(3) headerless source witness"
+        ]
+      },
+      {
+        "file": "plugins/fgOS/skills/terminal/SKILL.md",
+        "bytes": 6426,
+        "slots": 3,
+        "reasons": [
+          "L12-58(3) headerless source witness"
+        ]
+      }
+    ],
+    "selected": [
+      "plugins/fgOS/skills/approve/SKILL.md",
+      "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+      "plugins/fgOS/skills/cleanup-next/SKILL.md",
+      "plugins/fgOS/skills/coding-shape-distill/SKILL.md",
+      "plugins/fgOS/skills/coding-shape/SKILL.md",
+      "plugins/fgOS/skills/deliver/SKILL.md",
+      "plugins/fgOS/skills/discover-next/SKILL.md",
+      "plugins/fgOS/skills/discover/SKILL.md",
+      "plugins/fgOS/skills/merge-loop/SKILL.md",
+      "plugins/fgOS/skills/merge-next/SKILL.md",
+      "plugins/fgOS/skills/plan/SKILL.md",
+      "plugins/fgOS/skills/retro-loop/SKILL.md",
+      "plugins/fgOS/skills/retro-next/SKILL.md",
+      "plugins/fgOS/skills/terminal-close/SKILL.md",
+      "plugins/fgOS/skills/terminal/SKILL.md"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "L12-60 mandatory targeted re-review; original wave1 A51 seeds/ranks retained as history, not reseeded",
+    "targetedReReview": [
+      "plugins/fgOS/skills/approve/SKILL.md",
+      "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+      "plugins/fgOS/skills/cleanup-next/SKILL.md",
+      "plugins/fgOS/skills/coding-shape-distill/SKILL.md",
+      "plugins/fgOS/skills/coding-shape/SKILL.md",
+      "plugins/fgOS/skills/deliver/SKILL.md",
+      "plugins/fgOS/skills/discover-next/SKILL.md",
+      "plugins/fgOS/skills/discover/SKILL.md",
+      "plugins/fgOS/skills/merge-loop/SKILL.md",
+      "plugins/fgOS/skills/merge-next/SKILL.md",
+      "plugins/fgOS/skills/plan/SKILL.md",
+      "plugins/fgOS/skills/retro-loop/SKILL.md",
+      "plugins/fgOS/skills/retro-next/SKILL.md",
+      "plugins/fgOS/skills/terminal-close/SKILL.md",
+      "plugins/fgOS/skills/terminal/SKILL.md"
+    ]
+  },
+  {
+    "set": "step04-009",
+    "seed": "A51-step04-file-v1\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-009",
+    "population": [
+      "AGENTS.md",
+      "core/instructions/platform-laws.md"
+    ],
+    "ranks": [
+      {
+        "file": "core/instructions/platform-laws.md",
+        "rankHash": "0fa956b1e374a2c0623da1ff4ee77f1efe3bdff33ba2061d9612c9326c13d1e9"
+      },
+      {
+        "file": "AGENTS.md",
+        "rankHash": "94f9628b00b5a7684201923dbd4bc084b6c19242e35988dc2c2233cd0dab9fb8"
+      }
+    ],
+    "sample": [
+      "core/instructions/platform-laws.md"
+    ],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-009",
+    "unpatchedRanks": [],
+    "unpatchedSample": [],
+    "mandatoryWitnesses": [
+      {
+        "file": "AGENTS.md",
+        "bytes": 28612,
+        "slots": 24,
+        "reasons": [
+          "root instruction source/projection boundary",
+          "L12-57 changed binding"
+        ]
+      },
+      {
+        "file": "CLAUDE.md",
+        "bytes": 505,
+        "slots": 1,
+        "reasons": [
+          "root instruction source/projection boundary"
+        ]
+      },
+      {
+        "file": "core/instructions/design-principles.md",
+        "bytes": 2331,
+        "slots": 2,
+        "reasons": [
+          "root instruction source/projection boundary",
+          "L12-57 changed binding"
+        ]
+      },
+      {
+        "file": "core/instructions/platform-laws.md",
+        "bytes": 1888,
+        "slots": 24,
+        "reasons": [
+          "root instruction source/projection boundary",
+          "L12-57 changed binding"
+        ]
+      }
+    ],
+    "selected": [
+      "AGENTS.md",
+      "CLAUDE.md",
+      "core/instructions/design-principles.md",
+      "core/instructions/platform-laws.md"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "L12-60 mandatory targeted re-review; original wave1 A51 seeds/ranks retained as history, not reseeded",
+    "targetedReReview": [
+      "AGENTS.md",
+      "CLAUDE.md",
+      "core/instructions/design-principles.md",
+      "core/instructions/platform-laws.md"
+    ]
+  },
+  {
+    "set": "step04-010",
+    "seed": "A51-step04-file-v1\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-010",
+    "population": [
+      "bin/fgos.mjs"
+    ],
+    "ranks": [
+      {
+        "file": "bin/fgos.mjs",
+        "rankHash": "67037bcb3a6da58002b3b8ce895a9b3950e14a8d939b7cc7d81f90a99be2854f"
+      }
+    ],
+    "sample": [
+      "bin/fgos.mjs"
+    ],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-010",
+    "unpatchedRanks": [],
+    "unpatchedSample": [],
+    "mandatoryWitnesses": [
+      {
+        "file": "bin/fgos.mjs",
+        "bytes": 298883,
+        "slots": 36,
+        "reasons": [
+          "source >=65536 bytes",
+          "prepared mandatory file"
+        ]
+      }
+    ],
+    "selected": [
+      "bin/fgos.mjs"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "L12-60 mandatory targeted re-review; original wave1 A51 seeds/ranks retained as history, not reseeded",
+    "targetedReReview": [
+      "bin/fgos.mjs"
+    ]
+  },
+  {
+    "set": "step04-011",
+    "seed": "A51-step04-file-v1\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-011",
+    "population": [],
+    "ranks": [],
+    "sample": [],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-011",
+    "unpatchedRanks": [],
+    "unpatchedSample": [],
+    "mandatoryWitnesses": [
+      {
+        "file": "src/cli/command-registry.mjs",
+        "bytes": 147272,
+        "slots": 15,
+        "reasons": [
+          "source >=65536 bytes",
+          "prepared mandatory file",
+          "L12-57 changed binding"
+        ]
+      }
+    ],
+    "selected": [
+      "src/cli/command-registry.mjs"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "L12-60 mandatory targeted re-review; original wave1 A51 seeds/ranks retained as history, not reseeded",
+    "targetedReReview": [
+      "src/cli/command-registry.mjs"
+    ]
+  },
+  {
+    "set": "step04-012",
+    "seed": "A51-step04-file-v1\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-012",
+    "population": [
+      "apps/fgos-gateway/web/src/api/errors.ts"
+    ],
+    "ranks": [
+      {
+        "file": "apps/fgos-gateway/web/src/api/errors.ts",
+        "rankHash": "ff6b96cffd51a883f95780531ce4d8398df9e1d9f7f2787f365a6f72b7a58374"
+      }
+    ],
+    "sample": [
+      "apps/fgos-gateway/web/src/api/errors.ts"
+    ],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-012",
+    "unpatchedRanks": [
+      {
+        "file": "apps/fgos-gateway/web/src/api/poll.ts",
+        "rankHash": "06833ffde59619ba9b61059adb69c08628335004cb0fc7d8a84aeee69773608f"
+      },
+      {
+        "file": "apps/fgos-gateway/src/cf_access.rs",
+        "rankHash": "0823689cab34d9f48e6677c30c46c1975c23939083bda9345cbe12a322a7349d"
+      },
+      {
+        "file": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+        "rankHash": "12280e5b32b871f193b544867e3984131f4bf339202cbd735d3b0324a7933c23"
+      },
+      {
+        "file": "apps/fgos-gateway/web/src/App.tsx",
+        "rankHash": "1992a3d94e5d02f83552b46ba5209ab150df7f31dbd92d4a804ec75843725327"
+      },
+      {
+        "file": "apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx",
+        "rankHash": "1e29d0e4d1645b43ee33a21422dc4c96df83b130a1ee0b917de52ec8f2d75032"
+      },
+      {
+        "file": "apps/fgos-gateway/web/src/lib/status.ts",
+        "rankHash": "4340c96af7e97ddc523ae3e84fdd53e54189a78d0dbd2694c2a4841f8d83e3a9"
+      },
+      {
+        "file": "apps/fgos-gateway/web/src/lib/network.ts",
+        "rankHash": "899c786e0ee7b09761a4f33eee26ccf31aa9abf875ebef3ccabb9d03c81e2b14"
+      },
+      {
+        "file": "apps/fgos-gateway/build.rs",
+        "rankHash": "97aa5f4b3bb26e4bc7775188ea2f9efed43d6bd26a430a488da232e078a8c67d"
+      },
+      {
+        "file": "apps/fgos-gateway/Cargo.toml",
+        "rankHash": "99f0f4a6bb76e449f7cfde8a2ae6efb465f62ed08371a465e1149268421ae124"
+      },
+      {
+        "file": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+        "rankHash": "9da8102d68dda3309aaacc00d9ab28e3fd7e0db1e98daac3c82601c841490550"
+      },
+      {
+        "file": "apps/fgos-gateway/web/src/api/client.ts",
+        "rankHash": "9e1d627f30a0940c587257b0f172deb1c1cfd0961d82e0bd97af37763d4037ff"
+      },
+      {
+        "file": "apps/fgos-gateway/src/mcp.rs",
+        "rankHash": "ab85583055eb3db6799910c09f35002179dcb906cf1ca35af268e02cc5e59ed9"
+      },
+      {
+        "file": "apps/fgos-gateway/web/src/api/types.ts",
+        "rankHash": "d5a9a50199ee788c9a587a567bb3f1fe7ccaa276b42c8b09ce02ed891e54afd4"
+      }
+    ],
+    "unpatchedSample": [
+      "apps/fgos-gateway/web/src/api/poll.ts",
+      "apps/fgos-gateway/src/cf_access.rs"
+    ],
+    "mandatoryWitnesses": [
+      {
+        "file": "apps/fgos-gateway/src/gateway.rs",
+        "bytes": 109927,
+        "slots": 19,
+        "reasons": [
+          "source >=65536 bytes",
+          "prepared mandatory file"
+        ]
+      },
+      {
+        "file": "apps/fgos-gateway/Cargo.toml",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "apps/fgos-gateway/build.rs",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "apps/fgos-gateway/src/cf_access.rs",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "apps/fgos-gateway/src/mcp.rs",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "apps/fgos-gateway/web/src/App.tsx",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "apps/fgos-gateway/web/src/api/client.ts",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "apps/fgos-gateway/web/src/api/errors.ts",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "apps/fgos-gateway/web/src/api/poll.ts",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "apps/fgos-gateway/web/src/api/types.ts",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "apps/fgos-gateway/web/src/lib/network.ts",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "apps/fgos-gateway/web/src/lib/status.ts",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      }
+    ],
+    "selected": [
+      "apps/fgos-gateway/Cargo.toml",
+      "apps/fgos-gateway/build.rs",
+      "apps/fgos-gateway/src/cf_access.rs",
+      "apps/fgos-gateway/src/gateway.rs",
+      "apps/fgos-gateway/src/mcp.rs",
+      "apps/fgos-gateway/web/src/App.tsx",
+      "apps/fgos-gateway/web/src/api/client.ts",
+      "apps/fgos-gateway/web/src/api/errors.ts",
+      "apps/fgos-gateway/web/src/api/poll.ts",
+      "apps/fgos-gateway/web/src/api/types.ts",
+      "apps/fgos-gateway/web/src/lib/network.ts",
+      "apps/fgos-gateway/web/src/lib/status.ts",
+      "apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx",
+      "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+      "apps/fgos-gateway/web/src/screens/Taskboard.tsx"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "L12-60 mandatory targeted re-review; original wave1 A51 seeds/ranks retained as history, not reseeded",
+    "targetedReReview": [
+      "apps/fgos-gateway/Cargo.toml",
+      "apps/fgos-gateway/build.rs",
+      "apps/fgos-gateway/src/cf_access.rs",
+      "apps/fgos-gateway/src/gateway.rs",
+      "apps/fgos-gateway/src/mcp.rs",
+      "apps/fgos-gateway/web/src/App.tsx",
+      "apps/fgos-gateway/web/src/api/client.ts",
+      "apps/fgos-gateway/web/src/api/errors.ts",
+      "apps/fgos-gateway/web/src/api/poll.ts",
+      "apps/fgos-gateway/web/src/api/types.ts",
+      "apps/fgos-gateway/web/src/lib/network.ts",
+      "apps/fgos-gateway/web/src/lib/status.ts",
+      "apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx",
+      "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+      "apps/fgos-gateway/web/src/screens/Taskboard.tsx"
+    ]
+  },
+  {
+    "set": "step04-013",
+    "seed": "A51-step04-file-v1\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-013",
+    "population": [],
+    "ranks": [],
+    "sample": [],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-013",
+    "unpatchedRanks": [
+      {
+        "file": "src/config/shared-config-file.mjs",
+        "rankHash": "0c2ed52fbb2578c4b86f7622b8aef05f6446caa12e3c7d94952ff379bf0b0d09"
+      },
+      {
+        "file": "src/config/global-config.mjs",
+        "rankHash": "fd52c3d40daabe8316ef7dded7a2283f6c8ee9bf08dd9043e9c4168da11ff97e"
+      }
+    ],
+    "unpatchedSample": [
+      "src/config/shared-config-file.mjs"
+    ],
+    "mandatoryWitnesses": [
+      {
+        "file": "src/config/global-config.mjs",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "src/config/shared-config-file.mjs",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      }
+    ],
+    "selected": [
+      "src/config/global-config.mjs",
+      "src/config/shared-config-file.mjs"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "L12-60 mandatory targeted re-review; original wave1 A51 seeds/ranks retained as history, not reseeded",
+    "targetedReReview": [
+      "src/config/global-config.mjs",
+      "src/config/shared-config-file.mjs"
+    ]
+  },
+  {
+    "set": "step04-014",
+    "seed": "A51-step04-file-v1\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-014",
+    "population": [],
+    "ranks": [],
+    "sample": [],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-014",
+    "unpatchedRanks": [
+      {
+        "file": "src/install/coexist.mjs",
+        "rankHash": "bcf300528939e6f44efa09b955f11520de92ed5f244e3bbdca7fcd8d7139418e"
+      }
+    ],
+    "unpatchedSample": [
+      "src/install/coexist.mjs"
+    ],
+    "mandatoryWitnesses": [
+      {
+        "file": "src/install/coexist.mjs",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      }
+    ],
+    "selected": [
+      "src/install/coexist.mjs"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "L12-60 mandatory targeted re-review; original wave1 A51 seeds/ranks retained as history, not reseeded",
+    "targetedReReview": [
+      "src/install/coexist.mjs"
+    ]
+  },
+  {
+    "set": "step04-015",
+    "seed": "A51-step04-file-v1\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-015",
+    "population": [
+      "src/intake/discovery.mjs",
+      "src/intake/verify-pattern-check.mjs"
+    ],
+    "ranks": [
+      {
+        "file": "src/intake/discovery.mjs",
+        "rankHash": "3289233867bb7d36cb960346562955d34ec8769b7222793ed0e13b764a030a6c"
+      },
+      {
+        "file": "src/intake/verify-pattern-check.mjs",
+        "rankHash": "4fde767b2b2ab293e262275f5fe71d977b6dacf55e4708e835a8d5d4dc11c485"
+      }
+    ],
+    "sample": [
+      "src/intake/discovery.mjs"
+    ],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-015",
+    "unpatchedRanks": [
+      {
+        "file": "src/intake/plan.mjs",
+        "rankHash": "3ae751ace018f0fb6c2ba85a90f97cc847452cb892771d5f8d9b7353020f7a03"
+      },
+      {
+        "file": "src/intake/plan-verdict-from-plan-md.mjs",
+        "rankHash": "51d34b6a29767a127c7c2c950fd063cc1cc67287bb09823b5e4953dcb6582040"
+      }
+    ],
+    "unpatchedSample": [
+      "src/intake/plan.mjs"
+    ],
+    "mandatoryWitnesses": [
+      {
+        "file": "src/intake/discovery.mjs",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "src/intake/plan-verdict-from-plan-md.mjs",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "src/intake/plan.mjs",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      },
+      {
+        "file": "src/intake/verify-pattern-check.mjs",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      }
+    ],
+    "selected": [
+      "src/intake/discovery.mjs",
+      "src/intake/plan-verdict-from-plan-md.mjs",
+      "src/intake/plan.mjs",
+      "src/intake/verify-pattern-check.mjs"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "L12-60 mandatory targeted re-review; original wave1 A51 seeds/ranks retained as history, not reseeded",
+    "targetedReReview": [
+      "src/intake/discovery.mjs",
+      "src/intake/plan-verdict-from-plan-md.mjs",
+      "src/intake/plan.mjs",
+      "src/intake/verify-pattern-check.mjs"
+    ]
+  },
+  {
+    "set": "step04-016",
+    "seed": "A51-step04-file-v1\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-016",
+    "population": [],
+    "ranks": [],
+    "sample": [],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e\u0000step04-016",
+    "unpatchedRanks": [
+      {
+        "file": ".github/workflows/ci.yml",
+        "rankHash": "bb3cf2fc99ebe3e2d3fe73273ca03af95d13a5f8ba4a67a1f0186da090433f9e"
+      }
+    ],
+    "unpatchedSample": [
+      ".github/workflows/ci.yml"
+    ],
+    "mandatoryWitnesses": [
+      {
+        "file": ".githooks/pre-commit",
+        "bytes": 29032,
+        "slots": 3,
+        "reasons": [
+          "L12-57 changed binding"
+        ]
+      },
+      {
+        "file": ".github/workflows/ci.yml",
+        "reasons": [
+          "L12-60: record changed this turn, mandatory targeted whole-file re-review"
+        ]
+      }
+    ],
+    "selected": [
+      ".githooks/pre-commit",
+      ".github/workflows/ci.yml"
+    ],
+    "reviewedFiles": [],
+    "reworkNumerator": null,
+    "reworkDenominator": null,
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "L12-60 mandatory targeted re-review; original wave1 A51 seeds/ranks retained as history, not reseeded",
+    "targetedReReview": [
+      ".githooks/pre-commit",
+      ".github/workflows/ci.yml"
+    ]
+  },
+  {
+    "set": "step04-017",
+    "seed": "A51-step04-file-v1\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-017",
+    "population": [],
+    "ranks": [],
+    "sample": [],
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-017",
     "unpatchedRanks": [],
     "unpatchedSample": [],
     "mandatoryWitnesses": [
       {
         "file": "CHANGELOG.md",
-        "bytes": 366929,
+        "bytes": 368613,
         "slots": 1,
         "reasons": [
           "source >=65536 bytes",
@@ -26,99 +2526,103 @@
     "reviewedFiles": [],
     "reworkNumerator": null,
     "reworkDenominator": null,
-    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "A51 seeded selection for sets 017–033 after L12-60 sweep",
+    "targetedReReview": []
   },
   {
     "set": "step04-018",
-    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-018",
+    "seed": "A51-step04-file-v1\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-018",
     "population": [],
     "ranks": [],
     "sample": [],
-    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-018",
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-018",
     "unpatchedRanks": [
       {
-        "file": "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md",
-        "rankHash": "051006a7413287172a761c7e06e7fd76c7fa5601285694b1ce83ea0cf50d4c5c"
+        "file": "herdr-dashboard/src/pane_scan.rs",
+        "rankHash": "02451e4a31a837f6beb8c748158a87e5698c214f4af69a9886b7f44b837bdb9d"
       },
       {
-        "file": "plans/reports/fork-260928-1017-panel-depth-experiment-design-research-report.md",
-        "rankHash": "0943efe148ac01a9263a4d59e129510f49b314744cd05a2cb448b6673205a8bd"
+        "file": "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md",
+        "rankHash": "027be52622205964474a2c2c7a77c215a56b5bed13f5e1bd0d2911cfab7f05af"
       },
       {
         "file": "docs/history/tsk-43q/iron-law-evidence.md",
-        "rankHash": "0f9011b40e7d08476f865ddc92d04793cbf8ee6fe877906a0d6303c0e50a44e6"
+        "rankHash": "32c8d052ad8581bfe3a00f8145f82d31aca45565f40ad9bdd768692a24878795"
       },
       {
         "file": "docs/history/p03-3-proof2-work-lookup-proto-guard/CONTEXT.md",
-        "rankHash": "25b19ecb62c77b6af7cca661f5805b141c3b7d8a45f889424cb9ca6d17956b03"
+        "rankHash": "36f3ca608ec59df10a23b196b812797b2c0d143962d68f2ffd04565ba3a6ea35"
       },
       {
-        "file": "plans/reports/reviewer-p03-1-260905-0251-skill-authoring-review-report.md",
-        "rankHash": "2c478a3bfa37b6217b688ffd3434fee747aef74c3c12f7eb1b2bb25329eeed6e"
-      },
-      {
-        "file": "herdr-dashboard/src/pane_scan.rs",
-        "rankHash": "8c5cfbcaa151b278bc7f71c9a808acee81997859828f5cd0561c4f8372209d51"
+        "file": "plans/reports/fork-260928-1017-panel-depth-experiment-design-research-report.md",
+        "rankHash": "46fff5d203ebd5dec0606d8696796c339691d5d41b6de2dbb791106a6cc70803"
       },
       {
         "file": "plans/reports/review-prompt-260911-1654-runtime-recovery-design-second-opinion.md",
-        "rankHash": "ab73d710b1df6526062c067d68a033e709cafff234b8dc5b4d82c408081e7388"
+        "rankHash": "59447eed0a68a5799d3e816bf7f9bcbce4bbbcf59e30f346191b62ac3b523f8c"
       },
       {
         "file": "plans/reports/from-implementer-to-red-team-260907-1050-dispatch-visibility-v0-review-prompt.md",
-        "rankHash": "cac6c5963e679e33c1315ec679c3e601062bf4d90fd9e414031d509e639c2aef"
+        "rankHash": "a90e946a4063c0e92acdbbce281e1dd3210705684ecadba81fb72ef3b8abef22"
+      },
+      {
+        "file": "plans/reports/reviewer-p03-1-260905-0251-skill-authoring-review-report.md",
+        "rankHash": "c247d937437524ec2f6d75cea5e500b6a50eec3b76d1653ccd439916e09453ee"
       },
       {
         "file": "plans/reports/review-prompt-260911-1805-runtime-recovery-detailed-design.md",
-        "rankHash": "f59ea8a2ba3ee6c54587ea6e0f60f78d6ef8e94870f77b1903a5e8267e7383d8"
+        "rankHash": "dc2d79211b9daf956f34eaf11b87db7aeefa23325d86c548d16eb782fb75409f"
       }
     ],
     "unpatchedSample": [
-      "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md",
-      "plans/reports/fork-260928-1017-panel-depth-experiment-design-research-report.md"
+      "herdr-dashboard/src/pane_scan.rs",
+      "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md"
     ],
     "mandatoryWitnesses": [],
     "selected": [
-      "plans/reports/fork-260928-1017-panel-depth-experiment-design-research-report.md",
+      "herdr-dashboard/src/pane_scan.rs",
       "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md"
     ],
     "reviewedFiles": [],
     "reworkNumerator": null,
     "reworkDenominator": null,
-    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "A51 seeded selection for sets 017–033 after L12-60 sweep",
+    "targetedReReview": []
   },
   {
     "set": "step04-019",
-    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-019",
+    "seed": "A51-step04-file-v1\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-019",
     "population": [
       "packages/distribution/rust/src/manifest.rs"
     ],
     "ranks": [
       {
         "file": "packages/distribution/rust/src/manifest.rs",
-        "rankHash": "be020aec5beb7ae9e57ba71b280f06d7cc4b718b7bec0f3f839cd11cb6d786ec"
+        "rankHash": "83a66f07b67f2019a98e69d89e42d47d10334bbb11d8c5ab3ed1d9d2e4930ed5"
       }
     ],
     "sample": [
       "packages/distribution/rust/src/manifest.rs"
     ],
-    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-019",
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-019",
     "unpatchedRanks": [
       {
-        "file": "packages/distribution/rust/src/workspace.rs",
-        "rankHash": "0bc14cb36056a6fc4b5e38e2c75b96211fccd6e75a44fd40afffcbf22b162802"
+        "file": "packages/distribution/rust/src/canonical.rs",
+        "rankHash": "17b2d9c7d60fc60a7bd98e61717047a3f6ac2710f69b874a56768aa8484dbf68"
       },
       {
         "file": "packages/distribution/rust/src/verify.rs",
-        "rankHash": "359ad3deb6485ab2b3f0089d9b15409a3acbee6ba9af4b11ddc0354305be1024"
+        "rankHash": "2086fb5745ab1f11e762533e0fc5017d3138754e9d3bf1a16b985c762f663bc2"
       },
       {
-        "file": "packages/distribution/rust/src/canonical.rs",
-        "rankHash": "72ae39716e74ad23176c235e6526d9f640dea386364751011a7a0ae28fb4bd18"
+        "file": "packages/distribution/rust/src/workspace.rs",
+        "rankHash": "c1c5ab99a3030012b26fd56b5ffc822d98e62635f971ced67a5a7a8e0d15dd5d"
       }
     ],
     "unpatchedSample": [
-      "packages/distribution/rust/src/workspace.rs"
+      "packages/distribution/rust/src/canonical.rs"
     ],
     "mandatoryWitnesses": [
       {
@@ -132,35 +2636,37 @@
       }
     ],
     "selected": [
+      "packages/distribution/rust/src/canonical.rs",
       "packages/distribution/rust/src/init.rs",
-      "packages/distribution/rust/src/manifest.rs",
-      "packages/distribution/rust/src/workspace.rs"
+      "packages/distribution/rust/src/manifest.rs"
     ],
     "reviewedFiles": [],
     "reworkNumerator": null,
     "reworkDenominator": null,
-    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "A51 seeded selection for sets 017–033 after L12-60 sweep",
+    "targetedReReview": []
   },
   {
     "set": "step04-020",
-    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-020",
+    "seed": "A51-step04-file-v1\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-020",
     "population": [
       "packages/herdr-fgos-common/rust/src/fgos.rs"
     ],
     "ranks": [
       {
         "file": "packages/herdr-fgos-common/rust/src/fgos.rs",
-        "rankHash": "6b05073423d052098ded86847da8c780d35a71e4033eb1e4ba795cdc4921342a"
+        "rankHash": "ff869a3f7631983210d570061e03f1e5cda4dc0281f52849c4ccd5e78a2a24cc"
       }
     ],
     "sample": [
       "packages/herdr-fgos-common/rust/src/fgos.rs"
     ],
-    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-020",
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-020",
     "unpatchedRanks": [
       {
         "file": "packages/herdr-fgos-common/rust/src/settings.rs",
-        "rankHash": "37de31cf2b0f753f59fdd6e401731e0729d96dc369b5c598c127916e66dccafb"
+        "rankHash": "dfff5878917e5f02db6a3163361b8d3036731921a0528e78c7bb485748ee2871"
       }
     ],
     "unpatchedSample": [
@@ -174,19 +2680,21 @@
     "reviewedFiles": [],
     "reworkNumerator": null,
     "reworkDenominator": null,
-    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "A51 seeded selection for sets 017–033 after L12-60 sweep",
+    "targetedReReview": []
   },
   {
     "set": "step04-021",
-    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-021",
+    "seed": "A51-step04-file-v1\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-021",
     "population": [],
     "ranks": [],
     "sample": [],
-    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-021",
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-021",
     "unpatchedRanks": [
       {
         "file": "packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs",
-        "rankHash": "3f8e3bb3395ed800492ca44f14107cec14ce8031792529d87268bc91cc6f5a6b"
+        "rankHash": "2bc4554638486ab67586aacd3747519e993fd11301d033f19b71342120dc9ac2"
       }
     ],
     "unpatchedSample": [
@@ -199,43 +2707,45 @@
     "reviewedFiles": [],
     "reworkNumerator": null,
     "reworkDenominator": null,
-    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "A51 seeded selection for sets 017–033 after L12-60 sweep",
+    "targetedReReview": []
   },
   {
     "set": "step04-022",
-    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-022",
+    "seed": "A51-step04-file-v1\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-022",
     "population": [],
     "ranks": [],
     "sample": [],
-    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-022",
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-022",
     "unpatchedRanks": [
       {
-        "file": "src/runner/claim-liveness.mjs",
-        "rankHash": "0b2690dc306cb70fd560c3c44e8a52e6fa4cb23afe3675c0eb6f2a5d901a0e0f"
+        "file": "src/runner/dispatch/assignment-policy.mjs",
+        "rankHash": "36cdb90e3923bd8468e864741ff2982d970699a8204fd8db05997cd494f0ba8c"
       },
       {
         "file": "src/runner/agent-roster.mjs",
-        "rankHash": "107041577ed9e700cf35f52c3c46244a8d6d64451887c0e219b12c5e101b46f7"
+        "rankHash": "8b5491598454d63885d6f30ef5104b97b828d0daa276833bb752775a203f504b"
+      },
+      {
+        "file": "src/runner/claim-liveness.mjs",
+        "rankHash": "91b979528cbd100fc510f10c4ea2d1f3a59a84cd0ed81acb7781122a67432ae4"
       },
       {
         "file": "src/runner/anti-loop.mjs",
-        "rankHash": "4b0fd0f6fb5db254be5c809822c54a4b3aab7f89c4e13b6977fc3cfc9375ab5b"
-      },
-      {
-        "file": "src/runner/dispatch/assignment-policy.mjs",
-        "rankHash": "d61ada20256b8c518b604de8af5ca4f40b62e3aff356af69fd3e2d5075a93f9c"
-      },
-      {
-        "file": "src/runner/claim-port.mjs",
-        "rankHash": "e43ca060c532ac77c13b6d1e4748455003fecff76707a0cb5c9d2ff914673df9"
+        "rankHash": "99544c399f120e54d72e5c3255c347276d9839bf3894739571d23b650441374b"
       },
       {
         "file": "src/runner/dispatch/cli.mjs",
-        "rankHash": "f5046ac7342b30cf6f2b2420bdef6ce3b0f91a84a894667be2ff6cac8ebed1f8"
+        "rankHash": "9ea9af9b2805540aaa66421f1c2c0c39ec3e73049b4f62a6c58cd484e96bcbcf"
+      },
+      {
+        "file": "src/runner/claim-port.mjs",
+        "rankHash": "abdae4d5c141ff5dc86d3fc6c4c24434593cf3cece7b561a5f2c32055d47d1bb"
       }
     ],
     "unpatchedSample": [
-      "src/runner/claim-liveness.mjs"
+      "src/runner/dispatch/assignment-policy.mjs"
     ],
     "mandatoryWitnesses": [
       {
@@ -249,17 +2759,19 @@
       }
     ],
     "selected": [
-      "src/runner/claim-liveness.mjs",
+      "src/runner/dispatch/assignment-policy.mjs",
       "src/runner/dispatch/assignment-runner.mjs"
     ],
     "reviewedFiles": [],
     "reworkNumerator": null,
     "reworkDenominator": null,
-    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "A51 seeded selection for sets 017–033 after L12-60 sweep",
+    "targetedReReview": []
   },
   {
     "set": "step04-023",
-    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-023",
+    "seed": "A51-step04-file-v1\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-023",
     "population": [
       "src/runner/dispatch/confinement/backend-registry.mjs",
       "src/runner/dispatch/confinement/policies.mjs",
@@ -267,46 +2779,46 @@
     ],
     "ranks": [
       {
-        "file": "src/runner/dispatch/confinement/request.mjs",
-        "rankHash": "30c7b004633d7207fae607d243d5ddb5f0d7159119c47dae6b6a250046c6fb3a"
+        "file": "src/runner/dispatch/confinement/policies.mjs",
+        "rankHash": "479a24e57e2f428d37940647871eb65586705869b7915cced48fc130cda81ae9"
       },
       {
         "file": "src/runner/dispatch/confinement/backend-registry.mjs",
-        "rankHash": "cc712f3a85d85d15c197c55e10755e74ce621d87eabad44a01e42a37fc595283"
+        "rankHash": "f0daeb9dccb27af2f1c0ba674ad9e787f2a44b576347d39b28c95d00748eb9f3"
       },
       {
-        "file": "src/runner/dispatch/confinement/policies.mjs",
-        "rankHash": "ccd0715b7e970d5d289ea58384ef5674cff2f19d7745aee93b3bebdd65246398"
+        "file": "src/runner/dispatch/confinement/request.mjs",
+        "rankHash": "f3d03decc4e64cabd69c264f7b31dda66c0c0eb28130328dfe27a72ebc2401f0"
       }
     ],
     "sample": [
-      "src/runner/dispatch/confinement/request.mjs"
+      "src/runner/dispatch/confinement/policies.mjs"
     ],
-    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-023",
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-023",
     "unpatchedRanks": [
       {
-        "file": "src/runner/dispatch/execution-contract.mjs",
-        "rankHash": "0cd907b16fd7b7848220323e0528b1c969c08adb8ea5506aca675317000b5266"
-      },
-      {
-        "file": "src/runner/dispatch/prepare.mjs",
-        "rankHash": "3087606f7e00f30f290581a5c626ff12757dab65f08f326f4cbcfb399178ac6c"
-      },
-      {
         "file": "src/runner/dispatch/operation-prompt-templates.mjs",
-        "rankHash": "47d65aa7dbcbb7995f8d0cd4b0fcea40d7ccb1785fb8751e268a7078a447d2e3"
+        "rankHash": "309a765e2061378247b96b5c1455514bd209891c25b2fe044fa7ca5a837f0bdf"
       },
       {
         "file": "src/runner/dispatch/herdr-round.mjs",
-        "rankHash": "608d92e0ecbbcd9b2828d9d35839a0aff77f056b57ece44f7e3a0e44aa82f9a1"
+        "rankHash": "33d960db640ac29687dde09250de3913c0c7af12ace5664266c0bbfd8fae5f08"
+      },
+      {
+        "file": "src/runner/dispatch/execution-contract.mjs",
+        "rankHash": "93270a0389d14ce48568a29d35d04a208301abd29fe86e542fcb22c874cc090f"
       },
       {
         "file": "src/runner/dispatch/mechanism.mjs",
-        "rankHash": "ed5a001b471cf345a1dac1a3588fe08b977d014a86af0f4833a3802cffc52022"
+        "rankHash": "bb10394e2a0ae23bb5246d1dd3a8250d93b8b050a711d70726a079c07b6beda6"
+      },
+      {
+        "file": "src/runner/dispatch/prepare.mjs",
+        "rankHash": "e251cb49bd7e3effe8e5254305ea043e68cc8c657e31fa957ecd2f0d47db8ac2"
       }
     ],
     "unpatchedSample": [
-      "src/runner/dispatch/execution-contract.mjs"
+      "src/runner/dispatch/operation-prompt-templates.mjs"
     ],
     "mandatoryWitnesses": [
       {
@@ -332,49 +2844,51 @@
     "selected": [
       "src/runner/dispatch/config.mjs",
       "src/runner/dispatch/confinement/authority.mjs",
-      "src/runner/dispatch/confinement/request.mjs",
-      "src/runner/dispatch/execution-contract.mjs"
+      "src/runner/dispatch/confinement/policies.mjs",
+      "src/runner/dispatch/operation-prompt-templates.mjs"
     ],
     "reviewedFiles": [],
     "reworkNumerator": null,
     "reworkDenominator": null,
-    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "A51 seeded selection for sets 017–033 after L12-60 sweep",
+    "targetedReReview": []
   },
   {
     "set": "step04-024",
-    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-024",
+    "seed": "A51-step04-file-v1\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-024",
     "population": [],
     "ranks": [],
     "sample": [],
-    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-024",
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-024",
     "unpatchedRanks": [
       {
-        "file": "src/runner/dispatch/trust-store.mjs",
-        "rankHash": "01de28776fd1cb0c7ce5144fc710a757d189474c1f581a0746e9f2008be5ef51"
-      },
-      {
         "file": "src/runner/dispatch/run-lock.mjs",
-        "rankHash": "1cee024234b0a93ec134878c12e90ceb791e08fcd5cfc8122f897b14afc92ff4"
+        "rankHash": "0404045b6aa453298643cb2d76922b3da8d2d916a46e299c25f93b97253097a7"
       },
       {
         "file": "src/runner/frozen-judge.mjs",
-        "rankHash": "3b65e0535fb066eb1fdde9c1b83cb17d75570cadbccbd80d31a3c59aa1ec5764"
-      },
-      {
-        "file": "src/runner/goal-check.mjs",
-        "rankHash": "3d5160fda7e433e8b0596c3f20f89f27fa00257e1dd8a9ac5f57f4899e4568e6"
-      },
-      {
-        "file": "src/runner/dispatch/transport.mjs",
-        "rankHash": "577527f775037798037839d7116c0f561e679373b5749f5006b5d81af8bba4c6"
+        "rankHash": "1012fd8a32b3470207cf4a6cc39e47ec34edf149c6ba4a5d2f63d4d6fba6fdad"
       },
       {
         "file": "src/runner/dispatch/worker-home.mjs",
-        "rankHash": "9d8b4343a371ae25bab4ffcb706149974c3411a2358a4bba5948b1776ccdcf91"
+        "rankHash": "385ec268896de6ad175ffa0bc0a7d97ff575af5f15978f2f1db67fe4f279ae54"
+      },
+      {
+        "file": "src/runner/dispatch/transport.mjs",
+        "rankHash": "476f843b9971479b9e4c93c100a93c7ad426fddf5436d0362de7dff4c7691bb6"
+      },
+      {
+        "file": "src/runner/dispatch/trust-store.mjs",
+        "rankHash": "6930f735e07a9d06a1e79b737a6567a58032d9841696efb53cc34ca637d1f2da"
+      },
+      {
+        "file": "src/runner/goal-check.mjs",
+        "rankHash": "f474f2d7ce1b57da847d301d6087a473acee4a5a2aa254951ea4d42148f2b640"
       }
     ],
     "unpatchedSample": [
-      "src/runner/dispatch/trust-store.mjs"
+      "src/runner/dispatch/run-lock.mjs"
     ],
     "mandatoryWitnesses": [
       {
@@ -397,55 +2911,57 @@
     ],
     "selected": [
       "src/runner/dispatch/resolve.mjs",
-      "src/runner/dispatch/trust-store.mjs",
+      "src/runner/dispatch/run-lock.mjs",
       "src/runner/loop.mjs"
     ],
     "reviewedFiles": [],
     "reworkNumerator": null,
     "reworkDenominator": null,
-    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "A51 seeded selection for sets 017–033 after L12-60 sweep",
+    "targetedReReview": []
   },
   {
     "set": "step04-025",
-    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-025",
+    "seed": "A51-step04-file-v1\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-025",
     "population": [
       "src/runner/merge.mjs",
       "src/runner/worktree.mjs"
     ],
     "ranks": [
       {
-        "file": "src/runner/worktree.mjs",
-        "rankHash": "50318e4f73b232d1046d160a47473f55d32646b2022d5fa75d68333680d68bc9"
+        "file": "src/runner/merge.mjs",
+        "rankHash": "470d5300f506050847daa751f0cf1e1da4ddd7942ed53749453581030932f804"
       },
       {
-        "file": "src/runner/merge.mjs",
-        "rankHash": "7f3802d7b73379c7e76c0ea1593e8bd042ca9601093c0ffa7d78b2089d9bfc24"
+        "file": "src/runner/worktree.mjs",
+        "rankHash": "c2a55f1101272ac71ebb5e90278ff7041af6e09a406169c49a4a463178a976f4"
       }
     ],
     "sample": [
-      "src/runner/worktree.mjs"
+      "src/runner/merge.mjs"
     ],
-    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-025",
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-025",
     "unpatchedRanks": [
       {
-        "file": "src/runner/work-compat.mjs",
-        "rankHash": "a6a783d3e87727fb012b65ca8003adcffd2f61066568de7b3994ac9dcd7eae32"
+        "file": "src/runner/paths.mjs",
+        "rankHash": "1a227e1b15fa45f6c103397deb31594bce6e8ea6b54c7685945dda7845a8fbb2"
       },
       {
         "file": "src/runner/promote-engine.mjs",
-        "rankHash": "aa2cc516cfbd49b1990c7852bbba9430b557254218efa77be362b1cceacd249a"
+        "rankHash": "4021456a57fadd83e45f9dc4d2d8ffe0c64dffda0e40722ee8bb577efb639b42"
+      },
+      {
+        "file": "src/runner/work-compat.mjs",
+        "rankHash": "432bed82cffff23ccae6e570f367bb7a58b59f279ba3ae64319927a3b3c8acba"
       },
       {
         "file": "src/runner/promote-preflight.mjs",
-        "rankHash": "cf43e8b6145ba95e0bf68e0ccb1eca13006178f79f96042289aa15023faed9ec"
-      },
-      {
-        "file": "src/runner/paths.mjs",
-        "rankHash": "fe61e3a2ae670d8ccdb7a8c5cb7d3ec460c174d2813f01d7644f76d856ff9f9d"
+        "rankHash": "6f8cbd3ea76a6311ee97f015bd4a1a54bfac27493c0ff2c801ed209e8ed29a46"
       }
     ],
     "unpatchedSample": [
-      "src/runner/work-compat.mjs"
+      "src/runner/paths.mjs"
     ],
     "mandatoryWitnesses": [
       {
@@ -459,7 +2975,7 @@
       },
       {
         "file": "src/runner/worktree.mjs",
-        "bytes": 72077,
+        "bytes": 78643,
         "slots": 12,
         "reasons": [
           "source >=65536 bytes",
@@ -469,17 +2985,19 @@
     ],
     "selected": [
       "src/runner/merge.mjs",
-      "src/runner/work-compat.mjs",
+      "src/runner/paths.mjs",
       "src/runner/worktree.mjs"
     ],
     "reviewedFiles": [],
     "reworkNumerator": null,
     "reworkDenominator": null,
-    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "A51 seeded selection for sets 017–033 after L12-60 sweep",
+    "targetedReReview": []
   },
   {
     "set": "step04-026",
-    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-026",
+    "seed": "A51-step04-file-v1\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-026",
     "population": [
       "src/state/gate-bypass.mjs",
       "src/state/priority-formula.mjs",
@@ -487,114 +3005,116 @@
     ],
     "ranks": [
       {
+        "file": "src/state/gate-bypass.mjs",
+        "rankHash": "712167578338f543eed85f1a8ecac427545a498ad2618e70d701a9006da4fa39"
+      },
+      {
         "file": "src/state/priority-formula.mjs",
-        "rankHash": "3a12e711791d798e7b7e3bb91e5e57b6a05394543558026b37515a37f8bcb7d6"
+        "rankHash": "95748018f9c498c5882be74528cb568f21a705b6def2bc1a8c14ba599e1c8f85"
       },
       {
         "file": "src/state/replay.mjs",
-        "rankHash": "97be02a18dae1b484c3896cb09457f77b9552f83360b89a56e035417d45b37a9"
-      },
-      {
-        "file": "src/state/gate-bypass.mjs",
-        "rankHash": "9dfd8cea50a6b4faaa183056986cda786e74356a7afb3618b653caa45d7a19f1"
+        "rankHash": "9c75d40c5a1aabb69519f0391e8c47eb87c1315f99174c0dbcced2297be46af4"
       }
     ],
     "sample": [
-      "src/state/priority-formula.mjs"
+      "src/state/gate-bypass.mjs"
     ],
-    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-026",
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-026",
     "unpatchedRanks": [
       {
-        "file": "src/state/graph-harness.mjs",
-        "rankHash": "002e390bb530b457a5d48d35daefe66365c994b1ff3554b71d5f86c879e1b2ae"
-      },
-      {
-        "file": "src/state/frontier.mjs",
-        "rankHash": "0e0a269c95cd7266afd805edf8d67f88669a1405f4e96f9b373150d5cf155f59"
-      },
-      {
         "file": "src/state/events-jsonl-truncation-guard.mjs",
-        "rankHash": "1efd6d1e03d168c8ab5d0d7f78a751648e9fc3112b279b0bd1a803606601f832"
-      },
-      {
-        "file": "src/state/cleanup-harness.mjs",
-        "rankHash": "2aee9a9589edd1e30a96a0dfea2d0a0d9e57e283e00357a0af562a508f0de8ad"
-      },
-      {
-        "file": "src/state/graph-metrics.mjs",
-        "rankHash": "3a4c83c2a58b5ee4cb244d8597571d4204aae1142c11461869ef0628d3125be3"
-      },
-      {
-        "file": "src/state/dep-graph.mjs",
-        "rankHash": "4f816937634dfbcb37c7df89e8e844e70fedbe3078c100b9b5ca0be5e6fd2560"
-      },
-      {
-        "file": "src/state/status-fsm.mjs",
-        "rankHash": "58b76ac4d4827ab681a81d57bb7236eb3a80176e38d0f8de1ce872925dfcaa4e"
-      },
-      {
-        "file": "src/state/retro-pool.mjs",
-        "rankHash": "6a8ef02d3177d7758e7bd5b857ee374e5d0ab30df21fb4a86c8e5b663291f6ad"
-      },
-      {
-        "file": "src/state/postland-drift.mjs",
-        "rankHash": "6b9669914986784be4f702913bb5d0598a9488afdff150313dd284bd6121b400"
-      },
-      {
-        "file": "src/state/events-compaction.mjs",
-        "rankHash": "784f0a3d6059213825403d47b9bba75e080b89bb9d8e29bc6698e68bd73089ca"
-      },
-      {
-        "file": "src/state/cleanup-pool.mjs",
-        "rankHash": "97b352046babbc443a9254eeccc5299a0ade4c6ec755a81a02f2a9565656a7a8"
-      },
-      {
-        "file": "src/state/drift-status.mjs",
-        "rankHash": "a3a8d921cd1ca10fd149635a59352d2596ee8198cda463f13a304705b056c263"
+        "rankHash": "01918ed97b33d2b6e2294ec3f9e1a17ca9fed0864e2482f2708b54d18f8ea517"
       },
       {
         "file": "src/state/knowledge-registry.mjs",
-        "rankHash": "d99e1a17155377148c71ef64c5ad180b7e3e3f9ef589cfd2b4b2a3037bfc3b41"
+        "rankHash": "1f549be84d89438607ed908f355f66cd4d7396e081af0443b72f0b8d5371bdb9"
+      },
+      {
+        "file": "src/state/graph-harness.mjs",
+        "rankHash": "68120c64a9de404b1bc88b72fb96190d32f115a30abc1de0856bd79b04a73b89"
+      },
+      {
+        "file": "src/state/status-fsm.mjs",
+        "rankHash": "843ded5e2097d4ab522cd9fcc4bc6c1bdcfc4fbac83bcecf431b3138027eb0bf"
+      },
+      {
+        "file": "src/state/drift-status.mjs",
+        "rankHash": "a091192116acd074078dcc8eb11ab969ec4f65be929051a06e3f581e7d246e99"
+      },
+      {
+        "file": "src/state/events-compaction.mjs",
+        "rankHash": "b26aecdc7024a96af406ff650c4405e1891a354c14ac10515d70a84023a30de5"
+      },
+      {
+        "file": "src/state/frontier.mjs",
+        "rankHash": "b2c09fe5ac76ebf55e2d73cc600e1c8577b0f6b1d5f974031cf4903e4d33de12"
+      },
+      {
+        "file": "src/state/dep-graph.mjs",
+        "rankHash": "bc68964efa7e1613ab0f4f266b5cfc54758733d36e6d8bd73678c36d76fba361"
+      },
+      {
+        "file": "src/state/cleanup-pool.mjs",
+        "rankHash": "cea6ce098bb373215f61cee5d9189e17de18939353515e31ca6c5a4ea03d1b5a"
+      },
+      {
+        "file": "src/state/graph-metrics.mjs",
+        "rankHash": "e027be77faeaeef148ebf3146f366513d4d3f39ea619803344339181cff2a1ca"
+      },
+      {
+        "file": "src/state/cleanup-harness.mjs",
+        "rankHash": "edcce56cbc65dd1722bc37e5117d70ac39f0b2430eb37678af52baea8d4d7014"
+      },
+      {
+        "file": "src/state/postland-drift.mjs",
+        "rankHash": "ee8e5cc1b3acf6ea50b4e859a17068547fb84c5049e776a1b0c7108fee4f9b6b"
+      },
+      {
+        "file": "src/state/retro-pool.mjs",
+        "rankHash": "fe95eea2f4be8d7585ab1188e959fc1b77c730b427d634d79521d17133c93a21"
       }
     ],
     "unpatchedSample": [
-      "src/state/graph-harness.mjs",
-      "src/state/frontier.mjs"
+      "src/state/events-jsonl-truncation-guard.mjs",
+      "src/state/knowledge-registry.mjs"
     ],
     "mandatoryWitnesses": [],
     "selected": [
-      "src/state/frontier.mjs",
-      "src/state/graph-harness.mjs",
-      "src/state/priority-formula.mjs"
+      "src/state/events-jsonl-truncation-guard.mjs",
+      "src/state/gate-bypass.mjs",
+      "src/state/knowledge-registry.mjs"
     ],
     "reviewedFiles": [],
     "reworkNumerator": null,
     "reworkDenominator": null,
-    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "A51 seeded selection for sets 017–033 after L12-60 sweep",
+    "targetedReReview": []
   },
   {
     "set": "step04-027",
-    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-027",
+    "seed": "A51-step04-file-v1\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-027",
     "population": [],
     "ranks": [],
     "sample": [],
-    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-027",
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-027",
     "unpatchedRanks": [
       {
-        "file": "src/state/work.mjs",
-        "rankHash": "683c456e514621026ddb09004a3d30be28191448a30a58025e17788ce676c8c2"
-      },
-      {
         "file": "src/state/tool-registry.mjs",
-        "rankHash": "98ec3b868776926aa6c91b58583811472c63f8a83ab653e791846070654b2086"
+        "rankHash": "3c0d3787a2dea7ced3ff50f12fc661c133c6359fc4e5466c88fa79e48bd25b0c"
       },
       {
         "file": "src/state/worker-slots.mjs",
-        "rankHash": "ff3e501bab7e19cb8683fd8aaaebfb72288ba617ed2a2b34ff53ce33b6a5a157"
+        "rankHash": "9e3418e165a8dea2735dfc85f30033e354365407110dc92e917e05141112d7e7"
+      },
+      {
+        "file": "src/state/work.mjs",
+        "rankHash": "ff963423ca5bd5e8cc56f52f7d1bd8a337a0bd33a91ad0f52266e784194032c0"
       }
     ],
     "unpatchedSample": [
-      "src/state/work.mjs"
+      "src/state/tool-registry.mjs"
     ],
     "mandatoryWitnesses": [
       {
@@ -609,65 +3129,69 @@
     ],
     "selected": [
       "src/state/store.mjs",
-      "src/state/work.mjs"
+      "src/state/tool-registry.mjs"
     ],
     "reviewedFiles": [],
     "reworkNumerator": null,
     "reworkDenominator": null,
-    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "A51 seeded selection for sets 017–033 after L12-60 sweep",
+    "targetedReReview": []
   },
   {
     "set": "step04-028",
-    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-028",
+    "seed": "A51-step04-file-v1\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-028",
     "population": [],
     "ranks": [],
     "sample": [],
-    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-028",
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-028",
     "unpatchedRanks": [
       {
-        "file": "src/util/format-duration.mjs",
-        "rankHash": "a38c5a54be669c2ffadd0737c1abbbdb222ce30bf8786328850d0eaa1056fdb4"
+        "file": "src/util/format-bytes.mjs",
+        "rankHash": "a215c037c293e470f7942586589ae04fa1256494792697cd0ac68d6ea59c2336"
       },
       {
-        "file": "src/util/format-bytes.mjs",
-        "rankHash": "c27926b983fb15fe0a798751ce87dbb2343b4d1669f5fb68cff88d9edad81d9c"
+        "file": "src/util/format-duration.mjs",
+        "rankHash": "c450b3799408b64769ecf21cb121fdd2e4ce410a4190ff619c8058a9125386ef"
       }
     ],
     "unpatchedSample": [
-      "src/util/format-duration.mjs"
+      "src/util/format-bytes.mjs"
     ],
     "mandatoryWitnesses": [],
     "selected": [
-      "src/util/format-duration.mjs"
+      "src/util/format-bytes.mjs"
     ],
     "reviewedFiles": [],
     "reworkNumerator": null,
     "reworkDenominator": null,
-    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "A51 seeded selection for sets 017–033 after L12-60 sweep",
+    "targetedReReview": []
   },
   {
     "set": "step04-029",
-    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-029",
+    "seed": "A51-step04-file-v1\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-029",
     "population": [],
     "ranks": [],
     "sample": [],
-    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-029",
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-029",
     "unpatchedRanks": [
       {
         "file": "src/verbs/merge/approve.mjs",
-        "rankHash": "0aeede0deae596099cd6f0c0bbdbe142c1ad97f77743c338791f7714c4350de1"
-      },
-      {
-        "file": "src/verbs/merge/iron-law-level.mjs",
-        "rankHash": "501a961f04812021f61436bd2f6e68d5efbc20d9d44309478bcf8a886c00ba5c"
-      },
-      {
-        "file": "src/verbs/merge/sync-root.mjs",
-        "rankHash": "758ac6639f0e8fbbd14c49fb6b609a47856d14a640399cd937315c2ec1166188"
+        "rankHash": "0b25b5c9725375a1b689ef85d5b8829bcbe03a2cf88bc0b8262b18d3e899579b"
       },
       {
         "file": "src/verbs/merge/merge.mjs",
-        "rankHash": "9f3e9f789757f6c7d05efeded9b9339fdaa988a361aa77a5672fbd0480743a23"
+        "rankHash": "36b49c0bf89235c73e6dbadb34a981ba70699e92fe249c440115749d304873c3"
+      },
+      {
+        "file": "src/verbs/merge/iron-law-level.mjs",
+        "rankHash": "b188a0448b07b943d9d780af495fbd43c3e49a3fd4eda5dba52803ce20f9ec7b"
+      },
+      {
+        "file": "src/verbs/merge/sync-root.mjs",
+        "rankHash": "bc07d185f1ce041f009f1181512df56ed5826c0c54f6b668a6037d476c904042"
       }
     ],
     "unpatchedSample": [
@@ -680,123 +3204,164 @@
     "reviewedFiles": [],
     "reworkNumerator": null,
     "reworkDenominator": null,
-    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "A51 seeded selection for sets 017–033 after L12-60 sweep",
+    "targetedReReview": []
   },
   {
     "set": "step04-030",
-    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-030",
+    "seed": "A51-step04-file-v1\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-030",
     "population": [
       "core/skills/fgos-clarifying/SKILL.md"
     ],
     "ranks": [
       {
         "file": "core/skills/fgos-clarifying/SKILL.md",
-        "rankHash": "5c64f7388076645a1604f662f04ba65055f48756bc12683d7cc4e4fcd37746c6"
+        "rankHash": "e432dd7c79b6daacb25fcbd8f6fc2cb106e451760f1e7f5057029a516c5b9cd3"
       }
     ],
     "sample": [
       "core/skills/fgos-clarifying/SKILL.md"
     ],
-    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-030",
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-030",
     "unpatchedRanks": [
       {
-        "file": ".claude/skills/ui-spec/SKILL.md",
-        "rankHash": "154386e5b766de1a19181e08fdbf65e1bd9b52aac8a6a062ff538debf6203968"
-      },
-      {
         "file": ".claude/skills/ui-spec/CONVENTION.md",
-        "rankHash": "23f8ec027fa5d02cbec7f60b159d9e5e88474bf286e18c2220aec06fc55359e6"
-      },
-      {
-        "file": "core/skills/_shared/citation-format.md",
-        "rankHash": "a6ac06cd5e9dec5d602927057f634576050741144ac3e29f1323d23033734441"
-      },
-      {
-        "file": "core/skills/fgos-indexing/SKILL.md",
-        "rankHash": "b360c9cbb64ba618d62cdc78bc8898b54cf7ee6b89c2eba693d97f1519293d39"
+        "rankHash": "3d336cbc128f83b097a465eaf9503dd28aab9c5b62b2fbf26f96d2fc7d207846"
       },
       {
         "file": "core/skills/distill/references/deep-dive-protocol.md",
-        "rankHash": "d12bb3c0c44ce3ea3ff9a7b88ca4ca63bb599b890e9762db9fe841fbf6e2d7fc"
+        "rankHash": "4607d245250ca29c04dbe85b0093f21301781ded508dcaa3edc685cfc21f8f97"
+      },
+      {
+        "file": "core/skills/_shared/citation-format.md",
+        "rankHash": "5d893fc47bc9bd7cdac327610fcc71d69113ea369ee0e0a61e1f3d225825761f"
+      },
+      {
+        "file": "core/skills/fgos-indexing/SKILL.md",
+        "rankHash": "6d5f39dd535523294f4cdd442446e354e087ef16f348f7eb1a7acffe6c66536b"
       },
       {
         "file": "core/skills/_shared/coding-worker-contract.md",
-        "rankHash": "e7c06f8b1f90a9618b4d1fd499ddcf123fff6971c87e5fde8606ccb00e238302"
+        "rankHash": "6e9c1e899afc67f97d4db6b230d61b56905d25c5ef1a24599a6efca2d23a0682"
       },
       {
         "file": ".claude/skills/ui-spec/references/CONVENTION.md",
-        "rankHash": "f334935b5a34b2114fdf00360122085fa994937c1bc9f3895df785d22470fb82"
+        "rankHash": "795f2c17f1c83eede08220e227a3e74c2e2b3cd92509cbe1c1b113b71b0e7f01"
+      },
+      {
+        "file": ".claude/skills/ui-spec/SKILL.md",
+        "rankHash": "f2da02e2ddf0dbe4172b6858d0e2c7098cef8c83bf13bc6dd93da6aa76a293fb"
       }
     ],
     "unpatchedSample": [
-      ".claude/skills/ui-spec/SKILL.md",
-      ".claude/skills/ui-spec/CONVENTION.md"
+      ".claude/skills/ui-spec/CONVENTION.md",
+      "core/skills/distill/references/deep-dive-protocol.md"
     ],
-    "mandatoryWitnesses": [],
+    "mandatoryWitnesses": [
+      {
+        "file": "core/skills/_shared/capability-catalog.md",
+        "bytes": 8207,
+        "slots": 3,
+        "reasons": [
+          "L12-10 source/render/companion join"
+        ]
+      },
+      {
+        "file": "core/skills/_shared/executor-dispatch-fallback.md",
+        "bytes": 18870,
+        "slots": 20,
+        "reasons": [
+          "L12-10 source/render/companion join"
+        ]
+      },
+      {
+        "file": "core/skills/_shared/planning-capability-awareness.md",
+        "bytes": 6132,
+        "slots": 3,
+        "reasons": [
+          "L12-10 source/render/companion join"
+        ]
+      },
+      {
+        "file": "core/skills/fgos-run/SKILL.md",
+        "reasons": [
+          "L12-60 main-changed source plus all generated outputs; zero documentation edges, mandatory full-context review"
+        ]
+      }
+    ],
     "selected": [
       ".claude/skills/ui-spec/CONVENTION.md",
-      ".claude/skills/ui-spec/SKILL.md",
-      "core/skills/fgos-clarifying/SKILL.md"
+      "core/skills/_shared/capability-catalog.md",
+      "core/skills/_shared/executor-dispatch-fallback.md",
+      "core/skills/_shared/planning-capability-awareness.md",
+      "core/skills/distill/references/deep-dive-protocol.md",
+      "core/skills/fgos-clarifying/SKILL.md",
+      "core/skills/fgos-run/SKILL.md"
     ],
     "reviewedFiles": [],
     "reworkNumerator": null,
     "reworkDenominator": null,
-    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "A51 seeded selection for sets 017–033 after L12-60 sweep",
+    "targetedReReview": []
   },
   {
     "set": "step04-031",
-    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-031",
+    "seed": "A51-step04-file-v1\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-031",
     "population": [
       "core/skills/fgos-researching/SKILL.md"
     ],
     "ranks": [
       {
         "file": "core/skills/fgos-researching/SKILL.md",
-        "rankHash": "49cb8540660b48344e4764dc6d092d9840ca3a4d1b8bebe6287868071a54b6d1"
+        "rankHash": "e2d21c0cfc427214875dd7e1aca962c6e31d76e7daabe25713db086a1677d675"
       }
     ],
     "sample": [
       "core/skills/fgos-researching/SKILL.md"
     ],
-    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-031",
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-031",
     "unpatchedRanks": [
       {
-        "file": "src/runner/prompt-templates/worker-prompt-discovery.txt",
-        "rankHash": "0c0224e506e35bbffe881101554fed612144831c62fa9acb239bc12dff0b8ff2"
-      },
-      {
-        "file": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
-        "rankHash": "5b6d215cf013f53af71006a7cc39c09eb3f8e83304c0fc956f36a0d42a0cfb27"
-      },
-      {
         "file": "core/task-specs/fgos-indexing.md",
-        "rankHash": "a1157871c3c15d9392b955bd7cf78f5ab2f0a43fc83bd1e266b85a04f48b70eb"
+        "rankHash": "039b97af45feb337b7c6e2fffe044fdba0dcf903bdbff0b88cea313d43cb104b"
       },
       {
         "file": "core/task-specs/fgos-researching.md",
-        "rankHash": "c7023f5a5181a35f9e3aad3f76d49ed27fa08203139fd34f77ba5657806d6b7d"
+        "rankHash": "671946a2441fb3f3c11589df3264b5b950fab77100bcb629bc7c882426644212"
+      },
+      {
+        "file": "src/runner/prompt-templates/worker-prompt-discovery.txt",
+        "rankHash": "96d2b65201445b5d11a617798583f73f94e230a7739dcc0bb2831daf7753807a"
+      },
+      {
+        "file": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+        "rankHash": "e2ac980560978fc5f38d8fa176f87a4db00f89a729412b0515546e9f774a7e9b"
       }
     ],
     "unpatchedSample": [
-      "src/runner/prompt-templates/worker-prompt-discovery.txt"
+      "core/task-specs/fgos-indexing.md"
     ],
     "mandatoryWitnesses": [],
     "selected": [
       "core/skills/fgos-researching/SKILL.md",
-      "src/runner/prompt-templates/worker-prompt-discovery.txt"
+      "core/task-specs/fgos-indexing.md"
     ],
     "reviewedFiles": [],
     "reworkNumerator": null,
     "reworkDenominator": null,
-    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "A51 seeded selection for sets 017–033 after L12-60 sweep",
+    "targetedReReview": []
   },
   {
     "set": "step04-032",
-    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-032",
+    "seed": "A51-step04-file-v1\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-032",
     "population": [],
     "ranks": [],
     "sample": [],
-    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-032",
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-032",
     "unpatchedRanks": [],
     "unpatchedSample": [],
     "mandatoryWitnesses": [
@@ -815,15 +3380,17 @@
     "reviewedFiles": [],
     "reworkNumerator": null,
     "reworkDenominator": null,
-    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "A51 seeded selection for sets 017–033 after L12-60 sweep",
+    "targetedReReview": []
   },
   {
     "set": "step04-033",
-    "seed": "A51-step04-file-v1\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-033",
+    "seed": "A51-step04-file-v1\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-033",
     "population": [],
     "ranks": [],
     "sample": [],
-    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000d4a07d57c4d146b482d4a9e632dc02d8df42af79\u0000step04-033",
+    "unpatchedSeed": "A51-step04-file-v1-unpatched\u0000dc24ce64527fbffd23e1643f35a7ddf808fd7b45\u0000step04-033",
     "unpatchedRanks": [],
     "unpatchedSample": [],
     "mandatoryWitnesses": [
@@ -878,6 +3445,8 @@
     "reviewedFiles": [],
     "reworkNumerator": null,
     "reworkDenominator": null,
-    "reviewStatus": "pending Lead-started independent review; >3% expands to every file in this set"
+    "reviewStatus": "pending fresh Lead-started independent review; no approval carry",
+    "selectionMode": "A51 seeded selection for sets 017–033 after L12-60 sweep",
+    "targetedReReview": []
   }
 ]

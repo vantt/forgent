@@ -1,5 +1,5 @@
 {
-  "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+  "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
   "findings": [
     {
       "sourceOwner": "core/skills/fgos-clarifying/SKILL.md",
@@ -25,8 +25,14 @@
       "inventoryRefs": [],
       "populationGap": true,
       "reason": "Whole-file reading noticed the wrapped Native-First Dispatch Doctrine rule-2 decision citation outside the frozen Step 4 slot joins. No id is invented and no consumer edit is authorized.",
-      "status": "Lead census admission and content-bound authoring needed before Step 7 assembly; current record covers only the admitted RUL45 slot",
-      "candidateLookupOnly": "docs/platform/runner/decisions/h-36d872fbb0e5.md; title-matched 0026 with later 0033 narrowing; not an executable patch or accepted binding"
+      "status": "Addressed under L12-60: first-class record slot, independent semantic review pending; no census admission question.",
+      "candidateLookupOnly": "docs/platform/runner/decisions/h-36d872fbb0e5.md; title-matched 0026 with later 0033 narrowing; not an executable patch or accepted binding",
+      "currentSlotKeys": [
+        "{\"edgeId\":null,\"file\":\"core/skills/fgos-clarifying/SKILL.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":70,\"columnStart\":21,\"file\":\"core/skills/fgos-clarifying/SKILL.md\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":100,\"text\":\"docs/decisions/0026-vision-orchestrator-roottask-\"}}"
+      ],
+      "currentDispositions": [
+        "parked"
+      ]
     },
     {
       "sourceOwner": "core/skills/fgos-clarifying/SKILL.md",
@@ -52,8 +58,14 @@
       "inventoryRefs": [],
       "populationGap": true,
       "reason": "Whole-file reading noticed the wrapped Native-First Dispatch Doctrine rule-2 decision citation outside the frozen Step 4 slot joins. No id is invented and no consumer edit is authorized.",
-      "status": "Lead census admission and content-bound authoring needed before Step 7 assembly; current record covers only the admitted RUL45 slot",
-      "candidateLookupOnly": "docs/platform/runner/decisions/h-36d872fbb0e5.md; title-matched 0026 with later 0033 narrowing; not an executable patch or accepted binding"
+      "status": "Addressed under L12-60: first-class record slot, independent semantic review pending; no census admission question.",
+      "candidateLookupOnly": "docs/platform/runner/decisions/h-36d872fbb0e5.md; title-matched 0026 with later 0033 narrowing; not an executable patch or accepted binding",
+      "currentSlotKeys": [
+        "{\"edgeId\":\"class4-l-000040\",\"file\":\".agents/skills/fgos-clarifying/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-000040\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":101},{\"edgeId\":\"class4-l-000040\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":102}]}"
+      ],
+      "currentDispositions": [
+        "render-join"
+      ]
     },
     {
       "sourceOwner": "core/skills/fgos-clarifying/SKILL.md",
@@ -79,10 +91,18 @@
       "inventoryRefs": [],
       "populationGap": true,
       "reason": "Whole-file reading noticed the wrapped Native-First Dispatch Doctrine rule-2 decision citation outside the frozen Step 4 slot joins. No id is invented and no consumer edit is authorized.",
-      "status": "Lead census admission and content-bound authoring needed before Step 7 assembly; current record covers only the admitted RUL45 slot",
-      "candidateLookupOnly": "docs/platform/runner/decisions/h-36d872fbb0e5.md; title-matched 0026 with later 0033 narrowing; not an executable patch or accepted binding"
+      "status": "Addressed under L12-60: first-class record slot, independent semantic review pending; no census admission question.",
+      "candidateLookupOnly": "docs/platform/runner/decisions/h-36d872fbb0e5.md; title-matched 0026 with later 0033 narrowing; not an executable patch or accepted binding",
+      "currentSlotKeys": [
+        "{\"edgeId\":\"class4-l-002042\",\"file\":\"plugins/fgOS/skills/fgos-clarifying/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"class4-l-002042\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":101},{\"edgeId\":\"class4-l-002042\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class4.json\",\"originalLine\":102}]}"
+      ],
+      "currentDispositions": [
+        "render-join"
+      ]
     }
   ],
-  "frozenSlotsUnchanged": true,
-  "coverageLimit": "833 frozen slots mechanically replayed separately. These three noticed uncensused physical occurrences are not admitted or counted as invented record edges. This report is not a replacement census."
+  "frozenSlotsUnchanged": false,
+  "coverageLimit": "All 914 current authored slots are checked separately; these three former gaps now join first-class records. Frozen Step 2 ids/bytes remain unchanged.",
+  "previousInputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+  "frozenCensusesUnchanged": true
 }

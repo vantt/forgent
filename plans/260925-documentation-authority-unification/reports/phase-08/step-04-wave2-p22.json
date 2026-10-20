@@ -1,0 +1,769 @@
+{
+  "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "reviewerRule": "Never run checker/probes/resolver/author scripts. Read every assigned file through EOF and independently verify targets. One verdict per whole file, even when streamed.",
+  "set": "step04-012",
+  "files": [
+    "apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx",
+    "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+    "apps/fgos-gateway/web/src/screens/Taskboard.tsx"
+  ],
+  "joinedSlots": 10,
+  "items": [
+    {
+      "file": "apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx",
+      "sourceDigest": "0212810a96532e5b14e2420dcc66927c91f936d606a5bf1ad841b30c81202b27",
+      "sourceContext": "import { useEffect, useState } from 'react'\nimport type { ApiClient } from '../api/client'\nimport { GatewayUnreachableError } from '../api/errors'\nimport { hostOf, isNonLoopbackHost } from '../lib/network'\nimport type { WorkItem } from '../api/types'\n\n// S04 — Questions needing answer (docs/ui-spec/screens/S04-questions-\n// needing-answer.md). D15 (docs/history/herdr-web-dashboard/CONTEXT.md):\n// the `ask` channel only -- gate-approve questions have no durable,\n// remotely-observable pending state today (see TaskDetail.tsx's own\n// D15 citation for the live evidence).\n\nexport interface NeedsAnswerProps {\n  client: ApiClient\n  baseUrl: string\n  onOpenItem: (id: string) => void\n  onBack: () => void\n}\n\nexport function NeedsAnswer({ client, baseUrl, onOpenItem, onBack }: NeedsAnswerProps) {\n  const [items, setItems] = useState<WorkItem[] | null>(null)\n  const [loading, setLoading] = useState(true)\n  const [stale, setStale] = useState(false)\n  const [answerDrafts, setAnswerDrafts] = useState<Record<string, string>>({})\n\n  async function fetchList(): Promise<void> {\n    try {\n      const data = await client.listWork({ status: 'awaiting-human', all: true })\n      // Oldest-first (area spec: \"the thing that has been waiting longest\n      // is the thing most likely to be blocking something else\"). The\n      // contract carries no `parkedAt` field, so items are ordered by id\n      // only where no better signal exists -- Execute-time note, not a\n      // fabricated timestamp.\n      setItems(Object.values(data.work))\n      setStale(false)\n    } catch (err) {\n      if (err instanceof GatewayUnreachableError) {\n        setStale(true)\n        return\n      }\n      throw err\n    } finally {\n      setLoading(false)\n    }\n  }\n\n  useEffect(() => {\n    fetchList()\n    // eslint-disable-next-line react-hooks/exhaustive-deps\n  }, [client])\n\n  async function submitAnswer(id: string): Promise<void> {\n    const text = answerDrafts[id]\n    if (!text?.trim()) return\n    try {\n      await client.answerWork(id, text)\n      setAnswerDrafts((prev) => ({ ...prev, [id]: '' }))\n      await fetchList()\n    } catch (err) {\n      if (err instanceof GatewayUnreachableError) setStale(true)\n    }\n  }\n\n  const exposed = isNonLoopbackHost(baseUrl)\n\n  return (\n    <div className=\"min-h-svh bg-bg\">\n      <div data-testid=\"topbar\" className=\"flex items-center justify-between border-b border-border bg-surface px-6 py-3\">\n        <div className=\"flex items-center gap-3\">\n          <button data-testid=\"back-to-board\" onClick={onBack} className=\"text-sm font-medium text-ink-muted hover:text-brand\">\n            ← Board\n          </button>\n          <span className=\"text-sm font-semibold text-ink\">Needs answer · {items?.length ?? 0}</span>\n        </div>\n        <div className=\"flex items-center gap-3 text-sm text-ink-muted\">\n          {exposed && (\n            <span\n              data-testid=\"exposure-warning\"\n              className=\"rounded-full bg-status-needs-answer-bg px-2.5 py-1 text-xs font-medium text-status-needs-answer\"\n            >\n              ⚠ reachable on network\n            </span>\n          )}\n          <span data-testid=\"gateway-indicator\">{hostOf(baseUrl)}</span>\n        </div>\n      </div>\n\n      {stale && (\n        <div data-testid=\"disconnected-banner\" className=\"flex items-center gap-3 bg-danger-bg px-6 py-2 text-sm text-danger\">\n          Gateway unreachable — showing last known data.\n          <button\n            data-testid=\"retry-button\"\n            onClick={() => {\n              setLoading(true)\n              fetchList()\n            }}\n            className=\"rounded-md border border-danger px-2 py-0.5 text-xs font-medium\"\n          >\n            Retry\n          </button>\n        </div>\n      )}\n\n      {loading && (\n        <div data-testid=\"loading-skeleton\" className=\"p-6 text-sm text-ink-muted\">\n          Loading…\n        </div>\n      )}\n\n      {!loading && items && items.length === 0 && (\n        <p data-testid=\"empty-questions\" className=\"p-6 text-sm text-ink-muted\">\n          Nothing is waiting on you.\n        </p>\n      )}\n\n      <div data-testid=\"list\" className=\"mx-auto max-w-2xl space-y-3 p-6\">\n        {(items ?? []).map((item) => (\n          <div key={item.id} data-testid={`row-${item.id}`} className=\"rounded-xl border border-border bg-surface p-4 shadow-sm\">\n            <div className=\"flex items-start justify-between gap-3\">\n              <span className=\"text-sm font-semibold text-ink\">\n                {item.id} · {item.title}\n              </span>\n            </div>\n            <p data-testid={`tag-${item.id}`} className=\"mt-1 inline-block rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium text-ink-muted\">\n              ASK\n            </p>\n            <textarea\n              data-testid={`answer-input-${item.id}`}\n              value={answerDrafts[item.id] ?? ''}\n              onChange={(e) => setAnswerDrafts((prev) => ({ ...prev, [item.id]: e.target.value }))}\n              disabled={stale}\n              className=\"mt-2 w-full rounded-lg border border-border bg-surface p-2 text-sm text-ink\"\n            />\n            <div className=\"mt-2 flex justify-end gap-2\">\n              <button data-testid={`open-${item.id}`} onClick={() => onOpenItem(item.id)} className=\"rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-ink\">\n                Open\n              </button>\n              <button\n                data-testid={`answer-submit-${item.id}`}\n                onClick={() => submitAnswer(item.id)}\n                disabled={!answerDrafts[item.id]?.trim() || stale}\n                className=\"rounded-lg bg-brand px-3 py-1.5 text-sm font-semibold text-brand-contrast disabled:cursor-not-allowed disabled:opacity-40\"\n              >\n                Answer\n              </button>\n            </div>\n          </div>\n        ))}\n      </div>\n    </div>\n  )\n}\n",
+      "record": {
+        "file": "apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "0212810a96532e5b14e2420dcc66927c91f936d606a5bf1ad841b30c81202b27",
+        "digest": "0212810a96532e5b14e2420dcc66927c91f936d606a5bf1ad841b30c81202b27",
+        "inventoryEdgeIds": [
+          "class6-l-000070",
+          "class6-l-000070",
+          "class6-l-000071"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000070",
+            "slotKey": "{\"edgeId\":\"class6-l-000070\",\"file\":\"apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000070\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":7}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000070",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 7
+              }
+            ],
+            "consumerFile": "apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 7,
+                "columnStart": 36,
+                "columnEndExclusive": 71,
+                "text": "docs/ui-spec/screens/S04-questions-"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 7,
+                "columnStart": 36,
+                "columnEndExclusive": 71,
+                "text": "docs/ui-spec/screens/S04-questions-"
+              },
+              {
+                "line": 8,
+                "columnStart": 1,
+                "columnEndExclusive": 21,
+                "text": "// needing-answer.md"
+              }
+            ],
+            "matchedExpression": "docs/ui-spec/screens/S04-questions-\n// needing-answer.md",
+            "logicalReference": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Retained native path, literal example or captured contract reference stays literal. Own source passage: '// S04 — Questions needing answer (docs/ui-spec/screens/S04-questions-\\n// needing-answer.md). D15 (docs/history/herdr-web-dashboard/CONTEXT.md):'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000070",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 7,
+                "matchedExpression": "docs/ui-spec/screens/S04-questions-\n// needing-answer.md",
+                "originalLineText": "// S04 — Questions needing answer (docs/ui-spec/screens/S04-questions-"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000070",
+            "slotKey": "{\"edgeId\":\"class6-l-000070\",\"file\":\"apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000070\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":8}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000070",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 8
+              }
+            ],
+            "consumerFile": "apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 8,
+                "columnStart": 1,
+                "columnEndExclusive": 21,
+                "text": "// needing-answer.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 7,
+                "columnStart": 36,
+                "columnEndExclusive": 71,
+                "text": "docs/ui-spec/screens/S04-questions-"
+              },
+              {
+                "line": 8,
+                "columnStart": 1,
+                "columnEndExclusive": 21,
+                "text": "// needing-answer.md"
+              }
+            ],
+            "matchedExpression": "docs/ui-spec/screens/S04-questions-\n// needing-answer.md",
+            "logicalReference": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Retained native path, literal example or captured contract reference stays literal. Own source passage: '// S04 — Questions needing answer (docs/ui-spec/screens/S04-questions-\\n// needing-answer.md). D15 (docs/history/herdr-web-dashboard/CONTEXT.md):'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000070",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 8,
+                "matchedExpression": "docs/ui-spec/screens/S04-questions-\n// needing-answer.md",
+                "originalLineText": "// needing-answer.md). D15 (docs/history/herdr-web-dashboard/CONTEXT.md):"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000071",
+            "slotKey": "{\"edgeId\":\"class6-l-000071\",\"file\":\"apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000071\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":8}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000071",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 8
+              }
+            ],
+            "consumerFile": "apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 8,
+                "columnStart": 29,
+                "columnEndExclusive": 72,
+                "text": "docs/history/herdr-web-dashboard/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 8,
+                "columnStart": 29,
+                "columnEndExclusive": 72,
+                "text": "docs/history/herdr-web-dashboard/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/herdr-web-dashboard/CONTEXT.md",
+            "logicalReference": "docs/history/herdr-web-dashboard/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '// needing-answer.md). D15 (docs/history/herdr-web-dashboard/CONTEXT.md):'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/herdr-web-dashboard/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000071",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 8,
+                "matchedExpression": "docs/history/herdr-web-dashboard/CONTEXT.md",
+                "originalLineText": "// needing-answer.md). D15 (docs/history/herdr-web-dashboard/CONTEXT.md):"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-012",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58",
+          "L12-60"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "0212810a96532e5b14e2420dcc66927c91f936d606a5bf1ad841b30c81202b27",
+          "bytes": 5891,
+          "lines": 152,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetEvidence": {},
+      "renderContexts": {},
+      "populationGapFindings": [],
+      "L12-60-coverage": {
+        "stepFiveExcluded": [],
+        "authorAddedSlots": [],
+        "recordChangedThisTurn": true
+      },
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+      "sourceDigest": "66493b27c3dede73be383d786cf5342ed7770fad9a9bbbf982adac0e01b6056e",
+      "sourceContext": "import { useEffect, useRef, useState } from 'react'\nimport type { ApiClient } from '../api/client'\nimport { GatewayApiError, GatewayUnreachableError } from '../api/errors'\nimport { hostOf, isNonLoopbackHost } from '../lib/network'\nimport { pollStateDigest } from '../api/poll'\nimport { statusColor } from '../lib/status'\nimport type { SettlementEntry, WorkDetail, WorkDocsData } from '../api/types'\n\n// S03 — Task detail (docs/ui-spec/screens/S03-task-detail.md). \"The core\n// deliverable of the whole cluster\" per its own Purpose section.\n\nconst NEEDS_ANSWER_STATUSES = new Set(['awaiting-human', 'awaiting-approval'])\n\nexport interface TimelineRound {\n  question: string\n  answer: string | null\n}\n\n// R9: pairing is POSITIONAL, never a link the data does not carry.\n// `askHistory` is oldest-first (confirmed: its last element equals the\n// separate `ask` field, the most recent question -- a live `fgos show`\n// check, not assumed). `settlement.recent` is newest-first and capped at\n// 5 entries ACROSS every settlement kind (SETTLEMENT_DISPLAY_CAP), so\n// only the answer-kind entries are usable, and only the most recent ones\n// -- a round older than that window has no answer available through this\n// view at all (a real API limit, not a client choice to hide it).\n//\n// `isCurrentlyParked` disambiguates two DIFFERENT reasons the trailing\n// question(s) might lack an answer, which a length comparison alone\n// cannot tell apart: a genuinely still-open round (the item's own FSM\n// allows at most one open ask at a time, so this is only ever the LAST\n// entry) versus an answer that exists but sits outside the 5-answer\n// cap window. When parked, the last question is excluded from pairing\n// entirely (it structurally has no answer anywhere yet) before aligning\n// the rest from the end; when not parked, every question is treated as\n// potentially answered and aligned from the end as-is.\nexport function pairTimeline(\n  askHistory: string[] | undefined,\n  settlementRecent: SettlementEntry[] | undefined,\n  isCurrentlyParked: boolean,\n): TimelineRound[] {\n  const questions = askHistory ?? []\n  const answersNewestFirst = (settlementRecent ?? []).filter((s) => s.kind === 'answer')\n  const answersOldestFirst = [...answersNewestFirst].reverse().map((s) => s.detail ?? '')\n\n  const openRound = isCurrentlyParked && questions.length > 0 ? questions[questions.length - 1] : null;\n  const answerableQuestions = openRound !== null ? questions.slice(0, -1) : questions;\n\n  // Align from the END: the newest answerable question pairs with the\n  // newest available answer, working backward. A question older than the\n  // available answer window gets `answer: null` with no fabricated text.\n  const rounds: TimelineRound[] = []\n  for (let i = 0; i < answerableQuestions.length; i++) {\n    const answerIndexFromEnd = answerableQuestions.length - 1 - i\n    const answer =\n      answerIndexFromEnd < answersOldestFirst.length ? answersOldestFirst[answersOldestFirst.length - 1 - answerIndexFromEnd] : null\n    rounds.push({ question: answerableQuestions[i], answer })\n  }\n  if (openRound !== null) {\n    rounds.push({ question: openRound, answer: null })\n  }\n  return rounds\n}\n\nexport interface TaskDetailProps {\n  client: ApiClient\n  baseUrl: string\n  itemId: string\n  onBack: () => void\n  pollIntervalMs?: number\n}\n\nexport function TaskDetail({ client, baseUrl, itemId, onBack, pollIntervalMs = 5000 }: TaskDetailProps) {\n  const [detail, setDetail] = useState<WorkDetail | null>(null)\n  const [docs, setDocs] = useState<WorkDocsData | null>(null)\n  const [loading, setLoading] = useState(true)\n  const [stale, setStale] = useState(false)\n  const [showMachineLog, setShowMachineLog] = useState(false)\n  const [showEarlierRounds, setShowEarlierRounds] = useState(false)\n  const [answerDraft, setAnswerDraft] = useState('')\n  const [answering, setAnswering] = useState(false)\n  const [approveError, setApproveError] = useState<string | null>(null)\n  const [showEditPlaceholder, setShowEditPlaceholder] = useState(false)\n  const lastDigestRef = useRef<string | undefined>(undefined)\n\n  async function fetchDetail(): Promise<void> {\n    try {\n      const [detailData, docsData] = await Promise.all([client.getWork(itemId), client.getWorkDocs(itemId)])\n      setDetail(detailData)\n      setDocs(docsData)\n      setStale(false)\n    } catch (err) {\n      if (err instanceof GatewayUnreachableError) {\n        setStale(true)\n        return\n      }\n      throw err\n    } finally {\n      setLoading(false)\n    }\n  }\n\n  useEffect(() => {\n    let cancelled = false\n    fetchDetail()\n    client\n      .stateDigest()\n      .then((digest) => {\n        if (!cancelled) lastDigestRef.current = digest.data_hash\n      })\n      .catch(() => {})\n    const interval = setInterval(() => {\n      pollStateDigest(client, lastDigestRef.current)\n        .then((result) => {\n          if (cancelled) return\n          lastDigestRef.current = result.dataHash\n          if (result.changed) return fetchDetail()\n        })\n        .catch((err) => {\n          if (cancelled) return\n          if (err instanceof GatewayUnreachableError) setStale(true)\n        })\n    }, pollIntervalMs)\n    return () => {\n      cancelled = true\n      clearInterval(interval)\n    }\n    // eslint-disable-next-line react-hooks/exhaustive-deps\n  }, [client, itemId, pollIntervalMs])\n\n  async function submitAnswer(): Promise<void> {\n    if (!answerDraft.trim()) return\n    setAnswering(true)\n    try {\n      await client.answerWork(itemId, answerDraft)\n      setAnswerDraft('')\n      await fetchDetail()\n    } catch (err) {\n      if (err instanceof GatewayUnreachableError) setStale(true)\n      // A GatewayApiError here is a real engine rejection -- left on\n      // screen implicitly via the unchanged draft; a full error banner\n      // is Execute-time polish this item's own scope does not require\n      // beyond not losing the person's typed answer.\n    } finally {\n      setAnswering(false)\n    }\n  }\n\n  async function retire(): Promise<void> {\n    try {\n      await client.moveWork(itemId, 'wontfix')\n      await fetchDetail()\n    } catch (err) {\n      if (err instanceof GatewayUnreachableError) setStale(true)\n    }\n  }\n\n  async function approveMerge(): Promise<void> {\n    setApproveError(null)\n    try {\n      await client.approveWork(itemId)\n      await fetchDetail()\n    } catch (err) {\n      if (err instanceof GatewayUnreachableError) {\n        setStale(true)\n        return\n      }\n      // R7: report unavailable WITH the reason, never silently. No\n      // endpoint exposes \"is this gateway at the main working tree\"\n      // ahead of time (area spec's own Open Gaps do not name one\n      // either), so this button is offered and the engine's real\n      // refusal -- e.g. `approve` structurally refusing outside the\n      // main working tree -- surfaces here verbatim rather than being\n      // predicted client-side.\n      if (err instanceof GatewayApiError) {\n        setApproveError(err.message)\n      }\n    }\n  }\n\n  if (loading) {\n    return (\n      <div data-testid=\"loading-skeleton\" className=\"p-6 text-sm text-ink-muted\">\n        Loading…\n      </div>\n    )\n  }\n\n  if (!detail) {\n    return null\n  }\n\n  const item = detail.work\n  const gates = detail.gates ?? {}\n  const askHistory = gates.askHistory ?? []\n  const isParked = item.status === 'awaiting-human'\n  const neverParked = askHistory.length === 0\n  const rounds = pairTimeline(askHistory, detail.settlement?.recent, isParked)\n  const visibleRounds = showEarlierRounds ? rounds : rounds.slice(-1)\n  const hiddenRoundCount = rounds.length - visibleRounds.length\n  const exposed = isNonLoopbackHost(baseUrl)\n  const decisions = detail.decisions ?? []\n  const canApprove = item.status === 'awaiting-approval'\n  const gateHistory = (['contextApprove', 'planApprove', 'validateApprove'] as const)\n    .map((name) => [name, gates[name]] as const)\n    .filter((entry): entry is [typeof entry[0], NonNullable<typeof entry[1]>] => entry[1] !== undefined)\n  const color = statusColor(item.status)\n\n  // D17 (docs/history/herdr-web-dashboard/CONTEXT.md): the classification\n  // line (domain/tier/deps/parent) -- only the fields that are actually\n  // present render, same \"no fabricated row\" convention docsRef already\n  // used before D17.\n  const metaParts = [\n    item.domain,\n    item.size && `size-${item.size}`,\n    item.rigor && `rigor-${item.rigor}`,\n    item.deps && item.deps.length > 0 && `deps: ${item.deps.join(', ')}`,\n    item.parent && `parent: ${item.parent}`,\n  ].filter(Boolean)\n\n  return (\n    <div className=\"min-h-svh bg-bg pb-24\">\n      <div data-testid=\"topbar\" className=\"flex items-center justify-between border-b border-border bg-surface px-6 py-3\">\n        <div className=\"flex items-center gap-3\">\n          <button data-testid=\"back-to-board\" onClick={onBack} className=\"text-sm font-medium text-ink-muted hover:text-brand\">\n            ← Board\n          </button>\n          <span className=\"text-sm font-semibold text-ink\">\n            {item.id} · {item.title}\n          </span>\n        </div>\n        <div className=\"flex items-center gap-3 text-sm text-ink-muted\">\n          {exposed && (\n            <span\n              data-testid=\"exposure-warning\"\n              className=\"rounded-full bg-status-needs-answer-bg px-2.5 py-1 text-xs font-medium text-status-needs-answer\"\n            >\n              ⚠ reachable on network\n            </span>\n          )}\n          <span data-testid=\"gateway-indicator\">{hostOf(baseUrl)}</span>\n        </div>\n      </div>\n\n      {stale && (\n        <div data-testid=\"disconnected-banner\" className=\"flex items-center gap-3 bg-danger-bg px-6 py-2 text-sm text-danger\">\n          Gateway unreachable — showing last known data.\n          <button\n            data-testid=\"retry-button\"\n            onClick={() => {\n              setLoading(true)\n              fetchDetail()\n            }}\n            className=\"rounded-md border border-danger px-2 py-0.5 text-xs font-medium\"\n          >\n            Retry\n          </button>\n        </div>\n      )}\n\n      <div className=\"mx-auto flex max-w-5xl flex-col gap-4 p-6\">\n        <div\n          data-testid=\"question-region\"\n          className=\"rounded-xl border border-status-needs-answer-bar/40 bg-status-needs-answer-bg p-5\"\n        >\n          {neverParked ? (\n            <p data-testid=\"never-parked\" className=\"text-sm text-ink-muted\">\n              This item has never needed a person.\n            </p>\n          ) : isParked ? (\n            <>\n              <p data-testid=\"needs-answer-badge\" className=\"text-xs font-semibold uppercase tracking-wide text-status-needs-answer\">\n                NEEDS YOUR ANSWER · round {askHistory.length} of {askHistory.length}\n              </p>\n              <p data-testid=\"current-question\" className=\"mt-2 text-lg font-semibold text-ink\">\n                {gates.ask}\n              </p>\n              <textarea\n                data-testid=\"answer-input\"\n                value={answerDraft}\n                onChange={(e) => setAnswerDraft(e.target.value)}\n                disabled={stale}\n                className=\"mt-3 w-full rounded-lg border border-border bg-surface p-2 text-sm text-ink\"\n              />\n              <button\n                data-testid=\"answer-submit\"\n                onClick={submitAnswer}\n                disabled={!answerDraft.trim() || answering || stale}\n                className=\"mt-2 rounded-lg bg-brand px-4 py-1.5 text-sm font-semibold text-brand-contrast disabled:cursor-not-allowed disabled:opacity-40\"\n              >\n                Answer this\n              </button>\n            </>\n          ) : (\n            <p data-testid=\"last-question\" className=\"text-sm text-ink\">\n              {gates.ask ?? 'No open question.'}\n            </p>\n          )}\n        </div>\n\n        <div data-testid=\"why-region\" className=\"rounded-xl border border-border bg-surface p-5\">\n          {/* The real data has no separate \"why\" field from the question\n              text itself (a live `fgos show` check confirmed each\n              askHistory entry already embeds the options-still-standing\n              reasoning inline, matching how these questions are actually\n              written per D6's own framing requirement) -- rendering a\n              second, fabricated \"why\" summary here would invent content\n              this screen has no real source for. */}\n          <h3 className=\"text-sm font-semibold text-ink\">Why you&apos;re being asked</h3>\n          <p className=\"mt-1 text-sm text-ink-muted\">{gates.ask ?? 'No open question.'}</p>\n        </div>\n\n        <div className=\"grid grid-cols-1 gap-4 md:grid-cols-2\">\n          <div data-testid=\"context-region\" className=\"rounded-xl border border-border bg-surface p-5\">\n            <h3 className=\"text-sm font-semibold text-ink\">What this item is</h3>\n            <p data-testid=\"item-summary\" className=\"mt-1 text-sm text-ink\">\n              {item.id} · {item.title}\n            </p>\n            <div className=\"mt-1 flex flex-wrap items-center gap-1.5\">\n              <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${color.bg} ${color.text}`}>\n                {item.status}\n              </span>\n              {item.workflowStep && (\n                <span data-testid=\"item-step\" className=\"text-xs text-ink-muted\">\n                  {item.workflowStep}\n                </span>\n              )}\n              {item.risk && <span className=\"text-xs text-ink-muted\">· {item.risk}</span>}\n            </div>\n\n            {metaParts.length > 0 && (\n              <p data-testid=\"item-meta\" className=\"mt-2 text-xs text-ink-muted\">\n                {metaParts.join(' · ')}\n              </p>\n            )}\n\n            {item.description && (\n              <p data-testid=\"item-description\" className=\"mt-3 text-sm text-ink-muted\">\n                {item.description}\n              </p>\n            )}\n\n            {item.verify && (\n              <p data-testid=\"item-verify\" className=\"mt-3 rounded-md bg-surface-muted p-2 font-mono text-xs text-ink\">\n                verify: {item.verify}\n              </p>\n            )}\n\n            {item.footprint && item.footprint.length > 0 && (\n              <p data-testid=\"item-footprint\" className=\"mt-2 text-xs text-ink-muted\">\n                footprint: {item.footprint.join(', ')}\n              </p>\n            )}\n\n            {item.docsRef && (\n              <a data-testid=\"item-docs-link\" href=\"#\" className=\"mt-2 inline-block text-xs text-brand hover:underline\">\n                {item.docsRef} ↗\n              </a>\n            )}\n\n            <h3 className=\"mt-4 text-sm font-semibold text-ink\">What the agent did</h3>\n            {docs?.narrativeMissing ? (\n              <p data-testid=\"narrative-missing\" className=\"mt-1 text-sm text-ink-muted\">\n                Narrative not found at {docs.docsRef}.\n              </p>\n            ) : docs?.contextMd || docs?.planMd ? (\n              <div data-testid=\"narrative\" className=\"mt-1 space-y-2\">\n                {docs.contextMd && (\n                  <pre data-testid=\"context-md\" className=\"overflow-x-auto rounded-md bg-surface-muted p-2 text-xs text-ink\">\n                    {docs.contextMd}\n                  </pre>\n                )}\n                {docs.planMd && (\n                  <pre data-testid=\"plan-md\" className=\"overflow-x-auto rounded-md bg-surface-muted p-2 text-xs text-ink\">\n                    {docs.planMd}\n                  </pre>\n                )}\n              </div>\n            ) : (\n              <p data-testid=\"no-docs-ref\" className=\"mt-1 text-sm text-ink-muted\">\n                No docsRef on this item.\n              </p>\n            )}\n\n            <button\n              data-testid=\"machine-log-disclosure\"\n              onClick={() => setShowMachineLog((v) => !v)}\n              className=\"mt-3 text-xs font-medium text-ink-muted hover:text-brand\"\n            >\n              {showMachineLog ? '▾' : '▸'} Machine decision log ({decisions.length})\n            </button>\n            {showMachineLog && (\n              <ul data-testid=\"machine-log\" className=\"mt-2 space-y-1 text-xs text-ink-muted\">\n                {decisions.map((d, i) => (\n                  <li key={i}>{d.text}</li>\n                ))}\n              </ul>\n            )}\n\n            {gateHistory.length > 0 && (\n              // D4-scope decision (2026-08-15, user-confirmed): the\n              // gate-approve channel has no durable PENDING-question state to\n              // show remotely (a live `gates` object only ever carries a\n              // COMPLETED `{actor, at, verify}` record once a gate is\n              // approved -- confirmed via `fgos show`, no \"pending question\"\n              // field exists anywhere in it). Rather than fabricate a\n              // \"GATE · <name>\" needs-answer row S04's own mock draws, this\n              // renders the real, completed gate history instead -- history,\n              // not a question. Making gate questions durably visible to a\n              // remote client while still open is a real architecture gap,\n              // out of this item's own scope.\n              <div data-testid=\"gate-history\" className=\"mt-3 border-t border-border pt-3\">\n                <h3 className=\"text-xs font-semibold text-ink\">Gate history</h3>\n                <ul className=\"mt-1 space-y-1 text-xs text-ink-muted\">\n                  {gateHistory.map(([name, record]) => (\n                    <li key={name} data-testid={`gate-history-${name}`}>\n                      {name} · {record.actor} · {record.at}\n                    </li>\n                  ))}\n                </ul>\n              </div>\n            )}\n          </div>\n\n          <div data-testid=\"timeline-region\" className=\"rounded-xl border border-border bg-surface p-5\">\n            <h3 className=\"mb-2 text-sm font-semibold text-ink\">Conversation history</h3>\n            {hiddenRoundCount > 0 && (\n              <button\n                data-testid=\"timeline-show-earlier\"\n                onClick={() => setShowEarlierRounds(true)}\n                className=\"mb-2 text-xs font-medium text-brand hover:underline\"\n              >\n                show {hiddenRoundCount} earlier round{hiddenRoundCount === 1 ? '' : 's'}\n              </button>\n            )}\n            <div className=\"space-y-3\">\n              {visibleRounds.map((round, i) => (\n                <div key={i} data-testid={`round-${i}`} className=\"border-l-2 border-border pl-3\">\n                  <p className=\"text-sm text-ink\">Q {round.question}</p>\n                  <p data-testid={`round-${i}-answer`} className=\"mt-1 text-sm text-ink-muted\">\n                    {round.answer !== null ? `A ${round.answer}` : 'A — waiting'}\n                  </p>\n                </div>\n              ))}\n            </div>\n          </div>\n        </div>\n      </div>\n\n      <div\n        data-testid=\"actions-region\"\n        className=\"fixed inset-x-0 bottom-0 flex items-center justify-between border-t border-border bg-surface px-6 py-3\"\n      >\n        <div className=\"flex items-center gap-2\">\n          <button\n            data-testid=\"action-edit\"\n            onClick={() => setShowEditPlaceholder(true)}\n            className=\"rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-ink\"\n          >\n            Edit\n          </button>\n          <button\n            data-testid=\"action-retire\"\n            onClick={retire}\n            disabled={stale}\n            className=\"rounded-lg border border-danger px-3 py-1.5 text-sm font-medium text-danger disabled:cursor-not-allowed disabled:opacity-40\"\n          >\n            Retire\n          </button>\n          {approveError && (\n            <span data-testid=\"approve-error\" className=\"text-xs text-danger\">\n              {approveError}\n            </span>\n          )}\n        </div>\n        <button\n          data-testid=\"action-approve-merge\"\n          onClick={approveMerge}\n          disabled={!canApprove || stale}\n          className=\"flex items-center gap-1.5 rounded-lg bg-brand px-4 py-1.5 text-sm font-semibold text-brand-contrast disabled:cursor-not-allowed disabled:opacity-40\"\n        >\n          Approve merge <span title=\"The only control on this client that changes trunk.\">ⓘ</span>\n        </button>\n      </div>\n\n      {showEditPlaceholder && (\n        // M03 (docs/ui-spec/modals/M03-add-edit-item.md) is not owned by\n        // any item in this cluster's current run -- same placeholder\n        // pattern tsk-5jr's Taskboard already uses for the same reason.\n        // tsk-41h's PATCH /work/{id} exists to support M03 once it is\n        // built; this item does not build M03 itself.\n        <div data-testid=\"edit-placeholder\" role=\"dialog\" className=\"fixed inset-0 flex items-center justify-center bg-ink/20\">\n          <div className=\"rounded-xl border border-border bg-surface p-6 shadow-lg\">\n            Edit item — coming soon.\n            <button\n              data-testid=\"edit-placeholder-close\"\n              onClick={() => setShowEditPlaceholder(false)}\n              className=\"ml-3 rounded-md border border-border px-2 py-1 text-xs font-medium\"\n            >\n              Close\n            </button>\n          </div>\n        </div>\n      )}\n    </div>\n  )\n}\n\n// tsk-4id (D4 of docs/history/herdr-web-dashboard/CONTEXT.md): \"needs\n// answer\" covers BOTH the ask channel AND the gate-approve channel. This\n// item's own detail screen only ever shows the ask channel's live\n// question (`gates.ask`, present exactly when `status === 'awaiting-\n// human'`) -- a gate-approve park (`status === 'awaiting-approval'`) has\n// no free-text question to show here at all (`gates.contextApprove`/\n// `planApprove`/`validateApprove` are `{actor, at, verify}` records, not\n// questions); S04 (NeedsAnswer.tsx) is where both channels are unified\n// into one list, per its own spec.\nexport { NEEDS_ANSWER_STATUSES }\n",
+      "record": {
+        "file": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "66493b27c3dede73be383d786cf5342ed7770fad9a9bbbf982adac0e01b6056e",
+        "digest": "66493b27c3dede73be383d786cf5342ed7770fad9a9bbbf982adac0e01b6056e",
+        "inventoryEdgeIds": [
+          "class6-l-000072",
+          "class6-l-000073",
+          "class6-l-000074",
+          "class6-l-000075"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000072",
+            "slotKey": "{\"edgeId\":\"class6-l-000072\",\"file\":\"apps/fgos-gateway/web/src/screens/TaskDetail.tsx\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000072\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":9}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000072",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 9
+              }
+            ],
+            "consumerFile": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 9,
+                "columnStart": 23,
+                "columnEndExclusive": 62,
+                "text": "docs/ui-spec/screens/S03-task-detail.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 9,
+                "columnStart": 23,
+                "columnEndExclusive": 62,
+                "text": "docs/ui-spec/screens/S03-task-detail.md"
+              }
+            ],
+            "matchedExpression": "docs/ui-spec/screens/S03-task-detail.md",
+            "logicalReference": "docs/ui-spec/screens/S03-task-detail.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Retained native path, literal example or captured contract reference stays literal. Own source passage: '// S03 — Task detail (docs/ui-spec/screens/S03-task-detail.md). \"The core'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/ui-spec/screens/S03-task-detail.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000072",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 9,
+                "matchedExpression": "docs/ui-spec/screens/S03-task-detail.md",
+                "originalLineText": "// S03 — Task detail (docs/ui-spec/screens/S03-task-detail.md). \"The core"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000073",
+            "slotKey": "{\"edgeId\":\"class6-l-000073\",\"file\":\"apps/fgos-gateway/web/src/screens/TaskDetail.tsx\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000073\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":209}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000073",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 209
+              }
+            ],
+            "consumerFile": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 209,
+                "columnStart": 11,
+                "columnEndExclusive": 54,
+                "text": "docs/history/herdr-web-dashboard/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 209,
+                "columnStart": 11,
+                "columnEndExclusive": 54,
+                "text": "docs/history/herdr-web-dashboard/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/herdr-web-dashboard/CONTEXT.md",
+            "logicalReference": "docs/history/herdr-web-dashboard/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '  // D17 (docs/history/herdr-web-dashboard/CONTEXT.md): the classification'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/herdr-web-dashboard/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000073",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 209,
+                "matchedExpression": "docs/history/herdr-web-dashboard/CONTEXT.md",
+                "originalLineText": "  // D17 (docs/history/herdr-web-dashboard/CONTEXT.md): the classification"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000074",
+            "slotKey": "{\"edgeId\":\"class6-l-000074\",\"file\":\"apps/fgos-gateway/web/src/screens/TaskDetail.tsx\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000074\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":487}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000074",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 487
+              }
+            ],
+            "consumerFile": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 487,
+                "columnStart": 17,
+                "columnEndExclusive": 57,
+                "text": "docs/ui-spec/modals/M03-add-edit-item.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 487,
+                "columnStart": 17,
+                "columnEndExclusive": 57,
+                "text": "docs/ui-spec/modals/M03-add-edit-item.md"
+              }
+            ],
+            "matchedExpression": "docs/ui-spec/modals/M03-add-edit-item.md",
+            "logicalReference": "docs/ui-spec/modals/M03-add-edit-item.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Retained native path, literal example or captured contract reference stays literal. Own source passage: '        // M03 (docs/ui-spec/modals/M03-add-edit-item.md) is not owned by'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/ui-spec/modals/M03-add-edit-item.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000074",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 487,
+                "matchedExpression": "docs/ui-spec/modals/M03-add-edit-item.md",
+                "originalLineText": "        // M03 (docs/ui-spec/modals/M03-add-edit-item.md) is not owned by"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000075",
+            "slotKey": "{\"edgeId\":\"class6-l-000075\",\"file\":\"apps/fgos-gateway/web/src/screens/TaskDetail.tsx\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000075\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":509}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000075",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 509
+              }
+            ],
+            "consumerFile": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 509,
+                "columnStart": 19,
+                "columnEndExclusive": 62,
+                "text": "docs/history/herdr-web-dashboard/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 509,
+                "columnStart": 19,
+                "columnEndExclusive": 62,
+                "text": "docs/history/herdr-web-dashboard/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/herdr-web-dashboard/CONTEXT.md",
+            "logicalReference": "docs/history/herdr-web-dashboard/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '// tsk-4id (D4 of docs/history/herdr-web-dashboard/CONTEXT.md): \"needs'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/herdr-web-dashboard/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000075",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 509,
+                "matchedExpression": "docs/history/herdr-web-dashboard/CONTEXT.md",
+                "originalLineText": "// tsk-4id (D4 of docs/history/herdr-web-dashboard/CONTEXT.md): \"needs"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-012",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58",
+          "L12-60"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "66493b27c3dede73be383d786cf5342ed7770fad9a9bbbf982adac0e01b6056e",
+          "bytes": 21906,
+          "lines": 518,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetEvidence": {},
+      "renderContexts": {},
+      "populationGapFindings": [],
+      "L12-60-coverage": {
+        "stepFiveExcluded": [],
+        "authorAddedSlots": [],
+        "recordChangedThisTurn": true
+      },
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "sourceDigest": "c9716c0cb1e719e2e3701dd494cf3265c4512cd544813a72180eca7624d8611b",
+      "sourceContext": "import { useEffect, useMemo, useRef, useState } from 'react'\nimport type { ApiClient } from '../api/client'\nimport { GatewayUnreachableError } from '../api/errors'\nimport { pollStateDigest } from '../api/poll'\nimport type { WorkItem } from '../api/types'\nimport { hostOf, isNonLoopbackHost } from '../lib/network'\nimport { statusColor } from '../lib/status'\n\n// S02 — Taskboard (docs/ui-spec/screens/S02-taskboard.md). Statuses that\n// belong in the \"needs answer\" rail regardless of which group-by is\n// active on the board -- a cross-cutting subset, not a board group of its\n// own (Layout: the rail is pinned separately from whatever the board is\n// currently grouped by).\nconst NEEDS_ANSWER_STATUSES = new Set(['awaiting-human', 'awaiting-approval'])\n\nconst COLLAPSE_STORAGE_PREFIX = 'herdr-taskboard-collapsed:'\n// D16 (docs/history/herdr-web-dashboard/CONTEXT.md): group view and\n// kanban view are the same status-grouped data, two renderings -- the\n// choice is a reading preference, remembered like collapse state.\nconst VIEW_STORAGE_KEY = 'herdr-taskboard-view'\ntype BoardView = 'group' | 'kanban'\n\nfunction readCollapsed(group: string): boolean {\n  try {\n    return window.localStorage.getItem(COLLAPSE_STORAGE_PREFIX + group) === '1'\n  } catch {\n    return false\n  }\n}\n\nfunction writeCollapsed(group: string, collapsed: boolean): void {\n  try {\n    if (collapsed) window.localStorage.setItem(COLLAPSE_STORAGE_PREFIX + group, '1')\n    else window.localStorage.removeItem(COLLAPSE_STORAGE_PREFIX + group)\n  } catch {\n    // best-effort only -- a person losing remembered collapse state across\n    // reloads is not worth failing the board over.\n  }\n}\n\nfunction readBoardView(): BoardView {\n  try {\n    return window.localStorage.getItem(VIEW_STORAGE_KEY) === 'kanban' ? 'kanban' : 'group'\n  } catch {\n    return 'group'\n  }\n}\n\nfunction writeBoardView(view: BoardView): void {\n  try {\n    window.localStorage.setItem(VIEW_STORAGE_KEY, view)\n  } catch {\n    // best-effort only, same as collapse state.\n  }\n}\n\nfunction isPresent(value: string | undefined): value is string {\n  return value !== undefined && value !== '';\n}\n\nexport interface TaskboardProps {\n  client: ApiClient\n  baseUrl: string\n  onSelectItem: (id: string) => void\n  // A-S02-006 (S02-taskboard.md): a rail entry click navigates to S04\n  // (the needs-answer LIST), not directly to S03 -- optional, falling\n  // back to `onSelectItem` when unset, so a caller not yet wired for S04\n  // (or an existing test) keeps its prior behavior unchanged.\n  onOpenNeedsAnswer?: () => void\n  pollIntervalMs?: number\n}\n\nexport function Taskboard({ client, baseUrl, onSelectItem, onOpenNeedsAnswer, pollIntervalMs = 5000 }: TaskboardProps) {\n  const [items, setItems] = useState<Record<string, WorkItem> | null>(null)\n  const [loading, setLoading] = useState(true)\n  // ST-DISCONNECTED (area spec Edge Cases / 30-states-and-errors.md):\n  // gateway unreachable marks existing data stale IN PLACE -- `items`\n  // itself is never cleared on a failed fetch.\n  const [stale, setStale] = useState(false)\n  const [stageFilter, setStageFilter] = useState('')\n  const [riskFilter, setRiskFilter] = useState('')\n  const [collapsedOverrides, setCollapsedOverrides] = useState<Record<string, boolean>>({})\n  const [showAddPlaceholder, setShowAddPlaceholder] = useState(false)\n  const [boardView, setBoardView] = useState<BoardView>(readBoardView)\n  const [dragOverColumn, setDragOverColumn] = useState<string | null>(null)\n  const lastDigestRef = useRef<string | undefined>(undefined)\n\n  async function fetchBoard(): Promise<void> {\n    try {\n      const data = await client.listWork({ all: true })\n      setItems(data.work)\n      setStale(false)\n    } catch (err) {\n      if (err instanceof GatewayUnreachableError) {\n        setStale(true)\n        return\n      }\n      throw err\n    } finally {\n      setLoading(false)\n    }\n  }\n\n  useEffect(() => {\n    let cancelled = false\n    fetchBoard()\n    // Seed the digest baseline so the FIRST scheduled poll tick can\n    // correctly detect \"unchanged\" -- pollStateDigest's own contract\n    // treats an undefined previous hash as always-changed (there is\n    // nothing to compare against yet), which is right for a caller that\n    // has never polled before but wrong here: fetchBoard() above already\n    // loaded the current data, so the first tick must compare against\n    // THIS moment's digest, not treat itself as the first poll ever.\n    client\n      .stateDigest()\n      .then((digest) => {\n        if (!cancelled) lastDigestRef.current = digest.data_hash\n      })\n      .catch(() => {\n        // A failed seed just means the first real tick falls back to\n        // pollStateDigest's own always-changed default -- one possibly\n        // redundant refetch, never a crash.\n      })\n    const interval = setInterval(() => {\n      pollStateDigest(client, lastDigestRef.current)\n        .then((result) => {\n          if (cancelled) return\n          lastDigestRef.current = result.dataHash\n          if (result.changed) return fetchBoard()\n        })\n        .catch((err) => {\n          if (cancelled) return\n          if (err instanceof GatewayUnreachableError) setStale(true)\n        })\n    }, pollIntervalMs)\n    return () => {\n      cancelled = true\n      clearInterval(interval)\n    }\n    // eslint-disable-next-line react-hooks/exhaustive-deps\n  }, [client, pollIntervalMs])\n\n  function retry(): void {\n    setLoading(true)\n    fetchBoard()\n  }\n\n  function toggleGroup(group: string): void {\n    setCollapsedOverrides((prev) => {\n      const current = prev[group] ?? readCollapsed(group)\n      const next = { ...prev, [group]: !current }\n      writeCollapsed(group, next[group])\n      return next\n    })\n  }\n\n  function isGroupCollapsed(group: string): boolean {\n    return collapsedOverrides[group] ?? readCollapsed(group)\n  }\n\n  function clearFilters(): void {\n    setStageFilter('')\n    setRiskFilter('')\n  }\n\n  function switchView(view: BoardView): void {\n    setBoardView(view)\n    writeBoardView(view)\n  }\n\n  // A-S02-013: drag-drop in kanban view runs the SAME one-door-write verb\n  // a card's quick action would (moveWork) -- never a client-side status\n  // edit. A failed move (e.g. an illegal FSM transition) just leaves the\n  // board to refresh from the real state on the next poll tick, same as\n  // any other write rejection this screen already doesn't special-case.\n  async function dropOnColumn(itemId: string, toStatus: string): Promise<void> {\n    setDragOverColumn(null)\n    try {\n      await client.moveWork(itemId, toStatus)\n      await fetchBoard()\n    } catch (err) {\n      if (err instanceof GatewayUnreachableError) setStale(true)\n    }\n  }\n\n  const allItems = useMemo(() => (items ? Object.values(items) : []), [items])\n\n  const needsAnswer = useMemo(() => allItems.filter((item) => NEEDS_ANSWER_STATUSES.has(item.status)), [allItems]);\n\n  const filtered = useMemo(\n    () => allItems.filter((item) => (!stageFilter || item.workflowStep === stageFilter) && (!riskFilter || item.risk === riskFilter)),\n    [allItems, stageFilter, riskFilter],\n  )\n\n  const groups = useMemo(() => {\n    const byStatus = new Map<string, WorkItem[]>()\n    for (const item of filtered) {\n      const bucket = byStatus.get(item.status) ?? []\n      bucket.push(item)\n      byStatus.set(item.status, bucket)\n    }\n    return [...byStatus.entries()].sort(([a], [b]) => a.localeCompare(b))\n  }, [filtered])\n\n  const stages = useMemo(() => [...new Set(allItems.map((i) => i.workflowStep).filter(isPresent))], [allItems])\n  const risks = useMemo(() => [...new Set(allItems.map((i) => i.risk).filter(isPresent))], [allItems])\n\n  const exposed = isNonLoopbackHost(baseUrl)\n  const filtersActive = stageFilter !== '' || riskFilter !== ''\n\n  function ItemCard({ item }: { item: WorkItem }) {\n    const color = statusColor(item.status)\n    return (\n      <div\n        data-testid={`card-${item.id}`}\n        draggable={boardView === 'kanban'}\n        onDragStart={(e) => e.dataTransfer.setData('text/plain', item.id)}\n        onClick={() => onSelectItem(item.id)}\n        className=\"group cursor-pointer rounded-lg border border-border bg-surface p-3 shadow-sm transition hover:border-brand/40 hover:shadow\"\n      >\n        <div className=\"mb-1 flex items-start justify-between gap-2\">\n          <span className=\"font-mono text-xs text-ink-muted\">{item.id}</span>\n          <span className=\"text-ink-muted opacity-0 transition group-hover:opacity-100\">⋯</span>\n        </div>\n        <p className=\"text-sm font-medium text-ink\">{item.title}</p>\n        <div className=\"mt-2 flex flex-wrap items-center gap-1.5\">\n          <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${color.bg} ${color.text}`}>\n            {item.status}\n          </span>\n          {item.workflowStep && (\n            <span className=\"text-xs text-ink-muted\">\n              {item.workflowStep}\n            </span>\n          )}\n        </div>\n      </div>\n    )\n  }\n\n  return (\n    <div className=\"min-h-svh bg-bg\">\n      <div data-testid=\"topbar\" className=\"flex items-center justify-between border-b border-border bg-surface px-6 py-3\">\n        <h1 className=\"font-mono text-lg font-bold text-brand\">herdr</h1>\n        <div className=\"flex items-center gap-3 text-sm text-ink-muted\">\n          <span data-testid=\"gateway-indicator\">{hostOf(baseUrl)}</span>\n          {exposed && (\n            <span\n              data-testid=\"exposure-warning\"\n              className=\"rounded-full bg-status-needs-answer-bg px-2.5 py-1 text-xs font-medium text-status-needs-answer\"\n            >\n              ⚠ reachable on network\n            </span>\n          )}\n        </div>\n      </div>\n\n      <div data-testid=\"controls\" className=\"flex flex-wrap items-center gap-3 border-b border-border bg-surface px-6 py-3\">\n        <select\n          data-testid=\"stage-filter\"\n          value={stageFilter}\n          onChange={(e) => setStageFilter(e.target.value)}\n          className=\"rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-ink\"\n        >\n          <option value=\"\">All stages</option>\n          {stages.map((s) => (\n            <option key={s} value={s}>\n              {s}\n            </option>\n          ))}\n        </select>\n        <select\n          data-testid=\"risk-filter\"\n          value={riskFilter}\n          onChange={(e) => setRiskFilter(e.target.value)}\n          className=\"rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-ink\"\n        >\n          <option value=\"\">All risks</option>\n          {risks.map((r) => (\n            <option key={r} value={r}>\n              {r}\n            </option>\n          ))}\n        </select>\n\n        <div className=\"flex items-center gap-0.5 rounded-lg border border-border bg-surface-muted p-0.5\" role=\"group\" aria-label=\"Board view\">\n          <button\n            type=\"button\"\n            data-testid=\"view-toggle-group\"\n            aria-pressed={boardView === 'group'}\n            onClick={() => switchView('group')}\n            className={`rounded-md px-2 py-1 text-xs font-medium transition ${\n              boardView === 'group' ? 'bg-surface text-brand shadow-sm' : 'text-ink-muted'\n            }`}\n          >\n            ▤ List\n          </button>\n          <button\n            type=\"button\"\n            data-testid=\"view-toggle-kanban\"\n            aria-pressed={boardView === 'kanban'}\n            onClick={() => switchView('kanban')}\n            className={`rounded-md px-2 py-1 text-xs font-medium transition ${\n              boardView === 'kanban' ? 'bg-surface text-brand shadow-sm' : 'text-ink-muted'\n            }`}\n          >\n            ▥ Board\n          </button>\n        </div>\n\n        <button\n          data-testid=\"add-item-button\"\n          onClick={() => setShowAddPlaceholder(true)}\n          className=\"ml-auto rounded-lg bg-brand px-3 py-1.5 text-sm font-semibold text-brand-contrast transition hover:bg-brand-dark\"\n        >\n          + Add\n        </button>\n      </div>\n\n      {stale && (\n        <div data-testid=\"disconnected-banner\" className=\"flex items-center gap-3 bg-danger-bg px-6 py-2 text-sm text-danger\">\n          Gateway unreachable — showing last known data.\n          <button data-testid=\"retry-button\" onClick={retry} className=\"rounded-md border border-danger px-2 py-0.5 text-xs font-medium\">\n            Retry\n          </button>\n        </div>\n      )}\n\n      {loading && (\n        <div data-testid=\"loading-skeleton\" className=\"p-6 text-sm text-ink-muted\">\n          Loading…\n        </div>\n      )}\n\n      {!loading && allItems.length === 0 && (\n        <div data-testid=\"empty-board\" className=\"p-6 text-sm text-ink-muted\">\n          No work items yet.\n        </div>\n      )}\n\n      {!loading && allItems.length > 0 && filtered.length === 0 && (\n        <div data-testid=\"empty-filter\" className=\"flex items-center gap-3 p-6 text-sm text-ink-muted\">\n          No items match the active filter (stage: {stageFilter || '—'}, risk: {riskFilter || '—'}).\n          <button data-testid=\"clear-filter\" onClick={clearFilters} className=\"rounded-md border border-border px-2 py-0.5 text-xs font-medium\">\n            Clear filter\n          </button>\n        </div>\n      )}\n\n      <div className=\"flex items-start gap-6 p-6\">\n        {boardView === 'group' ? (\n          <div data-testid=\"board\" className=\"flex-1 space-y-4\">\n            {groups.map(([status, groupItems]) => {\n              const color = statusColor(status)\n              const collapsed = isGroupCollapsed(status)\n              return (\n                <div key={status} data-testid={`group-${status}`} className=\"overflow-hidden rounded-lg border border-border\">\n                  <h3\n                    data-testid={`group-header-${status}`}\n                    onClick={() => toggleGroup(status)}\n                    className={`flex cursor-pointer items-center gap-2 border-l-4 ${color.barBorder} bg-surface px-4 py-2 text-sm font-semibold text-ink`}\n                  >\n                    <span>{collapsed ? '▸' : '▾'}</span>\n                    {status} · {groupItems.length}\n                  </h3>\n                  {!collapsed && (\n                    <div className=\"space-y-2 bg-bg p-3\">\n                      {groupItems.map((item) => (\n                        <ItemCard key={item.id} item={item} />\n                      ))}\n                    </div>\n                  )}\n                </div>\n              )\n            })}\n          </div>\n        ) : (\n          <div data-testid=\"board-kanban\" className=\"flex flex-1 gap-4 overflow-x-auto\">\n            {groups.map(([status, groupItems]) => {\n              const color = statusColor(status)\n              return (\n                <div\n                  key={status}\n                  data-testid={`kanban-column-${status}`}\n                  onDragOver={(e) => {\n                    e.preventDefault()\n                    setDragOverColumn(status)\n                  }}\n                  onDragLeave={() => setDragOverColumn((prev) => (prev === status ? null : prev))}\n                  onDrop={(e) => {\n                    e.preventDefault()\n                    const id = e.dataTransfer.getData('text/plain')\n                    if (id) dropOnColumn(id, status)\n                  }}\n                  className={`w-64 shrink-0 overflow-hidden rounded-lg border ${\n                    dragOverColumn === status ? 'border-brand' : 'border-border'\n                  }`}\n                >\n                  <h3 className={`border-t-4 ${color.bar} bg-surface px-3 py-2 text-sm font-semibold text-ink`}>\n                    {status} · {groupItems.length}\n                  </h3>\n                  <div className=\"min-h-[2rem] space-y-2 bg-bg p-2\">\n                    {groupItems.map((item) => (\n                      <ItemCard key={item.id} item={item} />\n                    ))}\n                  </div>\n                </div>\n              )\n            })}\n          </div>\n        )}\n\n        <div data-testid=\"needs-answer-rail\" className=\"w-72 shrink-0 rounded-lg border border-status-needs-answer-bg bg-status-needs-answer-bg/40 p-3\">\n          <h3 className=\"mb-2 text-sm font-semibold text-status-needs-answer\">Needs answer · {needsAnswer.length}</h3>\n          <div className=\"space-y-2\">\n            {needsAnswer.map((item) => (\n              <div\n                key={item.id}\n                data-testid={`rail-item-${item.id}`}\n                onClick={() => (onOpenNeedsAnswer ? onOpenNeedsAnswer() : onSelectItem(item.id))}\n                className=\"cursor-pointer rounded-lg border border-border bg-surface p-2.5 text-sm shadow-sm\"\n              >\n                <span className=\"font-mono text-xs text-ink-muted\">{item.id}</span>\n                <p className=\"text-ink\">{item.title}</p>\n              </div>\n            ))}\n          </div>\n        </div>\n      </div>\n\n      {filtersActive && (\n        <div className=\"px-6 pb-4\">\n          <button data-testid=\"clear-filters-controls\" onClick={clearFilters} className=\"rounded-md border border-border px-2 py-1 text-xs font-medium\">\n            Clear filters\n          </button>\n        </div>\n      )}\n\n      {showAddPlaceholder && (\n        // M03 (docs/ui-spec/modals/M03-add-edit-item.md) is not owned by\n        // any item in this cluster's current run -- see plan.md's own\n        // \"NẮN LẠI P3 tsk-5jr\" section. A minimal placeholder keeps\n        // A-S02-002 a real interaction instead of a dead button.\n        <div data-testid=\"add-item-placeholder\" role=\"dialog\" className=\"fixed inset-0 flex items-center justify-center bg-ink/20\">\n          <div className=\"rounded-xl border border-border bg-surface p-6 shadow-lg\">\n            Add item — coming soon.\n            <button data-testid=\"add-item-placeholder-close\" onClick={() => setShowAddPlaceholder(false)} className=\"ml-3 rounded-md border border-border px-2 py-1 text-xs font-medium\">\n              Close\n            </button>\n          </div>\n        </div>\n      )}\n    </div>\n  )\n}\n",
+      "record": {
+        "file": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "c9716c0cb1e719e2e3701dd494cf3265c4512cd544813a72180eca7624d8611b",
+        "digest": "c9716c0cb1e719e2e3701dd494cf3265c4512cd544813a72180eca7624d8611b",
+        "inventoryEdgeIds": [
+          "class6-l-000076",
+          "class6-l-000077",
+          "class6-l-000078"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000076",
+            "slotKey": "{\"edgeId\":\"class6-l-000076\",\"file\":\"apps/fgos-gateway/web/src/screens/Taskboard.tsx\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000076\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":9}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000076",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 9
+              }
+            ],
+            "consumerFile": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 9,
+                "columnStart": 21,
+                "columnEndExclusive": 58,
+                "text": "docs/ui-spec/screens/S02-taskboard.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 9,
+                "columnStart": 21,
+                "columnEndExclusive": 58,
+                "text": "docs/ui-spec/screens/S02-taskboard.md"
+              }
+            ],
+            "matchedExpression": "docs/ui-spec/screens/S02-taskboard.md",
+            "logicalReference": "docs/ui-spec/screens/S02-taskboard.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Retained native path, literal example or captured contract reference stays literal. Own source passage: '// S02 — Taskboard (docs/ui-spec/screens/S02-taskboard.md). Statuses that'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/ui-spec/screens/S02-taskboard.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000076",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 9,
+                "matchedExpression": "docs/ui-spec/screens/S02-taskboard.md",
+                "originalLineText": "// S02 — Taskboard (docs/ui-spec/screens/S02-taskboard.md). Statuses that"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000077",
+            "slotKey": "{\"edgeId\":\"class6-l-000077\",\"file\":\"apps/fgos-gateway/web/src/screens/Taskboard.tsx\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000077\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":17}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000077",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 17
+              }
+            ],
+            "consumerFile": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 17,
+                "columnStart": 9,
+                "columnEndExclusive": 52,
+                "text": "docs/history/herdr-web-dashboard/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 17,
+                "columnStart": 9,
+                "columnEndExclusive": 52,
+                "text": "docs/history/herdr-web-dashboard/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/herdr-web-dashboard/CONTEXT.md",
+            "logicalReference": "docs/history/herdr-web-dashboard/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '// D16 (docs/history/herdr-web-dashboard/CONTEXT.md): group view and'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/herdr-web-dashboard/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000077",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 17,
+                "matchedExpression": "docs/history/herdr-web-dashboard/CONTEXT.md",
+                "originalLineText": "// D16 (docs/history/herdr-web-dashboard/CONTEXT.md): group view and"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000078",
+            "slotKey": "{\"edgeId\":\"class6-l-000078\",\"file\":\"apps/fgos-gateway/web/src/screens/Taskboard.tsx\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000078\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":439}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000078",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 439
+              }
+            ],
+            "consumerFile": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 439,
+                "columnStart": 17,
+                "columnEndExclusive": 57,
+                "text": "docs/ui-spec/modals/M03-add-edit-item.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 439,
+                "columnStart": 17,
+                "columnEndExclusive": 57,
+                "text": "docs/ui-spec/modals/M03-add-edit-item.md"
+              }
+            ],
+            "matchedExpression": "docs/ui-spec/modals/M03-add-edit-item.md",
+            "logicalReference": "docs/ui-spec/modals/M03-add-edit-item.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Retained native path, literal example or captured contract reference stays literal. Own source passage: '        // M03 (docs/ui-spec/modals/M03-add-edit-item.md) is not owned by'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/ui-spec/modals/M03-add-edit-item.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000078",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 439,
+                "matchedExpression": "docs/ui-spec/modals/M03-add-edit-item.md",
+                "originalLineText": "        // M03 (docs/ui-spec/modals/M03-add-edit-item.md) is not owned by"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-012",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58",
+          "L12-60"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "c9716c0cb1e719e2e3701dd494cf3265c4512cd544813a72180eca7624d8611b",
+          "bytes": 18023,
+          "lines": 454,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetEvidence": {},
+      "renderContexts": {},
+      "populationGapFindings": [],
+      "L12-60-coverage": {
+        "stepFiveExcluded": [],
+        "authorAddedSlots": [],
+        "recordChangedThisTurn": true
+      },
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    }
+  ]
+}

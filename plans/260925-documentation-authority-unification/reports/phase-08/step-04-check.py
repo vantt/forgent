@@ -8,7 +8,8 @@ sys.dont_write_bytecode=True
 import importlib.util,json,pathlib,collections,re,copy,argparse,subprocess,tempfile,math,functools
 P=pathlib.Path(__file__).resolve().parent
 s=importlib.util.spec_from_file_location('step03',P/'step-03-check.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m)
-PIN='ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e'
+PIN='dc24ce64527fbffd23e1643f35a7ddf808fd7b45'
+zs=importlib.util.spec_from_file_location('sweep_lib',P/'step-04-l12-60-lib.py');z=importlib.util.module_from_spec(zs);zs.loader.exec_module(z)
 _original_carriage=m.resolver.carriage
 @functools.lru_cache(None)
 def step4_carriage(body,line,path=''):
@@ -31,13 +32,13 @@ def slotkey(x):
  key={'file':x['file'],'edgeId':x['edgeId'],'inventoryRefs':x['inventoryRefs']}
  if x.get('supplementalOccurrenceKey'):key['supplementalOccurrenceKey']=x['supplementalOccurrenceKey']
  return canon(key)
-POP=read('step-04-population.json');BATCHES=read('step-04-batches.json')['batches'];PROV=read('step-04-source-render-provenance.json')
+POP=read('step-04-population.json');BATCHES=copy.deepcopy(read('step-04-batches.json')['batches']);PROV=read('step-04-source-render-provenance.json')
 ROWS={slotkey(r):r for r in POP['rows'] if r['bucket']=='step4'}
 # Supplemental occurrences are NOT accepted census ids. Keep the exact frozen
 # tuple and an explicit pending admission blocker, never mint an edge identity.
 for gap in read('step-04-batches.json')['mainMergeSupplement']['groups']:
  rows=[r for r in POP['rows'] if r['bucket']=='step4' and r['file'] in gap['files']]
- BATCHES.append({**gap,'consumerFiles':gap['files'],'edgeRefs':[{k:r[k] for k in ('file','edgeId','inventoryRefs','supplementalOccurrenceKey')} for r in rows],'mandatoryFiles':gap['files'],'pendingCensusAdmission':True})
+ BATCHES.append({**gap,'consumerFiles':gap['files'],'edgeRefs':[{k:r[k] for k in ('file','edgeId','inventoryRefs','supplementalOccurrenceKey') if k in r} for r in rows],'mandatoryFiles':gap['files'],'pendingCensusAdmission':False})
 
 def inventory_occurrences(edge):
  result=[]
@@ -56,6 +57,7 @@ def record_owner(row):
  return owner(row['sourceOwner'])
 def isrender(row):return row['file']!=record_owner(row)
 def spans(row):
+ if row.get('currentSpans'):return row['currentSpans']
  b=row['binding'];txt=m.blob(PIN,row['file']).decode();ls=txt.splitlines()
  if 'line' in b:
   return [{k:b[k] for k in ('line','columnStart','columnEndExclusive','text')}]
@@ -85,6 +87,8 @@ def provenance(file):
    for e in r.get('existingEdgeJoins',[]):
     hits=[x for x in POP['rows'] if x['file']==r['path'] and x['edgeId']==e['edgeId']]
     if len(hits)==1:e['sourceSpan']=hits[0]['binding']
+   if r['path'].startswith('.claude/skills/') and 'generated thin wrapper' in m.blob(PIN,r['path']).decode():
+    r['generatorDoor']='npm run build:skills';r['wrapperProvenance']='L12-60(6): thin wrappers are build:skills outputs.'
   out.append(k)
  if file=='core/skills/_shared/ak-cook-worker-contract.md':
   source=m.blob(PIN,file);renders=[]
@@ -92,7 +96,7 @@ def provenance(file):
    data=m.blob(PIN,path);header,body=data.split(b'\n',1)
    assert body==source and b'core/skills/_shared/ak-cook-worker-contract.md' in header
    renders.append({'path':path,'digest':m.sha(data),'sourceDigest':m.sha(source),'renderOnly':True,'headerWitness':{'line':1,'text':header.decode()},'spanCorrespondence':{'sourceLine':6,'renderLine':7,'text':'docs/specs/runner.md'},'bodyEqualsSource':True})
-  out.append({'sourcePath':file,'sourceDigest':m.sha(source),'renderFiles':renders,'generatorDoor':'npm run build:skills','determinismReceipt':None,'installedPackageLimit':'Repo bytes only; no build, determinism or installed-link proof claimed','censusAdmission':'pending Lead; exact supplemental tuples only'})
+  out.append({'sourcePath':file,'sourceDigest':m.sha(source),'renderFiles':renders,'generatorDoor':'npm run build:skills','determinismReceipt':None,'installedPackageLimit':'Repo bytes only; no build, determinism or installed-link proof claimed','censusAdmission':'L12-60(7): first-class supplemental tuples; no Step 2 id minted'})
  return out
 
 def selection(rs,batch):
@@ -117,6 +121,29 @@ def selection(rs,batch):
  selected=sorted(set(sample+usample+[x['file'] for x in mandatory]))
  return {'set':batch['batch'],'seed':seed,'population':pop,'ranks':ranks,'sample':sample,'unpatchedSeed':useed,'unpatchedRanks':empty,'unpatchedSample':usample,'mandatoryWitnesses':mandatory,'selected':selected,'reviewedFiles':[],'reworkNumerator':None,'reworkDenominator':None,'reviewStatus':'pending Lead-started independent review; >3% expands to every file in this set'}
 
+def park_own_quote(e,before):
+ passage=m.resolver.passage(before,e['sourceSpans']);context=m.adjacent_passage(before,e['sourceSpans'])
+ quote=e.get('parkSourceQuote');assert quote and quote==passage and quote in context,'quoted passage absent from own source context'
+ # Every human-facing blocker/dependency/witness assessment carries THIS source quote.
+ marker='Own source passage: '+repr(quote)
+ for text in [e['reason'],e['blockedReason'],e['dependency'],e['searchWitness']['assessment']]:assert marker in text,'own passage missing or copied'
+ return True
+
+def census_coverage(r):
+ files={r['file']}|{e['consumerFile'] for e in r['edges']}|{x['path'] for j in r['sourceRenderProvenance'] for x in j['renderFiles']}
+ assert isinstance(r.get('stepFiveExcluded'),list),'missing explicit Step 5 exclusion list'
+ excluded={(v['inventory'],v['consumerFile'],v['edgeId']):v for v in r['stepFiveExcluded'] if v.get('inventory')}
+ joined={(v['inventory'],e['consumerFile'],v['edgeId']) for e in r['edges'] for v in e['inventoryRefs']}
+ for x in z.inventories():
+  if x['file'] not in files:continue
+  key=(x['inventory'],x['file'],x['edgeId'])
+  if key in joined:continue
+  assert key in excluded,'unslotted census edge: '+str(key)
+  v=excluded[key]
+  if x['inventory'].startswith('step-02l') and z.prose_file(x['file']):assert z.fence_at(m.blob(PIN,x['file']).decode(),v['sourceSpans'][0]['line']) or 'managed instruction projection' in v['reason'],'prose census edge may not be hidden in Step 5: '+str(key)
+  assert v['reason'] and v['inputCommit']==x['inputCommit'] and v['sourceSpans']==z.relocate(x['inputCommit'],PIN,x['file'],x['spans']),'invalid exclusion witness: '+str(key)
+ return True
+
 class Checker:
  def __init__(self):
   self.tree=set(m.git('ls-tree','-r','--name-only',PIN).decode().splitlines());self.failures=[]
@@ -136,12 +163,13 @@ class Checker:
   if r['inventoryInputs']:
    ck('primary-inventory-pin',lambda:r['inventoryInputCommit']==r['inventoryInputs'][0]['commit'] and r['inventoryFileDigest']==m.sha(m.blob(r['inventoryInputCommit'],f)))
   else:
-   ck('supplemental-not-census',lambda:r['inventoryInputCommit'] is None and r['inventoryFileDigest'] is None and r.get('censusAdmission')=='pending Lead; exact supplemental tuple only' and all(ROWS[e['slotKey']].get('populationGap') for e in r['edges']))
+   ck('supplemental-not-census',lambda:r['inventoryInputCommit'] is None and r['inventoryFileDigest'] is None and (bool(r.get('zeroEdgeCoverage')) or (r.get('censusAdmission','').startswith('L12-60') and all(ROWS[e['slotKey']].get('populationGap') for e in r['edges']))))
   for inp in r['inventoryInputs']:
    ck('census-artifact-pin',lambda inp=inp:m.sha((P/inp['path']).read_bytes())==inp['sha256'] and (P/inp['path']).read_bytes()==m.blob(PIN,str(m.REL/inp['path'])))
+  ck('census-edge-slot-or-step5',lambda: census_coverage(r))
   for e in r['edges']:
    key=e['slotKey'];row=ROWS.get(key);file=e['consumerFile'];before=m.blob(PIN,file).decode();bsp=e['sourceSpans']
-   ck('slot-join',lambda e=e,row=row:row is not None and row['file']==e['consumerFile'] and slotkey({**e,'file':e['consumerFile']})==key and record_owner(row)==f and row['edgeId']==e['edgeId'] and row['inventoryRefs']==e['inventoryRefs'] and (bool(e['inventoryRefs']) or (row.get('populationGap') and e.get('supplementalOccurrenceKey')==row['supplementalOccurrenceKey'] and e['edgeId'] is None and e.get('censusAdmission')=='pending Lead; exact supplemental tuple only' and e['disposition']=='parked' and e['blockedCategory']=='lead-ruling')) and e['renderOnly']==isrender(row))
+   ck('slot-join',lambda e=e,row=row:row is not None and row['file']==e['consumerFile'] and slotkey({**e,'file':e['consumerFile']})==key and record_owner(row)==f and row['edgeId']==e['edgeId'] and row['inventoryRefs']==e['inventoryRefs'] and (bool(e['inventoryRefs']) or (row.get('populationGap') and e.get('supplementalOccurrenceKey')==row['supplementalOccurrenceKey'] and e['edgeId'] is None and e.get('censusAdmission','').startswith('L12-60') and row.get('censusAdmission','').startswith('L12-60'))) and e['renderOnly']==isrender(row))
    for ref in e['inventoryRefs']:
     def census_id(ref=ref,e=e):
      data=read(ref['inventory']);entries=data['entries']
@@ -161,19 +189,22 @@ class Checker:
     ck('supplemental-occurrence-binding',supplemental_binding)
    ck('slot-original-spans',lambda e=e,row=row:e['slotSourceSpans']==spans(row))
    ck('source-spans',lambda e=e,before=before:m.spans_text(before,e['sourceSpans'])==e['matchedExpression'] and all(s in e['sourceSpans'] for s in e['slotSourceSpans']))
-   ck('disposition',lambda e=e:e['disposition'] in ['patch','preserve','parked','phase9-row-flip'] and e['reason'] and 'L12-' in e['reason'])
-   ck('zero-apply-now',lambda e=e:e['timing']==('Phase 9' if e['disposition'] in ('patch','phase9-row-flip') else 'none'))
+   ck('disposition',lambda e=e:e['disposition'] in ['patch','preserve','parked','phase9-row-flip','render-join'] and e['reason'] and 'L12-' in e['reason'])
+   ck('zero-apply-now',lambda e=e:e['timing']==('Phase 9' if (e.get('sourceDisposition') if e['renderOnly'] else e['disposition']) in ('patch','phase9-row-flip') else 'none'))
    ck('record-text-history',lambda e=e:m.factual_reason(PIN,e,re.sub(r':\d+(?:-\d+)?$','',e.get('legacyPath',''))))
    ck('dependency-categories',lambda e=e:e['blockedCategory']==e['dependencyCategory'] and (e['blockedCategory'] in m.CATEGORIES if e['disposition']=='parked' else e['blockedCategory'] is None))
    if e['renderOnly']:
+    ck('render-join-not-patch',lambda e=e:e['disposition']=='render-join' and e.get('sourceDisposition') in ['patch','preserve','parked','phase9-row-flip'])
     ck('render-path-diff-rejected',lambda e=e:e['diffHunk'] is None and e.get('replacement') is None and e['target'] is None and e['anchor'] is None)
+    ck('render-canonical-slot-present',lambda e=e:bool(e.get('sourceSlotKey')))
     if e.get('sourceSlotKey'):
-     ck('render-disposition-join',lambda e=e:any(x['slotKey']==e['sourceSlotKey'] and not x['renderOnly'] and x['logicalReference']==e['logicalReference'] and x['disposition']==e['disposition'] for x in r['edges']))
+     ck('render-disposition-join',lambda e=e:any(x['slotKey']==e['sourceSlotKey'] and not x['renderOnly'] and x['logicalReference']==e['logicalReference'] and x['disposition']==e['sourceDisposition'] for x in r['edges']))
     ck('render-source-correspondence',lambda e=e:any(e['consumerFile']==x['path'] for j in r['sourceRenderProvenance'] for x in j['renderFiles']))
     continue
    if e['disposition']=='preserve':ck('preserve-no-patch',lambda e=e:e['diffHunk'] is None and e['target'] is None)
    if e['disposition']=='phase9-row-flip':ck('whole-row',lambda e=e:e.get('rowReplacement') and e['dependency'] and e['target'] is None and e['diffHunk'] is None)
    if e['disposition']=='parked':
+    ck('park-own-source-quote',lambda e=e,before=before:park_own_quote(e,before))
     ck('park-search-witness',lambda e=e,before=before:m.verify_witness(e['searchWitness'],PIN,e['legacyPath'],m.resolver.passage(before,e['sourceSpans'])))
     ck('park-no-diff',lambda e=e:e['target'] is None and e['diffHunk'] is None and e['blockedReason'] and e['dependency'])
    if e['disposition']!='patch':continue
@@ -227,7 +258,8 @@ class Checker:
  def all(self,rs):
   ids=sorted(set(r['reviewSet'] for r in rs));expected=[x for b in BATCHES if b['batch'] in ids for x in b['edgeRefs']]
   self.check('one-to-one-batch-slot-coverage',lambda:collections.Counter(slotkey(x) for x in expected)==collections.Counter(e['slotKey'] for r in rs for e in r['edges']))
-  self.check('one-owner-record-per-batch',lambda:collections.Counter((b['batch'],f) for b in BATCHES if b['batch'] in ids for f in set(record_owner(row) for row in manifest_rows(b)))==collections.Counter((r['reviewSet'],r['file']) for r in rs))
+  self.check('one-owner-record-per-batch',lambda:collections.Counter((b['batch'],f) for b in BATCHES if b['batch'] in ids for f in set(record_owner(row) for row in manifest_rows(b))|set(b.get('zeroEdgeOwners',[])))==collections.Counter((r['reviewSet'],r['file']) for r in rs))
+  self.check('all-33-batches-present',lambda: ids==sorted(b['batch'] for b in BATCHES))
   global PIN
   original_pin=PIN
   try:
@@ -241,4 +273,4 @@ class Checker:
   finally:PIN=original_pin
   return {'authorInputCommit':PIN,'recordAuthorPins':dict(collections.Counter(r['authorInputCommit'] for r in rs)),'checkedBatches':ids,'files':len(rs),'consumerFiles':len({e['consumerFile'] for r in rs for e in r['edges']}),'edges':sum(len(r['edges']) for r in rs),'dispositions':dict(collections.Counter(e['disposition'] for r in rs for e in r['edges'])),'failureCount':len(self.failures),'failures':self.failures,'openLeadRulingEdges':[{'set':r['reviewSet'],'file':r['file'],'edgeId':e['edgeId'],'slotKey':e['slotKey']} for r in rs for e in r['edges'] if e['blockedCategory']=='lead-ruling'],'checkerSha256':m.sha(pathlib.Path(__file__).read_bytes()),'reusedStep3Sha256':m.sha((P/'step-03-check.py').read_bytes())}
 if __name__=='__main__':
- out=Checker().all(load());save('step-04-wave2-check-result.json',out);print(json.dumps(out,ensure_ascii=False));raise SystemExit(bool(out['failureCount']))
+ out=Checker().all(load());out['recordFileHashes']={f.name:m.sha(f.read_bytes()) for f in sorted((P/'step-04-records').glob('*.jsonl'))};out['dependencyHashes']={n:m.sha((P/n).read_bytes()) for n in ['step-03-check.py','step-03-resolve.py','step-04-l12-60-lib.py','step-04-population.json','step-04-batches.json','step-04-source-render-provenance.json']};save('step-04-wave2-check-result.json',out);save('step-04-l12-60-check-result.json',out);print(json.dumps(out,ensure_ascii=False));raise SystemExit(bool(out['failureCount']))

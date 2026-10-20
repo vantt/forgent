@@ -1,0 +1,173 @@
+[
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-040.jsonl",
+    "file": "docs/specs/distribution.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "2ec528e548524013cf50acc51e346df04a8a32eb857907e84125c330959ed5dc",
+    "digest": "c1d603b46dd20e0d0b7c5efa262bb6c50907141f073e2c3239469494b5c02f44",
+    "currentDigest": "50caaa90bbe5ca52d0966a963fe89f3956e996275c5b56160197aadee4e64f38",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  },
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-040.jsonl",
+    "file": "docs/specs/platform-foundations.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "afffddb3162f8b2bbe6ab27d57de39436d16ff4618b60e8bb9ead8310750010f",
+    "digest": "5691c41135cf442388902d8d0c63d43fe30bad26fac9e8467c1559c385079905",
+    "currentDigest": "724cb15eacab003e2c0dc03fe188ff19d627a3d8bc896dc708c2825817f1f274",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  },
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-040.jsonl",
+    "file": "docs/specs/reading-map.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "b1526ab184a7d8ab5cf9124355efc0cf950788878808dd22a5940bc4c50252c8",
+    "digest": "c74cc8ddd669ce52a67f989db2aab55901f7b5befcdff2154ebce83f302f6756",
+    "currentDigest": "285f0d2d1120156fb2ab38703a98c0a6e2f93f3ce0fa9d44a39a917feb204e22",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  },
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-041.jsonl",
+    "file": "docs/specs/runner.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "4ac7d62813f0438afd0bea5ff6b90270cf66f709c102c80afb1ca2cb1cefabba",
+    "digest": "8287db544b755d4360911fdc899b69265a50de9fb58b1209782a2767f8395697",
+    "currentDigest": "1881ed87c6109e4128e21dfb5e190591c36515751a539fc2d6136dc8b74f1cd1",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  },
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-068.jsonl",
+    "file": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "a08ddaf2ed0c4b3ac386706094d6a57f84c8450be2dafd03e59cea05d3d260ee",
+    "digest": "65c8bf8e907d50e2fc59986cb3bf26b966719818c47a45c059518bd7e89f0303",
+    "currentDigest": "9bdf1fe4b06079cdd87d6b96993ca3c0580376027164925258a136ef83aa3cbd",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  },
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-101.jsonl",
+    "file": "docs/platform/git/spec.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "98fd8131377c48df0337199e9341bd9131727242efbaa861eb201788517ac439",
+    "digest": "b40cad45b20331b2699ede4d9e777486bbff67d96205783439c118c53cf39e20",
+    "currentDigest": "3534bfd0d0e80ac8faed63ac9fddf61ccf45376517921ca0da5bf94fe5ff5139",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  },
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-126.jsonl",
+    "file": "docs/backlog.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "952ab5dcafe6959ac00b12b43d7711345370f81d5bbc7e0ac325dce5ea4932fc",
+    "digest": "b9f6678387c5f2a15766739e0e14919c1dc8cb7087e5c3784c985f26a1a2dc6d",
+    "currentDigest": "6ffd196ef5dfec1bf62328a9f06d3936429d5c90c8089871e4f1636176504e8c",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  },
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r1/batch-040.jsonl",
+    "file": "docs/specs/distribution.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "a765622c42fc163024bbfb0e4db844826c8d693382566286d147878177618c64",
+    "digest": "c1d603b46dd20e0d0b7c5efa262bb6c50907141f073e2c3239469494b5c02f44",
+    "currentDigest": "50caaa90bbe5ca52d0966a963fe89f3956e996275c5b56160197aadee4e64f38",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  },
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r1/batch-040.jsonl",
+    "file": "docs/specs/platform-foundations.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "b25a497fb48df47b07f778c40955b1b934d3823e7c95061ba917bcc080634d52",
+    "digest": "5691c41135cf442388902d8d0c63d43fe30bad26fac9e8467c1559c385079905",
+    "currentDigest": "724cb15eacab003e2c0dc03fe188ff19d627a3d8bc896dc708c2825817f1f274",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  },
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r1/batch-040.jsonl",
+    "file": "docs/specs/reading-map.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "30edfb2bfc3d73104cfecf3cda58a685f91bd8171445245b6892b82daffb60f2",
+    "digest": "c74cc8ddd669ce52a67f989db2aab55901f7b5befcdff2154ebce83f302f6756",
+    "currentDigest": "285f0d2d1120156fb2ab38703a98c0a6e2f93f3ce0fa9d44a39a917feb204e22",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  },
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r1/batch-041.jsonl",
+    "file": "docs/specs/runner.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "a8a3edb26f0e4b37b86754abf53487a19cd7a5b9faf7598b6809a73da6e5891e",
+    "digest": "8287db544b755d4360911fdc899b69265a50de9fb58b1209782a2767f8395697",
+    "currentDigest": "1881ed87c6109e4128e21dfb5e190591c36515751a539fc2d6136dc8b74f1cd1",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  },
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r2/batch-040.jsonl",
+    "file": "docs/specs/distribution.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "37b2623f9e1a10c069e5d3d3d90fcd5b8934c77b8d14cdcfa28da1135faf4acf",
+    "digest": "c1d603b46dd20e0d0b7c5efa262bb6c50907141f073e2c3239469494b5c02f44",
+    "currentDigest": "50caaa90bbe5ca52d0966a963fe89f3956e996275c5b56160197aadee4e64f38",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  },
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r2/batch-040.jsonl",
+    "file": "docs/specs/platform-foundations.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "cc5d308132a75f7be5dded63561695232437f5acaf441d3cb38b1e2a8b0731c6",
+    "digest": "5691c41135cf442388902d8d0c63d43fe30bad26fac9e8467c1559c385079905",
+    "currentDigest": "724cb15eacab003e2c0dc03fe188ff19d627a3d8bc896dc708c2825817f1f274",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  },
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r2/batch-040.jsonl",
+    "file": "docs/specs/reading-map.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "da95573f0099e96ed5827fa81b7fd0459d3e996087ce136e0645d7b7abc04332",
+    "digest": "c74cc8ddd669ce52a67f989db2aab55901f7b5befcdff2154ebce83f302f6756",
+    "currentDigest": "285f0d2d1120156fb2ab38703a98c0a6e2f93f3ce0fa9d44a39a917feb204e22",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  },
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r2/batch-041.jsonl",
+    "file": "docs/specs/runner.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "8fb71e03caf97521faafe8820719f2ace68be0a83f6c2b9e10a43b0d5830921f",
+    "digest": "8287db544b755d4360911fdc899b69265a50de9fb58b1209782a2767f8395697",
+    "currentDigest": "1881ed87c6109e4128e21dfb5e190591c36515751a539fc2d6136dc8b74f1cd1",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  },
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r3/batch-040.jsonl",
+    "file": "docs/specs/distribution.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "a0596bdd6c3f9f851238debfa02f419c620a129f2432bf1905848133b3af7719",
+    "digest": "c1d603b46dd20e0d0b7c5efa262bb6c50907141f073e2c3239469494b5c02f44",
+    "currentDigest": "50caaa90bbe5ca52d0966a963fe89f3956e996275c5b56160197aadee4e64f38",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  },
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r3/batch-040.jsonl",
+    "file": "docs/specs/platform-foundations.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "f53ce905bd326915c26648d8eb16fe16b633a76b65b468b4aec2b91bd39f144a",
+    "digest": "5691c41135cf442388902d8d0c63d43fe30bad26fac9e8467c1559c385079905",
+    "currentDigest": "724cb15eacab003e2c0dc03fe188ff19d627a3d8bc896dc708c2825817f1f274",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  },
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r3/batch-040.jsonl",
+    "file": "docs/specs/reading-map.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "f96ceea9a2e9bf9802b1ac4c7416cc280e5c68a3c37c5344472a622ad3a8c46a",
+    "digest": "c74cc8ddd669ce52a67f989db2aab55901f7b5befcdff2154ebce83f302f6756",
+    "currentDigest": "285f0d2d1120156fb2ab38703a98c0a6e2f93f3ce0fa9d44a39a917feb204e22",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  },
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records-r3/batch-041.jsonl",
+    "file": "docs/specs/runner.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "92b38b8ab9671a7cf339297d9faf4d3686cd403d02e5c05e79102b0a052578af",
+    "digest": "8287db544b755d4360911fdc899b69265a50de9fb58b1209782a2767f8395697",
+    "currentDigest": "1881ed87c6109e4128e21dfb5e190591c36515751a539fc2d6136dc8b74f1cd1",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  }
+]

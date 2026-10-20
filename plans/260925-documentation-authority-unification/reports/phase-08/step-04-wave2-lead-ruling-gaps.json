@@ -1,69 +1,101 @@
 {
-  "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
-  "recordedPendingCensusSlots": [
+  "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "recordedPendingCensusSlots": [],
+  "recordedPendingCensusSlotCount": 0,
+  "separateUncensusedPhysicalOccurrences": [],
+  "separateOccurrenceCount": 0,
+  "setClosure": "No open Lead ruling/admission slot. Independent content review still pending; genuine carry/dead-link/description dependencies remain explicit for Step 7/9.",
+  "previousInputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+  "resolvedSupplementalSlots": [
     {
       "set": "step04-032",
       "file": "core/skills/_shared/ak-cook-worker-contract.md",
       "edgeId": null,
-      "slotKey": "{\"edgeId\":null,\"file\":\".agents/skills/_shared/ak-cook-worker-contract.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":26,\"columnStart\":6,\"file\":\".agents/skills/_shared/ak-cook-worker-contract.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":7,\"text\":\"docs/specs/runner.md\"}}"
+      "slotKey": "{\"edgeId\":null,\"file\":\".agents/skills/_shared/ak-cook-worker-contract.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":26,\"columnStart\":6,\"file\":\".agents/skills/_shared/ak-cook-worker-contract.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":7,\"text\":\"docs/specs/runner.md\"}}",
+      "disposition": "render-join",
+      "sourceDisposition": "parked",
+      "resolution": "L12-60(7): first-class supplemental occurrence key, no census admission blocker or invented id."
     },
     {
       "set": "step04-032",
       "file": "core/skills/_shared/ak-cook-worker-contract.md",
       "edgeId": null,
-      "slotKey": "{\"edgeId\":null,\"file\":\"core/skills/_shared/ak-cook-worker-contract.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":26,\"columnStart\":6,\"file\":\"core/skills/_shared/ak-cook-worker-contract.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":6,\"text\":\"docs/specs/runner.md\"}}"
+      "slotKey": "{\"edgeId\":null,\"file\":\"core/skills/_shared/ak-cook-worker-contract.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":26,\"columnStart\":6,\"file\":\"core/skills/_shared/ak-cook-worker-contract.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":6,\"text\":\"docs/specs/runner.md\"}}",
+      "disposition": "parked",
+      "sourceDisposition": null,
+      "resolution": "L12-60(7): first-class supplemental occurrence key, no census admission blocker or invented id."
     },
     {
       "set": "step04-032",
       "file": "core/skills/_shared/ak-cook-worker-contract.md",
       "edgeId": null,
-      "slotKey": "{\"edgeId\":null,\"file\":\"plugins/fgOS/skills/_shared/ak-cook-worker-contract.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":26,\"columnStart\":6,\"file\":\"plugins/fgOS/skills/_shared/ak-cook-worker-contract.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":7,\"text\":\"docs/specs/runner.md\"}}"
+      "slotKey": "{\"edgeId\":null,\"file\":\"plugins/fgOS/skills/_shared/ak-cook-worker-contract.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":26,\"columnStart\":6,\"file\":\"plugins/fgOS/skills/_shared/ak-cook-worker-contract.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":7,\"text\":\"docs/specs/runner.md\"}}",
+      "disposition": "render-join",
+      "sourceDisposition": "parked",
+      "resolution": "L12-60(7): first-class supplemental occurrence key, no census admission blocker or invented id."
     },
     {
       "set": "step04-033",
       "file": "plans/261020-1250-debate-pattern-and-judge-role/plan.md",
       "edgeId": null,
-      "slotKey": "{\"edgeId\":null,\"file\":\"plans/261020-1250-debate-pattern-and-judge-role/plan.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":37,\"columnStart\":15,\"file\":\"plans/261020-1250-debate-pattern-and-judge-role/plan.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":38,\"text\":\"docs/specs/workflow.md\"}}"
+      "slotKey": "{\"edgeId\":null,\"file\":\"plans/261020-1250-debate-pattern-and-judge-role/plan.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":37,\"columnStart\":15,\"file\":\"plans/261020-1250-debate-pattern-and-judge-role/plan.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":38,\"text\":\"docs/specs/workflow.md\"}}",
+      "disposition": "preserve",
+      "sourceDisposition": null,
+      "resolution": "L12-60(7): first-class supplemental occurrence key, no census admission blocker or invented id."
     },
     {
       "set": "step04-033",
       "file": "plans/261020-1250-debate-pattern-and-judge-role/plan.md",
       "edgeId": null,
-      "slotKey": "{\"edgeId\":null,\"file\":\"plans/261020-1250-debate-pattern-and-judge-role/plan.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":72,\"columnStart\":52,\"file\":\"plans/261020-1250-debate-pattern-and-judge-role/plan.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":38,\"text\":\"docs/specs/runner.md\"}}"
+      "slotKey": "{\"edgeId\":null,\"file\":\"plans/261020-1250-debate-pattern-and-judge-role/plan.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":72,\"columnStart\":52,\"file\":\"plans/261020-1250-debate-pattern-and-judge-role/plan.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":38,\"text\":\"docs/specs/runner.md\"}}",
+      "disposition": "preserve",
+      "sourceDisposition": null,
+      "resolution": "L12-60(7): first-class supplemental occurrence key, no census admission blocker or invented id."
     },
     {
       "set": "step04-033",
       "file": "plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md",
       "edgeId": null,
-      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":68,\"columnStart\":48,\"file\":\"plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":35,\"text\":\"docs/specs/runner.md\"}}"
+      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":68,\"columnStart\":48,\"file\":\"plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":35,\"text\":\"docs/specs/runner.md\"}}",
+      "disposition": "preserve",
+      "sourceDisposition": null,
+      "resolution": "L12-60(7): first-class supplemental occurrence key, no census admission blocker or invented id."
     },
     {
       "set": "step04-033",
       "file": "plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md",
       "edgeId": null,
-      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":157,\"columnStart\":137,\"file\":\"plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":28,\"text\":\"docs/specs/runner.md\"}}"
+      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":157,\"columnStart\":137,\"file\":\"plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":28,\"text\":\"docs/specs/runner.md\"}}",
+      "disposition": "preserve",
+      "sourceDisposition": null,
+      "resolution": "L12-60(7): first-class supplemental occurrence key, no census admission blocker or invented id."
     },
     {
       "set": "step04-033",
       "file": "plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md",
       "edgeId": null,
-      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":33,\"columnStart\":11,\"file\":\"plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":16,\"text\":\"docs/specs/workflow.md\"}}"
+      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":33,\"columnStart\":11,\"file\":\"plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":16,\"text\":\"docs/specs/workflow.md\"}}",
+      "disposition": "preserve",
+      "sourceDisposition": null,
+      "resolution": "L12-60(7): first-class supplemental occurrence key, no census admission blocker or invented id."
     },
     {
       "set": "step04-033",
       "file": "plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md",
       "edgeId": null,
-      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":97,\"columnStart\":77,\"file\":\"plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":16,\"text\":\"docs/specs/runner.md\"}}"
+      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":97,\"columnStart\":77,\"file\":\"plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":16,\"text\":\"docs/specs/runner.md\"}}",
+      "disposition": "preserve",
+      "sourceDisposition": null,
+      "resolution": "L12-60(7): first-class supplemental occurrence key, no census admission blocker or invented id."
     },
     {
       "set": "step04-033",
       "file": "plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md",
       "edgeId": null,
-      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":121,\"columnStart\":95,\"file\":\"plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":125,\"text\":\"docs/specs/workflow.md:195\"}}"
+      "slotKey": "{\"edgeId\":null,\"file\":\"plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":121,\"columnStart\":95,\"file\":\"plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md\",\"inputCommit\":\"3732d245d75d7c40b7206ac53707821176c471ec\",\"line\":125,\"text\":\"docs/specs/workflow.md:195\"}}",
+      "disposition": "preserve",
+      "sourceDisposition": null,
+      "resolution": "L12-60(7): first-class supplemental occurrence key, no census admission blocker or invented id."
     }
-  ],
-  "recordedPendingCensusSlotCount": 10,
-  "separateUncensusedPhysicalOccurrences": "step-04-wave2-population-gaps.json",
-  "separateOccurrenceCount": 3,
-  "setClosure": "032/033 cannot close before Lead admission and content-bound reauthor/review. The three separate clarifying occurrences also need census admission; no fabricated ids or executable consumer patches."
+  ]
 }

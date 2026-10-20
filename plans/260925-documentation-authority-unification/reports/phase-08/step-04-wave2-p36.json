@@ -1,0 +1,1943 @@
+{
+  "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "reviewerRule": "Never run checker/probes/resolver/author scripts. Read every assigned file through EOF and independently verify targets. One verdict per whole file, even when streamed.",
+  "set": "step04-026",
+  "files": [
+    "src/state/events-jsonl-truncation-guard.mjs",
+    "src/state/gate-bypass.mjs",
+    "src/state/knowledge-registry.mjs"
+  ],
+  "joinedSlots": 21,
+  "items": [
+    {
+      "file": "src/state/events-jsonl-truncation-guard.mjs",
+      "sourceDigest": "b4dd68558622a872395138a790bc63926ebdf60323b880c6f69b23ca3d7ee0ab",
+      "sourceContext": "// events-jsonl-truncation-guard.mjs -- tsk-cgg (docs/history/\n// events-jsonl-git-tracked-truncation/CONTEXT.md D1): detects a\n// stash/checkout/reset/clean-style silent truncation of the shared\n// `.fgos/events.jsonl`, a failure class the sibling `events-jsonl-\n// contiguity.mjs` (tsk-3wq) is structurally blind to. That module only\n// inspects the CURRENT file's own internal self-consistency (duplicate/\n// gapped `seq`); a truncate-then-reappend always renumbers forward from\n// the cut point, producing a log that is perfectly contiguous and\n// therefore invisible to any content-only check.\n//\n// This module closes that gap with an external high-water-mark: the last\n// line's `seq` AND a content hash, persisted in a gitignored sidecar next\n// to the log (never itself git-tracked, so a git operation on the log\n// can't also revert the mark). On every check, if the file has grown back\n// past the old mark's `seq`, the mark's own `seq` position is looked up in\n// the CURRENT file and its content re-hashed -- a truncate-then-reappend\n// always reuses that `seq` for a DIFFERENT event, so a content mismatch at\n// that position is the direct structural signature of this failure class,\n// catching it even after the log has regrown past the old mark (proven\n// against a synthetic repro of the real incident during `fgos-coding-validating`,\n// see plan.md's feasibility matrix -- a seq-only mark would miss exactly\n// this case).\n//\n// Lives under src/state/ alongside events.mjs and events-jsonl-\n// contiguity.mjs, for the same reason as that module: src/setup/\n// registrations.mjs -- a shipped, packaged module -- imports this at\n// runtime; scripts/events-jsonl-truncation-guard.mjs is the thin CLI\n// wrapper around this file, not the other way around.\n\nimport fs from \"node:fs\";\nimport path from \"node:path\";\nimport crypto from \"node:crypto\";\nimport { execFileSync } from \"node:child_process\";\nimport { recordMainCheckoutGuardWarning } from \"./main-checkout-guard-warnings.mjs\";\nimport { resolveFgosFile, FGOS_FILE } from \"./fgos-file-registry.mjs\";\n/**\n * The checkpoint writes the main checkout's index, so the caller runs it\n * while holding the main checkout mutex and passes `commit(args)`: it runs\n * one git command with that mutex borrowed (add, commit and the reset after\n * a failed commit all go through it) and throws on a non-zero exit. Without\n * `commit` the checkpoint never commits: an unguarded commit would race a land.\n */\n\nfunction lastNonEmptyLine(raw) {\n  const lines = raw.split(\"\\n\");\n  if (lines.length > 0 && lines[lines.length - 1] === \"\") lines.pop();\n  return lines.length > 0 ? lines[lines.length - 1] : null;\n}\n\nfunction hashLine(line) {\n  return crypto.createHash(\"sha256\").update(line).digest(\"hex\");\n}\n\n/**\n * Pure core: compute the current high-water-mark from raw log text. Hashes\n * the raw line text itself (never a re-parsed/re-serialized form) so the\n * hash is stable regardless of key order -- matches `fixContiguity`'s own\n * dedup precedent of comparing raw lines, not reparsed objects. Returns\n * `null` for an empty/line-less log (nothing to mark yet).\n */\nexport function computeGuardMark(raw) {\n  const line = lastNonEmptyLine(raw);\n  if (line === null) return null;\n  let parsed;\n  try {\n    parsed = JSON.parse(line);\n  } catch (err) {\n    throw new Error(`events-jsonl-truncation-guard: last line does not parse as JSON -- refusing to mark a malformed log: ${err.message}`);\n  }\n  if (typeof parsed.seq !== \"number\") return null; // pre-Phase-2 legacy tail, nothing to mark\n  return { seq: parsed.seq, hash: hashLine(line) };\n}\n\n/**\n * Pure core: check `raw` (current log text) against `storedMark` (the\n * `{seq, hash}` last persisted, or `null` on first run). Never mutates,\n * never throws on the expected finding -- mirrors `checkContiguity`'s own\n * \"a break IS the finding this function exists to surface\" posture.\n *\n * - `storedMark === null` (bootstrap: no sidecar yet, or a legacy tail with\n *   no seq) -- always `ok`, mark is simply the current tip. This is what\n *   keeps a healthy pre-existing repo's real history from being\n *   misread as one giant regression on its very first run.\n * - current tip's `seq` lower than `storedMark.seq` -- an obvious\n *   regression, unconditional break.\n * - current tip's `seq` at or past `storedMark.seq` -- look up the line\n *   AT `storedMark.seq` in the current file. Missing entirely, or present\n *   with different content than `storedMark.hash` recorded, is a break:\n *   the structural signature of a truncate-then-reappend, still caught\n *   even after the log has regrown past the old mark.\n */\nexport function checkTruncationGuard(raw, storedMark) {\n  const currentMark = computeGuardMark(raw);\n\n  if (storedMark === null) {\n    return { ok: true, reason: \"bootstrap\", message: \"no prior mark -- recording the current tip as the first mark\", mark: currentMark };\n  }\n\n  if (currentMark === null) {\n    // Log went from having a marked seq tail to having none at all --\n    // as unambiguous a truncation as they come.\n    return { ok: false, reason: \"log-emptied\", message: `log no longer has a seq'd tail (was seq ${storedMark.seq})`, mark: currentMark };\n  }\n\n  if (currentMark.seq < storedMark.seq) {\n    return {\n      ok: false,\n      reason: \"regressed\",\n      message: `current tip seq ${currentMark.seq} is lower than the last recorded mark (seq ${storedMark.seq}) -- the log went backwards`,\n      mark: currentMark,\n    };\n  }\n\n  const entries = raw\n    .split(\"\\n\")\n    .filter((l) => l !== \"\")\n    .map((line) => {\n      try {\n        return { line, parsed: JSON.parse(line) };\n      } catch {\n        return { line, parsed: null };\n      }\n    });\n  const atMark = entries.find((e) => e.parsed && e.parsed.seq === storedMark.seq);\n\n  if (!atMark) {\n    return {\n      ok: false,\n      reason: \"mark-seq-missing\",\n      message: `no line in the current log carries seq ${storedMark.seq} (the last recorded mark) even though the tip has grown to seq ${currentMark.seq} -- the position was renumbered out from under the mark`,\n      mark: currentMark,\n    };\n  }\n\n  const atMarkHash = hashLine(atMark.line);\n  if (atMarkHash !== storedMark.hash) {\n    return {\n      ok: false,\n      reason: \"content-mismatch\",\n      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/how-to/resolve-an-events-jsonl-truncation.md)`,\n      mark: currentMark,\n    };\n  }\n\n  return { ok: true, reason: \"clean\", message: `mark still holds at seq ${storedMark.seq}, tip now at seq ${currentMark.seq}`, mark: currentMark };\n}\n\n/**\n * Tầng A/T5 (TA-D10): the sidecar now holds a MAP `{fileName -> {seq,\n * hash}}` instead of a single `{seq, hash}` object -- one entry per\n * tracked file (baseline-0's own basename `\"events.jsonl\"`, or\n * `\"events/<writer file name>\"` for a per-writer file), since a\n * truncation on one writer's file must never be confused with, or hide\n * behind, another writer's own mark. Still one gitignored sidecar per\n * `.fgos/` dir (unchanged path/name) -- only its on-disk SHAPE changed.\n * `readGuardMarks`/`writeGuardMarks` own that shape; every other function\n * below narrows to one entry by `fileKey`.\n */\nexport function readGuardMarks(guardPath) {\n  let raw;\n  try {\n    raw = fs.readFileSync(guardPath, \"utf8\");\n  } catch {\n    return {};\n  }\n  try {\n    const parsed = JSON.parse(raw);\n    return parsed && typeof parsed === \"object\" && !Array.isArray(parsed) ? parsed : {};\n  } catch {\n    return {};\n  }\n}\n\n/** Persist the WHOLE marks map to `guardPath`. */\nexport function writeGuardMarks(guardPath, marks) {\n  fs.mkdirSync(path.dirname(guardPath), { recursive: true });\n  fs.writeFileSync(guardPath, `${JSON.stringify(marks)}\\n`, \"utf8\");\n}\n\n/** Read one file's persisted mark from the shared sidecar map. Missing\n * sidecar, missing entry, unreadable, or malformed content is treated as\n * bootstrap (`null`), never a hard failure -- matches `checkContiguity`'s\n * \"never throws on the expected finding\" posture; a lost/corrupt sidecar\n * is itself a legitimate reason to re-bootstrap from the current tip\n * rather than crash `fgos doctor`. */\nexport function readGuardMark(guardPath, fileKey) {\n  const mark = readGuardMarks(guardPath)[fileKey];\n  return mark && typeof mark.seq === \"number\" && typeof mark.hash === \"string\" ? mark : null;\n}\n\n/** Persist `mark` under `fileKey` in the shared sidecar map, leaving every\n * other file's own entry untouched. `mark === null` (an empty/legacy log)\n * writes nothing -- there is no mark yet to advance to. */\nexport function writeGuardMark(guardPath, fileKey, mark) {\n  if (mark === null) return;\n  const marks = readGuardMarks(guardPath);\n  marks[fileKey] = mark;\n  writeGuardMarks(guardPath, marks);\n}\n\n/**\n * Derives the canonical sidecar `fileKey` from a log path.\n * If the log file lives directly inside an `events` directory (e.g. `.fgos/events/<name>.jsonl`),\n * returns `events/<name>`. Otherwise defaults to `path.basename(logPath)`.\n */\nexport function deriveFileKeyFromLogPath(logPath) {\n  const parent = path.basename(path.dirname(logPath));\n  return parent === \"events\" ? `events/${path.basename(logPath)}` : path.basename(logPath);\n}\n\n/** Read-only: run `checkTruncationGuard` against real files on disk,\n * never writing the sidecar. Unlocked read of the log -- mirrors\n * `checkEventsJsonlContiguity`'s own precedent (a report that races a\n * concurrent append at worst reads a slightly stale snapshot, never a\n * torn/corrupt one; `appendEvent`'s own lock still protects the file\n * itself from a torn write). `fileKey` defaults to `deriveFileKeyFromLogPath(logPath)` --\n * `events/<name>` when inside an `events/` directory, or `path.basename(logPath)` otherwise. */\nexport function checkEventsJsonlTruncationGuard(logPath, guardPath, fileKey = deriveFileKeyFromLogPath(logPath)) {\n  const raw = fs.existsSync(logPath) ? fs.readFileSync(logPath, \"utf8\") : \"\";\n  const storedMark = readGuardMark(guardPath, fileKey);\n  return checkTruncationGuard(raw, storedMark);\n}\n\n/** Read-modify-write: runs the same check, and when it passes (bootstrap\n * or clean), advances the persisted mark forward to the log's current\n * tip -- this IS the mechanism (an external mark that only a clean check\n * ever gets to move). Never advances the mark on a break, so the failing\n * mark stays pointed at the last known-good position for whoever\n * investigates. Same `fileKey` default as `checkEventsJsonlTruncationGuard`. */\nexport function advanceEventsJsonlTruncationGuard(logPath, guardPath, fileKey = deriveFileKeyFromLogPath(logPath)) {\n  const report = checkEventsJsonlTruncationGuard(logPath, guardPath, fileKey);\n  if (report.ok && report.mark !== null) {\n    writeGuardMark(guardPath, fileKey, report.mark);\n  }\n  return report;\n}\n\n/**\n * Tầng A/T5 (TA-D10): every file the guard/checkpoint machinery tracks --\n * baseline-0 (`${fgosDir}/events.jsonl`, always listed, tagged with the\n * `fileKey` `\"events.jsonl\"` even if it does not physically exist yet) plus\n * every `*.jsonl` file directly under `${fgosDir}/events/` (non-recursive,\n * so a future `archive/` there is structurally never included), tagged\n * `\"events/<name>\"`. Mirrors `discoverEventFilePaths` in replay.mjs (T3/T4)\n * -- a separate copy here on purpose: this module is `kernel` tier and may\n * not import from `src/state/replay.mjs` (one-way-down layering).\n */\nfunction discoverGuardedFiles(fgosDir) {\n  const result = [{ fileKey: \"events.jsonl\", logPath: path.join(fgosDir, \"events.jsonl\") }];\n  const eventsDirPath = path.join(fgosDir, \"events\");\n  let names = [];\n  try {\n    names = fs\n      .readdirSync(eventsDirPath, { withFileTypes: true })\n      .filter((entry) => entry.isFile() && entry.name.endsWith(\".jsonl\"))\n      .map((entry) => entry.name);\n  } catch (err) {\n    if (err.code !== \"ENOENT\") throw err;\n  }\n  for (const name of names) {\n    result.push({ fileKey: `events/${name}`, logPath: path.join(eventsDirPath, name) });\n  }\n  return result;\n}\n\n/**\n * Unconditionally re-baselines the truncation guard mark for all discovered log files\n * in `fgosDir` that exist on disk.\n *\n * Unlike `advanceEventsJsonlTruncationGuard`, which refuses to update the mark when\n * a break is detected, this function computes and writes the current tip mark\n * unconditionally -- acknowledging any break and bringing the mark up to date.\n *\n * @param {string} fgosDir - Path to the `.fgos` directory\n * @param {string} guardPath - Path to the guard sidecar file\n * @returns {{ rebaselined: Array<{fileKey: string, mark: {seq: number, hash: string}}>, skippedEmpty: Array<string> }}\n */\nexport function forceRebaselineTruncationGuard(fgosDir, guardPath) {\n  const rebaselined = [];\n  const skippedEmpty = [];\n  for (const { fileKey, logPath } of discoverGuardedFiles(fgosDir)) {\n    if (!fs.existsSync(logPath)) continue;\n    const raw = fs.readFileSync(logPath, \"utf8\");\n    const mark = computeGuardMark(raw);\n    if (mark === null) {\n      skippedEmpty.push(fileKey);\n    } else {\n      writeGuardMark(guardPath, fileKey, mark);\n      rebaselined.push({ fileKey, mark });\n    }\n  }\n  return { rebaselined, skippedEmpty };\n}\n\nexport const DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC = 3600; // 3600 seconds (1 hour) fallback interval\n\n/** The single-file core `getUncommittedEventCount` (below) sums over every\n * discovered file. Returns 0 if `logPath` does not exist. */\nfunction getUncommittedEventCountForFile(logPath, repoRoot) {\n  if (!fs.existsSync(logPath)) return 0;\n  const relPath = (path.relative(repoRoot, logPath) || \".fgos/events.jsonl\").replaceAll(\"\\\\\", \"/\");\n  let diskLines = 0;\n  try {\n    const rawDisk = fs.readFileSync(logPath, \"utf8\");\n    diskLines = rawDisk.split(\"\\n\").filter((l) => l.trim() !== \"\").length;\n  } catch {\n    return 0;\n  }\n\n  let committedLines = 0;\n  try {\n    const rawCommitted = execFileSync(\"git\", [\"show\", `HEAD:${relPath}`], {\n      cwd: repoRoot,\n      encoding: \"utf8\",\n      stdio: [\"ignore\", \"pipe\", \"ignore\"],\n    });\n    committedLines = rawCommitted.split(\"\\n\").filter((l) => l.trim() !== \"\").length;\n  } catch {\n    committedLines = 0;\n  }\n\n  return Math.max(0, diskLines - committedLines);\n}\n\n/**\n * Calculates the number of uncommitted appended events across baseline-0\n * AND every per-writer file under `.fgos/events/` (TA-D10) relative to git\n * HEAD, summed. `fgosDir` is the `.fgos` directory (not a single log path\n * -- pre-T5 this function took `logPath` directly; there were no callers\n * outside this module to preserve compat for). Returns 0 for a dir with no\n * baseline and no `events/` files at all.\n */\nexport function getUncommittedEventCount(fgosDir, repoRoot) {\n  let total = 0;\n  for (const { logPath } of discoverGuardedFiles(fgosDir)) {\n    total += getUncommittedEventCountForFile(logPath, repoRoot);\n  }\n  return total;\n}\n\n/**\n * Runs opportunistic checks immediately after main checkout lock acquisition:\n * D1: Advance truncation guard and record warning on break; refuse mark advancement & fallback commit on break (never throws/blocks).\n * D2: Fallback auto-commit of .fgos/events.jsonl and .fgos/events/ if dirty after fallbackIntervalSec (default 3600s, never throws/blocks).\n *\n * @param {string} dir - .fgos directory or repo root\n * @param {string} [repoRoot] - optional repository root (defaults to parent of dir if dir is .fgos)\n * @param {Object} [opts] - optional options for testing\n * @param {number} [opts.nowSec] - mock current timestamp (unix seconds)\n * @param {number} [opts.fallbackIntervalSec] - override fallback threshold seconds (default 3600)\n * @param {string} [opts.rawLog] - mock raw log text for testing\n * @param {Function} [opts.commit] - `(gitArgs) => void`, runs one git command\n *   under the borrowed main-checkout mutex, throwing on failure. Omitted, the\n *   fallback checkpoint never commits.\n */\nexport function runOpportunisticMainCheckoutChecks(\n  dir,\n  repoRoot = null,\n  {\n    nowSec = null,\n    fallbackIntervalSec = null,\n    rawLog = null,\n    commit = null,\n  } = {}\n) {\n  if (process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS === \"1\") return;\n  const fgosDir = path.basename(dir) === \".fgos\" ? dir : path.join(dir, \".fgos\");\n  const realRepoRoot = repoRoot || (path.basename(dir) === \".fgos\" ? path.dirname(dir) : dir);\n\n  let breakFlagged = false;\n\n  // D1: Detect and warn, per tracked file (TA-D10: baseline-0 AND every\n  // per-writer file under .fgos/events/). Refuse mark advancement /\n  // fallback commit on ANY file's break -- a break on one writer's file is\n  // just as real a truncation as one on baseline-0.\n  try {\n    const guardPath = resolveFgosFile(fgosDir, FGOS_FILE.GUARD_MARK);\n    if (rawLog !== null) {\n      // Test-injection path (existing `rawLog` override): scoped to\n      // baseline-0 only, byte-identical to before T5 -- callers using this\n      // override are simulating a single log's raw text directly, not a\n      // whole directory.\n      const fileKey = \"events.jsonl\";\n      const storedMark = readGuardMark(guardPath, fileKey);\n      const report = checkTruncationGuard(rawLog, storedMark);\n      if (report.ok && report.mark !== null) {\n        writeGuardMark(guardPath, fileKey, report.mark);\n      } else if (!report.ok) {\n        recordMainCheckoutGuardWarning(fgosDir, { ...report, file: fileKey });\n        breakFlagged = true;\n      }\n    } else {\n      for (const { fileKey, logPath } of discoverGuardedFiles(fgosDir)) {\n        if (!fs.existsSync(logPath)) continue;\n        const report = advanceEventsJsonlTruncationGuard(logPath, guardPath, fileKey);\n        if (report && report.ok === false) {\n          recordMainCheckoutGuardWarning(fgosDir, { ...report, file: fileKey });\n          breakFlagged = true;\n        }\n      }\n    }\n  } catch {\n    // Non-blocking: swallow error\n  }\n\n  // D1 Fail-closed: refuse fallback auto-commit when an unacknowledged break is flagged\n  if (breakFlagged) return;\n\n  // D2: Fallback auto-commit for quiet periods without merges.\n  try {\n    const logPath = path.join(fgosDir, \"events.jsonl\");\n    const eventsDirPath = path.join(fgosDir, \"events\");\n    const pathspecs = [];\n    if (fs.existsSync(logPath)) {\n      pathspecs.push((path.relative(realRepoRoot, logPath) || \".fgos/events.jsonl\").replaceAll(\"\\\\\", \"/\"));\n    }\n    if (fs.existsSync(eventsDirPath)) {\n      pathspecs.push(path.relative(realRepoRoot, eventsDirPath).replaceAll(\"\\\\\", \"/\"));\n    }\n    if (pathspecs.length > 0) {\n      const statusOut = execFileSync(\"git\", [\"status\", \"--porcelain\", \"--\", ...pathspecs], {\n        cwd: realRepoRoot,\n        encoding: \"utf8\",\n        stdio: [\"ignore\", \"pipe\", \"ignore\"],\n      }).trim();\n\n      if (statusOut.length > 0) {\n        let lastCommitSec = null;\n        try {\n          const logOut = execFileSync(\"git\", [\"log\", \"-1\", \"--format=%ct\", \"--\", ...pathspecs], {\n            cwd: realRepoRoot,\n            encoding: \"utf8\",\n            stdio: [\"ignore\", \"pipe\", \"ignore\"],\n          }).trim();\n          if (logOut) {\n            const parsed = parseInt(logOut, 10);\n            if (!Number.isNaN(parsed)) {\n              lastCommitSec = parsed;\n            }\n          }\n        } catch {\n          lastCommitSec = null;\n        }\n\n        let oldestDirtySec = null;\n        for (const spec of pathspecs) {\n          const fullPath = path.resolve(realRepoRoot, spec);\n          try {\n            const stat = fs.statSync(fullPath);\n            if (stat.isDirectory()) {\n              const entries = fs.readdirSync(fullPath, { withFileTypes: true });\n              for (const entry of entries) {\n                if (entry.isFile()) {\n                  const fileStat = fs.statSync(path.join(fullPath, entry.name));\n                  const mtimeSec = Math.floor(fileStat.mtimeMs / 1000);\n                  if (oldestDirtySec === null || mtimeSec < oldestDirtySec) {\n                    oldestDirtySec = mtimeSec;\n                  }\n                }\n              }\n            } else if (stat.isFile()) {\n              const mtimeSec = Math.floor(stat.mtimeMs / 1000);\n              if (oldestDirtySec === null || mtimeSec < oldestDirtySec) {\n                oldestDirtySec = mtimeSec;\n              }\n            }\n          } catch {\n            // ignore\n          }\n        }\n\n        let configFallbackIntervalSec = null;\n        try {\n          const sharedConfigPath = path.join(realRepoRoot, \".fgos\", \"config.json\");\n          if (fs.existsSync(sharedConfigPath)) {\n            const cfg = JSON.parse(fs.readFileSync(sharedConfigPath, \"utf8\"));\n            configFallbackIntervalSec = cfg?.checkpoint?.fallbackIntervalSec;\n          }\n        } catch {\n          // ignore\n        }\n\n        const effectiveFallbackIntervalSec =\n          fallbackIntervalSec !== null\n            ? fallbackIntervalSec\n            : typeof configFallbackIntervalSec === \"number\"\n            ? configFallbackIntervalSec\n            : DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC;\n\n        const currentTimeSec = nowSec !== null ? nowSec : Math.floor(Date.now() / 1000);\n        const refSec = lastCommitSec !== null ? lastCommitSec : oldestDirtySec;\n\n        const fallbackIntervalMet =\n          effectiveFallbackIntervalSec !== null &&\n          refSec !== null &&\n          currentTimeSec - refSec >= effectiveFallbackIntervalSec;\n\n        if (fallbackIntervalMet) {\n          if (typeof commit === \"function\") {\n            commit([\"add\", ...pathspecs]);\n            try {\n              commit([\"commit\", \"-m\", \"chore(.fgos): fallback events checkpoint\", \"--\", ...pathspecs]);\n            } catch (commitErr) {\n              try {\n                commit([\"reset\", \"--\", ...pathspecs]);\n              } catch {\n                // best-effort\n              }\n              throw commitErr;\n            }\n          }\n        }\n      }\n    }\n  } catch {\n    // Non-blocking: swallow error\n  }\n}\n\n\n",
+      "record": {
+        "file": "src/state/events-jsonl-truncation-guard.mjs",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "b4dd68558622a872395138a790bc63926ebdf60323b880c6f69b23ca3d7ee0ab",
+        "digest": "b4dd68558622a872395138a790bc63926ebdf60323b880c6f69b23ca3d7ee0ab",
+        "inventoryEdgeIds": [
+          "class6-l-000414",
+          "class6-l-000414"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000414",
+            "slotKey": "{\"edgeId\":\"class6-l-000414\",\"file\":\"src/state/events-jsonl-truncation-guard.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000414\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000414",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1
+              }
+            ],
+            "consumerFile": "src/state/events-jsonl-truncation-guard.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1,
+                "columnStart": 50,
+                "columnEndExclusive": 63,
+                "text": "docs/history/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1,
+                "columnStart": 50,
+                "columnEndExclusive": 63,
+                "text": "docs/history/"
+              },
+              {
+                "line": 2,
+                "columnStart": 1,
+                "columnEndExclusive": 50,
+                "text": "// events-jsonl-git-tracked-truncation/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/\n// events-jsonl-git-tracked-truncation/CONTEXT.md",
+            "logicalReference": "docs/history/events-jsonl-git-tracked-truncation/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '// events-jsonl-truncation-guard.mjs -- tsk-cgg (docs/history/\\n// events-jsonl-git-tracked-truncation/CONTEXT.md D1): detects a'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/events-jsonl-git-tracked-truncation/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000414",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1,
+                "matchedExpression": "docs/history/\n// events-jsonl-git-tracked-truncation/CONTEXT.md",
+                "originalLineText": "// events-jsonl-truncation-guard.mjs -- tsk-cgg (docs/history/"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000414",
+            "slotKey": "{\"edgeId\":\"class6-l-000414\",\"file\":\"src/state/events-jsonl-truncation-guard.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000414\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":2}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000414",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 2
+              }
+            ],
+            "consumerFile": "src/state/events-jsonl-truncation-guard.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 2,
+                "columnStart": 1,
+                "columnEndExclusive": 50,
+                "text": "// events-jsonl-git-tracked-truncation/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1,
+                "columnStart": 50,
+                "columnEndExclusive": 63,
+                "text": "docs/history/"
+              },
+              {
+                "line": 2,
+                "columnStart": 1,
+                "columnEndExclusive": 50,
+                "text": "// events-jsonl-git-tracked-truncation/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/\n// events-jsonl-git-tracked-truncation/CONTEXT.md",
+            "logicalReference": "docs/history/events-jsonl-git-tracked-truncation/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '// events-jsonl-truncation-guard.mjs -- tsk-cgg (docs/history/\\n// events-jsonl-git-tracked-truncation/CONTEXT.md D1): detects a'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/events-jsonl-git-tracked-truncation/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000414",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 2,
+                "matchedExpression": "docs/history/\n// events-jsonl-git-tracked-truncation/CONTEXT.md",
+                "originalLineText": "// events-jsonl-git-tracked-truncation/CONTEXT.md D1): detects a"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-026",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59",
+          "L12-60"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "src/state/events-jsonl-truncation-guard.mjs",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "b4dd68558622a872395138a790bc63926ebdf60323b880c6f69b23ca3d7ee0ab",
+          "bytes": 22019,
+          "lines": 520,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": [
+          {
+            "inventory": "step-02l-census-class6.json",
+            "edgeId": "class6-l-000415",
+            "consumerFile": "src/state/events-jsonl-truncation-guard.mjs",
+            "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 309,
+                "columnStart": 260,
+                "line": 140,
+                "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
+              }
+            ],
+            "reason": "L12-60(1): runtime-emitted/help/example string or executable reader/writer/default, not a maintained prose comment; Step 5 owns output/path parity."
+          },
+          {
+            "inventory": null,
+            "edgeId": null,
+            "consumerFile": "src/state/events-jsonl-truncation-guard.mjs",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "sourceSpans": [
+              {
+                "line": 140,
+                "columnStart": 260,
+                "columnEndExclusive": 309,
+                "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
+              }
+            ],
+            "reason": "L12-60(1): runtime-emitted/help/example string or executable reader/writer/default, not a maintained prose comment; Step 5 owns output/path parity."
+          }
+        ]
+      },
+      "targetEvidence": {},
+      "renderContexts": {},
+      "populationGapFindings": [],
+      "L12-60-coverage": {
+        "stepFiveExcluded": [
+          {
+            "inventory": "step-02l-census-class6.json",
+            "edgeId": "class6-l-000415",
+            "consumerFile": "src/state/events-jsonl-truncation-guard.mjs",
+            "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 309,
+                "columnStart": 260,
+                "line": 140,
+                "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
+              }
+            ],
+            "reason": "L12-60(1): runtime-emitted/help/example string or executable reader/writer/default, not a maintained prose comment; Step 5 owns output/path parity."
+          },
+          {
+            "inventory": null,
+            "edgeId": null,
+            "consumerFile": "src/state/events-jsonl-truncation-guard.mjs",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "sourceSpans": [
+              {
+                "line": 140,
+                "columnStart": 260,
+                "columnEndExclusive": 309,
+                "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
+              }
+            ],
+            "reason": "L12-60(1): runtime-emitted/help/example string or executable reader/writer/default, not a maintained prose comment; Step 5 owns output/path parity."
+          }
+        ],
+        "authorAddedSlots": [],
+        "recordChangedThisTurn": true
+      },
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "src/state/gate-bypass.mjs",
+      "sourceDigest": "723e40beb662fb094a4ee832fa0755cfc554d01c7623cf411eeda1092e9247b8",
+      "sourceContext": "// gate-bypass.mjs — decides whether a skill-embedded confirmation gate\n// (fgos-coding-exploring's \"Approve CONTEXT.md?\", fgos-coding-planning's \"Approve work\n// shape?\") can be auto-approved instead of asked (docs/history/gate-bypass/\n// CONTEXT.md D1-D5). Never touches the `awaiting-human` park (D1) — that\n// stays a separate, untouched mechanism.\n//\n// Two axes must both hold, plus an absolute floor:\n//   - D2: the artifact has zero open items (mechanical, not a confidence read)\n//   - D5: the item's `tier` is covered by the configured level\n//   - D4: a hard-gate risk-keyword hit always overrides both axes to false\n//\n// Every read here fails closed to the safest answer (level 'off', not\n// covered, has open items) — a missing or malformed `.fgos/gate-bypass.json`\n// must never silently open a gate that would otherwise ask.\n//\n// tsk-224 (docs/history/coding-planning-validating-gate-redesign/CONTEXT.md)\n// adds `canAutoApproveMergedGate` at the bottom of this file, for the single\n// gate that replaced `planApprove` + `validateApprove`. It supersedes the\n// `canAutoApproveValidate` export that used to live here, and relaxes D2's\n// \"never a self-reported read\" clause — but only because every check in it\n// is monotone toward asking (D9), so a session's own judgment can raise the\n// bar and never lower it. `canAutoApprove` itself is unchanged; its only\n// remaining caller is fgos-coding-exploring's `contextApprove`.\n\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport { SIZES } from './work.mjs';\nimport { HEAVY_KEYWORDS, matchesKeyword } from '../intake/risk-keywords.mjs';\nimport { readSharedConfig } from '../config/shared-config-file.mjs';\n\n/** Level order, weakest to strongest. 'off' auto-approves nothing. */\nexport const LEVELS = Object.freeze(['off', ...SIZES]);\n\nexport const DEFAULT_LEVEL = 'off';\n\nconst CONFIG_FILE_NAME = 'gate-bypass.json';\n\n/**\n * Read the configured bypass level. `dir` is the `.fgos` directory (every\n * existing caller already resolves this before calling — bin/fgos.mjs's\n * `gate-bypass` verb, both skill-embedded gate checks in fgos-coding-exploring/\n * fgos-coding-planning).\n *\n * Tries the shared config file first (`config.gateBypass.level`,\n * docs/history/doctor-fix-gate-bypass/CONTEXT.md D1/D3 — gate-bypass's real\n * registry entry, `registrations.mjs`); `readSharedConfig` takes the repo\n * root (`.fgos`'s parent), not `.fgos` itself, so that's resolved here via\n * `path.dirname(dir)`. Falls back to the legacy standalone\n * `<dir>/gate-bypass.json` (never deleted, a \"read the old file until a real\n * migration writes the new one\" discipline) when the shared file has no\n * valid `gateBypass` entry yet.\n *\n * Fails closed to `DEFAULT_LEVEL` on a missing file, invalid JSON, or a\n * shape/value that isn't a recognized level, at either layer — never\n * throws, per D2/D4's \"never fails open\" requirement.\n */\nexport function readGateBypassLevel(dir) {\n  let shared;\n  try {\n    shared = readSharedConfig(path.dirname(dir));\n  } catch {\n    shared = undefined;\n  }\n  const sharedLevel = shared?.gateBypass?.level;\n  if (typeof sharedLevel === 'string' && LEVELS.includes(sharedLevel)) {\n    return sharedLevel;\n  }\n  return readLegacyStandaloneLevel(dir);\n}\n\n/**\n * Legacy standalone `<dir>/gate-bypass.json` read (pre-D1 shape, D2 of this\n * item's own CONTEXT.md) — byte-identical logic to what `readGateBypassLevel`\n * used to be before the shared-file read was added above.\n */\nfunction readLegacyStandaloneLevel(dir) {\n  const filePath = path.join(dir, CONFIG_FILE_NAME);\n  let raw;\n  try {\n    raw = fs.readFileSync(filePath, 'utf8');\n  } catch {\n    return DEFAULT_LEVEL;\n  }\n\n  let parsed;\n  try {\n    parsed = JSON.parse(raw);\n  } catch {\n    return DEFAULT_LEVEL;\n  }\n\n  if (!parsed || typeof parsed.level !== 'string' || !LEVELS.includes(parsed.level)) {\n    return DEFAULT_LEVEL;\n  }\n  return parsed.level;\n}\n\n/**\n * Does `level` cover `size`? `off` covers nothing. Any other level covers\n * its own size and every lighter one (D5's reuse of `SIZES`' own order).\n * An unrecognized size or level is never covered (fail closed).\n */\nexport function isSizeCovered(size, level) {\n  const sizeRank = SIZES.indexOf(size);\n  const levelRank = LEVELS.indexOf(level);\n  if (sizeRank === -1 || levelRank === -1 || level === 'off') return false;\n  return sizeRank < levelRank;\n}\nexport const isTierCovered = isSizeCovered;\n\n/**\n * D2's mechanical completeness check on a gated artifact's raw text\n * (CONTEXT.md or plan.md content). True means \"not clear enough to skip the\n * gate\" — the safe default. Flags on either:\n *   - a real `TODO`/`FIXME` marker — the word immediately followed\n *     (optionally after whitespace) by `:` or `(`, the shape an actual code\n *     marker is written in (`TODO:`, `FIXME:`, `TODO(name):`) — or\n *   - a missing `## Outstanding questions` section, or one whose body isn't\n *     exactly \"None\" (case-insensitive) — the convention this item's own\n *     CONTEXT.md/plan.md already follow.\n * A missing section fails closed to \"has open items\" rather than assuming\n * the artifact just doesn't use the convention.\n *\n * The colon/paren requirement exists because a bare `\\b(TODO|FIXME)\\b`\n * match fires on prose that legitimately discusses fgOS's own `todo`\n * status literal or an enum like `WorkTab::Todo`, without ever getting\n * closer to a genuine unfinished marker. Requiring the code-marker shape\n * resolves that class of false positive while still catching a real one.\n */\nexport function hasOpenItems(artifactText) {\n  const text = typeof artifactText === 'string' ? artifactText : '';\n  if (/\\b(TODO|FIXME)\\s*[:(]/i.test(text)) return true;\n\n  const match = text.match(/^##\\s*Outstanding questions\\s*$([\\s\\S]*?)(?=^##\\s|$(?![\\s\\S]))/im);\n  if (!match) return true;\n\n  const body = match[1].trim();\n  if (!body) return true;\n  return !/^none\\b/i.test(body);\n}\n\nfunction stripCitations(text) {\n  if (typeof text !== 'string') return '';\n  // Backtick-quoted spans (code spans, quoted paths/filenames).\n  let out = text.replace(/`[^`]*`/g, ' ');\n  // Bare filename-shaped tokens, e.g. AUDIT.md, gate-bypass.mjs.\n  out = out.replace(/\\b[\\w-]+\\.(md|mjs|js|cjs|ts|json|yml|yaml|txt)\\b/gi, ' ');\n  return out;\n}\n\n/**\n * Combine all three checks (D5's two axes plus D4's floor) into the single\n * yes/no a Gate step needs. `item` is the work item (title/description/tier\n * read from it); `artifactText` is the gated artifact's raw content;\n * `level` is the value `readGateBypassLevel` returned.\n */\nexport function canAutoApprove(item, artifactText, level) {\n  const haystack = stripCitations(`${item?.title ?? ''}\\n${item?.description ?? ''}`);\n\n  // Known, permanent limitations of the mechanical floor:\n  // - A title/description that merely mentions a hard-gate word as a topic\n  //   (not describing an actual risky change) still hard-gates — accepted,\n  //   because the failure mode is asking a human unnecessarily (friction),\n  //   never silently skipping a real risk (the floor's own fail-safe direction).\n  // - Negated prose (\"no auth/audit risk applies here\") still hard-gates —\n  //   accepted, because teaching the floor to parse negation would turn it\n  //   from mechanical/lexical into an interpretive read, exactly what its own\n  //   design principle (docs/explanation/gate-bypass-design.md) exists to prevent.\n  const hardGateHit = HEAVY_KEYWORDS.some((keyword) => matchesKeyword(haystack, keyword));\n  if (hardGateHit) return false;\n\n  if (!isSizeCovered(item?.size, level)) return false;\n  if (hasOpenItems(artifactText)) return false;\n  return true;\n}\n\n/**\n * The cost verdict a session supplies to the merged gate below\n * (`docs/history/coding-planning-validating-gate-redesign/CONTEXT.md` D4,\n * D5). Deliberately two-valued: the gate only ever needs to know whether\n * being wrong here is cheap to undo, not how expensive it would be.\n * Anything that is not exactly `REVERSIBLE` asks, so an unrecognized or\n * missing verdict fails closed like every other read in this file.\n */\nexport const COST_REVERSIBLE = 'REVERSIBLE';\n\n/**\n * Build the hard-gate floor's haystack (D10).\n *\n * The source is the item's own submit text UNION the *structured* fields\n * the plan carries — footprint paths and each child spec's title/verify/\n * action — and deliberately NOT `plan.md`'s narrative prose.\n *\n * That exclusion is measured, not stylistic (plan.md's assumption A1):\n * scanning narrative prose would trip this floor on 266 of the 318 real\n * `docs/history/*&#47;plan.md` files in this repo (83.6%), driven by `audit`\n * (242), `auth` (217), and `security` (210) — words that are this\n * project's everyday vocabulary rather than a signal that anything is\n * irreversible. A floor that fires on five plans out of six has stopped\n * discriminating. Structured fields carry the same added coverage D10\n * wanted (a bland submit text whose plan touches `src/**&#47;migration.mjs`)\n * without inheriting that vocabulary problem.\n */\nfunction mergedGateHaystack(item, childSpecs) {\n  const parts = [\n    stripCitations(item?.title ?? ''),\n    stripCitations(item?.description ?? ''),\n  ];\n\n  for (const p of Array.isArray(item?.footprint) ? item.footprint : []) {\n    if (typeof p === 'string') parts.push(p);\n  }\n\n  for (const child of Array.isArray(childSpecs) ? childSpecs : []) {\n    if (!child || typeof child !== 'object') continue;\n    for (const field of ['title', 'verify', 'action']) {\n      if (typeof child[field] === 'string') parts.push(child[field]);\n    }\n    for (const p of Array.isArray(child.footprint) ? child.footprint : []) {\n      if (typeof p === 'string') parts.push(p);\n    }\n  }\n\n  return parts.join('\\n');\n}\n\n/**\n * The single merged gate that replaces `planApprove` + `validateApprove`\n * (`docs/history/coding-planning-validating-gate-redesign/CONTEXT.md` D1),\n * sitting at `fgos-coding-validating` immediately before materialize (D7).\n * Supersedes the `canAutoApproveValidate` this export replaced, which\n * carried `docs/history/gate-bypass/CONTEXT.md` D6's verdict axis.\n *\n * Four checks, and — the load-bearing property (D9) — every one of them\n * can only push toward ASKING, never toward silence. That monotone\n * direction is what makes the self-reported `costVerdict` axis safe where\n * `gate-bypass` D2 refused one: a session's own judgment can escalate to\n * \"ask\", but it can never talk the mechanical floor below down.\n *\n *   1. D10 — hard-gate floor over the widened structured haystack above.\n *   2. D11 — tier ceiling. Note this axis measures *delegation appetite*\n *      (\"how heavy a piece has the person authorized the machine to run\n *      alone\"), NOT risk; size and reversibility are different things, and\n *      conflating them is exactly what D10/D11 separated.\n *   3. D8 — `gate-bypass` D2's surviving mechanical-completeness half,\n *      read fresh off `plan.md` at gate time.\n *   4. D3/D4/D5 — the session's own cost verdict.\n *\n * `canAutoApprove` above is deliberately left untouched: after D1 its only\n * remaining caller is `fgos-coding-exploring`'s `contextApprove`, which D2\n * of the same CONTEXT.md keeps exactly as it is.\n */\nexport function canAutoApproveMergedGate(item, planText, childSpecs, costVerdict, level) {\n  const haystack = mergedGateHaystack(item, childSpecs);\n  const hardGateHit = HEAVY_KEYWORDS.some((keyword) => matchesKeyword(haystack, keyword));\n  if (hardGateHit) return false;\n\n  if (!isSizeCovered(item?.size, level)) return false;\n  if (hasOpenItems(planText)) return false;\n  if (costVerdict !== COST_REVERSIBLE) return false;\n  return true;\n}\n",
+      "record": {
+        "file": "src/state/gate-bypass.mjs",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "723e40beb662fb094a4ee832fa0755cfc554d01c7623cf411eeda1092e9247b8",
+        "digest": "723e40beb662fb094a4ee832fa0755cfc554d01c7623cf411eeda1092e9247b8",
+        "inventoryEdgeIds": [
+          "class6-l-000419",
+          "class6-l-000419",
+          "class6-l-000420",
+          "class6-l-000421",
+          "class6-l-000422",
+          "class6-l-000423",
+          "class6-l-000424",
+          "class6-l-000425",
+          "class6-l-000426"
+        ],
+        "diff": "--- a/src/state/gate-bypass.mjs\n+++ b/src/state/gate-bypass.mjs\n@@ -165,7 +165,7 @@\n   // - Negated prose (\"no auth/audit risk applies here\") still hard-gates —\n   //   accepted, because teaching the floor to parse negation would turn it\n   //   from mechanical/lexical into an interpretive read, exactly what its own\n-  //   design principle (docs/explanation/gate-bypass-design.md) exists to prevent.\n+  //   design principle (docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md#why-the-skip-criterion-is-mechanical-not-a-confidence-read) exists to prevent.\n   const hardGateHit = HEAVY_KEYWORDS.some((keyword) => matchesKeyword(haystack, keyword));\n   if (hardGateHit) return false;\n \n",
+        "edges": [
+          {
+            "edgeId": "class6-l-000419",
+            "slotKey": "{\"edgeId\":\"class6-l-000419\",\"file\":\"src/state/gate-bypass.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000419\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":3}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000419",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 3
+              }
+            ],
+            "consumerFile": "src/state/gate-bypass.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 3,
+                "columnStart": 52,
+                "columnEndExclusive": 77,
+                "text": "docs/history/gate-bypass/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 3,
+                "columnStart": 52,
+                "columnEndExclusive": 77,
+                "text": "docs/history/gate-bypass/"
+              },
+              {
+                "line": 4,
+                "columnStart": 1,
+                "columnEndExclusive": 14,
+                "text": "// CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/gate-bypass/\n// CONTEXT.md",
+            "logicalReference": "docs/history/gate-bypass/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '// shape?\") can be auto-approved instead of asked (docs/history/gate-bypass/\\n// CONTEXT.md D1-D5). Never touches the `awaiting-human` park (D1) — that'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/gate-bypass/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000419",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 3,
+                "matchedExpression": "docs/history/gate-bypass/\n// CONTEXT.md",
+                "originalLineText": "// shape?\") can be auto-approved instead of asked (docs/history/gate-bypass/"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000419",
+            "slotKey": "{\"edgeId\":\"class6-l-000419\",\"file\":\"src/state/gate-bypass.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000419\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":4}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000419",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 4
+              }
+            ],
+            "consumerFile": "src/state/gate-bypass.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 4,
+                "columnStart": 1,
+                "columnEndExclusive": 14,
+                "text": "// CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 3,
+                "columnStart": 52,
+                "columnEndExclusive": 77,
+                "text": "docs/history/gate-bypass/"
+              },
+              {
+                "line": 4,
+                "columnStart": 1,
+                "columnEndExclusive": 14,
+                "text": "// CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/gate-bypass/\n// CONTEXT.md",
+            "logicalReference": "docs/history/gate-bypass/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '// shape?\") can be auto-approved instead of asked (docs/history/gate-bypass/\\n// CONTEXT.md D1-D5). Never touches the `awaiting-human` park (D1) — that'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/gate-bypass/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000419",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 4,
+                "matchedExpression": "docs/history/gate-bypass/\n// CONTEXT.md",
+                "originalLineText": "// CONTEXT.md D1-D5). Never touches the `awaiting-human` park (D1) — that"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000420",
+            "slotKey": "{\"edgeId\":\"class6-l-000420\",\"file\":\"src/state/gate-bypass.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000420\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":16}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000420",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 16
+              }
+            ],
+            "consumerFile": "src/state/gate-bypass.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 16,
+                "columnStart": 13,
+                "columnEndExclusive": 77,
+                "text": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 16,
+                "columnStart": 13,
+                "columnEndExclusive": 77,
+                "text": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md",
+            "logicalReference": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '// tsk-224 (docs/history/coding-planning-validating-gate-redesign/CONTEXT.md)'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000420",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 16,
+                "matchedExpression": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md",
+                "originalLineText": "// tsk-224 (docs/history/coding-planning-validating-gate-redesign/CONTEXT.md)"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000421",
+            "slotKey": "{\"edgeId\":\"class6-l-000421\",\"file\":\"src/state/gate-bypass.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000421\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":45}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000421",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 45
+              }
+            ],
+            "consumerFile": "src/state/gate-bypass.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 45,
+                "columnStart": 4,
+                "columnEndExclusive": 50,
+                "text": "docs/history/doctor-fix-gate-bypass/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 45,
+                "columnStart": 4,
+                "columnEndExclusive": 50,
+                "text": "docs/history/doctor-fix-gate-bypass/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/doctor-fix-gate-bypass/CONTEXT.md",
+            "logicalReference": "docs/history/doctor-fix-gate-bypass/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: \" * docs/history/doctor-fix-gate-bypass/CONTEXT.md D1/D3 — gate-bypass's real\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/doctor-fix-gate-bypass/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000421",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 45,
+                "matchedExpression": "docs/history/doctor-fix-gate-bypass/CONTEXT.md",
+                "originalLineText": " * docs/history/doctor-fix-gate-bypass/CONTEXT.md D1/D3 — gate-bypass's real"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000422",
+            "slotKey": "{\"edgeId\":\"class6-l-000422\",\"file\":\"src/state/gate-bypass.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000422\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":168}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000422",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 168
+              }
+            ],
+            "consumerFile": "src/state/gate-bypass.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 168,
+                "columnStart": 26,
+                "columnEndExclusive": 64,
+                "text": "docs/explanation/gate-bypass-design.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 168,
+                "columnStart": 26,
+                "columnEndExclusive": 64,
+                "text": "docs/explanation/gate-bypass-design.md"
+              }
+            ],
+            "matchedExpression": "docs/explanation/gate-bypass-design.md",
+            "logicalReference": "docs/explanation/gate-bypass-design.md",
+            "disposition": "patch",
+            "diffHunk": "@@ -165,7 +165,7 @@",
+            "reason": "A51, L12-7/30/31/32/58: The renamed design describes a mechanical criterion, contrasting it with interpretive confidence. The source still rejects risk keyword negation rather than widening that lexical gate. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md",
+            "anchor": "why-the-skip-criterion-is-mechanical-not-a-confidence-read",
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/explanation/gate-bypass-design.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000422",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 168,
+                "matchedExpression": "docs/explanation/gate-bypass-design.md",
+                "originalLineText": "  //   design principle (docs/explanation/gate-bypass-design.md) exists to prevent."
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000423",
+            "slotKey": "{\"edgeId\":\"class6-l-000423\",\"file\":\"src/state/gate-bypass.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000423\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":179}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000423",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 179
+              }
+            ],
+            "consumerFile": "src/state/gate-bypass.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 179,
+                "columnStart": 6,
+                "columnEndExclusive": 70,
+                "text": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 179,
+                "columnStart": 6,
+                "columnEndExclusive": 70,
+                "text": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md",
+            "logicalReference": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: ' * (`docs/history/coding-planning-validating-gate-redesign/CONTEXT.md` D4,'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000423",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 179,
+                "matchedExpression": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md",
+                "originalLineText": " * (`docs/history/coding-planning-validating-gate-redesign/CONTEXT.md` D4,"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000424",
+            "slotKey": "{\"edgeId\":\"class6-l-000424\",\"file\":\"src/state/gate-bypass.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000424\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":196}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000424",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 196
+              }
+            ],
+            "consumerFile": "src/state/gate-bypass.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 196,
+                "columnStart": 5,
+                "columnEndExclusive": 31,
+                "text": "docs/history/*&#47;plan.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 196,
+                "columnStart": 5,
+                "columnEndExclusive": 31,
+                "text": "docs/history/*&#47;plan.md"
+              }
+            ],
+            "matchedExpression": "docs/history/*&#47;plan.md",
+            "logicalReference": "docs/history/*&#47;plan.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: ' * `docs/history/*&#47;plan.md` files in this repo (83.6%), driven by `audit`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/*&",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000424",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 196,
+                "matchedExpression": "docs/history/*&#47;plan.md",
+                "originalLineText": " * `docs/history/*&#47;plan.md` files in this repo (83.6%), driven by `audit`"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000425",
+            "slotKey": "{\"edgeId\":\"class6-l-000425\",\"file\":\"src/state/gate-bypass.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000425\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":229}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000425",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 229
+              }
+            ],
+            "consumerFile": "src/state/gate-bypass.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 229,
+                "columnStart": 6,
+                "columnEndExclusive": 70,
+                "text": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 229,
+                "columnStart": 6,
+                "columnEndExclusive": 70,
+                "text": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md",
+            "logicalReference": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: ' * (`docs/history/coding-planning-validating-gate-redesign/CONTEXT.md` D1),'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000425",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 229,
+                "matchedExpression": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md",
+                "originalLineText": " * (`docs/history/coding-planning-validating-gate-redesign/CONTEXT.md` D1),"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000426",
+            "slotKey": "{\"edgeId\":\"class6-l-000426\",\"file\":\"src/state/gate-bypass.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000426\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":232}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000426",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 232
+              }
+            ],
+            "consumerFile": "src/state/gate-bypass.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 232,
+                "columnStart": 13,
+                "columnEndExclusive": 48,
+                "text": "docs/history/gate-bypass/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 232,
+                "columnStart": 13,
+                "columnEndExclusive": 48,
+                "text": "docs/history/gate-bypass/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/gate-bypass/CONTEXT.md",
+            "logicalReference": "docs/history/gate-bypass/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: \" * carried `docs/history/gate-bypass/CONTEXT.md` D6's verdict axis.\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/gate-bypass/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000426",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 232,
+                "matchedExpression": "docs/history/gate-bypass/CONTEXT.md",
+                "originalLineText": " * carried `docs/history/gate-bypass/CONTEXT.md` D6's verdict axis."
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {
+              "{\"edgeId\":\"class6-l-000422\",\"file\":\"src/state/gate-bypass.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000422\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":168}]}": "read-only citation; no writer/default-root/schema/identity change"
+            },
+            "descriptionTruth": {
+              "{\"edgeId\":\"class6-l-000422\",\"file\":\"src/state/gate-bypass.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000422\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":168}]}": {
+                "sourcePassage": "  //   design principle (docs/explanation/gate-bypass-design.md) exists to prevent.",
+                "adjacentPassage": "  // Known, permanent limitations of the mechanical floor:\n  // - A title/description that merely mentions a hard-gate word as a topic\n  //   (not describing an actual risky change) still hard-gates — accepted,\n  //   because the failure mode is asking a human unnecessarily (friction),\n  //   never silently skipping a real risk (the floor's own fail-safe direction).\n  // - Negated prose (\"no auth/audit risk applies here\") still hard-gates —\n  //   accepted, because teaching the floor to parse negation would turn it\n  //   from mechanical/lexical into an interpretive read, exactly what its own\n  //   design principle (docs/explanation/gate-bypass-design.md) exists to prevent.\n  const hardGateHit = HEAVY_KEYWORDS.some((keyword) => matchesKeyword(haystack, keyword));\n  if (hardGateHit) return false;",
+                "target": "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md",
+                "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+                "targetDigest": "062af6c9bf24067dd2c739af0ad913014dc068b95ea6165393a51e324a19522f",
+                "targetEvidence": [
+                  {
+                    "line": 35,
+                    "text": "## Why the skip criterion is mechanical, not a confidence read"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "The renamed design describes a mechanical criterion, contrasting it with interpretive confidence. The source still rejects risk keyword negation rather than widening that lexical gate."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "The renamed design describes a mechanical criterion, contrasting it with interpretive confidence. The source still rejects risk keyword negation rather than widening that lexical gate."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "The renamed design describes a mechanical criterion, contrasting it with interpretive confidence. The source still rejects risk keyword negation rather than widening that lexical gate."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "The renamed design describes a mechanical criterion, contrasting it with interpretive confidence. The source still rejects risk keyword negation rather than widening that lexical gate."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "The renamed design describes a mechanical criterion, contrasting it with interpretive confidence. The source still rejects risk keyword negation rather than widening that lexical gate."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "The renamed design describes a mechanical criterion, contrasting it with interpretive confidence. The source still rejects risk keyword negation rather than widening that lexical gate."
+                  }
+                },
+                "assessment": "The renamed design describes a mechanical criterion, contrasting it with interpretive confidence. The source still rejects risk keyword negation rather than widening that lexical gate."
+              }
+            },
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {
+            "{\"edgeId\":\"class6-l-000422\",\"file\":\"src/state/gate-bypass.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000422\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":168}]}": {
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "targetDigest": "062af6c9bf24067dd2c739af0ad913014dc068b95ea6165393a51e324a19522f",
+              "passage": "## Why the skip criterion is mechanical, not a confidence read",
+              "targetEvidenceLine": 35,
+              "targetLines": [
+                35
+              ],
+              "targetLineText": [
+                "## Why the skip criterion is mechanical, not a confidence read"
+              ],
+              "sourceLocatorTokens": []
+            }
+          },
+          "relativeResolution": {
+            "{\"edgeId\":\"class6-l-000422\",\"file\":\"src/state/gate-bypass.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000422\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":168}]}": {
+              "replacement": "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md#why-the-skip-criterion-is-mechanical-not-a-confidence-read",
+              "resolvedTarget": "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md",
+              "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "authorityStatus": "cutover-patch-only"
+            }
+          },
+          "labelForm": {
+            "{\"edgeId\":\"class6-l-000422\",\"file\":\"src/state/gate-bypass.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000422\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":168}]}": {
+              "source": "docs/explanation/gate-bypass-design.md",
+              "replacement": "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md#why-the-skip-criterion-is-mechanical-not-a-confidence-read",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            }
+          }
+        },
+        "reviewSet": "step04-026",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59",
+          "L12-60"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "src/state/gate-bypass.mjs",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "723e40beb662fb094a4ee832fa0755cfc554d01c7623cf411eeda1092e9247b8",
+          "bytes": 11646,
+          "lines": 262,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetEvidence": {
+        "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md": [
+          {
+            "edgeSlot": "{\"edgeId\":\"class6-l-000422\",\"file\":\"src/state/gate-bypass.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000422\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":168}]}",
+            "targetCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "targetDigest": "062af6c9bf24067dd2c739af0ad913014dc068b95ea6165393a51e324a19522f",
+            "passage": "## Why the skip criterion is mechanical, not a confidence read",
+            "targetEvidenceLine": 35,
+            "targetLines": [
+              35
+            ],
+            "targetLineText": [
+              "## Why the skip criterion is mechanical, not a confidence read"
+            ],
+            "sourceLocatorTokens": []
+          }
+        ]
+      },
+      "renderContexts": {},
+      "populationGapFindings": [],
+      "L12-60-coverage": {
+        "stepFiveExcluded": [],
+        "authorAddedSlots": [],
+        "recordChangedThisTurn": true
+      },
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "src/state/knowledge-registry.mjs",
+      "sourceDigest": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+      "sourceContext": "// src/state/knowledge-registry.mjs\n// Pure domain model, reducer, and invariants for the Knowledge Registry.\n\nexport class KnowledgeValidationError extends Error {\n  constructor(message) {\n    super(message);\n    this.name = 'KnowledgeValidationError';\n    this.category = 'validation';\n  }\n}\n\nexport const VALID_DOC_LIFECYCLE = Object.freeze([\n  'reserved',\n  'provisional',\n  'active',\n  'superseded',\n  'retired',\n]);\n\n// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'\n// is a registered framework today, and its 4 modes are a closed set --\n// growing either list is a real product decision (a new writing framework,\n// or a new Diataxis mode), never a typo a reducer should silently accept.\nexport const VALID_FRAMEWORKS = Object.freeze(['diataxis']);\nexport const DIATAXIS_MODES = Object.freeze(['tutorial', 'how-to', 'reference', 'explanation']);\n\n/**\n * A doc is \"live\" (still the authoritative slot occupant) when it is\n * neither 'retired' nor 'superseded' -- doc.supersede already moved\n * \"current\" to supersededBy, so a superseded doc is excluded the same way\n * a retired one is, even though it isn't retired itself. This is the ONE\n * definition every reader of docLifecycle liveness shares: resolveDocId\n * below, src/report/knowledge-resolver.mjs's own resolution logic, and the\n * knowledge doctor checks in src/setup/registrations.mjs -- previously\n * re-implemented independently in each of those three places, free to\n * silently drift apart on a future lifecycle change.\n */\nexport function isLiveDocLifecycle(docLifecycle) {\n  return docLifecycle !== 'retired' && docLifecycle !== 'superseded';\n}\n\n// A single safe path SEGMENT: no '/' or '\\', can't start with '.' (rules\n// out '.', '..', and hidden-file-style segments in one regex), non-empty.\n// topicId/purposeSlug/role all become filesystem path segments downstream\n// (scripts/knowledge-migration.mjs builds `docs/${purposeSlug}/${role}.md`\n// directly from registry-accepted values) -- nothing before this validated\n// that, so `purposeSlug: '../../evil'` or `role: '../escape'` reached the\n// reducer, and from there the filesystem, unchecked.\nconst SAFE_SLUG_RE = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;\n\nfunction assertSafeSlug(value, label) {\n  if (typeof value !== 'string' || !SAFE_SLUG_RE.test(value)) {\n    throw new KnowledgeValidationError(\n      `${label} must be a safe single path segment (letters/digits, then letters/digits/./-/_, never '/', '\\\\', or starting with '.'): got ${JSON.stringify(value)}`\n    );\n  }\n}\n\n// A repo-relative doc path that must stay under docs/ -- rejects an\n// absolute path, a backslash, and any '.'/'..'/empty path segment (the\n// literal path-traversal shape: 'docs/../evil/guide.md',\n// 'docs/ok/../escape.md'). Deliberately string-only (no `node:path`\n// import) to keep this module's own \"pure domain model\" contract --\n// normalizing '..' segments manually is enough to prove the path can never\n// climb out of docs/, without adding a filesystem-adjacent dependency to a\n// module that has none today.\nfunction assertSafeDocPath(value, label) {\n  if (typeof value !== 'string' || value.length === 0) {\n    throw new KnowledgeValidationError(`${label} must be a non-empty string`);\n  }\n  if (value.includes('\\\\')) {\n    throw new KnowledgeValidationError(`${label} must not contain backslashes: got ${JSON.stringify(value)}`);\n  }\n  if (value.startsWith('/') || /^[A-Za-z]:/.test(value)) {\n    throw new KnowledgeValidationError(`${label} must be repo-relative, never absolute: got ${JSON.stringify(value)}`);\n  }\n  if (!value.startsWith('docs/')) {\n    throw new KnowledgeValidationError(`${label} must live under 'docs/': got ${JSON.stringify(value)}`);\n  }\n  const segments = value.split('/');\n  if (segments.some((seg) => seg === '.' || seg === '..' || seg === '')) {\n    throw new KnowledgeValidationError(`${label} must not contain '.', '..', or empty path segments: got ${JSON.stringify(value)}`);\n  }\n}\n\n/**\n * Enforces the narrow, mechanical slice of the closed role/framework/mode\n * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1\n * already states unconditionally: framework must be a registered one, mode\n * must be one of that framework's own modes, and role must never equal a\n * mode name (\"a role name must not equal any framework mode name\"). This\n * does NOT enforce a closed set of *role* values -- that needs a registered\n * per-role vocabulary (meaning/defaultFramework/defaultMode/lifecyclePolicy\n * per §7.2) seeded from a real reclassification of the corpus, a product\n * decision beyond this mechanical guard's scope.\n */\nfunction assertFrameworkModeRoleValid({ framework, mode, role }) {\n  if (!VALID_FRAMEWORKS.includes(framework)) {\n    throw new KnowledgeValidationError(\n      `Invalid framework: '${framework}' — registered frameworks are: ${VALID_FRAMEWORKS.join(', ')}.`\n    );\n  }\n  if (framework === 'diataxis') {\n    if (!DIATAXIS_MODES.includes(mode)) {\n      throw new KnowledgeValidationError(\n        `Invalid mode: '${mode}' for framework 'diataxis' — valid modes are: ${DIATAXIS_MODES.join(', ')}.`\n      );\n    }\n    if (DIATAXIS_MODES.includes(role)) {\n      throw new KnowledgeValidationError(\n        `Invalid role: '${role}' — a role name must not equal a Diataxis mode name (${DIATAXIS_MODES.join(', ')}).`\n      );\n    }\n  }\n}\n\n/**\n * Return all active docs matching (topicId, role) in view.\n */\nexport function getActiveDocs(view, topicId, role) {\n  if (!view || !view.docs) return [];\n  return Object.values(view.docs).filter(\n    (doc) => doc.topicId === topicId && doc.role === role && doc.docLifecycle === 'active'\n  );\n}\n\n/**\n * Assert that activeDoc(topicId, role) <= 1 for the given topicId and role.\n * Throws KnowledgeValidationError if violation exists.\n */\nexport function assertActiveDocCardinality(view, topicId, role) {\n  const activeDocs = getActiveDocs(view, topicId, role);\n  if (activeDocs.length > 1) {\n    throw new KnowledgeValidationError(\n      `Invariant violation: activeDoc(${topicId}, ${role}) count is ${activeDocs.length}, max allowed is 1.`\n    );\n  }\n}\n\n/**\n * Refuses `currentPath` when a DIFFERENT non-retired doc already claims it\n * as its own currentPath -- resolveDocPath's \"direct match on currentPath\"\n * step (src/report/knowledge-resolver.mjs) can only ever return one doc for\n * a given path; two docs silently sharing one currentPath means a caller\n * (knowledge attest, the legacy compound gate) resolves an ambiguous\n * `[doc, otherDoc]` array and picks `[0]` without knowing it -- exactly the\n * \"capture attaches to the wrong doc\" shape a fail-closed check must catch\n * at write time instead.\n */\nfunction assertCurrentPathUnique(view, id, currentPath) {\n  for (const doc of Object.values(view.docs)) {\n    if (doc.docId !== id && doc.currentPath === currentPath && doc.docLifecycle !== 'retired') {\n      throw new KnowledgeValidationError(\n        `currentPath \"${currentPath}\" is already claimed by doc '${doc.docId}' — currentPath must be unique among non-retired docs.`\n      );\n    }\n  }\n}\n\n/**\n * Refuses a NEW docId for (topicId, role) while a different doc already\n * occupies that slot in a still-live state -- otherwise `doc.reserve`/\n * `doc.register` with distinct `--doc-id` values is an escape hatch around\n * `assertActiveDocCardinality` (which only ever looks at 'active' rows):\n * two 'provisional' docs for the same role would sail through unnoticed.\n * 'retired' and 'superseded' free the slot on purpose -- `doc.promote`'s own\n * error message tells callers to supersede the existing active doc before\n * registering its replacement, so a superseded row must not still block.\n * A second doc for the same role is only legitimate after `topic.split`\n * gives it a distinct topicId with real lineage.\n */\nfunction assertDocSlotAvailable(view, id, topicId, role) {\n  for (const doc of Object.values(view.docs)) {\n    if (\n      doc.docId !== id &&\n      doc.topicId === topicId &&\n      doc.role === role &&\n      doc.docLifecycle !== 'retired' &&\n      doc.docLifecycle !== 'superseded'\n    ) {\n      throw new KnowledgeValidationError(\n        `doc slot (${topicId}, ${role}) is already occupied by doc '${doc.docId}' (${doc.docLifecycle}) — retire or supersede it first, or use \"fgos topic split\" to give the new doc its own topicId with lineage.`\n      );\n    }\n  }\n}\n\n/**\n * Refuses a doc write targeting a topic whose status is 'retired' -- reserve/\n * register/mark-rendered/promote must never let a doc keep advancing under a\n * topic that was retired directly (`fgos topic retire`) while the doc itself\n * was left in place (unlike `topic.split`/`topic.merge`, which always move a\n * doc's own topicId onto a still-active successor as part of the same event,\n * so a doc can never be stranded under a retired topic through those paths).\n * doc.supersede/doc.retire/doc.path-move are exempt on purpose: those are\n * exit-lifecycle or physical-relocation operations, never new content.\n */\nfunction assertTopicWritable(view, topicId, verb) {\n  const topic = view.topics[topicId];\n  if (topic && topic.status === 'retired') {\n    throw new KnowledgeValidationError(\n      `${verb}: topic '${topicId}' is retired — no new doc content may be written into a retired topic; migrate this doc to a live topic (via \"fgos topic split\"/\"fgos topic merge\") first.`\n    );\n  }\n}\n\n/**\n * Resolves a doc's identity from an explicit docId, or by searching for the\n * doc whose (topicId, role) match -- never by reconstructing `${topicId}:\n * ${role}` as a string. docId is a durable identity (docs/architect/\n * knowledge-registry-redesign.md §7.3) that topic.split intentionally never\n * rewrites even though it does move the doc's own topicId onto the successor\n * -- so a caller holding only (topicId, role) after a split must look the\n * doc up by field, or it silently misses every doc whose id predates the\n * split. When more than one doc shares (topicId, role) -- a live doc plus a\n * retired/superseded predecessor sharing the slot on purpose -- the live one\n * wins.\n */\nexport function resolveDocId(view, { docId, topicId, role }) {\n  if (docId) return docId;\n  if (!topicId || !role) return null;\n  const matches = Object.values(view.docs).filter((d) => d.topicId === topicId && d.role === role);\n  if (matches.length === 0) return null;\n  const live = matches.find((d) => isLiveDocLifecycle(d.docLifecycle));\n  return (live ?? matches[0]).docId;\n}\n\n/**\n * Apply a single knowledge event (topic.* or doc.*) onto view.\n * view = { topics: {...}, docs: {...}, ... }\n */\nexport function applyKnowledgeEvent(view, event) {\n  if (!view.topics) view.topics = {};\n  if (!view.docs) view.docs = {};\n\n  const payload = event.payload ?? {};\n\n  switch (event.type) {\n    case 'topic.register': {\n      const { topicId, purposeSlug, purposeTitle, entities } = payload;\n      if (!topicId || !purposeSlug) {\n        throw new KnowledgeValidationError('topic.register requires topicId and purposeSlug');\n      }\n      assertSafeSlug(topicId, 'topic.register: topicId');\n      assertSafeSlug(purposeSlug, 'topic.register: purposeSlug');\n      if (view.topics[topicId]) {\n        throw new KnowledgeValidationError(\n          `topic.register: topic '${topicId}' already exists (${view.topics[topicId].status}) — register is create-only; use \"fgos topic rename\"/\"fgos topic split\"/\"fgos topic merge\" to change an existing topic.`\n        );\n      }\n      view.topics[topicId] = {\n        topicId,\n        purposeSlug,\n        purposeTitle: purposeTitle ?? purposeSlug,\n        entities: Array.isArray(entities) ? [...entities] : [],\n        status: 'active',\n        lineage: null,\n        createdAt: event.ts ?? Date.now(),\n        updatedAt: event.ts ?? Date.now(),\n      };\n      break;\n    }\n\n    case 'topic.rename': {\n      const { topicId, newPurposeSlug, newPurposeTitle } = payload;\n      const topic = view.topics[topicId];\n      if (!topic) {\n        throw new KnowledgeValidationError(`topic.rename: topic '${topicId}' not found`);\n      }\n      topic.lineage = {\n        ...(topic.lineage ?? {}),\n        renamedFrom: topic.purposeSlug,\n      };\n      if (newPurposeSlug) {\n        assertSafeSlug(newPurposeSlug, 'topic.rename: newPurposeSlug');\n        topic.purposeSlug = newPurposeSlug;\n      }\n      if (newPurposeTitle) topic.purposeTitle = newPurposeTitle;\n      topic.updatedAt = event.ts ?? Date.now();\n      break;\n    }\n\n    case 'topic.split': {\n      const { topicId, newTopics } = payload;\n      const oldTopic = view.topics[topicId];\n      if (!oldTopic) {\n        throw new KnowledgeValidationError(`topic.split: old topic '${topicId}' not found`);\n      }\n      if (oldTopic.status !== 'active') {\n        throw new KnowledgeValidationError(`topic.split: source topic '${topicId}' is '${oldTopic.status}', must be 'active'`);\n      }\n      if (!Array.isArray(newTopics) || newTopics.length < 2) {\n        throw new KnowledgeValidationError('topic.split requires at least 2 successor topics -- a single-successor split is a rename (\"fgos topic rename\"), not a split');\n      }\n\n      // Validate the WHOLE newTopics array before mutating anything: a\n      // successor id equal to the source would un-retire the source topic\n      // right after this case retires it (and its lineage.splitFrom would\n      // point at itself); a successor id repeated within one split call\n      // means only the last one's metadata survives, silently discarding\n      // the others'; a successor id that already names an existing topic\n      // (active or retired) would silently overwrite that topic's own\n      // history/status.\n      const seenSuccessors = new Set();\n      for (const nt of newTopics) {\n        const newTopicId = nt?.topicId;\n        if (!newTopicId || !nt?.purposeSlug) {\n          throw new KnowledgeValidationError('topic.split new topic requires topicId and purposeSlug');\n        }\n        assertSafeSlug(newTopicId, 'topic.split: successor topicId');\n        assertSafeSlug(nt.purposeSlug, 'topic.split: successor purposeSlug');\n        if (newTopicId === topicId) {\n          throw new KnowledgeValidationError(`topic.split: successor topicId '${newTopicId}' cannot equal the source topicId`);\n        }\n        if (seenSuccessors.has(newTopicId)) {\n          throw new KnowledgeValidationError(`topic.split: successor topicId '${newTopicId}' listed more than once in newTopics`);\n        }\n        seenSuccessors.add(newTopicId);\n        if (view.topics[newTopicId]) {\n          throw new KnowledgeValidationError(`topic.split: successor topicId '${newTopicId}' already exists (${view.topics[newTopicId].status}) -- topic ids are create-only`);\n        }\n      }\n\n      // Every LIVE doc under the source topic must land under exactly one\n      // successor via rolesToMove -- checked BEFORE any mutation, same\n      // fail-nothing-mutates discipline as the successor checks above.\n      // Without this: a role missing from every successor's rolesToMove\n      // stays on the OLD topicId, which this case is about to retire --\n      // stranding a live doc under a retired topic, the exact invariant\n      // this whole item's other fixes (doc.demote's assertTopicWritable,\n      // migration's topic-liveness preflight) already treat as a real\n      // problem. A role listed in MORE than one successor's rolesToMove\n      // would silently land the doc under whichever successor processes\n      // last, discarding the caller's real intent with no error.\n      const liveDocsUnderSource = Object.values(view.docs).filter(\n        (d) => d.topicId === topicId && isLiveDocLifecycle(d.docLifecycle)\n      );\n      const roleAssignedTo = new Map();\n      for (const nt of newTopics) {\n        if (!Array.isArray(nt.rolesToMove)) continue;\n        for (const role of nt.rolesToMove) {\n          if (roleAssignedTo.has(role)) {\n            throw new KnowledgeValidationError(\n              `topic.split: role '${role}' is listed in more than one successor's rolesToMove (both '${roleAssignedTo.get(role)}' and '${nt.topicId}') -- a role can only move to exactly one successor`\n            );\n          }\n          roleAssignedTo.set(role, nt.topicId);\n        }\n      }\n      const strandedDocs = liveDocsUnderSource.filter((d) => !roleAssignedTo.has(d.role));\n      if (strandedDocs.length > 0) {\n        throw new KnowledgeValidationError(\n          `topic.split: ${strandedDocs.length} live doc(s) under source topic '${topicId}' are not assigned to any successor's rolesToMove (${strandedDocs.map((d) => `${d.docId} (role '${d.role}')`).join(', ')}) -- every live doc must move to a successor, or be explicitly retired/superseded first`\n        );\n      }\n\n      // Mark old topic as retired\n      oldTopic.status = 'retired';\n      oldTopic.updatedAt = event.ts ?? Date.now();\n\n      const oldDocs = Object.values(view.docs).filter((d) => d.topicId === topicId);\n\n      for (const nt of newTopics) {\n        const { topicId: newTopicId, purposeSlug, purposeTitle, entities, rolesToMove } = nt;\n        view.topics[newTopicId] = {\n          topicId: newTopicId,\n          purposeSlug,\n          purposeTitle: purposeTitle ?? purposeSlug,\n          entities: Array.isArray(entities) ? [...entities] : (oldTopic.entities ?? []),\n          status: 'active',\n          lineage: { splitFrom: topicId },\n          createdAt: event.ts ?? Date.now(),\n          updatedAt: event.ts ?? Date.now(),\n        };\n\n        if (Array.isArray(rolesToMove)) {\n          for (const doc of oldDocs) {\n            if (rolesToMove.includes(doc.role)) {\n              doc.topicId = newTopicId;\n              doc.updatedAt = event.ts ?? Date.now();\n            }\n          }\n        }\n      }\n      break;\n    }\n\n    case 'topic.merge': {\n      const { sourceTopicIds, targetTopicId } = payload;\n      if (!Array.isArray(sourceTopicIds) || !targetTopicId) {\n        throw new KnowledgeValidationError('topic.merge requires sourceTopicIds and targetTopicId');\n      }\n      const targetTopic = view.topics[targetTopicId];\n      if (!targetTopic) {\n        throw new KnowledgeValidationError(`topic.merge: target topic '${targetTopicId}' not found`);\n      }\n      if (targetTopic.status !== 'active') {\n        throw new KnowledgeValidationError(`topic.merge: target topic '${targetTopicId}' is '${targetTopic.status}', must be 'active'`);\n      }\n\n      // Fail-closed on the source list itself before the role-collision check\n      // or any mutation: a source equal to targetTopicId means srcTopic and\n      // targetTopic are the SAME object below, so the mutation loop would\n      // retire the target right after giving it a lineage.mergedFrom entry\n      // pointing at itself; a source that doesn't exist would otherwise be\n      // silently recorded into lineage.mergedFrom by the spread below without\n      // ever being retired or moving any docs; a non-active source (already\n      // retired, or mid-merge as some other merge's own target) means its\n      // docs were already supposed to have moved elsewhere.\n      const seenSources = new Set();\n      for (const sId of sourceTopicIds) {\n        if (sId === targetTopicId) {\n          throw new KnowledgeValidationError(`topic.merge: source '${sId}' cannot equal targetTopicId`);\n        }\n        if (seenSources.has(sId)) {\n          throw new KnowledgeValidationError(`topic.merge: source '${sId}' listed more than once in sourceTopicIds`);\n        }\n        seenSources.add(sId);\n        const srcTopic = view.topics[sId];\n        if (!srcTopic) {\n          throw new KnowledgeValidationError(`topic.merge: source topic '${sId}' not found`);\n        }\n        if (srcTopic.status !== 'active') {\n          throw new KnowledgeValidationError(`topic.merge: source topic '${sId}' is '${srcTopic.status}', must be 'active'`);\n        }\n      }\n\n      // Validate BEFORE mutating anything: merge moves doc.topicId directly,\n      // never through doc.register's own assertDocSlotAvailable check, so\n      // this is the only place a merge's own (targetTopicId, role) collision\n      // gets caught. A whole-merge failure here (nothing mutated yet) beats\n      // silently landing two live docs on the same role.\n      const roleOccupants = new Map();\n      for (const doc of Object.values(view.docs)) {\n        if (doc.docLifecycle === 'retired' || doc.docLifecycle === 'superseded') continue;\n        if (doc.topicId !== targetTopicId && !sourceTopicIds.includes(doc.topicId)) continue;\n        const priorDocId = roleOccupants.get(doc.role);\n        if (priorDocId && priorDocId !== doc.docId) {\n          throw new KnowledgeValidationError(\n            `topic.merge: role '${doc.role}' would have two live docs under target '${targetTopicId}' after merge ('${priorDocId}' and '${doc.docId}') — supersede or retire one first.`\n          );\n        }\n        roleOccupants.set(doc.role, doc.docId);\n      }\n\n      targetTopic.lineage = {\n        ...(targetTopic.lineage ?? {}),\n        mergedFrom: Array.isArray(targetTopic.lineage?.mergedFrom)\n          ? [...targetTopic.lineage.mergedFrom, ...sourceTopicIds]\n          : [...sourceTopicIds],\n      };\n      targetTopic.updatedAt = event.ts ?? Date.now();\n\n      for (const sId of sourceTopicIds) {\n        const srcTopic = view.topics[sId];\n        if (srcTopic) {\n          srcTopic.status = 'retired';\n          srcTopic.updatedAt = event.ts ?? Date.now();\n        }\n        for (const doc of Object.values(view.docs)) {\n          if (doc.topicId === sId) {\n            doc.topicId = targetTopicId;\n            doc.updatedAt = event.ts ?? Date.now();\n          }\n        }\n      }\n      break;\n    }\n\n    case 'topic.retire': {\n      const { topicId } = payload;\n      const topic = view.topics[topicId];\n      if (!topic) {\n        throw new KnowledgeValidationError(`topic.retire: topic '${topicId}' not found`);\n      }\n      topic.status = 'retired';\n      topic.updatedAt = event.ts ?? Date.now();\n      break;\n    }\n\n    case 'doc.reserve': {\n      const { topicId, role, currentPath, framework, mode, docId } = payload;\n      if (!topicId || !role || !currentPath) {\n        throw new KnowledgeValidationError('doc.reserve requires topicId, role, and currentPath');\n      }\n      if (!view.topics[topicId]) {\n        throw new KnowledgeValidationError(`doc.reserve: topicId \"${topicId}\" is not registered — run \"fgos topic register\" first`);\n      }\n      assertSafeSlug(role, 'doc.reserve: role');\n      assertSafeDocPath(currentPath, 'doc.reserve: currentPath');\n      assertTopicWritable(view, topicId, 'doc.reserve');\n      const resolvedFramework = framework ?? 'diataxis';\n      const resolvedMode = mode ?? 'explanation';\n      assertFrameworkModeRoleValid({ framework: resolvedFramework, mode: resolvedMode, role });\n      const id = docId ?? `${topicId}:${role}`;\n      if (view.docs[id]) {\n        throw new KnowledgeValidationError(\n          `doc.reserve: doc '${id}' already exists (${view.docs[id].docLifecycle}) — reserve is create-only; use \"fgos doc register\" for an explicit update.`\n        );\n      }\n      assertDocSlotAvailable(view, id, topicId, role);\n      assertCurrentPathUnique(view, id, currentPath);\n      view.docs[id] = {\n        docId: id,\n        topicId,\n        role,\n        framework: resolvedFramework,\n        mode: resolvedMode,\n        docLifecycle: 'reserved',\n        currentPath,\n        aliases: [],\n        sourceCaptureIds: [],\n        createdAt: event.ts ?? Date.now(),\n        updatedAt: event.ts ?? Date.now(),\n      };\n      break;\n    }\n\n    case 'doc.register': {\n      const { topicId, role, currentPath, framework, mode, docLifecycle, aliases, sourceCaptureIds, docId } = payload;\n      if (!topicId || !role || !currentPath) {\n        throw new KnowledgeValidationError('doc.register requires topicId, role, and currentPath');\n      }\n      if (!view.topics[topicId]) {\n        throw new KnowledgeValidationError(`doc.register: topicId \"${topicId}\" is not registered — run \"fgos topic register\" first`);\n      }\n      assertSafeSlug(role, 'doc.register: role');\n      assertSafeDocPath(currentPath, 'doc.register: currentPath');\n      assertTopicWritable(view, topicId, 'doc.register');\n      const id = docId ?? `${topicId}:${role}`;\n      const existing = view.docs[id];\n      if (existing && (existing.topicId !== topicId || existing.role !== role || existing.currentPath !== currentPath)) {\n        throw new KnowledgeValidationError(\n          `doc.register: doc '${id}' already exists with topicId='${existing.topicId}', role='${existing.role}', currentPath='${existing.currentPath}' — register cannot change a doc's identity or path. Use \"fgos topic split\"/\"fgos topic merge\" to change topicId/role (with lineage), or \"fgos doc move-path\" to change currentPath (preserves the old path as an alias).`\n        );\n      }\n      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is\n      // the sole provisional->active gate, doc.supersede/doc.retire are the\n      // sole way out of 'active'. Re-registering an EXISTING docId must\n      // never itself move the lifecycle beyond one narrow, already-tested\n      // bridge: defaulting to 'provisional' on a bare re-register (no\n      // --lifecycle given) would silently demote an already-'active' doc,\n      // and accepting an arbitrary explicit docLifecycle would resurrect a\n      // 'retired'/'superseded' doc back to 'active' through this side door.\n      // The one legitimate register-driven transition is 'reserved' ->\n      // 'provisional': \"doc reserve\" creates the empty slot, \"doc register\"\n      // with real content is how that slot gets its first draft, and that\n      // flow is exercised end-to-end by knowledge-verbs/knowledge-attest-\n      // gate tests. Anything else -- an explicit lifecycle that disagrees\n      // with the current one, outside that one bridge -- is refused.\n      let lifecycle;\n      if (existing) {\n        if (docLifecycle === undefined || docLifecycle === existing.docLifecycle) {\n          lifecycle = existing.docLifecycle;\n        } else if (existing.docLifecycle === 'reserved' && docLifecycle === 'provisional') {\n          lifecycle = 'provisional';\n        } else {\n          throw new KnowledgeValidationError(\n            `doc.register: doc '${id}' already exists with docLifecycle='${existing.docLifecycle}' — register cannot change lifecycle to '${docLifecycle}'; use \"fgos doc promote\"/\"fgos doc supersede\"/\"fgos doc retire\" instead.`\n          );\n        }\n      } else {\n        lifecycle = docLifecycle ?? 'provisional';\n        if (lifecycle === 'draft' || !VALID_DOC_LIFECYCLE.includes(lifecycle)) {\n          throw new KnowledgeValidationError(`Invalid docLifecycle: '${lifecycle}'`);\n        }\n      }\n      const resolvedFramework = framework ?? existing?.framework ?? 'diataxis';\n      const resolvedMode = mode ?? existing?.mode ?? 'explanation';\n      assertFrameworkModeRoleValid({ framework: resolvedFramework, mode: resolvedMode, role });\n      if (lifecycle === 'active') {\n        const activeDocs = getActiveDocs(view, topicId, role);\n        if (activeDocs.length > 0 && activeDocs[0].docId !== id) {\n          throw new KnowledgeValidationError(\n            `activeDoc(${topicId}, ${role}) already exists: '${activeDocs[0].currentPath}'`\n          );\n        }\n      }\n      assertDocSlotAvailable(view, id, topicId, role);\n      assertCurrentPathUnique(view, id, currentPath);\n      view.docs[id] = {\n        docId: id,\n        topicId,\n        role,\n        framework: resolvedFramework,\n        mode: resolvedMode,\n        docLifecycle: lifecycle,\n        currentPath,\n        aliases: Array.isArray(aliases) ? [...aliases] : (existing?.aliases ?? []),\n        sourceCaptureIds: Array.isArray(sourceCaptureIds) ? [...sourceCaptureIds] : (existing?.sourceCaptureIds ?? []),\n        createdAt: existing?.createdAt ?? event.ts ?? Date.now(),\n        updatedAt: event.ts ?? Date.now(),\n      };\n      assertActiveDocCardinality(view, topicId, role);\n      break;\n    }\n\n    case 'doc.mark-rendered': {\n      const { docId, topicId, role } = payload;\n      const id = resolveDocId(view, { docId, topicId, role });\n      const doc = view.docs[id];\n      if (!doc) {\n        throw new KnowledgeValidationError(`doc.mark-rendered: doc '${id}' not found`);\n      }\n      assertTopicWritable(view, doc.topicId, 'doc.mark-rendered');\n      if (doc.docLifecycle !== 'reserved') {\n        throw new KnowledgeValidationError(\n          `doc.mark-rendered: doc '${id}' is '${doc.docLifecycle}', must be 'reserved'`\n        );\n      }\n      doc.docLifecycle = 'provisional';\n      doc.updatedAt = event.ts ?? Date.now();\n      break;\n    }\n\n    case 'doc.promote': {\n      const { docId, topicId, role } = payload;\n      const id = resolveDocId(view, { docId, topicId, role });\n      const doc = view.docs[id];\n      if (!doc) {\n        throw new KnowledgeValidationError(`doc.promote: doc '${id}' not found`);\n      }\n      assertTopicWritable(view, doc.topicId, 'doc.promote');\n      if (doc.docLifecycle === 'reserved') {\n        throw new KnowledgeValidationError(\n          `doc.promote: cannot promote doc '${id}' from 'reserved' state (must mark-rendered/provisional first)`\n        );\n      }\n      if (doc.docLifecycle !== 'provisional') {\n        throw new KnowledgeValidationError(\n          `doc.promote: doc '${id}' is in '${doc.docLifecycle}' state, must be 'provisional'`\n        );\n      }\n      const activeDocs = getActiveDocs(view, doc.topicId, doc.role);\n      if (activeDocs.length > 0 && activeDocs[0].docId !== id) {\n        throw new KnowledgeValidationError(\n          `doc.promote: activeDoc(${doc.topicId}, ${doc.role}) already exists: '${activeDocs[0].currentPath}'`\n        );\n      }\n      doc.docLifecycle = 'active';\n      doc.updatedAt = event.ts ?? Date.now();\n      assertActiveDocCardinality(view, doc.topicId, doc.role);\n      break;\n    }\n\n    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration\n    // \"leaves every migrated document provisional unless explicitly\n    // promoted\" -- an active doc whose content moved out from under it\n    // needs re-verification before it counts as authoritative again, but\n    // nothing in the reducer could legitimately move active -> provisional\n    // before this event existed (doc.register's own lifecycle guard\n    // deliberately refuses that exact transition as a silent-demote\n    // vector). doc.demote is the explicit, auditable door for it -- the\n    // mirror image of doc.promote, never inferred from any other event.\n    case 'doc.demote': {\n      const { docId, topicId, role } = payload;\n      const id = resolveDocId(view, { docId, topicId, role });\n      const doc = view.docs[id];\n      if (!doc) {\n        throw new KnowledgeValidationError(`doc.demote: doc '${id}' not found`);\n      }\n      assertTopicWritable(view, doc.topicId, 'doc.demote');\n      if (doc.docLifecycle !== 'active') {\n        throw new KnowledgeValidationError(\n          `doc.demote: doc '${id}' is '${doc.docLifecycle}', must be 'active'`\n        );\n      }\n      doc.docLifecycle = 'provisional';\n      doc.updatedAt = event.ts ?? Date.now();\n      break;\n    }\n\n    case 'doc.supersede': {\n      const { docId, topicId, role, supersededBy } = payload;\n      const id = resolveDocId(view, { docId, topicId, role });\n      const doc = view.docs[id];\n      if (!doc) {\n        throw new KnowledgeValidationError(`doc.supersede: doc '${id}' not found`);\n      }\n      // supersededBy is a lineage pointer other readers (the resolver's\n      // fallback, doctors, end-user doc indexing) can follow forward from a\n      // dead doc to its replacement -- an unvalidated value (a docId that\n      // doesn't exist, points back at itself, or points at another already-\n      // dead doc) would corrupt that lineage silently instead of failing at\n      // write time where the mistake is still cheap to catch.\n      if (supersededBy) {\n        if (supersededBy === id) {\n          throw new KnowledgeValidationError(`doc.supersede: doc '${id}' cannot be supersededBy itself`);\n        }\n        const successor = view.docs[supersededBy];\n        if (!successor) {\n          throw new KnowledgeValidationError(`doc.supersede: supersededBy doc '${supersededBy}' not found`);\n        }\n        if (!isLiveDocLifecycle(successor.docLifecycle)) {\n          throw new KnowledgeValidationError(\n            `doc.supersede: supersededBy doc '${supersededBy}' is '${successor.docLifecycle}' — must be a live doc, not another dead one`\n          );\n        }\n        // src/report/knowledge-resolver.mjs's own definition of \"live\" is\n        // doc-live AND topic-active -- a successor whose OWN topic is\n        // retired would pass the docLifecycle check above yet never be\n        // treated as a valid resolution target by any reader (the\n        // resolver's isLive, doctor's isLiveDocLifecycle-based checks).\n        // Writing a supersededBy pointer the read side can never honor is\n        // the same \"registry accepts something no reader can use\" shape\n        // this reducer's other guards (assertTopicWritable, the topic-\n        // active checks on topic.merge/split) already close elsewhere.\n        const successorTopic = view.topics[successor.topicId];\n        if (!successorTopic || successorTopic.status !== 'active') {\n          throw new KnowledgeValidationError(\n            `doc.supersede: supersededBy doc '${supersededBy}' is under topic '${successor.topicId}', which is '${successorTopic?.status ?? 'missing'}' (not active) — the successor's own topic must be active for any reader to ever resolve this pointer`\n          );\n        }\n        doc.supersededBy = supersededBy;\n      }\n      doc.docLifecycle = 'superseded';\n      doc.updatedAt = event.ts ?? Date.now();\n      break;\n    }\n\n    case 'doc.retire': {\n      const { docId, topicId, role } = payload;\n      const id = resolveDocId(view, { docId, topicId, role });\n      const doc = view.docs[id];\n      if (!doc) {\n        throw new KnowledgeValidationError(`doc.retire: doc '${id}' not found`);\n      }\n      doc.docLifecycle = 'retired';\n      doc.updatedAt = event.ts ?? Date.now();\n      break;\n    }\n\n    // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation\n    // links a capture to a document slot ... the precise replacement for\n    // the old 'compound stores docType/docPath' meaning.\" Modeled as\n    // accumulating into the SAME `sourceCaptureIds` field `doc.register`\n    // already seeds from bootstrap (docs/architect/...md §7.2's own\n    // example schema) -- one array of every capture that has ever\n    // justified this doc's content, never overwritten, mirroring\n    // an accumulate-never-replace fold rule.\n    case 'doc.attest': {\n      const { docId, topicId, role, captureId } = payload;\n      const id = resolveDocId(view, { docId, topicId, role });\n      const doc = view.docs[id];\n      if (!doc) {\n        throw new KnowledgeValidationError(`doc.attest: doc '${id}' not found`);\n      }\n      // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation\n      // rejects retired topics and retired documents\". This must live here,\n      // in the reducer, not only in the CLI's resolveDocPath-based\n      // pre-check -- any caller using the write facade directly (attest-\n      // DocStore) would otherwise bypass that check entirely. 'superseded'\n      // is rejected the same way retired is: a superseded doc is no longer\n      // the authoritative slot occupant (doc.supersede already moved that\n      // role to supersededBy), so a capture attested here would silently\n      // attach to a doc nothing points at as current anymore.\n      if (doc.docLifecycle === 'retired' || doc.docLifecycle === 'superseded') {\n        throw new KnowledgeValidationError(`doc.attest: doc '${id}' is ${doc.docLifecycle}`);\n      }\n      assertTopicWritable(view, doc.topicId, 'doc.attest');\n      if (!captureId || typeof captureId !== 'string' || !captureId.trim()) {\n        throw new KnowledgeValidationError('doc.attest requires captureId');\n      }\n      if (!Array.isArray(doc.sourceCaptureIds)) doc.sourceCaptureIds = [];\n      if (!doc.sourceCaptureIds.includes(captureId)) {\n        doc.sourceCaptureIds.push(captureId);\n      }\n      doc.updatedAt = event.ts ?? Date.now();\n      break;\n    }\n\n    case 'doc.path-move': {\n      const { docId, topicId, role, newPath } = payload;\n      const id = resolveDocId(view, { docId, topicId, role });\n      const doc = view.docs[id];\n      if (!doc) {\n        throw new KnowledgeValidationError(`doc.path-move: doc '${id}' not found`);\n      }\n      if (!newPath) {\n        throw new KnowledgeValidationError('doc.path-move requires newPath');\n      }\n      assertSafeDocPath(newPath, 'doc.path-move: newPath');\n      assertCurrentPathUnique(view, id, newPath);\n      if (doc.currentPath && doc.currentPath !== newPath && !doc.aliases.includes(doc.currentPath)) {\n        doc.aliases.push(doc.currentPath);\n      }\n      doc.currentPath = newPath;\n      doc.updatedAt = event.ts ?? Date.now();\n      break;\n    }\n\n    default:\n      break;\n  }\n}\n\n/**\n * Fold knowledge events into a view object.\n */\nexport function foldKnowledgeEvents(events, seedView) {\n  const view = seedView ? { ...seedView } : { topics: {}, docs: {} };\n  if (!view.topics) view.topics = {};\n  if (!view.docs) view.docs = {};\n\n  for (const event of events) {\n    if (event.type.startsWith('topic.') || event.type.startsWith('doc.')) {\n      applyKnowledgeEvent(view, event);\n    }\n  }\n\n  return { topics: view.topics, docs: view.docs };\n}\n",
+      "record": {
+        "file": "src/state/knowledge-registry.mjs",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+        "digest": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+        "inventoryEdgeIds": [
+          "class6-l-000438",
+          "class6-l-000439",
+          "class6-l-000440",
+          "class6-l-000441",
+          "class6-l-000442",
+          "class6-l-000443",
+          "class6-l-000444",
+          "class6-l-000445",
+          null,
+          null
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000438",
+            "slotKey": "{\"edgeId\":\"class6-l-000438\",\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000438\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":20}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000438",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 20
+              }
+            ],
+            "consumerFile": "src/state/knowledge-registry.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 20,
+                "columnStart": 4,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 20,
+                "columnStart": 4,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+            "logicalReference": "docs/architect/knowledge-registry-redesign.md",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58/60: A51, L12-30/31/32/58/60: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis' is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis' is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'\"",
+            "dependency": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis' is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'\"",
+            "blockedCategory": "phase9-carry",
+            "dependencyCategory": "phase9-carry",
+            "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000438",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 20,
+                "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+                "originalLineText": "// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'"
+              }
+            ],
+            "searchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+              "passage": "// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "hitCount": 2,
+                  "liveHitCount": 0,
+                  "hitsSha256": "56a6dad6e3ae8d6ead1d2f6fc1ca7ce6a213c3d4949cce22ebc2f902f3988320"
+                },
+                {
+                  "query": "§5.5/§14.1: only 'diataxis'",
+                  "hitCount": 0,
+                  "liveHitCount": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+                }
+              ],
+              "assessment": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis' is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'\"",
+              "hitGroups": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "carriageCount": 2,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis' is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'\"",
+                  "category": "carriage"
+                },
+                {
+                  "query": "§5.5/§14.1: only 'diataxis'",
+                  "carriageCount": 0,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis' is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'\"",
+                  "category": "dead"
+                }
+              ]
+            },
+            "parkSourceQuote": "// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'"
+          },
+          {
+            "edgeId": "class6-l-000439",
+            "slotKey": "{\"edgeId\":\"class6-l-000439\",\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000439\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":88}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000439",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 88
+              }
+            ],
+            "consumerFile": "src/state/knowledge-registry.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 88,
+                "columnStart": 20,
+                "columnEndExclusive": 65,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 88,
+                "columnStart": 20,
+                "columnEndExclusive": 65,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+            "logicalReference": "docs/architect/knowledge-registry-redesign.md",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58/60: A51, L12-30/31/32/58/60: Phase 9 carry: knowledge-registry-redesign * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1 is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: ' * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1 is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: ' * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1'",
+            "dependency": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1 is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: ' * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1'",
+            "blockedCategory": "phase9-carry",
+            "dependencyCategory": "phase9-carry",
+            "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000439",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 88,
+                "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+                "originalLineText": " * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1"
+              }
+            ],
+            "searchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+              "passage": " * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "hitCount": 2,
+                  "liveHitCount": 0,
+                  "hitsSha256": "56a6dad6e3ae8d6ead1d2f6fc1ca7ce6a213c3d4949cce22ebc2f902f3988320"
+                },
+                {
+                  "query": "§7.2 rule 1",
+                  "hitCount": 0,
+                  "liveHitCount": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+                }
+              ],
+              "assessment": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1 is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: ' * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1'",
+              "hitGroups": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "carriageCount": 2,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1 is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: ' * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1'",
+                  "category": "carriage"
+                },
+                {
+                  "query": "§7.2 rule 1",
+                  "carriageCount": 0,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1 is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: ' * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1'",
+                  "category": "dead"
+                }
+              ]
+            },
+            "parkSourceQuote": " * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1"
+          },
+          {
+            "edgeId": "class6-l-000440",
+            "slotKey": "{\"edgeId\":\"class6-l-000440\",\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000440\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":210}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000440",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 210
+              }
+            ],
+            "consumerFile": "src/state/knowledge-registry.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 210,
+                "columnStart": 55,
+                "columnEndExclusive": 70,
+                "text": "docs/architect/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 210,
+                "columnStart": 55,
+                "columnEndExclusive": 70,
+                "text": "docs/architect/"
+              }
+            ],
+            "matchedExpression": "docs/architect/",
+            "logicalReference": "docs/architect/",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58/60: A51, L12-30/31/32/58/60: Phase 9 carry: knowledge-registry-redesign * ${role}` as a string. docId is a durable identity (docs/architect/ is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: ' * ${role}` as a string. docId is a durable identity (docs/architect/'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign * ${role}` as a string. docId is a durable identity (docs/architect/ is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: ' * ${role}` as a string. docId is a durable identity (docs/architect/'",
+            "dependency": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign * ${role}` as a string. docId is a durable identity (docs/architect/ is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: ' * ${role}` as a string. docId is a durable identity (docs/architect/'",
+            "blockedCategory": "phase9-carry",
+            "dependencyCategory": "phase9-carry",
+            "legacyPath": "docs/architect/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000440",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 210,
+                "matchedExpression": "docs/architect/",
+                "originalLineText": " * ${role}` as a string. docId is a durable identity (docs/architect/"
+              }
+            ],
+            "searchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/architect/",
+              "passage": " * ${role}` as a string. docId is a durable identity (docs/architect/",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/architect/",
+                  "hitCount": 1545,
+                  "liveHitCount": 808,
+                  "hitsSha256": "358db0c84f3897ebc983fbbec7df35003e6ec5f584191abfe24861d2f0cb416e"
+                }
+              ],
+              "assessment": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign * ${role}` as a string. docId is a durable identity (docs/architect/ is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: ' * ${role}` as a string. docId is a durable identity (docs/architect/'",
+              "hitGroups": [
+                {
+                  "query": "docs/architect/",
+                  "carriageCount": 737,
+                  "liveCount": 808,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign * ${role}` as a string. docId is a durable identity (docs/architect/ is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: ' * ${role}` as a string. docId is a durable identity (docs/architect/'",
+                  "category": "citation-only"
+                }
+              ]
+            },
+            "parkSourceQuote": " * ${role}` as a string. docId is a durable identity (docs/architect/"
+          },
+          {
+            "edgeId": "class6-l-000441",
+            "slotKey": "{\"edgeId\":\"class6-l-000441\",\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000441\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":537}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000441",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 537
+              }
+            ],
+            "consumerFile": "src/state/knowledge-registry.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 537,
+                "columnStart": 10,
+                "columnEndExclusive": 55,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 537,
+                "columnStart": 10,
+                "columnEndExclusive": 55,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+            "logicalReference": "docs/architect/knowledge-registry-redesign.md",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58/60: A51, L12-30/31/32/58/60: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is'",
+            "dependency": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is'",
+            "blockedCategory": "phase9-carry",
+            "dependencyCategory": "phase9-carry",
+            "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000441",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 537,
+                "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+                "originalLineText": "      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is"
+              }
+            ],
+            "searchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+              "passage": "      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "hitCount": 2,
+                  "liveHitCount": 0,
+                  "hitsSha256": "56a6dad6e3ae8d6ead1d2f6fc1ca7ce6a213c3d4949cce22ebc2f902f3988320"
+                },
+                {
+                  "query": "§7.3: doc.promote is",
+                  "hitCount": 0,
+                  "liveHitCount": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+                }
+              ],
+              "assessment": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is'",
+              "hitGroups": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "carriageCount": 2,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is'",
+                  "category": "carriage"
+                },
+                {
+                  "query": "§7.3: doc.promote is",
+                  "carriageCount": 0,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is'",
+                  "category": "dead"
+                }
+              ]
+            },
+            "parkSourceQuote": "      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is"
+          },
+          {
+            "edgeId": "class6-l-000442",
+            "slotKey": "{\"edgeId\":\"class6-l-000442\",\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000442\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":646}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000442",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 646
+              }
+            ],
+            "consumerFile": "src/state/knowledge-registry.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 646,
+                "columnStart": 8,
+                "columnEndExclusive": 53,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 646,
+                "columnStart": 8,
+                "columnEndExclusive": 53,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+            "logicalReference": "docs/architect/knowledge-registry-redesign.md",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58/60: A51, L12-30/31/32/58/60: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration'",
+            "dependency": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration'",
+            "blockedCategory": "phase9-carry",
+            "dependencyCategory": "phase9-carry",
+            "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000442",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 646,
+                "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+                "originalLineText": "    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration"
+              }
+            ],
+            "searchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+              "passage": "    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "hitCount": 2,
+                  "liveHitCount": 0,
+                  "hitsSha256": "56a6dad6e3ae8d6ead1d2f6fc1ca7ce6a213c3d4949cce22ebc2f902f3988320"
+                },
+                {
+                  "query": "§13.5 rule 6: migration",
+                  "hitCount": 0,
+                  "liveHitCount": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+                }
+              ],
+              "assessment": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration'",
+              "hitGroups": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "carriageCount": 2,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration'",
+                  "category": "carriage"
+                },
+                {
+                  "query": "§13.5 rule 6: migration",
+                  "carriageCount": 0,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration'",
+                  "category": "dead"
+                }
+              ]
+            },
+            "parkSourceQuote": "    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration"
+          },
+          {
+            "edgeId": "class6-l-000443",
+            "slotKey": "{\"edgeId\":\"class6-l-000443\",\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000443\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":733}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000443",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 733
+              }
+            ],
+            "consumerFile": "src/state/knowledge-registry.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 733,
+                "columnStart": 8,
+                "columnEndExclusive": 53,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 733,
+                "columnStart": 8,
+                "columnEndExclusive": 53,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+            "logicalReference": "docs/architect/knowledge-registry-redesign.md",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58/60: A51, L12-30/31/32/58/60: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation'",
+            "dependency": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation'",
+            "blockedCategory": "phase9-carry",
+            "dependencyCategory": "phase9-carry",
+            "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000443",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 733,
+                "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+                "originalLineText": "    // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation"
+              }
+            ],
+            "searchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+              "passage": "    // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "hitCount": 2,
+                  "liveHitCount": 0,
+                  "hitsSha256": "56a6dad6e3ae8d6ead1d2f6fc1ca7ce6a213c3d4949cce22ebc2f902f3988320"
+                },
+                {
+                  "query": "§7.4: \"Attestation",
+                  "hitCount": 0,
+                  "liveHitCount": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+                }
+              ],
+              "assessment": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation'",
+              "hitGroups": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "carriageCount": 2,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation'",
+                  "category": "carriage"
+                },
+                {
+                  "query": "§7.4: \"Attestation",
+                  "carriageCount": 0,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '    // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation'",
+                  "category": "dead"
+                }
+              ]
+            },
+            "parkSourceQuote": "    // docs/architect/knowledge-registry-redesign.md §7.4: \"Attestation"
+          },
+          {
+            "edgeId": "class6-l-000444",
+            "slotKey": "{\"edgeId\":\"class6-l-000444\",\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000444\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":737}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000444",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 737
+              }
+            ],
+            "consumerFile": "src/state/knowledge-registry.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 737,
+                "columnStart": 38,
+                "columnEndExclusive": 58,
+                "text": "docs/architect/...md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 737,
+                "columnStart": 38,
+                "columnEndExclusive": 58,
+                "text": "docs/architect/...md"
+              }
+            ],
+            "matchedExpression": "docs/architect/...md",
+            "logicalReference": "docs/architect/...md",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58/60: A51, L12-30/31/32/58/60: Phase 9 carry: knowledge-registry-redesign // already seeds from bootstrap (docs/architect/...md §7.2's own is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"    // already seeds from bootstrap (docs/architect/...md §7.2's own\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // already seeds from bootstrap (docs/architect/...md §7.2's own is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"    // already seeds from bootstrap (docs/architect/...md §7.2's own\"",
+            "dependency": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // already seeds from bootstrap (docs/architect/...md §7.2's own is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"    // already seeds from bootstrap (docs/architect/...md §7.2's own\"",
+            "blockedCategory": "phase9-carry",
+            "dependencyCategory": "phase9-carry",
+            "legacyPath": "docs/architect/...md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000444",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 737,
+                "matchedExpression": "docs/architect/...md",
+                "originalLineText": "    // already seeds from bootstrap (docs/architect/...md §7.2's own"
+              }
+            ],
+            "searchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/architect/...md",
+              "passage": "    // already seeds from bootstrap (docs/architect/...md §7.2's own",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/architect/...md",
+                  "hitCount": 0,
+                  "liveHitCount": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+                },
+                {
+                  "query": "§7.2's own",
+                  "hitCount": 2,
+                  "liveHitCount": 2,
+                  "hitsSha256": "6b9b6d3c53765528d67974c1c478f211ab9d4aaae17f68b41831b15cc1d24107"
+                }
+              ],
+              "assessment": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // already seeds from bootstrap (docs/architect/...md §7.2's own is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"    // already seeds from bootstrap (docs/architect/...md §7.2's own\"",
+              "hitGroups": [
+                {
+                  "query": "docs/architect/...md",
+                  "carriageCount": 0,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // already seeds from bootstrap (docs/architect/...md §7.2's own is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"    // already seeds from bootstrap (docs/architect/...md §7.2's own\"",
+                  "category": "dead"
+                },
+                {
+                  "query": "§7.2's own",
+                  "carriageCount": 0,
+                  "liveCount": 2,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // already seeds from bootstrap (docs/architect/...md §7.2's own is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: \"    // already seeds from bootstrap (docs/architect/...md §7.2's own\"",
+                  "category": "citation-only"
+                }
+              ]
+            },
+            "parkSourceQuote": "    // already seeds from bootstrap (docs/architect/...md §7.2's own"
+          },
+          {
+            "edgeId": "class6-l-000445",
+            "slotKey": "{\"edgeId\":\"class6-l-000445\",\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000445\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":748}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000445",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 748
+              }
+            ],
+            "consumerFile": "src/state/knowledge-registry.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 748,
+                "columnStart": 10,
+                "columnEndExclusive": 55,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 748,
+                "columnStart": 10,
+                "columnEndExclusive": 55,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+            "logicalReference": "docs/architect/knowledge-registry-redesign.md",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58/60: A51, L12-30/31/32/58/60: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation'",
+            "dependency": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation'",
+            "blockedCategory": "phase9-carry",
+            "dependencyCategory": "phase9-carry",
+            "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000445",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 748,
+                "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+                "originalLineText": "      // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation"
+              }
+            ],
+            "searchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+              "passage": "      // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "hitCount": 2,
+                  "liveHitCount": 0,
+                  "hitsSha256": "56a6dad6e3ae8d6ead1d2f6fc1ca7ce6a213c3d4949cce22ebc2f902f3988320"
+                },
+                {
+                  "query": "§14.3: \"attestation",
+                  "hitCount": 0,
+                  "liveHitCount": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+                }
+              ],
+              "assessment": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation'",
+              "hitGroups": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "carriageCount": 2,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation'",
+                  "category": "carriage"
+                },
+                {
+                  "query": "§14.3: \"attestation",
+                  "carriageCount": 0,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "A51, L12-30/31/32/58: Phase 9 carry: knowledge-registry-redesign // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation is held in non-canonical docs/platform/proposals/knowledge-registry-redesign.md source snapshot. Carry this exact framework/role/doc identity, lifecycle or attestation rule into a live registry holder and prove schema/reader parity in the behavioral-consumer step before redirecting the comment. Own source passage: '      // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation'",
+                  "category": "dead"
+                }
+              ]
+            },
+            "parkSourceQuote": "      // docs/architect/knowledge-registry-redesign.md §14.3: \"attestation"
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":56,\"columnStart\":35,\"file\":\"src/state/knowledge-registry.mjs\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":61,\"text\":\"docs/../evil/guide.md\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "src/state/knowledge-registry.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 61,
+                "columnStart": 35,
+                "columnEndExclusive": 56,
+                "text": "docs/../evil/guide.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 61,
+                "columnStart": 35,
+                "columnEndExclusive": 56,
+                "text": "docs/../evil/guide.md"
+              }
+            ],
+            "matchedExpression": "docs/../evil/guide.md",
+            "logicalReference": "docs/../evil/guide.md",
+            "legacyPath": "docs/../evil/guide.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Literal adversarial path example or paired sibling artifact names in a comment; not a navigation destination. Step 5 owns matcher behavior. Own source passage: \"// literal path-traversal shape: 'docs/../evil/guide.md',\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-dead-path-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "src/state/knowledge-registry.mjs",
+              "line": 61,
+              "columnStart": 35,
+              "columnEndExclusive": 56,
+              "text": "docs/../evil/guide.md"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true
+          },
+          {
+            "edgeId": null,
+            "slotKey": "{\"edgeId\":null,\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":25,\"columnStart\":5,\"file\":\"src/state/knowledge-registry.mjs\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":62,\"text\":\"docs/ok/../escape.md\"}}",
+            "inventoryRefs": [],
+            "inventoryOccurrences": [],
+            "consumerFile": "src/state/knowledge-registry.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 62,
+                "columnStart": 5,
+                "columnEndExclusive": 25,
+                "text": "docs/ok/../escape.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 62,
+                "columnStart": 5,
+                "columnEndExclusive": 25,
+                "text": "docs/ok/../escape.md"
+              }
+            ],
+            "matchedExpression": "docs/ok/../escape.md",
+            "logicalReference": "docs/ok/../escape.md",
+            "legacyPath": "docs/ok/../escape.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Literal adversarial path example or paired sibling artifact names in a comment; not a navigation destination. Step 5 owns matcher behavior. Own source passage: \"// 'docs/ok/../escape.md'). Deliberately string-only (no `node:path`\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "sweepOrigin": "L12-60-dead-path-scan",
+            "supplementalOccurrenceKey": {
+              "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "file": "src/state/knowledge-registry.mjs",
+              "line": 62,
+              "columnStart": 5,
+              "columnEndExclusive": 25,
+              "text": "docs/ok/../escape.md"
+            },
+            "censusAdmission": "L12-60 author-added first-class occurrence; no Step 2 id minted",
+            "authorAddedEdge": true
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-026",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59",
+          "L12-60"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "src/state/knowledge-registry.mjs",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+          "bytes": 37623,
+          "lines": 812,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetEvidence": {},
+      "renderContexts": {},
+      "populationGapFindings": [],
+      "L12-60-coverage": {
+        "stepFiveExcluded": [],
+        "authorAddedSlots": [
+          "{\"edgeId\":null,\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":56,\"columnStart\":35,\"file\":\"src/state/knowledge-registry.mjs\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":61,\"text\":\"docs/../evil/guide.md\"}}",
+          "{\"edgeId\":null,\"file\":\"src/state/knowledge-registry.mjs\",\"inventoryRefs\":[],\"supplementalOccurrenceKey\":{\"columnEndExclusive\":25,\"columnStart\":5,\"file\":\"src/state/knowledge-registry.mjs\",\"inputCommit\":\"dc24ce64527fbffd23e1643f35a7ddf808fd7b45\",\"line\":62,\"text\":\"docs/ok/../escape.md\"}}"
+        ],
+        "recordChangedThisTurn": true
+      },
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    }
+  ]
+}

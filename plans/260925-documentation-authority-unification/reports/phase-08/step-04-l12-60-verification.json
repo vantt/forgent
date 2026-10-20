@@ -1,0 +1,114 @@
+{
+  "authorPin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "commands": [
+    {
+      "label": "ratchet",
+      "command": [
+        "node",
+        "scripts/check-legacy-docs-ratchet.mjs"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.089,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-l12-60-ratchet.stdout.log",
+      "logSha256": "6cbeaa998a4dbca53e4c04e411d654cc715ca13d8113f9bf80dda70669bb5ab2"
+    },
+    {
+      "label": "citation-drift",
+      "command": [
+        "node",
+        "scripts/check-decision-citation-drift.mjs"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.047,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-l12-60-citation-drift.stdout.log",
+      "logSha256": "a55a98ef3a961181b729bb169cefd37a7a0d63c12438c58c4f8a40902ec998e8"
+    },
+    {
+      "label": "binding-tests",
+      "command": [
+        "node",
+        "--test",
+        "test/scripts/check-legacy-docs-ratchet.test.mjs",
+        "test/scripts/generate-doc-inventory.test.mjs",
+        "test/scripts/doc-binding-repair.test.mjs",
+        "test/scripts/doc-corpus-decisions.test.mjs",
+        "test/scripts/doc-decision-review.test.mjs",
+        "test/scripts/doc-decision-exact.test.mjs",
+        "test/scripts/doc-decision-conservation.test.mjs",
+        "test/scripts/doc-decision-mirrors.test.mjs"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 1.461,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-l12-60-binding-tests.stdout.log",
+      "logSha256": "94a884ef67dc228498a75c912fa20ed5e26d5edbea832443ced53dfccebad7ce"
+    },
+    {
+      "label": "light-tests",
+      "command": [
+        "node",
+        "--test",
+        "test/scripts/doc-link-pass.test.mjs",
+        "test/scripts/check-doc-candidate-status.test.mjs",
+        "test/scripts/check-doc-constitution.test.mjs",
+        "test/scripts/generate-shipped-path-inventory.test.mjs",
+        "test/setup/instruction-registry.test.mjs",
+        "test/setup/instruction-composition.test.mjs",
+        "test/setup/instruction-projections.test.mjs"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 1.907,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-l12-60-light-tests.stdout.log",
+      "logSha256": "39498ed7a596c85d2fecc607628a1f14aa22d6ddf0cfa2d7a204e83a14bb38bf"
+    },
+    {
+      "label": "checker",
+      "command": [
+        "python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-04-check.py"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 22.328,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-l12-60-checker.stdout.log",
+      "logSha256": "618b97bdefb9068d8c10a29a78332139bca6e49de4a9a6cfffd275d66175d14f"
+    },
+    {
+      "label": "probes",
+      "command": [
+        "python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-04-l12-60-probes.py"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 2.202,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-l12-60-probes.stdout.log",
+      "logSha256": "f4d4034ec6d572bdca3e44aa44e0d3ccb31de6e1408057345d47324e6eb39d11"
+    },
+    {
+      "label": "packet",
+      "command": [
+        "python3",
+        "-B",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave2-packet.py"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 2.556,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-l12-60-packet.stdout.log",
+      "logSha256": "1b5f90c442616c738411a5784dc149435ad3ce89a4da4bc36ebb99d8d12b9960"
+    },
+    {
+      "label": "whitespace",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.36,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-l12-60-whitespace.stdout.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "allPassed": true,
+  "acceptance": "Serial working-tree author proof only; no independent semantics, real-commit reproduction, source application or installed parity acceptance."
+}

@@ -1,6 +1,22 @@
 {
-  "authorInputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+  "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
   "authoredBatches": [
+    "step04-001",
+    "step04-002",
+    "step04-003",
+    "step04-004",
+    "step04-005",
+    "step04-006",
+    "step04-007",
+    "step04-008",
+    "step04-009",
+    "step04-010",
+    "step04-011",
+    "step04-012",
+    "step04-013",
+    "step04-014",
+    "step04-015",
+    "step04-016",
     "step04-017",
     "step04-018",
     "step04-019",
@@ -21,10 +37,1426 @@
   ],
   "records": [
     {
+      "set": "step04-001",
+      "file": "domains/coding/AGENTS.md",
+      "digest": "f0b4079e790b0c85f56be179670e2c8bf0026b8759e4db602a8006bef469a924",
+      "recordSha256": "7ac24e6cd363855f16564d75a01cb94013f43370105a2250badf4da60c993986",
+      "edges": 5,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-001",
+      "file": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+      "digest": "d4a473140d8dd360e446e288101fca3052a2e7aca6809fe1981b95947c7a7516",
+      "recordSha256": "1ac67a94d883b59ab0503dcf9ab8eaa0bee77dd9130fc356928d093cb69922d5",
+      "edges": 12,
+      "diffBytes": 809
+    },
+    {
+      "set": "step04-001",
+      "file": "domains/coding/skills/fgos-coding-exploring/SKILL.md",
+      "digest": "9427b9e7d3bfe654519419ec2ec8632b66b69bca11218c2279238cc4f3289d3f",
+      "recordSha256": "2b6e447594021e4a2414ddfb17ccf1b4e9ea11376f318f2594edc755b2de4cef",
+      "edges": 9,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-001",
+      "file": "domains/coding/skills/fgos-coding-exploring/references/gate-mechanics.md",
+      "digest": "b0bc2aeacea29dbe5f4ea8d46a684ca9f907453f8813f02accf226f1549463bc",
+      "recordSha256": "29525133881fe176ffd8be735ac21886f21fe628461717c5658c623721b40de1",
+      "edges": 8,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-001",
+      "file": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+      "digest": "8dc34fb566efe56f5adb0b460baa7c5d4cabee9bfd3bb5c491cc2f0ed6285218",
+      "recordSha256": "762d8b4d07023db0d77615b0d439701d6c3b3192c1fada2479a4b41d99fbae77",
+      "edges": 8,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-001",
+      "file": "domains/coding/skills/fgos-coding-implement/SKILL.md",
+      "digest": "ab60f67d8f8dffefdebc9152f42e788ce0a3895ec8605e9ff39544af1811ffae",
+      "recordSha256": "bcd8cbe2f93a948f5d83bb8aa1c7b01883c3324da2c3ff984261e97598a2940d",
+      "edges": 6,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-001",
+      "file": "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "digest": "f0006cf1f33ab0c3e1dc40f6501e5da3825d1a8c2dcd67339dc4a29427fb1b59",
+      "recordSha256": "37c5dd21e0c94585184393518a74673ba45ca22e16fae37ed62fdd50e3125f9d",
+      "edges": 8,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-001",
+      "file": "domains/coding/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+      "digest": "ea2d3891915949c1e9764240b81af748393713f00685ac173eb5c64ed1df9043",
+      "recordSha256": "7dc5a67ccdd0acc669ef5a51a09a7cab4ef24480c86d77578101af33fa1e3392",
+      "edges": 4,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-001",
+      "file": "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+      "digest": "c92a685759d8af23f375bfac6c89268d794c66aca11f2586fab0388f44ca1c43",
+      "recordSha256": "bbe41fc51f0b0c3342dbfd4aa9bfe764dec3825ad2b157cddde0d89ff3cc98e6",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-002",
+      "file": "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "digest": "4eca5e5f5db1c61d2582cced415a1b283d3663274760fea6e76e9ffb3ad3b3e7",
+      "recordSha256": "8c2f7ab5f2cf61e5b199a8788b5d30ec0c9d5ee6a7423c66ed0792decd21ff8d",
+      "edges": 12,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-002",
+      "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "digest": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+      "recordSha256": "5628b05395c195621500935527ed8926619938acabc44a0cd170cc40b2de0609",
+      "edges": 13,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-002",
+      "file": "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+      "digest": "04d749a7f036cf4f29caa8c82c5bd79426046508ef3cf8d71e47e0b5c72ea432",
+      "recordSha256": "e6ddfed60dfb1de3f18044c90fef8f305bd6d5986b8d823e303880c562f62072",
+      "edges": 22,
+      "diffBytes": 588
+    },
+    {
+      "set": "step04-002",
+      "file": "domains/coding/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+      "digest": "7e448dffd744f14eec929b42849e7c6567743a257ee3950e7f559ba2c78a3183",
+      "recordSha256": "7acb80bedf1d1f1649bd2597eb2eccc3b394130e377efe21661795965e235966",
+      "edges": 4,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-002",
+      "file": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "digest": "a6309b897ca51eed64c361807c084c32e03a33e8da26d89b5932513fe985dfc7",
+      "recordSha256": "354599eb4bdc2c0b60642c5d79340e6ea4cdc79d95e6ec3dc538daa4cbf3cf14",
+      "edges": 10,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-002",
+      "file": "domains/coding/task-specs/lock-decisions.md",
+      "digest": "b10c869d4505677d08568ac790a43b274ff29f466ad6623c384e85039e10f7b8",
+      "recordSha256": "ac95bdfd0c4e0591b60913839b4c5128b6b811aee8d5bf4b6916c4d7b25ab0ca",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-002",
+      "file": "domains/coding/skills/fgos-coding-planning/SKILL.md",
+      "digest": "fd2ea486b4b913e7e3f15f6f161f159cd350bfe8b26376042819d7b31c675d4c",
+      "recordSha256": "877811c9bec1a3f65940bf20bb43d6c86cd98798a56c96e74ae5a45be44771d3",
+      "edges": 6,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-002",
+      "file": "domains/coding/skills/fgos-coding-validating/SKILL.md",
+      "digest": "fa831842240da6d8b77ad4193a09c1ccf8ea7972608ec31fc3966c2511b06d0c",
+      "recordSha256": "a0c2ebc9f824ac432308a82eddc63d69d0644787fe519bd83cbba123ac3ea6e2",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-002",
+      "file": "domains/coding/task-specs/shape-plan.md",
+      "digest": "591e766e58c8d28bc703bf28cdd2930dc031d9fff2d57cc4e231e31f4b09f7e5",
+      "recordSha256": "22a50b56aa5fa129f65ca6ff40f74999b91ef1a3fdf3a71612aeaca25f5dd09d",
+      "edges": 0,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260831-1637-step07-inline-assignment-mvp/phase-03-harness-seam-and-two-proofs.md",
+      "digest": "94b15cc5d528ffae5a98cd5c76c5fdecce3b119f518296e5a96e3af8fdbd32d3",
+      "recordSha256": "8301f7c0661f76143e85ae59c78ddfe643e47975b5489ce612d51ed4ee61d1a6",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260831-1637-step07-inline-assignment-mvp/plan.md",
+      "digest": "5cb334851823367dd91272d367b982d970d05cd6178ae13351e72b51d2f42f41",
+      "recordSha256": "42cdc08b8fd230f7871b3b9ffdce3ce64aaafb8e39bdb647d75c9d5f7ad97303",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260901-1542-step08-standalone-coordination/plan.md",
+      "digest": "84a360c159f3616100895e67a8d9a4d9380da3996f6f30e60dc28c9c91667633",
+      "recordSha256": "797cbbdede2e93e77dc6b8c9658d5c15b9b620e9ac7b38bef0df647078220131",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1650-GH-08-P00.2-dispatch-policy-fixes-report.md",
+      "digest": "878e0d55164eacd831ac3ffee326f64cf4cd8e1b269731155b4eb6ef90a27313",
+      "recordSha256": "f1afb12de64c93182375f0f876aabb59a411e2e9072e6a22673d7ddddc224c75",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1745-GH-08-P00.3-cli-wiring-live-proof-report.md",
+      "digest": "c80f1a7d69fef91affce16c5e9398e151d1568e6a4a1b142c3254c25a70facd8",
+      "recordSha256": "b811fb011e145eb41775bc1379525017ddae218391ec5927b772db5dac7eeb07",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1840-GH-08-P00.4-provider-family-fix-report.md",
+      "digest": "e9cfa826f8e05483f067b1f356f21edd654ad0d74eb0af405c007d91991e7f92",
+      "recordSha256": "21f0d0f691a2d7268d4560e00da175b98f42fa2bbb91e481036b69c3426c774b",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-2050-GH-08-P01.1-coordination-store-report.md",
+      "digest": "d84e7b9720fe1c9508c444b624cb85fd30e788dbfa5461f4bb6971bf3ae8d3c2",
+      "recordSha256": "507582b16fe423bed7208552380f051d89e91ee765230655c921879207feb0b3",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1640-GH-08-P00.1-h1l1-fix-recheck-report.md",
+      "digest": "75b1ce0cc526d7256caf26f967d8120811d7e1725fe1bc12af27cbdb4cf397c4",
+      "recordSha256": "dd0e345ebc35b5f5714ab4b460cd66815c443f7685ab187c82c947fcc9c50473",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1720-GH-08-P00.2-dispatch-policy-redteam-report.md",
+      "digest": "7804171dce4043e3038d6ccc06f2622997c3a1ad5e63261e4fd8c1213246ccce",
+      "recordSha256": "4cb31fce6c5b56b226ae74c33de5a2475a2ccd40f4c8a5292ed0b466fb81e0d8",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1735-GH-08-P00.2-rt1-fix-recheck-report.md",
+      "digest": "ca6ee58cddfa1be705e2ca60cf8cad619e481bc4325d32b01731aea3d75f3d4d",
+      "recordSha256": "447492a1b8a9cbdcc0a1259b9752666d250a692e20ea07b4da24098c69d5f2d1",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1815-GH-08-P00.3-cli-wiring-redteam-report.md",
+      "digest": "365ae40fc95e2840b16f8a70620e6f669ee5e2dd3d6dedb7ec6a6111459c6504",
+      "recordSha256": "cc555e5da91ca3eadd861bccc4c8e784ce7ef0cf632d13c630c179bd873429e6",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2140-GH-08-P01.1-coordination-store-redteam-report.md",
+      "digest": "579dcf3aef872ae804ce25df83cbf61d65425457a79f3ca0b767d726106be3dc",
+      "recordSha256": "f1b0267bf282fe5c99fde09ddb5444e76cc096649cce4ef314845859a4d557cb",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2200-GH-08-P01.1-round2-fix-recheck-report.md",
+      "digest": "83495625e48d977e7aeccda8451f863e8971b966dc615e3bb48bc4adcf5f41bb",
+      "recordSha256": "e18f0aa0748cb6c8adc47d19907448ba601d3502cfc7f7f3014fbec436e77462",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1609-GH-08-P00.1-canonical-docs-review-report.md",
+      "digest": "e2552cc29918fc23ab8f8c93956651e72cf63fad0088c4126f49768496bfa882",
+      "recordSha256": "0c8d45ced9ea31e74fc9ad3f810316c781eab7a5e0e2a597b586b1dc322cd68a",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1702-GH-08-P00.2-dispatch-policy-review-report.md",
+      "digest": "d712d0c2fc1c82bd263994909c8d29e08611a382947246de26b223eb351912ea",
+      "recordSha256": "7bed385edc893a0275855dc5992b953cb1d5b4e1a63f78c1719e51a7422f6c18",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1800-GH-08-P00.3-cli-wiring-review-report.md",
+      "digest": "ba76fb16a3a433f7169529d538f2ef9392c563aeb3e0a5e5dbbc219f61ac1681",
+      "recordSha256": "17224c962df0ba563cd345705d531e6ca1ebf0ea655387b568c07e9fb3b87911",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-2115-GH-08-P01.1-coordination-store-review-report.md",
+      "digest": "974cd1f1c82fd33afd1d758696428af63a446f3e8363b0c29c390778b4102fc8",
+      "recordSha256": "f7bca7f9b33f5b0587cdf900b961f14973b64675b686681ce2ca865657ffa230",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/phase-03-recheck-disposition-live-proof.md",
+      "digest": "ddaffbdee71bca0bc5221af7b29101e2eca9caa8c53a5a368db378476d0d6422",
+      "recordSha256": "1012ac191a83729de3fbe89dbab51a7031ff498671b80e1845eae061b058bf6d",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/plan.md",
+      "digest": "a61cad35d7b84940dcb7ee7f90aa3ec4d176e319ab9e7a58358caab47d01662c",
+      "recordSha256": "5e4801dafff91208fc8548d9f8debd9319dcf753af6e2ea454220fab26a7d2f9",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P00.1-contract-promotion-report.md",
+      "digest": "b78a928bc9eed5af604a13806c356583557699f71d852d55841caa8c888efa3f",
+      "recordSha256": "7b6ca14e467ddd2dba8b5988892451c3afb9dae95241fec4a42cc865fd421e6d",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P01.1-fixture-skeleton-report.md",
+      "digest": "7e7473b96122fec0ed0887e6b98698dfec259687807ece4a7881b7e5c8ca16e6",
+      "recordSha256": "73026fb0099fad9fbd66714893b421fe0667140ac80c36d4999de204aa19ba82",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P02.2-idempotency-bounds-authority-report.md",
+      "digest": "904f71dc16f7a7ca35be03c1cf8774bb553152c492599f4c82a176e63a7a5939",
+      "recordSha256": "a3a107fb3328852adea0c978a084a1e9e41c84df5b9035c339f9b9ece6787f63",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P03.1-recheck-disposition-replay-report.md",
+      "digest": "1d12d268146b402f62bc15e26af470a7c52b49712760dd246971ae7b5f8b37a3",
+      "recordSha256": "e27013ae0037c6d5e2f61f79a7d7758cd679518c27c8c82aa3d59da955123358",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P03.2-live-proof-negative-battery-report.md",
+      "digest": "d546a1229620dfecd4548b19ffd8c479c52a6931e99d7578a4df412ec1a1b6df",
+      "recordSha256": "81ba2d9c5cea88cb1463a19a72b3b2e8b4aa6f36e26949ad022626b2263d94d1",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P00.1-redteam-findings-fix-report.md",
+      "digest": "3427e947691228f3926b4349d26c731465c858ef37b2f0d397127817d4010805",
+      "recordSha256": "e8ff938818dc39008fa9e1c02e568443461cd0731ef707da09b8e6f74c722a00",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P01.1-test-coverage-fix-report.md",
+      "digest": "07be8eff528e5887d9a42b0b77383c8660fd148cb6fff1562893ab9e9f597e60",
+      "recordSha256": "a96e3bbc8b0bb528ff171a2edbd0b51904c5816343aef11aea5a7bbf919164dd",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P00.1-contract-promotion-redteam-report.md",
+      "digest": "8a0c94da649fa0b1196440afe17c8aba3f0107d4e9eba53930b8460d83b18669",
+      "recordSha256": "5740773b467f996e9c39c19831fd5b78f9ff8d0c8c6c23c9182ad31614bf731f",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P00.1-fix-recheck-report.md",
+      "digest": "9983f55cd61b0fe8bd2553892cc891f832051663c230a7c6343c4a6fee013406",
+      "recordSha256": "cc0329aa5e2ee9e09ce18c818826edeed3eca77e4e94cc6a4f9abdd70ca3f670",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P01.1-fix-recheck-report.md",
+      "digest": "22b204d358b9fba82a454fe125c547680aa47fbe8033cd81a1652b1170b79a9a",
+      "recordSha256": "ac6507a14a38721db3a1a43ebf920e7ced2dccd60d846c3188cf325640b99dc2",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P01.1-fixture-skeleton-redteam-report.md",
+      "digest": "e174a0c49565143c9bd4baa970938c54e8697b945e8a7fb11cbd4e11f32a295d",
+      "recordSha256": "97b49cdd558af60b55ee1492e045354e31984150575f28372d36a03bd9e2d7b5",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-contract-promotion-review-report.md",
+      "digest": "edaaaeaf4c433d6872a3fb313177bc74e7e8707a2d343908237c3ef69bc9a1b8",
+      "recordSha256": "65236b0de146a23cc2343d0a1c6ca357525b101566e1d0715123bd48aa0d15f2",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-fix-recheck-report.md",
+      "digest": "d0a4da5f5379a7b022c6de126665237bf43e102f2737a7208a5b6d664af894f6",
+      "recordSha256": "aac5d8bb0bc3c6eafc68e85fa42061c33ea1eff670611624a19187c6146c2ee2",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P01.1-fixture-skeleton-review-report.md",
+      "digest": "6ae3e9575e2eb91f172728785f3e43790fb6fe536b4a2fd46d120b1398a4664a",
+      "recordSha256": "514c06040dfd9c9309ca970557284d22fd09987e000aafd80706ced85458f9fb",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P02.1-driver-authorization-review-report.md",
+      "digest": "8b63dc157a34751c44e684e19caca058f5496e81f73969480d0579ae34ab0d83",
+      "recordSha256": "a8a409163f13790d60c8e0d34763513c5c4e47575442675ba1768f66b1fbc6f8",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/phase-00-consume-handoff-and-freeze-scope.md",
+      "digest": "532c642481d741994847ad11e34e4552f39b31747ea145dbf4b6ed4e59cd8f09",
+      "recordSha256": "cadadc56d384002bc4125a2ed63b397b721e6af3b1168389e8387d615b25e178",
+      "edges": 4,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/phase-04-mvp5-usable-standalone-live-proof.md",
+      "digest": "e04d4d637b4ba870a1ad826c9395f2ae317b28017d24fdfee08326beaf4bc599",
+      "recordSha256": "625e27da8c4660d4083de14b2fa672c30e3f848373894207b8336cf7cacaf201",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/plan.md",
+      "digest": "cc2f90870a8a18c024bed056c76d1882c3622f70a2685c100f12677a2d038665",
+      "recordSha256": "fee1d0eed15bcede3033920e8be61fc2c007e64fc1da02ba92f2ce1edf489f7a",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P00.1-handoff-consumption-report.md",
+      "digest": "a7a19a8ed2e53f9e38835f945fa4c4e8c4dbb36b5f491ca0a6431e43df851034",
+      "recordSha256": "cae2541f95cddbb6b60fdfe0466322eec5c503318283665922bd6c1ac234c17f",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P01.1-mvp3-recheck-disposition-report.md",
+      "digest": "8fd65aac473db692824d388407589059e3d2702fc76e0acd5045d4e56ece8239",
+      "recordSha256": "caa6b1d4cd71d8cfc4b85e9003d743aff57c5215138610a9f90e324fa7236840",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.1-thin-launcher-core-report.md",
+      "digest": "44526bd85abcca1496876c47092a4b8334ebb16dfacacc7958b8da2fed59ea80",
+      "recordSha256": "7f4f85dbe0b101154dad9a71ab3aed3e913d78f0cd7ee5388cfa5a2769df830b",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
+      "digest": "6dc3d867871c2957d9860e9a9e37d93628b67c5e4d6259fb404e15f0dba120c1",
+      "recordSha256": "f374ab464d9f7f3b425d2923f7e0930b490b43c5b842beed9f80c3ff895cedcb",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P03.1-role-execution-policy-report.md",
+      "digest": "7d2496160b0425b2b3ee23fa295e44ecd97c287b18bc4bb1d81998b1b6b10461",
+      "recordSha256": "f71cf6391151c013007c68deb64d66fbdf3a8fcf5ba1b00768bbd01d1a57ec22",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P04.1-mvp5-resume-live-proof-report.md",
+      "digest": "ab37bc6219ebdad391abb7aeb4a1cc97c7482477b224734d07a99e8e28e59fc8",
+      "recordSha256": "416edd2391e852d2c12a147f1b8918ebfc24965bb5a5937dd9eb91ff9b733ae6",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-003",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P04.2-dogfood-handoff-report.md",
+      "digest": "45f9534b8f10392bd2456ae290b3abd5ae61feb041b4d9b79b6a772d54d8ef39",
+      "recordSha256": "bfbcc5c58c6eebdb7ac10dcd533712d5cd5c789eb19d9f5648493749f0eaef46",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P00.1-review-redteam-findings-fix-report.md",
+      "digest": "3e49d66d4f9c3f88192d039c8cc86df707ad87576d8e86fb96811112ddcc029a",
+      "recordSha256": "8fc0b116afe09084160052f4534f2f5a0ac3bebd78a7eac3816689dde4215f2e",
+      "edges": 4,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P02.1-path-resolution-fix-report.md",
+      "digest": "8c014dee715a00cd26a6dc70b3ac8e27b3ea4469e189beba66ac9a2df0549329",
+      "recordSha256": "17716cad83be237a4ab6c08e47e4fdb797ee4e504dc6817b3d6c9380b4f399cb",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P04.2-handoff-gaps-fix-report.md",
+      "digest": "76545f27676b684d4d7390a2a37df469cf6e9590b2e9477b3fc1fe44e0f694cf",
+      "recordSha256": "2f14577d60e385637484cac5ab03368a5c8c5b00168f01a7c2fb53e0c7e1b1c8",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P00.1-handoff-consumption-redteam-report.md",
+      "digest": "4e94a9147a8d4cd7981de4d0d4a8ca69096948faad3a4fa62e2d8f1736486abc",
+      "recordSha256": "ac1ba206f119c767943464180c0c77bffdfed3f13ff29e7ab9b1f1e93bb26706",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P00.1-recheck-report.md",
+      "digest": "4c3624d84aedc7703515add208ac60e8902e34653ef2763aa33865903e34687f",
+      "recordSha256": "869cd3d18ef6de186fa12d0b7496c968f28b89a02e529ca45657089f798bd97d",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P01.1-mvp3-recheck-disposition-redteam-report.md",
+      "digest": "ae6a68291eadd560ca3f5ecd84a8ab9bb4384829af6cef30b5c7d8ee4cce889b",
+      "recordSha256": "c02710e7991abc98614ceb0fbebeec11da26c33ea1c7867175008b7b893d160f",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.1-recheck-report.md",
+      "digest": "937da692c59997d0cf37ad067ca78c09826b8c5c56ef7539b07c1fa34fc6673e",
+      "recordSha256": "de4a10bf1ae7322d7192620cb6df42af5be734120f897c0e2e869236d32f3c43",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.1-thin-launcher-core-redteam-report.md",
+      "digest": "ac0ac07d40937491a5592185ebdf82a74cb7516cac8e926699cc52cad0c78adc",
+      "recordSha256": "44963f5334e0ef34c8ef1c48777b407d1ee89015ebead30d9a467c14281f566b",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.2-show-resume-setup-redteam-report.md",
+      "digest": "99ae90816a65be4d2e15648e3c21fc81784c0ef794fbd1a6c9a3918017d5be56",
+      "recordSha256": "6008dd1b68d3d292f77e9000995c66dbe322e9bcc100ee4818d3e2c7ec0cfcec",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P03.1-role-execution-policy-redteam-report.md",
+      "digest": "f345f714031a81c019958e4bc2612cbd93dcc4ccda06fa3b7878efac1d1e9623",
+      "recordSha256": "3945e9796a41016f88609cb5c77244ab3c46c0a202b03be96ddcbf9888bfe68b",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P04.1-mvp5-resume-live-proof-redteam-report.md",
+      "digest": "1cba3820c6c7b3288a95661afb6e5ce3580d54697679486b59a1f5df43cfe667",
+      "recordSha256": "bdc2cf01e45b83e3952a1ec7493edfb63e148e65b7417cab65f45c38e678f211",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P04.2-dogfood-handoff-redteam-report.md",
+      "digest": "7b708cdf3aa7749a4ccbd3f6e4e5112614669d791345f1101258ceb8baaef879",
+      "recordSha256": "c9b1118e5d0c4236c1ad28b026a39382f9f3407251f4ad2fe15f445200cc4cc1",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-handoff-consumption-review-report.md",
+      "digest": "f1e39b9ad2d6dfb54bd64f4c2a7f4bfad0ca3ac801ba7fbdf78aeb90d769928f",
+      "recordSha256": "ca2e27c00b07f367ab69076cd8d434ebaa1086cc6ecd8cec9363cf2080700521",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-recheck-report.md",
+      "digest": "b7caafe7fb6b9fb134c282a5d2e6068eab6164f3e608ab9d6ca681d10db1fe0e",
+      "recordSha256": "6baa2688913143c06e5e8ed0ec143a1d02ade879f27c75dd72361b767ee1f1af",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P01.1-mvp3-recheck-disposition-review-report.md",
+      "digest": "da1c7c163a6cef24d154b78a0ed13601a36fe3ceb4f4c6539bc1f9a0017e76cb",
+      "recordSha256": "d7b1ef083b7f5cb29f11dda1c04628d566ea2eda955247280beb16eda1509d01",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.1-recheck-report.md",
+      "digest": "7357ee70a444ddd4f8fc989ab3f8221a910a763cf8c4891481c2e657b994019d",
+      "recordSha256": "e8a7cb8f22b76dd3fd69794371e7cfc9c4474f74d2938439fd77b883ecc0573b",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.1-thin-launcher-core-review-report.md",
+      "digest": "42e57d96edf6988cf7c3bfb5a225bc5b24b94e0f998e8867828db0688cb84104",
+      "recordSha256": "c5a8c001fd12815ca60bd04bab861f95b42d098efb46d0eef05409a5a4339a18",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.2-show-resume-setup-review-report.md",
+      "digest": "607ffb27be8c7fb800a72d1c9196c3e7fd69ebb956ba0073681252ecff563640",
+      "recordSha256": "f7e0ba155ebba3e10c87f8ec04fcf9b1f73824fd6f692deed80fd270705bb323",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P03.1-role-execution-policy-review-report.md",
+      "digest": "b1d55eed70a607be6c95bb314a564b8f9b76e6002c87104d3ca247ece4ad86b0",
+      "recordSha256": "bf75247c96c4b233639dc4850a966b5925f7581572e53eca4e804001d4564947",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.1-mvp5-resume-live-proof-review-report.md",
+      "digest": "84abba7d7f34b0088862dab4e1a60007b994f1efa217a62a1ddc3990f871ecb3",
+      "recordSha256": "5d39a225272402f8b123830462b3639ae4360e6cb1450c24afd52af95ee6d464",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.1-recheck-report.md",
+      "digest": "b52c4ee6a89f2e988e1d3d7e89232f2e28bbb835238b75586b40720bf46728e1",
+      "recordSha256": "55e7a365f184db268f9bf02df27cc682cdbc5a6313b7e964cdae402eec6525e4",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.2-dogfood-handoff-review-report.md",
+      "digest": "862390ff6275a36f9f9e78b0402ed9a3e7453014babc7ebf5a9874d08e64414f",
+      "recordSha256": "dfb022fb6aee4693fc0377574eb0752b06f38f0f36c19bf83d8ea20baf7d5119",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260904-2329-group-thinking-plan-loop/phase-01-mutation-unlock.md",
+      "digest": "1369c41194a4679d490956d23e8a396c77ca68037994d160a785741b4f7980a3",
+      "recordSha256": "e20bf29ee58c533dd690d1137d159c93b422e5d27cf053f24fa434e603054bd9",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260904-2329-group-thinking-plan-loop/phase-02-chain-verb-and-pack-registration.md",
+      "digest": "728a0335c327b848dd68dd34408b2e87251297c54b3289de68af407689c67cc9",
+      "recordSha256": "a9bd41c05fd9accf019876fbce1dbb906373bc0b9fb8b8f6a41a3a9a97d63598",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260904-2329-group-thinking-plan-loop/phase-03-plan-loop-skill-and-live-proof.md",
+      "digest": "8014be04e689068e752c684ab3ba15cf86e11527fc10fbee89ae44698b3c85d5",
+      "recordSha256": "caea236b127ec5324e3e3fe74737ac3dd591f30f9d4f9f8c5b2b3a2c7c6b93ed",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260904-2329-group-thinking-plan-loop/plan.md",
+      "digest": "ef539ade3f7530a53071f19905c1dd66cfa949239cdc4b55f71ed74db303c531",
+      "recordSha256": "26f0338507e8171275acd97c96f65b36e75eb53ab1e8dd81dd5d15e61fc98418",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/doer-260905-0000-p01-1-mutation-unlock-report.md",
+      "digest": "1d6710b6924e8bebd5ba2715609c21c6d61cff45b5fe0779381e91631980c7ba",
+      "recordSha256": "c6c7e2be1497ead8e02da1430641311df3c0a2ad6d32d73e6abdef1675e9c353",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/doer-260905-0245-p03-1-skill-authoring-report.md",
+      "digest": "0694c00741255cc4e284b8c290c0d400b0973b06335d435fea9b7ba26b103f41",
+      "recordSha256": "53b8cdbf3f25b9dfe01eaa8594834e8c11ddf03b927d41f1b1c053ef5b248fbb",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0105-p02-1-fix-report.md",
+      "digest": "75af8065f2eaf76eadfac652a15bfd0078b8a29d03866bfbb70ff563ea6e0fbf",
+      "recordSha256": "af18b654967af8342c69b9676b47296ba2696ecd277798c4a43c7a0b1d1c0be9",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0112-p01-1-fix-report.md",
+      "digest": "10d7cf2f018e31563c9e7f3a4282dedf5d5bc592f68750a8848c653e046231be",
+      "recordSha256": "553aee5455325fe0634b91ffc06382635653e1c84addf7efb637bc80f4214151",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0225-wave1-integration-cwd-semantics-report.md",
+      "digest": "1c4fc86c308be69d8d0fc9e9124c373fb0bb846327a2186980006154872adaa0",
+      "recordSha256": "16721eba38952d4029f70f296268f87d3ba8944821cf46542a24564ae98c9607",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0320-p03-1-persona-fix-report.md",
+      "digest": "ef56d78c2ab6452473d4e91490b6d95ef1c8f31d7cf161e4c6f8e7f5a7bf640e",
+      "recordSha256": "f2bb350948fce1d9be5ab1ddd0419dd34dff432a141515ef0fcd351662646c60",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0022-p02-1-chain-verb-report.md",
+      "digest": "3c192e286e8b6eb7b93b37ad3a51c9fa0ac3c658f350040615d057ea4129f325",
+      "recordSha256": "fa64046d0e72745cbad32647a375ff93f34b54d82db43f1cac693a2eea6e3cd4",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0053-p01-1-mutation-unlock-report.md",
+      "digest": "69945a84b810a3ca7241a00760f3a81841ab0facded8211bbcfa96816d6c5c88",
+      "recordSha256": "b0af9d39bf80c1866fc2db7bd39ebae883a5eb0a56f8d01cfa786fdacbf34be9",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0300-p03-1-skill-authoring-report.md",
+      "digest": "5fa747e12829b3453ac190020c4b47a8361ec9c91a3ea7c03c7bf28a4f10639f",
+      "recordSha256": "69c757d54cc66071ec8a07db37d357807f1058a618b36bc2d98bc0941774afd0",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0022-p02-1-chain-verb-review-report.md",
+      "digest": "cecb4f02a715087b947aba7c1e07ebcd3cc9dea5199347b9a32f28de7726332f",
+      "recordSha256": "3a26fafac9e2a2365b0e03bd0009ddc1aaf698544f9b07d9e45088b72ebca6d0",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0053-p01-1-mutation-unlock-review-report.md",
+      "digest": "fd47d3c9492cadc6e7c4d9c3a03f13b570a7bc992a806048e5de75f99a8d1341",
+      "recordSha256": "1fe80d76f322aab2bf1f12c109ff071cd6af01bf866c91d1edb27338f3fc817e",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0730-p03-1-r5-live-proof-review-report.md",
+      "digest": "1e7437fd49ece4d23e35b756e8014cd1a112ebb3f5d0a198c0b7525759044bde",
+      "recordSha256": "df6e8635f274f948bdeb038f741dc26f96f6318822b03f3f7c1f505e1274becf",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260905-architecture-advisory-panel/phase-02-capability-fit-audit.md",
+      "digest": "f00a77818c16fa9cea16a068be6c668dcca4885a773017f40d11331a2b0b468c",
+      "recordSha256": "38b43c7927134becebb8aaa0097a12a69bed946fa57cbc3e3d6fcbe7be994cef",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-004",
+      "file": "archive/plans/260905-architecture-advisory-panel/phase-05-comparative-proof-and-promotion.md",
+      "digest": "c340805055ba7ef3860c55bd81eb20fb19ba0ba42b19340c202c88a9888a6f22",
+      "recordSha256": "7ea9f4abd62658828b393064fd96fc46b606b9d102eaf539d15fc37640f23965",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-005",
+      "file": "archive/plans/260905-architecture-advisory-panel/plan.md",
+      "digest": "9088f5478c70ee3cbc44908e09335eda70ef33b3489f8f4b8f94d8eaebfa7a83",
+      "recordSha256": "f5034927195deb9c7611ccd7fdf5ab0ad748bebf1fd06da1873f7b5fedeb41a6",
+      "edges": 6,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-005",
+      "file": "archive/plans/260906-1831-dispatch-visibility-v0/phase-01-executor-profile-trust-home.md",
+      "digest": "33921c02383b7ae6613649b4ec9167d4f285220f19832d29179583b7fe4c2817",
+      "recordSha256": "c544177a406c3a5a0aaf66af16c02f0b494402c673a29c8230f990ba41e861e7",
+      "edges": 5,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-005",
+      "file": "archive/plans/260906-1831-dispatch-visibility-v0/phase-06-live-proof-matrix.md",
+      "digest": "b945368d11534594eb8ca96dca5df112be4fe462acd2f093cc78a695ffdb18b3",
+      "recordSha256": "637c787be31c46230870340e0fe72d24a3e7eb516c11a6c59cbb67f805fef653",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-005",
+      "file": "archive/plans/260906-1831-dispatch-visibility-v0/plan.md",
+      "digest": "588a5cf5916ec6eee72aacb457b977cf8fcc01c1f6efa6592b458610e828239b",
+      "recordSha256": "0d79bbb59b086eded7096998dc534f3e80dd8cc842d3c9408ece5568d3411ace",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-005",
+      "file": "archive/plans/260910-1243-confinement-authority-implementation/plan.md",
+      "digest": "c0d9cabaf5243d1f7b7792c30862f98c74bf65b295006bbf719c468f9e9c268b",
+      "recordSha256": "a81beb20f9bf3fc7ed0c17900fe61e9016705e4b4af7122ef2f5cf33aa9f4a73",
+      "edges": 11,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-005",
+      "file": "archive/plans/260910-1243-confinement-authority-implementation/reports/phase-07-strict-readiness-docs-closeout-report.md",
+      "digest": "abac59d5dfb986c565a07c7b80f6bb4a2dd455059676d342702290f3f13ecdd8",
+      "recordSha256": "4d850b5ce60e1655b052f5548be044b326bf177f2478f4a1babc6c23cd2dbb8e",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-005",
+      "file": "archive/plans/260910-1700-rust-host-r1-kernel/plan.md",
+      "digest": "6bbc53aca6d6e6952090aee80f05a7b04ac213e61da03231a5047c5f2d226e1e",
+      "recordSha256": "f9f7305142175ce72b19167378b321952b08647f25818e3e5cef15e63a286f16",
+      "edges": 17,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-005",
+      "file": "archive/plans/260910-1700-rust-host-r1-kernel/reports/p00-inventory.md",
+      "digest": "e8b27bd3302a8342ef4a5be0672045db9b4af1bb7e940417a314b589d79acc7e",
+      "recordSha256": "77bee58404340d443f95202f23ffdefe5849ba5989f8f0a53d2b73c9bd9e4aac",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-005",
+      "file": "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md",
+      "digest": "d6b057701646c6f5da759e7225fa64e68ba8854ed6c262a7ec1b8d2d9b59743c",
+      "recordSha256": "5277bbbeeed1675b69b27a2f0c4981445b068079b9a1c03ea2bf7e4edc757b77",
+      "edges": 16,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-006",
+      "file": "archive/plans/260911-2305-runtime-recovery/phase-designs/launch-reconciliation.md",
+      "digest": "72c152a4be707185f9e7308bbbcc1eb400b8c3776e7843a78ada6a00fd757e3c",
+      "recordSha256": "91befd0526d5efbca9a118903577e65ecc9d8cdca464400ce197660582346515",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-006",
+      "file": "archive/plans/260911-2305-runtime-recovery/plan.md",
+      "digest": "898b0ab3771ce00962f0ec9e7e4972bdbd64fc633e07ce0448bf80ade98ecdc0",
+      "recordSha256": "006f71f0131c609862bc454b9f0b8ad8bb667189d020e15223ad14597f08fb43",
+      "edges": 12,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-006",
+      "file": "archive/plans/260911-2305-runtime-recovery/reports/phase-00-baseline-report.md",
+      "digest": "4e7c0eaba7ef9a4ebce2cd41ed0c4871f00b947a724197fb6e2db724b81bf10a",
+      "recordSha256": "54d122230c144d0e55b174f41d413074924ecbbfbb175215f1f0804ea1ba4b93",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-006",
+      "file": "archive/plans/260915-0455-test-suite-feedback-cost/plan.md",
+      "digest": "7d418b0f3b9b019bc359b6ed0133d8b8c70653f11ccc8a955c2c859888896080",
+      "recordSha256": "56cea25feec3e6e9616bb75591d17aa86c8744a0e7f4440eb6be895d20e189bb",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-006",
+      "file": "archive/plans/260915-code-implementation-track-policy/plan.md",
+      "digest": "5e101cf7db67d14fc16a85086df488461b9368ad187a7ef9d3305a09fdf4cb7e",
+      "recordSha256": "a634586040fbc27684dc66f99c60f1011db7fab7d448e494352632209931570d",
+      "edges": 8,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-006",
+      "file": "archive/plans/260915-code-implementation-track-policy/reports/review-260915-0944-critical-design-review.md",
+      "digest": "feb7797a2f6003110077cf596502f5c9b514ee053971880bf36ad1a70a1f68a0",
+      "recordSha256": "e3f2d74e62ee41cb3a74bcf7ac35c911626e5245199954cfa5d32850d225a342",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-006",
+      "file": "archive/plans/260915-code-implementation-track-policy/reports/track-closeout.md",
+      "digest": "d507b429e79f317a64ebf08a8e0fa75238c0129170a602c8d69ba51060f95e88",
+      "recordSha256": "83924e3d5a8b2dae5962ee8392892f1fbc3dab86084af77645e6a786bebb8036",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-006",
+      "file": "archive/plans/260915-code-panel-multicell-facade/phase-00-contract-and-baseline.md",
+      "digest": "8e6d347540750d351b7c9a583ad61a8af4e5a1c90c2f151f0de409409004a436",
+      "recordSha256": "e20c16fbecc88e20b59ae1273b417966627a97e9bb89e53d016cdf669be761eb",
+      "edges": 4,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-006",
+      "file": "archive/plans/260915-code-panel-multicell-facade/phase-03-resume-and-compatibility.md",
+      "digest": "67c61b5ba055c82e697493b4b2b1fd93a25ea280b2cc2333fd5b1026e3085ef1",
+      "recordSha256": "43f30eec528c3ee51311c3be0ad18f8b26e1ef276f56e2905b1cb888b83cea24",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-006",
+      "file": "archive/plans/260915-code-panel-multicell-facade/phase-04-fix-orphaned-authorization.md",
+      "digest": "d5562cbaaefab73e2fedfd221a787b18f7983f623c2aff1c914bc59834282bd0",
+      "recordSha256": "3e5bdda5e3ae8c94431a4894026632eb65197baa67b5a192c158ace811af2ad6",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-006",
+      "file": "archive/plans/260915-code-panel-multicell-facade/phase-05-live-proof-and-rollout.md",
+      "digest": "e8a72de2c5949849f6610b747d66e8d132fc3cee1012e084a82336b9d005f044",
+      "recordSha256": "461255006c7238de713d4134aefa872e8e3e5dd07c2c4ec7f0b907a408e5fcdb",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-006",
+      "file": "archive/plans/260915-code-panel-multicell-facade/plan.md",
+      "digest": "f140451a4829cab0f353b7ca4cabfa4805ed930db097ced83f36d814df7008c5",
+      "recordSha256": "9fd0ff502921b0dc8edabf2709565201c0bad931185d0a9cf6971df832f72067",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-006",
+      "file": "archive/plans/260915-dispatch-operability-implementation/plan.md",
+      "digest": "b6e1256f71114873c207674d381118405b60f2b06bce78b16bea1d25401f8ff3",
+      "recordSha256": "ebb9186b3a89fa82e20a226118a0514fc839cd460d2892b46153e57c13524b04",
+      "edges": 5,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-006",
+      "file": "archive/plans/260915-executor-policy-dispatch-seams/plan.md",
+      "digest": "03d9cc95c6b32e4769700f698cbe22d8e72a3e0b8221b9e18d31c6d374f653af",
+      "recordSha256": "37c88323dcdc52ffd662e3147237a4c06342514662d3186c23fead5fe729229d",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-006",
+      "file": "archive/plans/260917-cold-resumable-coordination-dag/phase-00-baseline-and-migration-lock.md",
+      "digest": "bd80d475c2329d045d11e9f506417a3f235380120a1118569ca84741e5dd5f35",
+      "recordSha256": "13483e9a03553d6e5d23dc8b3b58cb64736b4ebab24cd541659c6a3e2e376ea3",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-006",
+      "file": "archive/plans/260917-cold-resumable-coordination-dag/phase-07-migration-and-release-proof.md",
+      "digest": "afad7cd7152db1ed4e4dcf16bf8c111b4ac1aa5d9309b65f55c40a49cbc675b9",
+      "recordSha256": "4b026fff1fdf950c596afe19723030f0570ba00c06bcb540f752a023cc92e326",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-006",
+      "file": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring-rubric.md",
+      "digest": "ed539e77a53d544bd266e8eb212b4241b9f8535c0c38e179556a2f855eec8f76",
+      "recordSha256": "e0487d50fe3ec5a7ab02982b3bd9ee3cf2c8e1379739bccb63d1444d7ac74b96",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-006",
+      "file": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-1/ground-truth.md",
+      "digest": "e7cb6655d964900842c1483b04a224577fa6be19055f36f87fc2e6a7a33d2dc2",
+      "recordSha256": "ddb82c0046367d67bc6fa3ed02fa9c02d7af98a7a9b35fd563ebd206736f1a41",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-006",
+      "file": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-2/ground-truth.md",
+      "digest": "4dba623856c9553162170264f0077d11a2032ebc345c9ae9ec2fed46e3a3c7c4",
+      "recordSha256": "d27d1d373aa9e9916873ed1d6a98f8befc4b9e0e4cf6670db8234a816d2a93a2",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-007",
+      "file": "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "digest": "c79321dfa77a43487ddd6b79d171d426a462c036d5ff1f360531222e88253b81",
+      "recordSha256": "716780d8790fa36515938bae9254502301aa37e1ce19fb85e719ff5b9703558a",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-007",
+      "file": "archive/plans/260919-coordination-skill-harness-simplification/reports/unit-I27-panel-depth-experiment-real-comparison-report.md",
+      "digest": "90e7a0c444258438ad5b994de4ee8e22b39787e37e3740030cf5e50252ac5d29",
+      "recordSha256": "d4ea750487df5f87840f201127bb108c4e6468ee06b89caa9946ee4ac7ac80db",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-008",
+      "file": "plugins/fgOS/skills/approve/SKILL.md",
+      "digest": "223db0a2171ec07fc5790edc7048685c6f98c1a72b65491c504cc915309791d2",
+      "recordSha256": "40daaa3629ff003eef2ec85c83b94a34381ec16592ce5926754dc46b7cbc08cb",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-008",
+      "file": "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+      "digest": "952474402b90ec3582ad8b55e1c5a03cfc98c11630c3b7c522bb244a235ed871",
+      "recordSha256": "3ce767195fd630cc7fba4f65f894a957dd740a0faf6ce8e71d1d5ec518aea233",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-008",
+      "file": "plugins/fgOS/skills/cleanup-next/SKILL.md",
+      "digest": "3c5c1d8c5d73be3fe4ba54328cea8f93c6a2f01e0bb8b6063fbdbd84cb50e5c8",
+      "recordSha256": "fa94eba72912f7880f1ff05a66c1dab046fc3016cad46071dadda8f9fae48f62",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-008",
+      "file": "plugins/fgOS/skills/coding-shape-distill/SKILL.md",
+      "digest": "125000a056b5565c6ea9be96de16437ef6cfd6d627523ca0107db3a1ee7718c9",
+      "recordSha256": "21d574f624924863a1cc32b67aa52fb1da0dabb53095116241baaadac50a0bc3",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-008",
+      "file": "plugins/fgOS/skills/coding-shape/SKILL.md",
+      "digest": "e1d9fc8b334325e7c217a35732b5e2534f67c6ebd3006c0a330ccdfa23e6218a",
+      "recordSha256": "6356b4f0cd3bab74a4a1897d4f4c8ce3b17baa9147497846daa9ac6cd37925b9",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-008",
+      "file": "plugins/fgOS/skills/deliver/SKILL.md",
+      "digest": "55ea600a67fb3de0c179bedba1c9c843dbe9df85fd18cba8c555e42ed722ea50",
+      "recordSha256": "0b71e0067465477906be13ed76ae5d5fc028a6238a171949a236ed072a441a70",
+      "edges": 4,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-008",
+      "file": "plugins/fgOS/skills/discover-next/SKILL.md",
+      "digest": "51f1216af69370718c7f4a1f1e2e1d0cf214aacd4b52fb09a289468038ba30c6",
+      "recordSha256": "71af8635b7f0e6c5a878ef7f4f01dd34d41295536d11e622fddd7f0960afc808",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-008",
+      "file": "plugins/fgOS/skills/discover/SKILL.md",
+      "digest": "ce933f48a9e25fb48f66be6872f03bc0477418abe47276959fdc8a8ed3f450bc",
+      "recordSha256": "82e4bd6f2e20aa0aba11c90326f25d7dabd8bdb3e004034503e93d18776df615",
+      "edges": 6,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-008",
+      "file": "plugins/fgOS/skills/merge-loop/SKILL.md",
+      "digest": "35d99ac7831e3eea531afcdd7669c7eb106082a43fa320c77407552967f03e92",
+      "recordSha256": "00de8e750838060a026573c8b7e6e8a104ef7f97f504fb3315c0465912f37bce",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-008",
+      "file": "plugins/fgOS/skills/merge-next/SKILL.md",
+      "digest": "1771a139178781aa4d91abafe5995568d3d40d3169a8ede0973ed7ea4870b9ee",
+      "recordSha256": "35e64ed69db05ae24a8a1e1f270e633ce3d4ec8daf1bfa38ae1edb378c150a80",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-008",
+      "file": "plugins/fgOS/skills/plan/SKILL.md",
+      "digest": "88bd6263cecf791048767b20c2cf23ce5b231c1357079143c6c45812b17c6d44",
+      "recordSha256": "7409f247de503fddafe88d4b2703d3b6783cba60b99a2f2017ae7d9aa645c884",
+      "edges": 4,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-008",
+      "file": "plugins/fgOS/skills/retro-loop/SKILL.md",
+      "digest": "b134815fe10d13c4351a4d5f11b5e18db796b086afacc2767a062c218f7c892d",
+      "recordSha256": "024a944530d79838a77b1e2b49089454d561d218e74b956fd0f095918eb098a7",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-008",
+      "file": "plugins/fgOS/skills/retro-next/SKILL.md",
+      "digest": "6766d18d3cac978028869955934cc082a38f9d6ea3e62e65be9bda3d326b4b84",
+      "recordSha256": "20e1b21d100d97ae39e08701123b69971ebbe281ae2acf298a4d346c21be6740",
+      "edges": 4,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-008",
+      "file": "plugins/fgOS/skills/terminal-close/SKILL.md",
+      "digest": "c32b482db8d607c60980972525a112969f064a3e7c3e1d345b852ef002a976d0",
+      "recordSha256": "40fee6eed9d35dc23b1db99114b01d6966288a52476b546d89a2c8a5abdae8ec",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-008",
+      "file": "plugins/fgOS/skills/terminal/SKILL.md",
+      "digest": "65fdc9d4360dce4ed0c859879160e57bda72157b9edff99b3bff429b27c9e294",
+      "recordSha256": "62f5f4b69ce75889ee54692194e1764f81a342505d03ede9373a30f3b4fe50af",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-009",
+      "file": "AGENTS.md",
+      "digest": "7100231ae81a24ba491542a5564d8413d778208772d2a756a42e3e91725578cf",
+      "recordSha256": "b7e1f9ed922a9c83dd87e0c3d5a9994dc730b742d57d4e547a38d2e551cb6cc2",
+      "edges": 24,
+      "diffBytes": 4992
+    },
+    {
+      "set": "step04-009",
+      "file": "CLAUDE.md",
+      "digest": "384fb0e29c88662a86a6eec0334f557a71bb2c533f2f6c2ce137552a90b32568",
+      "recordSha256": "92cec73e487d05e889f031c7ed1ea3403ab8a2160c1617934a6fb6094a14d062",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-009",
+      "file": "core/instructions/design-principles.md",
+      "digest": "1ce8aecdf134ad53db49ee0643eae4cadc145ac2136ab553c9f2b391d9a5a084",
+      "recordSha256": "f869f00f1e448b5c3f7d44941f310872fd256860ac577e24b8df94bf4740c482",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-009",
+      "file": "core/instructions/platform-laws.md",
+      "digest": "4b834fa5ea7db1d9637a3126a7a96f7758be2f1650131411c4e69b3a91ac6f90",
+      "recordSha256": "99294ebb4a571fde6d4b3ee975b21b3c40ae5625bdff743a6df5e7d2ebbeb333",
+      "edges": 24,
+      "diffBytes": 3703
+    },
+    {
+      "set": "step04-010",
+      "file": "bin/fgos.mjs",
+      "digest": "64ace4da89dbc1222c6d3c0d634272c9b043d1c268a257ed2e2e09385a5eb198",
+      "recordSha256": "860295e7013e49b14ef3e6c1c7aa19aa0f34435cd88a5f0a777748a9d400d222",
+      "edges": 36,
+      "diffBytes": 932
+    },
+    {
+      "set": "step04-011",
+      "file": "src/cli/command-registry.mjs",
+      "digest": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+      "recordSha256": "8dc99a3cd341c307d2939e0df4e7b9b756283111eb3f7e0eed339f3d4ae6a6eb",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-012",
+      "file": "apps/fgos-gateway/Cargo.toml",
+      "digest": "560906267efc832f207db70303bda05b42f5afc8bbf7eca4c0a6b78e3634345d",
+      "recordSha256": "e2641cd00f05591e7162090007e27a6e61c8979378f62f6e1757e065d4118734",
+      "edges": 5,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-012",
+      "file": "apps/fgos-gateway/build.rs",
+      "digest": "0109e37c64e9474009c71bb3f3220496fad07dfd77b28c796f1f828c9d2d5671",
+      "recordSha256": "6fa9f11ad9f4b2ed36b6af5c6d9678ddb8ff5e248e3b1af546004b0d7b197efc",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-012",
+      "file": "apps/fgos-gateway/src/cf_access.rs",
+      "digest": "be105b105b492ce1fe89a11282dd480e2daf4e5fe179d1166b03148df937feca",
+      "recordSha256": "d72675ae53d423aa8b71c1fca702b1e7681f0aa244da1abd5cf4ab1f5837b4df",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-012",
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "digest": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
+      "recordSha256": "0df4de772e8828ba4a8bbebd46b3fb9e54ae578d020313af793450759d3ad323",
+      "edges": 19,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-012",
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "digest": "b60e289295c3daad726e988d63674e7f344d554577864b34e470d89ccad90df3",
+      "recordSha256": "aed23d33e00b397c8b0b20d87df36950cc5de0d9c29c217f9fc68028babde244",
+      "edges": 5,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-012",
+      "file": "apps/fgos-gateway/web/src/App.tsx",
+      "digest": "e773360e01f1b4851b8390cb8cf975e4cdcb04dbd9327aa21aac36ce9b52978e",
+      "recordSha256": "00c1538a6b18c2c3d62eabf68e4b53cde4c6da7676f692a00101cc88278d5a96",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-012",
+      "file": "apps/fgos-gateway/web/src/api/client.ts",
+      "digest": "462686f57dabbbfb487309df49aa276224d1866b8b970248b0166d770f4d63cb",
+      "recordSha256": "77bf32e7ad7bc338a2fef482122570d1b2481f8fb6cf04b4cdf0372a336cef0d",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-012",
+      "file": "apps/fgos-gateway/web/src/api/errors.ts",
+      "digest": "177282665dd0ed07aeaa6242bd7bfb9b8e0561fd57e9971aba736517d6be65b5",
+      "recordSha256": "0b729cd04669cc29ab0ebf1ca2efef1b170b3f5b3e0cf98dc0742d8ed7f99c42",
+      "edges": 1,
+      "diffBytes": 552
+    },
+    {
+      "set": "step04-012",
+      "file": "apps/fgos-gateway/web/src/api/poll.ts",
+      "digest": "e132174794ce66814931c772b7b6497e563d3f5147a5f5fcee822eff479fdb48",
+      "recordSha256": "b4662e451d1fa63d4f88d793ac78edcc28259f974625303faf7718c482e6590b",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-012",
+      "file": "apps/fgos-gateway/web/src/api/types.ts",
+      "digest": "ee921f18e8b6b4a0b5b0e37e4739488254c1b0dc9b90871e1de28cd21d3969fa",
+      "recordSha256": "94b57cef73fb2005e31fddcd63fe0b27e5f9c33ce11e9e7e3342a5be02258783",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-012",
+      "file": "apps/fgos-gateway/web/src/lib/network.ts",
+      "digest": "167d4741830756c229f6b492defa0a2d809e5f1bfc057daee54c5eaf9cf11319",
+      "recordSha256": "9531d8b6937b1f30de69af6a14bdd2c7d7c98d3aa94c4e0b2da5505c7c155d17",
+      "edges": 4,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-012",
+      "file": "apps/fgos-gateway/web/src/lib/status.ts",
+      "digest": "2a2953f58c6ac83e3d0c7d07806fd15b9d14f6e85a61c49720c87cafd265466a",
+      "recordSha256": "f7e6f2cca3309ae3ab6bcf57b39c0bfe20056f4a8d9afe4db899c7c6513f77e8",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-012",
+      "file": "apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx",
+      "digest": "0212810a96532e5b14e2420dcc66927c91f936d606a5bf1ad841b30c81202b27",
+      "recordSha256": "3868244b74bc23d4aeaa72e6e6ee251f7efc1493ed8b3f8329c5a1dc50a39c44",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-012",
+      "file": "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+      "digest": "66493b27c3dede73be383d786cf5342ed7770fad9a9bbbf982adac0e01b6056e",
+      "recordSha256": "01642b4611d637040d95a0d465119dfcb248bbcfb1f5c9b4e0159ce49ba46ed5",
+      "edges": 4,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-012",
+      "file": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+      "digest": "c9716c0cb1e719e2e3701dd494cf3265c4512cd544813a72180eca7624d8611b",
+      "recordSha256": "daa22e1f5c81376bfaa0f6862f654b8364eb823102b0d5ce26425e4a3c01c628",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-013",
+      "file": "src/config/global-config.mjs",
+      "digest": "128596fa9a107741cb126d67c9932ae91b8430d4bed5abaa64f16c72af59815d",
+      "recordSha256": "35f99db96f451108a8d55084c15edced8278be82163da448e5292fecd746cc59",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-013",
+      "file": "src/config/shared-config-file.mjs",
+      "digest": "c2239950f9a6dcf64d140ca9208ea013104b81c82599b0754c268f760ee44d5c",
+      "recordSha256": "4d47b70263b1bbe76f61a75ae5a856d267ef7daab3460d5a8cd3960de5d4520e",
+      "edges": 2,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-014",
+      "file": "src/install/coexist.mjs",
+      "digest": "099cfd22d3f84d221507697bfb0c84f336e4c85305433117e2390ebaad632a03",
+      "recordSha256": "48e7cd685a504857ea4a5afc6ab2e078ec5068964ebed283c37949bd7dad2ec9",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-015",
+      "file": "src/intake/discovery.mjs",
+      "digest": "6da596afa6d305cd8431a7f79659c04449bfe7ecd793bc5600fd11cd2cff9c1b",
+      "recordSha256": "41f3b099be28cbaad5457619124f9b1ddab9b374b0a18131ac6d5db9df949124",
+      "edges": 3,
+      "diffBytes": 689
+    },
+    {
+      "set": "step04-015",
+      "file": "src/intake/plan-verdict-from-plan-md.mjs",
+      "digest": "1472684acd2398d71885e73ee5b365a42e9a263f5581ce5ce0518c857fb71f09",
+      "recordSha256": "ac5497af4337e82ee6816c381d59e102441cdfadc98eba4ab1c16413bc792e34",
+      "edges": 9,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-015",
+      "file": "src/intake/plan.mjs",
+      "digest": "c3c72be35468420d9f42bcf23a0bdec9e48a11c1f4d8dd6bb4b9be09f4c60dc6",
+      "recordSha256": "6703419330012d7373bee26788f7aa6580e7630cdae798e20408d9b6ff75c62c",
+      "edges": 8,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-015",
+      "file": "src/intake/verify-pattern-check.mjs",
+      "digest": "1cfe3feb6375b999c4b851f6e9ef8fce7b1fb1209a81c29dd0a043939cb69e0c",
+      "recordSha256": "c89e2c77f93823e4358fa879c22cee49f581d1f146993700a7178b962341527d",
+      "edges": 2,
+      "diffBytes": 678
+    },
+    {
+      "set": "step04-016",
+      "file": ".githooks/pre-commit",
+      "digest": "ebcefc2815d02910532f1642afff4b7ee1b22ce20d9c5859e8ec44e1019f2943",
+      "recordSha256": "73c681306fa9d07f64e4b58ade3bdb928de8d32007409ea4646392cf67d5d93e",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-016",
+      "file": ".github/workflows/ci.yml",
+      "digest": "9c0a0e571f33944b4501618e5264842ce83da8eae23efda70662d127104a5eef",
+      "recordSha256": "8da5981f82f6939e5551c6e8a7c2fbc09ebb5b8b2e687daad9d8bd7245584f04",
+      "edges": 1,
+      "diffBytes": 0
+    },
+    {
       "set": "step04-017",
       "file": "CHANGELOG.md",
-      "digest": "6edda75bd4f92d5be267754e05e91530bba2bd4d895bd20a4c5e02258e5f2715",
-      "recordSha256": "2ade02da1135496a9006e781bbc5f66452b835946c24ce4b917107420c513221",
+      "digest": "062f9fdd3601883b474bc5f0980b444366e8b10fafb6dc490ac8bd5fee00e8e9",
+      "recordSha256": "4c761eeec2e149b4a21b14d2d3522fa8ab08332a69ce379b6c8509edb17b2b96",
       "edges": 1,
       "diffBytes": 0
     },
@@ -32,7 +1464,7 @@
       "set": "step04-018",
       "file": "docs/history/p03-3-proof2-work-lookup-proto-guard/CONTEXT.md",
       "digest": "53025ccab0ea02e33df9f8ca038b5272d01133004b9c9825eb0f242f2ba72d67",
-      "recordSha256": "ebee9f93380514fb4fec5859f8b843126d4bd2606912d399abd1c27243380084",
+      "recordSha256": "a1ccdf65812a75bc21a7206badf3ae465e088e3962ac61e2ddf00a749bbfc882",
       "edges": 5,
       "diffBytes": 0
     },
@@ -40,7 +1472,7 @@
       "set": "step04-018",
       "file": "docs/history/tsk-43q/iron-law-evidence.md",
       "digest": "4a995d3b84383eaef283f607233c70a3dbafe80be0ba8785248da24c121fa11b",
-      "recordSha256": "fffe996fe4d5a324a93f491551a61849e0daf735447443d784fb152c4757d7fb",
+      "recordSha256": "ed02d7e03f86218e0b564361d5a455665c839d73d679bd7cf8a10bb8343aeddb",
       "edges": 1,
       "diffBytes": 0
     },
@@ -48,7 +1480,7 @@
       "set": "step04-018",
       "file": "herdr-dashboard/src/pane_scan.rs",
       "digest": "4e71fa33d2081c4e36bee7c0d90c5c85cbb7a203bce86117e9a43e408ad0ec10",
-      "recordSha256": "6e489de0832f8e94310353ef501fd8c148b480bf9b0496b22cfe1cbed76b7345",
+      "recordSha256": "177d14553b15ad569f0e20e64f0bec72be33f24c6be62b58a660da7e2fa5af6e",
       "edges": 2,
       "diffBytes": 0
     },
@@ -56,7 +1488,7 @@
       "set": "step04-018",
       "file": "plans/reports/fork-260928-1017-panel-depth-experiment-design-research-report.md",
       "digest": "b9b9a8c8e87f1c9989f587d45feeb36e5917226bd53a7254adb0470d98be7369",
-      "recordSha256": "45eb320d361b289f9e31ef7e6a6e7068ed17cb896150891f05ead4578be9d3d4",
+      "recordSha256": "9185777864c171452872958e165387479997da0c616a28f93b464caf40bedb31",
       "edges": 1,
       "diffBytes": 0
     },
@@ -64,7 +1496,7 @@
       "set": "step04-018",
       "file": "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md",
       "digest": "4d5af3639f5511770443d983afb52907184c40b0f1758fe031c451232938f2a9",
-      "recordSha256": "5ec839fce70495bb043a16fe3656910703602b8d143cd3e1b0e2dacd31f4cc26",
+      "recordSha256": "47c9b5725ddd9bbe4aa29474a81ab09c6173d69bc64e33a890eda2fa00538ad2",
       "edges": 1,
       "diffBytes": 0
     },
@@ -72,7 +1504,7 @@
       "set": "step04-018",
       "file": "plans/reports/from-implementer-to-red-team-260907-1050-dispatch-visibility-v0-review-prompt.md",
       "digest": "32c9cddf13d922a3466076e2940c845926d2d1bba40616a0e51fa513bb34855f",
-      "recordSha256": "a7f37a7a99c0696546df817a8586135564d637af1573d4c999267ab55ab86a9e",
+      "recordSha256": "fd702a3b77d37924e6eeeedee9e2c0dd572dc4b059322eb706232b8e7959302d",
       "edges": 1,
       "diffBytes": 0
     },
@@ -80,7 +1512,7 @@
       "set": "step04-018",
       "file": "plans/reports/review-prompt-260911-1654-runtime-recovery-design-second-opinion.md",
       "digest": "1f021f2d199b76e0838f554cbd1bdcd0095fc399f92e149e62ffcce640b4ed1a",
-      "recordSha256": "64392ff37b6759f2b7d964a9b2e3e8e189c2a26bcfba5ddbb181fe096de9cbfb",
+      "recordSha256": "c2b70d883c1d6e22eec540b4a3da263a84fcb98d48cd3c70ecf47101ee76ed4d",
       "edges": 2,
       "diffBytes": 0
     },
@@ -88,7 +1520,7 @@
       "set": "step04-018",
       "file": "plans/reports/review-prompt-260911-1805-runtime-recovery-detailed-design.md",
       "digest": "72f6cf553b7baf82dc26269054a4e3620048e19f055a3a4f7afe8caac35e82c8",
-      "recordSha256": "2005bfa94c2437d68671187540e8eaead09574724a7937c99a15cefa6c7da50d",
+      "recordSha256": "7f8c37e854e44210655b07e58f8e76fee023a7b5b53314703b6ba5fd8c7323c8",
       "edges": 1,
       "diffBytes": 0
     },
@@ -96,7 +1528,7 @@
       "set": "step04-018",
       "file": "plans/reports/reviewer-p03-1-260905-0251-skill-authoring-review-report.md",
       "digest": "b944ffc8fc9daa3c09d4ed08480a1877a2173e09d841900192e9455c826a0045",
-      "recordSha256": "18d81fa95a96b0a3a58a2a3f5e08b4ed8dd1f0fbaf59980d21ff2304b7c40a93",
+      "recordSha256": "677fd4ae1bcca1954a2ddb22dfe76c113e25fe51acb010552f7e1ad0dda21b5f",
       "edges": 1,
       "diffBytes": 0
     },
@@ -104,7 +1536,7 @@
       "set": "step04-019",
       "file": "packages/distribution/rust/src/canonical.rs",
       "digest": "15ea0f48882aa65ed613554dea8a708618d84e94771deb1af2949fedfe682379",
-      "recordSha256": "5eea90ba546e9286bc3e511a48f223bbc56545e3206127a12cc88f6cd04e492b",
+      "recordSha256": "4280c0f7f16cc525a13844296e9769bcbace54d793fe77fd4b37763ca97e20f7",
       "edges": 1,
       "diffBytes": 0
     },
@@ -112,7 +1544,7 @@
       "set": "step04-019",
       "file": "packages/distribution/rust/src/init.rs",
       "digest": "1cfecbbe025a6485495b6e76bf5076d1fa3238ae27a01cf755c83c085a4ebf1c",
-      "recordSha256": "2b391c7136e30a8eb61a3d1079e39d7376988ca91bc01eaabb43aa6498b5f6d7",
+      "recordSha256": "f51a418b9a03df1449b057066dc8c4f0738a6db1f6679be66868dd73d501fb62",
       "edges": 1,
       "diffBytes": 0
     },
@@ -120,7 +1552,7 @@
       "set": "step04-019",
       "file": "packages/distribution/rust/src/manifest.rs",
       "digest": "cc45d293313bf2de2b912293a52dc1f76214eb4c06b56b28f90ab52d640d274a",
-      "recordSha256": "f9c3288da48ea2efcf2d6ea92c3be0740732b56593a3fdfd7afae3da0fbb37fd",
+      "recordSha256": "9d77c648e2ffa0b6e0378f7d08922ef08a3ca045059c9c759a45258504c47b7a",
       "edges": 1,
       "diffBytes": 518
     },
@@ -128,7 +1560,7 @@
       "set": "step04-019",
       "file": "packages/distribution/rust/src/verify.rs",
       "digest": "45abf2dc964ec6fe1687d1cac3bc46654a6b32552ffe8d12d0f1c5753f42b800",
-      "recordSha256": "51ae0be679c3a711976c7f78096a368a8c7d9c185d9984b7109b55761b0b89a5",
+      "recordSha256": "ae9f8c0175340aad0518a8503b412a439f2d70331c1aabd2daaa92fdbd76ef55",
       "edges": 1,
       "diffBytes": 0
     },
@@ -136,7 +1568,7 @@
       "set": "step04-019",
       "file": "packages/distribution/rust/src/workspace.rs",
       "digest": "dc18facaa1515280f9f57f75c462376220a64acd778278fc7a8cf1f55805c49b",
-      "recordSha256": "dc01b3c7d6c67345fd5c96b90382c0e98274c7cbf837595746b27105449c48a9",
+      "recordSha256": "12a9f058c2c2636918c621da073fb2a00ab48aa7834ca23613b69d9a6f133f34",
       "edges": 2,
       "diffBytes": 0
     },
@@ -144,7 +1576,7 @@
       "set": "step04-020",
       "file": "packages/herdr-fgos-common/rust/src/fgos.rs",
       "digest": "fcaaaa8f0beabf43e8d9e312da0dac0d2392d7bd52c38d5eaa8ee4a37bc286a9",
-      "recordSha256": "57f827d6cb0a72d2a09ea5ec4bfb62b7dc5cdb03fc0c7a602a8d86c4052d48cf",
+      "recordSha256": "1e772da3e5d61bec230e8a943c5c5ede1b186264612623f37a19aa24b983260e",
       "edges": 3,
       "diffBytes": 651
     },
@@ -152,7 +1584,7 @@
       "set": "step04-020",
       "file": "packages/herdr-fgos-common/rust/src/settings.rs",
       "digest": "4454b148e5e22b467b867c513ce6cc532cd63821e4ab54ea5f4d03cb23aae9d7",
-      "recordSha256": "f0a95bf2a3f404b8c60437314ccede6c80ad9ef18ef7808f203f43268102bfa8",
+      "recordSha256": "a3a10b1229c9dcde038d58390ac8900fc21223b2491ebcfd80a56ecd7bfb58ee",
       "edges": 1,
       "diffBytes": 0
     },
@@ -160,7 +1592,7 @@
       "set": "step04-021",
       "file": "packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs",
       "digest": "6deabc793f7f5ac9fc5ae5c91e1a18d466e1cca573b40988a75c44bd5fa794b0",
-      "recordSha256": "815ef491b1706344788845e0d176c45df500cbf3e865447f08e8c5ec28dd8d4f",
+      "recordSha256": "94c82cb91bb0eae79fe9a74de9c3ef312624497f8942640c6fbb8e6824bbfac2",
       "edges": 1,
       "diffBytes": 0
     },
@@ -168,7 +1600,7 @@
       "set": "step04-022",
       "file": "src/runner/agent-roster.mjs",
       "digest": "bddc69ef02c932c8a05d8486a29c02c4188a3cb7e31f8706cf3ce360cc42ed31",
-      "recordSha256": "31f63aa85dffad1a612ae7af374e1234a5d931fe444ee0f473b3aa79108f3538",
+      "recordSha256": "1bf0dd82970c221c29b6fcec1719f8f1937277df83b380ab7ebbacb8c143d8bb",
       "edges": 1,
       "diffBytes": 0
     },
@@ -176,7 +1608,7 @@
       "set": "step04-022",
       "file": "src/runner/anti-loop.mjs",
       "digest": "d996232d9518a8fcf6f7017f781716f513eb3c0c9f80e17741b9507bda48ae49",
-      "recordSha256": "b6a8c4678f993d6298d3ed64f2fabb06aa08a0319f539e872198b2e521504e88",
+      "recordSha256": "291355d561dbfd3fdeaefdeb8c23758d3cc7fbc575be22f0d9f4f4d2ae345b73",
       "edges": 3,
       "diffBytes": 0
     },
@@ -184,7 +1616,7 @@
       "set": "step04-022",
       "file": "src/runner/claim-liveness.mjs",
       "digest": "a4a01260422ce8eab25f67be7fcd47f0638230616e1e9237c881e8755ffdb538",
-      "recordSha256": "18bb6c0d69a40d5b0819ca82dd48d57bd084147578da55611f55f1219067a2bd",
+      "recordSha256": "e484b3e6e8e6fd99c41f7583b70026edbce36d6c3032885d83c5454984426b00",
       "edges": 1,
       "diffBytes": 0
     },
@@ -192,7 +1624,7 @@
       "set": "step04-022",
       "file": "src/runner/claim-port.mjs",
       "digest": "6e510ae19478f1ba71a2ab900f024d98b0150dd20da9fd255afdd407ae9c50c7",
-      "recordSha256": "b9cdbfb07e2e4624ec170008e739cb4a8aad2073be26a6555efd1eb4a9c4c18f",
+      "recordSha256": "7b3cd4da65be5265ddf7e5d71633283349637d0b96e3203bbf5acaac809fd2d0",
       "edges": 1,
       "diffBytes": 0
     },
@@ -200,7 +1632,7 @@
       "set": "step04-022",
       "file": "src/runner/dispatch/assignment-policy.mjs",
       "digest": "c0cff9ec45634a9a8164c10dd9cc944145776cbe51d04ccb0a5676419fdf667a",
-      "recordSha256": "9f9e757cfe5b66ab9532d754174b2b4ee3feac1647c9437c5d3745fd2d4d5857",
+      "recordSha256": "697b9c164e580254fa73bfd7339876b528e5527200603d219b4f44d44468f1f3",
       "edges": 1,
       "diffBytes": 0
     },
@@ -208,7 +1640,7 @@
       "set": "step04-022",
       "file": "src/runner/dispatch/assignment-runner.mjs",
       "digest": "0fa987f013541a563fea17fde0a9f435a917bedc44f6c054a2ea53881ef67338",
-      "recordSha256": "ea6968fce3ac723d881c2cc1d308ec61caca2b1f7e0e868bb94fd8fdf446b414",
+      "recordSha256": "673e625a1b2b16b02dc4dbd8d387b1e45acb385ad4088cb78373e1fbc3626a4f",
       "edges": 1,
       "diffBytes": 0
     },
@@ -216,7 +1648,7 @@
       "set": "step04-022",
       "file": "src/runner/dispatch/cli.mjs",
       "digest": "f87f801077619893579bcebeb1643cdff9a32bd09652619e43d81599c2119969",
-      "recordSha256": "e2720ec14b2e496427512c29900a1ba41a9bb826f4a63e294d51015f6e06c7da",
+      "recordSha256": "4bb73a48c17e7d71f96ae7965647eaad2af127594cab1205d1efca3ac710298d",
       "edges": 2,
       "diffBytes": 0
     },
@@ -224,7 +1656,7 @@
       "set": "step04-023",
       "file": "src/runner/dispatch/config.mjs",
       "digest": "6d32edc9d13ab80dbab237e71deb8beb971e7a94ac1bea547d1eb6c8ac2c6b2f",
-      "recordSha256": "0b189cfa784f0d0d2966bb8ff2b101878ff5ae0ab64973d30666f4170d653483",
+      "recordSha256": "e8aaec4100c31ce1195eb044464feebd161dfdd7f771b26303cc071a21b1ded7",
       "edges": 7,
       "diffBytes": 0
     },
@@ -232,7 +1664,7 @@
       "set": "step04-023",
       "file": "src/runner/dispatch/confinement/authority.mjs",
       "digest": "e618d5997f85e200c50f6459c43f08f31852bbd6cefb6c27c128c4e845c78709",
-      "recordSha256": "917b7079fe3cdab70c141ace0b5c667a5f5fc645f2bf9592457f369ef2930dc6",
+      "recordSha256": "0ba06d357586bd8738a7a416e31637c45e4251052ac940f014655306b5bae3a6",
       "edges": 1,
       "diffBytes": 0
     },
@@ -240,7 +1672,7 @@
       "set": "step04-023",
       "file": "src/runner/dispatch/confinement/backend-registry.mjs",
       "digest": "8c07146b675d4ad1086c88685de4a521c7004bc00de39e20d2dbb99d96bfa1ff",
-      "recordSha256": "0616b9e58d544313c4c923db40016ebafe295349f97ba90ead03f6947465a17a",
+      "recordSha256": "0e1277a4ae6e2400ee437cd8cbca9c73ba3d9674ee32397601565cee67548752",
       "edges": 1,
       "diffBytes": 661
     },
@@ -248,7 +1680,7 @@
       "set": "step04-023",
       "file": "src/runner/dispatch/confinement/policies.mjs",
       "digest": "cc531111c8fc233ca9557d5ba89ab119ad3c4870145dc9ffcc865fcd87599d1f",
-      "recordSha256": "cdda81c6eaf7c0ae269b6eac2d0b0b5b4180f45b94bd553932ca4181a8724703",
+      "recordSha256": "ff864f182d34e816d444ef7806a7494276abad3c5f848d5e65c1bb65b5d60258",
       "edges": 1,
       "diffBytes": 636
     },
@@ -256,7 +1688,7 @@
       "set": "step04-023",
       "file": "src/runner/dispatch/confinement/request.mjs",
       "digest": "aba50726b489db9763742539c462cf269461943576472c71e84d2d7fe248f185",
-      "recordSha256": "075fc6508c3cb9a8a24fabef8fb92c7a9b983e0de63a6b5aeb07c2e39c192fd0",
+      "recordSha256": "8a1476763e14bcdfac41194e322d3314beff76a695d98a122cfc4b0ee9047e68",
       "edges": 1,
       "diffBytes": 456
     },
@@ -264,7 +1696,7 @@
       "set": "step04-023",
       "file": "src/runner/dispatch/execution-contract.mjs",
       "digest": "fcc21d444c42d171838107a577de7487daf8a920c08a779a21fa0d7e2f22e4b6",
-      "recordSha256": "6c5f393b785b48e088a6764cdfeda51e6b6d3254d8108a2877d16b267c368132",
+      "recordSha256": "0ac12f0decdf45047d7a3be525756728769ec3807b10a04b415e4fbe5191a82a",
       "edges": 1,
       "diffBytes": 0
     },
@@ -272,7 +1704,7 @@
       "set": "step04-023",
       "file": "src/runner/dispatch/herdr-round.mjs",
       "digest": "d964dcab21c72000fa01f4c37bc0a70f0124cc0812e4a94742f355f5b2fb0a20",
-      "recordSha256": "793d950120ff5c5fb5b4b5dc592941654cc70ac80be37cbd3f3af375868b87d9",
+      "recordSha256": "225f689389da58be350caa8c62d5fc098fc4a0060cbfe6471999a42cb0979938",
       "edges": 1,
       "diffBytes": 0
     },
@@ -280,15 +1712,15 @@
       "set": "step04-023",
       "file": "src/runner/dispatch/mechanism.mjs",
       "digest": "964be5b92c651b0e5cd0cfef5e51b6f9e90e1e172b0ccba7c58c19fe42d32709",
-      "recordSha256": "61469ee2f8dcb4e03f300ffde7911fad7b1a2b35e03aed70f92b2176f4308aea",
-      "edges": 5,
+      "recordSha256": "067075cb553308aa64d6efd10f9016118e0795b7151fbb57b9650fc4ecb74fc1",
+      "edges": 6,
       "diffBytes": 0
     },
     {
       "set": "step04-023",
       "file": "src/runner/dispatch/operation-prompt-templates.mjs",
       "digest": "932f932d239ccec0ef3debd919576d25ab068c50cb990d1f15afd03ff30f46af",
-      "recordSha256": "6c7d11e0e9676af30c38f2762de4a212041f216595b8f052026a5e6e74eda8fa",
+      "recordSha256": "04977b881d57d3f3de1fcbd037f7cf495f2cc48cc001a10e6525bcc2d01b75bc",
       "edges": 1,
       "diffBytes": 0
     },
@@ -296,7 +1728,7 @@
       "set": "step04-023",
       "file": "src/runner/dispatch/prepare.mjs",
       "digest": "d2bc4e5bccce5db31c8a56a364d06d88916b4c108cb0191957e8989b44ff90ce",
-      "recordSha256": "ddd5d76892616a06b9adaa44f8c4e397abfa36df8996a331419c6494ad3d0728",
+      "recordSha256": "acab74d5a4182da27d3b8c2acd291ddcfcc7a77022a7a684645d5f686858b033",
       "edges": 1,
       "diffBytes": 0
     },
@@ -304,7 +1736,7 @@
       "set": "step04-024",
       "file": "src/runner/dispatch/resolve.mjs",
       "digest": "2b4ef017b414383b5a0360b98f9eb420d709ee15d3b8acf83769fa1aec675375",
-      "recordSha256": "1eac75fad5cde010e21f1d54ac1d0957583bfad537f4154d4e2b44da8b5625bc",
+      "recordSha256": "773c7435588407cc88cfa9fa7c444c0e1c7b54fb9fbe1ae232e09f72a4759b9d",
       "edges": 5,
       "diffBytes": 0
     },
@@ -312,7 +1744,7 @@
       "set": "step04-024",
       "file": "src/runner/dispatch/run-lock.mjs",
       "digest": "4fe905899159baa52755203570a56efd376deb5262cbd6d0ee0a88cfd1c287e6",
-      "recordSha256": "e8337d7357ee4348183079bebe54d0f3528b973a5db07e82272e8ff849ef74b4",
+      "recordSha256": "77906d1a5d0b59fb8a237369ec83fd12004076c8562b8d53bfd9eb060f8d9a83",
       "edges": 1,
       "diffBytes": 0
     },
@@ -320,7 +1752,7 @@
       "set": "step04-024",
       "file": "src/runner/dispatch/transport.mjs",
       "digest": "cc3af74ca5969fb9089c26c602d0c22bcac4ea73073c7b2986f81230b2f68b71",
-      "recordSha256": "461f5b0ed910f7e2b78deb90b464d7a67106c03781e9b0c3d5d959199fa73360",
+      "recordSha256": "768a9c264d293df21e17222ecc1d4f93ded78094d1b6482cab801621ed061577",
       "edges": 4,
       "diffBytes": 0
     },
@@ -328,7 +1760,7 @@
       "set": "step04-024",
       "file": "src/runner/dispatch/trust-store.mjs",
       "digest": "349ae77849e4f842da05c496b57d95f6ab5ab7cc7da125c90c859ffbbd9d2b10",
-      "recordSha256": "4c2526b59eedc78d6b73211168d7bb9273e1a9a2869371b172b12934a3b6f40d",
+      "recordSha256": "63b3e79a03c3478cf6f594ce62547bd003c5f59a99262f3b965a7c353c4cf3a8",
       "edges": 1,
       "diffBytes": 0
     },
@@ -336,7 +1768,7 @@
       "set": "step04-024",
       "file": "src/runner/dispatch/worker-home.mjs",
       "digest": "88c48ce8a3d68f126ebaf6e98ef696e7a365e07f4a0b2b9b62ed0cf94b479b5a",
-      "recordSha256": "08cc8e6179f49c4ed10e8a362f04a49e203fcc597c9d1f649df3afc0c35b0630",
+      "recordSha256": "9514fe6cddc138df255533ccb0f3fd82c762c82f64ed44d6c6d7b6ef8f66de73",
       "edges": 2,
       "diffBytes": 0
     },
@@ -344,7 +1776,7 @@
       "set": "step04-024",
       "file": "src/runner/frozen-judge.mjs",
       "digest": "96265fab86a2a57ae4b191c83a864a4f285942f2c35318fbdae435a832bb75ed",
-      "recordSha256": "2679db9d968a76048e9ef1600ed34755cbc197d4716c9a277acee00651b8eeec",
+      "recordSha256": "15553ae9741802e3285723aa9af6c77a06f40de151968232d766297bc81370d2",
       "edges": 3,
       "diffBytes": 0
     },
@@ -352,7 +1784,7 @@
       "set": "step04-024",
       "file": "src/runner/goal-check.mjs",
       "digest": "37c1a8a6c8983d2b71d261a19be3b6070f04fadba361590bbfb5d5d1fc5e35cf",
-      "recordSha256": "76eaea7563acf2e6ddcb570c057bfa28369ae68f0cfe91853f6beea137ad0b33",
+      "recordSha256": "0e9f6a8fa1837b21ab94c8018609cf25d0d387f3723d70ddfd1c41d023eead0c",
       "edges": 2,
       "diffBytes": 0
     },
@@ -360,7 +1792,7 @@
       "set": "step04-024",
       "file": "src/runner/loop.mjs",
       "digest": "a0dad051957975f880a26ff6cf9f360535ad7b7603534e7007521b867c7d955f",
-      "recordSha256": "bdb4a5bf2a177b7efbf46668cf162e5ccbac85d42a31fde389988458216272f6",
+      "recordSha256": "c761898303c4e97030f596155c7666ae8d80540473e3c9bb4fba93c6bac6e064",
       "edges": 5,
       "diffBytes": 0
     },
@@ -368,7 +1800,7 @@
       "set": "step04-025",
       "file": "src/runner/merge.mjs",
       "digest": "8ccdb5441f10f806a1753d47394b4c74c655d02c5c7a03f7a1af56ce08024eb4",
-      "recordSha256": "f0353d997e18d0e8be360d7df781fa2b38e6530a0e45a9ef7ff696a8804901b6",
+      "recordSha256": "273fb2cf0db33a4274c5bac6a92c80ada3b0171107dd036e0d19d6320e5bd843",
       "edges": 18,
       "diffBytes": 2978
     },
@@ -376,7 +1808,7 @@
       "set": "step04-025",
       "file": "src/runner/paths.mjs",
       "digest": "5da8aae9f0a8cec9e518e268cd88e8139e8dbd0a6768e08b961d291cf01fc799",
-      "recordSha256": "9ff8de18b2188c93079983df24873fa25f6400e672e1d80e01b8821fb24ddffe",
+      "recordSha256": "309a45044ec6021133c53d27bb6ea800f2ef238478d155aeefa251cd34e93b53",
       "edges": 1,
       "diffBytes": 0
     },
@@ -384,7 +1816,7 @@
       "set": "step04-025",
       "file": "src/runner/promote-engine.mjs",
       "digest": "623403dec319fdc5dfb94ea9a87d49368511fd168fbc8324528b33a3e82dfb65",
-      "recordSha256": "7fd37ee18e816e37242f137f9ab92d2ec6f900ed64e26cf0983020de1600a738",
+      "recordSha256": "96f2182b0b4b65b690d571e7b44aa7fdb27748103fe278f5c24091e3be85030f",
       "edges": 1,
       "diffBytes": 0
     },
@@ -392,7 +1824,7 @@
       "set": "step04-025",
       "file": "src/runner/promote-preflight.mjs",
       "digest": "9e41b6d1cad288ab913ed591af5c5c02b13c065c171e22d964cf81c80e7748cd",
-      "recordSha256": "76ad9085cdb7dc73dc2c6e6c00cc3d9f30ad7f27e2e0af0a5485c3945fde7966",
+      "recordSha256": "6328cb7c8a299154b17b50425c520d88804f596e59d2d6b783a4af85951dd1ca",
       "edges": 2,
       "diffBytes": 0
     },
@@ -400,23 +1832,23 @@
       "set": "step04-025",
       "file": "src/runner/work-compat.mjs",
       "digest": "a804010f1992b05a28e07e11681c06919b1bc4a72fd1ab3e77bd2590bb020d25",
-      "recordSha256": "fd1595be3125570daaabf09eab09dd83df71d1434d485630c4faa64082d5a0db",
+      "recordSha256": "211457a705929b45841507cf36efdb0e7c7469232aad276c071aab115e34dc70",
       "edges": 2,
       "diffBytes": 0
     },
     {
       "set": "step04-025",
       "file": "src/runner/worktree.mjs",
-      "digest": "8782458081f0512fb29b323ab1858aebc64adb029228703c8fe9a9f850a05fd9",
-      "recordSha256": "641d05ed507c8f4c104a0dd3d74bf718b10dd629bc760a2d90cc9b672ebe6fe5",
+      "digest": "c99b08a8ba3c0b597223b28d2aeaa4616d533f59da9fefed512815d81f58848d",
+      "recordSha256": "30b733bf4483d45f0e632957cefca68536e0ce2702bbe3ab68c18754be95a528",
       "edges": 12,
-      "diffBytes": 750
+      "diffBytes": 752
     },
     {
       "set": "step04-026",
       "file": "src/state/cleanup-harness.mjs",
       "digest": "621b44fba812f9bf3ab4a368a32f0a55d2f3914c70ff86eb7936d1f0b705f993",
-      "recordSha256": "9a456caa2968b0f2a2d7ea22fe8fa9045a232cd447dbcf76ed88bfa3cabf99da",
+      "recordSha256": "afcbadc3d17a6536166d429a4904cb86980837d6cfa5db18258b7bba033b86a1",
       "edges": 1,
       "diffBytes": 0
     },
@@ -424,7 +1856,7 @@
       "set": "step04-026",
       "file": "src/state/cleanup-pool.mjs",
       "digest": "46ce8b7bbd04d3da091cd9cb6a905c7d9149019028698587009b81d7d9444927",
-      "recordSha256": "7bae78cf1318ab9142a7115b96558b1238e21e6218d8853091f0b391a2ffadf9",
+      "recordSha256": "21a4e298eb716d38998677c45555f68abe74b7b59fd99058c309ad59b6ac69e4",
       "edges": 1,
       "diffBytes": 0
     },
@@ -432,7 +1864,7 @@
       "set": "step04-026",
       "file": "src/state/dep-graph.mjs",
       "digest": "75f51cf42ac18bd405651145ee188ea5abee47f6161e72f3a75475f9694fa2fb",
-      "recordSha256": "e2a1a377d54fed68acda87d052548c47b8e4f1b4d125f4fb55410c0f8f4f3de7",
+      "recordSha256": "4ef5da9b94c3d049eac1d64b06ef5188c74eb8607cdbe6460b81ed7327b8dad1",
       "edges": 1,
       "diffBytes": 0
     },
@@ -440,7 +1872,7 @@
       "set": "step04-026",
       "file": "src/state/drift-status.mjs",
       "digest": "ffdc80dfdd8956f975641eec39498d09b7e576b4f481540aa7f2703c9ff58771",
-      "recordSha256": "3a7a480ce2c86df3ebaee9cf96e50e6cfbac3b31f9a7e7c6e2ec16c125e71932",
+      "recordSha256": "78c0a2a1c866562febcdd54e053871339a7c9c820c83ed92e04741d4c470abe3",
       "edges": 3,
       "diffBytes": 0
     },
@@ -448,7 +1880,7 @@
       "set": "step04-026",
       "file": "src/state/events-compaction.mjs",
       "digest": "c2ac54d19f7eeffd0dffc7e7ceda1389c3c36c0d550aef5f434ae585259c0e69",
-      "recordSha256": "bbc412d2770957d4847423f35826f07c6cbf7c8c8daa2c441706d619d16c39a8",
+      "recordSha256": "b757e6b1470d7e2b2a2c4006174535986dade81ef8b6e3aed31e959c5acecde6",
       "edges": 1,
       "diffBytes": 0
     },
@@ -456,7 +1888,7 @@
       "set": "step04-026",
       "file": "src/state/events-jsonl-truncation-guard.mjs",
       "digest": "b4dd68558622a872395138a790bc63926ebdf60323b880c6f69b23ca3d7ee0ab",
-      "recordSha256": "f9d4533e3c6d4df6f86ff957f602ec1cdcb35184998836487e00ec55d2ab5264",
+      "recordSha256": "58e12f6011ef61fcace1804c4e39b6bf40ba73ee8aed1ab6ea91872668e162f2",
       "edges": 2,
       "diffBytes": 0
     },
@@ -464,7 +1896,7 @@
       "set": "step04-026",
       "file": "src/state/frontier.mjs",
       "digest": "dca56e29f4928eb025fb2bf085c75a7d1969d59b3b645754b3dc6b44e3db47d7",
-      "recordSha256": "6887648748b4efb63b8ce06e6eae05e353b9f8e59471e562710eba0311793991",
+      "recordSha256": "08c28310eae9d867582cb8e2005464d4ec25ac4692bae9f2790e2fa9b8cf9823",
       "edges": 5,
       "diffBytes": 0
     },
@@ -472,7 +1904,7 @@
       "set": "step04-026",
       "file": "src/state/gate-bypass.mjs",
       "digest": "723e40beb662fb094a4ee832fa0755cfc554d01c7623cf411eeda1092e9247b8",
-      "recordSha256": "1bdf937a4fb065e779cb8a68d683f24da842e09946c67c61d8ffa2342ff6ec68",
+      "recordSha256": "98742d04d3e93a65e0221751f5959f0d711886eaf66278186b897dca61471a37",
       "edges": 9,
       "diffBytes": 715
     },
@@ -480,7 +1912,7 @@
       "set": "step04-026",
       "file": "src/state/graph-harness.mjs",
       "digest": "6d93e939f7d13ec8f24957eca8b02bc66aad00573c4369175bcb426915ac789b",
-      "recordSha256": "c8fef28ddbabf7117e10bf6be1d87fadd5f33fff134a8931f3a21435d1794c33",
+      "recordSha256": "1cc2f3e7682de8ec8c93ce473134d2a5e6cb14efe7e4290ca12846f6fafb57a0",
       "edges": 6,
       "diffBytes": 0
     },
@@ -488,23 +1920,23 @@
       "set": "step04-026",
       "file": "src/state/graph-metrics.mjs",
       "digest": "ce0c9112f0a22ae408a442773fc91628eb225ef103bc9024a16ce926c1f0f167",
-      "recordSha256": "35eb0ebb2bdad5d00072cc7c8bd14cd6ed886d3e0dce326b4fa54cc8fefe6c09",
-      "edges": 5,
+      "recordSha256": "543e4002a1c3493a1dcb7e40fcaca93dd8a9c983dbbc91fb121077a8f90358a5",
+      "edges": 6,
       "diffBytes": 0
     },
     {
       "set": "step04-026",
       "file": "src/state/knowledge-registry.mjs",
       "digest": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
-      "recordSha256": "3baaa3722ba9d88b3d39cc640e85fd4f62b04b53e56e124ef0702e8d9153b463",
-      "edges": 8,
+      "recordSha256": "392512e24ecb7b0fb3c6d6a970dd0baadd1619f01500b30025bd8c98e88cbcf9",
+      "edges": 10,
       "diffBytes": 0
     },
     {
       "set": "step04-026",
       "file": "src/state/postland-drift.mjs",
       "digest": "a266644fd0caac9f2736850c6ef46307304c186a5a698793f17eb6d7861bf464",
-      "recordSha256": "e39454eeed84a6312cd74cb15100e05c0c70abb6a1ac521cddb4ad17c5b8f696",
+      "recordSha256": "d59e60d10f2b0df8648e0763993dbb4b4ea7669ac2be96f3bfda3e5d69ac6137",
       "edges": 1,
       "diffBytes": 0
     },
@@ -512,7 +1944,7 @@
       "set": "step04-026",
       "file": "src/state/priority-formula.mjs",
       "digest": "5a1767b93f0155567472eb059899aa993a147ecc0e0aaf75dafe8e93da72d6fe",
-      "recordSha256": "c73e02d20cc3aac2f20298859b186a5b29f74658ec3411122f7943b5aaf9e725",
+      "recordSha256": "9cac60f09ad81a5a807abcffb5c789395ee6590da42815e8e5aabdd6c247eb31",
       "edges": 1,
       "diffBytes": 572
     },
@@ -520,7 +1952,7 @@
       "set": "step04-026",
       "file": "src/state/replay.mjs",
       "digest": "6fbdd0bd9867118cf3ce086ed45a6e3e9a6c61bcc5f99a086d86440be4f0d673",
-      "recordSha256": "902fa7876732617ab458d5fd5089fe0f6c083c91d53dd2191fa4aa94aad903d6",
+      "recordSha256": "7798c557d784a22503b59739362a61625681e95eeb0dd0a1fd961d9babb73237",
       "edges": 4,
       "diffBytes": 640
     },
@@ -528,7 +1960,7 @@
       "set": "step04-026",
       "file": "src/state/retro-pool.mjs",
       "digest": "bed4fe7e4a09ee49d3ae019e30dc21b73bc00bbbc8a20be3eec4cdf6352140ae",
-      "recordSha256": "c72650735e8f6237ddb5ef9c3524cc94987b67014f53c8a718631c7187862306",
+      "recordSha256": "6c0553863aae16e96c2bd1df36a7388eb72b81bd4266993ecffcbfc707428aef",
       "edges": 1,
       "diffBytes": 0
     },
@@ -536,7 +1968,7 @@
       "set": "step04-026",
       "file": "src/state/status-fsm.mjs",
       "digest": "6853485189d2e25e6ee2a5997d11f0b2ae4e608cf5ed6332df010b2e703b76b0",
-      "recordSha256": "312aeca7f5ed32379c2e5fc5d6a23d98dbc2d45fb814d23a34c0e67c9e733a6a",
+      "recordSha256": "51e11181b3caf410f50df28cb5181346610f643bb449c5894673bb8f3c984c3d",
       "edges": 3,
       "diffBytes": 0
     },
@@ -544,7 +1976,7 @@
       "set": "step04-027",
       "file": "src/state/store.mjs",
       "digest": "b8eacaa22d2f17b04f494f9671b3bec2b883306aadb9ae0909298b94b20e11c4",
-      "recordSha256": "0eeebd91b6ffcbca0569c8454a286c997d3efa8056c32f4838b6caa14617c259",
+      "recordSha256": "64a9104a50685684ca3a373b188d32fa92b2171c8ba443f11dbff4e3ef8f72fc",
       "edges": 11,
       "diffBytes": 0
     },
@@ -552,7 +1984,7 @@
       "set": "step04-027",
       "file": "src/state/tool-registry.mjs",
       "digest": "e713e0adcfe2398dd8d11c19d6cd1ddbf912222cb75410bdbdf1cdf3406e66f2",
-      "recordSha256": "5b81e5ea400cccf5b9cf0ca5d1f99f783ec2001c5abdc876c20a3ad85ad996e2",
+      "recordSha256": "25e15b9f4930015bf73c3da9475100d2d776ad890a74dabfc49613d46bc2a3ce",
       "edges": 2,
       "diffBytes": 0
     },
@@ -560,15 +1992,15 @@
       "set": "step04-027",
       "file": "src/state/work.mjs",
       "digest": "ae5f1599cf36963602efd1e8b13ee2ac883997ea747cd99877364d0162c05059",
-      "recordSha256": "a977f056a149a2eb57b99de15ace6d3eacc83636c101a0f1477a17957f40af80",
-      "edges": 11,
+      "recordSha256": "bfaaaa34bdb749d09bd3595392505c76900b3ef9cd1ffa0320f8d2a96d67f6f6",
+      "edges": 12,
       "diffBytes": 0
     },
     {
       "set": "step04-027",
       "file": "src/state/worker-slots.mjs",
       "digest": "bc37bb0d995fe7339925c209c4e79232bdc5e3c079668f89c8f52313312dbf95",
-      "recordSha256": "cea4472f2447a01d75670d9183fc52d2c7371b5dd1a50bebfa33e2e87f5481ab",
+      "recordSha256": "d69ef7dd36fe76e91dd3804bade9793433399801f1a04248c0c1e6b53a1afc01",
       "edges": 3,
       "diffBytes": 0
     },
@@ -576,7 +2008,7 @@
       "set": "step04-028",
       "file": "src/util/format-bytes.mjs",
       "digest": "786e381e7581ddd1923305d3bb25e193aba99b84118728574c84280d5290966d",
-      "recordSha256": "0619a4c0170b5bc3796a5d139eb5f1918fa25371a9dd15cb6a4192963b5bdc9f",
+      "recordSha256": "e2af1e543b17ad163d9403498f87b81e488d5a44f919acd1d0ec43f3d67d23e5",
       "edges": 2,
       "diffBytes": 0
     },
@@ -584,7 +2016,7 @@
       "set": "step04-028",
       "file": "src/util/format-duration.mjs",
       "digest": "aa3d4629659f6b635267965013716b45e71120cce5282f6b2a4503148c616ce9",
-      "recordSha256": "7a547b809cce6f040cd885f43d3b573dfc30b22f283fe7bd9393b8337068e14e",
+      "recordSha256": "73f4211669e9f2a5fa1a7d372861d7b074160e0ce0d63132731119a1280e57fd",
       "edges": 2,
       "diffBytes": 0
     },
@@ -592,7 +2024,7 @@
       "set": "step04-029",
       "file": "src/verbs/merge/approve.mjs",
       "digest": "6e287f08f1d2b6386023a07722cc8010c98a3db8607ea1243f244077a057db8b",
-      "recordSha256": "549c5a1211ae822c7b4b542c0efd308993d06fba33c24ed3b23570aa59126d9d",
+      "recordSha256": "a87c9556086e5be891228eb4af84bc18e7350b33434d4e2af8820c43ad1bda42",
       "edges": 8,
       "diffBytes": 0
     },
@@ -600,7 +2032,7 @@
       "set": "step04-029",
       "file": "src/verbs/merge/iron-law-level.mjs",
       "digest": "28037a676ec6f8533c2c8b0bcd66be0ec8dff1acfca0d656de7c5baa02043b73",
-      "recordSha256": "e44ac58985b65a9f209d75f591922258346f18e13bf7448fe7cde622c52bdbf3",
+      "recordSha256": "76761a60312e62476bee28157e075b8d86ab43b2de5104dc607ba11f9d5b7928",
       "edges": 2,
       "diffBytes": 0
     },
@@ -608,7 +2040,7 @@
       "set": "step04-029",
       "file": "src/verbs/merge/merge.mjs",
       "digest": "0a453f93896685a77cf5494ff5d2f6f8106ff638e1b17079a368801fdb064f89",
-      "recordSha256": "76ef0a4ec3d7f3551b00d4a881da83fb70ac65971b309f269c465507690e82b6",
+      "recordSha256": "3901ca02943fa4525887477b2e95ad5ed5ce9c835005d3da2c4bdfa9dc29b6b6",
       "edges": 5,
       "diffBytes": 0
     },
@@ -616,7 +2048,7 @@
       "set": "step04-029",
       "file": "src/verbs/merge/sync-root.mjs",
       "digest": "0ebead4914bf2a464d3f116655cf0713cef268be2a85871ba048cf35b148204d",
-      "recordSha256": "ced6edb877ef6f6d96dad9ccffc060d5b1ec30adf12d8b5d9dbe4f634798eb51",
+      "recordSha256": "1e0afe133ab3c6dc97a8b3753e236fa717616c5d2c1c403d6561df5bc1b35784",
       "edges": 2,
       "diffBytes": 0
     },
@@ -624,7 +2056,7 @@
       "set": "step04-030",
       "file": ".claude/skills/ui-spec/CONVENTION.md",
       "digest": "18c861503a1bcfe263d1d48c5763b95dcb39f61b477256ffed3d895af1729b68",
-      "recordSha256": "ebbfe802ac2e8658663840ff7fb8cfa4457af8d482046ba15d67e9d143c42eb8",
+      "recordSha256": "9bb1560f715e152253a657b37a0832293d2a50c59a12c248baacb019cf9ee920",
       "edges": 1,
       "diffBytes": 0
     },
@@ -632,7 +2064,7 @@
       "set": "step04-030",
       "file": ".claude/skills/ui-spec/SKILL.md",
       "digest": "afd4e1e3b050ea6771ae6bb3aaabe85f335b62cbf06ebca807f4ec91751e84f4",
-      "recordSha256": "2ece847272888fbd9f8394cd834b9ea79e6ffcb29e1ac2631e5dc472d9f8e0cb",
+      "recordSha256": "d0e0f835c449be83319b4727d81498812897544ee66b2e8373734c7033da5b93",
       "edges": 4,
       "diffBytes": 0
     },
@@ -640,7 +2072,7 @@
       "set": "step04-030",
       "file": ".claude/skills/ui-spec/references/CONVENTION.md",
       "digest": "18c861503a1bcfe263d1d48c5763b95dcb39f61b477256ffed3d895af1729b68",
-      "recordSha256": "51bf7d56c94a788759cc2943349282b8069eeb667b592a100a49a803275994b4",
+      "recordSha256": "bb3b0d7011c4afcaa00a60d3dbc40e2d209244af34f1ac0512c4745bce7a7164",
       "edges": 1,
       "diffBytes": 0
     },
@@ -648,15 +2080,15 @@
       "set": "step04-030",
       "file": "core/skills/_shared/citation-format.md",
       "digest": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
-      "recordSha256": "adb03e42d8ebdd417249e49c359a202018af45420d80f973e87462fff0c5b7c7",
-      "edges": 27,
+      "recordSha256": "7ddabfe72a1d743e9988964f418dee378e72f7577132282ce962342ff9f05b5e",
+      "edges": 30,
       "diffBytes": 0
     },
     {
       "set": "step04-030",
       "file": "core/skills/_shared/coding-worker-contract.md",
       "digest": "e76250e9dc79a8c161f6e7e4c22e85069461e4c4b29d919b10bbff6059185185",
-      "recordSha256": "29342e48d062fbaa42382580cb09efb0ace3c1805323369e465fc3eb89869898",
+      "recordSha256": "34cff87ccbd88c98e2f5ec982b1481e8dd71796ba184eb45d34214f5f031f7d0",
       "edges": 15,
       "diffBytes": 0
     },
@@ -664,23 +2096,55 @@
       "set": "step04-030",
       "file": "core/skills/distill/references/deep-dive-protocol.md",
       "digest": "dc6c43de2ffdb23e581b19f2d46a72affbc2279d92f7ccb971fd567c5e7d9961",
-      "recordSha256": "da86722a35f4f8139f2f9cc57fb28b5535aa759958cc52517b7e98e47a4e8c23",
-      "edges": 1,
+      "recordSha256": "35019853ab90db23b35391e43c862d25c5e3c5dac4ed4ff02ecfa0531ffff124",
+      "edges": 2,
       "diffBytes": 0
     },
     {
       "set": "step04-030",
       "file": "core/skills/fgos-clarifying/SKILL.md",
       "digest": "1eb6fe9cc19fa2e311b9f0a2a6eeb3810c12834f3c8bb59671b44b423be34bee",
-      "recordSha256": "3480cb085d7380319f5a88382af994c76ea51410bea4539270b4f6e78cd8dda7",
-      "edges": 3,
+      "recordSha256": "97f86ecba4faaa70664c2530df777e21228b8327ea8fb127b4d0e7094b60d490",
+      "edges": 6,
       "diffBytes": 724
     },
     {
       "set": "step04-030",
       "file": "core/skills/fgos-indexing/SKILL.md",
       "digest": "7356ec97cdc0532e3deb260faade56da41ea919cf704d2326e596a0f1f1c969e",
-      "recordSha256": "d542f5986c3325f477b86ca07bec43009e48b76c5b25eba86e947ecfd5a10e72",
+      "recordSha256": "8b0ae629a17e1e1668f65da1b34eea5b3e3c08abd4e0d3338eed2cba126912fc",
+      "edges": 15,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-030",
+      "file": "core/skills/fgos-run/SKILL.md",
+      "digest": "1e1ebada1abc36f8d1313f78d28cbe6fd9cbfb160ae7f1f2aa2031bb349c2afc",
+      "recordSha256": "a06f3712aee2ab4e2f9716e9eb9f0b9e0a011899933e52ec68d9c2dadbf5eca6",
+      "edges": 0,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-030",
+      "file": "core/skills/_shared/capability-catalog.md",
+      "digest": "3ccd086bc1c45fa7ce778d0963f879db18d8ab94c7468e5791baff8fbb3b49e0",
+      "recordSha256": "e86f02a6f72a4e64b31a192c12ac8cbb3e185c2c990c361e1da1615d852fef76",
+      "edges": 3,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-030",
+      "file": "core/skills/_shared/executor-dispatch-fallback.md",
+      "digest": "49e1fc021d5aa79b882ec8beb1669bf0a6b4a1ff1b15ee592a566483d10fb2c4",
+      "recordSha256": "f02c3edaac6162a542e1ea92dd775670fe92fe6ed530b2872797a9ce8c7e8353",
+      "edges": 20,
+      "diffBytes": 0
+    },
+    {
+      "set": "step04-030",
+      "file": "core/skills/_shared/planning-capability-awareness.md",
+      "digest": "4b4862f70896950a94951ebe0c1bfcdda842bc4d13536f870de58b64eb3deb94",
+      "recordSha256": "554d2daac38478d7d8a217465369f6c8f3746b96f81df624977f32ed97a852f0",
       "edges": 3,
       "diffBytes": 0
     },
@@ -688,7 +2152,7 @@
       "set": "step04-031",
       "file": "core/skills/fgos-researching/SKILL.md",
       "digest": "a08b3797131892f339e15b18aba9792ff3fc5d448261cafd59264b2d5ce2f9c8",
-      "recordSha256": "1b921b8f1edaca178073a5d4022159521526b6fddce4bee18dfa705d06f28fc0",
+      "recordSha256": "6449cf8aaf6578cc3225f80b5e0c4fc23d12e8d0269908552b902605ee3ed160",
       "edges": 6,
       "diffBytes": 590
     },
@@ -696,7 +2160,7 @@
       "set": "step04-031",
       "file": "core/task-specs/fgos-indexing.md",
       "digest": "4a23450a73f61c2cc9bc63a5b7eee88eb44d07855a76a8d37c5943edc27e63fd",
-      "recordSha256": "feeead6906b58f424658db8e0c0743b57e819c86699dda7a5b5fc1cbea9f4909",
+      "recordSha256": "8807dba19b9bd57758e19716c1630a2c0699d3529a692450b59bbdf3a0a5f00e",
       "edges": 1,
       "diffBytes": 0
     },
@@ -704,7 +2168,7 @@
       "set": "step04-031",
       "file": "core/task-specs/fgos-researching.md",
       "digest": "e0ddb50a83351347eeb60d3b345cd1ad9d7e827485ded1cb65aad134ee0f9226",
-      "recordSha256": "f7e49b883ce78f76a69bf4c475b2e7ccb34dd580df8c4dfbc58cc342e8f7a15b",
+      "recordSha256": "7e61eae54dec45f2af985f8db5215455afdf15ed64282f34487a912c77249170",
       "edges": 1,
       "diffBytes": 0
     },
@@ -712,7 +2176,7 @@
       "set": "step04-031",
       "file": "src/runner/prompt-templates/worker-prompt-discovery.txt",
       "digest": "c343469a6d604920e84a426dc1d72872d067b8aa83b5be6f420f9d580a06b9cb",
-      "recordSha256": "c2fe5fc28bc8aa1b51ff8644340d0423a98f6fd6cdbe80e1fd6471187dee9652",
+      "recordSha256": "c9a5e098520f3e77dbf1f2e4c1cc93ece446328e756fbdab04f8204e90e87302",
       "edges": 1,
       "diffBytes": 0
     },
@@ -720,15 +2184,15 @@
       "set": "step04-031",
       "file": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
       "digest": "845861f6c8d55ab31e656fb6a54b6c3f6a51507fd02352de15146b7b08cd474a",
-      "recordSha256": "a49cc29bf56d1f927d9ae5164eb64aaaffd26775db20d96182f6d365b1f736c6",
-      "edges": 1,
+      "recordSha256": "04fb8c84bdd1b2cc7e44318ab44ded9af99a98f89364dc208030b537143b851a",
+      "edges": 3,
       "diffBytes": 0
     },
     {
       "set": "step04-032",
       "file": "core/skills/_shared/ak-cook-worker-contract.md",
       "digest": "1fc127fcd70dc9232146771063dea6f729909277a98e3bcc1cdf2a4183aa03d0",
-      "recordSha256": "328d47458d842a867eed9b8a10a7c3050eede58805415c98a157f9c1859fa057",
+      "recordSha256": "3f666fd40dbedbe2a2388d98df5149f824f588226e6a67a5a9477ad1affc976b",
       "edges": 3,
       "diffBytes": 0
     },
@@ -736,7 +2200,7 @@
       "set": "step04-033",
       "file": "plans/261020-1250-debate-pattern-and-judge-role/plan.md",
       "digest": "c5e83e6ad211216f2cfedf0edeb208d7495c2173fbb299b395ac0e4e4e5d3bd7",
-      "recordSha256": "8feb806beef4634165bda0f4d51d3646fc9ca302731415f8e80a1a5deff9cde2",
+      "recordSha256": "0529e1fbd75b0ed87ad23a8eeb9fbfbd7f373f620fb64fda1e3c22784ee6c3b1",
       "edges": 2,
       "diffBytes": 0
     },
@@ -744,7 +2208,7 @@
       "set": "step04-033",
       "file": "plans/reports/phase-lead-261020-1110-model-pool-b1-p07-proof.md",
       "digest": "e888fcf7bbb67a8e6bc716b5359fd06a5022ef56f80139ce24ef21684fc3813a",
-      "recordSha256": "00c5fb4af03f0363ff7fbd7394d41dd61079afc62a9168645612d4636dcf2483",
+      "recordSha256": "0f92ce5b2118a16dc8e5ca23cb4b41517486d9951eff6c6999b27cc79b1852b7",
       "edges": 1,
       "diffBytes": 0
     },
@@ -752,7 +2216,7 @@
       "set": "step04-033",
       "file": "plans/reports/phase-lead-261020-1225-mpb1-other-pool-cells.md",
       "digest": "b448582368aa6fdca0c97badf598f5e783540d508cec3f260a68a19fd2ae327a",
-      "recordSha256": "aabf710b38f62ca46553c7af7e2fb195f98d2d46f64c28663f5224f5a7eea3ec",
+      "recordSha256": "d99fafbf046c58a5a3251b688dee458770fa59f043e95eeaf14339cf405d5554",
       "edges": 1,
       "diffBytes": 0
     },
@@ -760,7 +2224,7 @@
       "set": "step04-033",
       "file": "plans/reports/phase-lead-261020-1303-debate-pattern-and-judge-role.md",
       "digest": "d8e9dd76b56af721e93d98008fc64ae5f4fd8ba3c08aa610428443e624a700b9",
-      "recordSha256": "93201362ebec21b4816348e569eed2337ed4eea0af8ed0cdb326905a02e86a82",
+      "recordSha256": "fcabe307ef573e063c0868c89246606fd376c78280cb5976d48ee6c1f327f5cd",
       "edges": 2,
       "diffBytes": 0
     },
@@ -768,144 +2232,220 @@
       "set": "step04-033",
       "file": "plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md",
       "digest": "d05a7a264c697d888a6beb1ced5e6dc9c73fa96a34a78734e8722071eb5a4cdc",
-      "recordSha256": "28f78bb6fade9c736418b1b31e5378185cc55541e40c2c9501369a34f8613c07",
+      "recordSha256": "4fb807ad35b12fb06c061333aac0f17422db95e701070282685b2a75ba4b498a",
       "edges": 1,
       "diffBytes": 0
     }
   ],
   "recordFiles": [
     {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-001.jsonl",
+      "sha256": "b625cf7c234e8ed0182a605bb9a9c1fc28c4362b8db87153d5af3586efa97bf7",
+      "bytes": 242962
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-002.jsonl",
+      "sha256": "c657d02b0eb243f9ec6d028c0ad1c41dae30e9f1477ec30e5253d6d1385fb85d",
+      "bytes": 247456
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-003.jsonl",
+      "sha256": "9a6aa3b2b930b97ebc68b4cff4834bb7df7b11c72163b0fef44b5b7cba52c941",
+      "bytes": 175114
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-004.jsonl",
+      "sha256": "368cdb77e22cada0efa407b5f2e8378368f929a98fb68668e41c33951d32fcb1",
+      "bytes": 164576
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-005.jsonl",
+      "sha256": "f02b0c3e7684b88d40a9ce3842a65e8170547ae842b034116b1851541288d879",
+      "bytes": 209500
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-006.jsonl",
+      "sha256": "5b62793b010d0732044ccf4b1ee58fec6375f93ae2e097ea6473c3982d560497",
+      "bytes": 163578
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-007.jsonl",
+      "sha256": "149a55be09e4293f3522a6b6a9b873f4ae47d6db10c85d563d0828d535810a50",
+      "bytes": 6720
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-008.jsonl",
+      "sha256": "f034cccbca4fd8db4d42ad424cd94f63bd856a00529536e93eed27f9cd6e8dbe",
+      "bytes": 121671
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+      "sha256": "f7b568240d7ea2f4097a8837a160879b6e595b901bdc24a7980ae55be79cc773",
+      "bytes": 275478
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-010.jsonl",
+      "sha256": "1ad1c175acfc9c844c3c8bd8aa85ae5d70c51560de7aa327245f085d821aac96",
+      "bytes": 124770
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-011.jsonl",
+      "sha256": "5e20ab40b3ca62a568fb4c5d4d9857b05919c36e7373477f47f505af3385941f",
+      "bytes": 20733
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-012.jsonl",
+      "sha256": "594bc326c1d46e615d513bd1e228734fca81b2d2b04d72c913f57dde49c8530c",
+      "bytes": 138535
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-013.jsonl",
+      "sha256": "4957f82917edfb1be6e2234526e4ac85167db7c5427f85b49e98dd03245cfdaa",
+      "bytes": 8158
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-014.jsonl",
+      "sha256": "d21ffa5fafbacc511ffb11946847d7f1f0603e3422c8b64d3268017719d37287",
+      "bytes": 3134
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-015.jsonl",
+      "sha256": "21e4fbdedae76dae51c17efe9e9daa705161517d71dd2ebfc37eae6d2e69aaca",
+      "bytes": 63070
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-016.jsonl",
+      "sha256": "e225a71a2a9b97acd252bc5bbb4217244a8b3f974025f6c81c79322f7c763cf3",
+      "bytes": 11973
+    },
+    {
       "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-017.jsonl",
-      "sha256": "27210e2839b80b09948691f6673087d02d2b159c2861c9dd4f9b4b87599c65e9",
-      "bytes": 5218
+      "sha256": "2298ab74cd4e7d285d1a093fe97bd108bef15f288a9e8eab4ed445f9839f1f23",
+      "bytes": 3022
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-018.jsonl",
-      "sha256": "1714c00ac5de77a736ad6a4726ac62e216785812246be6cb45f0c1ee53c73888",
-      "bytes": 50263
+      "sha256": "202d7a3dae5d553df4cfc466bee3d85b53937d50b3d5fabee2c3a1fbba530819",
+      "bytes": 41455
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-019.jsonl",
-      "sha256": "841ac50dd33ae61fdb054381ea9163e5599192bd67ef265c496c29a96178bdaa",
-      "bytes": 41314
+      "sha256": "629661c425cb9ee7f693a2871e8757358c810e8eb07453b64fcc00e046cc0c3f",
+      "bytes": 45251
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-020.jsonl",
-      "sha256": "d401f67a90b4bac3001a217b5a54e4fd28964ff6ca415f33495f585daaf48f7f",
-      "bytes": 20205
+      "sha256": "a07b589ec5fe0734b0942599f1d425b0b6fd5c3d34fc8c6e81349842201e51a0",
+      "bytes": 20084
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-021.jsonl",
-      "sha256": "40536b9cbb6a766b0798fb171ed07f3fc93cff3b1153ef1dc3122658282d52fb",
-      "bytes": 3314
+      "sha256": "5a85a05dec0c945fc505c871af1e1feddca9e946642de77fb8c16102f9bf10a4",
+      "bytes": 3181
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-022.jsonl",
-      "sha256": "1daf1560ac60980ba5929e163ea30e6997e27419b7ec7b69c80cafffd2c3949e",
-      "bytes": 29658
+      "sha256": "3ccc4ed3d36cc64b2fa159366ec42bf96b1110e5ec9cd420d7cea17f1e29eb19",
+      "bytes": 28487
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-023.jsonl",
-      "sha256": "f7419740e8c9a60c353b012f00d97b4ac815bfaaac65c72c3e6424134f78c3ef",
-      "bytes": 84439
+      "sha256": "cd93fac8705222fa84a3e0d69fad0367fe89e3d44dbd183ebbc1e96faace0c86",
+      "bytes": 85450
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-024.jsonl",
-      "sha256": "9a0767110c402de5df5552e1e8922ed0866fe0ba26a0d06e1b0d59e82b450454",
-      "bytes": 65915
+      "sha256": "642a3f22e5992d14240c3bd3cf9175f4b092a9980b70f490717a7e7807235c40",
+      "bytes": 60501
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-025.jsonl",
-      "sha256": "13456b191df556e982ca182028e8297c116960ffa445bfbc395899ded993f465",
-      "bytes": 127050
+      "sha256": "a97f99a3d056a457c32e5e9826874cdc07740a98d35d803480c97028d4d6f55a",
+      "bytes": 126376
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
-      "sha256": "e0e56c565bb1e9bc9d788a7ccd755d5a885563fd71f0d7461095ae7e31bc6c5b",
-      "bytes": 206995
+      "sha256": "eae84949775152dbb58cf22e06df69bf217c262452fe5d27c02b07e71256a169",
+      "bytes": 209162
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-027.jsonl",
-      "sha256": "82c5d01f2b90bb8806cef35da08edb94681a6b7311df901df00e2174119540dd",
-      "bytes": 58883
+      "sha256": "3ea1bea7fa6b9636be16397d594c100a35f94c0b0c8632076ede5f62f9c739b0",
+      "bytes": 62632
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-028.jsonl",
-      "sha256": "f5e2fb4248f318ccadc74be77d0a043a1e6889409e53c957f6108c9b1e38884e",
-      "bytes": 10695
+      "sha256": "c4ea3e35cc1e84d5166fff858f1e078a08d6803c1bf5d77a15b3ea792f0aeb46",
+      "bytes": 10161
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-029.jsonl",
-      "sha256": "a2e4469349137c08d54ee1531334f4f58901b3a04f847cf249709badcdbb7de6",
-      "bytes": 39618
+      "sha256": "22a921b48b7932f3c51f8110575ea1fbf05458afb6835ea0936b9d94f263b423",
+      "bytes": 35587
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-030.jsonl",
-      "sha256": "063eecc7511e79cd5812f06949aefcadd05a703d28135f69a14ebceac1b4c4db",
-      "bytes": 182544
+      "sha256": "2493674bb7097527854a3521458cb4b6e9512138b51a519b225591a519613043",
+      "bytes": 322039
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-031.jsonl",
-      "sha256": "d3a98e12bca6db59a27a38ae628c0bb56c64344b7f172bf953e87028790f65cf",
-      "bytes": 50912
+      "sha256": "bb00ede379e5fccd3e566da484e6a16bc6936a11f2ddf42c6efc83a214336f43",
+      "bytes": 63836
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-032.jsonl",
-      "sha256": "d00a3400e26b03c152c647d0992fa4ee642234814e6b2d8bd6a3c06740e78bc7",
-      "bytes": 15849
+      "sha256": "e86f8f6418e2f1de15863ea12c300606f6cce09830c6d5d977d8fbe38c16708b",
+      "bytes": 11195
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-033.jsonl",
-      "sha256": "864083f421c5a904dc2a78e8c0c5e9273ea2302c57f943b84ea781cc5efadde8",
-      "bytes": 34325
+      "sha256": "b08f0cc30967c2c8eaecf874b1b2b2df8f16e8cf89fb78f204139eb776909a61",
+      "bytes": 18446
     }
   ],
   "inputs": [
     {
       "path": "step-04-batches.json",
-      "sha256": "b965adc71f57fe40b56ec8290d4f2f1779bfa76edf208cc4aa9c7d8daa9c1a45"
+      "sha256": "fad816b3704d6dc045b52361270dee4bad1c69eab70391d1f8c0b077afb07b4c"
     },
     {
       "path": "step-04-population.json",
-      "sha256": "ca9ece9e343f6b7c14b00a77207e5ff46c99082be054e52e1a397d45dbfde418"
+      "sha256": "910b23d677f3a88069724459d9c27da7da17cc6f2c9ff53f6d24c04628f849ef"
     },
     {
       "path": "step-04-source-render-provenance.json",
-      "sha256": "dc0fa31fd54dcdeae507ba65c57c7d59191c6534a51b537b99a7f9c9479fbf87"
-    },
-    {
-      "path": "step-04-population-gaps.json",
-      "sha256": "c4fb9bed895b2f3d43df5328208d6039b4c09c2422426c158450f25c9c781518"
+      "sha256": "062a56597aa26b7ac11565faeb604e0f772d0783f7709efc56490b90383bc688"
     },
     {
       "path": "owner-answers.md",
-      "sha256": "5cf527e766eaae140ce60ec0276c7cf6d384e7de13d417e6ac526a26d649b799"
+      "sha256": "0b1d87efb002178feef1329464957f220927e726a4e06c1cd6f3379de141b976"
     },
     {
-      "path": "step-04-wave2-population-gaps.json",
-      "sha256": "85ce62da87a9cb6d356759d70f504488a93dc2ac33148ab091ed59650976370b"
+      "path": "step-04-l12-60-sweep.json",
+      "sha256": "2183d475478ca2eef0159d6c327f6662f351dda89da5e1819cf38b53c6a03c63"
     },
     {
-      "path": "step-04-wave2-step0-binding-check.json",
-      "sha256": "d40409afc927de176714490209fa6435855c7fc5a84af589ed76f706cc964b26"
-    },
-    {
-      "path": "step-04-wave2-lead-ruling-gaps.json",
-      "sha256": "7c002560826dd873ff2195c1fcbd404bf80832dd4438dea4a0380ea45049800a"
+      "path": "step-00-l12-61-binding-check.json",
+      "sha256": "438d46b3548d8553e8a27b30c20905c2a7d6b21c92393a97988ee1880b709c96"
     }
   ],
-  "selectionSha256": "6422472433f1aaf869634e04788e0992580995fa1eefe2205032ead5fe9d05e2",
+  "selectionSha256": "2954fb9a5d20c7d6100474286041e5eff0076e1cc0bcbb0c844fd335a92698c0",
   "parts": [
     {
       "part": 1,
-      "set": "step04-017",
+      "set": "step04-001",
       "files": [
-        "CHANGELOG.md"
+        "domains/coding/AGENTS.md",
+        "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "domains/coding/skills/fgos-coding-exploring/SKILL.md",
+        "domains/coding/skills/fgos-coding-exploring/references/gate-mechanics.md",
+        "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md"
       ],
-      "edges": 1,
-      "bytes": 379790,
+      "edges": 42,
+      "bytes": 377028,
       "payload": "step-04-wave2-p01.json",
-      "payloadSha256": "e0472f7347cfaaa463cbbf59b9260e9c780a7406e7781e7a9358265e5ebcb46d",
+      "payloadSha256": "4651c0c4d6b765f536dc4e9b55874146b0447982e4890d386ab245f5a9f5ed89",
       "expectedReviewerOutput": "review-a38-step-04-wave2-p01.md",
       "reviewStatus": "pending",
       "elapsedReviewerSeconds": 0,
@@ -913,15 +2453,17 @@
     },
     {
       "part": 2,
-      "set": "step04-018",
+      "set": "step04-001",
       "files": [
-        "plans/reports/fork-260928-1017-panel-depth-experiment-design-research-report.md",
-        "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md"
+        "domains/coding/skills/fgos-coding-implement/SKILL.md",
+        "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+        "domains/coding/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+        "domains/coding/skills/fgos-coding-knowledge/SKILL.md"
       ],
-      "edges": 2,
-      "bytes": 31335,
+      "edges": 21,
+      "bytes": 192325,
       "payload": "step-04-wave2-p02.json",
-      "payloadSha256": "137f9da5ddbbf8e179990958703799cbeba1989ac414a8212240702dea3ba54a",
+      "payloadSha256": "6dcc1836d97aabb8baef9498a03f0580b9d2bf5e5afaa23125c522e66a4ec3ff",
       "expectedReviewerOutput": "review-a38-step-04-wave2-p02.md",
       "reviewStatus": "pending",
       "elapsedReviewerSeconds": 0,
@@ -929,16 +2471,16 @@
     },
     {
       "part": 3,
-      "set": "step04-019",
+      "set": "step04-002",
       "files": [
-        "packages/distribution/rust/src/init.rs",
-        "packages/distribution/rust/src/manifest.rs",
-        "packages/distribution/rust/src/workspace.rs"
+        "domains/coding/skills/fgos-coding-planning/SKILL.md",
+        "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+        "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md"
       ],
-      "edges": 4,
-      "bytes": 150403,
+      "edges": 31,
+      "bytes": 260141,
       "payload": "step-04-wave2-p03.json",
-      "payloadSha256": "f4c159f9253c9e6132ee096701ef94d9702655cec10be93203acc99890d056b2",
+      "payloadSha256": "c2dd54932f3178f3111997c443ae7a20979fd3a804f764e0797a0f499703e546",
       "expectedReviewerOutput": "review-a38-step-04-wave2-p03.md",
       "reviewStatus": "pending",
       "elapsedReviewerSeconds": 0,
@@ -946,15 +2488,19 @@
     },
     {
       "part": 4,
-      "set": "step04-020",
+      "set": "step04-002",
       "files": [
-        "packages/herdr-fgos-common/rust/src/fgos.rs",
-        "packages/herdr-fgos-common/rust/src/settings.rs"
+        "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+        "domains/coding/skills/fgos-coding-validating/SKILL.md",
+        "domains/coding/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+        "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+        "domains/coding/task-specs/lock-decisions.md",
+        "domains/coding/task-specs/shape-plan.md"
       ],
-      "edges": 4,
-      "bytes": 85134,
+      "edges": 40,
+      "bytes": 380365,
       "payload": "step-04-wave2-p04.json",
-      "payloadSha256": "a2201fe29bfb72a172d7aa16e167789b63b9b26a0b77b3c751f3f05fb3fae2f2",
+      "payloadSha256": "8213ebbc78d4f13a832bc167dd6484aec8a17c70e3d7b62e994147716e4e0593",
       "expectedReviewerOutput": "review-a38-step-04-wave2-p04.md",
       "reviewStatus": "pending",
       "elapsedReviewerSeconds": 0,
@@ -962,14 +2508,44 @@
     },
     {
       "part": 5,
-      "set": "step04-021",
+      "set": "step04-003",
       "files": [
-        "packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs"
+        "archive/plans/260831-1637-step07-inline-assignment-mvp/phase-03-harness-seam-and-two-proofs.md",
+        "archive/plans/260831-1637-step07-inline-assignment-mvp/plan.md",
+        "archive/plans/260901-1542-step08-standalone-coordination/plan.md",
+        "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1650-GH-08-P00.2-dispatch-policy-fixes-report.md",
+        "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1745-GH-08-P00.3-cli-wiring-live-proof-report.md",
+        "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1840-GH-08-P00.4-provider-family-fix-report.md",
+        "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-2050-GH-08-P01.1-coordination-store-report.md",
+        "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1640-GH-08-P00.1-h1l1-fix-recheck-report.md",
+        "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1720-GH-08-P00.2-dispatch-policy-redteam-report.md",
+        "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1735-GH-08-P00.2-rt1-fix-recheck-report.md",
+        "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1815-GH-08-P00.3-cli-wiring-redteam-report.md",
+        "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2140-GH-08-P01.1-coordination-store-redteam-report.md",
+        "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2200-GH-08-P01.1-round2-fix-recheck-report.md",
+        "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1609-GH-08-P00.1-canonical-docs-review-report.md",
+        "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1702-GH-08-P00.2-dispatch-policy-review-report.md",
+        "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1800-GH-08-P00.3-cli-wiring-review-report.md",
+        "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-2115-GH-08-P01.1-coordination-store-review-report.md",
+        "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/phase-03-recheck-disposition-live-proof.md",
+        "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/plan.md",
+        "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P00.1-contract-promotion-report.md",
+        "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P01.1-fixture-skeleton-report.md",
+        "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P02.2-idempotency-bounds-authority-report.md",
+        "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P03.1-recheck-disposition-replay-report.md",
+        "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P03.2-live-proof-negative-battery-report.md",
+        "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P00.1-redteam-findings-fix-report.md",
+        "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P01.1-test-coverage-fix-report.md",
+        "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P00.1-contract-promotion-redteam-report.md",
+        "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P00.1-fix-recheck-report.md",
+        "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P01.1-fix-recheck-report.md",
+        "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P01.1-fixture-skeleton-redteam-report.md",
+        "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-contract-promotion-review-report.md"
       ],
-      "edges": 1,
-      "bytes": 46456,
+      "edges": 35,
+      "bytes": 393654,
       "payload": "step-04-wave2-p05.json",
-      "payloadSha256": "f84939599107afb8ea85a5a98b47b879bf9d0f487ca6518627ee30d95147bc20",
+      "payloadSha256": "b20b23535ce4fd778aba181241ab4ec37bddd42adf7cc0b3be0fb564af0ffb51",
       "expectedReviewerOutput": "review-a38-step-04-wave2-p05.md",
       "reviewStatus": "pending",
       "elapsedReviewerSeconds": 0,
@@ -977,15 +2553,26 @@
     },
     {
       "part": 6,
-      "set": "step04-022",
+      "set": "step04-003",
       "files": [
-        "src/runner/claim-liveness.mjs",
-        "src/runner/dispatch/assignment-runner.mjs"
+        "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-fix-recheck-report.md",
+        "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P01.1-fixture-skeleton-review-report.md",
+        "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P02.1-driver-authorization-review-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/phase-00-consume-handoff-and-freeze-scope.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/phase-04-mvp5-usable-standalone-live-proof.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/plan.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P00.1-handoff-consumption-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P01.1-mvp3-recheck-disposition-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.1-thin-launcher-core-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P03.1-role-execution-policy-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P04.1-mvp5-resume-live-proof-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P04.2-dogfood-handoff-report.md"
       ],
-      "edges": 2,
-      "bytes": 155681,
+      "edges": 23,
+      "bytes": 157581,
       "payload": "step-04-wave2-p06.json",
-      "payloadSha256": "401281dd86b660ded5152a0960db2793fe16aa6169ed45c1925a66cd5606b930",
+      "payloadSha256": "aa41115b38cc25638506d9e0a153598bdea83de8e5a1d8ee76797a1f14d956c3",
       "expectedReviewerOutput": "review-a38-step-04-wave2-p06.md",
       "reviewStatus": "pending",
       "elapsedReviewerSeconds": 0,
@@ -993,17 +2580,44 @@
     },
     {
       "part": 7,
-      "set": "step04-023",
+      "set": "step04-004",
       "files": [
-        "src/runner/dispatch/config.mjs",
-        "src/runner/dispatch/confinement/authority.mjs",
-        "src/runner/dispatch/confinement/request.mjs",
-        "src/runner/dispatch/execution-contract.mjs"
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P00.1-review-redteam-findings-fix-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P02.1-path-resolution-fix-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P04.2-handoff-gaps-fix-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P00.1-handoff-consumption-redteam-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P00.1-recheck-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P01.1-mvp3-recheck-disposition-redteam-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.1-recheck-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.1-thin-launcher-core-redteam-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.2-show-resume-setup-redteam-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P03.1-role-execution-policy-redteam-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P04.1-mvp5-resume-live-proof-redteam-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P04.2-dogfood-handoff-redteam-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-handoff-consumption-review-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-recheck-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P01.1-mvp3-recheck-disposition-review-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.1-recheck-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.1-thin-launcher-core-review-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.2-show-resume-setup-review-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P03.1-role-execution-policy-review-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.1-mvp5-resume-live-proof-review-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.1-recheck-report.md",
+        "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.2-dogfood-handoff-review-report.md",
+        "archive/plans/260904-2329-group-thinking-plan-loop/phase-01-mutation-unlock.md",
+        "archive/plans/260904-2329-group-thinking-plan-loop/phase-02-chain-verb-and-pack-registration.md",
+        "archive/plans/260904-2329-group-thinking-plan-loop/phase-03-plan-loop-skill-and-live-proof.md",
+        "archive/plans/260904-2329-group-thinking-plan-loop/plan.md",
+        "archive/plans/260904-2329-group-thinking-plan-loop/reports/doer-260905-0000-p01-1-mutation-unlock-report.md",
+        "archive/plans/260904-2329-group-thinking-plan-loop/reports/doer-260905-0245-p03-1-skill-authoring-report.md",
+        "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0105-p02-1-fix-report.md",
+        "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0112-p01-1-fix-report.md",
+        "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0225-wave1-integration-cwd-semantics-report.md"
       ],
-      "edges": 10,
-      "bytes": 283607,
+      "edges": 43,
+      "bytes": 393967,
       "payload": "step-04-wave2-p07.json",
-      "payloadSha256": "3ea1ec56f9474ba5fe767bda852a2dc7efff84c9420b83e0667c56b50b2a7a8b",
+      "payloadSha256": "e734048b4e5e70043d62ef716c5f17bb84e89cd88e820d43cb60700b4f68575b",
       "expectedReviewerOutput": "review-a38-step-04-wave2-p07.md",
       "reviewStatus": "pending",
       "elapsedReviewerSeconds": 0,
@@ -1011,16 +2625,22 @@
     },
     {
       "part": 8,
-      "set": "step04-024",
+      "set": "step04-004",
       "files": [
-        "src/runner/dispatch/resolve.mjs",
-        "src/runner/dispatch/trust-store.mjs",
-        "src/runner/loop.mjs"
+        "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0320-p03-1-persona-fix-report.md",
+        "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0022-p02-1-chain-verb-report.md",
+        "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0053-p01-1-mutation-unlock-report.md",
+        "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0300-p03-1-skill-authoring-report.md",
+        "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0022-p02-1-chain-verb-review-report.md",
+        "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0053-p01-1-mutation-unlock-review-report.md",
+        "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0730-p03-1-r5-live-proof-review-report.md",
+        "archive/plans/260905-architecture-advisory-panel/phase-02-capability-fit-audit.md",
+        "archive/plans/260905-architecture-advisory-panel/phase-05-comparative-proof-and-promotion.md"
       ],
-      "edges": 11,
-      "bytes": 202508,
+      "edges": 12,
+      "bytes": 110492,
       "payload": "step-04-wave2-p08.json",
-      "payloadSha256": "0351ba0a404834c9b8ed948d42a3d940ee214623a32e791bc2a6e0e6ce4e859e",
+      "payloadSha256": "4d23a20a0534d7541875c4298b3c30616650402c235dd22fd014a1db382d4c0f",
       "expectedReviewerOutput": "review-a38-step-04-wave2-p08.md",
       "reviewStatus": "pending",
       "elapsedReviewerSeconds": 0,
@@ -1028,16 +2648,20 @@
     },
     {
       "part": 9,
-      "set": "step04-025",
+      "set": "step04-005",
       "files": [
-        "src/runner/merge.mjs",
-        "src/runner/work-compat.mjs",
-        "src/runner/worktree.mjs"
+        "archive/plans/260905-architecture-advisory-panel/plan.md",
+        "archive/plans/260906-1831-dispatch-visibility-v0/phase-01-executor-profile-trust-home.md",
+        "archive/plans/260906-1831-dispatch-visibility-v0/phase-06-live-proof-matrix.md",
+        "archive/plans/260906-1831-dispatch-visibility-v0/plan.md",
+        "archive/plans/260910-1243-confinement-authority-implementation/plan.md",
+        "archive/plans/260910-1243-confinement-authority-implementation/reports/phase-07-strict-readiness-docs-closeout-report.md",
+        "archive/plans/260910-1700-rust-host-r1-kernel/plan.md"
       ],
-      "edges": 32,
-      "bytes": 338429,
+      "edges": 42,
+      "bytes": 374693,
       "payload": "step-04-wave2-p09.json",
-      "payloadSha256": "53876133e25c8f6e75daa801dc22eab62c6b4400be583ac4a437221122ddc9c4",
+      "payloadSha256": "abdc42d398e1113bef4685aec8bb5ffe57a1e70d29542e7edfa91f0f575fd6d0",
       "expectedReviewerOutput": "review-a38-step-04-wave2-p09.md",
       "reviewStatus": "pending",
       "elapsedReviewerSeconds": 0,
@@ -1045,16 +2669,15 @@
     },
     {
       "part": 10,
-      "set": "step04-026",
+      "set": "step04-005",
       "files": [
-        "src/state/frontier.mjs",
-        "src/state/graph-harness.mjs",
-        "src/state/priority-formula.mjs"
+        "archive/plans/260910-1700-rust-host-r1-kernel/reports/p00-inventory.md",
+        "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md"
       ],
-      "edges": 12,
-      "bytes": 94779,
+      "edges": 17,
+      "bytes": 102027,
       "payload": "step-04-wave2-p10.json",
-      "payloadSha256": "1eb8d11548ce85c8f0d3f74255923472e248e17a049cde6a47acc98e10eb94ac",
+      "payloadSha256": "2e1cb0f509831d2bc20788306c8670770cf6faca65cf24cef5c9ae58a098e091",
       "expectedReviewerOutput": "review-a38-step-04-wave2-p10.md",
       "reviewStatus": "pending",
       "elapsedReviewerSeconds": 0,
@@ -1062,15 +2685,28 @@
     },
     {
       "part": 11,
-      "set": "step04-027",
+      "set": "step04-006",
       "files": [
-        "src/state/store.mjs",
-        "src/state/work.mjs"
+        "archive/plans/260911-2305-runtime-recovery/phase-designs/launch-reconciliation.md",
+        "archive/plans/260911-2305-runtime-recovery/plan.md",
+        "archive/plans/260911-2305-runtime-recovery/reports/phase-00-baseline-report.md",
+        "archive/plans/260915-0455-test-suite-feedback-cost/plan.md",
+        "archive/plans/260915-code-implementation-track-policy/plan.md",
+        "archive/plans/260915-code-implementation-track-policy/reports/review-260915-0944-critical-design-review.md",
+        "archive/plans/260915-code-implementation-track-policy/reports/track-closeout.md",
+        "archive/plans/260915-code-panel-multicell-facade/phase-00-contract-and-baseline.md",
+        "archive/plans/260915-code-panel-multicell-facade/phase-03-resume-and-compatibility.md",
+        "archive/plans/260915-code-panel-multicell-facade/phase-04-fix-orphaned-authorization.md",
+        "archive/plans/260915-code-panel-multicell-facade/phase-05-live-proof-and-rollout.md",
+        "archive/plans/260915-code-panel-multicell-facade/plan.md",
+        "archive/plans/260915-dispatch-operability-implementation/plan.md",
+        "archive/plans/260915-executor-policy-dispatch-seams/plan.md",
+        "archive/plans/260917-cold-resumable-coordination-dag/phase-00-baseline-and-migration-lock.md"
       ],
-      "edges": 22,
-      "bytes": 229634,
+      "edges": 49,
+      "bytes": 396625,
       "payload": "step-04-wave2-p11.json",
-      "payloadSha256": "03fc2332253166311c8708fb82b0a8b2e675f3c1d950c11ac9c16aae4d652e84",
+      "payloadSha256": "cd29c55d367f11bfe5d6b1adcf566d778a2f8f7c2ae94c19f868676ee017c0a4",
       "expectedReviewerOutput": "review-a38-step-04-wave2-p11.md",
       "reviewStatus": "pending",
       "elapsedReviewerSeconds": 0,
@@ -1078,14 +2714,17 @@
     },
     {
       "part": 12,
-      "set": "step04-028",
+      "set": "step04-006",
       "files": [
-        "src/util/format-duration.mjs"
+        "archive/plans/260917-cold-resumable-coordination-dag/phase-07-migration-and-release-proof.md",
+        "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring-rubric.md",
+        "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-1/ground-truth.md",
+        "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-2/ground-truth.md"
       ],
-      "edges": 2,
-      "bytes": 9586,
+      "edges": 4,
+      "bytes": 40295,
       "payload": "step-04-wave2-p12.json",
-      "payloadSha256": "25ff4534065565f1340a5f59d480212c9b4b7a440703a581a3748a4cf19d0b9b",
+      "payloadSha256": "0243ebe8126390fe4e10e72b18ec178e9c2f49bb258da7ec8c65cc806a452144",
       "expectedReviewerOutput": "review-a38-step-04-wave2-p12.md",
       "reviewStatus": "pending",
       "elapsedReviewerSeconds": 0,
@@ -1093,14 +2732,15 @@
     },
     {
       "part": 13,
-      "set": "step04-029",
+      "set": "step04-007",
       "files": [
-        "src/verbs/merge/approve.mjs"
+        "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+        "archive/plans/260919-coordination-skill-harness-simplification/reports/unit-I27-panel-depth-experiment-real-comparison-report.md"
       ],
-      "edges": 8,
-      "bytes": 76128,
+      "edges": 2,
+      "bytes": 287665,
       "payload": "step-04-wave2-p13.json",
-      "payloadSha256": "ecb3e16485da87b12ebf8572ff8953b7a3cfc4983a6ce0804a32d29c51de7048",
+      "payloadSha256": "71c2d38cc61ef12ac36f7de3ec8b63492f3fb7350d79cb6ff824c15b4d18bf36",
       "expectedReviewerOutput": "review-a38-step-04-wave2-p13.md",
       "reviewStatus": "pending",
       "elapsedReviewerSeconds": 0,
@@ -1108,16 +2748,28 @@
     },
     {
       "part": 14,
-      "set": "step04-030",
+      "set": "step04-008",
       "files": [
-        ".claude/skills/ui-spec/CONVENTION.md",
-        ".claude/skills/ui-spec/SKILL.md",
-        "core/skills/fgos-clarifying/SKILL.md"
+        "plugins/fgOS/skills/approve/SKILL.md",
+        "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+        "plugins/fgOS/skills/cleanup-next/SKILL.md",
+        "plugins/fgOS/skills/coding-shape-distill/SKILL.md",
+        "plugins/fgOS/skills/coding-shape/SKILL.md",
+        "plugins/fgOS/skills/deliver/SKILL.md",
+        "plugins/fgOS/skills/discover-next/SKILL.md",
+        "plugins/fgOS/skills/discover/SKILL.md",
+        "plugins/fgOS/skills/merge-loop/SKILL.md",
+        "plugins/fgOS/skills/merge-next/SKILL.md",
+        "plugins/fgOS/skills/plan/SKILL.md",
+        "plugins/fgOS/skills/retro-loop/SKILL.md",
+        "plugins/fgOS/skills/retro-next/SKILL.md",
+        "plugins/fgOS/skills/terminal-close/SKILL.md",
+        "plugins/fgOS/skills/terminal/SKILL.md"
       ],
-      "edges": 8,
-      "bytes": 127522,
+      "edges": 41,
+      "bytes": 292589,
       "payload": "step-04-wave2-p14.json",
-      "payloadSha256": "737174dbd1c15109df96ee4500268e9674a1c814dde6c6923ba6e63e0738892f",
+      "payloadSha256": "1e9858329401874cbbfc4e74bdafce517823dad97529d944eddc18f66f3eed1d",
       "expectedReviewerOutput": "review-a38-step-04-wave2-p14.md",
       "reviewStatus": "pending",
       "elapsedReviewerSeconds": 0,
@@ -1125,15 +2777,16 @@
     },
     {
       "part": 15,
-      "set": "step04-031",
+      "set": "step04-009",
       "files": [
-        "core/skills/fgos-researching/SKILL.md",
-        "src/runner/prompt-templates/worker-prompt-discovery.txt"
+        "AGENTS.md",
+        "CLAUDE.md",
+        "core/instructions/design-principles.md"
       ],
-      "edges": 7,
-      "bytes": 91386,
+      "edges": 27,
+      "bytes": 302964,
       "payload": "step-04-wave2-p15.json",
-      "payloadSha256": "9ad56ad66a9c115a5d4ab647fd235edaf47940e6d86ad735ecb77c459096b140",
+      "payloadSha256": "0d00640d4312467d905eee803909858e9490fe27a5cf1354e49cb9f65ccd13a3",
       "expectedReviewerOutput": "review-a38-step-04-wave2-p15.md",
       "reviewStatus": "pending",
       "elapsedReviewerSeconds": 0,
@@ -1141,14 +2794,14 @@
     },
     {
       "part": 16,
-      "set": "step04-032",
+      "set": "step04-009",
       "files": [
-        "core/skills/_shared/ak-cook-worker-contract.md"
+        "core/instructions/platform-laws.md"
       ],
-      "edges": 3,
-      "bytes": 31458,
+      "edges": 24,
+      "bytes": 233696,
       "payload": "step-04-wave2-p16.json",
-      "payloadSha256": "25fe07d8f2968a22dfa9f4416dba9eff51c23c776fda7a10a8956cf155258818",
+      "payloadSha256": "03b1a000f5880e262c1e4164092710c8a46fbe5c2737368e50462e5236bcd008",
       "expectedReviewerOutput": "review-a38-step-04-wave2-p16.md",
       "reviewStatus": "pending",
       "elapsedReviewerSeconds": 0,
@@ -1156,6 +2809,450 @@
     },
     {
       "part": 17,
+      "set": "step04-010",
+      "files": [
+        "bin/fgos.mjs"
+      ],
+      "edges": 0,
+      "bytes": 224733,
+      "payload": "step-04-wave2-p17.json",
+      "payloadSha256": "cff52156d44f305adaa0ff2c6382815ea4409f9ffb5272c50b7c3a2ed17010e0",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p17.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 18,
+      "set": "step04-010",
+      "files": [
+        "bin/fgos.mjs"
+      ],
+      "edges": 0,
+      "bytes": 81162,
+      "payload": "step-04-wave2-p18.json",
+      "payloadSha256": "39a84b156b5c4d77c6d3d504d61d28e3977a456bc4d0f867f558070b1936ba6d",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p18.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 19,
+      "set": "step04-010",
+      "files": [
+        "bin/fgos.mjs"
+      ],
+      "edges": 36,
+      "bytes": 192213,
+      "payload": "step-04-wave2-p19.json",
+      "payloadSha256": "138740c20f1053b6442fcb91300b26bb74113bec2188083d851546d158e5c1b3",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p19.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 20,
+      "set": "step04-011",
+      "files": [
+        "src/cli/command-registry.mjs"
+      ],
+      "edges": 1,
+      "bytes": 208233,
+      "payload": "step-04-wave2-p20.json",
+      "payloadSha256": "caf56558dd78c57e3b3bdab3f89ff5498bbbb9fbfc4ecb7e0c77508ff69170c6",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p20.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 21,
+      "set": "step04-012",
+      "files": [
+        "apps/fgos-gateway/Cargo.toml",
+        "apps/fgos-gateway/build.rs",
+        "apps/fgos-gateway/src/cf_access.rs",
+        "apps/fgos-gateway/src/gateway.rs",
+        "apps/fgos-gateway/src/mcp.rs",
+        "apps/fgos-gateway/web/src/App.tsx",
+        "apps/fgos-gateway/web/src/api/client.ts",
+        "apps/fgos-gateway/web/src/api/errors.ts",
+        "apps/fgos-gateway/web/src/api/poll.ts",
+        "apps/fgos-gateway/web/src/api/types.ts",
+        "apps/fgos-gateway/web/src/lib/network.ts",
+        "apps/fgos-gateway/web/src/lib/status.ts"
+      ],
+      "edges": 41,
+      "bytes": 389811,
+      "payload": "step-04-wave2-p21.json",
+      "payloadSha256": "f0b145e5c040172aa1225d82f61075b608f0c0f5f37e3537c9c93883e262c4e2",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p21.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 22,
+      "set": "step04-012",
+      "files": [
+        "apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx",
+        "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+        "apps/fgos-gateway/web/src/screens/Taskboard.tsx"
+      ],
+      "edges": 10,
+      "bytes": 81734,
+      "payload": "step-04-wave2-p22.json",
+      "payloadSha256": "33d7d3ddc7967ae5b689eb9de3dfb560ecf41f4602059668464cae8dcce50282",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p22.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 23,
+      "set": "step04-013",
+      "files": [
+        "src/config/global-config.mjs",
+        "src/config/shared-config-file.mjs"
+      ],
+      "edges": 3,
+      "bytes": 24945,
+      "payload": "step-04-wave2-p23.json",
+      "payloadSha256": "a889b11964f7dbd6373fd483d68fbfcd8e287a28f92b71bb43c88c5eb946c0de",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p23.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 24,
+      "set": "step04-014",
+      "files": [
+        "src/install/coexist.mjs"
+      ],
+      "edges": 1,
+      "bytes": 10531,
+      "payload": "step-04-wave2-p24.json",
+      "payloadSha256": "e755bc2ca390bdc33e4393b8ee74103120daf9f8a81a8848a1a90aaa5682a3a2",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p24.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 25,
+      "set": "step04-015",
+      "files": [
+        "src/intake/discovery.mjs",
+        "src/intake/plan-verdict-from-plan-md.mjs",
+        "src/intake/plan.mjs",
+        "src/intake/verify-pattern-check.mjs"
+      ],
+      "edges": 22,
+      "bytes": 206178,
+      "payload": "step-04-wave2-p25.json",
+      "payloadSha256": "ea0015334c8f232fe0e1c83c4fb55033c58ceec7c0373be371123f95f63cc645",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p25.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 26,
+      "set": "step04-016",
+      "files": [
+        ".githooks/pre-commit",
+        ".github/workflows/ci.yml"
+      ],
+      "edges": 4,
+      "bytes": 64650,
+      "payload": "step-04-wave2-p26.json",
+      "payloadSha256": "c5c8748b1d5ea5174615e9ad8963e4ab723d1bea697276b4b4c019434f804932",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p26.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 27,
+      "set": "step04-017",
+      "files": [
+        "CHANGELOG.md"
+      ],
+      "edges": 1,
+      "bytes": 376290,
+      "payload": "step-04-wave2-p27.json",
+      "payloadSha256": "ee55dbf84c57867edb6849316f44904b5d6a1acd1326ab84c22cf57454662023",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p27.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 28,
+      "set": "step04-018",
+      "files": [
+        "herdr-dashboard/src/pane_scan.rs",
+        "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md"
+      ],
+      "edges": 3,
+      "bytes": 42960,
+      "payload": "step-04-wave2-p28.json",
+      "payloadSha256": "1fe6d21713e7744438298685b9ab2d0cc31865b3883fda3eb73f4bab96a67114",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p28.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 29,
+      "set": "step04-019",
+      "files": [
+        "packages/distribution/rust/src/canonical.rs",
+        "packages/distribution/rust/src/init.rs",
+        "packages/distribution/rust/src/manifest.rs"
+      ],
+      "edges": 3,
+      "bytes": 154002,
+      "payload": "step-04-wave2-p29.json",
+      "payloadSha256": "187c4e4e300a075c10d11bd0f21c5a4107743e7f1461de30ad949a9de51f1bc9",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p29.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 30,
+      "set": "step04-020",
+      "files": [
+        "packages/herdr-fgos-common/rust/src/fgos.rs",
+        "packages/herdr-fgos-common/rust/src/settings.rs"
+      ],
+      "edges": 4,
+      "bytes": 85116,
+      "payload": "step-04-wave2-p30.json",
+      "payloadSha256": "e5cbf1aeea748a199dd7f41358526599a478f5e8797cd7ff3df35e1aefbb4d58",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p30.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 31,
+      "set": "step04-021",
+      "files": [
+        "packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs"
+      ],
+      "edges": 1,
+      "bytes": 46470,
+      "payload": "step-04-wave2-p31.json",
+      "payloadSha256": "57d07d5fadc3b3867cedbfcc17b0774c79fed6461d2ec137771f56e3dc171c86",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p31.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 32,
+      "set": "step04-022",
+      "files": [
+        "src/runner/dispatch/assignment-policy.mjs",
+        "src/runner/dispatch/assignment-runner.mjs"
+      ],
+      "edges": 2,
+      "bytes": 179475,
+      "payload": "step-04-wave2-p32.json",
+      "payloadSha256": "4bc4de2efc26339fa669358c56c9efdca5d30299f9a8de128e16b9a6eae63546",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p32.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 33,
+      "set": "step04-023",
+      "files": [
+        "src/runner/dispatch/config.mjs",
+        "src/runner/dispatch/confinement/authority.mjs",
+        "src/runner/dispatch/confinement/policies.mjs",
+        "src/runner/dispatch/operation-prompt-templates.mjs"
+      ],
+      "edges": 10,
+      "bytes": 294841,
+      "payload": "step-04-wave2-p33.json",
+      "payloadSha256": "7f94a566f8c1c2bd8f2672ebef159e46669608ee89b977afd4760f146959b82d",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p33.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 34,
+      "set": "step04-024",
+      "files": [
+        "src/runner/dispatch/resolve.mjs",
+        "src/runner/dispatch/run-lock.mjs",
+        "src/runner/loop.mjs"
+      ],
+      "edges": 11,
+      "bytes": 188873,
+      "payload": "step-04-wave2-p34.json",
+      "payloadSha256": "b3d1f1fb2708e08318b334525b4b10600d4f6aef30633110e9c104d06eeb4a44",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p34.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 35,
+      "set": "step04-025",
+      "files": [
+        "src/runner/merge.mjs",
+        "src/runner/paths.mjs",
+        "src/runner/worktree.mjs"
+      ],
+      "edges": 31,
+      "bytes": 355325,
+      "payload": "step-04-wave2-p35.json",
+      "payloadSha256": "4fb956da2a7896a8839515d17074b2b93aa7af7b901ff187ed73abc4c180cad1",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p35.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 36,
+      "set": "step04-026",
+      "files": [
+        "src/state/events-jsonl-truncation-guard.mjs",
+        "src/state/gate-bypass.mjs",
+        "src/state/knowledge-registry.mjs"
+      ],
+      "edges": 21,
+      "bytes": 187984,
+      "payload": "step-04-wave2-p36.json",
+      "payloadSha256": "ee451f275601f6e7e0fb1ca121e75a5400c61bc590b5b20f81a676772fdd40d1",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p36.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 37,
+      "set": "step04-027",
+      "files": [
+        "src/state/store.mjs",
+        "src/state/tool-registry.mjs"
+      ],
+      "edges": 13,
+      "bytes": 171839,
+      "payload": "step-04-wave2-p37.json",
+      "payloadSha256": "579f61e2417e657a36b8639b1a8d8215898a56a002b3eccab9861475b71b67cb",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p37.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 38,
+      "set": "step04-028",
+      "files": [
+        "src/util/format-bytes.mjs"
+      ],
+      "edges": 2,
+      "bytes": 9392,
+      "payload": "step-04-wave2-p38.json",
+      "payloadSha256": "a9adb26433951b9b41b3f97d58546abc197fee9f8e346c77f0d282fa4a396eea",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p38.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 39,
+      "set": "step04-029",
+      "files": [
+        "src/verbs/merge/approve.mjs"
+      ],
+      "edges": 8,
+      "bytes": 75239,
+      "payload": "step-04-wave2-p39.json",
+      "payloadSha256": "29cafb9dbbda9bbb0a45b09d12552a0bf8dc5d3217c4a49276d72a8b4495e585",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p39.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 40,
+      "set": "step04-030",
+      "files": [
+        ".claude/skills/ui-spec/CONVENTION.md",
+        "core/skills/_shared/capability-catalog.md",
+        "core/skills/_shared/executor-dispatch-fallback.md",
+        "core/skills/_shared/planning-capability-awareness.md",
+        "core/skills/distill/references/deep-dive-protocol.md",
+        "core/skills/fgos-clarifying/SKILL.md"
+      ],
+      "edges": 35,
+      "bytes": 378983,
+      "payload": "step-04-wave2-p40.json",
+      "payloadSha256": "83f1b670c01946836b9b05b1df0607b8f9742954ef4658dbf1abe756be3c17df",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p40.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 41,
+      "set": "step04-030",
+      "files": [
+        "core/skills/fgos-run/SKILL.md"
+      ],
+      "edges": 0,
+      "bytes": 31605,
+      "payload": "step-04-wave2-p41.json",
+      "payloadSha256": "d6918474ab2894a20a6c47da9dadfb7ca6da8c02d93a204c5c699c163a4a9952",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p41.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 42,
+      "set": "step04-031",
+      "files": [
+        "core/skills/fgos-researching/SKILL.md",
+        "core/task-specs/fgos-indexing.md"
+      ],
+      "edges": 7,
+      "bytes": 93176,
+      "payload": "step-04-wave2-p42.json",
+      "payloadSha256": "46b39e3ba957a655bf189580dccade53bb4d938c78cd0e05d1373fe6e924ec8f",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p42.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 43,
+      "set": "step04-032",
+      "files": [
+        "core/skills/_shared/ak-cook-worker-contract.md"
+      ],
+      "edges": 3,
+      "bytes": 24816,
+      "payload": "step-04-wave2-p43.json",
+      "payloadSha256": "42e3d1c8f66be38d980a1566815eb64577a5acbf95b7b507f85e065bf8f85f7a",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p43.md",
+      "reviewStatus": "pending",
+      "elapsedReviewerSeconds": 0,
+      "remainingReviewerBudgetSeconds": null
+    },
+    {
+      "part": 44,
       "set": "step04-033",
       "files": [
         "plans/261020-1250-debate-pattern-and-judge-role/plan.md",
@@ -1165,13 +3262,14 @@
         "plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md"
       ],
       "edges": 7,
-      "bytes": 118150,
-      "payload": "step-04-wave2-p17.json",
-      "payloadSha256": "4c9b48a08e4ff6ed15f1a1deb8a5dff26c808197b8d3cfc26b1c2c269f8e36d3",
-      "expectedReviewerOutput": "review-a38-step-04-wave2-p17.md",
+      "bytes": 95064,
+      "payload": "step-04-wave2-p44.json",
+      "payloadSha256": "ebaf9d55251b163a08770abe8b7722278af44e756d4e6333c8e1d373ffbd93dd",
+      "expectedReviewerOutput": "review-a38-step-04-wave2-p44.md",
       "reviewStatus": "pending",
       "elapsedReviewerSeconds": 0,
       "remainingReviewerBudgetSeconds": null
     }
-  ]
+  ],
+  "acceptance": "Records only; independent A51 semantics and L12-11 runner-commit accounting remain owed."
 }

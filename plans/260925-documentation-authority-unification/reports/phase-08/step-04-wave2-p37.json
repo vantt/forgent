@@ -1,0 +1,977 @@
+{
+  "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "reviewerRule": "Never run checker/probes/resolver/author scripts. Read every assigned file through EOF and independently verify targets. One verdict per whole file, even when streamed.",
+  "set": "step04-027",
+  "files": [
+    "src/state/store.mjs",
+    "src/state/tool-registry.mjs"
+  ],
+  "joinedSlots": 13,
+  "items": [
+    {
+      "file": "src/state/store.mjs",
+      "sourceDigest": "b8eacaa22d2f17b04f494f9671b3bec2b883306aadb9ae0909298b94b20e11c4",
+      "sourceContext": "// store.mjs — the single write door onto `.fgos/` (per D3/D5).\n//\n// This is the sole module that resolves `.fgos/` paths; byte-level append is\n// delegated to events.mjs. Every other module here is a pure lib that takes\n// an explicit path (events.mjs) or no path at all (status-fsm.mjs, replay.mjs,\n// work.mjs) — this module is what wires \"some directory\" to the two files\n// that live in it: `events.jsonl` (truth, per D3) and `state.json` (view,\n// per D4).\n//\n// Write order, always: append the event to the log FIRST, then rebuild and\n// overwrite the view SECOND. If a crash lands between the two, the log (the\n// only truth) already has the event — the view is merely stale, and\n// `rebuild()` below is the documented recovery path (per the plan's risk\n// map). The view is never written before the event that produced it exists.\n//\n// This module is also the CLI's single facade for the error-classification\n// contract (R4): EXIT_CODES + categoryOf are the one source for\n// category -> exit code, and the four error classes raised anywhere in the\n// state layer are re-exported from here so bin/fgos.mjs never needs to\n// import status-fsm.mjs/work.mjs/events.mjs directly.\n//\n// SIBLING FACADE (D3, worker-dispatch-log): `.fgos/logs/` is written by a\n// separate narrow facade, worker-log.mjs — NOT this door. This module's\n// single-write-door scope stays exactly `events.jsonl` + `state.json` (the\n// event-sourced FSM truth and its view); unstructured worker dispatch output\n// is a different concern and never flows through moveWork/appendEvent.\n\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport { execFileSync } from 'node:child_process';\nimport { viewRevision, serializeView, readAllEventsFromDir, rebuildViewFromDir, buildSnapshotFromDir, VIEW_SCHEMA_VERSION } from './replay.mjs';\nimport { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlapAmong, goalScopedCriticalPath, goalScopedGreedyTopUnblock, computeSchedule, detectCycles } from './graph-metrics.mjs';\nimport { transitionWork, FsmError } from './status-fsm.mjs';\nimport { transitionStep } from './step-fsm.mjs';\nimport { validateWork, validateDomainFields, checkAcceptanceEvidenceTraceable, WorkValidationError, DEFAULTS, GOAL_TIERS, truncateTitle } from './work.mjs';\nimport { getDomain, statusCategoryFor, parkReasonForStatus, roleGraphFor, effectiveStep, stepForPhase } from './domain-registry.mjs';\nimport { evaluateHandoff } from './handoff.mjs';\nimport { EventLogError } from './events.mjs';\nimport { frontier, frontierAcrossSteps, isDepsAndLineageReady as depsAndLineageReadyView } from './frontier.mjs';\nimport { assertNoCycle, assertNoUnifiedCycle } from './dep-graph.mjs';\nimport { resolveWriterIdentity } from '../util/session-identity.mjs';\nimport { KnowledgeValidationError, applyKnowledgeEvent } from './knowledge-registry.mjs';\nimport { resolveFriction, recordFriction } from '../observe/friction-client.mjs';\nexport { recordFriction, resolveFriction };\nimport { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';\nimport { readClaim, readClaims, releaseClaimTx, withMainState, buildEffectiveView, getItemDurableRevision } from './runtime-coordination.mjs';\n\nexport { FsmError, WorkValidationError, EventLogError, KnowledgeValidationError };\n\n/** Error raised by this module. `category` is the CLI exit-code contract (R4). */\nexport class StoreError extends Error {\n  constructor(category, message) {\n    super(message);\n    this.name = 'StoreError';\n    this.category = category;\n  }\n}\n\n/**\n * The one category -> exit-code map (R4). Values 2-5 unchanged from the\n * prior duplicate in bin/fgos.mjs. 'lock-timeout' (events.mjs), 'session-fail'\n * (session.mjs) and 'merge-fail' (merge.mjs) are distinct-on-purpose\n * categories that were previously unmapped here, so any error carrying them\n * fell through categoryOf's undefined-exitCode path and was treated as an\n * uncategorized bug: the whole runOnce drain-run aborted (throw, not a\n * graceful per-item halt) instead of returning its structured\n * dispatched/parked result with an accurate exit code (review-unreviewed-260717,\n * corroborated by two independent reviewers). 6 is reserved for loop.mjs's\n * EXIT_BUSY — skip it here.\n */\nexport const EXIT_CODES = Object.freeze({\n  precondition: 2,\n  conflict: 3,\n  validation: 4,\n  'corrupt-log': 5,\n  'lock-timeout': 7,\n  'session-fail': 8,\n  'merge-fail': 9,\n  // A genuine integrity failure (session manifest or protocol definition really missing),\n  // never an ordinary caller-correctable validation mistake. Mapped to the SAME\n  // exit code as 'validation' so no existing CLI exit-code contract changes\n  // -- only `err.category` becomes distinguishable, so a StoreError/\n  // CoordinationError carrying it is never mistaken for an ordinary\n  // 'refused' (category:'validation') outcome by a future DAG scheduler\n  // classifier (dag-request-scheduler.md §4).\n  'not-found': 4,\n});\n\n/**\n * Execution outcome codes of `fgos run` and foreground workflow runs (RUL99).\n * Separate from EXIT_CODES to prevent error categories from colliding with outcome names.\n */\nexport const OUTCOME_EXIT_CODES = Object.freeze({\n  'policy-refusal': 4,\n  'provider-limit': 10,\n  'execution-failure': 11,\n  'partial-writes': 12,\n  blocked: 13,\n  findings: 14,\n});\n\n/**\n * Map an execution outcome (e.g. from runUnit or workflowRun) onto a canonical exit code.\n * Non-pass outcomes map to OUTCOME_EXIT_CODES[outcome] or 1 when unrecognized. 'pass' maps to 0.\n *\n * @param {string} outcome\n * @returns {number}\n */\nexport function exitCodeForOutcome(outcome) {\n  if (outcome === 'pass') return 0;\n  if (typeof outcome !== 'string') return 1;\n  return OUTCOME_EXIT_CODES[outcome] ?? 1;\n}\n\n/**\n * Classify any error raised by this module's domain (StoreError, FsmError,\n * WorkValidationError, EventLogError all set `.category`) by reading the\n * property directly rather than an instanceof-chain — a new error class only\n * needs to set `.category` to participate, nothing here has to change.\n * Anything without a recognized `.category` falls back to 'unexpected'\n * (callers map that to exit 1).\n */\nexport function categoryOf(err) {\n  return err && typeof err.category === 'string' ? err.category : 'unexpected';\n}\n\nfunction paths(dir) {\n  return { logPath: path.join(dir, 'events.jsonl'), viewPath: resolveFgosFile(dir, FGOS_FILE.STATE) };\n}\n\n// Tầng A / T2 (TA-D2, TA-D11, TA-D14): new writes go under `.fgos/events/`,\n// one open file per writer, instead of the single top-level `events.jsonl`.\n// `paths(dir).logPath` (above) is untouched and stays load-bearing for two\n// unrelated things: it is baseline-0, the pre-cutover log frozen in place\n// (TA-D12, read but never appended to below), and its OWN dirname is what\n// `withStateAndRefresh` used to derive the cross-process lock from — the\n// state lock is now one per main checkout, covering the whole `.fgos/` dir\n// exactly as before (TA-D14: a per-file lock would no longer serialize the CAS\n// preconditions every mutation here depends on).\nconst EVENTS_SUBDIR = 'events';\n\nfunction eventsDirOf(dir) {\n  return path.join(dir, EVENTS_SUBDIR);\n}\n\n// TA-D11 naming: `<writer-id>-<openTs>.jsonl`, openTs compact\n// `YYYYMMDDTHHMMSSmmmZ` (no separators) so a writer's second file after a\n// future compaction never collides with its first.\nfunction formatCompactTs(date) {\n  return date.toISOString().replace(/[-:]/g, '').replace('.', '');\n}\n\n// Resolves the ONE currently-open file for this writer under\n// `.fgos/events/` (TA-D2/TA-D11): reuse it if a prior write in this same\n// writer identity already opened one, otherwise open a new one now. Never\n// writes to `paths(dir).logPath` (baseline-0 is frozen, TA-D12).\nexport function resolveWriterLogPath(dir) {\n  const dirPath = eventsDirOf(dir);\n  fs.mkdirSync(dirPath, { recursive: true });\n  const writerId = String(resolveWriterIdentity(dir).id);\n  const prefix = `${writerId}-`;\n  let existing = [];\n  try {\n    existing = fs\n      .readdirSync(dirPath, { withFileTypes: true })\n      .filter((entry) => entry.isFile() && entry.name.startsWith(prefix) && entry.name.endsWith('.jsonl'))\n      .map((entry) => entry.name)\n      .sort(); // the compact ts suffix sorts lexicographically -> last = newest = the open one\n  } catch (err) {\n    if (err.code !== 'ENOENT') throw err;\n  }\n  if (existing.length > 0) {\n    return path.join(dirPath, existing[existing.length - 1]);\n  }\n  return path.join(dirPath, `${prefix}${formatCompactTs(new Date())}.jsonl`);\n}\n\n// Tầng A/T3: the multi-file discovery + total-order + dedupe step now\n// lives in replay.mjs (`readAllEventsFromDir`/`rebuildViewFromDir`) — this\n// module only ever passes `dir` through. `readAllEvents`/`currentView` are\n// the ONE pair of names every reader below still calls, unchanged from T2,\n// so this handoff touched no call site.\nfunction readAllEvents(dir) {\n  return readAllEventsFromDir(dir);\n}\n\nfunction currentView(dir) {\n  return rebuildViewFromDir(dir);\n}\n\nfunction writeView(viewPath, view, snapshot, tx = null) {\n  // work-graph-intelligence S3: stamp a deterministic revision-hash onto the\n  // ON-DISK derived view only. `view` (what refreshView returns to store\n  // callers) stays the pure fold shape rebuildView produces — the revision is\n  // a sibling field written to state.json, never folded back into the view a\n  // rebuild returns. Determinism (same log -> same revision) keeps the\n  // rebuild-determinism e2e's before/after deep-equal green.\n  // tsk-49e: `snapshot` ({size, mtimeMs, lastLine} of events.jsonl as of\n  // this write) is the same kind of additive sibling field — read back only\n  // by replay.mjs's own incremental-rebuild fast path, never folded into the\n  // view a rebuild returns.\n  // tsk-37d: reuse the once-serialized view string to derive the revision hash\n  // and construct the persisted JSON without a second JSON.stringify pass over\n  // view.\n  const { viewStr, revision } = serializeView(view);\n  const snapshotPart = snapshot !== undefined ? `,\"snapshot\":${JSON.stringify(snapshot)}` : '';\n  const persistedContent = `${viewStr.slice(0, -1)},\"revision\":${JSON.stringify(revision)},\"viewSchemaVersion\":${VIEW_SCHEMA_VERSION}${snapshotPart}}\\n`;\n  // tsk-4mx: temp file, then rename(2) onto viewPath -- an atomic replace on\n  // POSIX, so a reader can never observe a truncated/partial state.json.\n  // Inside a state transaction the write goes through `tx`, which does exactly\n  // that and refuses it once the transaction is revoked.\n  if (tx) {\n    tx.writeText(viewPath, persistedContent);\n    return;\n  }\n  fs.mkdirSync(path.dirname(viewPath), { recursive: true });\n  const tmpPath = `${viewPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;\n  fs.writeFileSync(tmpPath, persistedContent, 'utf8');\n  fs.renameSync(tmpPath, viewPath);\n}\n\n// Shared tail of every mutation: rebuild the view fresh from the (now\n// updated) log and overwrite state.json. Always called AFTER the event that\n// caused the change has already been appended — never before.\nfunction refreshView(dir, tx = null) {\n  const { viewPath } = paths(dir);\n  const view = currentView(dir); // tries T4's incremental fast path first, falls back to a full multi-file fold\n  // T4's per-file anchor ({files: {name: {size, lastLine}}, maxTs}) --\n  // cheap stat + tail-read per file, never a full-content read. Safe to\n  // build here uncontended: refreshView always runs inside\n  // withStateAndRefresh's held lock (tsk-1q5), so no concurrent append\n  // can land between currentView's own read above and this snapshot build.\n  const snapshot = buildSnapshotFromDir(dir);\n  writeView(viewPath, view, snapshot, tx);\n  return view;\n}\n\n// tsk-1q5: every mutation below used to call `refreshView(dir)` AFTER\n// releasing the state lock (append-then-refresh, per the header comment\n// above, but as two SEPARATE critical sections). Two processes finishing\n// their own correctly-locked appends close together could then race their\n// unlocked `refreshView` calls: whichever one's whole-file `state.json`\n// write happened to land last won, even if its own log read was captured\n// before the other process's append — silently overwriting a fresher view\n// with a staler one (a lost-update on the derived cache, not the log\n// itself). Folding `refreshView` into the SAME held lock as the append\n// closes that window structurally, the same way `withStateTx`'s own doc\n// comment already describes for a precondition read ahead of an append.\nfunction withStateAndRefresh(dir, fn) {\n  let view;\n  const event = withMainState(dir, (tx) => {\n    const result = fn(tx);\n    view = refreshView(dir, tx);\n    return result;\n  });\n  return { event, view };\n}\n\n/**\n * Create `dir` (e.g. `.fgos/`) if missing, ensure the event log file exists,\n * and (re)write the view from it. Safe to call on an already-initialized\n * dir — idempotent.\n */\nexport function initStore(dir) {\n  const { logPath } = paths(dir);\n  fs.mkdirSync(dir, { recursive: true });\n  if (!fs.existsSync(logPath)) {\n    fs.writeFileSync(logPath, '', 'utf8');\n  }\n  return refreshView(dir);\n}\n\n/**\n * Add a new work item. Validates shape + deps against the log's own current\n * ids (read fresh, never off the possibly-stale view) BEFORE writing\n * anything — an invalid item never reaches the log.\n *\n * The existence check through the append is one held state-lock critical\n * section (via `withStateTx`/`tx.append`, not the bare\n * `appendEvent`): two processes racing `addWork` on the same id can no\n * longer both read \"id not present yet\" and both append a `work.add` — the\n * second to acquire the lock re-reads with the first's event already in the\n * log, so its own existence check now correctly fails.\n */\nexport function addWork(dir, work) {\n  return withStateAndRefresh(dir, (tx) => {\n    const before = currentView(dir);\n\n    if (before.work[work?.id]) {\n      throw new StoreError('validation', `work \"${work.id}\" already exists.`);\n    }\n\n    // Per D6/D7b: every NEW work.add event carries `tier` explicitly — the\n    // caller's own value, or work.mjs's declared DEFAULTS.tier when omitted —\n    // so the event log itself (not only replay.mjs's fold) states what tier\n    // was in effect at write time. `??` only fills in when `tier` is missing\n    // or nullish; an explicit (even invalid) value passes through unchanged\n    // so validateWork below still rejects it as validation.\n    //\n    // Per work-item-title-contract D2/D5, the title bound is applied HERE, on\n    // the same normalize step as tier and before validateWork — so the\n    // truncated title is what the appended event carries, and every caller\n    // reaching this door (submit and add in bin/fgos.mjs, decompose's children,\n    // the runner loop) obeys one rule without any of them repeating it.\n    const item = { ...work, size: work?.size ?? DEFAULTS.size, title: truncateTitle(work?.title) };\n    validateWork(item, Object.keys(before.work));\n    // domainFields fieldSchema (decision record 0027, D6): a separate,\n    // narrower check than validateWork's own domainFields shape rule above\n    // (work.mjs) — validates ONLY the namespace matching item's own domain\n    // against that domain's declared fieldSchema, if any. Run right after\n    // validateWork (which already confirmed item.domain is a real DOMAINS\n    // key or absent) so getDomain's lookup below can never miss.\n    validateDomainFields(item, getDomain(item.domain));\n    // statusCategory (decision record 0027, D2/D3): computed AFTER\n    // validateWork above confirms `item.domain` is either absent or a real\n    // DOMAINS key — deliberately not folded into the tier/title normalize\n    // step above it, because `getDomain` falls back to DEFAULT_DOMAIN with\n    // a `console.warn` for a genuinely unrecognized domain (domain-registry.mjs's\n    // `resolveDomainName`), and an invalid `item.domain` must\n    // still fail validation with exactly the same single stderr line as\n    // before this cell existed (test/cli/fgos.test.mjs's `submit --domain\n    // <bad>` stderr-parity assertion) — never a stray \"folding to coding\"\n    // warning for an item that is about to be rejected anyway. So the very\n    // first event a work item ever gets already carries its frozen\n    // category, with no from-scratch window a derive-on-read model would\n    // leave open (see STATUS_CATEGORIES's own doc comment, work.mjs, for\n    // the L3 replay-from-zero reasoning this avoids), but only once the\n    // item is known-valid. `statusCategoryFor` returns `undefined` (never\n    // stamped, per the same \"don't invent one\" rule moveWork below\n    // follows) unless `item.status` — almost always the caller's default\n    // `todo`, but a caller-declared `status` on `add` is legal and honored\n    // here too — falls in the six front-segment statuses `item`'s own\n    // domain declares a `statusLabels` entry for.\n    const addCategory = statusCategoryFor(getDomain(item.domain), item.status);\n    if (addCategory !== undefined) {\n      item.statusCategory = addCategory;\n    }\n    // tsk-48i D1: same write-time-stamp shape as statusCategory above, for\n    // the domain-owned parkReason table (parkReasonForStatus,\n    // domain-registry.mjs) -- lets a domain-agnostic reader (e.g.\n    // herdr-dashboard) tell \"actively worked\" apart from \"parked on a person\"\n    // or \"parked on a system error\" without learning the domain's own\n    // literal status strings.\n    const addParkReason = parkReasonForStatus(getDomain(item.domain), item.status);\n    if (addParkReason !== undefined) {\n      item.parkReason = addParkReason;\n    }\n    // tsk-5q5-2 (D1/D3): narrow write-time check on any acceptance clause\n    // supplying text+evidence together — see checkAcceptanceEvidenceTraceable's\n    // own doc comment (work.mjs) for what this does and does not prove.\n    checkAcceptanceEvidenceTraceable(item, path.dirname(dir));\n    // work-graph-intelligence S1 (D f176c18a): the acyclic invariant on `deps`\n    // is enforced at this SAME write door, right after shape/existence\n    // validation — never a second validation path. assertNoCycle throws\n    // WorkValidationError (category='validation'), already mapped to exit 4 by\n    // categoryOf below; it is never wrapped or re-classified here.\n    //\n    // S2a (record 0012) extends that guarantee from the deps-only graph to the\n    // UNIFIED blocking graph (`deps` as `blocks` edges + `parent` as\n    // `parent-child` edges). The deps-only check runs FIRST so a pure-deps cycle\n    // keeps its S1 \"dependency cycle\" message; assertNoUnifiedCycle then catches\n    // any cycle that a `parent` edge participates in (a MIXED or pure\n    // parent-child cycle the deps-only walk cannot see — a parent id is never\n    // existence-checked, so a dangling forward parent makes such a cycle\n    // reachable today) and reports it as a \"graph cycle\". Same\n    // WorkValidationError / category='validation' / exit-4 contract; no schema\n    // change, SCHEMA_VERSION unchanged, legacy events replay untouched (R11).\n    assertNoCycle(item, before.work);\n    assertNoUnifiedCycle(item, before.work);\n\n    item.writer = resolveWriterIdentity(dir);\n    return tx.append(resolveWriterLogPath(dir), { type: 'work.add', payload: item });\n  });\n}\n\n// D4/D5: the exact field set `edit` may patch. `id`, `status`, `workflowStep`, and\n// `domain` are deliberately absent — each already has its own dedicated\n// write path (identity is immutable; `status` is `move`'s; `workflowStep` is\n// `moveStep`'s) and mixing them into `edit` would open a second door onto\n// the same field.\nconst EDITABLE_FIELDS = new Set(['title', 'description', 'kind', 'risk', 'verify', 'size', 'rigor', 'refs', 'deps', 'acceptance', 'priority', 'intent', 'docsRef', 'parent', 'urgent', 'impact', 'effort', 'footprint', 'action', 'mergeAfter', 'supersededBy', 'duplicates', 'domainFields', 'goalTier', 'nextOperation', 'secondaryOperation', 'workflowRunId']);\n\n/**\n * Patch fields on an existing work item, through the SAME single write door\n * as `addWork`/`moveWork` (per D3). Unlike `addWork` (a full new record),\n * `patch` is a PARTIAL set of fields — only the D4 allowlist above may\n * appear in it; anything else (including a stray `id`/`status`/`workflowStep`/\n * `domain`) is rejected as `validation` before the merge even happens, so an\n * over-broad patch never silently no-ops instead of failing loud. The merged\n * candidate is validated by the SAME `validateWork` entry point `addWork`\n * uses — no field rule is re-implemented here. The appended event carries\n * only `{ id, patch }` (additive, per D3/R11) — never the full record — so\n * replay can fold exactly the changed keys onto the item.\n */\n// Same held-lock critical section as addWork above (existence + validation\n// check through the append, one withStateTx scope): two\n// processes racing editWork on the same id, or racing editWork against\n// addWork/moveWork/moveStep on ids that would collide (e.g. a deps/parent\n// cycle only the second writer's patch creates), can no longer both read a\n// precondition that the other's not-yet-visible write is about to invalidate.\nfunction validateWorkPatch(view, dir, id, patch, role, writer) {\n  const work = view.work[id];\n  if (!work) {\n    throw new StoreError('validation', `work \"${id}\" not found.`);\n  }\n  if (!patch || typeof patch !== 'object' || Array.isArray(patch) || Object.keys(patch).length === 0) {\n    throw new StoreError('validation', 'edit requires at least one field to change.');\n  }\n  for (const key of Object.keys(patch)) {\n    if (!EDITABLE_FIELDS.has(key)) {\n      throw new StoreError(\n        'validation',\n        `edit cannot change \"${key}\" — allowed fields are: ${[...EDITABLE_FIELDS].join(', ')}.`,\n      );\n    }\n  }\n  if (patch.kind !== undefined && work.status !== 'todo') {\n    throw new StoreError(\n      'validation',\n      `edit cannot change \"kind\" on work \"${id}\" -- status is \"${work.status}\", not \"todo\". `\n      + `kind selects the item's Workflow; it can only change while status is still todo, `\n      + `before a claim lets the item start walking that graph.`,\n    );\n  }\n  const normalizedPatch = typeof patch.title === 'string'\n    ? { ...patch, title: truncateTitle(patch.title) }\n    : patch;\n\n  const candidate = { ...work, ...normalizedPatch };\n  const touchedFields = new Set(Object.keys(patch));\n  validateWork(candidate, Object.keys(view.work), touchedFields);\n  if (touchedFields.has('domainFields')) {\n    validateDomainFields(candidate, getDomain(candidate.domain));\n  }\n  if (touchedFields.has('acceptance')) {\n    checkAcceptanceEvidenceTraceable(candidate, path.dirname(dir));\n  }\n  assertNoCycle(candidate, view.work);\n  assertNoUnifiedCycle(candidate, view.work);\n\n  const payload = { id, patch: normalizedPatch };\n  if (role !== undefined) {\n    payload.role = role;\n  }\n  payload.writer = writer;\n  return payload;\n}\n\nexport function editWork(dir, { id, patch, role } = {}) {\n  return withStateAndRefresh(dir, (tx) => {\n    const before = currentView(dir);\n    const writer = resolveWriterIdentity(dir);\n    const payload = validateWorkPatch(before, dir, id, patch, role, writer);\n    return tx.append(resolveWriterLogPath(dir), { type: 'work.edit', payload });\n  });\n}\n\n/**\n * Clear/annotate a stale reason/parkReason on a done or wontfix work item.\n * Appends a 'work.resolve-park-reason' event carrying { id, note, role, writer }.\n */\nexport function resolveParkReason(dir, { id, note, role } = {}) {\n  return withStateAndRefresh(dir, (tx) => {\n    const before = currentView(dir);\n    const work = before.work[id];\n    if (!work) {\n      throw new StoreError('validation', `work \"${id}\" not found.`);\n    }\n    if (!note || typeof note !== 'string' || note.trim() === '') {\n      throw new StoreError('validation', 'resolve-park-reason requires a non-empty --note.');\n    }\n    if (work.status !== 'done' && work.status !== 'wontfix') {\n      throw new StoreError(\n        'validation',\n        `resolve-park-reason can only clear reason/parkReason on terminal items (status \"done\" or \"wontfix\"); work \"${id}\" has status \"${work.status}\".`,\n      );\n    }\n    if (role !== undefined && role !== 'human' && role !== 'session') {\n      throw new StoreError('validation', `resolve-park-reason role must be \"human\" or \"session\" (got \"${role}\").`);\n    }\n\n    const payload = { id, note: note.trim() };\n    if (role !== undefined) {\n      payload.role = role;\n    }\n    payload.writer = resolveWriterIdentity(dir);\n    return tx.append(resolveWriterLogPath(dir), { type: 'work.resolve-park-reason', payload });\n  });\n}\n\n/**\n * Compose a câu-6 (\"learning gì để lại?\") record MECHANICALLY from data\n * already folded for `id` in `view` (the PRE-transition view — see moveWork\n * below), plus the settlement this very transition is about to create (not\n * yet in `view`, so passed in explicitly) — per Phase 3 S3-closeout (c) /\n * six-questions L5. Zero-effort (D3 of this cell): only object/array\n * bookkeeping, never a model call, never a spawn. An item with none of the\n * three channels still gets a minimal-but-real record (empty groups, null\n * outcome) — per this cell's action (2), \"không nổ, không im lặng bỏ qua\".\n * PURE: no fs, no Date.now() — mirrors replay.mjs's own purity discipline.\n */\nfunction composeLearning(view, id, closingSettlement) {\n  const actual = view.outcomes?.[id]?.actual ?? null;\n  const outcome = actual\n    ? { disposition: actual.outcome ?? null, attempts: actual.attempts ?? null, errorClass: actual.errorClass ?? null }\n    : null;\n\n  // F5: learning friction removed per Observe migration\n\n  const settlementRecords = [...(view.settlements?.[id] ?? []), closingSettlement];\n  const settlements = {};\n  for (const record of settlementRecords) {\n    const key = `${record.kind}/${record.role ?? 'unknown'}`;\n    settlements[key] = (settlements[key] ?? 0) + 1;\n  }\n\n  return { outcome, settlements };\n}\n\n/**\n * Set the persisted \"focus\" pointer (per str67-goal-directed-planning\n * D3/D4/D7) to `id` — the SINGLE write door for focus, mirroring\n * addWork/editWork's exact shape: resolve paths, rebuild the view fresh\n * inside the held lock, validate, append, refresh. Rejects an id that does\n * not exist, or whose item has no declared `goalTier` (D7: \"must target an\n * actual goal item\"). No CAS/precondition beyond those two checks — setting\n * focus to an id that is already the current focus is a harmless no-op\n * re-write (idempotent, per plan.md's edge-dimension note).\n */\nexport function setFocus(dir, { id, role } = {}) {\n  return withStateAndRefresh(dir, (tx) => {\n    const before = currentView(dir);\n    const work = before.work[id];\n    if (!work) {\n      throw new StoreError('validation', `work \"${id}\" not found.`);\n    }\n    if (!GOAL_TIERS.includes(work.goalTier)) {\n      throw new StoreError(\n        'validation',\n        `work \"${id}\" has no declared goal tier — \"goal set\" requires goalTier to be one of ${GOAL_TIERS.join(', ')}.`,\n      );\n    }\n    const payload = role !== undefined ? { id, role } : { id };\n    return tx.append(resolveWriterLogPath(dir), { type: 'goal.focus', payload });\n  });\n}\n\n/**\n * RUL58 acceptance-evidence gate: throws if `work` has opted into\n * `acceptance` clauses (per work.mjs's optional-additive shape) and any\n * populated clause still lacks evidence. `acceptance` absent, null, or an\n * empty array is a complete no-op (D4) — an item that never opted in is\n * unaffected. Pure — no I/O, no event append.\n *\n * Extracted out of `moveWork`'s inline `to === 'delivered'` check (tsk-396\n * D1) so `approve` (bin/fgos.mjs) can also call this directly, as a\n * pre-flight check before any merge mutation — the merge-then-gate\n * ordering gap tsk-396 exists to close. `moveWork` still calls this itself\n * below, unchanged, as the backstop for the doors into `delivered` that\n * don't go through that pre-flight (`return`'s `doing -> delivered`, the\n * mechanical `blocked -> delivered` retry).\n */\nexport function assertAcceptanceEvidence(id, work) {\n  if (!Array.isArray(work.acceptance) || work.acceptance.length === 0) return;\n  for (const clause of work.acceptance) {\n    if (typeof clause?.text !== 'string' || !clause.text.trim()) continue;\n    if (typeof clause.evidence !== 'string' || !clause.evidence.trim()) {\n      throw new StoreError(\n        'precondition',\n        `work \"${id}\" cannot move to \"delivered\" — acceptance clause \"${clause.text}\" has no evidence yet; edit --acceptance must supply it before \"delivered\".`,\n      );\n    }\n  }\n}\n\n/**\n * tsk-2p6: a risk:heavy item reaching `delivered` with no `plan.md` in its\n * own docs history means its risk map was never written down for evidence\n * to be checked against (found live: tsk-4ax/tsk-55p, docs/history/<id>/\n * carrying only iron-law-evidence.md). Same shape as\n * `assertAcceptanceEvidence` (RUL58) immediately above — a small assert\n * called from both `moveWork`'s `to === 'delivered'` backstop and\n * `approve`'s pre-flight call sites (`bin/fgos.mjs`) — but NOT pure: when an\n * `fgw/<id>` branch exists, it checks that branch via `git cat-file -e` (so the\n * pre-flight check succeeds before a merge when the branch is not yet in\n * `repoRoot`'s checkout); when no branch exists (pull/legacy or retroactive\n * items), it falls back to checking the current working tree via `fs.existsSync`.\n *\n * `risk === 'heavy'` only, not a live re-derivation of \"touches an\n * Iron-Law-gated module\" — that classification is the separate, existing\n * Iron Law gate's own job; `heavy` is this codebase's own established\n * mechanical proxy for \"this needed a written risk map\" (same trigger\n * `fgos-coding-validating`'s own heavy-risk human-confirmation gate uses).\n *\n * Deliberately never re-evaluates an item that reached `delivered` before\n * this gate existed (tsk-4ax/tsk-55p stay untouched) — this only fires at\n * the moment of a NEW transition into `delivered`, never as a standing\n * scan over history a retroactive plan.md could never honestly satisfy.\n */\nexport function assertPlanEvidence(id, work, repoRoot) {\n  const failure = checkPlanEvidence(id, work, repoRoot);\n  if (failure) throw new StoreError('precondition', failure);\n}\n\n// The git half of `assertPlanEvidence`: the failure message, or null when the\n// plan is there (or the item is not heavy). Runs git, so it never runs inside\n// the state lock; `moveWork` takes it before the lock as a snapshot.\nfunction checkPlanEvidence(id, work, repoRoot) {\n  if (work.risk !== 'heavy') return null;\n  const branch = `fgw/${id}`;\n  const candidates = [];\n  if (typeof work.docsRef === 'string' && work.docsRef.trim()) {\n    candidates.push(path.posix.join(work.docsRef.replace(/\\/+$/, ''), 'plan.md'));\n  }\n  candidates.push(`docs/history/${id}/plan.md`);\n\n  const hasBranch = (() => {\n    try {\n      execFileSync('git', ['rev-parse', '--verify', '--quiet', `refs/heads/${branch}`], { cwd: repoRoot, stdio: 'ignore' });\n      return true;\n    } catch {\n      return false;\n    }\n  })();\n\n  const hasPlan = candidates.some((candidate) => {\n    if (hasBranch) {\n      try {\n        execFileSync('git', ['cat-file', '-e', `${branch}:${candidate}`], { cwd: repoRoot, stdio: 'ignore' });\n        return true;\n      } catch {\n        return false;\n      }\n    } else {\n      return fs.existsSync(path.join(repoRoot, candidate));\n    }\n  });\n\n  if (hasPlan) return null;\n  const locDesc = hasBranch ? `on branch \"${branch}\"` : `in current tree (no branch \"${branch}\")`;\n  return `work \"${id}\" cannot move to \"delivered\" — risk:heavy but no plan.md found ${locDesc} (checked ${candidates.join(', ')}); write one before landing.`;\n}\n\n// The git directory that holds the refs of the checkout at `repoRoot`: its\n// `.git`, or, for a linked worktree (`.git` is a file naming the worktree's own\n// git dir), the common dir that git dir points at. Files only, no child process.\nfunction refsGitDir(repoRoot) {\n  const dotGit = path.join(repoRoot, '.git');\n  let gitDir = dotGit;\n  try {\n    if (!fs.statSync(dotGit).isDirectory()) {\n      const pointer = /^gitdir:\\s*(.+)$/m.exec(fs.readFileSync(dotGit, 'utf8'));\n      if (!pointer) return null;\n      gitDir = path.resolve(repoRoot, pointer[1].trim());\n      const common = fs.readFileSync(path.join(gitDir, 'commondir'), 'utf8').trim();\n      gitDir = path.resolve(gitDir, common);\n    }\n  } catch (err) {\n    if (err.code === 'ENOENT' || err.code === 'ENOTDIR') return null;\n    throw err;\n  }\n  return gitDir;\n}\n\n// Tip of `refs/heads/<branch>` read from the ref files only (no child process):\n// the loose ref, else packed-refs, else null. Used inside the state lock to\n// tell whether the plan-evidence snapshot still describes the branch.\nfunction readBranchTip(repoRoot, branch) {\n  const gitDir = refsGitDir(repoRoot);\n  if (!gitDir) return null;\n  try {\n    const loose = fs.readFileSync(path.join(gitDir, 'refs', 'heads', ...branch.split('/')), 'utf8').trim();\n    if (!loose.startsWith('ref:')) return loose;\n  } catch (err) {\n    if (err.code !== 'ENOENT' && err.code !== 'ENOTDIR') throw err;\n  }\n  try {\n    const line = fs.readFileSync(path.join(gitDir, 'packed-refs'), 'utf8').split('\\n').find((l) => l.endsWith(` refs/heads/${branch}`));\n    return line ? line.split(' ')[0] : null;\n  } catch (err) {\n    if (err.code !== 'ENOENT' && err.code !== 'ENOTDIR') throw err;\n    return null;\n  }\n}\n\nclass PlanEvidenceStale extends Error {}\n\n// What the delivered gate needs from git, taken before the state lock: the\n// item's durable revision and branch tip it was judged against, and the\n// verdict. Inside the lock only those two are compared, never git.\nfunction snapshotPlanEvidence(dir, id) {\n  const view = currentView(dir);\n  const work = view.work[id];\n  if (!work || work.risk !== 'heavy') return null;\n  const repoRoot = path.dirname(dir);\n  return {\n    revision: getItemDurableRevision(view, id),\n    tip: readBranchTip(repoRoot, `fgw/${id}`),\n    failure: checkPlanEvidence(id, work, repoRoot),\n  };\n}\n\nfunction applyPlanEvidenceSnapshot(dir, snapshot, view, id, work) {\n  if (work.risk !== 'heavy') return;\n  if (!snapshot || snapshot.revision !== getItemDurableRevision(view, id) || snapshot.tip !== readBranchTip(path.dirname(dir), `fgw/${id}`)) {\n    throw new PlanEvidenceStale();\n  }\n  if (snapshot.failure) throw new StoreError('precondition', snapshot.failure);\n}\n\n/**\n * Move a work item to a new status. Looks the item up fresh from the log,\n * delegates the precondition/CAS decision to status-fsm.mjs (pure — never writes),\n * and only then appends the event it returns.\n *\n * The lookup, the CAS decision, and the append are one held state-lock\n * critical section (via `withStateTx`/`tx.append`): two processes\n * racing `moveWork` on the same id with the same `expectedStatus` can no\n * longer both pass the CAS check against a status that's about to change out\n * from under one of them — the second to acquire the lock re-reads with the\n * first's event already in the log, so its own `expectedStatus` compare\n * correctly conflicts.\n */\nexport function moveWork(dir, args = {}) {\n  if (args.to !== 'delivered') return moveWorkOnce(dir, args, null);\n  // The delivered gate needs git; take it outside the lock and retry when the\n  // item or its branch moved between the snapshot and the lock.\n  for (let attempt = 0; attempt < 3; attempt += 1) {\n    try {\n      return moveWorkOnce(dir, args, snapshotPlanEvidence(dir, args.id));\n    } catch (err) {\n      if (!(err instanceof PlanEvidenceStale)) throw err;\n    }\n  }\n  throw new StoreError('conflict', `work \"${args.id}\": its plan evidence kept changing while moving to \"delivered\"; retry.`);\n}\n\nfunction moveWorkOnce(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger, rationale, alternatives, source, askSource, approved, mergedSha, mergedInto } = {}, planSnapshot = null) {\n  const result = withStateAndRefresh(dir, (tx) => {\n  const before = currentView(dir);\n  const work = before.work[id];\n  if (!work) {\n    throw new StoreError('validation', `work \"${id}\" not found.`);\n  }\n\n  // `reason`/`ask`/`answer` are each only meaningful on their own edge\n  // (per D5 for `reason`; async-human-gate D2/D5 for `ask`/`answer`);\n  // status-fsm.mjs enforces those requirements and ignores whichever of the three\n  // doesn't apply to the edge being taken — this facade never branches on\n  // `to` itself, it just forwards what the caller gave it.\n  const rawEvent = transitionWork({ work, to, expectedStatus, reason, ask, answer }); // FsmError: precondition | conflict\n  // Settlement role attribution (per Phase 3 S3-closeout, vision §8):\n  // stamped onto the payload AFTER the pure transition already returned it —\n  // passing `role` INTO transitionWork would be silently dropped, since\n  // status-fsm.mjs rebuilds `payload` itself from only the fields it knows about.\n  // Additive + optional: a caller that never supplies `role` gets the\n  // exact payload shape transitionWork already produced, byte-for-byte.\n  if (role !== undefined) {\n    rawEvent.payload.role = role;\n  }\n  // statusCategory (decision record 0027, D2/D3): stamped AFTER the pure\n  // transition already returned it, same post-transition pattern as `role`\n  // immediately above and `writer` immediately below — status-fsm.mjs never\n  // sees or validates this field (it stays domain-agnostic-consumer-only,\n  // never a move-legality input; see DOMAINS.coding.statusLabels's own\n  // comment on why category-level validation would be wrong). Computed\n  // from `work`'s OWN domain (never a global table), so a future\n  // second production domain with a different statusLabels map gets its\n  // own categories automatically, no branch here. Present only for the six\n  // front-segment statuses `to`'s domain actually declares a `statusLabels`\n  // entry for; the four tail-segment statuses (`delivered`/`retrospective`/\n  // `cleanup`/`done`) have none there by design (D1), so `category` is\n  // `undefined` and nothing is stamped — never invented, and never\n  // recomputed later at replay time (replay.mjs's work.move case only\n  // folds whatever this event actually carries).\n  const category = statusCategoryFor(getDomain(work.domain), to);\n  if (category !== undefined) {\n    rawEvent.payload.statusCategory = category;\n  }\n  // tsk-48i D1: same write-time-stamp shape as statusCategory above, for\n  // the domain-owned parkReason table (parkReasonForStatus,\n  // domain-registry.mjs).\n  const parkReason = parkReasonForStatus(getDomain(work.domain), to);\n  if (parkReason !== undefined) {\n    rawEvent.payload.parkReason = parkReason;\n  }\n  // Writer provenance (D8/D15/D17/D18, str46-io-contract) -- same\n  // post-transition stamp as role/headAtTake above, but unconditional:\n  // every moveWork call records who wrote it, never blocking on a\n  // malformed identity (D18).\n  rawEvent.payload.writer = resolveWriterIdentity(dir);\n  // Pull-door claim marker (stage-decompose S2-pull D1): the host repo's HEAD\n  // at claim time, additive on the SAME `to === 'doing'` move `take` writes —\n  // never a separate event (single write door, D3). Ignored by status-fsm.mjs (pure,\n  // only knows the fields it destructures itself) exactly like `role` above,\n  // so this is stamped post-transition the same way.\n  if (headAtTake !== undefined) {\n    rawEvent.payload.headAtTake = headAtTake;\n  }\n  // Pull-door return marker (pr-lifecycle D3/D4, mirrors headAtTake above):\n  // the host repo's HEAD at return time, additive on the SAME `to ===\n  // 'awaiting-approval'` move `return` writes when it goes green — never a separate\n  // event (single write door, D3). Together with the claim's own\n  // `headAtTake`, this gives the review gate an honest `headAtTake ->\n  // headAtReturn` diff range for a pull-door proposal, without depending on\n  // a live branch the way a runner proposal's `fgw/<id>` diff does. Ignored\n  // by status-fsm.mjs (pure, only knows the fields it destructures itself) exactly\n  // like `headAtTake`/`role` above, so this is stamped post-transition the\n  // same way.\n  if (headAtReturn !== undefined) {\n    rawEvent.payload.headAtReturn = headAtReturn;\n  }\n  // Branch-source take/return markers (human-rounds D2): the SAME\n  // post-transition stamp pattern as headAtTake/headAtReturn above, on the\n  // SAME edges (`to === 'doing'` for the claim, `to === 'awaiting-approval'` for the\n  // return) — a branch-source take/return never writes headAtTake/\n  // headAtReturn (those are the main-based discriminator; mixing the two\n  // would give the review gate a meaningless diff range), so this is a\n  // strict addition, never a rewrite of the main-based pull-door shape.\n  if (branchHeadAtTake !== undefined) {\n    rawEvent.payload.branchHeadAtTake = branchHeadAtTake;\n  }\n  if (branchHeadAtReturn !== undefined) {\n    rawEvent.payload.branchHeadAtReturn = branchHeadAtReturn;\n  }\n  // Merge-evidence provenance (tsk-5dk): the same additive, fsm-ignored\n  // post-transition stamp pattern as branchHeadAtTake/branchHeadAtReturn\n  // above, carried only by `approve`'s real merge/GitHub-merge call sites\n  // on the SAME `to === 'delivered'` move — a hand-typed `fgos move --to\n  // delivered` or a verify-only pull-door delivery never supplies these,\n  // so their absence from an event is itself evidence, not a gap.\n  if (mergedSha !== undefined) {\n    rawEvent.payload.mergedSha = mergedSha;\n  }\n  if (mergedInto !== undefined) {\n    rawEvent.payload.mergedInto = mergedInto;\n  }\n  // Claim-trigger marker (claim-lock §7, additive, NOT `claimRole`): who/what\n  // dispatched this claim (e.g. `'herdr'`) — audit-only, never a safety\n  // mechanism (claimRole/loop.mjs's reclaim-guard are unaffected). Stamped\n  // post-transition on the SAME `to === 'doing'` move `pick` writes, exactly\n  // like headAtTake above; ignored by status-fsm.mjs, which never destructures it.\n  if (claimTrigger !== undefined) {\n    rawEvent.payload.claimTrigger = claimTrigger;\n  }\n  // Parent-anchor snapshot at ask-time (str61 D2/D3): the same post-transition\n  // additive stamp pattern as headAtTake/headAtReturn above — a snapshot of\n  // the item's parent `{id, title, status}` taken at the moment this\n  // `to === 'awaiting-human'` move parks it, so a later read can tell what\n  // changed on the parent since. Ignored by status-fsm.mjs (pure, only knows the\n  // fields it destructures itself) exactly like headAtTake/role above, so\n  // this is stamped post-transition the same way. Never set on any other\n  // edge — putInAwaiting is the only caller that ever passes it.\n  if (parentSnapshotAtAsk !== undefined) {\n    rawEvent.payload.parentSnapshotAtAsk = parentSnapshotAtAsk;\n  }\n  // Status-at-ask split (claim-lock §5.1, tsk-40m P1 fix — docs/architect/\n  // doing-coordination-redesign.md): two SEPARATE fields, never conflated.\n  //\n  // `statusAtAsk` — informational/audit only, whatever the CALLER supplies\n  // (typically the EFFECTIVE view, so a claimed item legitimately reads\n  // 'doing' here — that's a true fact worth recording: \"this question was\n  // asked while someone was actively working it\"). NEVER read back for a\n  // resume decision.\n  //\n  // `durableStatusAtAsk` — the item's OWN DURABLE status right before this\n  // move parks it, computed HERE from `work.status` (the fresh durable read\n  // above), never from caller input. This is the ONLY field answerAwaiting\n  // trusts to pick a resume target. Trusting a caller-supplied value here\n  // was the exact bug this fix closes: a caller's view is typically\n  // EFFECTIVE (claim overlay), and forwarding its 'doing' into a value that\n  // gets resumed durably let `take` (todo) -> `ask` -> `answer` durably\n  // write awaiting-human -> doing with no backing claim at all. Resuming to\n  // `durableStatusAtAsk` instead restores the item's pre-park durable\n  // status with zero durable writes of 'doing' — for the normal claimed\n  // case, `putInAwaiting` (below) already settled and released the claim\n  // before this event was ever written, so there is nothing left to\n  // \"un-stale\"; a later `fgos take` acquires a fresh claim. For a\n  // genuinely legacy durable-doing item (no active claim), it durably\n  // resumes to `doing` — a value only ever a fresh, trusted read can\n  // produce here, never client input.\n  if (to === 'awaiting-human') {\n    if (statusAtAsk !== undefined) {\n      rawEvent.payload.statusAtAsk = statusAtAsk;\n    }\n    rawEvent.payload.durableStatusAtAsk = work.status;\n  }\n  // rationale/alternatives/source (tsk-63c D1, decision-schema-rationale-\n  // alternatives-source): the same additive, fsm-ignored post-transition\n  // stamp pattern as parentSnapshotAtAsk/statusAtAsk above, carried on the\n  // `ask`/`answer` gate edges via putInAwaiting/answerAwaiting — ported\n  // from bee's decisions.jsonl shape (docs/distillery/deep-dives/\n  // fgos-capture-gaps-vs-bee.md) so `gates[id]` gains the same\n  // who/why/what-was-rejected fields `addDecision` gets below, one schema\n  // for both surfaces.\n  if (rationale !== undefined) {\n    rawEvent.payload.rationale = rationale;\n  }\n  if (alternatives !== undefined) {\n    rawEvent.payload.alternatives = alternatives;\n  }\n  if (source !== undefined) {\n    rawEvent.payload.source = source;\n  }\n  // askSource (tsk-19zm D2): where THIS ask came from, kept apart from the\n  // answer's `source` above. The agent's options and reasoning live in the\n  // ask text itself (decision-question template), not in side fields.\n  if (askSource !== undefined) {\n    rawEvent.payload.askSource = askSource;\n  }\n  // approved: the owner answered with an explicit `--approve`. Gates that\n  // need consent release only on this, never on any non-empty answer.\n  if (approved === true) {\n    rawEvent.payload.approved = true;\n  }\n  // Release-trigger marker (claim-lock §3b, tsk-2zv): what released this\n  // specific `doing -> todo` move — additive, fsm-ignored, same\n  // post-transition stamp pattern as claimTrigger above. Historically only\n  // `releaseClaimOnExecuting` (src/intake/plan.mjs) ever passed this, so a\n  // reader could positively identify \"this todo-entry came from a claim-lock\n  // §3b release\" instead of inferring it from status/branch-existence\n  // alone, which reject (`awaiting-approval -> todo`) and a verify-fail park also\n  // produce without deleting the branch. tsk-40m D5: `releaseClaimOnExecuting`\n  // is now retired to a no-op (planning->executing no longer holds a\n  // durable `doing` to release) — no NEW event carries this marker.\n  // `latestTodoReleaseTrigger` (claim-port.mjs) still reads it purely for\n  // pre-migration event history.\n  if (releaseTrigger !== undefined) {\n    rawEvent.payload.releaseTrigger = releaseTrigger;\n  }\n  // Compound-learn done-gate RETIRED (work-item-status-delivered-\n  // retrospective-cleanup D1/D4/D11, supersedes RUL49/RUL50/RUL51): `done`\n  // is no longer reached directly from `doing`/`awaiting-approval` at all\n  // (those now target `delivered`), so a stage-based gate on `to==='done'`\n  // no longer makes sense here — the real \"has retrospective/cleanup\n  // actually completed\" check moves to a dedicated harness gating\n  // `cleanup -> done` (D8), not this inline block.\n\n  // Per-clause CoS done-gate (str73-done-flip-cos-check D2/D3, retargeted\n  // by work-item-status-delivered-retrospective-cleanup D3): a work item\n  // that has opted into `acceptance` clauses (per work.mjs's optional-\n  // additive shape) can never reach `delivered` while any populated clause\n  // still lacks evidence — mirrors bee's own per-clause CoS discipline\n  // (D1), mechanically checking only *presence* of evidence, never its\n  // truth. Placed AFTER transitionWork's CAS + precondition checks so a\n  // stale caller still gets 'conflict' first, and BEFORE the append below\n  // so a refused close persists nothing. All three doors into `delivered`\n  // (`doing`, `awaiting-approval`, and the mechanical `blocked` retry)\n  // converge on this one `moveWork` call, so gating on `to==='delivered'`\n  // here covers all three — a dependent that opens on `delivered` (RUL12)\n  // is exactly as protected as it was when `done` was the trigger, never\n  // less. Extracted to `assertAcceptanceEvidence` (tsk-396 D1) so `approve`\n  // (bin/fgos.mjs) can also run it as a pre-flight check, before any merge\n  // mutation, instead of only catching it here after the merge has already\n  // landed — this call site is unchanged, still the backstop for the doors\n  // that don't go through that pre-flight.\n  if (to === 'delivered') {\n    assertAcceptanceEvidence(id, work);\n    applyPlanEvidenceSnapshot(dir, planSnapshot, before, id, work);\n  }\n\n  // Câu-6 tự động (per Phase 3 S3-closeout (c), six-questions L5): BOTH doors\n  // into `done` (doing->done and awaiting-approval->done) converge on this one\n  // `moveWork` call, so gating on `to === 'done'` here — rather than at each\n  // caller — covers both without duplication (must_haves truth 1).\n  //\n  // Deviation from the plan's illustrative \"append a SEPARATE event\" shape\n  // (recorded in this cell's trace.decisions): the learning record is\n  // attached as an ADDITIVE `learning` field on THIS SAME work.move event's\n  // payload instead — composed from `before` (the pre-transition view,\n  // already in hand) plus the close settlement this transition is about to\n  // create. A second appendEvent here would become the new \"last event\"\n  // after every `move --to done`, which the settlement-role-attribution\n  // tests (phase-3-compound-learning-5) already assert IS the move event\n  // itself — an existing, unmodifiable test. One event, one extra field,\n  // is still exactly one write door (must_haves truth 3), just a tighter\n  // reading of it than the plan's illustration.\n  //\n  // Fail-safe (must_haves prohibition — mirrors discovery.mjs's\n  // judgeDiscovery fail-safe model-call pattern): a compose failure here\n  // must NEVER block the transition below. Best-effort, silently swallowed.\n  if (to === 'done') {\n    try {\n      rawEvent.payload.learning = composeLearning(before, id, { kind: 'close', role: role ?? null });\n    } catch {\n      // best-effort — see comment above.\n    }\n  }\n  return tx.append(resolveWriterLogPath(dir), rawEvent); // captures the real seq; rawEvent itself has none\n  });\n  if (answer) {\n    try {\n      resolveFriction(dir, { id, reason: 'answer', by: 'work' });\n    } catch {}\n  } else if (result.event.payload.to === 'done') {\n    try {\n      resolveFriction(dir, { id, reason: 'done', by: 'work' });\n    } catch {}\n  } else if (result.event.payload.to === 'wontfix') {\n    try {\n      resolveFriction(dir, { id, reason: 'wontfix', by: 'work' });\n    } catch {}\n  }\n  // tsk-2t9c D16: `delivered` is a terminal state for the role/holder axis\n  // -- no stage skill ever re-enters an item past this point (every wired\n  // reclaim lives at a stage-skill's own entry point), so an async call\n  // left open on it (most commonly D14's own `review` handoff on the\n  // approve path: nothing calls `handoff-return` between `awaiting-\n  // approval` and `delivered`) would sit \"open\" forever. A read-time\n  // consumer of `callThreads` (compound-learn, retrospective) would then\n  // misread every delivered item as carrying unresolved work rather than\n  // settled history. Close every still-open frame the exact same way a\n  // live reclaim would -- one `recordCallReturn` per frame, deepest first\n  // (the LIFO order `openCallStack` already enforces) -- never inventing a\n  // second closing mechanism. Runs AFTER the lock above releases (this\n  // function is fully synchronous, so there is no nesting risk), and only\n  // when the domain actually declares a `roleGraph` -- a domain with none\n  // never opens a call in the first place, so there is nothing to close.\n  if (result.event.payload.to === 'delivered') {\n    try {\n      const domain = getDomain(result.view.work[id]?.domain);\n      if (roleGraphFor(domain)) {\n        let stack = openCallStack(result.view.callThreads?.[id]);\n        while (stack.length > 0) {\n          const closeResult = recordCallReturn(dir, { id, note: 'auto-closed at delivered (tsk-2t9c D16)' });\n          stack = openCallStack(closeResult.view.callThreads?.[id]);\n        }\n      }\n    } catch {\n      // Best-effort, same fail-safe discipline as the `learning` compose\n      // above: the item already reached `delivered` -- that transition is\n      // what matters and must never be undone or reported as failed over a\n      // cleanup step that is not itself correctness-critical.\n    }\n  }\n  // tsk-2t9c D18: found via a real end-to-end run (a fresh agent following\n  // fgos-coding-implement's own Return-step prose, verbatim, top to\n  // bottom, on a real item) that never fired `handoff --to reviewer\n  // --reason review` even though the item genuinely reached `awaiting-\n  // approval` -- the instruction is imperative and unmissable in\n  // isolation, but sits trailing after several paragraphs of blocked/\n  // catchup caveats, is duplicated once per door into this status\n  // (`return`, `catchup`, and any future one), and nothing gates on it:\n  // skipping it produces no error, no red test, no symptom the skipping\n  // agent would ever notice. Same class of gap D16 already fixed for\n  // `delivered` (a skill-remembered side effect vs. an engine-guaranteed\n  // one) -- and the same fix: every door into `awaiting-approval`\n  // converges on this one `moveWork` call, so firing the review handoff\n  // HERE covers `return`/`catchup`/anything else at once, where the\n  // prose needed a copy per door and still wasn't reliably read. This\n  // does not change what the prose already prescribes -- it relocates\n  // who is responsible for making it actually happen. `recordCall` runs\n  // its own `evaluateHandoff` guard internally (fromRole read off the\n  // item's live `holder`, defaulting to the role graph's `defaultRole`),\n  // so a domain/stage/holder combination where this edge is not legal\n  // (or that already carries a role other than the review edge's `from`)\n  // simply refuses, caught and ignored below -- same \"must never block\n  // the transition\" fail-safe as every sibling block in this function.\n  if (result.event.payload.to === 'awaiting-approval') {\n    try {\n      const domain = getDomain(result.view.work[id]?.domain);\n      if (roleGraphFor(domain)) {\n        recordCall(dir, { id, toRole: 'reviewer', reason: 'review', note: 'auto-fired on reaching awaiting-approval (tsk-2t9c D18)' });\n      }\n    } catch {\n      // Best-effort -- see the block's own comment above.\n    }\n  }\n  return result;\n}\n\n/**\n * tsk-1ht: `getItemDurableRevision` hashes ONLY `view.work[id]` — never\n * `view.decisions`/`decisionsById`, `view.gates`, `view.discovery`,\n * `view.outcomes`, or `view.callThreads` (all separate,\n * type folds into one of those side logs can NEVER cause a revision drift,\n * no matter who wrote it or whether it carries a writer stamp at all — a\n * confirmed live case: `fgos decision`/`fgos gate-approve` (routinely\n * called by `fgos-coding-planning`/`fgos-coding-validating` mid-lifecycle,\n * by design) never stamp `payload.writer`, so treating them as\n * drift-relevant made the very first version of this fix fail closed on\n * every real coding-domain item, never actually reconciling anything.\n * `SIDE_LOG_ONLY_EVENT_TYPES` is a DENYLIST, not an allowlist, on purpose:\n * an unrecognized future event type defaults to being scanned (the safe,\n * conservative direction) rather than silently trusted.\n */\nconst SIDE_LOG_ONLY_EVENT_TYPES = new Set([\n  'decision',\n  'work.gate-approve',\n  'work.discovery',\n  'work.outcome',\n  'work.friction',\n  'work.call-summary',\n]);\n\n/**\n * settleClaim's revision-CAS check used to refuse ANY durable drift since\n * claim time, even when every intervening write came from the SAME writer\n * that now holds the claim — the routine mid-lifecycle `fgos edit` calls\n * `fgos-coding-planning`/`fgos-coding-discovering` make by design, never a\n * concurrent conflict. This reconciles exactly that case: every\n * `view.work[id]`-mutating event (per `SIDE_LOG_ONLY_EVENT_TYPES` above)\n * since the claim's own `acquiredAt` must be positively attributed\n * (`payload.writer.id`) to `claim.writerId` — an event with no writer\n * stamp at all (e.g. `recordClaimAttempt`'s reclaim record,\n * src/runner/claim-port.mjs's stale-claim-reclaim path) or one stamped\n * with a different writer fails this closed, keeping the original refuse.\n * `claim.writerId` absent (a claim written before that field existed) is\n * never reconciled either — no positive evidence exists to reconcile\n * against, the same \"never a false positive on old data\" floor the\n * writer-identity check above already holds to. `readRawEvents` is a\n * plain read (see its own doc comment) — safe to call here, already inside\n * the held state-lock critical section.\n */\nfunction revisionDriftIsSelfCaused(dir, id, claim) {\n  if (!claim.writerId) return false;\n  const acquiredAtMs = new Date(claim.acquiredAt).getTime();\n  if (!Number.isFinite(acquiredAtMs)) return false;\n  const events = readRawEvents(dir);\n  // Require POSITIVE evidence, never a vacuous pass: a preClaimRevision that\n  // was simply wrong to begin with (corrupt data, a fabricated value) has NO\n  // events explaining the drift at all -- `.every()` on an empty filtered\n  // set would otherwise reconcile a mismatch nothing actually caused. At\n  // least one same-writer event in the window is required, and any event in\n  // the window from a different (or missing) writer fails the whole check\n  // closed immediately.\n  let sawSelfCausedEvent = false;\n  for (const event of events) {\n    if (event.payload?.id !== id) continue;\n    if (SIDE_LOG_ONLY_EVENT_TYPES.has(event.type)) continue;\n    const eventTsMs = new Date(event.ts).getTime();\n    // `>=`, not `>`: `ts` has only millisecond resolution, and the very\n    // first post-claim event can legitimately share the exact same\n    // millisecond as `acquiredAt` (a real, intermittently-reproducing flake\n    // this fix caught in its own test suite) -- still strictly excludes an\n    // event from BEFORE the claim (e.g. the item's own `work.add`), which\n    // never shares that millisecond in practice.\n    if (!Number.isFinite(eventTsMs) || !(eventTsMs >= acquiredAtMs)) continue;\n    if (event.payload?.writer?.id !== claim.writerId) return false;\n    sawSelfCausedEvent = true;\n  }\n  return sawSelfCausedEvent;\n}\n\n/**\n * Settle an active runtime claim on item `id`, transitioning it DIRECTLY\n * from its preClaimStatus to `finalStatus` (D2; docs/architect/\n * doing-coordination-redesign.md §7.3/§9.2) — no durable intermediate\n * work.move(->doing) leg. Validates active runtime claim ownership\n * (claimId, writerId) and durable revision (preClaimRevision) FRESH,\n * inside the same held state-lock critical section the\n * write itself runs in — the FSM-validating `transitionWork` call is\n * built and proven valid BEFORE anything is appended, so a bad\n * finalStatus/missing ask never leaves a partial write on disk. Writes\n * work.attempt (the complete durable record of the attempt: from/to/\n * branch/head/timing) and, unless finalStatus === preClaimStatus (nothing\n * to durably move), a single work.move(preClaimStatus->finalStatus) —\n * then releases the runtime claim in that SAME critical section,\n * immediately after the write succeeds — never on a failed settle (a\n * caught CAS/revision conflict leaves the claim untouched for its owner\n * to retry or reconcile, unless the drift is self-caused, per\n * `revisionDriftIsSelfCaused` above — reconciled instead of refused).\n */\nexport function settleClaim(dir, {\n  id,\n  claimId,\n  finalStatus,\n  reason,\n  ask,\n  answer,\n  role,\n  headAtReturn,\n  branchHeadAtReturn,\n  parentSnapshotAtAsk,\n  statusAtAsk,\n  claimTrigger,\n  releaseTrigger,\n  rationale,\n  alternatives,\n  source,\n  askSource,\n  mergedSha,\n  mergedInto,\n  phase = 'execute',\n  result,\n  patch,\n} = {}) {\n  if (!id || typeof id !== 'string') {\n    throw new StoreError('validation', 'settleClaim: \"id\" is required.');\n  }\n\n  const claim = readClaim(dir, id);\n\n  if (claim) {\n    // tsk-40m code-review finding (blocker): an active claim exists for\n    // `id` — the caller MUST name it. Silently settling \"whatever claim is\n    // active right now\" when the caller omits claimId let a stale actor\n    // (its own claim already released/reclaimed) settle a DIFFERENT actor's\n    // live claim (D2's ownership check has nothing to check against).\n    if (!claimId) {\n      throw new StoreError('validation', `settleClaim: \"claimId\" is required for \"${id}\" — an active claim exists (\"${claim.claimId}\") and the caller must name it.`);\n    }\n    if (claim.claimId !== claimId) {\n      throw new StoreError('conflict', `settleClaim: claimId mismatch for \"${id}\": active claim is \"${claim.claimId}\", got \"${claimId}\".`);\n    }\n    const targetClaimId = claim.claimId;\n    // tsk-40m code-review finding (blocker, confirmed needed by product\n    // decision): claimId alone is only as strong as the caller's own\n    // discipline about where it got that value from — a caller with no\n    // in-process capability token (bin/fgos.mjs's `return`, a fresh CLI\n    // invocation separate from the original take/pick) can only ever\n    // discover a claimId by reading \"whichever claim is active right now\",\n    // which trivially \"matches\" whatever it just read. `writerId` (the\n    // session/shell identity `acquireClaim` recorded at claim time) closes\n    // that gap independently of claimId: resolved FRESH here from THIS\n    // caller's own real process/session, and compared against the claim's\n    // recorded owner. A claim written before this field existed reads\n    // `writerId: undefined` and skips the check (never a false positive on\n    // old data). Taking over a genuinely different session's live claim\n    // goes through the sanctioned stale-claim-reclaim path (claim-port.mjs,\n    // gated on real liveness) — never a direct settle under a different\n    // identity, however it obtained the claimId.\n    const writer = resolveWriterIdentity(dir);\n    const currentWriterId = String(writer.id);\n    if (claim.writerId !== undefined && claim.writerId !== currentWriterId) {\n      throw new StoreError('conflict', `settleClaim: writer identity mismatch for \"${id}\" — claim acquired by writer \"${claim.writerId}\", settling as writer \"${currentWriterId}\".`);\n    }\n\n    // One state transaction covers the claim, the event log and the release;\n    // the identities it needs are resolved by withMainState before the lock.\n    const res = withStateAndRefresh(dir, (tx) => {\n      // tsk-40m code-review finding (blocker, TOCTOU race): every check\n      // above (claimId, writerId) ran against a snapshot read BEFORE\n      // acquiring the state lock. Waiting for that lock (held by any other\n      // writer) is unbounded — long enough for claim-port.mjs's own\n      // stale-claim-reclaim to release THIS claim and hand it to a\n      // different actor in the meantime. Re-reading it here, now holding\n      // the state lock, closes the window: no release/\n      // reacquire and no durable write can\n      // land between this read and our own append below.\n      const freshClaim = readClaim(dir, id);\n      if (!freshClaim || freshClaim.claimId !== targetClaimId) {\n        throw new StoreError(\n          'conflict',\n          `settleClaim: claim for \"${id}\" changed while waiting for the write lock — had \"${targetClaimId}\", now ${freshClaim ? `\"${freshClaim.claimId}\"` : 'none'}.`,\n        );\n      }\n      if (freshClaim.writerId !== undefined && freshClaim.writerId !== currentWriterId) {\n        throw new StoreError('conflict', `settleClaim: writer identity for \"${id}\" changed while waiting for the write lock.`);\n      }\n\n      const before = currentView(dir);\n      const work = before.work[id];\n      if (!work) {\n        throw new StoreError('validation', `settleClaim: work \"${id}\" not found.`);\n      }\n\n      const preClaimStatus = freshClaim.preClaimStatus || work.status;\n      if (freshClaim.preClaimStatus && work.status !== freshClaim.preClaimStatus) {\n        throw new StoreError('conflict', `settleClaim: item \"${id}\" status changed from preClaimStatus \"${freshClaim.preClaimStatus}\" to \"${work.status}\".`);\n      }\n\n      if (freshClaim.preClaimRevision) {\n        const curRev = getItemDurableRevision(before, id);\n        if (curRev !== freshClaim.preClaimRevision) {\n          if (!revisionDriftIsSelfCaused(dir, id, freshClaim)) {\n            throw new StoreError('conflict', `settleClaim: item \"${id}\" durable revision changed from \"${freshClaim.preClaimRevision}\" to \"${curRev}\".`);\n          }\n          process.stderr.write(`fgos: settleClaim reconciled a same-writer revision drift for \"${id}\" (writer \"${freshClaim.writerId}\") -- preClaimRevision \"${freshClaim.preClaimRevision}\" -> \"${curRev}\"\\n`);\n        }\n      }\n\n      // tsk-40m (docs/architect/doing-coordination-redesign.md §7.3/§9.2,\n      // design target confirmed 2026-08-25): settle DIRECTLY from\n      // preClaimStatus to finalStatus — no durable intermediate\n      // work.move(->doing) leg at all. transitionWork validates the real\n      // edge (throws on an invalid finalStatus, a missing `ask` for an\n      // awaiting-human edge, etc.) BEFORE anything is appended, so a bad\n      // finalStatus never leaves a partial write on disk. A same-state\n      // settle (finalStatus === preClaimStatus — e.g. a branch-take item\n      // failing verify again while already 'blocked') has nothing to\n      // durably move: transitionWork has no self-loop edges by design, and\n      // status-fsm.mjs's TRANSITIONS table stays that way on purpose — the\n      // work.attempt below is the complete durable record of that attempt,\n      // with no accompanying work.move.\n      const isSameState = finalStatus === preClaimStatus;\n      let move3Raw = null;\n      if (!isSameState) {\n        move3Raw = transitionWork({\n          work,\n          to: finalStatus,\n          expectedStatus: preClaimStatus,\n          reason,\n          ask,\n          answer,\n        });\n        move3Raw.payload.writer = writer;\n        if (role !== undefined) move3Raw.payload.role = role;\n        const cat3 = statusCategoryFor(getDomain(work.domain), finalStatus);\n        if (cat3 !== undefined) move3Raw.payload.statusCategory = cat3;\n        const pr3 = parkReasonForStatus(getDomain(work.domain), finalStatus);\n        if (pr3 !== undefined) move3Raw.payload.parkReason = pr3;\n        if (headAtReturn !== undefined) move3Raw.payload.headAtReturn = headAtReturn;\n        if (releaseTrigger !== undefined) move3Raw.payload.releaseTrigger = releaseTrigger;\n        if (branchHeadAtReturn !== undefined) move3Raw.payload.branchHeadAtReturn = branchHeadAtReturn;\n        if (mergedSha !== undefined) move3Raw.payload.mergedSha = mergedSha;\n        if (mergedInto !== undefined) move3Raw.payload.mergedInto = mergedInto;\n        if (reason !== undefined) move3Raw.payload.reason = reason;\n        if (parentSnapshotAtAsk !== undefined) move3Raw.payload.parentSnapshotAtAsk = parentSnapshotAtAsk;\n        if (askSource !== undefined) move3Raw.payload.askSource = askSource;\n        // Status-at-ask split (tsk-40m P1 fix, same two-field discipline as\n        // moveWork's own — see its comment): `statusAtAsk` is caller-\n        // supplied/informational only; `durableStatusAtAsk` is ALWAYS the\n        // trusted value here — `preClaimStatus` IS the item's real durable\n        // status at this exact moment (already validated above: `work.status\n        // !== freshClaim.preClaimStatus` would have thrown conflict first),\n        // never a caller input, so a claimed item settling into\n        // awaiting-human can never durably record anything but its own true\n        // pre-claim status as the safe resume target.\n        if (finalStatus === 'awaiting-human') {\n          if (statusAtAsk !== undefined) move3Raw.payload.statusAtAsk = statusAtAsk;\n          move3Raw.payload.durableStatusAtAsk = preClaimStatus;\n        }\n      }\n\n      const writerLogPath = resolveWriterLogPath(dir);\n\n      if (patch && typeof patch === 'object' && !Array.isArray(patch) && Object.keys(patch).length > 0) {\n        const editPayload = validateWorkPatch(before, dir, id, patch, role, writer);\n        tx.append(writerLogPath, { type: 'work.edit', payload: editPayload });\n      }\n\n      // work.attempt: the complete durable record of this attempt —\n      // enriched with from/to/branch/head/timing metadata (design doc\n      // §7.2) so \"what happened during this attempt\" never needs to be\n      // inferred from an adjacent work.move.\n      const attemptResult = result || (finalStatus === 'awaiting-approval' || finalStatus === 'delivered' || finalStatus === 'done' ? 'success' : 'failed');\n      const attemptPayload = {\n        id,\n        phase,\n        result: attemptResult,\n        from: preClaimStatus,\n        to: finalStatus,\n        claimId: targetClaimId,\n        actor: freshClaim.actor || role || 'unknown',\n        endedAt: new Date().toISOString(),\n      };\n      if (freshClaim.acquiredAt != null) attemptPayload.startedAt = freshClaim.acquiredAt;\n      if (freshClaim.branch != null) attemptPayload.branch = freshClaim.branch;\n      if (freshClaim.headAtTake != null) attemptPayload.headAtTake = freshClaim.headAtTake;\n      if (freshClaim.branchHeadAtTake != null) attemptPayload.branchHeadAtTake = freshClaim.branchHeadAtTake;\n      if (branchHeadAtReturn !== undefined) attemptPayload.branchHeadAtReturn = branchHeadAtReturn;\n      if (headAtReturn !== undefined) attemptPayload.headAtReturn = headAtReturn;\n      if (reason !== undefined) attemptPayload.reason = reason;\n      // Stamped here too, not just on move3Raw: a same-state settle (e.g.\n      // claim-lock §3b releasing a claim whose preClaimStatus was already\n      // 'todo' — 'doing' never having been durable — back to 'todo') writes\n      // NO work.move at all, and this marker must still survive somewhere\n      // durable for claim-port.mjs's reclaim check to read (tsk-40m).\n      if (releaseTrigger !== undefined) attemptPayload.releaseTrigger = releaseTrigger;\n      const attemptEvent = tx.append(writerLogPath, { type: 'work.attempt', payload: attemptPayload });\n\n      // tsk-40m code-review finding (blocker, fixed): return the raw event\n      // directly — matching moveWork's own `return tx.append(...)`\n      // pattern immediately above in this file — so\n      // withStateAndRefresh's own `{ event, view }` wrapper (below,\n      // after this whole closure returns) produces `res.event` as a real\n      // final event (with its own `.seq`), never nested one level too\n      // deep. When a durable move actually happened, that move IS the\n      // \"final\" event bin/fgos.mjs's `return` command reads `.seq` off\n      // for its own CLI output; a same-state settle has no move, so the\n      // work.attempt (still a real, seq-bearing event) is the final event\n      // instead.\n      const writeResult = move3Raw ? tx.append(writerLogPath, move3Raw) : attemptEvent;\n\n      // Release the claim right after the durable write succeeds, in the same\n      // transaction — never on a failed settle (a conflict thrown above leaves\n      // a still-legitimately-held claim alone), and never after the\n      // best-effort recordCall* side effects below.\n      releaseClaimTx(tx, { id, claimId: targetClaimId });\n\n      return writeResult;\n    });\n\n    if (finalStatus === 'delivered') {\n      try {\n        const closeResult = recordCallReturn(dir, { id, note: 'auto-closed at delivered (tsk-2t9c D16)' });\n        if (closeResult) res.view = closeResult.view;\n      } catch {\n        // Best-effort\n      }\n    }\n\n    if (finalStatus === 'awaiting-approval') {\n      try {\n        const domain = getDomain(res.view.work[id]?.domain);\n        if (roleGraphFor(domain)) {\n          recordCall(dir, { id, toRole: 'reviewer', reason: 'review', note: 'auto-fired on reaching awaiting-approval (tsk-2t9c D18)' });\n        }\n      } catch {\n        // Best-effort\n      }\n    }\n\n    return res;\n  }\n\n  // Fallback for legacy items (durable status was 'doing' before migration, with no active runtime claim record)\n  return moveWork(dir, {\n    id,\n    to: finalStatus,\n    expectedStatus: 'doing',\n    reason,\n    ask,\n    answer,\n    role,\n    headAtReturn,\n    branchHeadAtReturn,\n    parentSnapshotAtAsk,\n    statusAtAsk,\n    claimTrigger,\n    releaseTrigger,\n    rationale,\n    alternatives,\n    source,\n    askSource,\n    mergedSha,\n    mergedInto,\n  });\n}\n\n/**\n * Park a work item into `awaiting-human`, carrying the question it is\n * waiting on (per D2/D5).\n *\n * The question's options and reasoning are part of `ask` itself (the\n * decision-question template); only its `source` is stored apart, as\n * `askSource`, so a later `answer` never overwrites it.\n *\n * tsk-40m P1 fix (docs/architect/doing-coordination-redesign.md): `ask`ing\n * an item under an ACTIVE runtime claim must not leave that claim orphaned\n * — a plain `moveWork` durably moves the item away from the claim's own\n * `preClaimStatus` (to `awaiting-human`) without ever touching the claim\n * file, which buildEffectiveView then reads as stale (a real bug on its\n * own: the item silently drops out of every claim-aware view — worker-slot\n * occupancy, stale-doing advisory — while the orphaned claim file lingers\n * forever with nothing to release it). So this delegates to `settleClaim`\n * whenever a claim is active: it validates ownership/CAS fresh, settles\n * the claim DIRECTLY from its preClaimStatus to `awaiting-human` (the same\n * one-move discipline every other settle path uses, `result: 'paused'`\n * marking this as a park rather than a completion), and releases the claim\n * in the same critical section — never a silent leak. `statusAtAsk` here\n * is purely informational (whatever the caller's own, typically EFFECTIVE,\n * view reports) — moveWork/settleClaim compute the resume-trusted\n * `durableStatusAtAsk` themselves, from a fresh durable read, regardless of\n * what (if anything) the caller passes.\n */\nexport function putInAwaiting(dir, { id, ask, expectedStatus, parentSnapshotAtAsk, statusAtAsk, source } = {}) {\n  const claim = readClaim(dir, id);\n  if (claim) {\n    return settleClaim(dir, {\n      id,\n      claimId: claim.claimId,\n      finalStatus: 'awaiting-human',\n      ask,\n      parentSnapshotAtAsk,\n      statusAtAsk,\n      askSource: source,\n      result: 'paused',\n    });\n  }\n  return moveWork(dir, {\n    id,\n    to: 'awaiting-human',\n    expectedStatus,\n    ask,\n    parentSnapshotAtAsk,\n    statusAtAsk,\n    askSource: source,\n  });\n}\n\n/**\n * Resume a work item out of `awaiting-human`, carrying the answer it was\n * waiting on (per D2/D5). Thin wrapper over `moveWork` — same\n * append-then-refresh tail, same CAS/validation errors — status-fsm.mjs requires a\n * non-empty `answer` on this edge.\n *\n * Resume target (claim-lock §5.1, tsk-40m P1 fix + hard-cut): reads the\n * gate's own `durableStatusAtAsk` (the item's trusted DURABLE status at\n * ask-time, stamped by moveWork/settleClaim themselves — never a caller-\n * supplied value) and resumes there. For an item claimed at ask-time, the\n * durable status was still `todo`, so this resumes to `todo`. `putInAwaiting`\n * already settled and released any active claim at park time (see below) —\n * there is no claim left here to \"un-stale\". Resuming just restores durable\n * status to what it was before the claim existed, so a later `fgos take`\n * can acquire a brand-new claim on it, with no durable write of `doing`\n * anywhere in this path.\n *\n * `awaiting-human -> doing` is retired from status-fsm.mjs's TRANSITIONS\n * table entirely (hard-cut, per the redesign) — a `durableStatusAtAsk` of\n * `doing` can therefore only ever be a truthful historical record of a\n * genuinely legacy pre-migration item's durable status, never a valid\n * resume target anymore, so it clamps to `todo` here instead of attempting\n * an edge that no longer exists. Data predating the `durableStatusAtAsk`\n * split falls back to the OLD `statusAtAsk` field (which used to double as\n * the resume target directly) under the SAME clamp — a legacy `'doing'`\n * there is exactly the value this hard-cut retires. `todo` is also the\n * final default for pre-existing logs/gates with neither field,\n * preserving the historical hardcoded-`todo` behavior byte for byte.\n */\nexport function answerAwaiting(dir, { id, answer, expectedStatus, role, rationale, alternatives, source, approved } = {}) {\n  const view = listWork(dir);\n  const gate = view.gates?.[id];\n  const recorded = gate?.durableStatusAtAsk ?? gate?.statusAtAsk;\n  const to = recorded === 'doing' ? 'todo' : (recorded ?? 'todo');\n  return moveWork(dir, { id, to, expectedStatus, answer, role, rationale, alternatives, source, approved });\n}\n\n/**\n * Move a work item to a new Workflow step. Mirrors `moveWork` exactly, one\n * dimension up: looks the item up fresh from the log, delegates the\n * precondition/CAS decision to step-fsm.mjs (pure — never writes), and only\n * then appends the event it returns.\n *\n * Same held-lock critical section as moveWork above — the lookup, the\n * `expectedStep` CAS decision, and the append all run inside one\n * `withStateTx` scope.\n */\nexport function moveStep(dir, { id, to, expectedStep, verify, role } = {}) {\n  let shouldResolveClarify = false;\n  const result = withStateAndRefresh(dir, (tx) => {\n    const before = currentView(dir);\n    const work = before.work[id];\n    if (!work) {\n      throw new StoreError('validation', `work \"${id}\" not found.`);\n    }\n\n    const drivingVerdict = before.discovery?.[id]?.at(-1);\n    const discoverEntry = stepForPhase(getDomain(work.domain, { onUnrecognized: () => {} }), 'discover', work.kind);\n    if (discoverEntry !== undefined && effectiveStep(work, getDomain(work.domain, { onUnrecognized: () => {} })) === discoverEntry && drivingVerdict?.clear !== false) {\n      shouldResolveClarify = true;\n    }\n\n    const rawEvent = transitionStep({ work, to, expectedStep, verify }); // FsmError: precondition | conflict\n    // Same post-transition role stamp as moveWork above — step-fsm.mjs is pure\n    // and only ever returns the fields it knows about.\n    if (role !== undefined) {\n      rawEvent.payload.role = role;\n    }\n    // Writer provenance (D8/D15/D17/D18, str46-io-contract) -- same\n    // post-transition stamp as role above, but unconditional: every\n    // moveStep call records who wrote it, never blocking on a malformed\n    // identity (D18).\n    rawEvent.payload.writer = resolveWriterIdentity(dir);\n    return tx.append(resolveWriterLogPath(dir), rawEvent);\n  });\n\n  if (shouldResolveClarify) {\n    try {\n      resolveFriction(dir, { id, reason: 'clarify-pass', by: 'work' });\n    } catch {}\n  }\n\n  return result;\n}\n\n/**\n * Rebuild the stack of currently-open async calls on `id`'s own\n * call-thread, purely from the log (tsk-2t9c D8/R7 — never a stored\n * counter, which can drift; a fold cannot). A plain `handoff` (`returning`\n * falsy) PUSHES itself as newly open; a `handoff` written by\n * `recordCallReturn` (`returning: true`) POPS the most recently opened\n * one — a genuine LIFO stack, not a flag compared against the current\n * holder, which cannot tell an open call from the very return event that\n * just closed it (both can carry the same `to`). `call-summary` entries\n * never touch the stack — sync calls do not nest against the async\n * callstack cap (handoff.mjs's own contract).\n */\nfunction openCallStack(callThreadEntries) {\n  if (!Array.isArray(callThreadEntries)) return [];\n  const stack = [];\n  for (const entry of callThreadEntries) {\n    if (entry.kind !== 'handoff') continue;\n    if (entry.returning) {\n      stack.pop();\n    } else {\n      stack.push(entry);\n    }\n  }\n  return stack;\n}\n\n/**\n * The single door for a role/holder call (tsk-2t9c D1/D4/D5/D8/D9): guards\n * the proposed call through handoff.mjs's pure `evaluateHandoff`, then\n * appends exactly the event kind the matched edge's own `mode` calls for —\n * never a caller choice. `mode: 'async'` writes `work.handoff` (holder\n * changes, full checkpoint); `mode: 'sync'` writes `work.call-summary`\n * (holder untouched, compact record) — same fresh-lookup -> guard ->\n * append shape every other mutation in this file already uses, one held\n * lock, one critical section.\n *\n * A REFUSED call throws `StoreError('validation', ...)` carrying the\n * refusal reason AND the legal edges as JSON — \"chặn và dạy tại chỗ\"\n * (D1): the caller can read the legal edges straight out of the error\n * message without a second round trip.\n *\n * `openSyncDepth` (D28, wired review finding H2/tsk-397): unlike\n * `openCallDepth`, this is NEVER derived from `callThreads` here — a\n * `work.call-summary` event commits atomically at the exact instant this\n * function's own door opens (see the `tx.append` call below), so\n * by the time a genuinely NESTED sync call (the callee's own work needing\n * a further sync consult before it finishes) would call `recordCall`\n * again, the outer call's event is already fully committed to the log —\n * indistinguishable, from replay alone, from two purely sequential sync\n * calls. Only the CALLER (a skill already inside its own sync-consult\n * work, about to make a further nested one) knows its real current\n * depth; it must track and pass that depth itself. Every existing\n * caller passes none, defaulting to `0` — identical behavior to before\n * this parameter existed — this only makes the cap genuinely reachable\n * for a future caller that does track its own nesting, instead of being\n * permanently unreachable dead code.\n */\nexport function recordCall(dir, { id, toRole, reason, note, outcome, openSyncDepth = 0 } = {}) {\n  return withStateAndRefresh(dir, (tx) => {\n    const before = currentView(dir);\n    const work = before.work[id];\n    if (!work) {\n      throw new StoreError('validation', `work \"${id}\" not found.`);\n    }\n    const domain = getDomain(work.domain);\n    const roleGraph = roleGraphFor(domain);\n    const fromRole = work.holder ?? roleGraph?.defaultRole;\n    // effectiveStep, not raw work.workflowStep: a work item's step is\n    // legitimately absent under the lazy-default rule (domain-registry.mjs's own\n    // effectiveStep/step-fsm.mjs precedent) -- reading work.workflowStep\n    // directly here made every handoff attempt on an item that never had\n    // an explicit moveStep refuse, including split children born straight at\n    // their execute step without ever calling moveStep (src/intake/plan.mjs's\n    // normalizeChild path).\n    const step = effectiveStep(work, domain);\n    const openCallDepth = openCallStack(before.callThreads?.[id]).length;\n\n    const result = evaluateHandoff({ domain, step, fromRole, toRole, reason, openCallDepth, openSyncDepth });\n    if (!result.ok) {\n      throw new StoreError(\n        'validation',\n        `handoff refused: ${result.refusal} -- legal edges: ${JSON.stringify(result.legalEdges)}`,\n      );\n    }\n\n    const rawEvent = result.edge.mode === 'async'\n      ? { type: 'work.handoff', payload: { id, from: fromRole, to: toRole, reason, mode: 'async', note } }\n      : { type: 'work.call-summary', payload: { id, calleeRole: toRole, reason, outcome } };\n    rawEvent.payload.writer = resolveWriterIdentity(dir);\n    return tx.append(resolveWriterLogPath(dir), rawEvent);\n  });\n}\n\n/**\n * Close the most recently opened async call on `id`'s own call-thread,\n * returning the ball to whoever opened it (tsk-2t9c D4: \"call = round-trip,\n * ball returns to sender\" -- a return is completing a call the guard\n * ALREADY approved when it was opened, never a fresh outbound call, so it\n * deliberately does NOT run back through `evaluateHandoff`/`roleGraph`\n * edge-legality. Requiring a matching reverse edge for every return would\n * double the roleGraph's own size for no real legality question -- the\n * open call already answered \"was this allowed\".\n *\n * Refuses only when there is genuinely no open call to close (nothing in\n * `callThreads[id]` is a `handoff` the item's current `holder` could be\n * returning from) -- same StoreError('validation', ...) shape as every\n * other refusal in this file.\n */\nexport function recordCallReturn(dir, { id, note } = {}) {\n  return withStateAndRefresh(dir, (tx) => {\n    const before = currentView(dir);\n    const work = before.work[id];\n    if (!work) {\n      throw new StoreError('validation', `work \"${id}\" not found.`);\n    }\n    const stack = openCallStack(before.callThreads?.[id]);\n    const openCall = stack.at(-1);\n    if (!openCall || openCall.to !== work.holder) {\n      throw new StoreError('validation', `work \"${id}\" has no open call for its current holder to return from.`);\n    }\n    const rawEvent = {\n      type: 'work.handoff',\n      payload: { id, from: work.holder, to: openCall.from, reason: openCall.reason, mode: 'async', returning: true, note },\n    };\n    rawEvent.payload.writer = resolveWriterIdentity(dir);\n    return tx.append(resolveWriterLogPath(dir), rawEvent);\n  });\n}\n\n/**\n * Log a context-discovery verdict event (per stage-clarify D3/D6): no FSM/work\n * validation beyond requiring the `id` the fold appends by; each verdict is its\n * own occurrence (pass or not) — the fold APPENDS per id, a later record never\n * the fold APPENDS per id, a later record never erases an earlier one. Same\n * single write door + append-then-refresh tail as every mutation here.\n */\nexport function addDiscovery(dir, payload) {\n  if (!payload || typeof payload.id !== 'string' || !payload.id.trim()) {\n    throw new StoreError('validation', 'discovery requires a non-empty \"id\".');\n  }\n  return withStateAndRefresh(dir, (tx) => tx.append(resolveWriterLogPath(dir), { type: 'work.discovery', payload }));\n}\n\n// Gate approve record shape (tsk-19j D1/D11): the 3 skill-embedded Gates\n// this schema covers — one per stage in the clarify->decompose sequence —\n// and the only 2 actors a real approve record can name (a person, or the\n// gate-bypass mechanism auto-approving on the person's behalf).\nconst GATE_APPROVE_GATES = new Set(['contextApprove', 'planApprove', 'validateApprove']);\nconst GATE_APPROVE_ACTORS = new Set(['human', 'bypass']);\n\n/**\n * Log a structured gate-approve event (tsk-19j D1/D11) — an explicit,\n * durable record that a skill-embedded Gate was approved, separate from the\n * `awaiting-human` ask/answer mechanism (putInAwaiting/answerAwaiting\n * above). No FSM/work validation beyond requiring `id`; each call is its own\n * occurrence, folded by `gate` into `gates[id]` in replay.mjs (a later\n * approve on the SAME gate overwrites that gate's own field, never the other\n * two). Mirrors `addDiscovery`'s shape exactly: single write door,\n * append-then-refresh tail, no CAS — an approve record never itself moves\n * the item.\n */\nexport function recordGateApprove(dir, { id, gate, actor, verify } = {}) {\n  if (typeof id !== 'string' || !id.trim()) {\n    throw new StoreError('validation', 'gate-approve requires a non-empty \"id\".');\n  }\n  if (typeof gate !== 'string' || !GATE_APPROVE_GATES.has(gate)) {\n    throw new StoreError('validation', `gate-approve requires \"gate\" to be one of: ${[...GATE_APPROVE_GATES].join(', ')}.`);\n  }\n  if (typeof actor !== 'string' || !GATE_APPROVE_ACTORS.has(actor)) {\n    throw new StoreError('validation', `gate-approve requires \"actor\" to be one of: ${[...GATE_APPROVE_ACTORS].join(', ')}.`);\n  }\n  if (typeof verify !== 'string' || !verify.trim()) {\n    throw new StoreError('validation', 'gate-approve requires a non-empty \"verify\".');\n  }\n  return withStateAndRefresh(dir, (tx) =>\n    tx.append(resolveWriterLogPath(dir), { type: 'work.gate-approve', payload: { id, gate, actor, verify } }));\n}\n\n/**\n * Log a decision event (no FSM/work validation — decisions are freeform).\n *\n * Schema per tsk-63c D1-D3 (decision-schema-rationale-alternatives-source,\n * ported from bee's live `.bee/decisions.jsonl` shape): `rationale` is\n * required (mirrors bee's own throw-if-blank rule); `alternatives` is\n * optional free text; `source` is optional free text (no enum, per D3),\n * defaulting to `'session'` when omitted since fgOS calls are\n * agent-initiated unless a human types the CLI directly; `id` is optional\n * (seq 1206, renumbered by tsk-n4i-1; was 1190) and, when present,\n * additionally folds this decision into a\n * per-item view alongside the existing global log (replay.mjs).\n *\n * `kind` (tsk-1ud D7 step 1): `'engine' | 'design'`, optional free text (no\n * enum, same posture as `source`), defaulting to `'design'` when omitted —\n * lets a consumer separate the engine's own bookkeeping records\n * (`resolveDiscovery`/`resolvePlan`, which pass `kind: 'engine'`\n * explicitly) from real design decisions without matching on `text`\n * prefixes.\n *\n * `scope` (tsk-1lv-2 D4): optional free text (no enum, same posture as\n * `source`/`kind`) — an area slug (e.g. `'repo'`, or one matching\n * `docs/specs/<area>.md`) marking a PLATFORM/repo-wide decision, as\n * opposed to `id`'s per-item scoping. Absent entirely for an item-scoped\n * or unscoped decision; `src/report/decision-index.mjs`'s\n * `buildDecisionIndexMarkdown` is the one reader that filters on its\n * presence to build `docs/decisions/index.md`. This function never\n * validates or defaults it — same \"CLI validates, store persists\"\n * split `relation` already established (see the CLI-layer comment above\n * `parseDecisionRelation` below).\n */\nexport function addDecision(dir, payload) {\n  if (!payload || typeof payload.text !== 'string' || !payload.text.trim()) {\n    throw new StoreError('validation', 'decision requires a non-empty \"text\".');\n  }\n  if (typeof payload.rationale !== 'string' || !payload.rationale.trim()) {\n    throw new StoreError('validation', 'decision requires a non-empty \"rationale\".');\n  }\n  const eventPayload = { ...payload, source: payload.source ?? 'session', kind: payload.kind ?? 'design' };\n  return withStateAndRefresh(dir, (tx) => {\n    // tsk-37t: unlike every neighbouring id-taking verb (editWork/moveWork\n    // both throw `work \"<id>\" not found` first), this used to accept any\n    // id at all — a decision scoped to a nonexistent item wrote a success\n    // envelope and a durable event that `fgos show <id>` could never\n    // retrieve (it refuses an unknown id), silently losing the record.\n    // `id` stays optional here (a global decision not scoped to one item is\n    // legitimate, e.g. `fgos decision` with no --id) — only validated when\n    // present.\n    if (payload.id !== undefined && payload.id !== null) {\n      const before = currentView(dir);\n      if (!before.work[payload.id]) {\n        throw new StoreError('validation', `work \"${payload.id}\" not found.`);\n      }\n    }\n    return tx.append(resolveWriterLogPath(dir), { type: 'decision', payload: eventPayload });\n  });\n}\n\n// tsk-1lv-1 (D2/D8): `--relation` is a CLI-surface requirement, not an\n// `addDecision` one — enforcing it inside `addDecision` itself would also\n// require every internal engine bookkeeping call (`resolveDiscovery`/\n// `resolvePlan`, `kind: 'engine'`) and every existing test fixture calling\n// `addDecision` directly to start passing it, which CONTEXT.md D4 pins as\n// explicitly unchanged (\"bookkeeping máy → kind:engine, đã có, không\n// đổi\"). `bin/fgos.mjs`'s `decision` case is the one CLI surface D1/D2\n// actually target (\"mọi write khai quan hệ tường minh\" is about the\n// human/skill-facing verb, not every programmatic writer of this event\n// type) — it calls `parseDecisionRelation`/`decisionTextLooksLikeSupersession`\n// below before calling `addDecision`, and `addDecision` itself stores\n// whatever `relation` string it is handed (or none) as a plain optional\n// payload field, same posture as `source`/`alternatives` above.\n\nconst SUPERSESSION_PROSE_PATTERN = /\\b(supersedes?|superseded|replaces?|overrides?|no longer applies|instead of the previous)\\b/i;\n\n/**\n * Pure: does `text` read like a supersession statement (STR72's own root\n * cause — bee v2.7.0 audited 70 decide events that narrated a supersession\n * in prose without declaring the relation flag, vs only 29 that declared it\n * correctly)? Used to refuse a `fgos decision` write that narrates a\n * supersession without `--relation supersedes:<id>`.\n */\nexport function decisionTextLooksLikeSupersession(text) {\n  return typeof text === 'string' && SUPERSESSION_PROSE_PATTERN.test(text);\n}\n\n/**\n * Pure: parse `fgos decision`'s `--relation` value into a structured\n * relation (D2: \"supersedes:<id>|touches:<id>|none\", every write declares\n * one explicitly — no default, no inference). Throws `StoreError('validation', …)`\n * on anything else, the same error shape every other CLI-facing parse in\n * this module uses.\n */\nexport function parseDecisionRelation(raw) {\n  if (typeof raw !== 'string' || !raw.trim()) {\n    throw new StoreError(\n      'validation',\n      'decision requires --relation none|supersedes:<id>|touches:<id>.',\n    );\n  }\n  const trimmed = raw.trim();\n  if (trimmed === 'none') return { kind: 'none' };\n  const supersedesMatch = /^supersedes:(.+)$/.exec(trimmed);\n  if (supersedesMatch && supersedesMatch[1].trim()) {\n    return { kind: 'supersedes', id: supersedesMatch[1].trim() };\n  }\n  const touchesMatch = /^touches:(.+)$/.exec(trimmed);\n  if (touchesMatch && touchesMatch[1].trim()) {\n    return { kind: 'touches', id: touchesMatch[1].trim() };\n  }\n  throw new StoreError(\n    'validation',\n    `decision --relation \"${raw}\" is not one of none|supersedes:<id>|touches:<id>.`,\n  );\n}\n\n// Diataxis doc-type axis (per CONTEXT D5/D6): an OPTIONAL, additive tag on\n// the compound-learn capture payload, orthogonal to the engineer type-axis\n// (pattern/decision/failure). Exactly the four Diataxis quadrants — no\n// audience/type beyond these four is valid when the field is present at\n// all; absent/null stays untagged (never required). Defined once here and\n// shared by `addOutcome` below.\nconst DIATAXIS_DOC_TYPES = new Set(['tutorial', 'how-to', 'reference', 'explanation']);\n\n// Shared optional-shape check for `payload.docType` (mirrors the `docsRef`\n// idiom in work.mjs: validated only when present, `null` treated as\n// absent/untagged, per D6). Throws the same `StoreError('validation', …)`\n// shape every other capture-door check in this file uses. Exported (slice-3\n// P1 fix) so a caller — `bin/fgos.mjs`'s `compound --doc-type` — can\n// pre-validate a quadrant BEFORE any write, reusing this single\n// `DIATAXIS_DOC_TYPES` set rather than duplicating the enum at the CLI\n// layer. `addOutcome` below still calls it too, so validation\n// stays identical whichever door the payload comes through.\nexport function assertValidDocType(payload) {\n  if (payload.docType === undefined || payload.docType === null) {\n    return;\n  }\n  if (typeof payload.docType !== 'string' || !DIATAXIS_DOC_TYPES.has(payload.docType)) {\n    throw new StoreError(\n      'validation',\n      `docType, when present, must be one of: ${[...DIATAXIS_DOC_TYPES].join(', ')}.`,\n    );\n  }\n}\n\n/**\n * Log a work-outcome event (predicted at claim, actual at close — per plan\n * Approach S1). No FSM/work validation beyond requiring the `id` the fold\n * merges on; unlike `addDecision`, payload shape (predicted-only vs\n * actual-only) is the caller's (runner's) concern, not this facade's — this\n * is still the single write door (D3), same append-then-refresh tail as\n * every other mutation here. `payload.docType` is an OPTIONAL Diataxis tag\n * (D5/D6): shape-checked only when present via `assertValidDocType` above;\n * the payload is still appended RAW (no destructure/allowlist) so it rides\n * replay's existing spread-fold with zero mechanism change.\n */\nexport function addOutcome(dir, payload) {\n  if (!payload || typeof payload.id !== 'string' || !payload.id.trim()) {\n    throw new StoreError('validation', 'outcome requires a non-empty \"id\".');\n  }\n  assertValidDocType(payload);\n  return withStateAndRefresh(dir, (tx) => tx.append(resolveWriterLogPath(dir), { type: 'work.outcome', payload }));\n}\n\n/**\n * Append a standalone durable `work.attempt` record for a claim that ends\n * WITHOUT a status transition — a stale runtime claim reclaimed by a new\n * claimant (claim-port.mjs's stale-claim-reclaim path). `settleClaim`\n * already folds a `work.attempt` into its own full segment when a claim\n * settles through a real status transition; this is the sibling for the\n * other way a claim ends (tsk-40m code-review finding, high, D4/D8) — kept\n * separate from `settleClaim` since a reclaim never transitions the item's\n * own status.\n *\n * `attemptCount`/`lastAttempt` (replay.mjs) rely on `work.attempt`\n * existing at all to tell \"started then reclaimed\" apart from \"never\n * started\" — without this, releasing/reclaiming a runtime claim (which\n * only ever deletes the `.fgos/runtime/claims/<id>.json` file, never a\n * durable event) left no trace an attempt ever happened.\n */\nexport function recordClaimAttempt(dir, { id, phase, result, claimId, actor, endedAt } = {}) {\n  if (!id || typeof id !== 'string') {\n    throw new StoreError('validation', 'recordClaimAttempt: \"id\" is required.');\n  }\n  if (!phase || typeof phase !== 'string') {\n    throw new StoreError('validation', 'recordClaimAttempt: \"phase\" is required.');\n  }\n  const payload = { id, phase, result, claimId, actor: actor || 'unknown', endedAt: endedAt || new Date().toISOString() };\n  return withStateAndRefresh(dir, (tx) => tx.append(resolveWriterLogPath(dir), { type: 'work.attempt', payload }));\n}\n\nexport function currentEffectiveView(dir) {\n  const durableView = currentView(dir);\n  const claims = readClaims(dir);\n  return buildEffectiveView(durableView, claims);\n}\n\n/** Read-only: the current effective view (durable view + active runtime claims). */\nexport function listWork(dir) {\n  return currentEffectiveView(dir);\n}\n\n/**\n * Read-only (per D1 request-class: a read never writes): the work items\n * ready to start right now — `todo` with every dep `done` (per D5, R5 —\n * frontier is always derived, never a stored list). Same read shape as\n * `listWork` above: rebuild the view fresh from the log, then derive.\n * A missing log rebuilds to an empty view (`{ work: {}, decisions: [] }`),\n * so `frontier` on it returns `[]` — never an error, exit 0, exactly like\n * `listWork` on an uninitialized dir. A corrupt log throws the same\n * `EventLogError('corrupt-log')` `rebuildView`/`listWork` already throw.\n * `phase` (optional): which Workflow phase counts as \"ready to start\" — passed\n * straight through to `frontier`'s own `phase` option (`'clarify'`/`'plan'`/\n * `'execute'`); omitted, `frontier`'s own default (`'execute'`) applies.\n */\nexport function readyWork(dir, { phase } = {}) {\n  return frontier(currentEffectiveView(dir), phase ? { phase } : undefined);\n}\n\n/**\n * Read-only stage-independent readiness check (choke-point-take-vs-pick-\n * claim-eligibility): true when `id` has every dep done and no open\n * decomposed child, regardless of its `workflowStep` — see frontier.mjs's\n * `isDepsAndLineageReady` for the full rationale. `take`'s explicit `--id`\n * branch uses this instead of `readyWork` so it can claim a clarify/decompose\n * item without losing the deps/lineage guard.\n */\nexport function isDepsAndLineageReady(dir, id) {\n  return depsAndLineageReadyView(currentEffectiveView(dir), id);\n}\n\n/**\n * Read-only (work-graph-intelligence S5): the mechanical graph-metrics surface\n * the `fgos graph` verb emits. Same read contract as `readyWork`/`listWork` —\n * rebuild the view fresh from the log, then hand it to the Domain compute core\n * (`graph-metrics.mjs`). Entry (`bin/fgos.mjs`) reads through this facade and\n * never imports the Domain graph module directly, exactly as the `ready` verb\n * reaches `frontier` only through `readyWork`.\n */\nexport function graphMetrics(dir) {\n  return computeGraphMetrics(currentEffectiveView(dir));\n}\n\n/**\n * Read-only (work-graph-intelligence S7): the what-if answer for a single item\n * — \"if I complete `id`, what does it unblock?\". Same read contract/facade\n * shape as graphMetrics; the Domain compute core decides the answer.\n */\nexport function graphWhatIf(dir, id) {\n  // tsk-40m code-review finding (high, D4): effective view, not durable-only\n  // -- an actively-claimed dependent (durable status still 'todo' post-\n  // migration) must not read as newly-ready idle work.\n  return computeWhatIf(currentEffectiveView(dir), id);\n}\n\n/**\n * Read-only (str67-goal-directed-planning D3): the goal-focus facade the\n * new `fgos goal show` verb reads. Same read contract/facade shape as\n * graphMetrics/graphWhatIf — Entry never imports graph-metrics.mjs directly,\n * it always reads through this door. Does NOT validate that `view.focus`\n * still names a real goal item (D7: a focus is never auto-cleared) — it just\n * reads whatever is persisted and computes over it; the goal-scoped metrics\n * functions already degrade gracefully (empty scope) on an unknown/stale id.\n */\nexport function goalFocusShow(dir) {\n  // tsk-40m code-review finding (non-blocking, round 3): effective view,\n  // not durable-only -- consistent with graphWhatIf/staleDoingAdvisory/\n  // footprintConflicts/computedSchedule above (D4). An actively-claimed\n  // item feeding criticalPath/topUnblock must read as 'doing', not a\n  // durable-only 'todo' left over from claim-time no longer writing it.\n  const view = currentEffectiveView(dir);\n  if (view.focus === undefined) {\n    return { focus: null };\n  }\n  return {\n    focus: view.focus,\n    criticalPath: goalScopedCriticalPath(view, view.focus),\n    topUnblock: goalScopedGreedyTopUnblock(view, view.focus),\n  };\n}\n\n/**\n * Read-only (work-graph-intelligence S8): the stale-doing advisory. Extracts\n * each `doing` item's latest claim timestamp from the raw log (the ts of its\n * most recent `work.move` to `doing`) and its `claimRole` from the view, then\n * hands them to the pure classifier. Advisory only — it reads, classifies, and\n * suggests; it never moves or reclaims anything.\n */\nexport function staleDoingAdvisory(dir, opts = {}) {\n  // tsk-40m code-review finding (high, D4): claim-time no longer writes a\n  // durable work.move(->doing) event for an active runtime claim (only\n  // settle-time does, retroactively) -- an item still under an active claim\n  // has NO such event yet, so the raw-event-derived `claimedAt` this used to\n  // rely on is blind to every post-migration claim (this advisory would\n  // always report zero of them, no matter how stale). An active claim's own\n  // `acquiredAt` is the real \"claimed at\" timestamp; the raw-event scan\n  // stays as the fallback for a legacy pre-migration item (durable status\n  // still 'doing', no active runtime claim record at all).\n  const claims = readClaims(dir);\n  const view = buildEffectiveView(currentView(dir), claims);\n  const claimedAt = new Map();\n  for (const event of readAllEvents(dir)) {\n    if (event.type === 'work.move' && event.payload?.to === 'doing' && typeof event.payload?.id === 'string') {\n      const ts = Date.parse(event.ts);\n      if (!Number.isNaN(ts)) claimedAt.set(event.payload.id, ts); // in-order iteration -> latest claim wins\n    }\n  }\n  const entries = [];\n  for (const id of Object.keys(view.work)) {\n    if (view.work[id].status !== 'doing') continue;\n    const claim = claims[id];\n    const claimTs = claim ? Date.parse(claim.acquiredAt) : claimedAt.get(id);\n    entries.push({\n      id,\n      claimRole: claim ? (claim.claimRole || claim.actor) : view.work[id].claimRole,\n      claimedAt: Number.isNaN(claimTs) ? undefined : claimTs,\n    });\n  }\n  return classifyStaleDoing(entries, opts);\n}\n\n/**\n * Read-only (work-graph-intelligence S10, tsk-1bl CONTEXT.md D4/D7): the\n * post-delivery staleness advisory — closes the observability gap\n * `staleDoingAdvisory` above leaves for `delivered`/`retrospective`/\n * `cleanup`. Rebuilds the view and raw event log the same way\n * `staleDoingAdvisory` does, then hands both straight to the pure\n * classifier (which reads its own entry-into-status events directly, no\n * intermediate `entries` extraction needed here since `classifyStalePost\n * Delivery` takes `rawEvents` itself). `opts.ttlDays` must be supplied by\n * the caller — same requirement `checkCleanupTTLElapsed`/\n * `pickNextCleanupItem` already have, since the real TTL is a per-repo\n * shared-config value this read-only facade never guesses.\n */\nexport function stalePostDeliveryAdvisory(dir, opts = {}) {\n  const view = currentView(dir);\n  const rawEvents = readAllEvents(dir);\n  return classifyStalePostDelivery(view, rawEvents, opts);\n}\n\n/**\n * Read-only (work-graph-intelligence S9): the footprint-intersection advisory —\n * pairs of ready items whose declared file footprints overlap, so a parallel\n * dispatch would risk a file conflict. Same read-facade shape as graphMetrics;\n * the Domain core finds the overlaps and suggests resolutions.\n * Candidates come from `frontierAcrossSteps` (tsk-4so D1, docs/history/\n * execution-fanout/CONTEXT-tsk-4so.md), not the single-step `frontier` —\n * two items at DIFFERENT steps (e.g. one at `decompose`, one at\n * `executing`) sharing a footprint is a real risk this advisory must catch,\n * not just two items both currently at `executing`. `footprintOverlap`\n * (the Execute-only single-step wrapper other decision docs already cite\n * by name as its contract) is intentionally left untouched — this reuses\n * the underlying `footprintOverlapAmong` pairwise comparison directly\n * instead.\n */\nexport function footprintConflicts(dir) {\n  // tsk-40m code-review finding (high, D4): effective view -- an actively-\n  // claimed item is not an idle-and-ready candidate for a parallel-dispatch\n  // collision.\n  return footprintOverlapAmong(frontierAcrossSteps(currentEffectiveView(dir)));\n}\n\n/**\n * Read-only (tsk-3c7): computed-parallel-wave-schedule — which frontier\n * items can dispatch in parallel right now, packed into waves by\n * declared-footprint conflict, plus a dep-graph cycle check over the\n * whole work map (never just the frontier — a cycle anywhere is a\n * graph-integrity defect regardless of which items in it are ready).\n * Same read-facade shape as `footprintConflicts`; the Domain core\n * (`graph-metrics.mjs`) computes both, this just rebuilds the view.\n */\nexport function computedSchedule(dir, candidateIds) {\n  // tsk-40m code-review finding (high, D4): effective view -- an actively-\n  // claimed item must not be scheduled into a new dispatch wave.\n  const view = currentEffectiveView(dir);\n  return { ...computeSchedule(view, candidateIds), cycles: detectCycles(view) };\n}\n\n/**\n * Read-only: the raw event array from the log, in append order (decision\n * 14396a5c). This exists so the runner's anti-loop can derive visit counts\n * from raw events WITHOUT resolving `.fgos/` paths itself — this module\n * stays the one place that maps a dir to its files, and the single write\n * door is untouched (this accessor never appends, never rebuilds the view).\n * Same failure surface as any read here: a missing log reads as `[]`, a\n * corrupt log throws EventLogError('corrupt-log').\n */\nexport function readRawEvents(dir) {\n  return readAllEvents(dir);\n}\n\n/**\n * Rebuild `state.json` from the log alone — the recovery path for a\n * missing, deleted, or stale view (per D3: the view is always derivable from\n * zero, and never itself the truth).\n */\nexport function rebuild(dir) {\n  return refreshView(dir);\n}\n\n/**\n * Append a knowledge event after validating payload and invariants inside lock.\n */\nexport function appendKnowledgeEvent(dir, type, payload) {\n  const logPath = resolveWriterLogPath(dir);\n  return withStateAndRefresh(dir, (tx) => {\n    const before = currentView(dir);\n    const event = { type, payload, ts: Date.now() };\n    applyKnowledgeEvent(before, event);\n    tx.append(logPath, { type, payload });\n    return event;\n  });\n}\n\nexport function registerTopicStore(dir, { topicId, purposeSlug, purposeTitle, entities }) {\n  return appendKnowledgeEvent(dir, 'topic.register', { topicId, purposeSlug, purposeTitle, entities });\n}\n\nexport function renameTopicStore(dir, { topicId, newPurposeSlug, newPurposeTitle }) {\n  return appendKnowledgeEvent(dir, 'topic.rename', { topicId, newPurposeSlug, newPurposeTitle });\n}\n\nexport function splitTopicStore(dir, { topicId, newTopics }) {\n  return appendKnowledgeEvent(dir, 'topic.split', { topicId, newTopics });\n}\n\nexport function mergeTopicStore(dir, { sourceTopicIds, targetTopicId }) {\n  return appendKnowledgeEvent(dir, 'topic.merge', { sourceTopicIds, targetTopicId });\n}\n\nexport function retireTopicStore(dir, { topicId }) {\n  return appendKnowledgeEvent(dir, 'topic.retire', { topicId });\n}\n\nexport function reserveDocStore(dir, { topicId, role, currentPath, framework, mode, docId }) {\n  return appendKnowledgeEvent(dir, 'doc.reserve', { topicId, role, currentPath, framework, mode, docId });\n}\n\nexport function registerDocStore(dir, { topicId, role, currentPath, framework, mode, docLifecycle, aliases, sourceCaptureIds, docId }) {\n  return appendKnowledgeEvent(dir, 'doc.register', { topicId, role, currentPath, framework, mode, docLifecycle, aliases, sourceCaptureIds, docId });\n}\n\nexport function markDocRenderedStore(dir, { docId, topicId, role }) {\n  return appendKnowledgeEvent(dir, 'doc.mark-rendered', { docId, topicId, role });\n}\n\nexport function promoteDocStore(dir, { docId, topicId, role }) {\n  return appendKnowledgeEvent(dir, 'doc.promote', { docId, topicId, role });\n}\n\nexport function demoteDocStore(dir, { docId, topicId, role }) {\n  return appendKnowledgeEvent(dir, 'doc.demote', { docId, topicId, role });\n}\n\nexport function supersedeDocStore(dir, { docId, topicId, role, supersededBy }) {\n  return appendKnowledgeEvent(dir, 'doc.supersede', { docId, topicId, role, supersededBy });\n}\n\nexport function retireDocStore(dir, { docId, topicId, role }) {\n  return appendKnowledgeEvent(dir, 'doc.retire', { docId, topicId, role });\n}\n\nexport function attestDocStore(dir, { docId, topicId, role, captureId }) {\n  return appendKnowledgeEvent(dir, 'doc.attest', { docId, topicId, role, captureId });\n}\n\nexport function moveDocPathStore(dir, { docId, topicId, role, newPath }) {\n  return appendKnowledgeEvent(dir, 'doc.path-move', { docId, topicId, role, newPath });\n}\n\n",
+      "record": {
+        "file": "src/state/store.mjs",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "b8eacaa22d2f17b04f494f9671b3bec2b883306aadb9ae0909298b94b20e11c4",
+        "digest": "b8eacaa22d2f17b04f494f9671b3bec2b883306aadb9ae0909298b94b20e11c4",
+        "inventoryEdgeIds": [
+          "class6-l-000454",
+          "class6-l-000456",
+          "class6-l-000456",
+          "class6-l-000457",
+          "class6-l-000457",
+          "class6-l-000458",
+          "class6-l-000459",
+          "class6-l-000460",
+          "class6-l-000461",
+          "class6-l-000462",
+          "class6-l-000463"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000454",
+            "slotKey": "{\"edgeId\":\"class6-l-000454\",\"file\":\"src/state/store.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000454\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":579}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000454",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 579
+              }
+            ],
+            "consumerFile": "src/state/store.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 579,
+                "columnStart": 56,
+                "columnEndExclusive": 74,
+                "text": "docs/history/<id>/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 579,
+                "columnStart": 56,
+                "columnEndExclusive": 74,
+                "text": "docs/history/<id>/"
+              }
+            ],
+            "matchedExpression": "docs/history/<id>/",
+            "logicalReference": "docs/history/<id>/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: ' * to be checked against (found live: tsk-4ax/tsk-55p, docs/history/<id>/'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<id>/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000454",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 579,
+                "matchedExpression": "docs/history/<id>/",
+                "originalLineText": " * to be checked against (found live: tsk-4ax/tsk-55p, docs/history/<id>/"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000456",
+            "slotKey": "{\"edgeId\":\"class6-l-000456\",\"file\":\"src/state/store.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000456\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":857}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000456",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 857
+              }
+            ],
+            "consumerFile": "src/state/store.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 857,
+                "columnStart": 61,
+                "columnEndExclusive": 76,
+                "text": "docs/architect/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 857,
+                "columnStart": 61,
+                "columnEndExclusive": 76,
+                "text": "docs/architect/"
+              },
+              {
+                "line": 858,
+                "columnStart": 1,
+                "columnEndExclusive": 36,
+                "text": "  // doing-coordination-redesign.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/\n  // doing-coordination-redesign.md",
+            "logicalReference": "docs/architect/doing-coordination-redesign.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Original implementation/proposal evidence stays literal; source tree retires in Phase 9 without current-authority acceptance. Own source passage: '  // Status-at-ask split (claim-lock §5.1, tsk-40m P1 fix — docs/architect/\\n  // doing-coordination-redesign.md): two SEPARATE fields, never conflated.'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/doing-coordination-redesign.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000456",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 857,
+                "matchedExpression": "docs/architect/\n  // doing-coordination-redesign.md",
+                "originalLineText": "  // Status-at-ask split (claim-lock §5.1, tsk-40m P1 fix — docs/architect/"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000456",
+            "slotKey": "{\"edgeId\":\"class6-l-000456\",\"file\":\"src/state/store.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000456\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":858}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000456",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 858
+              }
+            ],
+            "consumerFile": "src/state/store.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 858,
+                "columnStart": 1,
+                "columnEndExclusive": 36,
+                "text": "  // doing-coordination-redesign.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 857,
+                "columnStart": 61,
+                "columnEndExclusive": 76,
+                "text": "docs/architect/"
+              },
+              {
+                "line": 858,
+                "columnStart": 1,
+                "columnEndExclusive": 36,
+                "text": "  // doing-coordination-redesign.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/\n  // doing-coordination-redesign.md",
+            "logicalReference": "docs/architect/doing-coordination-redesign.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Original implementation/proposal evidence stays literal; source tree retires in Phase 9 without current-authority acceptance. Own source passage: '  // Status-at-ask split (claim-lock §5.1, tsk-40m P1 fix — docs/architect/\\n  // doing-coordination-redesign.md): two SEPARATE fields, never conflated.'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/doing-coordination-redesign.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000456",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 858,
+                "matchedExpression": "docs/architect/\n  // doing-coordination-redesign.md",
+                "originalLineText": "  // doing-coordination-redesign.md): two SEPARATE fields, never conflated."
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000457",
+            "slotKey": "{\"edgeId\":\"class6-l-000457\",\"file\":\"src/state/store.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000457\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":892}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000457",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 892
+              }
+            ],
+            "consumerFile": "src/state/store.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 892,
+                "columnStart": 40,
+                "columnEndExclusive": 67,
+                "text": "docs/distillery/deep-dives/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 892,
+                "columnStart": 40,
+                "columnEndExclusive": 67,
+                "text": "docs/distillery/deep-dives/"
+              },
+              {
+                "line": 893,
+                "columnStart": 1,
+                "columnEndExclusive": 33,
+                "text": "  // fgos-capture-gaps-vs-bee.md"
+              }
+            ],
+            "matchedExpression": "docs/distillery/deep-dives/\n  // fgos-capture-gaps-vs-bee.md",
+            "logicalReference": "docs/distillery/deep-dives/fgos-capture-gaps-vs-bee.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Retained native path, literal example or captured contract reference stays literal. Own source passage: \"  // from bee's decisions.jsonl shape (docs/distillery/deep-dives/\\n  // fgos-capture-gaps-vs-bee.md) so `gates[id]` gains the same\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/distillery/deep-dives/fgos-capture-gaps-vs-bee.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000457",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 892,
+                "matchedExpression": "docs/distillery/deep-dives/\n  // fgos-capture-gaps-vs-bee.md",
+                "originalLineText": "  // from bee's decisions.jsonl shape (docs/distillery/deep-dives/"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000457",
+            "slotKey": "{\"edgeId\":\"class6-l-000457\",\"file\":\"src/state/store.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000457\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":893}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000457",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 893
+              }
+            ],
+            "consumerFile": "src/state/store.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 893,
+                "columnStart": 1,
+                "columnEndExclusive": 33,
+                "text": "  // fgos-capture-gaps-vs-bee.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 892,
+                "columnStart": 40,
+                "columnEndExclusive": 67,
+                "text": "docs/distillery/deep-dives/"
+              },
+              {
+                "line": 893,
+                "columnStart": 1,
+                "columnEndExclusive": 33,
+                "text": "  // fgos-capture-gaps-vs-bee.md"
+              }
+            ],
+            "matchedExpression": "docs/distillery/deep-dives/\n  // fgos-capture-gaps-vs-bee.md",
+            "logicalReference": "docs/distillery/deep-dives/fgos-capture-gaps-vs-bee.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Retained native path, literal example or captured contract reference stays literal. Own source passage: \"  // from bee's decisions.jsonl shape (docs/distillery/deep-dives/\\n  // fgos-capture-gaps-vs-bee.md) so `gates[id]` gains the same\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/distillery/deep-dives/fgos-capture-gaps-vs-bee.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000457",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 893,
+                "matchedExpression": "docs/distillery/deep-dives/\n  // fgos-capture-gaps-vs-bee.md",
+                "originalLineText": "  // fgos-capture-gaps-vs-bee.md) so `gates[id]` gains the same"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000458",
+            "slotKey": "{\"edgeId\":\"class6-l-000458\",\"file\":\"src/state/store.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000458\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1147}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000458",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1147
+              }
+            ],
+            "consumerFile": "src/state/store.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1147,
+                "columnStart": 50,
+                "columnEndExclusive": 65,
+                "text": "docs/architect/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1147,
+                "columnStart": 50,
+                "columnEndExclusive": 65,
+                "text": "docs/architect/"
+              }
+            ],
+            "matchedExpression": "docs/architect/",
+            "logicalReference": "docs/architect/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Original implementation/proposal evidence stays literal; source tree retires in Phase 9 without current-authority acceptance. Own source passage: ' * from its preClaimStatus to `finalStatus` (D2; docs/architect/'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000458",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1147,
+                "matchedExpression": "docs/architect/",
+                "originalLineText": " * from its preClaimStatus to `finalStatus` (D2; docs/architect/"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000459",
+            "slotKey": "{\"edgeId\":\"class6-l-000459\",\"file\":\"src/state/store.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000459\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1273}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000459",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1273
+              }
+            ],
+            "consumerFile": "src/state/store.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1273,
+                "columnStart": 19,
+                "columnEndExclusive": 64,
+                "text": "docs/architect/doing-coordination-redesign.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1273,
+                "columnStart": 19,
+                "columnEndExclusive": 64,
+                "text": "docs/architect/doing-coordination-redesign.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/doing-coordination-redesign.md",
+            "logicalReference": "docs/architect/doing-coordination-redesign.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Original implementation/proposal evidence stays literal; source tree retires in Phase 9 without current-authority acceptance. Own source passage: '      // tsk-40m (docs/architect/doing-coordination-redesign.md §7.3/§9.2,'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/doing-coordination-redesign.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000459",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1273,
+                "matchedExpression": "docs/architect/doing-coordination-redesign.md",
+                "originalLineText": "      // tsk-40m (docs/architect/doing-coordination-redesign.md §7.3/§9.2,"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000460",
+            "slotKey": "{\"edgeId\":\"class6-l-000460\",\"file\":\"src/state/store.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000460\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1440}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000460",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1440
+              }
+            ],
+            "consumerFile": "src/state/store.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1440,
+                "columnStart": 20,
+                "columnEndExclusive": 65,
+                "text": "docs/architect/doing-coordination-redesign.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1440,
+                "columnStart": 20,
+                "columnEndExclusive": 65,
+                "text": "docs/architect/doing-coordination-redesign.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/doing-coordination-redesign.md",
+            "logicalReference": "docs/architect/doing-coordination-redesign.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Original implementation/proposal evidence stays literal; source tree retires in Phase 9 without current-authority acceptance. Own source passage: ' * tsk-40m P1 fix (docs/architect/doing-coordination-redesign.md): `ask`ing'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/doing-coordination-redesign.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000460",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1440,
+                "matchedExpression": "docs/architect/doing-coordination-redesign.md",
+                "originalLineText": " * tsk-40m P1 fix (docs/architect/doing-coordination-redesign.md): `ask`ing"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000461",
+            "slotKey": "{\"edgeId\":\"class6-l-000461\",\"file\":\"src/state/store.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000461\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1768}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000461",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1768
+              }
+            ],
+            "consumerFile": "src/state/store.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1768,
+                "columnStart": 5,
+                "columnEndExclusive": 25,
+                "text": "docs/specs/<area>.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1768,
+                "columnStart": 5,
+                "columnEndExclusive": 25,
+                "text": "docs/specs/<area>.md"
+              }
+            ],
+            "matchedExpression": "docs/specs/<area>.md",
+            "logicalReference": "docs/specs/<area>.md",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58/60: A51, L12-30/31/32/58/60: Description needs rewrite: decision scope is free text but the source illustrates area scope with docs/specs/<area>.md, a retiring monolithic area layout. Candidate decisions split across area holders; keep the free-text/public meaning and trace Step 5 decision-index grouping before specifying a truthful replacement example. Own source passage: ' * `docs/specs/<area>.md`) marking a PLATFORM/repo-wide decision, as'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "A51, L12-30/31/32/58: Description needs rewrite: decision scope is free text but the source illustrates area scope with docs/specs/<area>.md, a retiring monolithic area layout. Candidate decisions split across area holders; keep the free-text/public meaning and trace Step 5 decision-index grouping before specifying a truthful replacement example. Own source passage: ' * `docs/specs/<area>.md`) marking a PLATFORM/repo-wide decision, as'",
+            "dependency": "A51, L12-30/31/32/58: Description needs rewrite: decision scope is free text but the source illustrates area scope with docs/specs/<area>.md, a retiring monolithic area layout. Candidate decisions split across area holders; keep the free-text/public meaning and trace Step 5 decision-index grouping before specifying a truthful replacement example. Own source passage: ' * `docs/specs/<area>.md`) marking a PLATFORM/repo-wide decision, as'",
+            "blockedCategory": "description-rewrite",
+            "dependencyCategory": "description-rewrite",
+            "legacyPath": "docs/specs/<area>.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000461",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1768,
+                "matchedExpression": "docs/specs/<area>.md",
+                "originalLineText": " * `docs/specs/<area>.md`) marking a PLATFORM/repo-wide decision, as"
+              }
+            ],
+            "searchWitness": {
+              "pin": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/specs/<area>.md",
+              "passage": " * `docs/specs/<area>.md`) marking a PLATFORM/repo-wide decision, as",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/specs/<area>.md",
+                  "hitCount": 13,
+                  "liveHitCount": 13,
+                  "hitsSha256": "ad5f483a30d30de5d3f71b57472fc5eef4d9082c7de66ae462a5a322391d5bb7"
+                }
+              ],
+              "assessment": "A51, L12-30/31/32/58: Description needs rewrite: decision scope is free text but the source illustrates area scope with docs/specs/<area>.md, a retiring monolithic area layout. Candidate decisions split across area holders; keep the free-text/public meaning and trace Step 5 decision-index grouping before specifying a truthful replacement example. Own source passage: ' * `docs/specs/<area>.md`) marking a PLATFORM/repo-wide decision, as'",
+              "hitGroups": [
+                {
+                  "query": "docs/specs/<area>.md",
+                  "carriageCount": 0,
+                  "liveCount": 13,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "A51, L12-30/31/32/58: Description needs rewrite: decision scope is free text but the source illustrates area scope with docs/specs/<area>.md, a retiring monolithic area layout. Candidate decisions split across area holders; keep the free-text/public meaning and trace Step 5 decision-index grouping before specifying a truthful replacement example. Own source passage: ' * `docs/specs/<area>.md`) marking a PLATFORM/repo-wide decision, as'",
+                  "category": "citation-only"
+                }
+              ]
+            },
+            "parkSourceQuote": " * `docs/specs/<area>.md`) marking a PLATFORM/repo-wide decision, as"
+          },
+          {
+            "edgeId": "class6-l-000462",
+            "slotKey": "{\"edgeId\":\"class6-l-000462\",\"file\":\"src/state/store.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000462\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1772}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000462",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1772
+              }
+            ],
+            "consumerFile": "src/state/store.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1772,
+                "columnStart": 23,
+                "columnEndExclusive": 46,
+                "text": "docs/decisions/index.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1772,
+                "columnStart": 23,
+                "columnEndExclusive": 46,
+                "text": "docs/decisions/index.md"
+              }
+            ],
+            "matchedExpression": "docs/decisions/index.md",
+            "logicalReference": "docs/decisions/index.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Retained native path, literal example or captured contract reference stays literal. Own source passage: ' * presence to build `docs/decisions/index.md`. This function never'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/decisions/index.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000462",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1772,
+                "matchedExpression": "docs/decisions/index.md",
+                "originalLineText": " * presence to build `docs/decisions/index.md`. This function never"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000463",
+            "slotKey": "{\"edgeId\":\"class6-l-000463\",\"file\":\"src/state/store.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000463\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":2090}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000463",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 2090
+              }
+            ],
+            "consumerFile": "src/state/store.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 2090,
+                "columnStart": 60,
+                "columnEndExclusive": 73,
+                "text": "docs/history/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 2090,
+                "columnStart": 60,
+                "columnEndExclusive": 73,
+                "text": "docs/history/"
+              }
+            ],
+            "matchedExpression": "docs/history/",
+            "logicalReference": "docs/history/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: ' * Candidates come from `frontierAcrossSteps` (tsk-4so D1, docs/history/'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000463",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 2090,
+                "matchedExpression": "docs/history/",
+                "originalLineText": " * Candidates come from `frontierAcrossSteps` (tsk-4so D1, docs/history/"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-027",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59",
+          "L12-60"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "src/state/store.mjs",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "b8eacaa22d2f17b04f494f9671b3bec2b883306aadb9ae0909298b94b20e11c4",
+          "bytes": 110859,
+          "lines": 2214,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": [
+          {
+            "inventory": "step-02l-census-class6.json",
+            "edgeId": "class6-l-000455",
+            "consumerFile": "src/state/store.mjs",
+            "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 46,
+                "columnStart": 20,
+                "line": 615,
+                "text": "docs/history/${id}/plan.md"
+              }
+            ],
+            "reason": "L12-60(1): runtime-emitted/help/example string or executable reader/writer/default, not a maintained prose comment; Step 5 owns output/path parity."
+          },
+          {
+            "inventory": null,
+            "edgeId": null,
+            "consumerFile": "src/state/store.mjs",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "sourceSpans": [
+              {
+                "line": 615,
+                "columnStart": 20,
+                "columnEndExclusive": 34,
+                "text": "docs/history/$"
+              }
+            ],
+            "reason": "L12-60(1): runtime-emitted/help/example string or executable reader/writer/default, not a maintained prose comment; Step 5 owns output/path parity."
+          }
+        ]
+      },
+      "targetEvidence": {},
+      "renderContexts": {},
+      "populationGapFindings": [],
+      "L12-60-coverage": {
+        "stepFiveExcluded": [
+          {
+            "inventory": "step-02l-census-class6.json",
+            "edgeId": "class6-l-000455",
+            "consumerFile": "src/state/store.mjs",
+            "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sourceSpans": [
+              {
+                "columnEndExclusive": 46,
+                "columnStart": 20,
+                "line": 615,
+                "text": "docs/history/${id}/plan.md"
+              }
+            ],
+            "reason": "L12-60(1): runtime-emitted/help/example string or executable reader/writer/default, not a maintained prose comment; Step 5 owns output/path parity."
+          },
+          {
+            "inventory": null,
+            "edgeId": null,
+            "consumerFile": "src/state/store.mjs",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "sourceSpans": [
+              {
+                "line": 615,
+                "columnStart": 20,
+                "columnEndExclusive": 34,
+                "text": "docs/history/$"
+              }
+            ],
+            "reason": "L12-60(1): runtime-emitted/help/example string or executable reader/writer/default, not a maintained prose comment; Step 5 owns output/path parity."
+          }
+        ],
+        "authorAddedSlots": [],
+        "recordChangedThisTurn": true
+      },
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "src/state/tool-registry.mjs",
+      "sourceDigest": "e713e0adcfe2398dd8d11c19d6cd1ddbf912222cb75410bdbdf1cdf3406e66f2",
+      "sourceContext": "// tool-registry.mjs — pure validation/classification logic for the tool\n// registry (tsk-1dj, ported from repository-harness's tool-registry-\n// capability per docs/distillery/deep-dives/tool-registry.md).\n//\n// tsk-in1-1 D1: the event-sourced write door (`tool.register`/`tool.remove`,\n// once store.mjs's `registerTool`/`removeTool`) is retired — a tool provider\n// is now declared directly in `runner.executors.<id>` (`.fgos/config.json`),\n// the same config-edited precedent `executors` already was for `agy`. This\n// module keeps only the PURE read-side logic: `normalizeCapability` (never\n// touches fs) and `toolsFromExecutors` (below) turn a raw `cfg.executors`\n// map into the tool-shaped objects `probeTool`/`classifyRegistryPosture`\n// already expected — no shape change was needed for either of those two.\n//\n// The local status overlay (`readLocalStatus`/`writeLocalStatus`/\n// `probeTool`) is a SEPARATE, deliberately non-event-sourced concern (per\n// docs/history/tool-registry-capability-port/CONTEXT.md's pinned\n// \"registered vs present\" term): `tool check`'s result is a fact about\n// *this machine*, not a team decision, so it never goes through\n// `.fgos/events.jsonl` — it lives in one local, gitignored file beside it,\n// the same \"separate local facade outside the single write door\" shape\n// store.mjs's own header comment describes for `worker-log.mjs`.\n\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport { execFileSync } from 'node:child_process';\nimport { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';\n\n/** The full kind domain (repository-harness's own set, minus 'http' — 0 real\n * usage confirmed at tsk-in1-1 time (DISCUSSION.md §3 #14): no executor ever\n * declared kind:\"http\" here, so `probeHttp` (the TCP-connect presence probe\n * for it) was dead weight and was removed alongside it. */\nexport const KINDS = Object.freeze(['cli', 'binary', 'mcp', 'skill']);\n\n// mcp/skill tools are never on PATH (deep-dive §Cơ chế) — presence for\n// those two kinds is checked by scanning a path on disk instead, so a scan\n// target is the one piece of information those two kinds cannot do without.\nconst SCAN_REQUIRED_KINDS = new Set(['mcp', 'skill']);\n\n/**\n * Normalize a free-text capability label to kebab-case (repository-harness's\n * `normalize_capability` — \"Impact Analysis\"/\"impact_analysis\"/\n * \"impact-analysis\" all fold to the same string). Returns `''` for anything\n * that normalizes to nothing (non-string input, or a string with no\n * alphanumeric content) — callers treat an empty result as invalid.\n */\nexport function normalizeCapability(raw) {\n  if (typeof raw !== 'string') return '';\n  return raw\n    .trim()\n    .toLowerCase()\n    .replace(/[^a-z0-9]+/g, '-')\n    .replace(/^-+|-+$/g, '');\n}\n\n/**\n * Turn `cfg.executors` (`.fgos/config.json`'s `runner.executors`, D1) into\n * the tool-shaped objects `probeTool`/`classifyRegistryPosture` already\n * expect — pure, never touches fs. A executor entry is a TOOL (as opposed to\n * an agent/dispatch executor like `agy`) precisely when it declares\n * `kind: \"tool\"` — `for` alone is NOT a safe signal (tsk-34n D2/D3 gave\n * `agy`, a `kind:\"agent\"` executor, its own real `for` too, so a\n * dispatch-only executor can legitimately declare `for` now without\n * becoming tool-registry-probeable).\n *\n * tsk-45f D11 (superseded by tsk-34n): `executor.for` (the array `decide\n * --for` once read) replaced the older\n * `executor.capability` single-value field entirely — a real executor\n * (`gitnexus`) once declared only `capability`, so `decide --for\n * impact-analysis` always answered `unavailable` despite `fgos tool query\n * --capability impact-analysis` finding it. `for[0]` is the correct\n * single-value projection of this function's own always-one-capability-\n * per-entry shape (a executor serving several capabilities is still one\n * tool-registry row). The `capability` fallback tsk-45f kept for\n * not-yet-migrated executors is retired (tsk-34n): every executor in this\n * repo's own config has carried `for` since tsk-45f itself landed, and\n * `capability` is no longer read as input anywhere.\n *\n * tsk-in1-4 D5: `executor.kind` stopped meaning \"presence-probe mechanism\"\n * the moment `dispatch.mjs`'s own `kind` became the `agent`/`tool` BAN CHAT\n * axis (`gitnexus`/`herdr` both read `kind: \"tool\"` now, which tells\n * `probeTool` nothing about HOW to probe them). The probe mechanism and\n * probe command now live on the entry's own `invocations[0]` instead\n * (`via`/`command` — D8's `INVOCATION_VIA` vocabulary, `cli`/`mcp`, maps\n * onto `probeTool`'s own `kind` naming directly) — this module never reads\n * `executor.kind` for probing purposes anymore. Task 1's flat\n * `probeCommand` field is retired along with it (superseded, migrated to\n * `invocations[0].command` in the same change that introduced `kind:\n * \"tool\"`); a executor naming no `invocations` at all is simply not\n * probeable and is skipped, same as one naming neither `for` nor\n * `capability`.\n */\nexport function toolsFromExecutors(executors) {\n  const tools = {};\n  for (const [id, executor] of Object.entries(executors ?? {})) {\n    // tsk-34n regression found live: `agy` (kind:\"agent\") started\n    // declaring its own \"for\" (D3's migration, so `capabilities.<name>.\n    // prefer` can resolve it) -- without this gate, ANY executor naming\n    // \"for\" got treated as a tool-registry-probeable \"tool\", conflating\n    // the dispatch registry (kind:\"agent\", a live persona) with the\n    // presence-probe registry (kind:\"tool\", mechanical, e.g. gitnexus/\n    // herdr) this function's own docstring already says are different.\n    // A \"for\" on an agent executor is inert everywhere (dispatch ignores it,\n    // doctor flags it), so only kind:\"tool\" entries ever become tools here.\n    if (executor?.kind !== 'tool') continue;\n    const rawCapability = Array.isArray(executor?.for) && executor.for.length > 0 ? executor.for[0] : undefined;\n    const capability = normalizeCapability(rawCapability);\n    if (!capability) continue;\n    const invocation = Array.isArray(executor.invocations) ? executor.invocations[0] : undefined;\n    tools[id] = {\n      name: id,\n      kind: invocation?.via,\n      capability,\n      command: invocation?.command,\n      scanTarget: executor.scanTarget,\n      responsibility: executor.responsibility,\n      description: executor.description,\n    };\n  }\n  return tools;\n}\n\n// PATH resolution done by hand (fs.accessSync per PATH entry) rather than\n// shelling out to `command -v`/`where` — avoids building a shell string out\n// of a registered tool's own `command` field entirely, never a shell\n// injection surface.\n//\n// Shared with `dispatch.mjs`'s `detectAssistantCli` (D5, tsk-62v): both\n// modules scanned PATH for an executable independently before this cell —\n// `findExecutableOnPath` is the one implementation both now call.\n// `pathEnv`/`candidateNames` are both injectable so callers (and tests)\n// never have to mutate the real environment to control the result. Checks\n// every directory for `candidateNames[0]` before moving to\n// `candidateNames[1]` — an earlier name wins over a later one found\n// elsewhere on PATH.\nexport function findExecutableOnPath(candidateNames, pathEnv = process.env.PATH) {\n  const dirs = typeof pathEnv === 'string' && pathEnv ? pathEnv.split(path.delimiter).filter(Boolean) : [];\n  const defaultExts = process.platform === 'win32' ? (process.env.PATHEXT || '.EXE;.CMD;.BAT').split(';').filter(Boolean) : [''];\n  for (const name of candidateNames) {\n    const hasExt = process.platform === 'win32' && path.extname(name) !== '';\n    const exts = hasExt ? ['', ...defaultExts] : defaultExts;\n    for (const dir of dirs) {\n      for (const ext of exts) {\n        try {\n          fs.accessSync(path.join(dir, name + ext), fs.constants.X_OK);\n          return name;\n        } catch {\n          // not found in this PATH entry — keep scanning\n        }\n      }\n    }\n  }\n  return null;\n}\n\nfunction commandExistsOnPath(name) {\n  return findExecutableOnPath([name]) !== null;\n}\n\n// tsk-j7y D2: `scanTarget` existing on disk only ever proved the tool was\n// installed, never that its index reflects the current repo — the exact\n// gap that let GitNexus's impact() give false blast-radius evidence during\n// tsk-480 while `fgos tool query` still reported \"present\". GitNexus's own\n// `meta.json` (written inside its scanTarget) already records the commit\n// it last indexed, so comparing that against the repo's real HEAD costs\n// nothing new to read. Missing/malformed meta.json, no `lastCommit`, or a\n// failing `git rev-parse` (repoRoot not a git repo, or no commits yet) all\n// degrade to \"not stale\" — same never-throws, never-a-false-positive\n// contract `probeTool` already carries for the rest of this function.\nfunction isIndexStale(scanPath, repoRoot) {\n  let lastCommit;\n  try {\n    const meta = JSON.parse(fs.readFileSync(path.join(scanPath, 'meta.json'), 'utf8'));\n    lastCommit = typeof meta.lastCommit === 'string' ? meta.lastCommit : undefined;\n  } catch {\n    return false;\n  }\n  if (!lastCommit) return false;\n  let head;\n  try {\n    head = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();\n  } catch {\n    return false;\n  }\n  return head !== lastCommit;\n}\n\n/**\n * Probe one registered tool's presence on this machine, per its `kind`\n * (deep-dive §Cơ chế): `cli`/`binary` resolve on `PATH`; `mcp`/`skill` check\n * `scanTarget` exists on disk (resolved against `repoRoot`), and — tsk-j7y\n * D2 — resolve `'stale'` instead of `'present'` when the tool's own\n * `meta.json` records a `lastCommit` behind the repo's current `HEAD`. Never\n * throws for an absent tool — absence is a fact to report (`'missing'`),\n * never a CLI error (the core \"absent capability = clean skip, never a\n * failure\" contract this whole item ports).\n */\nexport async function probeTool(tool, repoRoot) {\n  if (tool.kind === 'cli' || tool.kind === 'binary') {\n    return commandExistsOnPath(tool.command) ? 'present' : 'missing';\n  }\n  if (tool.kind === 'mcp' || tool.kind === 'skill') {\n    if (!tool.scanTarget) return 'unknown';\n    const scanPath = path.resolve(repoRoot, tool.scanTarget);\n    if (!fs.existsSync(scanPath)) return 'missing';\n    return isIndexStale(scanPath, repoRoot) ? 'stale' : 'present';\n  }\n  return 'unknown';\n}\n\nexport function toolStatusPath(dir) {\n  return resolveFgosFile(dir, FGOS_FILE.TOOL_STATUS);\n}\n\n/**\n * Read the local, per-machine `check` status overlay — never the truth\n * about what is registered (that is `runner.executors` in\n * `.fgos/config.json`, D1), only what THIS machine last observed. Missing file reads as\n * `{}` (never checked yet); a corrupt file also reads as `{}` — this is a\n * disposable local cache, regenerated by the next `tool check`, so a\n * parse failure is never fatal here the way a corrupt `events.jsonl` is.\n */\nexport function readLocalStatus(dir) {\n  let raw;\n  try {\n    raw = fs.readFileSync(toolStatusPath(dir), 'utf8');\n  } catch (err) {\n    if (err.code === 'ENOENT') return {};\n    throw err;\n  }\n  try {\n    const parsed = JSON.parse(raw);\n    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};\n  } catch {\n    return {};\n  }\n}\n\nexport function writeLocalStatus(dir, statusMap) {\n  const statusPath = toolStatusPath(dir);\n  fs.mkdirSync(path.dirname(statusPath), { recursive: true });\n  fs.writeFileSync(statusPath, `${JSON.stringify(statusMap, null, 2)}\\n`, 'utf8');\n}\n\n/**\n * The resolved status for a registered tool name: whatever this machine's\n * local overlay says, or `'unknown'` when it has never been checked here\n * (registered-but-no-local-entry — the deep-dive's own US-027 distinction:\n * this must NEVER read as `'missing'`, which means \"checked, and it's not\n * there\").\n */\nexport function resolvedStatus(name, localStatus) {\n  const entry = localStatus[name];\n  return entry && typeof entry.status === 'string' ? entry.status : 'unknown';\n}\n\n/**\n * Classify the whole registry's posture (deep-dive's degrade ladder,\n * applied across every registered tool rather than per-capability — YAGNI,\n * per plan.md: the doctor entry reports overall registry health, not a\n * capability-specific check, so it never hardcodes a capability name):\n * zero tools registered -> `'inactive'` (mechanism unused, harmless, never\n * a failure); at least one registered but not every one resolves\n * `'present'` -> `'degraded'`; every registered tool resolves `'present'`\n * -> `'full'`.\n */\nexport function classifyRegistryPosture(tools, localStatus) {\n  const names = Object.keys(tools ?? {});\n  if (names.length === 0) {\n    return { posture: 'inactive', registeredCount: 0, presentCount: 0, missingCount: 0, unknownCount: 0 };\n  }\n  let presentCount = 0;\n  let missingCount = 0;\n  let unknownCount = 0;\n  for (const name of names) {\n    const status = resolvedStatus(name, localStatus);\n    if (status === 'present') presentCount += 1;\n    else if (status === 'missing') missingCount += 1;\n    else unknownCount += 1;\n  }\n  const posture = presentCount === names.length ? 'full' : 'degraded';\n  return { posture, registeredCount: names.length, presentCount, missingCount, unknownCount };\n}\n",
+      "record": {
+        "file": "src/state/tool-registry.mjs",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "e713e0adcfe2398dd8d11c19d6cd1ddbf912222cb75410bdbdf1cdf3406e66f2",
+        "digest": "e713e0adcfe2398dd8d11c19d6cd1ddbf912222cb75410bdbdf1cdf3406e66f2",
+        "inventoryEdgeIds": [
+          "class6-l-000464",
+          "class6-l-000465"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000464",
+            "slotKey": "{\"edgeId\":\"class6-l-000464\",\"file\":\"src/state/tool-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000464\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":3}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000464",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 3
+              }
+            ],
+            "consumerFile": "src/state/tool-registry.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 3,
+                "columnStart": 19,
+                "columnEndExclusive": 62,
+                "text": "docs/distillery/deep-dives/tool-registry.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 3,
+                "columnStart": 19,
+                "columnEndExclusive": 62,
+                "text": "docs/distillery/deep-dives/tool-registry.md"
+              }
+            ],
+            "matchedExpression": "docs/distillery/deep-dives/tool-registry.md",
+            "logicalReference": "docs/distillery/deep-dives/tool-registry.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Retained native path, literal example or captured contract reference stays literal. Own source passage: '// capability per docs/distillery/deep-dives/tool-registry.md).'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/distillery/deep-dives/tool-registry.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000464",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 3,
+                "matchedExpression": "docs/distillery/deep-dives/tool-registry.md",
+                "originalLineText": "// capability per docs/distillery/deep-dives/tool-registry.md)."
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000465",
+            "slotKey": "{\"edgeId\":\"class6-l-000465\",\"file\":\"src/state/tool-registry.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000465\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":16}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000465",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 16
+              }
+            ],
+            "consumerFile": "src/state/tool-registry.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 16,
+                "columnStart": 4,
+                "columnEndExclusive": 57,
+                "text": "docs/history/tool-registry-capability-port/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 16,
+                "columnStart": 4,
+                "columnEndExclusive": 57,
+                "text": "docs/history/tool-registry-capability-port/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/tool-registry-capability-port/CONTEXT.md",
+            "logicalReference": "docs/history/tool-registry-capability-port/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: \"// docs/history/tool-registry-capability-port/CONTEXT.md's pinned\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/tool-registry-capability-port/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000465",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 16,
+                "matchedExpression": "docs/history/tool-registry-capability-port/CONTEXT.md",
+                "originalLineText": "// docs/history/tool-registry-capability-port/CONTEXT.md's pinned"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-027",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59",
+          "L12-60"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "src/state/tool-registry.mjs",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "e713e0adcfe2398dd8d11c19d6cd1ddbf912222cb75410bdbdf1cdf3406e66f2",
+          "bytes": 13274,
+          "lines": 282,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetEvidence": {},
+      "renderContexts": {},
+      "populationGapFindings": [],
+      "L12-60-coverage": {
+        "stepFiveExcluded": [],
+        "authorAddedSlots": [],
+        "recordChangedThisTurn": true
+      },
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    }
+  ]
+}

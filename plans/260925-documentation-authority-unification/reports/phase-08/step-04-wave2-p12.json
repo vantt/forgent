@@ -1,76 +1,72 @@
 {
-  "authorInputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
+  "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
   "reviewerRule": "Never run checker/probes/resolver/author scripts. Read every assigned file through EOF and independently verify targets. One verdict per whole file, even when streamed.",
-  "set": "step04-028",
+  "set": "step04-006",
   "files": [
-    "src/util/format-duration.mjs"
+    "archive/plans/260917-cold-resumable-coordination-dag/phase-07-migration-and-release-proof.md",
+    "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring-rubric.md",
+    "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-1/ground-truth.md",
+    "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-2/ground-truth.md"
   ],
-  "joinedSlots": 2,
+  "joinedSlots": 4,
   "items": [
     {
-      "file": "src/util/format-duration.mjs",
-      "sourceDigest": "aa3d4629659f6b635267965013716b45e71120cce5282f6b2a4503148c616ce9",
-      "sourceContext": "// format-duration.mjs — humanize a millisecond count into a short string\n// (`1d 3h`, `5h 12m`, `2m 30s`, `45s`). PURE: no fs, no `.fgos/` read.\n//\n// First occupant of `src/util/`, the repo's cross-cutting pure-utility\n// location: this belongs to none of the 9 domain subsystems under `src/`\n// (docs/history/parallel-dispatch-demo-format-utils/plan.md, Approach).\n\nconst SECOND = 1000;\nconst MINUTE = 60 * SECOND;\nconst HOUR = 60 * MINUTE;\nconst DAY = 24 * HOUR;\n\n/**\n * Humanize `ms` into at most two units, starting from the largest non-zero\n * one and descending day -> hour -> minute -> second (D2,\n * docs/history/parallel-dispatch-demo-format-utils/CONTEXT.md). Remainders\n * below the smaller shown unit are truncated, never rounded, so the result\n * never claims more elapsed time than actually passed.\n */\nexport function formatDuration(ms) {\n  const days = Math.floor(ms / DAY);\n  const hours = Math.floor(ms / HOUR) % 24;\n  const minutes = Math.floor(ms / MINUTE) % 60;\n  const seconds = Math.floor(ms / SECOND) % 60;\n\n  if (days > 0) return hours > 0 ? `${days}d ${hours}h` : `${days}d`;\n  if (hours > 0) return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;\n  if (minutes > 0) return seconds > 0 ? `${minutes}m ${seconds}s` : `${minutes}m`;\n  return `${seconds}s`;\n}\n",
+      "file": "archive/plans/260917-cold-resumable-coordination-dag/phase-07-migration-and-release-proof.md",
+      "sourceDigest": "afad7cd7152db1ed4e4dcf16bf8c111b4ac1aa5d9309b65f55c40a49cbc675b9",
+      "sourceContext": "---\nstatus: completed\n---\n\n# Phase 07 - Migration And Release Proof\n\n## Goal\n\nClose the track with cross-version, adversarial recovery, consumer, and\ndocumentation proof; leave deferred mutation/fan-out work explicit.\n\n## Scope\n\n- Execute schema migration matrix against old/new binaries/worktrees.\n- Prove mixed-version append refusal, legacy session behavior, and explicit\n  unsupported-schema/legacy projections.\n- Run full adversarial test matrix for declaration tampering, semantic resume\n  drift, missing session/definition, corrupt evidence, cancellation, and\n  no-later-event integrity behavior.\n- Update runner/coordination specs, public how-to material, and changelog with\n  scope, caveat, compatibility, and deferred-feature facts.\n- Record live proof and final evidence under\n  `docs/architect/agent-coordination/verification/cold-resumable-coordination-dag/`.\n\n## Verification\n\n```sh\nnpm test -- test/runner/coordination-*.test.mjs test/verbs/coordination-*.test.mjs test/cli/coordination.test.mjs\nnpm test\n```\n\n## Exit Criteria\n\n- All schema/version and consumer proofs pass against integrated track SHA.\n- Docs explicitly state read-only individual-node scope and defer mutation/fan-\n  out DAG behind future evidence gates.\n- Final code-panel planned-mode live proof and full-suite baseline comparison\n  are recorded; no BLOCKER/HIGH remains.\n",
       "record": {
-        "file": "src/util/format-duration.mjs",
-        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "file": "archive/plans/260917-cold-resumable-coordination-dag/phase-07-migration-and-release-proof.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
         "inventoryInputs": [
           {
-            "path": "step-02l-census-class6.json",
-            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
-            "counts": {
-              "dynamicConstructions": 10980,
-              "dynamicFiles": 468,
-              "edgeFiles": 118,
-              "edges": 494,
-              "files": 490
-            }
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
           }
         ],
-        "authorInputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
-        "inventoryFileDigest": "aa3d4629659f6b635267965013716b45e71120cce5282f6b2a4503148c616ce9",
-        "digest": "aa3d4629659f6b635267965013716b45e71120cce5282f6b2a4503148c616ce9",
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "afad7cd7152db1ed4e4dcf16bf8c111b4ac1aa5d9309b65f55c40a49cbc675b9",
+        "digest": "afad7cd7152db1ed4e4dcf16bf8c111b4ac1aa5d9309b65f55c40a49cbc675b9",
         "inventoryEdgeIds": [
-          "class6-l-000479",
-          "class6-l-000480"
+          "evidence-110"
         ],
         "diff": "",
         "edges": [
           {
-            "edgeId": "class6-l-000479",
-            "slotKey": "{\"edgeId\":\"class6-l-000479\",\"file\":\"src/util/format-duration.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000479\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":6}]}",
+            "edgeId": "evidence-110",
+            "slotKey": "{\"edgeId\":\"evidence-110\",\"file\":\"archive/plans/260917-cold-resumable-coordination-dag/phase-07-migration-and-release-proof.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-110\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":23}]}",
             "inventoryRefs": [
               {
-                "inventory": "step-02l-census-class6.json",
-                "edgeId": "class6-l-000479",
-                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-                "originalLine": 6
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-110",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 23
               }
             ],
-            "consumerFile": "src/util/format-duration.mjs",
+            "consumerFile": "archive/plans/260917-cold-resumable-coordination-dag/phase-07-migration-and-release-proof.md",
             "renderOnly": false,
             "slotSourceSpans": [
               {
-                "line": 6,
-                "columnStart": 5,
-                "columnEndExclusive": 61,
-                "text": "docs/history/parallel-dispatch-demo-format-utils/plan.md"
+                "line": 23,
+                "columnStart": 4,
+                "columnEndExclusive": 51,
+                "text": "docs/architect/agent-coordination/verification/"
               }
             ],
             "sourceSpans": [
               {
-                "line": 6,
-                "columnStart": 5,
-                "columnEndExclusive": 61,
-                "text": "docs/history/parallel-dispatch-demo-format-utils/plan.md"
+                "line": 23,
+                "columnStart": 4,
+                "columnEndExclusive": 51,
+                "text": "docs/architect/agent-coordination/verification/"
               }
             ],
-            "matchedExpression": "docs/history/parallel-dispatch-demo-format-utils/plan.md",
-            "logicalReference": "docs/history/parallel-dispatch-demo-format-utils/plan.md",
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
             "disposition": "preserve",
             "diffHunk": null,
-            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '// (docs/history/parallel-dispatch-demo-format-utils/plan.md, Approach).'",
+            "reason": "A51, L12-60/26/38/40/46: Dated/archive evidence keeps its original citation identity. Own source passage: '  `docs/architect/agent-coordination/verification/cold-resumable-coordination-dag/`.'",
             "target": null,
             "anchor": null,
             "timing": "none",
@@ -78,68 +74,17 @@
             "dependency": null,
             "blockedCategory": null,
             "dependencyCategory": null,
-            "legacyPath": "docs/history/parallel-dispatch-demo-format-utils/plan.md",
+            "legacyPath": "docs/architect/agent-coordination/verification/",
             "inventoryOccurrences": [
               {
-                "inventory": "step-02l-census-class6.json",
-                "edgeId": "class6-l-000479",
-                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-                "originalLine": 6,
-                "matchedExpression": "docs/history/parallel-dispatch-demo-format-utils/plan.md",
-                "originalLineText": "// (docs/history/parallel-dispatch-demo-format-utils/plan.md, Approach)."
-              }
-            ]
-          },
-          {
-            "edgeId": "class6-l-000480",
-            "slotKey": "{\"edgeId\":\"class6-l-000480\",\"file\":\"src/util/format-duration.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000480\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":16}]}",
-            "inventoryRefs": [
-              {
-                "inventory": "step-02l-census-class6.json",
-                "edgeId": "class6-l-000480",
-                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-                "originalLine": 16
-              }
-            ],
-            "consumerFile": "src/util/format-duration.mjs",
-            "renderOnly": false,
-            "slotSourceSpans": [
-              {
-                "line": 16,
-                "columnStart": 4,
-                "columnEndExclusive": 63,
-                "text": "docs/history/parallel-dispatch-demo-format-utils/CONTEXT.md"
-              }
-            ],
-            "sourceSpans": [
-              {
-                "line": 16,
-                "columnStart": 4,
-                "columnEndExclusive": 63,
-                "text": "docs/history/parallel-dispatch-demo-format-utils/CONTEXT.md"
-              }
-            ],
-            "matchedExpression": "docs/history/parallel-dispatch-demo-format-utils/CONTEXT.md",
-            "logicalReference": "docs/history/parallel-dispatch-demo-format-utils/CONTEXT.md",
-            "disposition": "preserve",
-            "diffHunk": null,
-            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: ' * docs/history/parallel-dispatch-demo-format-utils/CONTEXT.md). Remainders'",
-            "target": null,
-            "anchor": null,
-            "timing": "none",
-            "blockedReason": null,
-            "dependency": null,
-            "blockedCategory": null,
-            "dependencyCategory": null,
-            "legacyPath": "docs/history/parallel-dispatch-demo-format-utils/CONTEXT.md",
-            "inventoryOccurrences": [
-              {
-                "inventory": "step-02l-census-class6.json",
-                "edgeId": "class6-l-000480",
-                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
-                "originalLine": 16,
-                "matchedExpression": "docs/history/parallel-dispatch-demo-format-utils/CONTEXT.md",
-                "originalLineText": " * docs/history/parallel-dispatch-demo-format-utils/CONTEXT.md). Remainders"
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-110",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 23,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "  `docs/architect/agent-coordination/verification/cold-resumable-coordination-dag/`."
               }
             ]
           }
@@ -148,33 +93,393 @@
           "coverage": {
             "writerTrace": {},
             "descriptionTruth": {},
-            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
           },
           "anchors": {},
           "relativeResolution": {},
           "labelForm": {}
         },
-        "reviewSet": "step04-028",
+        "reviewSet": "step04-006",
         "authoringRules": [
           "A51",
           "L12-7",
           "L12-10",
-          "L12-21..L12-59"
+          "L12-21..L12-58",
+          "L12-60"
         ],
         "sourceRenderProvenance": [],
         "wholeFileRead": {
-          "file": "src/util/format-duration.mjs",
-          "inputCommit": "d4a07d57c4d146b482d4a9e632dc02d8df42af79",
-          "digest": "aa3d4629659f6b635267965013716b45e71120cce5282f6b2a4503148c616ce9",
-          "bytes": 1292,
-          "lines": 30,
-          "headings": [],
-          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
-        }
+          "file": "archive/plans/260917-cold-resumable-coordination-dag/phase-07-migration-and-release-proof.md",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "afad7cd7152db1ed4e4dcf16bf8c111b4ac1aa5d9309b65f55c40a49cbc675b9",
+          "bytes": 1358,
+          "lines": 38,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
       },
       "targetEvidence": {},
       "renderContexts": {},
       "populationGapFindings": [],
+      "L12-60-coverage": {
+        "stepFiveExcluded": [],
+        "authorAddedSlots": [],
+        "recordChangedThisTurn": true
+      },
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring-rubric.md",
+      "sourceDigest": "ed539e77a53d544bd266e8eb212b4241b9f8535c0c38e179556a2f855eec8f76",
+      "sourceContext": "# Panel-Depth Experiment Scoring Rubric\n\n## 0. Provenance disclosure (read first)\n\n- The locked plan decision says this rubric must be committed **before** the first real call. That did not happen: real sessions were dispatched before the rubric existed.\n- As a disclosed mitigation, an agent with **no exposure** to any real run content wrote this file after the fact. It never read, listed, or grepped the experiment's `corpus/`, `real-runs/`, logs, or JSON, or `P05.2.md`. It worked only from the locked specification text, which is quoted in Section 1.\n- The final report MUST:\n  1. cite the git SHA of the commit that added this file;\n  2. state plainly that the rubric was written after real dispatch, as a mitigation, by a blind author.\n- This file does not change after its commit. A later correction goes in a new, dated section appended at the end, with its reason. The final report then cites both SHAs and says which results were scored under which version.\n\n## 1. Locked specification being operationalized (verbatim)\n\n> (a) The scoring rubric must be committed to the experiment's own directory BEFORE the first real call, with its git SHA cited in the final report — never written or adjusted after seeing results.\n>\n> (b) Explanations are stripped of any profile-identifying text and scored BLIND, by an executor on a DIFFERENT provider than the panel's own synthesizer/lead-advisor executors, plus a human spot-check of at least one case — the Lead (who knows which explanation is which) must never self-score.\n>\n> (c) \"Dissent retention\" is mechanical, not impressionistic: enumerate every distinct material finding in the full run's own `redteam.md`, then mark present/absent BY SUBSTANCE in each of the two explanations; also track whether critique/constraint objections (which exist in both profiles) survive, as a control.\n>\n> (d) Factual error is scored ONLY against independently VERIFIED ground truth (see corpus below) — never scorer opinion where no ground truth exists.\n\nThis rubric adds no scoring dimension beyond (a)–(d).\n\n## 2. Roles\n\n| Role | Who | May see | Must never |\n|---|---|---|---|\n| Packet preparer | Anyone except the blind scorer. Can be the Lead, because this work is mechanical. | Everything | Score, or edit explanation substance beyond the redactions in Section 4 |\n| Blind scorer | An executor on a provider that differs from **every** provider used by the panel's synthesizer and lead-advisor executors in any scored run | Blinded packet only (Section 3) | See profile names, run IDs, the unblinding key, or unredacted explanations |\n| Human spot-checker | A person, not the Lead | Blinded packet only | See the unblinding key before their marks are committed |\n| Lead | The experiment Lead | Everything | Score, re-score, adjudicate scorer or human disagreements, or edit any mark |\n\n**Provider check, done before scoring.** The preparer records in `scoring/provider-check.md`:\n- the synthesizer and lead-advisor executor and provider for every scored run;\n- the blind scorer's executor and provider.\n\nIf the scorer's provider matches any of the panel providers, stop and choose another scorer.\n\n## 3. Blinded packet contents (per case)\n\nFor each case, the preparer builds `scoring/<case-label>/`, where `<case-label>` is a neutral label such as `case-1`:\n\n1. `question.md`: the decision question as posed to the panel, identical for both runs.\n2. `explanation-X.md` and `explanation-Y.md`: the two final explanations, redacted per Section 4. Assign X and Y by an independent coin flip for each case, and record the result only in the unblinding key.\n3. `redteam-findings-source.md`: the full run's own `redteam.md`, verbatim. This is needed for (c). The scorer already knows one run had a red-team phase, so this file reveals nothing about which explanation came from which run.\n4. `control-objections-source-X.md` and `control-objections-source-Y.md`: each run's own architecture-critic and constraint-advocate objection outputs, verbatim, labelled with the same X/Y letter as that run's explanation. Apply the Section 4 redactions to these as well.\n5. For core cases only: `ground-truth.md` (Section 7.1).\n\n**Unblinding key.** Store the key at `scoring/unblinding-key.md` and commit it **only after** every scorer mark and every human spot-check mark is committed. Until then, keep it outside the repo or unstaged.\n\n## 4. Blinding: what counts as profile-identifying text\n\nIn each explanation and in each control-objection source, replace every occurrence of the items below with `[REDACTED]`. Do not reword the surrounding text.\n\n1. Profile names and synonyms: `full`, `standard`, `lite`, and any profile or variant name used by the protocol, when they refer to the run's profile.\n2. Any mention of a red-team phase or role as a process step: `red-team`, `red team`, `redteam`, `redteam.md`, `independent red-team`, `adversarial reviewer`. **Keep the substance** of any objection the sentence attributes to that role.\n   - Example: \"The red-team flagged that X fails under Y\" becomes \"[REDACTED] flagged that X fails under Y\".\n3. Protocol IDs, profile IDs, phase or step names that exist in only one profile, and window or reveal names tied to a red-team step.\n4. Run, session, assignment, and dispatch IDs; file paths; branch names; commit SHAs.\n5. Executor, model, and provider names, plus cost, token, round-count, and duration figures.\n6. Timestamps and dates, unless they are part of the decision's substance.\n7. Headings or sections that exist only because of a profile-specific phase, such as \"Red-team response\". Delete the heading text and keep the body, which is still subject to rule 2.\n\n**Do not redact:**\n- technical substance, findings, claims, numbers about the system under decision, or recommendations;\n- length or structure. Do not pad or truncate. Record each explanation's word count before and after redaction in the unblinding key.\n\n**Redaction self-check.** Before handing over the packet, the preparer greps each redacted file for every term in items 1–3 and records the zero-hit result in `scoring/redaction-check.md`. Any hit fails the packet.\n\n## 5. Dissent retention (spec c), step by step\n\n### 5.1 Enumerate red-team findings (before opening any explanation)\n\nThe blind scorer works from `redteam-findings-source.md` **only**, and has not yet opened `explanation-X.md` or `explanation-Y.md`.\n\n1. Read the file end to end.\n2. List every statement that meets **all** of these conditions. Each such statement is a candidate finding.\n   - It asserts a risk, error, gap, missing consideration, unsupported assumption, or a recommendation to change, condition, or reject the decision.\n   - It is about the decision's substance, not about wording, formatting, or the process of the panel itself.\n3. Exclude from the candidates:\n   - agreement or endorsement with no new objection;\n   - pure restatements of the question;\n   - style, wording, or formatting nits.\n4. Split compound candidates into atomic findings. The test: could an explanation contain one part without the other? If yes, split.\n5. Merge duplicates. Two candidates are the same finding only if they name **the same object** (component, assumption, or option) **and** the same failure or risk **and** the same claimed consequence.\n6. Number the result `RT-1 … RT-n`. For each finding, record:\n   - a one-sentence substance statement;\n   - the verbatim source quote, or its line numbers.\n7. **Freeze.** Commit `scoring/<case-label>/redteam-findings.md` before step 5.2. The list may not change after this commit.\n\n### 5.2 Mark presence in each explanation\n\nFor each `RT-i` and each explanation (X and Y), mark exactly one value:\n\n- **PRESENT**: the explanation states the same substance. That means the same object, the same risk or failure, and the same consequence, in any wording. The finding counts as present whether the explanation adopts it, conditions on it, or names it and rebuts it. Record the verbatim quote that satisfies the match.\n- **ABSENT**: no such statement exists. This includes cases where the explanation mentions the object but not the risk, or the risk on a different object.\n\nRules for the scorer:\n- Do not give partial credit. If you find yourself wanting to mark \"partial\", step 5.1.4 did not split the finding enough. Record that as a note in the marks file and mark ABSENT.\n- Do not infer. An implication the scorer could derive, but the text does not state, counts as ABSENT.\n\n### 5.3 Control: critique and constraint objections\n\n1. Repeat steps 5.1.2–5.1.7 separately on `control-objections-source-X.md` and `control-objections-source-Y.md`. Number the results `CX-1…` and `CY-1…`, and freeze both lists.\n2. Mark each `CX-i` PRESENT or ABSENT in `explanation-X.md`, and each `CY-i` in `explanation-Y.md`, using the Section 5.2 rules.\n\n### 5.4 Per-case outputs\n\n| Metric | Formula |\n|---|---|\n| Red-team retention X | PRESENT count of RT in X ÷ n |\n| Red-team retention Y | PRESENT count of RT in Y ÷ n |\n| Control retention X | PRESENT count of CX in X ÷ count of CX |\n| Control retention Y | PRESENT count of CY in Y ÷ count of CY |\n\nReport the raw counts next to every ratio. With a handful of cases, no significance test is claimed.\n\n### 5.5 Disposition of present findings (the only \"decision-quality\" measure)\n\nThe corpus note allows \"decision-quality\" scoring but does not define it. So that no new dimension is invented, this rubric limits decision-quality to the handling of the findings already enumerated in 5.1 and 5.3.\n\nFor each PRESENT mark, record one disposition:\n- **DISPOSED**: the explanation's final recommendation adopts the finding, adds a condition or mitigation for it, or rebuts it with a stated reason.\n- **MENTIONED-ONLY**: the finding appears, but the recommendation neither acts on it nor rebuts it.\n\nReport the DISPOSED count over the PRESENT count for each explanation. No other quality scale is applied.\n\n## 6. Scope per case type\n\n| Case type | Dissent retention (5.1–5.4) | Disposition (5.5) | Factual error (Section 7) |\n|---|---|---|---|\n| Core: the two herdr-gateway cases from `docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md` (one \"clear\", one \"unclear\") | Yes | Yes | Yes, against the ground-truth facts only |\n| Extra: 1–2 cases from this track's own decisions (for example I18 rust-host-regen, I21 executor-pin bypass, I24a H3 wording, I26 H1/H2 reconciliation) | Yes | Yes | **Forbidden.** These cases have no independent ground truth. |\n\nThe report must not state, estimate, or imply a factual-error rate, count, or comparison for any extra case. That includes qualitative claims such as \"X made more mistakes\". If the scorer believes an extra-case explanation is factually wrong, the scorer may record it as an unscored note, which is excluded from every metric.\n\n## 7. Factual error (spec d): core cases only\n\n### 7.1 Ground-truth sheet\n\nThe packet preparer extracts the two verified facts verbatim from `P05.2.md`, at about lines 170–200, into `scoring/<case-label>/ground-truth.md`. The extract must include the line citations and state which core case or cases each fact bears on. The facts are:\n\n- **GT-1**: a reproduced false-wrap rate of **30.8%**, from a real test run.\n- **GT-2**: a live-confirmed finding about the **Codex cursor glyph**.\n\nNothing else counts as ground truth. The scorer may not add facts.\n\n### 7.2 Procedure\n\nFor each core case, each explanation (X and Y), and each GT fact that bears on that case, mark exactly one value.\n\n**For GT-1:**\n\n| Mark | When |\n|---|---|\n| CONSISTENT | The explanation states a figure of 30.8%, or any figure from 30% to 32% inclusive, for the same measurement. It also counts if the explanation uses a qualitative description compatible with that level (for example \"about a third\" or \"roughly 30%\"), or relies on the rate being real and material. |\n| CONTRADICTS | The explanation states a figure outside 30–32% for the same measurement. It also counts if the explanation calls the rate negligible, rare, unconfirmed, or non-existent, or reasons as though the false-wrap problem does not occur. |\n| SILENT | The explanation makes no claim about this rate or problem. |\n\n**For GT-2:**\n\n| Mark | When |\n|---|---|\n| CONSISTENT | The explanation's claims about the Codex cursor-glyph behavior agree with the verified finding, or rely on that finding being real. |\n| CONTRADICTS | The explanation denies it, calls it unconfirmed or speculative, or asserts behavior that the verified finding is incompatible with. |\n| SILENT | The explanation makes no claim about this behavior. |\n\nFor every CONSISTENT or CONTRADICTS mark, record the verbatim quote.\n\n**Factual-error count** for an explanation is the number of CONTRADICTS marks. Report it with the number of facts actually engaged, meaning CONSISTENT plus CONTRADICTS, and never as a rate over facts the explanation stayed SILENT on.\n\nEvery other factual claim in a core-case explanation is **not scored**, even if the scorer believes it is wrong.\n\n## 8. Human spot-check (spec b)\n\n1. The human spot-checker independently repeats Sections 5.2, 5.3 (marking only), 5.5 and, for core cases, Section 7 on **at least one case**. Prefer a core case. They use the frozen finding lists from 5.1 and 5.3.\n2. The human's marks are committed before unblinding, in `scoring/<case-label>/human-marks.md`.\n3. Every mark where the human and the scorer disagree is listed in the report with both values. **No one reconciles the disagreements.** The Lead in particular does not adjudicate. The report shows the scorer's metrics and the human's metrics side by side for that case.\n\n## 9. Order of operations checklist\n\n- [ ] This rubric is committed, and its SHA is recorded for the final report (spec a).\n- [ ] The provider check is done (Section 2).\n- [ ] The blinded packets are built, and the redaction check passes (Sections 3–4).\n- [ ] For each case, the RT list is frozen and committed (5.1.7).\n- [ ] For each case, the CX and CY lists are frozen and committed (5.3).\n- [ ] For each case, the scorer's PRESENT/ABSENT marks, dispositions, and core-case factual marks are committed.\n- [ ] The human spot-check marks are committed for at least one case.\n- [ ] Only now is the unblinding key committed and X/Y mapped to the full and standard runs.\n- [ ] The report cites this rubric's SHA, the provenance disclosure from Section 0, the per-case tables from Section 5.4, the Section 5.5 disposition counts, core-case CONTRADICTS counts only, and the human-versus-scorer disagreements.\n",
+      "record": {
+        "file": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring-rubric.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "ed539e77a53d544bd266e8eb212b4241b9f8535c0c38e179556a2f855eec8f76",
+        "digest": "ed539e77a53d544bd266e8eb212b4241b9f8535c0c38e179556a2f855eec8f76",
+        "inventoryEdgeIds": [
+          "evidence-111"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-111",
+            "slotKey": "{\"edgeId\":\"evidence-111\",\"file\":\"archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring-rubric.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-111\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":132}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-111",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 132
+              }
+            ],
+            "consumerFile": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring-rubric.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 132,
+                "columnStart": 57,
+                "columnEndExclusive": 89,
+                "text": "agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 132,
+                "columnStart": 57,
+                "columnEndExclusive": 89,
+                "text": "agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "agent-coordination/verification/",
+            "logicalReference": "agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Dated/archive evidence keeps its original citation identity. Own source passage: '| Core: the two herdr-gateway cases from `docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md` (one \"clear\", one \"unclear\") | Yes | Yes | Yes, against the ground-truth facts only |'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-111",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 132,
+                "matchedExpression": [
+                  "agent-coordination/verification/"
+                ],
+                "originalLineText": "| Core: the two herdr-gateway cases from `docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md` (one \"clear\", one \"unclear\") | Yes | Yes | Yes, against the ground-truth facts only |"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-006",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58",
+          "L12-60"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring-rubric.md",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "ed539e77a53d544bd266e8eb212b4241b9f8535c0c38e179556a2f855eec8f76",
+          "bytes": 14557,
+          "lines": 190,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetEvidence": {},
+      "renderContexts": {},
+      "populationGapFindings": [],
+      "L12-60-coverage": {
+        "stepFiveExcluded": [],
+        "authorAddedSlots": [],
+        "recordChangedThisTurn": true
+      },
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-1/ground-truth.md",
+      "sourceDigest": "e7cb6655d964900842c1483b04a224577fa6be19055f36f87fc2e6a7a33d2dc2",
+      "sourceContext": "# Ground truth: case-1 (P05.2 clear case)\n\nExtracted verbatim from `docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md`, lines ~129-139 and ~209-211, 228.\n\n## GT-1: false-wrap rate\n\n> finding a real **30.8% false-wrap rate** on the R25-gated \"core\" tier (`ls -la`'s header defeating gutter detection, missing diff/graph-rail/caret-underline detectors) — a real, hand-traced violation of the project's own hard bar, not a hypothetical one.\n\nIndependently reproduced by a real test run later in the same cell (P05.2.md ~L183-187): \"First real (not hand-traced) run: **false wrap 4/13 = 30.8%**, exactly matching the panel's own hand trace.\" Fixed afterward to 0.0%.\n\n**Bears on:** case-1 (clear case) only.\n\n## GT-2: Codex cursor glyph\n\nNot applicable to case-1. See `scoring/case-2/ground-truth.md`.\n",
+      "record": {
+        "file": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-1/ground-truth.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "e7cb6655d964900842c1483b04a224577fa6be19055f36f87fc2e6a7a33d2dc2",
+        "digest": "e7cb6655d964900842c1483b04a224577fa6be19055f36f87fc2e6a7a33d2dc2",
+        "inventoryEdgeIds": [
+          "evidence-112"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-112",
+            "slotKey": "{\"edgeId\":\"evidence-112\",\"file\":\"archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-1/ground-truth.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-112\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":3}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-112",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 3
+              }
+            ],
+            "consumerFile": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-1/ground-truth.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 3,
+                "columnStart": 40,
+                "columnEndExclusive": 72,
+                "text": "agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 3,
+                "columnStart": 40,
+                "columnEndExclusive": 72,
+                "text": "agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "agent-coordination/verification/",
+            "logicalReference": "agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Dated/archive evidence keeps its original citation identity. Own source passage: 'Extracted verbatim from `docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md`, lines ~129-139 and ~209-211, 228.'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-112",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 3,
+                "matchedExpression": [
+                  "agent-coordination/verification/"
+                ],
+                "originalLineText": "Extracted verbatim from `docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md`, lines ~129-139 and ~209-211, 228."
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-006",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58",
+          "L12-60"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-1/ground-truth.md",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "e7cb6655d964900842c1483b04a224577fa6be19055f36f87fc2e6a7a33d2dc2",
+          "bytes": 833,
+          "lines": 15,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetEvidence": {},
+      "renderContexts": {},
+      "populationGapFindings": [],
+      "L12-60-coverage": {
+        "stepFiveExcluded": [],
+        "authorAddedSlots": [],
+        "recordChangedThisTurn": true
+      },
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-2/ground-truth.md",
+      "sourceDigest": "4dba623856c9553162170264f0077d11a2032ebc345c9ae9ec2fed46e3a3c7c4",
+      "sourceContext": "# Ground truth: case-2 (P05.2 unclear case)\n\nExtracted verbatim from `docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md`, lines ~140-152 and ~193-207.\n\n## GT-1: false-wrap rate\n\nNot applicable to case-2. See `scoring/case-1/ground-truth.md`.\n\n## GT-2: Codex cursor glyph\n\n> Concrete, previously unverified mechanism found: `MENU_CURSOR_ITEM` hardcodes Claude's own cursor glyph, and the repo's own prior-art notes record Codex using a different one — unconfirmed by any real capture at explanation time.\n\nLive-confirmed later in the same cell by capturing a real Codex pane (P05.2.md ~L193-201): \"Codex's real menu (`› 1. Yes, continue`) used a different cursor glyph (U+203A) than Claude's (U+276F) for the identical concept, exactly as the panel's documentary evidence predicted — and it really did wrap incorrectly before the fix.\"\n\n**Bears on:** case-2 (unclear case) only.\n",
+      "record": {
+        "file": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-2/ground-truth.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "4dba623856c9553162170264f0077d11a2032ebc345c9ae9ec2fed46e3a3c7c4",
+        "digest": "4dba623856c9553162170264f0077d11a2032ebc345c9ae9ec2fed46e3a3c7c4",
+        "inventoryEdgeIds": [
+          "evidence-113"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-113",
+            "slotKey": "{\"edgeId\":\"evidence-113\",\"file\":\"archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-2/ground-truth.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-113\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":3}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-113",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 3
+              }
+            ],
+            "consumerFile": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-2/ground-truth.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 3,
+                "columnStart": 40,
+                "columnEndExclusive": 72,
+                "text": "agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 3,
+                "columnStart": 40,
+                "columnEndExclusive": 72,
+                "text": "agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "agent-coordination/verification/",
+            "logicalReference": "agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Dated/archive evidence keeps its original citation identity. Own source passage: 'Extracted verbatim from `docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md`, lines ~140-152 and ~193-207.'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-113",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 3,
+                "matchedExpression": [
+                  "agent-coordination/verification/"
+                ],
+                "originalLineText": "Extracted verbatim from `docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md`, lines ~140-152 and ~193-207."
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-006",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58",
+          "L12-60"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-2/ground-truth.md",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "4dba623856c9553162170264f0077d11a2032ebc345c9ae9ec2fed46e3a3c7c4",
+          "bytes": 917,
+          "lines": 15,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetEvidence": {},
+      "renderContexts": {},
+      "populationGapFindings": [],
+      "L12-60-coverage": {
+        "stepFiveExcluded": [],
+        "authorAddedSlots": [],
+        "recordChangedThisTurn": true
+      },
       "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
     }
   ]

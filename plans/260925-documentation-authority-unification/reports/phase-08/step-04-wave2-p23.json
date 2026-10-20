@@ -1,0 +1,322 @@
+{
+  "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "reviewerRule": "Never run checker/probes/resolver/author scripts. Read every assigned file through EOF and independently verify targets. One verdict per whole file, even when streamed.",
+  "set": "step04-013",
+  "files": [
+    "src/config/global-config.mjs",
+    "src/config/shared-config-file.mjs"
+  ],
+  "joinedSlots": 3,
+  "items": [
+    {
+      "file": "src/config/global-config.mjs",
+      "sourceDigest": "128596fa9a107741cb126d67c9932ae91b8430d4bed5abaa64f16c72af59815d",
+      "sourceContext": "// global-config.mjs -- reads fgOS's global config file (~/.fgos/config.json)\n// and merges it with a project config, project always winning\n// (docs/history/global-project-config-awareness/CONTEXT.md D1).\n//\n// config-merge.mjs's own header comment already anticipated this exact\n// caller (\"a future caller may be a user-level config file\") -- this module\n// is that caller: mergeConfigDefaults(existing, defaults) already gives\n// \"existing wins, defaults only fill gaps\" semantics, which is exactly\n// \"project overwrites global\" when existing=project, defaults=global.\n\nimport fs from 'node:fs';\nimport os from 'node:os';\nimport path from 'node:path';\n\nimport { mergeConfigDefaults } from '../setup/config-merge.mjs';\nimport { sharedConfigFilePath } from './shared-config-file.mjs';\n\n// A function, not a module-load-time const: os.homedir() must be read fresh\n// on every call, not frozen the first time this module is imported --\n// otherwise a caller overriding process.env.HOME (tests; anything else that\n// legitimately runs with a different HOME) after this module already\n// loaded would see the wrong, stale path. `GLOBAL_CONFIG_PATH` below is\n// still exported as a snapshot for display purposes (messages, docs), but\n// every function's own default resolution calls this, never the constant.\nfunction defaultGlobalConfigPath() {\n  return path.join(os.homedir(), '.fgos', 'config.json');\n}\n\nexport const GLOBAL_CONFIG_PATH = defaultGlobalConfigPath();\n\n/**\n * Read+parse the global config file. A missing file is not an error --\n * global config is optional -- and resolves to `{}`. A present-but-invalid\n * file throws, the same discipline dispatch.mjs's loadRunnerConfig already\n * applies to the project-level file.\n */\nexport function loadGlobalConfig(globalConfigPath = defaultGlobalConfigPath()) {\n  if (!fs.existsSync(globalConfigPath)) return {};\n  const raw = fs.readFileSync(globalConfigPath, 'utf8');\n  try {\n    return JSON.parse(raw);\n  } catch (err) {\n    throw new Error(`cannot parse global config at \"${globalConfigPath}\": ${err.message}`);\n  }\n}\n\n/**\n * `projectConfig` merged with the global config, project winning any key\n * present in both.\n *\n * `sanitizeGlobal`, when given, runs on the loaded global config before the\n * merge — a caller-supplied, schema-aware filter for a global config file\n * this module itself has no schema knowledge of (kept general-purpose per\n * this file's header comment). Its purpose: a global config value that is\n * no longer valid against the current schema (e.g. a tier name retired by a\n * later migration) must never be allowed to fill a gap in a project config\n * that is missing that same key. `mergeConfigDefaults`'s fill-missing-only\n * contract has no way to know a key is stale rather than a legitimate\n * project-level customization, so the caller filters before merging, not\n * after: a stale key left in place would silently propagate into every\n * project's merged config and, once validation rejects the unknown key,\n * break every config load on that machine rather than just one project.\n */\nexport function mergeWithGlobalConfig(projectConfig, globalConfigPath = defaultGlobalConfigPath(), { sanitizeGlobal } = {}) {\n  const rawGlobalConfig = loadGlobalConfig(globalConfigPath);\n  const globalConfig = sanitizeGlobal ? sanitizeGlobal(rawGlobalConfig) : rawGlobalConfig;\n  return mergeConfigDefaults(projectConfig ?? {}, globalConfig).merged;\n}\n\n/**\n * Write `config` to the global config file, creating `~/.fgos/` if needed\n * (tsk-2qc-1 D4 — the write half `loadGlobalConfig` never had: this file\n * used to be read-only, since nothing needed to persist anything into it\n * before the tier-3 bin-discovery cache). Same \"the only write path in\n * this module, callers decide WHEN to write\" discipline\n * `writeSharedConfig` already applies to the project-level file.\n */\nexport function writeGlobalConfig(config, globalConfigPath = defaultGlobalConfigPath()) {\n  fs.mkdirSync(path.dirname(globalConfigPath), { recursive: true });\n  fs.writeFileSync(globalConfigPath, `${JSON.stringify(config, null, 2)}\\n`);\n}\n\n/**\n * Which config level is active for `cwd`'s project (project config wins\n * when present, per D1), and whether the other level is also present --\n * the awareness data `fgos doctor`'s config-awareness check reports on.\n *\n * `projectPresent` reflects the shared file (`.fgos/config.json`) alone\n * (tsk-5hv D1: the legacy runner config file was retired, no fallback).\n */\nexport function describeConfigAwareness(cwd, { globalConfigPath = defaultGlobalConfigPath(), projectConfigPath } = {}) {\n  const resolvedProjectPath = projectConfigPath ?? sharedConfigFilePath(cwd);\n  const globalPresent = fs.existsSync(globalConfigPath);\n  const projectPresent = fs.existsSync(resolvedProjectPath);\n  const active = projectPresent ? 'project' : globalPresent ? 'global' : 'none';\n  return {\n    active,\n    globalPresent,\n    projectPresent,\n    globalConfigPath,\n    projectConfigPath: resolvedProjectPath,\n  };\n}\n",
+      "record": {
+        "file": "src/config/global-config.mjs",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "128596fa9a107741cb126d67c9932ae91b8430d4bed5abaa64f16c72af59815d",
+        "digest": "128596fa9a107741cb126d67c9932ae91b8430d4bed5abaa64f16c72af59815d",
+        "inventoryEdgeIds": [
+          "class6-l-000226"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000226",
+            "slotKey": "{\"edgeId\":\"class6-l-000226\",\"file\":\"src/config/global-config.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000226\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":3}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000226",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 3
+              }
+            ],
+            "consumerFile": "src/config/global-config.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 3,
+                "columnStart": 5,
+                "columnEndExclusive": 60,
+                "text": "docs/history/global-project-config-awareness/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 3,
+                "columnStart": 5,
+                "columnEndExclusive": 60,
+                "text": "docs/history/global-project-config-awareness/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/global-project-config-awareness/CONTEXT.md",
+            "logicalReference": "docs/history/global-project-config-awareness/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '// (docs/history/global-project-config-awareness/CONTEXT.md D1).'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/global-project-config-awareness/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000226",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 3,
+                "matchedExpression": "docs/history/global-project-config-awareness/CONTEXT.md",
+                "originalLineText": "// (docs/history/global-project-config-awareness/CONTEXT.md D1)."
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-013",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58",
+          "L12-60"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "src/config/global-config.mjs",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "128596fa9a107741cb126d67c9932ae91b8430d4bed5abaa64f16c72af59815d",
+          "bytes": 5011,
+          "lines": 103,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetEvidence": {},
+      "renderContexts": {},
+      "populationGapFindings": [],
+      "L12-60-coverage": {
+        "stepFiveExcluded": [],
+        "authorAddedSlots": [],
+        "recordChangedThisTurn": true
+      },
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "src/config/shared-config-file.mjs",
+      "sourceDigest": "c2239950f9a6dcf64d140ca9208ea013104b81c82599b0754c268f760ee44d5c",
+      "sourceContext": "// shared-config-file.mjs -- the shared project config file (`.fgos/config.json`,\n// tsk-2ta D1 amended / tsk-5vf D1): one JSON file, one top-level section per\n// module (each module's own `registerConfigDefault` `key`, tsk-2cs D3/D6).\n// The legacy runner config file was retired (tsk-5hv D1) -- this is now\n// the sole config source, no fallback. `fgos setup` is what performs the real\n// write (D2); this module never writes on its own from a read (RUL9's\n// doctor-never-writes discipline, extended here to every read-only caller\n// of this module).\n//\n// `dir` is whatever project root the caller already resolved (repoRoot for\n// the runner path, cwd for doctor checks) -- no extra main-checkout\n// indirection. This file is NOT in `.gitignore`, so it is a normal\n// git-tracked file: every worktree checkout carries its own copy via\n// ordinary `git checkout`.\n\nimport fs from 'node:fs';\nimport path from 'node:path';\n\nexport function sharedConfigFilePath(dir) {\n  return path.join(dir, '.fgos', 'config.json');\n}\n\n/**\n * Read the shared config file at `dir`. Returns `{}` when it doesn't\n * exist. Invalid JSON throws, matching `loadGlobalConfig`'s existing\n * discipline.\n */\nexport function readSharedConfig(dir) {\n  const sharedPath = sharedConfigFilePath(dir);\n  if (fs.existsSync(sharedPath)) {\n    const raw = fs.readFileSync(sharedPath, 'utf8');\n    try {\n      return JSON.parse(raw);\n    } catch (err) {\n      throw new Error(`cannot parse shared config at \"${sharedPath}\": ${err.message}`);\n    }\n  }\n  return {};\n}\n\n// The repo-invariant check commands: deterministic, pure-read checks whose\n// pass/fail never depends on which item is being worked. They run alongside\n// an item's own `verify` at `return` and post-merge, so a repo-wide\n// invariant broken by item A cannot land on main unnoticed and stay red\n// across later merges (docs/history/tsk-516-approve-reverify-scope/\n// CONTEXT.md D2/D3/D4).\n//\n// Declared here, in the config layer, rather than hardcoded in the runner:\n// fgOS is a platform, and a project using it has its own invariant command,\n// not this repo's test layout (D6). This constant is only the default that\n// `fgos setup` writes -- the runner reads whatever the project's own config\n// actually says, and an absent section means no invariant check runs at all,\n// leaving behavior identical to before this existed.\n//\n// Lives in this domain-layer module (not next to its `registerConfigDefault`\n// call in the use-case layer) so both the use-case registration and the\n// infra-layer runner import it DOWNWARD -- an infra->use-case import would\n// break the one-way-down rule test/architecture.test.mjs enforces, which is\n// the very invariant this feature exists to protect.\nexport const DEFAULT_INVARIANT_CHECK_COMMANDS = ['node --test test/architecture.test.mjs'];\n\n/**\n * The invariant-check commands configured at `dir`, as a list of real\n * command strings. Returns `[]` for every shape that isn't a genuine list\n * of non-empty strings -- an absent section, a malformed one, or a list\n * with nothing runnable in it. Never falls back to\n * `DEFAULT_INVARIANT_CHECK_COMMANDS`: that default belongs to what `fgos\n * setup` WRITES, never to what a reader silently assumes -- otherwise a\n * project that deliberately configured no invariant checks would still get\n * this repo's own test command imposed on it.\n */\nexport function readInvariantCheckCommands(dir) {\n  const section = readSharedConfig(dir).invariantChecks;\n  if (!section || typeof section !== 'object' || Array.isArray(section)) return [];\n  if (!Array.isArray(section.commands)) return [];\n  return section.commands.filter((command) => typeof command === 'string' && command.trim() !== '');\n}\n\n// Project-specific commands every runner-created worktree runs after its\n// dependency install, before anything verifies in it -- e.g. building a\n// compiled binary the test suite needs, which a fresh checkout never has\n// (git only checks out tracked files). Empty by default: a project that\n// declares nothing keeps exactly today's behavior.\nexport const DEFAULT_WORKTREE_SETUP_COMMANDS = [];\n\n/**\n * The worktree setup commands configured at `dir` (`worktreeSetup.commands`),\n * as a list of non-empty command strings. `[]` for an absent or malformed\n * section -- same never-assume-a-default discipline as\n * `readInvariantCheckCommands`.\n */\nexport function readWorktreeSetupCommands(dir) {\n  const section = readSharedConfig(dir).worktreeSetup;\n  if (!section || typeof section !== 'object' || Array.isArray(section)) return [];\n  if (!Array.isArray(section.commands)) return [];\n  return section.commands.filter((command) => typeof command === 'string' && command.trim() !== '');\n}\n\n/**\n * Write `config` to the shared config file at `dir`, creating `.fgos/` if\n * needed. The only write path in this module -- callers decide WHEN to\n * write (`fgos setup`'s bootstrap, or the runner's own first-run default),\n * never triggered implicitly by a read.\n */\nexport function writeSharedConfig(dir, config) {\n  const sharedPath = sharedConfigFilePath(dir);\n  fs.mkdirSync(path.dirname(sharedPath), { recursive: true });\n  fs.writeFileSync(sharedPath, `${JSON.stringify(config, null, 2)}\\n`);\n}\n\n/**\n * `readSharedConfig` that degrades to `{}` instead of throwing on a file that\n * is present but not valid JSON.\n *\n * The shared config is explicitly an edit-the-file-by-hand surface, so a\n * half-typed edit is an ordinary state, not an exceptional one. A reader that\n * only wants one optional setting should behave the way it behaves when the\n * setting is absent — `readGateBypassLevel` has wrapped this call in exactly\n * this try/catch since it was written, for exactly this reason.\n *\n * Use this for an OPTIONAL setting whose absence is already meaningful. Do NOT\n * use it where the caller's whole job is to report on the file's health:\n * `fgos doctor`'s own checks must see the parse failure, not a tidy empty\n * object, or the one command that exists to name the problem would hide it.\n */\nexport function readSharedConfigOrEmpty(dir) {\n  try {\n    return readSharedConfig(dir);\n  } catch {\n    return {};\n  }\n}\n",
+      "record": {
+        "file": "src/config/shared-config-file.mjs",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "c2239950f9a6dcf64d140ca9208ea013104b81c82599b0754c268f760ee44d5c",
+        "digest": "c2239950f9a6dcf64d140ca9208ea013104b81c82599b0754c268f760ee44d5c",
+        "inventoryEdgeIds": [
+          "class6-l-000227",
+          "class6-l-000227"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000227",
+            "slotKey": "{\"edgeId\":\"class6-l-000227\",\"file\":\"src/config/shared-config-file.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000227\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":45}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000227",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 45
+              }
+            ],
+            "consumerFile": "src/config/shared-config-file.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 45,
+                "columnStart": 25,
+                "columnEndExclusive": 69,
+                "text": "docs/history/tsk-516-approve-reverify-scope/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 45,
+                "columnStart": 25,
+                "columnEndExclusive": 69,
+                "text": "docs/history/tsk-516-approve-reverify-scope/"
+              },
+              {
+                "line": 46,
+                "columnStart": 1,
+                "columnEndExclusive": 14,
+                "text": "// CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/tsk-516-approve-reverify-scope/\n// CONTEXT.md",
+            "logicalReference": "docs/history/tsk-516-approve-reverify-scope/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '// across later merges (docs/history/tsk-516-approve-reverify-scope/\\n// CONTEXT.md D2/D3/D4).'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/tsk-516-approve-reverify-scope/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000227",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 45,
+                "matchedExpression": "docs/history/tsk-516-approve-reverify-scope/\n// CONTEXT.md",
+                "originalLineText": "// across later merges (docs/history/tsk-516-approve-reverify-scope/"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000227",
+            "slotKey": "{\"edgeId\":\"class6-l-000227\",\"file\":\"src/config/shared-config-file.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000227\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":46}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000227",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 46
+              }
+            ],
+            "consumerFile": "src/config/shared-config-file.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 46,
+                "columnStart": 1,
+                "columnEndExclusive": 14,
+                "text": "// CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 45,
+                "columnStart": 25,
+                "columnEndExclusive": 69,
+                "text": "docs/history/tsk-516-approve-reverify-scope/"
+              },
+              {
+                "line": 46,
+                "columnStart": 1,
+                "columnEndExclusive": 14,
+                "text": "// CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/tsk-516-approve-reverify-scope/\n// CONTEXT.md",
+            "logicalReference": "docs/history/tsk-516-approve-reverify-scope/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '// across later merges (docs/history/tsk-516-approve-reverify-scope/\\n// CONTEXT.md D2/D3/D4).'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/tsk-516-approve-reverify-scope/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000227",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 46,
+                "matchedExpression": "docs/history/tsk-516-approve-reverify-scope/\n// CONTEXT.md",
+                "originalLineText": "// CONTEXT.md D2/D3/D4)."
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-013",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58",
+          "L12-60"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "src/config/shared-config-file.mjs",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "c2239950f9a6dcf64d140ca9208ea013104b81c82599b0754c268f760ee44d5c",
+          "bytes": 6143,
+          "lines": 132,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetEvidence": {},
+      "renderContexts": {},
+      "populationGapFindings": [],
+      "L12-60-coverage": {
+        "stepFiveExcluded": [],
+        "authorAddedSlots": [],
+        "recordChangedThisTurn": true
+      },
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    }
+  ]
+}

@@ -1,14 +1,18 @@
 [
   {
     "part": 1,
-    "set": "step04-017",
+    "set": "step04-001",
     "files": [
-      "CHANGELOG.md"
+      "domains/coding/AGENTS.md",
+      "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+      "domains/coding/skills/fgos-coding-exploring/SKILL.md",
+      "domains/coding/skills/fgos-coding-exploring/references/gate-mechanics.md",
+      "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md"
     ],
-    "edges": 1,
-    "bytes": 379790,
+    "edges": 42,
+    "bytes": 377028,
     "payload": "step-04-wave2-p01.json",
-    "payloadSha256": "e0472f7347cfaaa463cbbf59b9260e9c780a7406e7781e7a9358265e5ebcb46d",
+    "payloadSha256": "4651c0c4d6b765f536dc4e9b55874146b0447982e4890d386ab245f5a9f5ed89",
     "expectedReviewerOutput": "review-a38-step-04-wave2-p01.md",
     "reviewStatus": "pending",
     "elapsedReviewerSeconds": 0,
@@ -16,15 +20,17 @@
   },
   {
     "part": 2,
-    "set": "step04-018",
+    "set": "step04-001",
     "files": [
-      "plans/reports/fork-260928-1017-panel-depth-experiment-design-research-report.md",
-      "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md"
+      "domains/coding/skills/fgos-coding-implement/SKILL.md",
+      "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "domains/coding/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+      "domains/coding/skills/fgos-coding-knowledge/SKILL.md"
     ],
-    "edges": 2,
-    "bytes": 31335,
+    "edges": 21,
+    "bytes": 192325,
     "payload": "step-04-wave2-p02.json",
-    "payloadSha256": "137f9da5ddbbf8e179990958703799cbeba1989ac414a8212240702dea3ba54a",
+    "payloadSha256": "6dcc1836d97aabb8baef9498a03f0580b9d2bf5e5afaa23125c522e66a4ec3ff",
     "expectedReviewerOutput": "review-a38-step-04-wave2-p02.md",
     "reviewStatus": "pending",
     "elapsedReviewerSeconds": 0,
@@ -32,16 +38,16 @@
   },
   {
     "part": 3,
-    "set": "step04-019",
+    "set": "step04-002",
     "files": [
-      "packages/distribution/rust/src/init.rs",
-      "packages/distribution/rust/src/manifest.rs",
-      "packages/distribution/rust/src/workspace.rs"
+      "domains/coding/skills/fgos-coding-planning/SKILL.md",
+      "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md"
     ],
-    "edges": 4,
-    "bytes": 150403,
+    "edges": 31,
+    "bytes": 260141,
     "payload": "step-04-wave2-p03.json",
-    "payloadSha256": "f4c159f9253c9e6132ee096701ef94d9702655cec10be93203acc99890d056b2",
+    "payloadSha256": "c2dd54932f3178f3111997c443ae7a20979fd3a804f764e0797a0f499703e546",
     "expectedReviewerOutput": "review-a38-step-04-wave2-p03.md",
     "reviewStatus": "pending",
     "elapsedReviewerSeconds": 0,
@@ -49,15 +55,19 @@
   },
   {
     "part": 4,
-    "set": "step04-020",
+    "set": "step04-002",
     "files": [
-      "packages/herdr-fgos-common/rust/src/fgos.rs",
-      "packages/herdr-fgos-common/rust/src/settings.rs"
+      "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+      "domains/coding/skills/fgos-coding-validating/SKILL.md",
+      "domains/coding/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+      "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "domains/coding/task-specs/lock-decisions.md",
+      "domains/coding/task-specs/shape-plan.md"
     ],
-    "edges": 4,
-    "bytes": 85134,
+    "edges": 40,
+    "bytes": 380365,
     "payload": "step-04-wave2-p04.json",
-    "payloadSha256": "a2201fe29bfb72a172d7aa16e167789b63b9b26a0b77b3c751f3f05fb3fae2f2",
+    "payloadSha256": "8213ebbc78d4f13a832bc167dd6484aec8a17c70e3d7b62e994147716e4e0593",
     "expectedReviewerOutput": "review-a38-step-04-wave2-p04.md",
     "reviewStatus": "pending",
     "elapsedReviewerSeconds": 0,
@@ -65,14 +75,44 @@
   },
   {
     "part": 5,
-    "set": "step04-021",
+    "set": "step04-003",
     "files": [
-      "packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs"
+      "archive/plans/260831-1637-step07-inline-assignment-mvp/phase-03-harness-seam-and-two-proofs.md",
+      "archive/plans/260831-1637-step07-inline-assignment-mvp/plan.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/plan.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1650-GH-08-P00.2-dispatch-policy-fixes-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1745-GH-08-P00.3-cli-wiring-live-proof-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-1840-GH-08-P00.4-provider-family-fix-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-2050-GH-08-P01.1-coordination-store-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1640-GH-08-P00.1-h1l1-fix-recheck-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1720-GH-08-P00.2-dispatch-policy-redteam-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1735-GH-08-P00.2-rt1-fix-recheck-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1815-GH-08-P00.3-cli-wiring-redteam-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2140-GH-08-P01.1-coordination-store-redteam-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2200-GH-08-P01.1-round2-fix-recheck-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1609-GH-08-P00.1-canonical-docs-review-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1702-GH-08-P00.2-dispatch-policy-review-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1800-GH-08-P00.3-cli-wiring-review-report.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-2115-GH-08-P01.1-coordination-store-review-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/phase-03-recheck-disposition-live-proof.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/plan.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P00.1-contract-promotion-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P01.1-fixture-skeleton-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P02.2-idempotency-bounds-authority-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P03.1-recheck-disposition-replay-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P03.2-live-proof-negative-battery-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P00.1-redteam-findings-fix-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P01.1-test-coverage-fix-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P00.1-contract-promotion-redteam-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P00.1-fix-recheck-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P01.1-fix-recheck-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/redteam-260903-P01.1-fixture-skeleton-redteam-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-contract-promotion-review-report.md"
     ],
-    "edges": 1,
-    "bytes": 46456,
+    "edges": 35,
+    "bytes": 393654,
     "payload": "step-04-wave2-p05.json",
-    "payloadSha256": "f84939599107afb8ea85a5a98b47b879bf9d0f487ca6518627ee30d95147bc20",
+    "payloadSha256": "b20b23535ce4fd778aba181241ab4ec37bddd42adf7cc0b3be0fb564af0ffb51",
     "expectedReviewerOutput": "review-a38-step-04-wave2-p05.md",
     "reviewStatus": "pending",
     "elapsedReviewerSeconds": 0,
@@ -80,15 +120,26 @@
   },
   {
     "part": 6,
-    "set": "step04-022",
+    "set": "step04-003",
     "files": [
-      "src/runner/claim-liveness.mjs",
-      "src/runner/dispatch/assignment-runner.mjs"
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-fix-recheck-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P01.1-fixture-skeleton-review-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P02.1-driver-authorization-review-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/phase-00-consume-handoff-and-freeze-scope.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/phase-04-mvp5-usable-standalone-live-proof.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/plan.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P00.1-handoff-consumption-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P01.1-mvp3-recheck-disposition-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.1-thin-launcher-core-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P02.2-show-resume-setup-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P03.1-role-execution-policy-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P04.1-mvp5-resume-live-proof-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P04.2-dogfood-handoff-report.md"
     ],
-    "edges": 2,
-    "bytes": 155681,
+    "edges": 23,
+    "bytes": 157581,
     "payload": "step-04-wave2-p06.json",
-    "payloadSha256": "401281dd86b660ded5152a0960db2793fe16aa6169ed45c1925a66cd5606b930",
+    "payloadSha256": "aa41115b38cc25638506d9e0a153598bdea83de8e5a1d8ee76797a1f14d956c3",
     "expectedReviewerOutput": "review-a38-step-04-wave2-p06.md",
     "reviewStatus": "pending",
     "elapsedReviewerSeconds": 0,
@@ -96,17 +147,44 @@
   },
   {
     "part": 7,
-    "set": "step04-023",
+    "set": "step04-004",
     "files": [
-      "src/runner/dispatch/config.mjs",
-      "src/runner/dispatch/confinement/authority.mjs",
-      "src/runner/dispatch/confinement/request.mjs",
-      "src/runner/dispatch/execution-contract.mjs"
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P00.1-review-redteam-findings-fix-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P02.1-path-resolution-fix-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P04.2-handoff-gaps-fix-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P00.1-handoff-consumption-redteam-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P00.1-recheck-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P01.1-mvp3-recheck-disposition-redteam-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.1-recheck-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.1-thin-launcher-core-redteam-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P02.2-show-resume-setup-redteam-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P03.1-role-execution-policy-redteam-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P04.1-mvp5-resume-live-proof-redteam-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/redteam-260903-P04.2-dogfood-handoff-redteam-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-handoff-consumption-review-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-recheck-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P01.1-mvp3-recheck-disposition-review-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.1-recheck-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.1-thin-launcher-core-review-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P02.2-show-resume-setup-review-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P03.1-role-execution-policy-review-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.1-mvp5-resume-live-proof-review-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.1-recheck-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P04.2-dogfood-handoff-review-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/phase-01-mutation-unlock.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/phase-02-chain-verb-and-pack-registration.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/phase-03-plan-loop-skill-and-live-proof.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/plan.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/doer-260905-0000-p01-1-mutation-unlock-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/doer-260905-0245-p03-1-skill-authoring-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0105-p02-1-fix-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0112-p01-1-fix-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0225-wave1-integration-cwd-semantics-report.md"
     ],
-    "edges": 10,
-    "bytes": 283607,
+    "edges": 43,
+    "bytes": 393967,
     "payload": "step-04-wave2-p07.json",
-    "payloadSha256": "3ea1ec56f9474ba5fe767bda852a2dc7efff84c9420b83e0667c56b50b2a7a8b",
+    "payloadSha256": "e734048b4e5e70043d62ef716c5f17bb84e89cd88e820d43cb60700b4f68575b",
     "expectedReviewerOutput": "review-a38-step-04-wave2-p07.md",
     "reviewStatus": "pending",
     "elapsedReviewerSeconds": 0,
@@ -114,16 +192,22 @@
   },
   {
     "part": 8,
-    "set": "step04-024",
+    "set": "step04-004",
     "files": [
-      "src/runner/dispatch/resolve.mjs",
-      "src/runner/dispatch/trust-store.mjs",
-      "src/runner/loop.mjs"
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/fixer-260905-0320-p03-1-persona-fix-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0022-p02-1-chain-verb-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0053-p01-1-mutation-unlock-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/red-team-260905-0300-p03-1-skill-authoring-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0022-p02-1-chain-verb-review-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0053-p01-1-mutation-unlock-review-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0730-p03-1-r5-live-proof-review-report.md",
+      "archive/plans/260905-architecture-advisory-panel/phase-02-capability-fit-audit.md",
+      "archive/plans/260905-architecture-advisory-panel/phase-05-comparative-proof-and-promotion.md"
     ],
-    "edges": 11,
-    "bytes": 202508,
+    "edges": 12,
+    "bytes": 110492,
     "payload": "step-04-wave2-p08.json",
-    "payloadSha256": "0351ba0a404834c9b8ed948d42a3d940ee214623a32e791bc2a6e0e6ce4e859e",
+    "payloadSha256": "4d23a20a0534d7541875c4298b3c30616650402c235dd22fd014a1db382d4c0f",
     "expectedReviewerOutput": "review-a38-step-04-wave2-p08.md",
     "reviewStatus": "pending",
     "elapsedReviewerSeconds": 0,
@@ -131,16 +215,20 @@
   },
   {
     "part": 9,
-    "set": "step04-025",
+    "set": "step04-005",
     "files": [
-      "src/runner/merge.mjs",
-      "src/runner/work-compat.mjs",
-      "src/runner/worktree.mjs"
+      "archive/plans/260905-architecture-advisory-panel/plan.md",
+      "archive/plans/260906-1831-dispatch-visibility-v0/phase-01-executor-profile-trust-home.md",
+      "archive/plans/260906-1831-dispatch-visibility-v0/phase-06-live-proof-matrix.md",
+      "archive/plans/260906-1831-dispatch-visibility-v0/plan.md",
+      "archive/plans/260910-1243-confinement-authority-implementation/plan.md",
+      "archive/plans/260910-1243-confinement-authority-implementation/reports/phase-07-strict-readiness-docs-closeout-report.md",
+      "archive/plans/260910-1700-rust-host-r1-kernel/plan.md"
     ],
-    "edges": 32,
-    "bytes": 338429,
+    "edges": 42,
+    "bytes": 374693,
     "payload": "step-04-wave2-p09.json",
-    "payloadSha256": "53876133e25c8f6e75daa801dc22eab62c6b4400be583ac4a437221122ddc9c4",
+    "payloadSha256": "abdc42d398e1113bef4685aec8bb5ffe57a1e70d29542e7edfa91f0f575fd6d0",
     "expectedReviewerOutput": "review-a38-step-04-wave2-p09.md",
     "reviewStatus": "pending",
     "elapsedReviewerSeconds": 0,
@@ -148,16 +236,15 @@
   },
   {
     "part": 10,
-    "set": "step04-026",
+    "set": "step04-005",
     "files": [
-      "src/state/frontier.mjs",
-      "src/state/graph-harness.mjs",
-      "src/state/priority-formula.mjs"
+      "archive/plans/260910-1700-rust-host-r1-kernel/reports/p00-inventory.md",
+      "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md"
     ],
-    "edges": 12,
-    "bytes": 94779,
+    "edges": 17,
+    "bytes": 102027,
     "payload": "step-04-wave2-p10.json",
-    "payloadSha256": "1eb8d11548ce85c8f0d3f74255923472e248e17a049cde6a47acc98e10eb94ac",
+    "payloadSha256": "2e1cb0f509831d2bc20788306c8670770cf6faca65cf24cef5c9ae58a098e091",
     "expectedReviewerOutput": "review-a38-step-04-wave2-p10.md",
     "reviewStatus": "pending",
     "elapsedReviewerSeconds": 0,
@@ -165,15 +252,28 @@
   },
   {
     "part": 11,
-    "set": "step04-027",
+    "set": "step04-006",
     "files": [
-      "src/state/store.mjs",
-      "src/state/work.mjs"
+      "archive/plans/260911-2305-runtime-recovery/phase-designs/launch-reconciliation.md",
+      "archive/plans/260911-2305-runtime-recovery/plan.md",
+      "archive/plans/260911-2305-runtime-recovery/reports/phase-00-baseline-report.md",
+      "archive/plans/260915-0455-test-suite-feedback-cost/plan.md",
+      "archive/plans/260915-code-implementation-track-policy/plan.md",
+      "archive/plans/260915-code-implementation-track-policy/reports/review-260915-0944-critical-design-review.md",
+      "archive/plans/260915-code-implementation-track-policy/reports/track-closeout.md",
+      "archive/plans/260915-code-panel-multicell-facade/phase-00-contract-and-baseline.md",
+      "archive/plans/260915-code-panel-multicell-facade/phase-03-resume-and-compatibility.md",
+      "archive/plans/260915-code-panel-multicell-facade/phase-04-fix-orphaned-authorization.md",
+      "archive/plans/260915-code-panel-multicell-facade/phase-05-live-proof-and-rollout.md",
+      "archive/plans/260915-code-panel-multicell-facade/plan.md",
+      "archive/plans/260915-dispatch-operability-implementation/plan.md",
+      "archive/plans/260915-executor-policy-dispatch-seams/plan.md",
+      "archive/plans/260917-cold-resumable-coordination-dag/phase-00-baseline-and-migration-lock.md"
     ],
-    "edges": 22,
-    "bytes": 229634,
+    "edges": 49,
+    "bytes": 396625,
     "payload": "step-04-wave2-p11.json",
-    "payloadSha256": "03fc2332253166311c8708fb82b0a8b2e675f3c1d950c11ac9c16aae4d652e84",
+    "payloadSha256": "cd29c55d367f11bfe5d6b1adcf566d778a2f8f7c2ae94c19f868676ee017c0a4",
     "expectedReviewerOutput": "review-a38-step-04-wave2-p11.md",
     "reviewStatus": "pending",
     "elapsedReviewerSeconds": 0,
@@ -181,14 +281,17 @@
   },
   {
     "part": 12,
-    "set": "step04-028",
+    "set": "step04-006",
     "files": [
-      "src/util/format-duration.mjs"
+      "archive/plans/260917-cold-resumable-coordination-dag/phase-07-migration-and-release-proof.md",
+      "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring-rubric.md",
+      "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-1/ground-truth.md",
+      "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-2/ground-truth.md"
     ],
-    "edges": 2,
-    "bytes": 9586,
+    "edges": 4,
+    "bytes": 40295,
     "payload": "step-04-wave2-p12.json",
-    "payloadSha256": "25ff4534065565f1340a5f59d480212c9b4b7a440703a581a3748a4cf19d0b9b",
+    "payloadSha256": "0243ebe8126390fe4e10e72b18ec178e9c2f49bb258da7ec8c65cc806a452144",
     "expectedReviewerOutput": "review-a38-step-04-wave2-p12.md",
     "reviewStatus": "pending",
     "elapsedReviewerSeconds": 0,
@@ -196,14 +299,15 @@
   },
   {
     "part": 13,
-    "set": "step04-029",
+    "set": "step04-007",
     "files": [
-      "src/verbs/merge/approve.mjs"
+      "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "archive/plans/260919-coordination-skill-harness-simplification/reports/unit-I27-panel-depth-experiment-real-comparison-report.md"
     ],
-    "edges": 8,
-    "bytes": 76128,
+    "edges": 2,
+    "bytes": 287665,
     "payload": "step-04-wave2-p13.json",
-    "payloadSha256": "ecb3e16485da87b12ebf8572ff8953b7a3cfc4983a6ce0804a32d29c51de7048",
+    "payloadSha256": "71c2d38cc61ef12ac36f7de3ec8b63492f3fb7350d79cb6ff824c15b4d18bf36",
     "expectedReviewerOutput": "review-a38-step-04-wave2-p13.md",
     "reviewStatus": "pending",
     "elapsedReviewerSeconds": 0,
@@ -211,16 +315,28 @@
   },
   {
     "part": 14,
-    "set": "step04-030",
+    "set": "step04-008",
     "files": [
-      ".claude/skills/ui-spec/CONVENTION.md",
-      ".claude/skills/ui-spec/SKILL.md",
-      "core/skills/fgos-clarifying/SKILL.md"
+      "plugins/fgOS/skills/approve/SKILL.md",
+      "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+      "plugins/fgOS/skills/cleanup-next/SKILL.md",
+      "plugins/fgOS/skills/coding-shape-distill/SKILL.md",
+      "plugins/fgOS/skills/coding-shape/SKILL.md",
+      "plugins/fgOS/skills/deliver/SKILL.md",
+      "plugins/fgOS/skills/discover-next/SKILL.md",
+      "plugins/fgOS/skills/discover/SKILL.md",
+      "plugins/fgOS/skills/merge-loop/SKILL.md",
+      "plugins/fgOS/skills/merge-next/SKILL.md",
+      "plugins/fgOS/skills/plan/SKILL.md",
+      "plugins/fgOS/skills/retro-loop/SKILL.md",
+      "plugins/fgOS/skills/retro-next/SKILL.md",
+      "plugins/fgOS/skills/terminal-close/SKILL.md",
+      "plugins/fgOS/skills/terminal/SKILL.md"
     ],
-    "edges": 8,
-    "bytes": 127522,
+    "edges": 41,
+    "bytes": 292589,
     "payload": "step-04-wave2-p14.json",
-    "payloadSha256": "737174dbd1c15109df96ee4500268e9674a1c814dde6c6923ba6e63e0738892f",
+    "payloadSha256": "1e9858329401874cbbfc4e74bdafce517823dad97529d944eddc18f66f3eed1d",
     "expectedReviewerOutput": "review-a38-step-04-wave2-p14.md",
     "reviewStatus": "pending",
     "elapsedReviewerSeconds": 0,
@@ -228,15 +344,16 @@
   },
   {
     "part": 15,
-    "set": "step04-031",
+    "set": "step04-009",
     "files": [
-      "core/skills/fgos-researching/SKILL.md",
-      "src/runner/prompt-templates/worker-prompt-discovery.txt"
+      "AGENTS.md",
+      "CLAUDE.md",
+      "core/instructions/design-principles.md"
     ],
-    "edges": 7,
-    "bytes": 91386,
+    "edges": 27,
+    "bytes": 302964,
     "payload": "step-04-wave2-p15.json",
-    "payloadSha256": "9ad56ad66a9c115a5d4ab647fd235edaf47940e6d86ad735ecb77c459096b140",
+    "payloadSha256": "0d00640d4312467d905eee803909858e9490fe27a5cf1354e49cb9f65ccd13a3",
     "expectedReviewerOutput": "review-a38-step-04-wave2-p15.md",
     "reviewStatus": "pending",
     "elapsedReviewerSeconds": 0,
@@ -244,14 +361,14 @@
   },
   {
     "part": 16,
-    "set": "step04-032",
+    "set": "step04-009",
     "files": [
-      "core/skills/_shared/ak-cook-worker-contract.md"
+      "core/instructions/platform-laws.md"
     ],
-    "edges": 3,
-    "bytes": 31458,
+    "edges": 24,
+    "bytes": 233696,
     "payload": "step-04-wave2-p16.json",
-    "payloadSha256": "25fe07d8f2968a22dfa9f4416dba9eff51c23c776fda7a10a8956cf155258818",
+    "payloadSha256": "03b1a000f5880e262c1e4164092710c8a46fbe5c2737368e50462e5236bcd008",
     "expectedReviewerOutput": "review-a38-step-04-wave2-p16.md",
     "reviewStatus": "pending",
     "elapsedReviewerSeconds": 0,
@@ -259,6 +376,450 @@
   },
   {
     "part": 17,
+    "set": "step04-010",
+    "files": [
+      "bin/fgos.mjs"
+    ],
+    "edges": 0,
+    "bytes": 224733,
+    "payload": "step-04-wave2-p17.json",
+    "payloadSha256": "cff52156d44f305adaa0ff2c6382815ea4409f9ffb5272c50b7c3a2ed17010e0",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p17.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 18,
+    "set": "step04-010",
+    "files": [
+      "bin/fgos.mjs"
+    ],
+    "edges": 0,
+    "bytes": 81162,
+    "payload": "step-04-wave2-p18.json",
+    "payloadSha256": "39a84b156b5c4d77c6d3d504d61d28e3977a456bc4d0f867f558070b1936ba6d",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p18.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 19,
+    "set": "step04-010",
+    "files": [
+      "bin/fgos.mjs"
+    ],
+    "edges": 36,
+    "bytes": 192213,
+    "payload": "step-04-wave2-p19.json",
+    "payloadSha256": "138740c20f1053b6442fcb91300b26bb74113bec2188083d851546d158e5c1b3",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p19.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 20,
+    "set": "step04-011",
+    "files": [
+      "src/cli/command-registry.mjs"
+    ],
+    "edges": 1,
+    "bytes": 208233,
+    "payload": "step-04-wave2-p20.json",
+    "payloadSha256": "caf56558dd78c57e3b3bdab3f89ff5498bbbb9fbfc4ecb7e0c77508ff69170c6",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p20.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 21,
+    "set": "step04-012",
+    "files": [
+      "apps/fgos-gateway/Cargo.toml",
+      "apps/fgos-gateway/build.rs",
+      "apps/fgos-gateway/src/cf_access.rs",
+      "apps/fgos-gateway/src/gateway.rs",
+      "apps/fgos-gateway/src/mcp.rs",
+      "apps/fgos-gateway/web/src/App.tsx",
+      "apps/fgos-gateway/web/src/api/client.ts",
+      "apps/fgos-gateway/web/src/api/errors.ts",
+      "apps/fgos-gateway/web/src/api/poll.ts",
+      "apps/fgos-gateway/web/src/api/types.ts",
+      "apps/fgos-gateway/web/src/lib/network.ts",
+      "apps/fgos-gateway/web/src/lib/status.ts"
+    ],
+    "edges": 41,
+    "bytes": 389811,
+    "payload": "step-04-wave2-p21.json",
+    "payloadSha256": "f0b145e5c040172aa1225d82f61075b608f0c0f5f37e3537c9c93883e262c4e2",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p21.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 22,
+    "set": "step04-012",
+    "files": [
+      "apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx",
+      "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
+      "apps/fgos-gateway/web/src/screens/Taskboard.tsx"
+    ],
+    "edges": 10,
+    "bytes": 81734,
+    "payload": "step-04-wave2-p22.json",
+    "payloadSha256": "33d7d3ddc7967ae5b689eb9de3dfb560ecf41f4602059668464cae8dcce50282",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p22.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 23,
+    "set": "step04-013",
+    "files": [
+      "src/config/global-config.mjs",
+      "src/config/shared-config-file.mjs"
+    ],
+    "edges": 3,
+    "bytes": 24945,
+    "payload": "step-04-wave2-p23.json",
+    "payloadSha256": "a889b11964f7dbd6373fd483d68fbfcd8e287a28f92b71bb43c88c5eb946c0de",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p23.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 24,
+    "set": "step04-014",
+    "files": [
+      "src/install/coexist.mjs"
+    ],
+    "edges": 1,
+    "bytes": 10531,
+    "payload": "step-04-wave2-p24.json",
+    "payloadSha256": "e755bc2ca390bdc33e4393b8ee74103120daf9f8a81a8848a1a90aaa5682a3a2",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p24.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 25,
+    "set": "step04-015",
+    "files": [
+      "src/intake/discovery.mjs",
+      "src/intake/plan-verdict-from-plan-md.mjs",
+      "src/intake/plan.mjs",
+      "src/intake/verify-pattern-check.mjs"
+    ],
+    "edges": 22,
+    "bytes": 206178,
+    "payload": "step-04-wave2-p25.json",
+    "payloadSha256": "ea0015334c8f232fe0e1c83c4fb55033c58ceec7c0373be371123f95f63cc645",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p25.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 26,
+    "set": "step04-016",
+    "files": [
+      ".githooks/pre-commit",
+      ".github/workflows/ci.yml"
+    ],
+    "edges": 4,
+    "bytes": 64650,
+    "payload": "step-04-wave2-p26.json",
+    "payloadSha256": "c5c8748b1d5ea5174615e9ad8963e4ab723d1bea697276b4b4c019434f804932",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p26.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 27,
+    "set": "step04-017",
+    "files": [
+      "CHANGELOG.md"
+    ],
+    "edges": 1,
+    "bytes": 376290,
+    "payload": "step-04-wave2-p27.json",
+    "payloadSha256": "ee55dbf84c57867edb6849316f44904b5d6a1acd1326ab84c22cf57454662023",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p27.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 28,
+    "set": "step04-018",
+    "files": [
+      "herdr-dashboard/src/pane_scan.rs",
+      "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md"
+    ],
+    "edges": 3,
+    "bytes": 42960,
+    "payload": "step-04-wave2-p28.json",
+    "payloadSha256": "1fe6d21713e7744438298685b9ab2d0cc31865b3883fda3eb73f4bab96a67114",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p28.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 29,
+    "set": "step04-019",
+    "files": [
+      "packages/distribution/rust/src/canonical.rs",
+      "packages/distribution/rust/src/init.rs",
+      "packages/distribution/rust/src/manifest.rs"
+    ],
+    "edges": 3,
+    "bytes": 154002,
+    "payload": "step-04-wave2-p29.json",
+    "payloadSha256": "187c4e4e300a075c10d11bd0f21c5a4107743e7f1461de30ad949a9de51f1bc9",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p29.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 30,
+    "set": "step04-020",
+    "files": [
+      "packages/herdr-fgos-common/rust/src/fgos.rs",
+      "packages/herdr-fgos-common/rust/src/settings.rs"
+    ],
+    "edges": 4,
+    "bytes": 85116,
+    "payload": "step-04-wave2-p30.json",
+    "payloadSha256": "e5cbf1aeea748a199dd7f41358526599a478f5e8797cd7ff3df35e1aefbb4d58",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p30.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 31,
+    "set": "step04-021",
+    "files": [
+      "packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs"
+    ],
+    "edges": 1,
+    "bytes": 46470,
+    "payload": "step-04-wave2-p31.json",
+    "payloadSha256": "57d07d5fadc3b3867cedbfcc17b0774c79fed6461d2ec137771f56e3dc171c86",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p31.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 32,
+    "set": "step04-022",
+    "files": [
+      "src/runner/dispatch/assignment-policy.mjs",
+      "src/runner/dispatch/assignment-runner.mjs"
+    ],
+    "edges": 2,
+    "bytes": 179475,
+    "payload": "step-04-wave2-p32.json",
+    "payloadSha256": "4bc4de2efc26339fa669358c56c9efdca5d30299f9a8de128e16b9a6eae63546",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p32.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 33,
+    "set": "step04-023",
+    "files": [
+      "src/runner/dispatch/config.mjs",
+      "src/runner/dispatch/confinement/authority.mjs",
+      "src/runner/dispatch/confinement/policies.mjs",
+      "src/runner/dispatch/operation-prompt-templates.mjs"
+    ],
+    "edges": 10,
+    "bytes": 294841,
+    "payload": "step-04-wave2-p33.json",
+    "payloadSha256": "7f94a566f8c1c2bd8f2672ebef159e46669608ee89b977afd4760f146959b82d",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p33.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 34,
+    "set": "step04-024",
+    "files": [
+      "src/runner/dispatch/resolve.mjs",
+      "src/runner/dispatch/run-lock.mjs",
+      "src/runner/loop.mjs"
+    ],
+    "edges": 11,
+    "bytes": 188873,
+    "payload": "step-04-wave2-p34.json",
+    "payloadSha256": "b3d1f1fb2708e08318b334525b4b10600d4f6aef30633110e9c104d06eeb4a44",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p34.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 35,
+    "set": "step04-025",
+    "files": [
+      "src/runner/merge.mjs",
+      "src/runner/paths.mjs",
+      "src/runner/worktree.mjs"
+    ],
+    "edges": 31,
+    "bytes": 355325,
+    "payload": "step-04-wave2-p35.json",
+    "payloadSha256": "4fb956da2a7896a8839515d17074b2b93aa7af7b901ff187ed73abc4c180cad1",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p35.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 36,
+    "set": "step04-026",
+    "files": [
+      "src/state/events-jsonl-truncation-guard.mjs",
+      "src/state/gate-bypass.mjs",
+      "src/state/knowledge-registry.mjs"
+    ],
+    "edges": 21,
+    "bytes": 187984,
+    "payload": "step-04-wave2-p36.json",
+    "payloadSha256": "ee451f275601f6e7e0fb1ca121e75a5400c61bc590b5b20f81a676772fdd40d1",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p36.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 37,
+    "set": "step04-027",
+    "files": [
+      "src/state/store.mjs",
+      "src/state/tool-registry.mjs"
+    ],
+    "edges": 13,
+    "bytes": 171839,
+    "payload": "step-04-wave2-p37.json",
+    "payloadSha256": "579f61e2417e657a36b8639b1a8d8215898a56a002b3eccab9861475b71b67cb",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p37.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 38,
+    "set": "step04-028",
+    "files": [
+      "src/util/format-bytes.mjs"
+    ],
+    "edges": 2,
+    "bytes": 9392,
+    "payload": "step-04-wave2-p38.json",
+    "payloadSha256": "a9adb26433951b9b41b3f97d58546abc197fee9f8e346c77f0d282fa4a396eea",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p38.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 39,
+    "set": "step04-029",
+    "files": [
+      "src/verbs/merge/approve.mjs"
+    ],
+    "edges": 8,
+    "bytes": 75239,
+    "payload": "step-04-wave2-p39.json",
+    "payloadSha256": "29cafb9dbbda9bbb0a45b09d12552a0bf8dc5d3217c4a49276d72a8b4495e585",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p39.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 40,
+    "set": "step04-030",
+    "files": [
+      ".claude/skills/ui-spec/CONVENTION.md",
+      "core/skills/_shared/capability-catalog.md",
+      "core/skills/_shared/executor-dispatch-fallback.md",
+      "core/skills/_shared/planning-capability-awareness.md",
+      "core/skills/distill/references/deep-dive-protocol.md",
+      "core/skills/fgos-clarifying/SKILL.md"
+    ],
+    "edges": 35,
+    "bytes": 378983,
+    "payload": "step-04-wave2-p40.json",
+    "payloadSha256": "83f1b670c01946836b9b05b1df0607b8f9742954ef4658dbf1abe756be3c17df",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p40.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 41,
+    "set": "step04-030",
+    "files": [
+      "core/skills/fgos-run/SKILL.md"
+    ],
+    "edges": 0,
+    "bytes": 31605,
+    "payload": "step-04-wave2-p41.json",
+    "payloadSha256": "d6918474ab2894a20a6c47da9dadfb7ca6da8c02d93a204c5c699c163a4a9952",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p41.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 42,
+    "set": "step04-031",
+    "files": [
+      "core/skills/fgos-researching/SKILL.md",
+      "core/task-specs/fgos-indexing.md"
+    ],
+    "edges": 7,
+    "bytes": 93176,
+    "payload": "step-04-wave2-p42.json",
+    "payloadSha256": "46b39e3ba957a655bf189580dccade53bb4d938c78cd0e05d1373fe6e924ec8f",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p42.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 43,
+    "set": "step04-032",
+    "files": [
+      "core/skills/_shared/ak-cook-worker-contract.md"
+    ],
+    "edges": 3,
+    "bytes": 24816,
+    "payload": "step-04-wave2-p43.json",
+    "payloadSha256": "42e3d1c8f66be38d980a1566815eb64577a5acbf95b7b507f85e065bf8f85f7a",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p43.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 44,
     "set": "step04-033",
     "files": [
       "plans/261020-1250-debate-pattern-and-judge-role/plan.md",
@@ -268,10 +829,10 @@
       "plans/reports/research-261020-1457-mailbox-address-unit-and-first-consumer.md"
     ],
     "edges": 7,
-    "bytes": 118150,
-    "payload": "step-04-wave2-p17.json",
-    "payloadSha256": "4c9b48a08e4ff6ed15f1a1deb8a5dff26c808197b8d3cfc26b1c2c269f8e36d3",
-    "expectedReviewerOutput": "review-a38-step-04-wave2-p17.md",
+    "bytes": 95064,
+    "payload": "step-04-wave2-p44.json",
+    "payloadSha256": "ebaf9d55251b163a08770abe8b7722278af44e756d4e6333c8e1d373ffbd93dd",
+    "expectedReviewerOutput": "review-a38-step-04-wave2-p44.md",
     "reviewStatus": "pending",
     "elapsedReviewerSeconds": 0,
     "remainingReviewerBudgetSeconds": null

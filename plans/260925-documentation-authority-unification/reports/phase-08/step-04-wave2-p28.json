@@ -1,0 +1,306 @@
+{
+  "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+  "reviewerRule": "Never run checker/probes/resolver/author scripts. Read every assigned file through EOF and independently verify targets. One verdict per whole file, even when streamed.",
+  "set": "step04-018",
+  "files": [
+    "herdr-dashboard/src/pane_scan.rs",
+    "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md"
+  ],
+  "joinedSlots": 3,
+  "items": [
+    {
+      "file": "herdr-dashboard/src/pane_scan.rs",
+      "sourceDigest": "4e71fa33d2081c4e36bee7c0d90c5c85cbb7a203bce86117e9a43e408ad0ec10",
+      "sourceContext": "use std::collections::HashMap;\nuse std::io;\nuse std::process::Command;\n\nuse serde::Deserialize;\n\nuse crate::pick::is_valid_id;\nuse crate::ports::PaneRegistry;\n\n/// The two pane-identity fields tsk-4zo D1 requires — no `workspace_id`\n/// field, since scan scope is the dashboard's own workspace by\n/// construction (`HerdrPaneScanner` below is already scoped to one).\n#[derive(Debug, Clone, PartialEq, Eq)]\npub struct PaneIdentity {\n    pub pane_id: String,\n    pub tab_id: String,\n}\n\n/// One pane exactly as `herdr pane list` reports it (tsk-1zq). Kept whole\n/// rather than pre-reduced to a task-id map, because two different\n/// consumers now fold the same scan: the \"In process\" panel wants\n/// `task_id_map` below, and the worker lane's reuse decision\n/// (`layout::reusable_worker_pane`) wants `focused`/`tab_id`/`label` too.\n///\n/// `focused` is chrome-level data herdr already returns on the same row —\n/// legitimate to read (D10-2), unlike `agent_status`, which\n/// `docs/operator-runbook-herdr-cockpit.md`'s Hard rule forbids outright.\n#[derive(Debug, Clone, PartialEq, Eq)]\npub struct PaneSnapshot {\n    pub pane_id: String,\n    pub tab_id: String,\n    pub label: Option<String>,\n    pub focused: bool,\n}\n\n#[derive(Debug)]\npub enum PaneScanError {\n    Io(io::Error),\n    ExitStatus(String),\n    Parse(serde_json::Error),\n}\n\nimpl std::fmt::Display for PaneScanError {\n    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {\n        match self {\n            PaneScanError::Io(err) => write!(f, \"herdr CLI spawn failed: {err}\"),\n            PaneScanError::ExitStatus(detail) => write!(f, \"herdr CLI exited non-zero: {detail}\"),\n            PaneScanError::Parse(err) => write!(f, \"herdr CLI output parse failed: {err}\"),\n        }\n    }\n}\n\nimpl From<io::Error> for PaneScanError {\n    fn from(err: io::Error) -> Self {\n        PaneScanError::Io(err)\n    }\n}\n\n/// One row from `herdr pane list --workspace <id>`'s real `result.panes`\n/// array — `label` is genuinely optional (a live capture showed panes\n/// with no `label` key at all: never renamed by `/fgOS:pick`'s flow).\n/// `focused` defaults to `false` when absent for the same reason.\n#[derive(Debug, Deserialize)]\nstruct PaneRow {\n    pane_id: String,\n    tab_id: String,\n    label: Option<String>,\n    #[serde(default)]\n    focused: bool,\n}\n\n#[derive(Debug, Deserialize)]\nstruct PaneListResult {\n    panes: Vec<PaneRow>,\n}\n\n#[derive(Debug, Deserialize)]\nstruct PaneListEnvelope {\n    result: PaneListResult,\n}\n\n/// Reserved prefix for auto-launch guard labels (tsk-2ja's\n/// `pick::auto_discover_pane_label`, and any future `fgos-auto-*` sibling)\n/// — a label in this namespace is never a real task id, even though it\n/// syntactically passes `is_valid_id` (hyphenated lowercase segments are a\n/// legal id shape). `extract_task_id` below carves it out explicitly so\n/// this map never gets a phantom entry for a pane that isn't tracking any\n/// real work item.\nconst AUTO_LAUNCH_LABEL_PREFIX: &str = \"fgos-auto-\";\n\n/// Extracts the leading `<taskid>` segment from a pane label built per the\n/// locked convention (`docs/history/fgos-terminal-pane-rename/CONTEXT.md`\n/// D4: `<taskid> | fg.ssid:<v> | a.ssid:<v>`, unresolved segments\n/// dropped) — splits on `\" | \"` and validates the leading segment against\n/// fgOS's own id grammar (`pick::is_valid_id`), never trusting an\n/// arbitrary leading substring as a task-id. Rejects the reserved\n/// `fgos-auto-*` namespace first (tsk-2ja) — those labels pass\n/// `is_valid_id`'s syntax check but are never real task ids.\npub(crate) fn extract_task_id(label: &str) -> Option<&str> {\n    let leading = label.split(\" | \").next()?;\n    if leading.starts_with(AUTO_LAUNCH_LABEL_PREFIX) {\n        return None;\n    }\n    is_valid_id(leading).then_some(leading)\n}\n\n/// Parses `herdr pane list --workspace <id>`'s real response shape\n/// (`{\"id\":..., \"result\":{\"panes\":[...], \"type\":\"pane_list\"}}`, captured\n/// live) into one snapshot per pane, losing nothing — the two folds\n/// below each take what they need from it.\npub fn parse_pane_list(json: &str) -> Result<Vec<PaneSnapshot>, serde_json::Error> {\n    let envelope: PaneListEnvelope = serde_json::from_str(json)?;\n    Ok(envelope\n        .result\n        .panes\n        .into_iter()\n        .map(|pane| PaneSnapshot {\n            pane_id: pane.pane_id,\n            tab_id: pane.tab_id,\n            label: pane.label,\n            focused: pane.focused,\n        })\n        .collect())\n}\n\n/// Task-id → pane identity, for the \"In process\" panel's jump-to-pane\n/// action (tsk-4zo D1, tsk-1eu D2). Skips any pane with no `label` or a\n/// leading segment that isn't a valid fgOS task-id: only labeled,\n/// agent-launched panes are tracked.\n///\n/// The label answers \"which item was this pane opened for\" and nothing\n/// else — pure identity, written by the session itself through T3's\n/// capability-gated helper (D5). Whether that item is still running is a\n/// question only the engine answers (D2); no caller of this map may infer\n/// liveness from the fact that an entry exists.\npub fn task_id_map(panes: &[PaneSnapshot]) -> HashMap<String, PaneIdentity> {\n    let mut map = HashMap::new();\n    for pane in panes {\n        let Some(label) = &pane.label else { continue };\n        let Some(task_id) = extract_task_id(label) else {\n            continue;\n        };\n        map.insert(\n            task_id.to_string(),\n            PaneIdentity {\n                pane_id: pane.pane_id.clone(),\n                tab_id: pane.tab_id.clone(),\n            },\n        );\n    }\n    map\n}\n\n/// Guard check for a fixed, non-id-shaped pane title — the admin lane's\n/// own `fgos-auto-merge`/`fgos-auto-retro`/`fgos-auto-cleanup` slot\n/// titles (tsk-57q), which the adapter writes once per fixed pane and\n/// which never change per item. `task_id_map` above only ever returns\n/// id-shaped labels (`extract_task_id` rejects the whole `fgos-auto-*`\n/// namespace), so a fixed literal title needs this separate exact-match\n/// check instead.\n///\n/// tsk-1zq removed the one worker-lane caller (`fgos-auto-discover`):\n/// there, this was a launch mutex, i.e. a label carrying orchestrator\n/// state, which is precisely what D2 forbids. In the admin lane the\n/// label names a fixed slot rather than a running item, which is the\n/// distinction DISCUSSION.md §6 draws when it assigns admin-lane labels\n/// to the adapter and execution-lane labels to the session itself.\npub fn pane_has_label(json: &str, label: &str) -> Result<bool, serde_json::Error> {\n    let envelope: PaneListEnvelope = serde_json::from_str(json)?;\n    Ok(envelope\n        .result\n        .panes\n        .iter()\n        .any(|pane| pane.label.as_deref() == Some(label)))\n}\n\nfn run_pane_list(herdr_bin: &str, workspace_id: &str) -> Result<String, PaneScanError> {\n    let output = Command::new(herdr_bin)\n        .args([\"pane\", \"list\", \"--workspace\", workspace_id])\n        .output()?;\n    if !output.status.success() {\n        return Err(PaneScanError::ExitStatus(\n            String::from_utf8_lossy(&output.stderr).to_string(),\n        ));\n    }\n    Ok(String::from_utf8_lossy(&output.stdout).to_string())\n}\n\n/// The `PaneRegistry` adapter (tsk-4zo D1): the concrete herdr-CLI\n/// implementation of the pane-scan port, scoped to one workspace (the\n/// dashboard's own). Already the port/adapter shape tsk-3t9-2 asked for —\n/// `app.rs` only ever consumes pane tracking through `&dyn PaneRegistry`\n/// (`refresh_pane_state`), never this concrete struct directly; only the\n/// composition root (`main.rs`) constructs it. Built this way from the\n/// start since `tsk-3t9-1`'s foundation had already merged, so there was\n/// nothing left for tsk-3t9-2 to refactor.\npub struct HerdrPaneScanner {\n    pub herdr_bin: String,\n    pub workspace_id: String,\n}\n\nimpl PaneRegistry for HerdrPaneScanner {\n    fn scan_panes(&self) -> Result<Vec<PaneSnapshot>, PaneScanError> {\n        let stdout = run_pane_list(&self.herdr_bin, &self.workspace_id)?;\n        parse_pane_list(&stdout).map_err(PaneScanError::Parse)\n    }\n\n    fn has_labeled_pane(&self, label: &str) -> Result<bool, PaneScanError> {\n        let stdout = run_pane_list(&self.herdr_bin, &self.workspace_id)?;\n        pane_has_label(&stdout, label).map_err(PaneScanError::Parse)\n    }\n}\n\n#[cfg(test)]\nmod tests {\n    use super::*;\n\n    // Captured live this session: `herdr pane list --workspace wS` from\n    // inside this very session's own herdr-managed pane. 7 real panes:\n    // 2 with no `label` key at all, 5 with a 2-segment label\n    // (`taskid | a.ssid:<v>` — no `fg.ssid`, dropped because unresolved\n    // in these live sessions), never a 3-segment label in this capture.\n    const PANE_LIST_FIXTURE: &str = r#\"{\"id\":\"cli:pane:list\",\"result\":{\"panes\":[\n        {\"agent\":\"claude\",\"agent_status\":\"idle\",\"cwd\":\"/x\",\"focused\":false,\n         \"pane_id\":\"wS:pW\",\"tab_id\":\"wS:t8\",\"workspace_id\":\"wS\",\n         \"label\":\"tsk-n4i-2 | a.ssid:afffd875-be95-41cb-8eb2-fa2cf1276eb5\"},\n        {\"agent\":\"claude\",\"agent_status\":\"idle\",\"cwd\":\"/x\",\"focused\":false,\n         \"pane_id\":\"wS:p1D\",\"tab_id\":\"wS:t8\",\"workspace_id\":\"wS\"},\n        {\"agent\":\"claude\",\"agent_status\":\"working\",\"cwd\":\"/x\",\"focused\":false,\n         \"pane_id\":\"wS:p1C\",\"tab_id\":\"wS:tD\",\"workspace_id\":\"wS\",\n         \"label\":\"tsk-4zo | a.ssid:01d4c06d-70dc-4e06-a4b0-2bcf85668f28\"}\n    ],\"type\":\"pane_list\"}}\"#;\n\n    fn map_of(json: &str) -> HashMap<String, PaneIdentity> {\n        task_id_map(&parse_pane_list(json).expect(\"fixture should parse\"))\n    }\n\n    #[test]\n    fn pane_registry_parses_real_captured_pane_list_shape() {\n        let map = map_of(PANE_LIST_FIXTURE);\n        assert_eq!(map.len(), 2);\n        assert_eq!(\n            map.get(\"tsk-n4i-2\"),\n            Some(&PaneIdentity {\n                pane_id: \"wS:pW\".into(),\n                tab_id: \"wS:t8\".into(),\n            })\n        );\n        assert_eq!(\n            map.get(\"tsk-4zo\"),\n            Some(&PaneIdentity {\n                pane_id: \"wS:p1C\".into(),\n                tab_id: \"wS:tD\".into(),\n            })\n        );\n    }\n\n    #[test]\n    fn pane_registry_skips_panes_with_no_label() {\n        let map = map_of(PANE_LIST_FIXTURE);\n        // wS:p1D carries no `label` key at all — must never appear.\n        assert!(!map.values().any(|identity| identity.pane_id == \"wS:p1D\"));\n    }\n\n    #[test]\n    fn pane_registry_extracts_taskid_from_two_segment_label() {\n        // The real, live-observed shape: no fg.ssid segment at all.\n        assert_eq!(\n            extract_task_id(\"tsk-4zo | a.ssid:01d4c06d-70dc-4e06-a4b0-2bcf85668f28\"),\n            Some(\"tsk-4zo\")\n        );\n    }\n\n    #[test]\n    fn pane_registry_extracts_taskid_from_three_segment_label() {\n        assert_eq!(\n            extract_task_id(\"tsk-62x-1 | fg.ssid:649e49f0-1ea5 | a.ssid:649e49f0-1ea5\"),\n            Some(\"tsk-62x-1\")\n        );\n    }\n\n    #[test]\n    fn pane_registry_extracts_taskid_from_bare_taskid_label() {\n        assert_eq!(extract_task_id(\"tsk-19y\"), Some(\"tsk-19y\"));\n    }\n\n    #[test]\n    fn pane_registry_rejects_a_leading_segment_that_is_not_a_valid_taskid() {\n        // A pane manually renamed by a person to something that doesn't\n        // match fgOS's own id grammar (uppercase, here) must never be\n        // mistaken for a task-id — mirrors pick.rs's own grammar tests.\n        assert_eq!(extract_task_id(\"Reviewer | a.ssid:abc\"), None);\n        assert_eq!(extract_task_id(\"\"), None);\n    }\n\n    // Fixture for the auto-merge/retro/cleanup launcher's own fixed-title\n    // guard (tsk-57q) — one pane carries exactly the fixed, non-id-shaped\n    // label `extract_task_id` would silently drop.\n    const FIXED_LABEL_PANE_LIST_FIXTURE: &str = r#\"{\"id\":\"cli:pane:list\",\"result\":{\"panes\":[\n        {\"agent\":\"claude\",\"agent_status\":\"working\",\"cwd\":\"/x\",\"focused\":false,\n         \"pane_id\":\"wS:pOpL\",\"tab_id\":\"wS:tOp\",\"workspace_id\":\"wS\",\n         \"label\":\"fgos-auto-merge\"},\n        {\"agent\":\"claude\",\"agent_status\":\"idle\",\"cwd\":\"/x\",\"focused\":false,\n         \"pane_id\":\"wS:pOpR\",\"tab_id\":\"wS:tOp\",\"workspace_id\":\"wS\"}\n    ],\"type\":\"pane_list\"}}\"#;\n\n    #[test]\n    fn pane_has_label_finds_an_exact_fixed_title_match() {\n        assert!(\n            pane_has_label(FIXED_LABEL_PANE_LIST_FIXTURE, \"fgos-auto-merge\")\n                .expect(\"fixture should parse\")\n        );\n    }\n\n    #[test]\n    fn pane_has_label_is_false_when_no_pane_carries_that_exact_title() {\n        assert!(\n            !pane_has_label(FIXED_LABEL_PANE_LIST_FIXTURE, \"fgos-auto-retro\")\n                .expect(\"fixture should parse\")\n        );\n    }\n\n    #[test]\n    fn pane_has_label_ignores_panes_with_no_label_at_all() {\n        // wS:pOpR carries no label — must never be mistaken for a match.\n        assert!(\n            !pane_has_label(FIXED_LABEL_PANE_LIST_FIXTURE, \"\")\n                .expect(\"fixture should parse\")\n        );\n    }\n\n    #[test]\n    fn is_valid_id_s_grammar_happens_to_accept_the_fixed_operation_titles_too() {\n        // `is_valid_id`'s grammar (hyphen-joined lowercase-alnum segments,\n        // `pick.rs:47-67`) is not tied to any `tsk-`-style prefix, so\n        // `fgos-auto-merge` etc. structurally pass it too — this is a\n        // pre-existing property of the shared id grammar. It no longer\n        // means these titles leak into `parse_pane_list`'s map (next\n        // test): `extract_task_id` explicitly rejects the whole\n        // `fgos-auto-*` namespace (tsk-2ja's `AUTO_LAUNCH_LABEL_PREFIX`,\n        // closing the gap this test originally documented as a known,\n        // unaddressed limitation). `pane_has_label` itself never depended\n        // on this either way — it matches the exact literal label\n        // regardless of shape.\n        assert!(crate::pick::is_valid_id(\"fgos-auto-merge\"));\n        assert!(crate::pick::is_valid_id(\"fgos-auto-retro\"));\n        assert!(crate::pick::is_valid_id(\"fgos-auto-cleanup\"));\n    }\n\n    #[test]\n    fn pane_has_label_is_additive_and_extract_task_id_no_longer_matches_these_titles() {\n        // Corrected during the tsk-2ja/tsk-57q merge: `extract_task_id`\n        // now rejects the reserved `fgos-auto-*` namespace outright (see\n        // `extract_task_id_rejects_the_reserved_auto_launch_label_namespace`\n        // below), so `fgos-auto-merge` no longer parses as a bogus task id\n        // — `pane_has_label` remains a second, independent check, never a\n        // replacement for it, and its own exact-match result never\n        // depended on what `extract_task_id` decided either way.\n        let map = map_of(FIXED_LABEL_PANE_LIST_FIXTURE);\n        assert!(\n            !map.contains_key(\"fgos-auto-merge\"),\n            \"the reserved fgos-auto-* namespace must never be read back as a task id\"\n        );\n        assert!(\n            pane_has_label(FIXED_LABEL_PANE_LIST_FIXTURE, \"fgos-auto-merge\")\n                .expect(\"fixture should parse\")\n        );\n    }\n\n    #[test]\n    fn extract_task_id_rejects_the_reserved_auto_launch_label_namespace() {\n        // Syntactically id-shaped (passes `is_valid_id`) but must never\n        // be read back as a real task id — tsk-2ja's own guard label.\n        assert_eq!(extract_task_id(\"fgos-auto-discover-tsk-2ja\"), None);\n    }\n\n    const AUTO_DISCOVER_PANE_FIXTURE: &str = r#\"{\"id\":\"cli:pane:list\",\"result\":{\"panes\":[\n        {\"agent\":\"claude\",\"agent_status\":\"idle\",\"cwd\":\"/x\",\"focused\":false,\n         \"pane_id\":\"wS:pZ\",\"tab_id\":\"wS:t9\",\"workspace_id\":\"wS\",\n         \"label\":\"fgos-auto-discover-tsk-2ja\"},\n        {\"agent\":\"claude\",\"agent_status\":\"idle\",\"cwd\":\"/x\",\"focused\":false,\n         \"pane_id\":\"wS:pW\",\"tab_id\":\"wS:t8\",\"workspace_id\":\"wS\",\n         \"label\":\"tsk-n4i-2 | a.ssid:afffd875-be95-41cb-8eb2-fa2cf1276eb5\"}\n    ],\"type\":\"pane_list\"}}\"#;\n\n    #[test]\n    fn auto_discover_guard_detects_a_pane_by_its_exact_synthetic_label() {\n        assert!(pane_has_label(AUTO_DISCOVER_PANE_FIXTURE, \"fgos-auto-discover-tsk-2ja\").unwrap());\n        assert!(!pane_has_label(AUTO_DISCOVER_PANE_FIXTURE, \"fgos-auto-discover-tsk-9zz\").unwrap());\n    }\n\n    #[test]\n    fn auto_discover_pane_label_never_pollutes_the_dashboard_pane_map() {\n        // The synthetic label passes `is_valid_id`'s syntax check (legal\n        // hyphenated-lowercase shape) but must never surface as a task-id\n        // key in `parse_pane_list`'s own map — that map stays exactly as\n        // it was before this guard existed.\n        let map = map_of(AUTO_DISCOVER_PANE_FIXTURE);\n        assert!(\n            !map.contains_key(\"fgos-auto-discover-tsk-2ja\"),\n            \"a synthetic auto-discover label must never be read back as a task id\"\n        );\n        assert_eq!(map.len(), 1, \"only the real, id-labeled pane is tracked\");\n    }\n}\n",
+      "record": {
+        "file": "herdr-dashboard/src/pane_scan.rs",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "4e71fa33d2081c4e36bee7c0d90c5c85cbb7a203bce86117e9a43e408ad0ec10",
+        "digest": "4e71fa33d2081c4e36bee7c0d90c5c85cbb7a203bce86117e9a43e408ad0ec10",
+        "inventoryEdgeIds": [
+          "class6-l-000188",
+          "class6-l-000189"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000188",
+            "slotKey": "{\"edgeId\":\"class6-l-000188\",\"file\":\"herdr-dashboard/src/pane_scan.rs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000188\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":27}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000188",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 27
+              }
+            ],
+            "consumerFile": "herdr-dashboard/src/pane_scan.rs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 27,
+                "columnStart": 6,
+                "columnEndExclusive": 44,
+                "text": "docs/operator-runbook-herdr-cockpit.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 27,
+                "columnStart": 6,
+                "columnEndExclusive": 44,
+                "text": "docs/operator-runbook-herdr-cockpit.md"
+              }
+            ],
+            "matchedExpression": "docs/operator-runbook-herdr-cockpit.md",
+            "logicalReference": "docs/operator-runbook-herdr-cockpit.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Retained native path, literal example or captured contract reference stays literal. Own source passage: \"/// `docs/operator-runbook-herdr-cockpit.md`'s Hard rule forbids outright.\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/operator-runbook-herdr-cockpit.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000188",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 27,
+                "matchedExpression": "docs/operator-runbook-herdr-cockpit.md",
+                "originalLineText": "/// `docs/operator-runbook-herdr-cockpit.md`'s Hard rule forbids outright."
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000189",
+            "slotKey": "{\"edgeId\":\"class6-l-000189\",\"file\":\"herdr-dashboard/src/pane_scan.rs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000189\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":92}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000189",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 92
+              }
+            ],
+            "consumerFile": "herdr-dashboard/src/pane_scan.rs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 92,
+                "columnStart": 25,
+                "columnEndExclusive": 74,
+                "text": "docs/history/fgos-terminal-pane-rename/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 92,
+                "columnStart": 25,
+                "columnEndExclusive": 74,
+                "text": "docs/history/fgos-terminal-pane-rename/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/fgos-terminal-pane-rename/CONTEXT.md",
+            "logicalReference": "docs/history/fgos-terminal-pane-rename/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: External-project history convention or named history evidence stays literal. Own source passage: '/// locked convention (`docs/history/fgos-terminal-pane-rename/CONTEXT.md`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/fgos-terminal-pane-rename/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000189",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 92,
+                "matchedExpression": "docs/history/fgos-terminal-pane-rename/CONTEXT.md",
+                "originalLineText": "/// locked convention (`docs/history/fgos-terminal-pane-rename/CONTEXT.md`"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-018",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59",
+          "L12-60"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "herdr-dashboard/src/pane_scan.rs",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "4e71fa33d2081c4e36bee7c0d90c5c85cbb7a203bce86117e9a43e408ad0ec10",
+          "bytes": 16712,
+          "lines": 405,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetEvidence": {},
+      "renderContexts": {},
+      "populationGapFindings": [],
+      "L12-60-coverage": {
+        "stepFiveExcluded": [],
+        "authorAddedSlots": [],
+        "recordChangedThisTurn": true
+      },
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md",
+      "sourceDigest": "4d5af3639f5511770443d983afb52907184c40b0f1758fe031c451232938f2a9",
+      "sourceContext": "# Architecture review brief — Dispatch Visibility V0\n\n**Branch:** `dispatch-visibility-v0` @ `45281918` (= local `main`)\n**Repo:** fgOS (`/home/vantt/projects/forgentX`), worktree for this branch:\n`/home/vantt/projects/forgentX-worker-isolation`\n**What you are asked for:** an **architecture** judgement, not a correctness audit.\nTwo correctness reviews already ran and their findings are closed; the second one's\nreport is in this directory and is listed below as required reading so you do not\nre-derive what it already established.\n\n---\n\n## 1. What the system is for\n\nfgOS dispatches work to AI coding agents. Its core promise, from\n`docs/platform-foundations.md`, is **\"Release con người\"** — free the human from\nsitting and watching. A person should be able to leave, come back, and find out\nwhat happened.\n\nUntil this track, that promise had a hole in the middle. Dispatch ran an agent\n**headless** (`claude -p \"<prompt>\"`, `agy -p …`): a subprocess with a captured\nstdout and an exit code. Two consequences, both measured in production:\n\n1. **A multi-line prompt could not survive.** The prompt was substituted into an\n   argv element; a real implementation prompt is always multi-line, and it arrived\n   at the agent corrupted. Every real `fgos-coding-implement` dispatch was\n   destroyed this way, silently.\n2. **Nobody could see anything.** No pane to look at, no way to know whether a\n   30-minute round was working or wedged, no way to tell a run that ended an hour\n   ago from one killed mid-flight — `run.json` was written once as\n   `status: \"running\"` and never written again.\n\n**V0's goal:** make dispatch through **herdr** (a terminal-multiplexer daemon that\nruns real interactive agent TUIs in panes) actually work, be observable while it\nruns, and be safe enough that a worker cannot reach the operator's own cockpit.\n\n**Explicitly out of scope for V0:** *contact*. V0 grants **observation only** —\nany number of readers, no coordination. Talking to a running worker (answering its\nquestion, redirecting it, stopping it) is V1. Several design choices below only\nmake sense against that boundary, and one of the questions for you is whether the\nboundary is drawn in the right place.\n\n### The doctrine the whole design turns on\n\n> **A receipt is an artifact the receiver wrote.**\n\nTransport status is never proof. Concretely: a round concludes **only** when the\nworker's own `outbox/result-<round>.json` appears on disk. `agent_status` is never\nread as completion — that reading was wrong twice in production (reported `idle`\nbefore the agent had started at all, and again in a gap between two tool calls of\none turn).\n\nA second rule, stated three times in the code because it is the one that kills\nhealthy work when broken:\n\n> **A reading that could not be taken is not evidence.**\n\nA failed liveness probe reports `unknown`, never `absent`. `died` needs consecutive\nabsences and one `unknown` resets the count. Time in which the agent's status could\nnot be read does not count towards an idle timeout.\n\n---\n\n## 2. The entity chain\n\n```\nWork item  tsk-*          what needs doing            (fgos list)\n  └─ Assignment  asgn_*   who is doing which stage of it\n       └─ Run  runs/NN    one actual execution of an executor\n            └─ RunResult  result.json — what that execution produced\n```\n\nA retry is a **new Run**, never an edit of the old one. `run.json.status`\n(`running` | `settled` | `died` | `unknown`) is a statement about **the execution\nreaching its end** — never about whether the work succeeded, which lives in\n`result.json`'s `status`/`confidence`.\n\nThere is a second, flatter Run layout, `dispatch-runs/<workId>/<stamp>/`, used when\na runner dispatch has no Assignment of its own. **Two layouts for one concept is a\nthing worth your opinion.**\n\n---\n\n## 3. Shape of what was built\n\nThree boundaries, deliberately separate:\n\n- **Routing boundary** — the worker gets its own herdr *session*, so the socket\n  herdr hands it controls only worker panes.\n- **Namespace boundary** — the worker gets a private `HOME`, closing the\n  `$HOME/.config/herdr/herdr.sock` fallback.\n- **Neither closes the hole alone.** Measured: herdr injects `HERDR_SOCKET_PATH`\n  into every pane it creates and **overwrites any `--env` override**. A worker\n  cannot be denied a socket, only handed a different one.\n\nThe signal ladder, in strict order (`liveness.mjs`):\n\n```\n1. truth      the worker's result file — outranks even a process that has exited\n2. blocked    agent waiting on something only a person can answer\n3. died       consecutive absent readings only\n4. ceiling    absolute bound on the round\n5. stale      no progress; the ONLY rung that reads screen text\n```\n\nOne round, as a sequence (`herdr-round.mjs`):\n\n```\nprepareRunDir → establishConfinement → paneSplit → seedWorkspaceTrust\n  → startAgent → deliverBrief → pollForOutcome → concludeFailure | settleRound\n```\n\n---\n\n## 4. Files to read, in order\n\n### Start here (the argument, before the code)\n\n| file | why |\n|---|---|\n| `docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md` | the decision the design rests on |\n| `plans/260906-1831-dispatch-visibility-v0/plan.md` | the 7 phases, the definition of done, the named risks |\n| `plans/reports/from-red-team-to-implementer-260907-1853-dispatch-visibility-v0-review-report.md` | the second correctness review. **Read this before reviewing** — its findings are all closed, and it records what was probed and found sound (kill path, atomicity, collector, mock fidelity) so you need not repeat that work |\n\n### The core (≈1 600 lines — this is the architecture)\n\n| file | lines | what it owns |\n|---|---|---|\n| `src/runner/dispatch/herdr-round.mjs` | 704 | one round, as a named sequence. `runHerdrRound` is the sequence; `driveRound` is everything after confinement exists |\n| `src/runner/dispatch/liveness.mjs` | 207 | the signal ladder. **Pure** — no clock, no terminal, no I/O |\n| `src/runner/dispatch/visibility-session.mjs` | 305 | `run.json` + `visibility.json`; the only door onto both. Atomic write, merge-not-replace |\n| `src/runner/dispatch/herdr-agent.mjs` | 266 | the one door onto the herdr CLI |\n| `src/runner/dispatch/brief.mjs` | 103 | the brief and its pointer; teaches the worker one gesture (`.tmp` then rename) |\n| `src/runner/dispatch/worker-artifacts.mjs` | 58 | where a worker's claim is, under either name it may have used |\n| `src/runner/dispatch/dispatch-error.mjs` | 22 | the shared error type; exists so two adapter modules need not import each other |\n\n### Confinement\n\n| file | lines | |\n|---|---|---|\n| `src/runner/dispatch/worker-home.mjs` | 215 | provision / redact / remove a private HOME |\n| `src/runner/dispatch/worker-session.mjs` | 114 | session naming, socket paths, operator-session refusal |\n| `src/runner/dispatch/worker-session-boot.mjs` | 140 | bring the worker session up and give it a pane to split from |\n| `src/runner/dispatch/trust-store.mjs` | 287 | pre-seed workspace trust, both formats (claude JSON, codex TOML) |\n\n### The seams into the rest of fgOS (where two defects hid)\n\n| file | lines | read for |\n|---|---|---|\n| `src/runner/dispatch/cli.mjs` | 1324 | `spawnWorker` (175) and `executeExecutorCli` (380) — **the two production call sites.** Both once dropped fields the config declared |\n| `src/runner/dispatch/transport.mjs` | 695 | `resolveExecutorCommand`, the adapter registry, the cli-spawn/http adapters |\n| `src/runner/dispatch/config.mjs` | 1097 | the config door. `validateInteractiveModeShape` (579), `validateExecutionProfileShape` (713) |\n| `src/runner/dispatch/assignment-runner.mjs` | 1075 | the collector: Run → RunResult (line 862 on) |\n\n### Observation surface\n\n`src/verbs/dispatch/show-run.mjs` (131), `src/verbs/dispatch/watch.mjs` (90),\nand `bin/fgos.mjs`'s `stale` case (the orphaned-run advisory, 2946 on).\n\n### Evidence — read at least one\n\n`docs/architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md`\nplus `proofs/2026-09-07-v0/` (probe scripts + their result JSON). This is what was\nactually measured against a real herdr, a real claude and a real agy, rather than\nargued.\n\n### Tests worth reading as specification\n\n`test/runner/dispatch-liveness.test.mjs` (the ladder's contract),\n`test/runner/dispatch-production-call-sites.test.mjs` (starts at the config file —\nexists because everything else built the invocation by hand),\n`test/verbs/dispatch-observe.test.mjs` (walks the import graph to assert an\nobserver binds no writer).\n\n---\n\n## 5. What we would most like your judgement on\n\nNot a checklist to work through — the questions where a second architect is\nworth more than another correctness pass.\n\n1. **Is the entity chain right?** Work item → Assignment → Run → RunResult, with a\n   retry as a new Run. Is `Run` carrying its own status file the right shape, or\n   should run state be derived from the event log the rest of fgOS uses?\n\n2. **Two Run layouts.** `assignments/<id>/runs/NN` and\n   `dispatch-runs/<workId>/<stamp>`. Every reader now handles both. Is that a\n   boundary that should be collapsed, and if so which way?\n\n3. **Where the observation boundary sits.** V0 grants read-only observation and\n   defers contact to V1. An actor lease was written and then **removed** — it\n   promised one-driver-at-a-time that a check-then-write cannot deliver, and its\n   tests asserted the promise rather than the behaviour. The reasoning is in a\n   comment block in `visibility-session.mjs`. Was removing it right, and is the\n   heartbeat that replaced part of its job (`round.note({})` every 10s) the right\n   primitive for V1 to build the real lock on?\n\n4. **The purity of the ladder.** `evaluateLadder` is pure and asks the caller for\n   screen text via a `needsScreen` flag, answered by a second call. It stayed pure\n   against a review suggestion to inject a `readScreen` callback. Right call?\n\n5. **`herdr-round.mjs` at 704 lines.** It was 369 lines inside a 1100-line\n   `transport.mjs` and was split out and decomposed into named steps. Is the\n   current decomposition real, or is it one file that should be two or three?\n   Named remaining seams: `pollForOutcome` carries both ladder-polling and\n   brief-resend policy; `settleRound` does five things.\n\n6. **Config surface.** Four executor fields were just **deleted** (`receipt`, a\n   top-level `trustStore`, `confinement.sessionName`, and four transport\n   deadlines), and a config still declaring one is now refused by name rather than\n   ignored. Is \"refuse a removed field\" the right posture for a platform other\n   projects install, or should it warn and continue?\n\n7. **The thing we know is unproven.** Every live proof ran a trivial task with a\n   six-line prompt. What is established is **contract conformance** — the agent\n   reads the pointer, finds the brief, writes ack/report/result — not that an agent\n   does hard implementation work well. `capabilities.fgos-coding-implement.prefer`\n   is already flipped to `agy-herdr`, so the next real implement dispatch takes\n   this path. Does anything in the architecture make that flip riskier than it\n   needs to be?\n\n## 6. Ground rules\n\n- Do not send messages to, or interfere with, any running herdr session or agent.\n- Do not start a gateway by hand; `fgos gateway start` is the only door.\n- This is a review: **read and report, change nothing.**\n- Three tests fail on this branch (`fgos-intake-4`, `enduser-index`,\n  `coordination-doctor-check`). All three reproduce identically on `main` and\n  belong to other tracks; the branch touches none of their files. Suite otherwise:\n  5 739 pass.\n",
+      "record": {
+        "file": "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+        "inventoryFileDigest": "4d5af3639f5511770443d983afb52907184c40b0f1758fe031c451232938f2a9",
+        "digest": "4d5af3639f5511770443d983afb52907184c40b0f1758fe031c451232938f2a9",
+        "inventoryEdgeIds": [
+          "evidence-190"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-190",
+            "slotKey": "{\"edgeId\":\"evidence-190\",\"file\":\"plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-190\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":162}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-190",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 162
+              }
+            ],
+            "consumerFile": "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 162,
+                "columnStart": 2,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 162,
+                "columnStart": 2,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-60/26/38/40/46: Dated/archive evidence keeps its original citation identity. Own source passage: '`docs/architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-190",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 162,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "`docs/architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md`"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen slot, qualified original census occurrence or explicitly pending supplemental tuple. Other buckets remain Step 3/5; no new census id."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-018",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-59",
+          "L12-60"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md",
+          "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+          "digest": "4d5af3639f5511770443d983afb52907184c40b0f1758fe031c451232938f2a9",
+          "bytes": 11691,
+          "lines": 230,
+          "method": "Whole pinned blob decoded and scanned through EOF; all census joins and docs paths inspected; independent review pending."
+        },
+        "stepFiveExcluded": []
+      },
+      "targetEvidence": {},
+      "renderContexts": {},
+      "populationGapFindings": [],
+      "L12-60-coverage": {
+        "stepFiveExcluded": [],
+        "authorAddedSlots": [],
+        "recordChangedThisTurn": true
+      },
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    }
+  ]
+}
