@@ -6,6 +6,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 import { fixture, evidence } from './land-fixture.mjs';
+import { createGitLand } from '../../src/git/land.mjs';
 test('Land binds actual consumer verification and returns an established receipt after an external ABA', () => {
   const f = fixture(); try {
     const p = f.port(); const { candidate: c } = p.prepare({ operationId: 'land', request: f.request });
@@ -179,5 +180,35 @@ test('terminal replay bypasses a busy destination slot', () => {
     f.git('reset', '--hard', f.request.target);
     f.port().prepare({ operationId: 'holding', request: f.request });
     assert.deepEqual(f.port().prepare({ operationId: 'finished', request: f.request }).receipt, receipt);
+  } finally { f.close(); }
+});
+
+test('Land refuses a caller-owned merge slot before creating a candidate or moving either tip', () => {
+  const f = fixture();
+  const acquired = acquireSync(createLockScope('legacy-land-caller'), 'merge-slot', {
+    fgosDir: path.join(f.repo, '.fgos'), ref: encodeURIComponent('trunk'),
+  });
+  assert.equal(acquired.result, 'acquired');
+  try {
+    const sourceBefore = f.git('rev-parse', 'source');
+    assert.throws(() => f.port().prepare({ operationId: 'caller-slot', request: f.request }, [acquired.handle]), /land-slot-already-held/);
+    assert.equal(f.git('rev-parse', 'trunk'), f.request.target);
+    assert.equal(f.git('rev-parse', 'source'), sourceBefore);
+    assert.equal(fs.existsSync(path.join(f.repo, '.fgos/runtime/git-candidates')), false);
+  } finally { acquired.handle.release(); f.close(); }
+});
+
+test('Land refuses an ephemeral checkout as its repository handle before creating another candidate', () => {
+  const f = fixture();
+  try {
+    const ephemeral = path.join(f.temp, 'legacy-merge-checkout');
+    f.git('worktree', 'add', '-q', '--detach', ephemeral, f.request.target);
+    const p = createGitLand({ ...f.options, repoPath: ephemeral }, f.loader);
+    try {
+      assert.throws(() => p.prepare({ operationId: 'ephemeral-caller', request: f.request }), /land-main-handle-required/);
+      assert.equal(f.git('rev-parse', 'trunk'), f.request.target);
+      assert.equal(fs.existsSync(path.join(f.repo, '.fgos/runtime/git-candidates')), false);
+      assert.equal(execFileSync('git', ['-C', ephemeral, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(), f.request.target);
+    } finally { p.close(); }
   } finally { f.close(); }
 });
