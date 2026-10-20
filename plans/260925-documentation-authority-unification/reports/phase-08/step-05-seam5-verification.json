@@ -1,0 +1,79 @@
+{
+  "status": "blocked",
+  "inputCommit": "3aeaa333745373108342eee07f0636b63147a49c",
+  "elapsedSeconds": 424.795,
+  "elapsedScope": "Time from this round acknowledgement to handback measurement; no reviewer time claimed.",
+  "proofs": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-75-ratchet.log",
+      "sha256": "9299cb06b5c8c4b7518e62992d0bb4c198371d561f10b129c7456f63c3f59319",
+      "exit": 0
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-75-ratchet-tests.log",
+      "sha256": "3f888e2a556b615329959eb8e7e7dc04ad5642f7043a10bf330ff6525ba2566b",
+      "exit": 0
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-prompt-tests.log",
+      "sha256": "6676e6d4ddad58b81956a82e4e2a888d29fb81aade9429bb5be9722ba6b19ede",
+      "exit": 0
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-initial-check.json",
+      "sha256": "18e3edf7c1db07e5ed5cc73fd2de644d3be5c1a95ea061c5dc6f57049c6cd4fb",
+      "exit": 1
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-pilot-probes.log",
+      "sha256": "ed5a4641a73331a1c84a2cdcfc76a1f7bc1170db25a5ff214213f49b7cd12c57",
+      "exit": 0
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-generator-probes.log",
+      "sha256": "7cc6d9ffb263c648ee36809b9d2ccce34799ff3d39f01d30e079429f7bfe3062",
+      "exit": 1
+    }
+  ],
+  "ratchet": {
+    "exit": 0,
+    "testsPassed": 28,
+    "exceptionsRefreshed": false
+  },
+  "promptProof": {
+    "testsPassed": 12,
+    "currentCompletePromptBytes": 5235,
+    "currentCompletePromptSha256": "aab044f5bb29f76a4a9139a9a5a4fec6f1dd0180c2caac89927a4236bf0ab88b"
+  },
+  "fullStep5Checker": {
+    "recordsChecked": 291,
+    "literalReferences": 2419,
+    "dynamicTuples": 5654,
+    "failureCount": 2,
+    "includesSeam5": false
+  },
+  "pilotProbes": {
+    "baselineFailures": 0,
+    "passed": 44,
+    "total": 44
+  },
+  "generatorProbes": {
+    "exit": 1,
+    "baselineFailures": 2,
+    "mutationProbesExecuted": 0,
+    "reason": "Existing baseline-zero assertion stopped execution before mutations."
+  },
+  "probeExecution": "Unchanged probe logic copied to /tmp/fgos-work; only P anchored to the real reports directory and result output filenames redirected to seam5-specific paths to preserve historical results. No baseline assertion removed.",
+  "authoredSeam5SemanticRecords": 0,
+  "remaining": {
+    "files": 704,
+    "literalReferences": 1203,
+    "dynamicTuples": 25007,
+    "originalDynamicCarries": 3,
+    "sourcePromptSupplement": "Runtime-owned source prompt must join the atomic golden group when authored."
+  },
+  "blocker": "The required full-checker zero-failure outcome conflicts with preserving settled backlog records until Step 7 under L12-58(1): s4-pins/docs/backlog.md and s4-receipts/generators-skills-and-support fail at the merged tree. This blocks acceptance, not every independent semantic-authoring operation; the full seam 5 authoring is explicitly unfinished.",
+  "untouched": "No consumer, test, code, source prompt, baseline, gate, ledger shard or exception data changed; no git write, fgos CLI, build, cargo, gateway or live-state/secrets access. Existing seam4 checker result was restored byte-for-byte after the full checker refreshed its default extension output.",
+  "needsWrites": [],
+  "reviewReady": false
+}

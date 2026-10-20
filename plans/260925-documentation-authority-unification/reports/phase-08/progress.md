@@ -1090,3 +1090,11 @@ Full Step 5 remains **291 records / 2,419 original refs / 5,654 original tuples*
 `step-05-seam4-rereview2-list.json`: **22 files (18 source /4 generated), 342 action-or-slot entries**. R10 excludes 195 admission-only changes and owner/label-only repairs; 16 occurrence owner pointers and 86 generated admitted render-joins are corrected. Four output inventories actually own 1,902 canonical state refs; the brief's 2,402 prose count is corrected without changing census identities. Two static fgos-run render hashes reflect the already-accounted L12-73 merge, without generation.
 
 Runner owns commits. Lead owns independent re-review, final Step 7 assembly and missing Phase 9 state/runtime/generator proof; no acceptance or cutover is claimed. No CLI, build, services, cargo/npm suite, consumer/code/docs/skills/baseline edit, live state/secrets read or git write. Markdown preview remains with Lead. `needsWrites: []`. Final evidence: `step-05-seam4-fix2-verification.json`.
+
+## Seam 5 authoring started — 2026-10-21
+
+Brief acknowledged. Reading authoritative rules and census; merge accounting precedes records. No product files changed.
+
+## Seam 5 incomplete handback — 2026-10-21
+
+L12-75 merge accounting complete; ratchet 0 and 28/28. Current prompt parity 5,235 bytes; owning tests 12/12. Pilot probes 44/44 reject; generator probes stop on two baseline failures. Full checker 291 existing records, two backlog-related failures; settled records remain pinned for Step 7. Seam 5 semantic records remain unauthored (704 files / 1,203 references / 25,007 tuples); no review readiness claimed. See step-05-seam5-handback.md and step-05-seam5-verification.json. Measured author elapsed 424.795s.

@@ -1,0 +1,78 @@
+{
+  "kind": "Static same-input source/golden parity; partial seam 5 evidence, not completed admission",
+  "inputCommit": "3aeaa333745373108342eee07f0636b63147a49c",
+  "files": [
+    {
+      "file": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+      "inputCommit": "3aeaa333745373108342eee07f0636b63147a49c",
+      "sourceSha256": "845861f6c8d55ab31e656fb6a54b6c3f6a51507fd02352de15146b7b08cd474a",
+      "sourceMode": "100644",
+      "bytes": 5196,
+      "lines": 96,
+      "matchesPinnedBytes": true
+    },
+    {
+      "file": "test/runner/prompt-templates.test.mjs",
+      "inputCommit": "3aeaa333745373108342eee07f0636b63147a49c",
+      "sourceSha256": "fd208d60c7d244155735ff6ab272ae7a8b00489b40a5c6ba2a042355edb14a1f",
+      "sourceMode": "100644",
+      "bytes": 13471,
+      "lines": 276,
+      "matchesPinnedBytes": true
+    },
+    {
+      "file": "src/runner/prompt-templates.mjs",
+      "inputCommit": "3aeaa333745373108342eee07f0636b63147a49c",
+      "sourceSha256": "fd027de3376fbdfe654f2a2b8599a384d88f9b5383a0161b0b9df7bca9de39b9",
+      "sourceMode": "100644",
+      "bytes": 4611,
+      "lines": 105,
+      "matchesPinnedBytes": true
+    }
+  ],
+  "source": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+  "golden": "test/runner/prompt-templates.test.mjs",
+  "fixture": {
+    "title": "Add the widget",
+    "kind": "feature",
+    "description": "(không có)",
+    "feedbackSection": "",
+    "action": "(không có)",
+    "readFirst": "(không có)",
+    "docsRefPointer": "",
+    "refs": "src/widget.mjs, docs/specs/widget.md",
+    "verify": "npm test",
+    "domain": "coding",
+    "skillPath": ".claude/skills/fgos-code-implement/SKILL.md"
+  },
+  "renderedSha256": "aab044f5bb29f76a4a9139a9a5a4fec6f1dd0180c2caac89927a4236bf0ab88b",
+  "goldenSha256": "aab044f5bb29f76a4a9139a9a5a4fec6f1dd0180c2caac89927a4236bf0ab88b",
+  "renderedBytes": 5235,
+  "comparison": "All complete UTF-8 bytes equal, including trailing LF. Only JS escaped backticks and escaped backslashes decoded in expected string. No path normalization. No source edit or generator execution.",
+  "equal": true,
+  "atomicUnit": {
+    "coCutPaths": [
+      "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+      "test/runner/prompt-templates.test.mjs"
+    ],
+    "sourcePointerLines": [
+      31,
+      48
+    ],
+    "goldenPointerLines": [
+      198,
+      215
+    ],
+    "requirement": "Any later pointer rewrite must include both complete pinned files, shared substitutions, forward/inverse full-file diffs and expected complete prompt bytes in the same cutover specification AND seam receipt. No standalone golden update."
+  },
+  "unsettled": "No semantic disposition or cutover readiness is claimed by static equality. Full source-pointer target admission, all 704 test files and 25,007 dynamic tuples still require authored records.",
+  "owningProof": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/runner/prompt-templates.test.mjs",
+    "exit": 0,
+    "passed": 12,
+    "failed": 0,
+    "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-prompt-tests.log",
+    "logSha256": "6676e6d4ddad58b81956a82e4e2a888d29fb81aade9429bb5be9722ba6b19ede",
+    "scope": "Current source and current expected golden only; no candidate cutover proof."
+  }
+}

@@ -1,0 +1,1361 @@
+{
+  "merge": "e83ca379cb6eb76daa3ce2cf36e76dddc576f455",
+  "prior": "22a818b0c558182bed8165591a52e9dc57e1f41b",
+  "main": "10d6bcfe2908f3d5d55247699f4d873e1fb16104",
+  "mainCommits": [
+    "10d6bcfe2 docs(board): record the seat identity merge and the persona and host route lanes",
+    "bb6df3bfe docs(backlog): record that a brief typed into a shell pane runs its backtick spans",
+    "1b16c7dfc docs(backlog): record more herdr brief delivery faults and the private tmp pointer trap"
+  ],
+  "changedPaths": [
+    "docs/backlog.md",
+    "plans/261017-1313-fgos-platform-program-board/plan.md"
+  ],
+  "changedCandidateFiles": [],
+  "changedDocs": [
+    "docs/backlog.md"
+  ],
+  "overlaps": [
+    {
+      "stage": 3,
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-126.jsonl",
+      "recordLine": 2,
+      "recordSha256": "9fcfc11561556c7a1e9d7a6522c3cb47f54430f9d516537ac45314e39f801bf3",
+      "file": "docs/backlog.md",
+      "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sourceSha256": "b9f6678387c5f2a15766739e0e14919c1dc8cb7087e5c3784c985f26a1a2dc6d",
+      "currentConsumerSha256": "8be573e3ac34b85bf6a73fcf989af84f2758daa760dabee00b658dac30f907a0",
+      "currentPassages": [],
+      "custody": "Step 7 final-pin rebind under L12-58(1); no settled record edited.",
+      "spanChecks": [
+        {
+          "id": "maps-j-01276",
+          "pinnedSpan": {
+            "columnEndExclusive": 280,
+            "columnStart": 216,
+            "line": 17,
+            "text": "docs/history/mvp2-scope-test-infra/reports/case-1-interactive.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            22
+          ]
+        },
+        {
+          "id": "maps-j-01277",
+          "pinnedSpan": {
+            "columnEndExclusive": 799,
+            "columnStart": 738,
+            "line": 17,
+            "text": "docs/history/mvp2-scope-test-infra/reports/case-2-headless.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            22
+          ]
+        },
+        {
+          "id": "maps-j-01278",
+          "pinnedSpan": {
+            "columnEndExclusive": 744,
+            "columnStart": 725,
+            "line": 21,
+            "text": "docs/coexistence.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            26
+          ]
+        },
+        {
+          "id": "maps-j-01279",
+          "pinnedSpan": {
+            "columnEndExclusive": 1354,
+            "columnStart": 1335,
+            "line": 21,
+            "text": "docs/coexistence.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            26
+          ]
+        },
+        {
+          "id": "maps-j-01280",
+          "pinnedSpan": {
+            "columnEndExclusive": 168,
+            "columnStart": 142,
+            "line": 24,
+            "text": "docs/specs/distribution.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            29
+          ]
+        },
+        {
+          "id": "maps-j-01281",
+          "pinnedSpan": {
+            "columnEndExclusive": 194,
+            "columnStart": 146,
+            "line": 39,
+            "text": "docs/history/gate-dialogue-continuity/CONTEXT.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            44,
+            129
+          ]
+        },
+        {
+          "id": "maps-j-01282",
+          "pinnedSpan": {
+            "columnEndExclusive": 867,
+            "columnStart": 830,
+            "line": 39,
+            "text": "repo/docs/specs/work-state.md:647-675"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            44
+          ]
+        },
+        {
+          "id": "maps-j-01283",
+          "pinnedSpan": {
+            "columnEndExclusive": 237,
+            "columnStart": 223,
+            "line": 44,
+            "text": "/docs/history/"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            49
+          ]
+        },
+        {
+          "id": "maps-j-01284",
+          "pinnedSpan": {
+            "columnEndExclusive": 520,
+            "columnStart": 506,
+            "line": 44,
+            "text": "/docs/history/"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            49
+          ]
+        },
+        {
+          "id": "maps-j-01285",
+          "pinnedSpan": {
+            "columnEndExclusive": 686,
+            "columnStart": 673,
+            "line": 44,
+            "text": "docs/history/"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            22,
+            44,
+            49,
+            117,
+            119,
+            122,
+            127,
+            128,
+            129,
+            133,
+            135,
+            141,
+            151
+          ]
+        },
+        {
+          "id": "maps-j-01286",
+          "pinnedSpan": {
+            "columnEndExclusive": 744,
+            "columnStart": 719,
+            "line": 44,
+            "text": "docs/history/*/CONTEXT.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            49,
+            117
+          ]
+        },
+        {
+          "id": "maps-j-01287",
+          "pinnedSpan": {
+            "columnEndExclusive": 1082,
+            "columnStart": 1068,
+            "line": 44,
+            "text": "/docs/history/"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            49
+          ]
+        },
+        {
+          "id": "maps-j-01288",
+          "pinnedSpan": {
+            "columnEndExclusive": 329,
+            "columnStart": 301,
+            "line": 54,
+            "text": "docs/platform-foundations.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            59
+          ]
+        },
+        {
+          "id": "maps-j-01289",
+          "pinnedSpan": {
+            "columnEndExclusive": 95,
+            "columnStart": 80,
+            "line": 67,
+            "text": "docs/decisions/"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            73,
+            115,
+            124
+          ]
+        },
+        {
+          "id": "maps-j-01290",
+          "pinnedSpan": {
+            "columnEndExclusive": 780,
+            "columnStart": 736,
+            "line": 98,
+            "text": "docs/distillery/sources/beads-viewer-rust.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            104
+          ]
+        },
+        {
+          "id": "maps-j-01291",
+          "pinnedSpan": {
+            "columnEndExclusive": 875,
+            "columnStart": 843,
+            "line": 98,
+            "text": "docs/distillery/sources/beads.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            104
+          ]
+        },
+        {
+          "id": "maps-j-01292",
+          "pinnedSpan": {
+            "columnEndExclusive": 995,
+            "columnStart": 945,
+            "line": 98,
+            "text": "docs/distillery/deep-dives/work-item-management.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            104
+          ]
+        },
+        {
+          "id": "maps-j-01293",
+          "pinnedSpan": {
+            "columnEndExclusive": 4249,
+            "columnStart": 4194,
+            "line": 101,
+            "text": "docs/distillery/deep-dives/herdr-vs-tmux-observation.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            107
+          ]
+        },
+        {
+          "id": "maps-j-01294",
+          "pinnedSpan": {
+            "columnEndExclusive": 375,
+            "columnStart": 360,
+            "line": 102,
+            "text": "docs/backlog.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            108,
+            117,
+            121
+          ]
+        },
+        {
+          "id": "maps-j-01295",
+          "pinnedSpan": {
+            "columnEndExclusive": 501,
+            "columnStart": 481,
+            "line": 102,
+            "text": "docs/specs/runner.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            108
+          ]
+        },
+        {
+          "id": "maps-j-01296",
+          "pinnedSpan": {
+            "columnEndExclusive": 96,
+            "columnStart": 72,
+            "line": 107,
+            "text": "docs/id-systems-audit.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            113,
+            114,
+            115,
+            116,
+            117,
+            118
+          ]
+        },
+        {
+          "id": "maps-j-01297",
+          "pinnedSpan": {
+            "columnEndExclusive": 80,
+            "columnStart": 56,
+            "line": 108,
+            "text": "docs/id-systems-audit.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            113,
+            114,
+            115,
+            116,
+            117,
+            118
+          ]
+        },
+        {
+          "id": "maps-j-01298",
+          "pinnedSpan": {
+            "columnEndExclusive": 93,
+            "columnStart": 69,
+            "line": 109,
+            "text": "docs/id-systems-audit.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            113,
+            114,
+            115,
+            116,
+            117,
+            118
+          ]
+        },
+        {
+          "id": "maps-j-01299",
+          "pinnedSpan": {
+            "columnEndExclusive": 349,
+            "columnStart": 321,
+            "line": 109,
+            "text": "docs/decisions/0000-index.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            115
+          ]
+        },
+        {
+          "id": "maps-j-01300",
+          "pinnedSpan": {
+            "columnEndExclusive": 80,
+            "columnStart": 56,
+            "line": 110,
+            "text": "docs/id-systems-audit.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            113,
+            114,
+            115,
+            116,
+            117,
+            118
+          ]
+        },
+        {
+          "id": "maps-j-01301",
+          "pinnedSpan": {
+            "columnEndExclusive": 95,
+            "columnStart": 71,
+            "line": 111,
+            "text": "docs/id-systems-audit.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            113,
+            114,
+            115,
+            116,
+            117,
+            118
+          ]
+        },
+        {
+          "id": "maps-j-01302",
+          "pinnedSpan": {
+            "columnEndExclusive": 213,
+            "columnStart": 198,
+            "line": 111,
+            "text": "docs/backlog.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            108,
+            117,
+            121
+          ]
+        },
+        {
+          "id": "maps-j-01303",
+          "pinnedSpan": {
+            "columnEndExclusive": 411,
+            "columnStart": 396,
+            "line": 111,
+            "text": "docs/specs/*.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            117
+          ]
+        },
+        {
+          "id": "maps-j-01304",
+          "pinnedSpan": {
+            "columnEndExclusive": 439,
+            "columnStart": 415,
+            "line": 111,
+            "text": "docs/architecture-map.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            117
+          ]
+        },
+        {
+          "id": "maps-j-01305",
+          "pinnedSpan": {
+            "columnEndExclusive": 468,
+            "columnStart": 443,
+            "line": 111,
+            "text": "docs/history/*/CONTEXT.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            49,
+            117
+          ]
+        },
+        {
+          "id": "maps-j-01306",
+          "pinnedSpan": {
+            "columnEndExclusive": 592,
+            "columnStart": 568,
+            "line": 111,
+            "text": "docs/id-systems-audit.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            113,
+            114,
+            115,
+            116,
+            117,
+            118
+          ]
+        },
+        {
+          "id": "maps-j-01307",
+          "pinnedSpan": {
+            "columnEndExclusive": 124,
+            "columnStart": 100,
+            "line": 112,
+            "text": "docs/id-systems-audit.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            113,
+            114,
+            115,
+            116,
+            117,
+            118
+          ]
+        },
+        {
+          "id": "maps-j-01308",
+          "pinnedSpan": {
+            "columnEndExclusive": 367,
+            "columnStart": 343,
+            "line": 112,
+            "text": "docs/id-systems-audit.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            113,
+            114,
+            115,
+            116,
+            117,
+            118
+          ]
+        },
+        {
+          "id": "maps-j-01309",
+          "pinnedSpan": {
+            "columnEndExclusive": 254,
+            "columnStart": 224,
+            "line": 113,
+            "text": "docs/history/dogfood-p25-run1/"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            119
+          ]
+        },
+        {
+          "id": "maps-j-01310",
+          "pinnedSpan": {
+            "columnEndExclusive": 396,
+            "columnStart": 356,
+            "line": 113,
+            "text": "docs/history/p50-workflow-induct/plan.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            119
+          ]
+        },
+        {
+          "id": "maps-j-01311",
+          "pinnedSpan": {
+            "columnEndExclusive": 799,
+            "columnStart": 756,
+            "line": 113,
+            "text": "docs/history/fgos-sample-testbed/CONTEXT.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            119
+          ]
+        },
+        {
+          "id": "maps-j-01312",
+          "pinnedSpan": {
+            "columnEndExclusive": 1069,
+            "columnStart": 1054,
+            "line": 115,
+            "text": "docs/backlog.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            108,
+            117,
+            121
+          ]
+        },
+        {
+          "id": "maps-j-01313",
+          "pinnedSpan": {
+            "columnEndExclusive": 1166,
+            "columnStart": 1113,
+            "line": 116,
+            "text": "docs/history/str61-chat-context-continuity/CONTEXT.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            122
+          ]
+        },
+        {
+          "id": "maps-j-01314",
+          "pinnedSpan": {
+            "columnEndExclusive": 1739,
+            "columnStart": 1728,
+            "line": 118,
+            "text": "docs/specs/"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            29,
+            44,
+            108,
+            117,
+            124
+          ]
+        },
+        {
+          "id": "maps-j-01315",
+          "pinnedSpan": {
+            "columnEndExclusive": 2517,
+            "columnStart": 2502,
+            "line": 118,
+            "text": "docs/decisions/"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            73,
+            115,
+            124
+          ]
+        },
+        {
+          "id": "maps-j-01316",
+          "pinnedSpan": {
+            "columnEndExclusive": 540,
+            "columnStart": 496,
+            "line": 121,
+            "text": "docs/history/p50-workflow-induct/reports/..."
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            127
+          ]
+        },
+        {
+          "id": "maps-j-01317",
+          "pinnedSpan": {
+            "columnEndExclusive": 1302,
+            "columnStart": 1237,
+            "line": 122,
+            "text": "docs/history/p50-workflow-induct/reports/p50-workflow-induct-6.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            128
+          ]
+        },
+        {
+          "id": "maps-j-01318",
+          "pinnedSpan": {
+            "columnEndExclusive": 176,
+            "columnStart": 128,
+            "line": 123,
+            "text": "docs/history/gate-dialogue-continuity/CONTEXT.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            44,
+            129
+          ]
+        },
+        {
+          "id": "maps-j-01319",
+          "pinnedSpan": {
+            "columnEndExclusive": 943,
+            "columnStart": 933,
+            "line": 125,
+            "text": "docs/specs"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            29,
+            44,
+            108,
+            117,
+            124,
+            131
+          ]
+        },
+        {
+          "id": "maps-j-01320",
+          "pinnedSpan": {
+            "columnEndExclusive": 663,
+            "columnStart": 599,
+            "line": 127,
+            "text": "docs/history/mvp-gap-measure/reports/dry-run-findings.md:129-156"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            133
+          ]
+        },
+        {
+          "id": "maps-j-01321",
+          "pinnedSpan": {
+            "columnEndExclusive": 401,
+            "columnStart": 337,
+            "line": 129,
+            "text": "docs/history/mvp-gap-measure/reports/dry-run-findings.md:166-170"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            135
+          ]
+        },
+        {
+          "id": "maps-j-01322",
+          "pinnedSpan": {
+            "columnEndExclusive": 1336,
+            "columnStart": 1278,
+            "line": 135,
+            "text": "docs/history/worktree-companion-mount-ephemeral/CONTEXT.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            141
+          ]
+        },
+        {
+          "id": "maps-j-01323",
+          "pinnedSpan": {
+            "columnEndExclusive": 316,
+            "columnStart": 303,
+            "line": 145,
+            "text": "docs/history/"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            22,
+            44,
+            49,
+            117,
+            119,
+            122,
+            127,
+            128,
+            129,
+            133,
+            135,
+            141,
+            151
+          ]
+        },
+        {
+          "id": "author-wave5c-docs-backlog-L37C410",
+          "pinnedSpan": {
+            "line": 37,
+            "columnStart": 410,
+            "columnEndExclusive": 427,
+            "text": "work-state.md:864"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            42,
+            122
+          ]
+        },
+        {
+          "id": "author-wave5c-docs-backlog-L40C297",
+          "pinnedSpan": {
+            "line": 40,
+            "columnStart": 297,
+            "columnEndExclusive": 326,
+            "text": "platform-foundations.md:73-74"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            45
+          ]
+        },
+        {
+          "id": "author-wave5c-docs-backlog-L40C354",
+          "pinnedSpan": {
+            "line": 40,
+            "columnStart": 354,
+            "columnEndExclusive": 367,
+            "text": "work-state.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            42,
+            44,
+            45,
+            116,
+            122
+          ]
+        },
+        {
+          "id": "author-wave5c-docs-backlog-L40C513",
+          "pinnedSpan": {
+            "line": 40,
+            "columnStart": 513,
+            "columnEndExclusive": 542,
+            "text": "platform-foundations.md:17-20"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            45
+          ]
+        },
+        {
+          "id": "author-wave5c-docs-backlog-L108C292",
+          "pinnedSpan": {
+            "line": 108,
+            "columnStart": 292,
+            "columnEndExclusive": 306,
+            "text": "reading-map.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            114
+          ]
+        },
+        {
+          "id": "author-wave5c-docs-backlog-L110C134",
+          "pinnedSpan": {
+            "line": 110,
+            "columnStart": 134,
+            "columnEndExclusive": 143,
+            "text": "runner.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            108,
+            116
+          ]
+        },
+        {
+          "id": "author-wave5c-docs-backlog-L110C189",
+          "pinnedSpan": {
+            "line": 110,
+            "columnStart": 189,
+            "columnEndExclusive": 212,
+            "text": "platform-foundations.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            45,
+            59,
+            116
+          ]
+        },
+        {
+          "id": "author-wave5c-docs-backlog-L110C216",
+          "pinnedSpan": {
+            "line": 110,
+            "columnStart": 216,
+            "columnEndExclusive": 231,
+            "text": "distribution.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            29,
+            116
+          ]
+        },
+        {
+          "id": "author-wave5c-docs-backlog-L110C235",
+          "pinnedSpan": {
+            "line": 110,
+            "columnStart": 235,
+            "columnEndExclusive": 248,
+            "text": "work-state.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            42,
+            44,
+            45,
+            116,
+            122
+          ]
+        },
+        {
+          "id": "author-wave5c-docs-backlog-L116C997",
+          "pinnedSpan": {
+            "line": 116,
+            "columnStart": 997,
+            "columnEndExclusive": 1014,
+            "text": "work-state.md:864"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            42,
+            122
+          ]
+        }
+      ],
+      "movedSpanCount": 58
+    },
+    {
+      "stage": 5,
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+      "recordLine": 66,
+      "recordSha256": "d77aa5acb72b2593f051acbd70069a5ebb7fdad9e74e58e38a714642e4e61bdd",
+      "file": "docs/backlog.md",
+      "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "2e0cd5cd4e216a77ad108e187e109135571c0ca57e53bda77efcc2cef4e6331d",
+      "currentConsumerSha256": "8be573e3ac34b85bf6a73fcf989af84f2758daa760dabee00b658dac30f907a0",
+      "currentPassages": [],
+      "custody": "Step 7 final-pin rebind under L12-58(1); no settled record edited.",
+      "spanChecks": [
+        {
+          "id": "author-s4-ebdf0bbf30f386bc",
+          "pinnedSpan": {
+            "line": 22,
+            "columnStart": 216,
+            "columnEndExclusive": 280,
+            "text": "docs/history/mvp2-scope-test-infra/reports/case-1-interactive.md"
+          },
+          "equalAtHeadCoordinate": true,
+          "headTextMatchLines": [
+            22
+          ]
+        },
+        {
+          "id": "author-s4-3b7f91d826c53538",
+          "pinnedSpan": {
+            "line": 22,
+            "columnStart": 738,
+            "columnEndExclusive": 799,
+            "text": "docs/history/mvp2-scope-test-infra/reports/case-2-headless.md"
+          },
+          "equalAtHeadCoordinate": true,
+          "headTextMatchLines": [
+            22
+          ]
+        },
+        {
+          "id": "author-s4-08912b8301b10321",
+          "pinnedSpan": {
+            "line": 29,
+            "columnStart": 142,
+            "columnEndExclusive": 168,
+            "text": "docs/specs/distribution.md"
+          },
+          "equalAtHeadCoordinate": true,
+          "headTextMatchLines": [
+            29
+          ]
+        },
+        {
+          "id": "author-s4-a20431be6e7a6997",
+          "pinnedSpan": {
+            "line": 44,
+            "columnStart": 835,
+            "columnEndExclusive": 867,
+            "text": "docs/specs/work-state.md:647-675"
+          },
+          "equalAtHeadCoordinate": true,
+          "headTextMatchLines": [
+            44
+          ]
+        },
+        {
+          "id": "author-s4-30b59397818b58a4",
+          "pinnedSpan": {
+            "line": 49,
+            "columnStart": 224,
+            "columnEndExclusive": 237,
+            "text": "docs/history/"
+          },
+          "equalAtHeadCoordinate": true,
+          "headTextMatchLines": [
+            22,
+            44,
+            49,
+            117,
+            119,
+            122,
+            127,
+            128,
+            129,
+            133,
+            135,
+            141,
+            151
+          ]
+        },
+        {
+          "id": "author-s4-929e1de7d7453fd2",
+          "pinnedSpan": {
+            "line": 49,
+            "columnStart": 507,
+            "columnEndExclusive": 520,
+            "text": "docs/history/"
+          },
+          "equalAtHeadCoordinate": true,
+          "headTextMatchLines": [
+            22,
+            44,
+            49,
+            117,
+            119,
+            122,
+            127,
+            128,
+            129,
+            133,
+            135,
+            141,
+            151
+          ]
+        },
+        {
+          "id": "author-s4-7c7d595e2f389ade",
+          "pinnedSpan": {
+            "line": 49,
+            "columnStart": 673,
+            "columnEndExclusive": 686,
+            "text": "docs/history/"
+          },
+          "equalAtHeadCoordinate": true,
+          "headTextMatchLines": [
+            22,
+            44,
+            49,
+            117,
+            119,
+            122,
+            127,
+            128,
+            129,
+            133,
+            135,
+            141,
+            151
+          ]
+        },
+        {
+          "id": "author-s4-92d207a36a483d36",
+          "pinnedSpan": {
+            "line": 49,
+            "columnStart": 719,
+            "columnEndExclusive": 744,
+            "text": "docs/history/*/CONTEXT.md"
+          },
+          "equalAtHeadCoordinate": true,
+          "headTextMatchLines": [
+            49,
+            117
+          ]
+        },
+        {
+          "id": "author-s4-52877e7c60f16d3d",
+          "pinnedSpan": {
+            "line": 49,
+            "columnStart": 1069,
+            "columnEndExclusive": 1082,
+            "text": "docs/history/"
+          },
+          "equalAtHeadCoordinate": true,
+          "headTextMatchLines": [
+            22,
+            44,
+            49,
+            117,
+            119,
+            122,
+            127,
+            128,
+            129,
+            133,
+            135,
+            141,
+            151
+          ]
+        },
+        {
+          "id": "author-s4-19c252476bfb8f58",
+          "pinnedSpan": {
+            "line": 72,
+            "columnStart": 80,
+            "columnEndExclusive": 95,
+            "text": "docs/decisions/"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            73,
+            115,
+            124
+          ]
+        },
+        {
+          "id": "author-s4-f02a917bdfe98c52",
+          "pinnedSpan": {
+            "line": 107,
+            "columnStart": 481,
+            "columnEndExclusive": 501,
+            "text": "docs/specs/runner.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            108
+          ]
+        },
+        {
+          "id": "author-s4-2e799bbe055b244b",
+          "pinnedSpan": {
+            "line": 114,
+            "columnStart": 321,
+            "columnEndExclusive": 349,
+            "text": "docs/decisions/0000-index.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            115
+          ]
+        },
+        {
+          "id": "author-s4-033b8befd0b861df",
+          "pinnedSpan": {
+            "line": 116,
+            "columnStart": 396,
+            "columnEndExclusive": 411,
+            "text": "docs/specs/*.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            117
+          ]
+        },
+        {
+          "id": "author-s4-5caf17775c40c6b0",
+          "pinnedSpan": {
+            "line": 116,
+            "columnStart": 443,
+            "columnEndExclusive": 468,
+            "text": "docs/history/*/CONTEXT.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            49,
+            117
+          ]
+        },
+        {
+          "id": "author-s4-45dc2cd894385e72",
+          "pinnedSpan": {
+            "line": 118,
+            "columnStart": 224,
+            "columnEndExclusive": 254,
+            "text": "docs/history/dogfood-p25-run1/"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            119
+          ]
+        },
+        {
+          "id": "author-s4-721bff23faa8d622",
+          "pinnedSpan": {
+            "line": 118,
+            "columnStart": 356,
+            "columnEndExclusive": 396,
+            "text": "docs/history/p50-workflow-induct/plan.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            119
+          ]
+        },
+        {
+          "id": "author-s4-c9433d21d5c1e93a",
+          "pinnedSpan": {
+            "line": 118,
+            "columnStart": 756,
+            "columnEndExclusive": 799,
+            "text": "docs/history/fgos-sample-testbed/CONTEXT.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            119
+          ]
+        },
+        {
+          "id": "author-s4-229e8a5afb1230ae",
+          "pinnedSpan": {
+            "line": 121,
+            "columnStart": 1113,
+            "columnEndExclusive": 1166,
+            "text": "docs/history/str61-chat-context-continuity/CONTEXT.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            122
+          ]
+        },
+        {
+          "id": "author-s4-84005ca08befe2c0",
+          "pinnedSpan": {
+            "line": 123,
+            "columnStart": 1728,
+            "columnEndExclusive": 1739,
+            "text": "docs/specs/"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            29,
+            44,
+            108,
+            117,
+            124
+          ]
+        },
+        {
+          "id": "author-s4-09018bba15ce7bfe",
+          "pinnedSpan": {
+            "line": 123,
+            "columnStart": 2502,
+            "columnEndExclusive": 2517,
+            "text": "docs/decisions/"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            73,
+            115,
+            124
+          ]
+        },
+        {
+          "id": "author-s4-06e8be879d39deb1",
+          "pinnedSpan": {
+            "line": 126,
+            "columnStart": 496,
+            "columnEndExclusive": 540,
+            "text": "docs/history/p50-workflow-induct/reports/..."
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            127
+          ]
+        },
+        {
+          "id": "author-s4-68c3eab88fa07af7",
+          "pinnedSpan": {
+            "line": 127,
+            "columnStart": 1237,
+            "columnEndExclusive": 1302,
+            "text": "docs/history/p50-workflow-induct/reports/p50-workflow-induct-6.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            128
+          ]
+        },
+        {
+          "id": "author-s4-bb81392549cc3486",
+          "pinnedSpan": {
+            "line": 128,
+            "columnStart": 128,
+            "columnEndExclusive": 176,
+            "text": "docs/history/gate-dialogue-continuity/CONTEXT.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            44,
+            129
+          ]
+        },
+        {
+          "id": "author-s4-26fc8d2f9269bc9a",
+          "pinnedSpan": {
+            "line": 130,
+            "columnStart": 933,
+            "columnEndExclusive": 943,
+            "text": "docs/specs"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            29,
+            44,
+            108,
+            117,
+            124,
+            131
+          ]
+        },
+        {
+          "id": "author-s4-6f302576938a67b2",
+          "pinnedSpan": {
+            "line": 132,
+            "columnStart": 599,
+            "columnEndExclusive": 663,
+            "text": "docs/history/mvp-gap-measure/reports/dry-run-findings.md:129-156"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            133
+          ]
+        },
+        {
+          "id": "author-s4-4676c20acaf7573e",
+          "pinnedSpan": {
+            "line": 134,
+            "columnStart": 337,
+            "columnEndExclusive": 401,
+            "text": "docs/history/mvp-gap-measure/reports/dry-run-findings.md:166-170"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            135
+          ]
+        },
+        {
+          "id": "author-s4-d72e383c7545e538",
+          "pinnedSpan": {
+            "line": 140,
+            "columnStart": 1278,
+            "columnEndExclusive": 1336,
+            "text": "docs/history/worktree-companion-mount-ephemeral/CONTEXT.md"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            141
+          ]
+        },
+        {
+          "id": "author-s4-cdc5db14089ef6ef",
+          "pinnedSpan": {
+            "line": 150,
+            "columnStart": 303,
+            "columnEndExclusive": 316,
+            "text": "docs/history/"
+          },
+          "equalAtHeadCoordinate": false,
+          "headTextMatchLines": [
+            22,
+            44,
+            49,
+            117,
+            119,
+            122,
+            127,
+            128,
+            129,
+            133,
+            135,
+            141,
+            151
+          ]
+        }
+      ],
+      "movedSpanCount": 19
+    }
+  ],
+  "step0Receipt": "step-00-l12-75-binding-check.json",
+  "ratchet": {
+    "exit": 0,
+    "log": "step-00-l12-75-ratchet.log"
+  },
+  "ratchetTests": {
+    "exit": 0,
+    "passed": 28,
+    "log": "step-00-l12-75-ratchet-tests.log"
+  },
+  "exceptionsChanged": false,
+  "acceptance": "Author accounting; independent review and actual runner-commit accounting remain owed.",
+  "logHashes": {
+    "step-00-l12-75-ratchet.log": "9299cb06b5c8c4b7518e62992d0bb4c198371d561f10b129c7456f63c3f59319",
+    "step-00-l12-75-ratchet-tests.log": "3f888e2a556b615329959eb8e7e7dc04ad5642f7043a10bf330ff6525ba2566b"
+  }
+}

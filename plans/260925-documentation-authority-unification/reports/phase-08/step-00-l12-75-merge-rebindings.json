@@ -1,0 +1,29 @@
+{
+  "inputHEAD": "e83ca379cb6eb76daa3ce2cf36e76dddc576f455",
+  "merge": "e83ca379cb6eb76daa3ce2cf36e76dddc576f455",
+  "prior": "22a818b0c558182bed8165591a52e9dc57e1f41b",
+  "main": "10d6bcfe2908f3d5d55247699f4d873e1fb16104",
+  "mainCommits": 3,
+  "changedPaths": [
+    "docs/backlog.md",
+    "plans/261017-1313-fgos-platform-program-board/plan.md"
+  ],
+  "changedCandidateFiles": [],
+  "changedDocs": [
+    "docs/backlog.md"
+  ],
+  "checkedBindings": [],
+  "successorGroupMemberChecks": [],
+  "entries": [],
+  "parked": [],
+  "needsWrites": [],
+  "counts": {
+    "directChecked": 0,
+    "groupMembersChecked": 0,
+    "proposedRebindings": 0,
+    "appliedRebindings": 0,
+    "remainingDrift": 0
+  },
+  "step0Receipt": "step-00-l12-75-binding-check.json",
+  "acceptance": "Author accounting only. Settled Step 3/5 backlog coordinate drift remains Step 7 custody under L12-58(1); independent review and L12-11 actual runner-commit accounting remain owed."
+}

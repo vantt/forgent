@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/tmp/fgos-work/step-05-seam4-probes-seam5.py", line 8, in <module>
+    baseline=m.check();assert baseline['failureCount']==0,baseline['failures'][:5]
+AssertionError: [{'rule': 's4-pins', 'where': 'docs/backlog.md', 'error': 'condition false'}, {'rule': 's4-receipts', 'where': 'generators-skills-and-support', 'error': 'condition false'}]
