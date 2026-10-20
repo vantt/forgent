@@ -81,3 +81,16 @@ When a workflow step declares a human gate (`gate: { kind: "human" }`) or when a
 - **G7 Herdr Default:** All out-of-process unit runs default to spawning in a watched `herdr` terminal pane when herdr is available, falling back to `cli` when headless.
 - **Fail-Closed Mutating Gate:** Every file mutation runs strictly inside an isolated linked git worktree matching the Unit run specification.
 - **Honest Outcomes:** Reviewer findings are tracked as `findings`, not execution failures, and fix rounds are bounded by the collaboration pattern.
+
+---
+
+## 4. Reviewing a Change That Touches Tests
+
+Every behaviour has one owning proof (AGENTS.md L5 question 5, design principle 8 **One proof**). Whoever reviews a Unit's result, or accepts a lead's report, checks these four lines and returns a finding for each one that fails; a report that adds tests without reasons, or deletes a mechanism without a retired list, is not accepted:
+
+1. **Every new test file:** why not the existing file for this module? Only a new module or a new boundary gets a new file.
+2. **Every new test:** its title names the behaviour in plain words (no task ids), the owning proof was searched for (`rg` the behaviour's words and the symbol), and the report gives the reason no existing test proves it.
+3. **Every deleted or replaced mechanism:** its tests are retired in the same change and listed, each with the test that now owns the behaviour or the statement that the behaviour is gone.
+4. **Every Node test in a Rust-ported area** (git, holder-lock, event-store, run-supervisor, terminal-control): it is the one route proof for its port or a Node-only behaviour, never a copy of a case a Rust test owns.
+
+The report quotes the `suite:` line `npm test` prints (files, `test()` calls, wall time against `test/suite-baseline.json`).

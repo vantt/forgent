@@ -25,8 +25,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { REPO_ROOT } from './run-tests.mjs';
+
+// Not imported from run-tests.mjs: that module imports this one for the summary it prints.
+const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 export const RESPONSIBILITIES = Object.freeze([
   'direct-business-proof',
@@ -316,13 +319,230 @@ export function addedLinesFromGitDiff(scopeFiles, { baseRef = 'HEAD', exec = exe
   return rows;
 }
 
+// -- 4. suite shape: test() calls, cross-file clones, the summary `npm test` prints --
+//
+// One proof per behaviour (design principle 8): a test body copied byte for byte
+// into a second file proves nothing the first copy does not. Clones present when
+// the check landed sit in the baseline and are reported until they are deleted;
+// a clone that is not in the baseline fails the run.
+
+export const SUITE_BASELINE_PATH = path.join(REPO_ROOT, 'test', 'suite-baseline.json');
+const TEST_CALL_RE = /^[ \t]*(?:test|it)\(/gm;
+
+/**
+ * Index of the `)` closing the `(` at `open`, and of the first comma at the
+ * call's own depth (the end of the title argument). Skips strings, template
+ * literals, comments and regex literals. Null when the call never closes.
+ */
+export function closingParen(src, open) {
+  let depth = 0;
+  let firstComma = -1;
+  let prev = '(';
+  let i = open;
+  while (i < src.length) {
+    const c = src[i];
+    if (c === '"' || c === "'") {
+      i += 1;
+      while (i < src.length && src[i] !== c) i += src[i] === '\\' ? 2 : 1;
+    } else if (c === '`') {
+      i += 1;
+      let interpolation = 0;
+      while (i < src.length && !(src[i] === '`' && interpolation === 0)) {
+        if (src[i] === '\\') i += 1;
+        else if (src[i] === '$' && src[i + 1] === '{') { interpolation += 1; i += 1; }
+        else if (src[i] === '}' && interpolation > 0) interpolation -= 1;
+        i += 1;
+      }
+    } else if (c === '/' && src[i + 1] === '/') {
+      while (i < src.length && src[i] !== '\n') i += 1;
+      continue;
+    } else if (c === '/' && src[i + 1] === '*') {
+      const end = src.indexOf('*/', i + 2);
+      i = end < 0 ? src.length : end + 2;
+      continue;
+    } else if (c === '/' && /[(,=:[!&|?{};+\-*%<>~^]/.test(prev)) {
+      // A slash after an operator opens a regex literal, never a division.
+      i += 1;
+      let inClass = false;
+      while (i < src.length && src[i] !== '\n' && !(src[i] === '/' && !inClass)) {
+        if (src[i] === '\\') i += 1;
+        else if (src[i] === '[') inClass = true;
+        else if (src[i] === ']') inClass = false;
+        i += 1;
+      }
+    } else if (c === '(' || c === '[' || c === '{') {
+      depth += 1;
+    } else if (c === ')' || c === ']' || c === '}') {
+      depth -= 1;
+      if (depth === 0) return { end: i, firstComma };
+    } else if (c === ',' && depth === 1 && firstComma < 0) {
+      firstComma = i;
+    }
+    if (!/\s/.test(c)) prev = c === '"' || c === "'" || c === '`' || c === '/' ? 'a' : c;
+    i += 1;
+  }
+  return null;
+}
+
+/**
+ * Every top-level-of-line `test(` / `it(` call in one file, with its title and
+ * body (the arguments after the title) stripped of all whitespace. A call the
+ * scanner cannot close still counts, with `body: null`.
+ */
+export function scanTestCalls(source, file) {
+  const calls = [];
+  TEST_CALL_RE.lastIndex = 0;
+  let m;
+  while ((m = TEST_CALL_RE.exec(source)) !== null) {
+    const open = m.index + m[0].length - 1;
+    const line = source.slice(0, m.index).split('\n').length;
+    const span = closingParen(source, open);
+    if (!span || span.firstComma < 0) {
+      calls.push({ file, line, title: null, body: null });
+      continue;
+    }
+    calls.push({
+      file,
+      line,
+      title: source.slice(open + 1, span.firstComma).replace(/\s+/g, ''),
+      body: source.slice(span.firstComma + 1, span.end).replace(/\s+/g, ''),
+    });
+  }
+  return calls;
+}
+
+/** Bodies that occur in more than one file, keyed by a short hash of the body. */
+export function findCloneGroups(calls) {
+  const byBody = new Map();
+  for (const call of calls) {
+    if (!call.body) continue;
+    if (!byBody.has(call.body)) byBody.set(call.body, []);
+    byBody.get(call.body).push(call);
+  }
+  const groups = [];
+  for (const [body, members] of byBody) {
+    const files = [...new Set(members.map((c) => c.file))].sort();
+    if (files.length < 2) continue;
+    const hash = createHash('sha256').update(body).digest('hex').slice(0, 16);
+    groups.push({ hash, files, members: members.map(({ file, line, title }) => ({ file, line, title })) });
+  }
+  return groups.sort((a, b) => a.files.join().localeCompare(b.files.join()) || a.members[0].line - b.members[0].line);
+}
+
+/** Titles used in more than one file: a warning, since a shared title is not always a clone. */
+export function findSharedTitles(calls) {
+  const files = new Map();
+  for (const call of calls) {
+    if (!call.title) continue;
+    if (!files.has(call.title)) files.set(call.title, new Set());
+    files.get(call.title).add(call.file);
+  }
+  return [...files].filter(([, set]) => set.size > 1).map(([title, set]) => ({ title, files: [...set].sort() }));
+}
+
+export function readSuiteBaseline(baselinePath = SUITE_BASELINE_PATH) {
+  if (!fs.existsSync(baselinePath)) return { sha: null, files: null, tests: null, wallSeconds: null, knownClones: [] };
+  return { knownClones: [], ...JSON.parse(fs.readFileSync(baselinePath, 'utf8')) };
+}
+
+/** The ref new admission-rule violations are measured against: where this branch left main. */
+export function admissionBaseRef({ exec = execFileSync, cwd = REPO_ROOT } = {}) {
+  for (const ref of ['origin/main', 'main']) {
+    try {
+      return exec('git', ['merge-base', 'HEAD', ref], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    } catch {
+      // ref absent in this clone; try the next one
+    }
+  }
+  return 'HEAD';
+}
+
+function formatWall(seconds) {
+  return typeof seconds === 'number' ? `${Math.round(seconds)} s` : '? s';
+}
+
+/**
+ * What `npm test` prints after the run: the suite size line against the
+ * committed baseline, clone and shared-title findings, and new admission-rule
+ * violations. `status` is 1 only for a clone the baseline does not list.
+ */
+export function suiteReport({
+  files,
+  wallSeconds = null,
+  cwd = REPO_ROOT,
+  baselinePath = SUITE_BASELINE_PATH,
+  readFile = (f) => fs.readFileSync(f, 'utf8'),
+  admission = () => checkAdmission(addedLinesFromGitDiff(['test'], { baseRef: admissionBaseRef({ cwd }), cwd })),
+} = {}) {
+  const calls = files.flatMap((file) => scanTestCalls(readFile(path.resolve(cwd, file)), path.relative(cwd, path.resolve(cwd, file)).replaceAll('\\', '/')));
+  const baseline = readSuiteBaseline(baselinePath);
+  const lines = [];
+  const at = baseline.sha ? ` at ${baseline.sha.slice(0, 9)}` : '';
+  const base = baseline.tests === null ? 'no baseline' : `baseline ${baseline.files} / ${baseline.tests} / ${formatWall(baseline.wallSeconds)}${at}`;
+  lines.push(`suite: ${files.length} files, ${calls.length} test() calls, ${formatWall(wallSeconds)} wall (${base})`);
+
+  const clones = findCloneGroups(calls);
+  const known = new Set(baseline.knownClones.map((c) => c.hash));
+  const newClones = clones.filter((g) => !known.has(g.hash));
+  const present = new Set(clones.map((g) => g.hash));
+  const gone = baseline.knownClones.filter((c) => !present.has(c.hash));
+  for (const group of newClones) {
+    lines.push(`suite: ERROR: byte-identical test body in ${group.files.length} files; keep one, delete the others:`);
+    for (const m of group.members) lines.push(`  ${m.file}:${m.line}`);
+  }
+  if (clones.length - newClones.length > 0) lines.push(`suite: warning: ${clones.length - newClones.length} known cross-file clone(s) still listed in ${path.relative(cwd, baselinePath)}`);
+  if (gone.length > 0) lines.push(`suite: ${gone.length} baselined clone(s) are gone; shrink the baseline with \`node scripts/test-proof-inventory.mjs --write-baseline\``);
+  const shared = findSharedTitles(calls);
+  if (shared.length > 0) lines.push(`suite: warning: ${shared.length} test title(s) appear in more than one file (\`node scripts/test-proof-inventory.mjs --duplicates\` lists them)`);
+  let violations = [];
+  try {
+    violations = admission();
+  } catch (err) {
+    // Warning-only rules: a checkout git cannot diff (no commit yet, no git) skips them.
+    lines.push(`suite: warning: admission rules not checked: ${String(err.message).split('\n')[0]}`);
+  }
+  for (const v of violations) lines.push(`suite: warning: ${v.file}:${v.line} [${v.ruleId}] ${v.message}`);
+  return { lines, status: newClones.length > 0 ? 1 : 0, calls, clones, newClones, gone, shared, violations };
+}
+
+/** The baseline for the current tree: sizes, HEAD and every clone present now. Keeps the old wall time unless one is given. */
+export function buildSuiteBaseline({ files, cwd = REPO_ROOT, sha, wallSeconds, previous = {}, readFile = (f) => fs.readFileSync(f, 'utf8') }) {
+  const calls = files.flatMap((file) => scanTestCalls(readFile(path.resolve(cwd, file)), path.relative(cwd, path.resolve(cwd, file)).replaceAll('\\', '/')));
+  return {
+    sha,
+    files: files.length,
+    tests: calls.length,
+    wallSeconds: wallSeconds ?? previous.wallSeconds ?? null,
+    knownClones: findCloneGroups(calls).map(({ hash, files: cloneFiles }) => ({ hash, files: cloneFiles })),
+  };
+}
+
 // -- CLI entrypoint --
 
 const __filename = fileURLToPath(import.meta.url);
 
 if (process.argv[1] === __filename) {
   const args = process.argv.slice(2);
-  if (args[0] === '--check') {
+  const { discoverTestFiles } = await import('./run-tests.mjs');
+  if (args[0] === '--write-baseline') {
+    const wallIdx = args.indexOf('--wall-seconds');
+    const sha = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: REPO_ROOT, encoding: 'utf8' }).trim();
+    const baseline = buildSuiteBaseline({
+      files: discoverTestFiles(),
+      sha,
+      wallSeconds: wallIdx === -1 ? undefined : Number(args[wallIdx + 1]),
+      previous: readSuiteBaseline(),
+    });
+    fs.writeFileSync(SUITE_BASELINE_PATH, `${JSON.stringify(baseline, null, 2)}\n`);
+    console.log(`wrote ${path.relative(REPO_ROOT, SUITE_BASELINE_PATH)}: ${baseline.files} files, ${baseline.tests} test() calls, ${baseline.knownClones.length} known clone(s)`);
+  } else if (args[0] === '--duplicates') {
+    const report = suiteReport({ files: discoverTestFiles(), admission: () => [] });
+    for (const group of report.clones) {
+      console.log(`clone ${group.hash}${report.newClones.includes(group) ? ' (new)' : ''}:`);
+      for (const m of group.members) console.log(`  ${m.file}:${m.line} ${m.title}`);
+    }
+    for (const { title, files } of report.shared) console.log(`title ${title}: ${files.join(', ')}`);
+  } else if (args[0] === '--check') {
     const scopeIdx = args.indexOf('--scope');
     const scopeFiles = scopeIdx === -1 ? [] : args[scopeIdx + 1].split(',');
     const baselineIdx = args.indexOf('--baseline');
@@ -338,7 +558,7 @@ if (process.argv[1] === __filename) {
     }
     process.exitCode = 0; // warning-only: never fails the build in this track
   } else {
-    console.error('Usage: node scripts/test-proof-inventory.mjs --check --scope <files> [--baseline <path>]');
+    console.error('Usage: node scripts/test-proof-inventory.mjs --check --scope <files> [--baseline <path>] | --duplicates | --write-baseline [--wall-seconds <s>]');
     process.exitCode = 1;
   }
 }

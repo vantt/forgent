@@ -47,14 +47,6 @@ test("isWorkingTreeClean scope:'subtree' still blocks on a dirty file INSIDE the
   assert.equal(isWorkingTreeClean(sub, null, { scope: 'subtree' }), false);
 });
 
-test("isWorkingTreeClean scope:'whole-repo' (the default, unchanged) still blocks on the SAME dirty file outside the subtree — same repo, opposite scope, opposite answer", () => {
-  const topLevel = initRepo();
-  const sub = path.join(topLevel, 'sub');
-  fs.mkdirSync(sub, { recursive: true });
-  fs.writeFileSync(path.join(topLevel, 'elsewhere.txt'), 'uncommitted\n');
-  assert.equal(isWorkingTreeClean(sub), false);
-});
-
 test("isWorkingTreeClean scope:'subtree' shares the same .fgos/ exclusion + top-level-relative prefix as scope:'whole-repo'", () => {
   const topLevel = initRepo();
   const sub = path.join(topLevel, 'sub');
