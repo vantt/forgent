@@ -1,0 +1,1545 @@
+{
+  "merge": "4ef05b0b831d8cafa72a669625926090f787a28f",
+  "prior": "31791c7eba057371fb086f4ba3e8bfb744af3dfe",
+  "main": "cef8b532e82530f365ab1d3acb1a9b1d49e635a8",
+  "base": "10d6bcfe2908f3d5d55247699f4d873e1fb16104",
+  "mainCommits": [
+    "cef8b532e fix(distribution): read the checkout through the host the build just compiled",
+    "62af972cf Merge remote-tracking branch 'origin/main' into git/p07-switch",
+    "e3f69d228 docs(git): record the unit 26 green-branch report",
+    "6840fd81c docs(board): record the persona and host route merge and the config schema lane",
+    "425382d0f feat(runner): run a read-only workflow in a directory that is not a repository",
+    "4fa26e69b test: register the run supervisor protocol module, retry fixture removal and separate an item from its claim by a clock tick",
+    "b5f49c72e chore(git): refresh the mutation census",
+    "021a5deaa test(fgctl): create the activation gate's state root at 0700 whatever the umask",
+    "fcd6dd62f fix(test): print the suite report again by moving the addon staging out of the launcher",
+    "dc706acb2 test: retarget the git-spawn count and parity proofs to what the native driver spawns",
+    "f16e83473 test: bring the remaining runner, doctor and citation proofs onto the typed ports",
+    "c27bebad8 fix(runner): snapshot and discard a failed round's files before its dispatch checkout is removed",
+    "7f38325a0 fix(run-supervisor): the doctor route probe speaks the run supervisor protocol, not the lock protocol",
+    "c238e408a test(run-supervisor): give the terminal and direct harness projects a 0700 state root and the Git fence",
+    "b401c82b6 fix(git): point the npm channel's addon refusal to fgctl init",
+    "07b4a19b0 test(runner): activate the Git fence in the spawn-worker, driver and case-admission fixtures",
+    "b8333bda1 fix(test): hand the staged dev host to the suite as a complete release manifest",
+    "5bad3cc0c docs(board): record the exec budget decision and the persona and host route verify",
+    "4338c069b docs(board): record the main merge into the seat binding track",
+    "e2fff5a32 Merge remote-tracking branch 'origin/main' into git/p07-switch",
+    "5ecb1d990 docs(git): record the host gate rerun",
+    "79e04c570 chore(git): refresh the mutation census after merging main",
+    "ca88273c5 Merge remote-tracking branch 'origin/main' into git/p07-switch",
+    "3564cafd5 fix(git): settle the host-gate regressions (addon staging, text writer, borrow watch on every",
+    "049822850 docs(skills): describe the manual plan move without a git command so the census is empty",
+    "ccd60ab45 fix(git): settle the pre-merge risk review (approve retry, Land recovery via doctor --fix, runner",
+    "876ea737f feat(git): empty the mutation census by value flow so doctor git-mutation-one-door passes",
+    "fe6992580 Merge remote-tracking branch 'origin/main' into git/p07-switch",
+    "45fa7ecf2 feat(git): name standalone skills, follow function values in the one-door scan, bump lock routes to",
+    "d9635d4f8 Merge branch 'git/p08-gate' into git/p07-switch",
+    "19bae5e3e refactor(herdr-dashboard): resolve the main checkout through fgos-git",
+    "d4839a339 feat(git): resolve the one-door census by data flow and move main-checkout-reset onto SafeRestore",
+    "964d2837d test(git): add phase 08 proof scripts, vector matrix and implementation-status docs",
+    "10416a6b0 feat(git): add the one-door gate (data-flow scan, test spawn spy, seeded probes, census and doctor",
+    "7044c55d1 Merge branch 'git/p07-setup' into git/p07-switch",
+    "3e4aba182 refactor(git): move setup hooks, holder listings and Workflow integrate onto the typed ports",
+    "660605bdb Merge remote-tracking branch 'origin/main' into git/p07-switch",
+    "796cef626 perf(git): share checked repository facts per process and list ignored paths through Inspect",
+    "44abfcfa5 wip(git): partial setup, hooks, holder listing and workflow migration",
+    "fb929b7e4 chore(git): merge origin/main into git/p07-switch",
+    "5430a8b68 refactor(git): finish the Git ports round: no-wait refuses a held merge slot at once, addon verified",
+    "8eafe949d Merge branch 'git/p07-scripts' into git/p07-switch",
+    "64fe6c8ad Merge branch 'git/p07-readers' into git/p07-switch",
+    "8e3de1854 refactor(git): move Land merge reads onto Inspect and release unpublished Land candidates",
+    "14f7803cd refactor(git): move Node and observe readers onto Inspect",
+    "76049cd89 docs(skills): remove the last raw git worktree instruction and keep the census as a report only",
+    "b671220c7 refactor(git): route outer scripts, skill text and fixture repositories through the typed Git doors",
+    "7d931a0a2 fix(git): keep the target's .fgos bytes on catchup through Sync declarations and fence every CLI",
+    "e71381aba feat(git): land leaf, sync-root and promote merges through one Land sequence",
+    "5f41d4072 fix(git): declare .fgos and decision-index resolutions as Land candidate files on root publication",
+    "9da19dcfc fix(git): wait for Land admission without blocking the Node event loop and give publish the caller's",
+    "7481e261c feat(git): publish root merges and run catchup through Land and Sync",
+    "623c1b3a2 wip(git): start moving merge verbs onto the Land sequence",
+    "feb661fb9 feat(git): prepare Land against the current target and read merge facts through Inspect",
+    "6a61a76f5 fix(git): keep forced-session history, prune only owned leftovers and route Work event commits through the port",
+    "9d4c96e6b wip(git): partial inspected prune, worktree fact reuse and exact import check",
+    "ac64fa0be Merge branch 'git/p07-worktree-cluster' into git/p07-switch",
+    "54f365861 refactor(git): move the worktree cluster onto native Worktree, Refs and SafeRestore",
+    "48e81fed0 refactor(runner): drop the unreachable sync main-checkout refusal",
+    "07676120f Merge remote-tracking branch 'origin/main' into git/p07-switch",
+    "ff175e978 fix(runner): address Git Unit host findings",
+    "514dc094e test(git): pin Land's refusal of borrowed slots and ephemeral handles",
+    "df2bf26fd fix(git): harden scoped commit selection, authority and recovery",
+    "82d20d268 docs(report): record the review of the Unit commit core switch",
+    "82ca7102a refactor(git): switch Unit commit and sync to native ports",
+    "512e8cd2a docs(plan): re-plan the caller switch for foundation-first and record the caller census"
+  ],
+  "changedPaths": [
+    ".agents/skills/_shared/catchup-self-recovery.md",
+    ".agents/skills/_shared/coding-cell-policy.md",
+    ".agents/skills/_shared/private-cell-worktree.md",
+    ".agents/skills/distill/SKILL.md",
+    ".agents/skills/distill/scripts/distill.mjs",
+    ".agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+    ".agents/skills/fgos-lock-fence/SKILL.md",
+    ".agents/skills/fgos-run/SKILL.md",
+    ".claude/skills/distill/SKILL.md",
+    ".claude/skills/distill/scripts/distill.mjs",
+    ".claude/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+    ".githooks/pre-commit",
+    "CHANGELOG.md",
+    "Cargo.lock",
+    "apps/fgctl/tests/git_wal_activation_gate.rs",
+    "apps/fgos-gateway/Cargo.lock",
+    "apps/fgos-gateway/Cargo.toml",
+    "apps/fgos-gateway/src/main.rs",
+    "apps/fgos/tests/internal_lock_routes.rs",
+    "apps/fgos/tests/windows_borrow.rs",
+    "apps/fgos/tests/windows_lock_hold_route.rs",
+    "apps/fgos/tests/windows_support/mod.rs",
+    "bin/fgos.mjs",
+    "core/skills/_shared/catchup-self-recovery.md",
+    "core/skills/_shared/private-cell-worktree.md",
+    "core/skills/distill/SKILL.md",
+    "core/skills/distill/scripts/distill.mjs",
+    "core/skills/fgos-lock-fence/SKILL.md",
+    "core/skills/fgos-run/SKILL.md",
+    "core/skills/instruction-audit/SKILL.md",
+    "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+    "docs/architecture-manifest.json",
+    "docs/platform/component-boundary.md",
+    "docs/platform/git/spec.md",
+    "docs/platform/holder-lock/spec.md",
+    "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+    "docs/platform/process/spec.md",
+    "docs/specs/distribution.md",
+    "docs/specs/reading-map.md",
+    "docs/specs/runner.md",
+    "domains/coding/skills/_shared/coding-cell-policy.md",
+    "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+    "herdr-dashboard/Cargo.lock",
+    "herdr-dashboard/Cargo.toml",
+    "herdr-dashboard/src/main.rs",
+    "package.json",
+    "packages/distribution/rust/src/git_gate.rs",
+    "packages/distribution/rust/src/git_grant.rs",
+    "packages/distribution/rust/src/lib.rs",
+    "packages/distribution/rust/src/workspace.rs",
+    "packages/event-store/rust/src/legacy_import.rs",
+    "packages/git/contracts/internal-route.git-grant-check.v1.json",
+    "packages/git/contracts/mutation-census.v1.json",
+    "packages/git/contracts/ports.v1.json",
+    "packages/git/contracts/wal-record.v1.schema.json",
+    "packages/git/node-addon/src/git.rs",
+    "packages/git/node-addon/src/git/inspect.rs",
+    "packages/git/node-addon/src/git/land.rs",
+    "packages/git/node-addon/src/git/scoped_commit.rs",
+    "packages/git/node-addon/src/git/sync.rs",
+    "packages/git/node-addon/src/git/worktree.rs",
+    "packages/git/rust/src/driver.rs",
+    "packages/git/rust/src/grant.rs",
+    "packages/git/rust/src/inspect.rs",
+    "packages/git/rust/src/land.rs",
+    "packages/git/rust/src/lib.rs",
+    "packages/git/rust/src/native_lock.rs",
+    "packages/git/rust/src/publication.rs",
+    "packages/git/rust/src/recovery.rs",
+    "packages/git/rust/src/refs.rs",
+    "packages/git/rust/src/repository_config.rs",
+    "packages/git/rust/src/restore.rs",
+    "packages/git/rust/src/scoped_commit.rs",
+    "packages/git/rust/src/sync.rs",
+    "packages/git/rust/src/wal.rs",
+    "packages/git/rust/src/worktree.rs",
+    "packages/git/rust/tests/inspect.rs",
+    "packages/git/rust/tests/land.rs",
+    "packages/git/rust/tests/recovery_matrix.rs",
+    "packages/git/rust/tests/safe_restore.rs",
+    "packages/git/rust/tests/scoped_commit_sync.rs",
+    "packages/git/rust/tests/worktree.rs",
+    "packages/herdr-fgos-common/rust/src/fgos.rs",
+    "packages/herdr-fgos-common/rust/src/settings.rs",
+    "packages/holder-lock/contracts/internal-route.lock-borrow-vectors.v1.json",
+    "packages/holder-lock/contracts/internal-route.lock-fd.v1.json",
+    "packages/holder-lock/contracts/internal-route.lock-hold.v1.json",
+    "packages/holder-lock/contracts/internal-route.process-observe.v1.json",
+    "packages/holder-lock/contracts/internal-route.quiesce-scan.v1.json",
+    "packages/holder-lock/contracts/internal-route.state-root.v1.json",
+    "packages/holder-lock/contracts/main-checkout-borrow.v1.json",
+    "packages/holder-lock/rust/src/borrow_vectors.rs",
+    "packages/holder-lock/rust/src/lib.rs",
+    "packages/holder-lock/rust/src/port.rs",
+    "packages/holder-lock/rust/src/route.rs",
+    "packages/holder-lock/rust/src/route/hold.rs",
+    "packages/holder-lock/rust/tests/borrow_io.rs",
+    "packages/observe/rust/Cargo.toml",
+    "packages/observe/rust/src/case_journal.rs",
+    "packages/observe/rust/src/metrics_cli/harness.rs",
+    "packages/observe/rust/src/sources/claude_transcripts.rs",
+    "packages/observe/rust/src/sources/repo.rs",
+    "packages/observe/rust/tests/boundary_test.rs",
+    "packages/process/rust/src/containment/linux.rs",
+    "packages/process/rust/src/containment/mod.rs",
+    "plans/261017-1313-fgos-platform-program-board/plan.md",
+    "plans/261018-0914-git-component-fgos-git/phase-07-caller-migration-and-one-door.md",
+    "plans/261018-0914-git-component-fgos-git/plan.md",
+    "plans/reports/gate-261020-2329-git-p07-p08-host-gate.md",
+    "plans/reports/gate-261021-0312-git-p07-p08-host-gate-rerun.md",
+    "plans/reports/phase-lead-261020-1140-git-p07-u1-census-commit-core.md",
+    "plans/reports/phase-lead-261020-1150-git-p07-u2-commit-core-switch.md",
+    "plans/reports/phase-lead-261020-1224-git-p07-u3-review-fixes.md",
+    "plans/reports/phase-lead-261020-1234-git-p07-u4-land-merge-promote.md",
+    "plans/reports/phase-lead-261020-1234-git-p07-u5-worktree-cluster.md",
+    "plans/reports/phase-lead-261020-1243-git-p07-u6-host-findings.md",
+    "plans/reports/phase-lead-261020-1306-git-p07-u7-land-and-worktree-blockers.md",
+    "plans/reports/phase-lead-261020-1340-git-p07-u8-land-cutover.md",
+    "plans/reports/phase-lead-261020-1407-git-p07-u9-land-cutover-callers.md",
+    "plans/reports/phase-lead-261020-1501-git-p07-u10-leaf-land-and-waits.md",
+    "plans/reports/phase-lead-261020-1511-git-p07-u11-leaf-root-cutover.md",
+    "plans/reports/phase-lead-261020-1519-git-p07-u12-land-runner-item.md",
+    "plans/reports/phase-lead-261020-1553-git-p07-u13-catchup-store-and-fixtures.md",
+    "plans/reports/phase-lead-261020-1641-git-p07-u14-land-leftovers.md",
+    "plans/reports/phase-lead-261020-1641-git-p07-u16-readers.md",
+    "plans/reports/phase-lead-261020-1641-git-p07-u17-scripts-skills-fixtures.md",
+    "plans/reports/phase-lead-261020-1729-git-p07-u18-ports-round.md",
+    "plans/reports/phase-lead-261020-1801-git-p07-u19-main-merge-and-repo-handle.md",
+    "plans/reports/phase-lead-261020-1841-git-p07-u15b-setup-hooks-holder-workflow.md",
+    "plans/reports/phase-lead-261020-2002-git-p07-u20-one-door-gate.md",
+    "plans/reports/phase-lead-261020-2022-git-p08-u1-proofs-and-docs.md",
+    "plans/reports/phase-lead-261020-2046-git-p07-u21-empty-the-census.md",
+    "plans/reports/phase-lead-261020-2126-git-p07-u22-close-the-census.md",
+    "plans/reports/phase-lead-261020-2237-git-p07-u23-census-empty.md",
+    "plans/reports/phase-lead-261020-2339-git-p07-u24-review-fixes.md",
+    "plans/reports/phase-lead-261021-0045-git-p07-u25-host-gate-fixes.md",
+    "plans/reports/phase-lead-261021-0424-git-p07-u26-green-branch.md",
+    "plans/reports/review-261020-1221-git-p07-u2-commit-core.md",
+    "plans/reports/review-261020-2330-git-p07-p08-risk-review.md",
+    "plans/reports/scout-261020-1135-git-p07-census.e6.json",
+    "plans/reports/scout-261020-1135-git-p07-census.json",
+    "plans/reports/scout-261020-1135-git-p07-census.md",
+    "plans/reports/scout-261020-1616-git-p07-u13-census.e6.json",
+    "plans/reports/scout-261020-1616-git-p07-u13-census.json",
+    "plans/reports/scout-261020-1616-git-p07-u13-census.md",
+    "plans/reports/scout-261020-1702-git-p07-u17-census.md",
+    "plugins/fgOS/skills/_shared/catchup-self-recovery.md",
+    "plugins/fgOS/skills/_shared/coding-cell-policy.md",
+    "plugins/fgOS/skills/_shared/private-cell-worktree.md",
+    "plugins/fgOS/skills/deliver/SKILL.md",
+    "plugins/fgOS/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+    "plugins/fgOS/skills/fgos-lock-fence/SKILL.md",
+    "plugins/fgOS/skills/fgos-run/SKILL.md",
+    "plugins/fgOS/skills/pick/SKILL.md",
+    "scripts/__pycache__/git-p07-census.cpython-314.pyc",
+    "scripts/build-rust-distribution.mjs",
+    "scripts/ci-external-consumer.ps1",
+    "scripts/ci-external-consumer.sh",
+    "scripts/event-store/forge-probe.sh",
+    "scripts/event-store/power-loss-driver.mjs",
+    "scripts/event-store/power-loss.sh",
+    "scripts/event-store/v-spawn-bench.mjs",
+    "scripts/fgos-shell-integration.sh",
+    "scripts/git-addon.mjs",
+    "scripts/git-one-door-scan.mjs",
+    "scripts/git/e1-power-cut.mjs",
+    "scripts/git/e1-power-cut.sh",
+    "scripts/git/e3-bench.mjs",
+    "scripts/git/p-release-checks.sh",
+    "scripts/git/p-space-resource.mjs",
+    "scripts/git/p-space.sh",
+    "scripts/install-git-hooks.mjs",
+    "scripts/knowledge-canary.mjs",
+    "scripts/knowledge-migration.mjs",
+    "scripts/lib/dev-host-manifest.mjs",
+    "scripts/lib/git-addon-stage.mjs",
+    "scripts/lib/git-dir-layout.mjs",
+    "scripts/lib/git-ports.mjs",
+    "scripts/lib/git-spawn-match.mjs",
+    "scripts/lib/js-source-lexer.mjs",
+    "scripts/lib/sandbox-git.mjs",
+    "scripts/lib/test-git-config-guard.mjs",
+    "scripts/measure-coordination-baseline.mjs",
+    "scripts/measure-verify-cost.mjs",
+    "scripts/prepare-release.mjs",
+    "scripts/probe-storytelling-material.mjs",
+    "scripts/regenerate-observe-fixtures.mjs",
+    "scripts/run-rust-dev-host.mjs",
+    "scripts/run-tests.mjs",
+    "scripts/stress-test-files.mjs",
+    "scripts/test-proof-inventory.mjs",
+    "scripts/test-select-mutate.mjs",
+    "scripts/test-select-promote-report.mjs",
+    "scripts/test-select.mjs",
+    "scripts/test-timing.mjs",
+    "scripts/verify-fanout-overlap.mjs",
+    "src/cli/command-registry.mjs",
+    "src/cli/version.mjs",
+    "src/git/index.mjs",
+    "src/git/inspect.mjs",
+    "src/git/land.mjs",
+    "src/git/native.mjs",
+    "src/git/refs.mjs",
+    "src/git/remote.mjs",
+    "src/git/restore.mjs",
+    "src/git/scoped-commit.mjs",
+    "src/git/sync.mjs",
+    "src/holder-lock/fences.mjs",
+    "src/holder-lock/protocol.mjs",
+    "src/run-supervisor/attempt-step.mjs",
+    "src/run-supervisor/client.mjs",
+    "src/run-supervisor/direct-launch.mjs",
+    "src/run-supervisor/protocol.mjs",
+    "src/runner/attestation-guard.mjs",
+    "src/runner/claim-liveness.mjs",
+    "src/runner/claim-port.mjs",
+    "src/runner/dispatch/assignment-runner.mjs",
+    "src/runner/dispatch/cwd-lock.mjs",
+    "src/runner/dispatch/settlement.mjs",
+    "src/runner/dispatch/transport.mjs",
+    "src/runner/dispatch/trust-store.mjs",
+    "src/runner/execution/commit-unit-work.mjs",
+    "src/runner/execution/partial-writes.mjs",
+    "src/runner/execution/run.mjs",
+    "src/runner/execution/unit-sync.mjs",
+    "src/runner/github-adapter.mjs",
+    "src/runner/goal-check.mjs",
+    "src/runner/lock-wait.mjs",
+    "src/runner/loop.mjs",
+    "src/runner/main-fgos-checkpoint.mjs",
+    "src/runner/merge.mjs",
+    "src/runner/operation-choice.mjs",
+    "src/runner/paths.mjs",
+    "src/runner/promote-engine.mjs",
+    "src/runner/promote-preflight.mjs",
+    "src/runner/repo-locks.mjs",
+    "src/runner/session.mjs",
+    "src/runner/work-dispatch.mjs",
+    "src/runner/worktree.mjs",
+    "src/setup/git-checks.mjs",
+    "src/setup/git-hooks.mjs",
+    "src/setup/holder-lock-checks.mjs",
+    "src/setup/registrations.mjs",
+    "src/setup/run-supervisor-checks.mjs",
+    "src/state/cleanup-harness.mjs",
+    "src/state/drift-status.mjs",
+    "src/state/events-compaction.mjs",
+    "src/state/events-jsonl-truncation-guard.mjs",
+    "src/state/legacy-event-git-adapter.mjs",
+    "src/state/postland-drift.mjs",
+    "src/state/replay.mjs",
+    "src/state/store.mjs",
+    "src/state/tool-registry.mjs",
+    "src/util/git-paths.mjs",
+    "src/verbs/events/migrate.mjs",
+    "src/verbs/merge/approve.mjs",
+    "src/verbs/merge/catchup.mjs",
+    "src/verbs/merge/promote-to-component.mjs",
+    "src/verbs/merge/sync-root.mjs",
+    "src/verbs/state/edit.mjs",
+    "src/verbs/state/move.mjs",
+    "src/verbs/worktree/remove.mjs",
+    "src/workflow/case-admission-port.mjs",
+    "src/workflow/case-start.mjs",
+    "src/workflow/case-verbs.mjs",
+    "src/workflow/dir-guard.mjs",
+    "src/workflow/index.mjs",
+    "src/workflow/integrate.mjs",
+    "src/workflow/runner.mjs",
+    "src/workflow/unit-handoff.mjs",
+    "test/architecture.test.mjs",
+    "test/cli/dispatch-retired-doors.test.mjs",
+    "test/cli/fgos-approve-6.test.mjs",
+    "test/cli/fgos-claim.test.mjs",
+    "test/cli/fgos-disconnected-worktree-guard.test.mjs",
+    "test/cli/fgos-merge.test.mjs",
+    "test/cli/fgos-return.test.mjs",
+    "test/cli/fgos-stage.test.mjs",
+    "test/cli/fgos-version.test.mjs",
+    "test/cli/helpers/fgos-cli-harness.mjs",
+    "test/cli/invocation-fault-log.test.mjs",
+    "test/cli/run-verb.test.mjs",
+    "test/cli/take-pick-claim-eligibility.test.mjs",
+    "test/direct/merge-gate.test.mjs",
+    "test/distribution/native-addon.test.mjs",
+    "test/distribution/source-payload.test.mjs",
+    "test/e2e/compound-learn-lifecycle.test.mjs",
+    "test/e2e/domain-aware-stage-literals.test.mjs",
+    "test/e2e/fixture-marketing-domain.test.mjs",
+    "test/e2e/main-checkout-borrow-hook.test.mjs",
+    "test/e2e/main-checkout-lock-hook-worktree-commit.test.mjs",
+    "test/e2e/pr-gate.test.mjs",
+    "test/e2e/resync-worktree-bare-invocation.test.mjs",
+    "test/e2e/runner-loop.test.mjs",
+    "test/e2e/self-improve-loop.test.mjs",
+    "test/e2e/synthetic-domain.test.mjs",
+    "test/event-store/door.test.mjs",
+    "test/event-store/migrate-cutover-grant.test.mjs",
+    "test/fixtures/git-one-door/README.md",
+    "test/fixtures/git-one-door/argv-variable/src/reset.mjs",
+    "test/fixtures/git-one-door/borrowed-facade/src/borrow.mjs",
+    "test/fixtures/git-one-door/both-ways-value/src/run.mjs",
+    "test/fixtures/git-one-door/callback-argv/src/caller.mjs",
+    "test/fixtures/git-one-door/callback-argv/src/runner.mjs",
+    "test/fixtures/git-one-door/computed-member/src/commit.mjs",
+    "test/fixtures/git-one-door/config-path-flow/src/config.mjs",
+    "test/fixtures/git-one-door/config-path-flow/src/run.mjs",
+    "test/fixtures/git-one-door/consumer-marker-on-git/src/verify.mjs",
+    "test/fixtures/git-one-door/function-param-call/src/run.mjs",
+    "test/fixtures/git-one-door/function-value-flow/src/lock.mjs",
+    "test/fixtures/git-one-door/function-value-flow/src/probe.mjs",
+    "test/fixtures/git-one-door/global-options/src/remote.mjs",
+    "test/fixtures/git-one-door/hook-read-verb-writes/.githooks/post-checkout",
+    "test/fixtures/git-one-door/hook-replay-and-skill/core/skills/demo/SKILL.md",
+    "test/fixtures/git-one-door/hook-replay-and-skill/src/replay.mjs",
+    "test/fixtures/git-one-door/launcher-operand/src/plan.mjs",
+    "test/fixtures/git-one-door/map-registry/src/run.mjs",
+    "test/fixtures/git-one-door/method-return/src/registry.mjs",
+    "test/fixtures/git-one-door/method-return/src/run.mjs",
+    "test/fixtures/git-one-door/napi-node-caller/packages/demo/rust/src/lib.rs",
+    "test/fixtures/git-one-door/napi-node-caller/src/port.mjs",
+    "test/fixtures/git-one-door/promisify-exec/src/push.mjs",
+    "test/fixtures/git-one-door/promisify-exec/src/run.mjs",
+    "test/fixtures/git-one-door/read-verb-writes/bin/status.mjs",
+    "test/fixtures/git-one-door/rust-argv-runner/packages/demo/rust/src/lib.rs",
+    "test/fixtures/git-one-door/rust-argv-runner/packages/runner/rust/src/lib.rs",
+    "test/fixtures/git-one-door/rust-command-alias/packages/demo/rust/src/lib.rs",
+    "test/fixtures/git-one-door/rust-first-push/packages/demo/rust/src/lib.rs",
+    "test/fixtures/git-one-door/rust-option-match/packages/demo/rust/src/lib.rs",
+    "test/fixtures/git-one-door/rust-sandbox-argv/packages/demo/rust/src/lib.rs",
+    "test/fixtures/git-one-door/rust-shell-args/packages/demo/rust/src/lib.rs",
+    "test/fixtures/git-one-door/rust-temp-dir-unrelated/packages/demo/rust/src/lib.rs",
+    "test/fixtures/git-one-door/rust-variable-binary/packages/demo/rust/src/lib.rs",
+    "test/fixtures/git-one-door/shell-data-operand/scripts/setup.sh",
+    "test/fixtures/git-one-door/shell-option-variable/src/stage.mjs",
+    "test/fixtures/git-one-door/shell-string/scripts/release.mjs",
+    "test/fixtures/git-one-door/standalone-skill/core/skills/learn/SKILL.md",
+    "test/fixtures/git-one-door/standalone-skill/core/skills/learn/scripts/run.mjs",
+    "test/fixtures/git-one-door/standalone-skill/core/skills/plain/SKILL.md",
+    "test/fixtures/git-one-door/standalone-skill/core/skills/plain/scripts/run.mjs",
+    "test/fixtures/git-one-door/wrapper-prepends-verb/src/wrap.mjs",
+    "test/git/e2e-consumer-noncoding.test.mjs",
+    "test/git/inspect.test.mjs",
+    "test/git/land-recovery.test.mjs",
+    "test/git/land.test.mjs",
+    "test/git/legacy-event-adapter.test.mjs",
+    "test/git/native-load.test.mjs",
+    "test/git/one-door.test.mjs",
+    "test/git/recovery.test.mjs",
+    "test/git/scoped-commit.test.mjs",
+    "test/git/sync.test.mjs",
+    "test/helpers/fixture-dir.mjs",
+    "test/helpers/git-fixture.mjs",
+    "test/helpers/git-spawn-spy.mjs",
+    "test/helpers/js-source-lexer.test.mjs",
+    "test/helpers/main-checkout-hook-repo.mjs",
+    "test/helpers/run-unit-with-port.mjs",
+    "test/helpers/workflow-fixture-repo.mjs",
+    "test/holder-lock/driver-unavailable.test.mjs",
+    "test/holder-lock/fences-main-door.test.mjs",
+    "test/holder-lock/fences-rust-locks.test.mjs",
+    "test/holder-lock/fences-stop-check.test.mjs",
+    "test/holder-lock/fences-v1-ledger.test.mjs",
+    "test/holder-lock/fences-v1-tombstone.test.mjs",
+    "test/holder-lock/registry-contract.test.mjs",
+    "test/holder-lock/windows-borrow.test.mjs",
+    "test/install-packaging.test.mjs",
+    "test/intake/discovery.test.mjs",
+    "test/intake/plan.test.mjs",
+    "test/run-supervisor/support/direct-harness.mjs",
+    "test/run-supervisor/support/terminal-harness.mjs",
+    "test/runner/assignment-enumerator-guard.test.mjs",
+    "test/runner/claim-capacity-race.test.mjs",
+    "test/runner/claim-port.test.mjs",
+    "test/runner/confinement-registry-fixture.helper.mjs",
+    "test/runner/custody-lease-commit.test.mjs",
+    "test/runner/dispatch-confinement-backend-p03.test.mjs",
+    "test/runner/dispatch-production-call-sites.test.mjs",
+    "test/runner/dispatch-reconciliation-import-graph.test.mjs",
+    "test/runner/driver-rununit.test.mjs",
+    "test/runner/execution/commit-unit-work.test.mjs",
+    "test/runner/execution/git-core-adapters.test.mjs",
+    "test/runner/execution/partial-writes.test.mjs",
+    "test/runner/execution/run-case-admission.test.mjs",
+    "test/runner/execution/run-resume-order.test.mjs",
+    "test/runner/execution/run-sync.test.mjs",
+    "test/runner/execution/run.test.mjs",
+    "test/runner/fanout-batch-runner-commit.test.mjs",
+    "test/runner/land-vs-manual-commit.test.mjs",
+    "test/runner/loop-rununit.test.mjs",
+    "test/runner/loop.test.mjs",
+    "test/runner/merge-land.test.mjs",
+    "test/runner/merge-target-slot-multiprocess.test.mjs",
+    "test/runner/merge.test.mjs",
+    "test/runner/promote-engine.test.mjs",
+    "test/runner/promote-preflight.test.mjs",
+    "test/runner/repo-locks-multiprocess.test.mjs",
+    "test/runner/session.test.mjs",
+    "test/runner/spawn-worker.test.mjs",
+    "test/runner/work-path-case-admission.test.mjs",
+    "test/runner/worktree-admin-multiprocess.test.mjs",
+    "test/runner/worktree-callsite-wrapper.test.mjs",
+    "test/runner/worktree-native-fixture.helper.mjs",
+    "test/runner/worktree-ports.test.mjs",
+    "test/runner/worktree.test.mjs",
+    "test/rust-host/dev-host.test.mjs",
+    "test/rust-host/fgctl-init-download-sources.test.mjs",
+    "test/rust-host/fgctl-init-fixture.mjs",
+    "test/rust-host/fgctl-init-preflight-tail.test.mjs",
+    "test/rust-host/fgctl-init.test.mjs",
+    "test/rust-host/fgctl-upgrade.test.mjs",
+    "test/rust-host/fixtures/node-git-caller.mjs",
+    "test/rust-host/harness.mjs",
+    "test/rust-host/harness.test.mjs",
+    "test/rust-host/internal-routes.test.mjs",
+    "test/rust-host/release-tree.test.mjs",
+    "test/scripts/fgos-shell-integration.test.mjs",
+    "test/scripts/full-suite-queue.test.mjs",
+    "test/scripts/install-git-hooks.test.mjs",
+    "test/scripts/knowledge-migration.test.mjs",
+    "test/scripts/prepare-release.test.mjs",
+    "test/scripts/run-rust-dev-host-staging.test.mjs",
+    "test/scripts/run-tests.test.mjs",
+    "test/scripts/sandbox-git.test.mjs",
+    "test/scripts/test-git-config-guard.test.mjs",
+    "test/scripts/test-proof-inventory.test.mjs",
+    "test/scripts/test-select-mutate.test.mjs",
+    "test/scripts/test-select.test.mjs",
+    "test/scripts/test-timing.test.mjs",
+    "test/setup/active-release-drift-check.test.mjs",
+    "test/setup/checks-setup-config.test.mjs",
+    "test/setup/checks.test.mjs",
+    "test/setup/dir-resolution.test.mjs",
+    "test/setup/doctor-fresh-run.test.mjs",
+    "test/setup/git-checks.test.mjs",
+    "test/setup/holder-lock-checks.test.mjs",
+    "test/setup/knowledge-doctor.test.mjs",
+    "test/setup/uninstall-wiring-2.test.mjs",
+    "test/setup/uninstall-wiring-3.test.mjs",
+    "test/setup/uninstall-wiring.test.mjs",
+    "test/state/events-compaction.test.mjs",
+    "test/state/events-jsonl-truncation-guard.test.mjs",
+    "test/state/hot-lock-host-judge.test.mjs",
+    "test/state/identity-before-lock.test.mjs",
+    "test/state/runtime-coordination.test.mjs",
+    "test/state/store.test.mjs",
+    "test/verbs/worktree-create.test.mjs",
+    "test/verbs/worktree-remove.test.mjs",
+    "test/workflow/units-runner.test.mjs",
+    "test/workflow/workflow-runner.test.mjs"
+  ],
+  "changedCandidateFiles": [
+    "docs/platform/component-boundary.md",
+    "docs/platform/git/spec.md",
+    "docs/platform/holder-lock/spec.md",
+    "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+    "docs/platform/process/spec.md"
+  ],
+  "changedDocs": [
+    "docs/architecture-manifest.json",
+    "docs/platform/component-boundary.md",
+    "docs/platform/git/spec.md",
+    "docs/platform/holder-lock/spec.md",
+    "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+    "docs/platform/process/spec.md",
+    "docs/specs/distribution.md",
+    "docs/specs/reading-map.md",
+    "docs/specs/runner.md"
+  ],
+  "overlaps": {
+    "step3": {
+      "count": 9,
+      "records": [
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-040.jsonl",
+          "line": 4,
+          "file": "docs/specs/distribution.md",
+          "consumer": null
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-040.jsonl",
+          "line": 11,
+          "file": "docs/specs/reading-map.md",
+          "consumer": null
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-041.jsonl",
+          "line": 1,
+          "file": "docs/specs/runner.md",
+          "consumer": null
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-093.jsonl",
+          "line": 1,
+          "file": "docs/platform/component-boundary.md",
+          "consumer": null
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-101.jsonl",
+          "line": 1,
+          "file": "docs/platform/git/spec.md",
+          "consumer": null
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-104.jsonl",
+          "line": 1,
+          "file": "docs/platform/holder-lock/spec.md",
+          "consumer": null
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-110.jsonl",
+          "line": 10,
+          "file": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+          "consumer": null
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-112.jsonl",
+          "line": 1,
+          "file": "docs/platform/process/spec.md",
+          "consumer": null
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-126.jsonl",
+          "line": 1,
+          "file": "docs/architecture-manifest.json",
+          "consumer": null
+        }
+      ]
+    },
+    "step4": {
+      "count": 33,
+      "records": [
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-002.jsonl",
+          "line": 1,
+          "hit": [
+            "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-008.jsonl",
+          "line": 6,
+          "hit": [
+            "plugins/fgOS/skills/deliver/SKILL.md"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-010.jsonl",
+          "line": 1,
+          "hit": [
+            "bin/fgos.mjs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-011.jsonl",
+          "line": 1,
+          "hit": [
+            "src/cli/command-registry.mjs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-012.jsonl",
+          "line": 1,
+          "hit": [
+            "apps/fgos-gateway/Cargo.toml"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-016.jsonl",
+          "line": 1,
+          "hit": [
+            ".githooks/pre-commit"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-017.jsonl",
+          "line": 1,
+          "hit": [
+            "CHANGELOG.md"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-019.jsonl",
+          "line": 5,
+          "hit": [
+            "packages/distribution/rust/src/workspace.rs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-020.jsonl",
+          "line": 1,
+          "hit": [
+            "packages/herdr-fgos-common/rust/src/fgos.rs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-020.jsonl",
+          "line": 2,
+          "hit": [
+            "packages/herdr-fgos-common/rust/src/settings.rs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-022.jsonl",
+          "line": 3,
+          "hit": [
+            "src/runner/claim-liveness.mjs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-022.jsonl",
+          "line": 4,
+          "hit": [
+            "src/runner/claim-port.mjs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-022.jsonl",
+          "line": 6,
+          "hit": [
+            "src/runner/dispatch/assignment-runner.mjs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-024.jsonl",
+          "line": 3,
+          "hit": [
+            "src/runner/dispatch/transport.mjs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-024.jsonl",
+          "line": 4,
+          "hit": [
+            "src/runner/dispatch/trust-store.mjs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-024.jsonl",
+          "line": 7,
+          "hit": [
+            "src/runner/goal-check.mjs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-024.jsonl",
+          "line": 8,
+          "hit": [
+            "src/runner/loop.mjs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-025.jsonl",
+          "line": 1,
+          "hit": [
+            "src/runner/merge.mjs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-025.jsonl",
+          "line": 2,
+          "hit": [
+            "src/runner/paths.mjs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-025.jsonl",
+          "line": 3,
+          "hit": [
+            "src/runner/promote-engine.mjs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-025.jsonl",
+          "line": 4,
+          "hit": [
+            "src/runner/promote-preflight.mjs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-025.jsonl",
+          "line": 6,
+          "hit": [
+            "src/runner/worktree.mjs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
+          "line": 1,
+          "hit": [
+            "src/state/cleanup-harness.mjs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
+          "line": 4,
+          "hit": [
+            "src/state/drift-status.mjs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
+          "line": 5,
+          "hit": [
+            "src/state/events-compaction.mjs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
+          "line": 6,
+          "hit": [
+            "src/state/events-jsonl-truncation-guard.mjs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
+          "line": 12,
+          "hit": [
+            "src/state/postland-drift.mjs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
+          "line": 14,
+          "hit": [
+            "src/state/replay.mjs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-027.jsonl",
+          "line": 1,
+          "hit": [
+            "src/state/store.mjs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-027.jsonl",
+          "line": 2,
+          "hit": [
+            "src/state/tool-registry.mjs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-029.jsonl",
+          "line": 1,
+          "hit": [
+            "src/verbs/merge/approve.mjs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-029.jsonl",
+          "line": 4,
+          "hit": [
+            "src/verbs/merge/sync-root.mjs"
+          ]
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-030.jsonl",
+          "line": 9,
+          "hit": [
+            "core/skills/fgos-run/SKILL.md"
+          ]
+        }
+      ]
+    },
+    "step5": {
+      "count": 81,
+      "records": [
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+          "line": 1,
+          "hit": [
+            ".githooks/pre-commit"
+          ],
+          "file": ".githooks/pre-commit"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+          "line": 2,
+          "hit": [
+            "bin/fgos.mjs"
+          ],
+          "file": "bin/fgos.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+          "line": 3,
+          "hit": [
+            "src/cli/command-registry.mjs"
+          ],
+          "file": "src/cli/command-registry.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+          "line": 6,
+          "hit": [
+            "src/runner/claim-port.mjs"
+          ],
+          "file": "src/runner/claim-port.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+          "line": 7,
+          "hit": [
+            "src/runner/merge.mjs"
+          ],
+          "file": "src/runner/merge.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+          "line": 8,
+          "hit": [
+            "src/runner/worktree.mjs"
+          ],
+          "file": "src/runner/worktree.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+          "line": 9,
+          "hit": [
+            "src/state/events-jsonl-truncation-guard.mjs"
+          ],
+          "file": "src/state/events-jsonl-truncation-guard.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 2,
+          "hit": [
+            ".agents/skills/_shared/catchup-self-recovery.md"
+          ],
+          "file": ".agents/skills/_shared/catchup-self-recovery.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 3,
+          "hit": [
+            ".agents/skills/_shared/coding-cell-policy.md"
+          ],
+          "file": ".agents/skills/_shared/coding-cell-policy.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 8,
+          "hit": [
+            ".agents/skills/distill/SKILL.md"
+          ],
+          "file": ".agents/skills/distill/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 12,
+          "hit": [
+            ".agents/skills/distill/scripts/distill.mjs"
+          ],
+          "file": ".agents/skills/distill/scripts/distill.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 27,
+          "hit": [
+            ".agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md"
+          ],
+          "file": ".agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 36,
+          "hit": [
+            ".claude/skills/distill/scripts/distill.mjs"
+          ],
+          "file": ".claude/skills/distill/scripts/distill.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 49,
+          "hit": [
+            "core/skills/_shared/catchup-self-recovery.md"
+          ],
+          "file": "core/skills/_shared/catchup-self-recovery.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 54,
+          "hit": [
+            "core/skills/distill/SKILL.md"
+          ],
+          "file": "core/skills/distill/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 58,
+          "hit": [
+            "core/skills/distill/scripts/distill.mjs"
+          ],
+          "file": "core/skills/distill/scripts/distill.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 64,
+          "hit": [
+            "core/skills/instruction-audit/scripts/instruction-audit.mjs"
+          ],
+          "file": "core/skills/instruction-audit/scripts/instruction-audit.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 69,
+          "hit": [
+            "domains/coding/skills/_shared/coding-cell-policy.md"
+          ],
+          "file": "domains/coding/skills/_shared/coding-cell-policy.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 82,
+          "hit": [
+            "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md"
+          ],
+          "file": "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 95,
+          "hit": [
+            "plugins/fgOS/skills/_shared/catchup-self-recovery.md"
+          ],
+          "file": "plugins/fgOS/skills/_shared/catchup-self-recovery.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 96,
+          "hit": [
+            "plugins/fgOS/skills/_shared/coding-cell-policy.md"
+          ],
+          "file": "plugins/fgOS/skills/_shared/coding-cell-policy.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 109,
+          "hit": [
+            "plugins/fgOS/skills/deliver/SKILL.md"
+          ],
+          "file": "plugins/fgOS/skills/deliver/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 125,
+          "hit": [
+            "plugins/fgOS/skills/fgos-coding-planning/references/bootstrap-and-lane.md"
+          ],
+          "file": "plugins/fgOS/skills/fgos-coding-planning/references/bootstrap-and-lane.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 141,
+          "hit": [
+            "plugins/fgOS/skills/pick/SKILL.md"
+          ],
+          "file": "plugins/fgOS/skills/pick/SKILL.md"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 161,
+          "hit": [
+            "scripts/build-rust-distribution.mjs"
+          ],
+          "file": "scripts/build-rust-distribution.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 175,
+          "hit": [
+            "scripts/ci-external-consumer.ps1"
+          ],
+          "file": "scripts/ci-external-consumer.ps1"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 176,
+          "hit": [
+            "scripts/ci-external-consumer.sh"
+          ],
+          "file": "scripts/ci-external-consumer.sh"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 184,
+          "hit": [
+            "scripts/event-store/v-spawn-bench.mjs"
+          ],
+          "file": "scripts/event-store/v-spawn-bench.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 189,
+          "hit": [
+            "scripts/fgos-shell-integration.sh"
+          ],
+          "file": "scripts/fgos-shell-integration.sh"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 192,
+          "hit": [
+            "scripts/git/e3-bench.mjs"
+          ],
+          "file": "scripts/git/e3-bench.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 195,
+          "hit": [
+            "scripts/install-git-hooks.mjs"
+          ],
+          "file": "scripts/install-git-hooks.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 198,
+          "hit": [
+            "scripts/knowledge-canary.mjs"
+          ],
+          "file": "scripts/knowledge-canary.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 200,
+          "hit": [
+            "scripts/knowledge-migration.mjs"
+          ],
+          "file": "scripts/knowledge-migration.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 204,
+          "hit": [
+            "scripts/lib/test-git-config-guard.mjs"
+          ],
+          "file": "scripts/lib/test-git-config-guard.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 206,
+          "hit": [
+            "scripts/measure-coordination-baseline.mjs"
+          ],
+          "file": "scripts/measure-coordination-baseline.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 208,
+          "hit": [
+            "scripts/measure-verify-cost.mjs"
+          ],
+          "file": "scripts/measure-verify-cost.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 214,
+          "hit": [
+            "scripts/prepare-release.mjs"
+          ],
+          "file": "scripts/prepare-release.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 215,
+          "hit": [
+            "scripts/probe-storytelling-material.mjs"
+          ],
+          "file": "scripts/probe-storytelling-material.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 218,
+          "hit": [
+            "scripts/regenerate-observe-fixtures.mjs"
+          ],
+          "file": "scripts/regenerate-observe-fixtures.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 219,
+          "hit": [
+            "scripts/run-rust-dev-host.mjs"
+          ],
+          "file": "scripts/run-rust-dev-host.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 221,
+          "hit": [
+            "scripts/run-tests.mjs"
+          ],
+          "file": "scripts/run-tests.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 222,
+          "hit": [
+            "scripts/stress-test-files.mjs"
+          ],
+          "file": "scripts/stress-test-files.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 224,
+          "hit": [
+            "scripts/test-proof-inventory.mjs"
+          ],
+          "file": "scripts/test-proof-inventory.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 227,
+          "hit": [
+            "scripts/test-select-mutate.mjs"
+          ],
+          "file": "scripts/test-select-mutate.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 228,
+          "hit": [
+            "scripts/test-select-promote-report.mjs"
+          ],
+          "file": "scripts/test-select-promote-report.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 231,
+          "hit": [
+            "scripts/test-select.mjs"
+          ],
+          "file": "scripts/test-select.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 232,
+          "hit": [
+            "scripts/test-timing.mjs"
+          ],
+          "file": "scripts/test-timing.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+          "line": 233,
+          "hit": [
+            "scripts/verify-fanout-overlap.mjs"
+          ],
+          "file": "scripts/verify-fanout-overlap.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 13,
+          "hit": [
+            "src/setup/git-checks.mjs"
+          ],
+          "file": "src/setup/git-checks.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 14,
+          "hit": [
+            "src/setup/git-hooks.mjs"
+          ],
+          "file": "src/setup/git-hooks.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 15,
+          "hit": [
+            "src/setup/holder-lock-checks.mjs"
+          ],
+          "file": "src/setup/holder-lock-checks.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 21,
+          "hit": [
+            "src/setup/registrations.mjs"
+          ],
+          "file": "src/setup/registrations.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+          "line": 22,
+          "hit": [
+            "src/setup/run-supervisor-checks.mjs"
+          ],
+          "file": "src/setup/run-supervisor-checks.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+          "line": 33,
+          "hit": [
+            "packages/holder-lock/rust/tests/borrow_io.rs"
+          ],
+          "file": "packages/holder-lock/rust/tests/borrow_io.rs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+          "line": 75,
+          "hit": [
+            "test/git/inspect.test.mjs"
+          ],
+          "file": "test/git/inspect.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+          "line": 89,
+          "hit": [
+            "test/holder-lock/windows-borrow.test.mjs"
+          ],
+          "file": "test/holder-lock/windows-borrow.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+          "line": 103,
+          "hit": [
+            "test/runner/confinement-registry-fixture.helper.mjs"
+          ],
+          "file": "test/runner/confinement-registry-fixture.helper.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+          "line": 126,
+          "hit": [
+            "test/runner/promote-engine.test.mjs"
+          ],
+          "file": "test/runner/promote-engine.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+          "line": 127,
+          "hit": [
+            "test/runner/promote-preflight.test.mjs"
+          ],
+          "file": "test/runner/promote-preflight.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+          "line": 131,
+          "hit": [
+            "test/runner/repo-locks-multiprocess.test.mjs"
+          ],
+          "file": "test/runner/repo-locks-multiprocess.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+          "line": 138,
+          "hit": [
+            "test/runner/worktree-admin-multiprocess.test.mjs"
+          ],
+          "file": "test/runner/worktree-admin-multiprocess.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+          "line": 142,
+          "hit": [
+            "test/rust-host/fgctl-init-preflight-tail.test.mjs"
+          ],
+          "file": "test/rust-host/fgctl-init-preflight-tail.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+          "line": 145,
+          "hit": [
+            "test/rust-host/internal-routes.test.mjs"
+          ],
+          "file": "test/rust-host/internal-routes.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+          "line": 157,
+          "hit": [
+            "test/scripts/prepare-release.test.mjs"
+          ],
+          "file": "test/scripts/prepare-release.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+          "line": 159,
+          "hit": [
+            "test/scripts/test-proof-inventory.test.mjs"
+          ],
+          "file": "test/scripts/test-proof-inventory.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+          "line": 161,
+          "hit": [
+            "test/scripts/test-select-mutate.test.mjs"
+          ],
+          "file": "test/scripts/test-select-mutate.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+          "line": 164,
+          "hit": [
+            "test/scripts/test-select.test.mjs"
+          ],
+          "file": "test/scripts/test-select.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+          "line": 165,
+          "hit": [
+            "test/scripts/test-timing.test.mjs"
+          ],
+          "file": "test/scripts/test-timing.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+          "line": 169,
+          "hit": [
+            "test/setup/git-checks.test.mjs"
+          ],
+          "file": "test/setup/git-checks.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+          "line": 177,
+          "hit": [
+            "test/state/hot-lock-host-judge.test.mjs"
+          ],
+          "file": "test/state/hot-lock-host-judge.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+          "line": 179,
+          "hit": [
+            "test/state/identity-before-lock.test.mjs"
+          ],
+          "file": "test/state/identity-before-lock.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl",
+          "line": 2,
+          "hit": [
+            "test/architecture.test.mjs"
+          ],
+          "file": "test/architecture.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl",
+          "line": 29,
+          "hit": [
+            "test/setup/dir-resolution.test.mjs"
+          ],
+          "file": "test/setup/dir-resolution.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl",
+          "line": 30,
+          "hit": [
+            "test/setup/uninstall-wiring.test.mjs"
+          ],
+          "file": "test/setup/uninstall-wiring.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+          "line": 10,
+          "hit": [
+            "test/cli/fgos-version.test.mjs"
+          ],
+          "file": "test/cli/fgos-version.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+          "line": 11,
+          "hit": [
+            "test/distribution/source-payload.test.mjs"
+          ],
+          "file": "test/distribution/source-payload.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl",
+          "line": 1,
+          "hit": [
+            "test/setup/doctor-fresh-run.test.mjs"
+          ],
+          "file": "test/setup/doctor-fresh-run.test.mjs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl",
+          "line": 3,
+          "hit": [
+            "apps/fgctl/tests/git_wal_activation_gate.rs"
+          ],
+          "file": "apps/fgctl/tests/git_wal_activation_gate.rs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl",
+          "line": 5,
+          "hit": [
+            "apps/fgos/tests/internal_lock_routes.rs"
+          ],
+          "file": "apps/fgos/tests/internal_lock_routes.rs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl",
+          "line": 6,
+          "hit": [
+            "apps/fgos/tests/windows_lock_hold_route.rs"
+          ],
+          "file": "apps/fgos/tests/windows_lock_hold_route.rs"
+        },
+        {
+          "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl",
+          "line": 40,
+          "hit": [
+            "test/state/events-compaction.test.mjs"
+          ],
+          "file": "test/state/events-compaction.test.mjs"
+        }
+      ]
+    }
+  },
+  "step0Receipt": "step-00-l12-79-binding-check.json",
+  "ratchet": {
+    "exit": 0,
+    "log": "step-00-l12-79-ratchet.log"
+  },
+  "ratchetTests": {
+    "exit": 0,
+    "passed": 28,
+    "log": "step-00-l12-79-ratchet-tests.log"
+  },
+  "exceptionsChanged": true,
+  "refreshedExceptions": [
+    "docs/specs/distribution.md",
+    "docs/specs/reading-map.md",
+    "docs/specs/runner.md"
+  ],
+  "rebindingsApplied": [
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "claimId": "claim_83c033652dd933ee9b5fc5e519a2b6fb",
+      "targetOwner": "docs/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "targetUnitDigest": "3107c11cadd26ba38d873decdc003dab6bd5420a74c0bd72936871ee5f515887"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "claimId": "claim_af89c4e6063eb43c4e690c3fdd430677",
+      "targetOwner": "docs/platform/component-boundary.md",
+      "targetAnchor": "unheaded-block-11",
+      "targetUnitDigest": "f8a32e4acdd852c4ea75cb607e860ba4790acf17eaf9c8b613703cc277355ad0"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "claimId": "claim_f9c135d80cce2e8cf98c8b3b5b0db4ad",
+      "targetOwner": "docs/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "targetUnitDigest": "3107c11cadd26ba38d873decdc003dab6bd5420a74c0bd72936871ee5f515887"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "claimId": "claim_b19630ef4dcf1330c9807fc226a90e7b",
+      "targetOwner": "docs/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "targetUnitDigest": "3107c11cadd26ba38d873decdc003dab6bd5420a74c0bd72936871ee5f515887"
+    }
+  ],
+  "acceptance": "Author accounting; independent review and actual runner-commit accounting remain owed.",
+  "logHashes": {
+    "step-00-l12-79-ratchet.log": "9299cb06b5c8c4b7518e62992d0bb4c198371d561f10b129c7456f63c3f59319",
+    "step-00-l12-79-ratchet-tests.log": "0d3d6861998ebd81d78bd277cf26ab53986e8636e886eec13278baa464fee1c7"
+  }
+}
