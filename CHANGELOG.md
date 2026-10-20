@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- New skill `fgos-cook`: delivers a plan written by `ak:plan` by opening a conductor case on the coding guide with an owner-approved frame, then dispatching one slice at a time through `fgos run` and `fgos workflow` naming the case, checking each result itself and handing the branch to the owner (it never merges). Slices run serially in one worktree until the Git land operation exists; the route table waits for Seat Binding.
+
 - `npm test` now prepares the release fgos, fgctl and native addon it tests against (incremental), so the suite is green on a fresh machine, not only in CI.
 
 - `npm test` ends with a `suite:` line: test files, `test()` calls and wall time against the committed `test/suite-baseline.json`. It fails when a test body is copied byte for byte into a second file and the baseline does not list that clone, and warns on titles shared across files and on new unmarked `fgos init` or network calls in tests. `node scripts/test-proof-inventory.mjs --duplicates` lists the clones and shared titles; `--write-baseline [--wall-seconds <s>]` refreshes the baseline.
