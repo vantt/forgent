@@ -222,9 +222,20 @@ test('the CLI door builds a host binary before the queue only when none resolves
     // queue could replace the one a queued run elsewhere is executing.
     queueWithHostBin({ env: {} }, {
       resolve: () => '/activated/fgos',
+      speaksLockProtocol: () => true,
       ensure: () => assert.fail('nothing is built before the queue when a host binary resolves'),
       queue: () => () => {},
     });
+
+    // A resolved host that does not speak this checkout's lock protocol is replaced by a built one.
+    let queuedWith;
+    queueWithHostBin({ env: {} }, {
+      resolve: () => '/activated/fgos',
+      speaksLockProtocol: () => false,
+      ensure: () => '/built/by/cargo/fgos',
+      queue: () => { queuedWith = process.env.FGOS_HOST_BIN; return () => {}; },
+    });
+    assert.equal(queuedWith, '/built/by/cargo/fgos');
   } finally {
     if (saved === undefined) delete process.env.FGOS_HOST_BIN;
     else process.env.FGOS_HOST_BIN = saved;

@@ -11,7 +11,7 @@ import path from 'node:path';
 import { spawn, spawnSync, execFileSync } from 'node:child_process';
 import { placeFences, fenceStatus, TOMBSTONE_FILE, V1_LOCK_PRESENT } from '../../src/holder-lock/fences.mjs';
 import { workspaceListing } from '../../src/setup/holder-lock-checks.mjs';
-import { useReleaseFixture, fixture, runFgctl } from '../rust-host/fgctl-init-fixture.mjs';
+import { useReleaseFixture, fixture, runFgctl, withoutActiveRelease } from '../rust-host/fgctl-init-fixture.mjs';
 
 const HOST = process.env.FGOS_HOST_BIN;
 const HAS_FLOCK = spawnSync('flock', ['--version'], { stdio: 'ignore' }).status === 0;
@@ -61,7 +61,7 @@ function tombstoneRecord(lockPath) {
 }
 
 function cleanEnv(extra = {}) {
-  const env = { ...process.env, FGOS_STATE_HOME: stateHome, ...extra };
+  const env = { ...withoutActiveRelease(process.env), FGOS_STATE_HOME: stateHome, ...extra };
   for (const key of ['CLAUDE_CODE_SESSION_ID', 'CODEX_THREAD_ID', 'FGOS_SESSION_ID', 'FGOS_STATE_ROOT']) delete env[key];
   return env;
 }

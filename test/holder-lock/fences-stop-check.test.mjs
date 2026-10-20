@@ -231,7 +231,9 @@ test('a process working in a linked worktree blocks only when the caller lists t
   const ws = makeWorkspace('linked-dir');
   const linked = path.join(scratch, 'linked-dir-checkout');
   fs.mkdirSync(linked);
-  const sleeper = spawn('sleep', ['30'], { cwd: linked, stdio: 'ignore' });
+  // Not an fgOS process: without the pinned state root in its environment only its cwd can name it.
+  const { FGOS_STATE_ROOT: _pinned, ...plainEnv } = process.env;
+  const sleeper = spawn('sleep', ['30'], { cwd: linked, env: plainEnv, stdio: 'ignore' });
   children.add(sleeper);
   try {
     const excludePids = foreignPids();

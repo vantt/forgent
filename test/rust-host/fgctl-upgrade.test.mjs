@@ -14,6 +14,7 @@ import {
   computeArtifactDigest,
   releaseOutputDir,
 } from '../../scripts/build-rust-distribution.mjs';
+import { withoutActiveRelease } from './fgctl-init-fixture.mjs';
 import { releaseBinaryPath } from '../../src/util/release-binary-path.mjs';
 import { pathWithGcLeakingGit, processesUnder } from './fgctl-init-fixture.mjs';
 
@@ -34,7 +35,7 @@ function runFgctl(args, { cwd, stateHome, env = {} } = {}) {
   return spawnSync(FGCTL_BIN, args, {
     cwd,
     env: {
-      ...process.env,
+      ...withoutActiveRelease(process.env),
       FGOS_STATE_HOME: stateHome,
       ...env,
     },
@@ -54,7 +55,7 @@ function runFgos(args, { cwd, stateHome, env = {} } = {}) {
   return spawnSync(FGOS_BIN, args, {
     cwd,
     env: {
-      ...process.env,
+      ...withoutActiveRelease(process.env),
       FGOS_STATE_HOME: stateHome,
       ...env,
     },

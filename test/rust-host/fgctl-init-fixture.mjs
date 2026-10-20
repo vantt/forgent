@@ -19,11 +19,20 @@ export const releaseDirName = (digest) => (process.platform === 'win32' ? digest
 // Filled by the before() hook that useReleaseFixture() registers.
 export const fixture = { releaseDir: null, digest: null };
 
+/**
+ * `env` without the variable pair that names the outer run's active release. A staged release
+ * runs its own payload; handed that pair, its host would run the checkout's payload instead.
+ */
+export function withoutActiveRelease(env) {
+  const { FGOS_ACTIVE_RELEASE_PATH, FGOS_ACTIVE_MANIFEST_PATH, ...rest } = env;
+  return rest;
+}
+
 export function runFgctl(args, { cwd, stateHome, env = {} } = {}) {
   return spawnSync(FGCTL_BIN, args, {
     cwd,
     env: {
-      ...process.env,
+      ...withoutActiveRelease(process.env),
       FGOS_STATE_HOME: stateHome,
       ...env,
     },

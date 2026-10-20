@@ -280,7 +280,7 @@ function mirroredRepoRoot(prefix) {
   fs.copyFileSync(realLibPath, path.join(root, 'scripts', 'lib', 'is-main-module.mjs'));
   fs.copyFileSync(realQueueLibPath, path.join(root, 'scripts', 'lib', 'full-suite-queue.mjs'));
   // ...and the libraries run-tests.mjs and the distribution builder (its one-door census step) import.
-  for (const rel of ['lib/git-dir-layout.mjs', 'lib/js-source-lexer.mjs', 'lib/git-spawn-match.mjs', 'git-one-door-scan.mjs']) {
+  for (const rel of ['lib/dev-host-manifest.mjs', 'lib/git-dir-layout.mjs', 'lib/js-source-lexer.mjs', 'lib/git-spawn-match.mjs', 'git-one-door-scan.mjs']) {
     fs.copyFileSync(fileURLToPath(new URL(`../../scripts/${rel}`, import.meta.url)), path.join(root, 'scripts', rel));
   }
   // run-tests.mjs builds the native addon record through the distribution builder's helpers.

@@ -35,7 +35,7 @@ const env = { ...process.env, FGOS_HOST_BIN: '' };
 ensureGitAddon(env);
 console.log(env.FGOS_HOST_BIN + '\\n' + env.FGOS_ACTIVE_MANIFEST_PATH);
 " 2>> "$WORK/release-build.log") && [ -x "$FGOS_HOST_BIN" ] || { echo "addon staging failed (see $WORK/release-build.log)" >&2; exit 1; }
-export FGOS_HOST_BIN FGOS_ACTIVE_MANIFEST_PATH
+export FGOS_HOST_BIN FGOS_ACTIVE_MANIFEST_PATH FGOS_ACTIVE_RELEASE_PATH="$CHECKOUT"
 check() { # name, command...
   local name="$1"; shift
   if "$@" > "$WORK/$name.log" 2>&1; then echo "PASS $name" | tee -a "$VERDICTS"

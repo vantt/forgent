@@ -7,7 +7,7 @@ import path from 'node:path';
 import { spawnSync, execFileSync } from 'node:child_process';
 import { computeArtifactDigest, hashFile } from '../../scripts/build-rust-distribution.mjs';
 import { holdLock } from './fgctl-lock-holder.mjs';
-import { useReleaseFixture, releaseDirName, fixture, runFgctl, runShim, pathWithGcLeakingGit, processesUnder } from './fgctl-init-fixture.mjs';
+import { useReleaseFixture, releaseDirName, fixture, runFgctl, runShim, pathWithGcLeakingGit, processesUnder, withoutActiveRelease } from './fgctl-init-fixture.mjs';
 
 useReleaseFixture();
 
@@ -285,7 +285,7 @@ test('P7: Local runtime tail failure leaves workspace in diagnosable state with 
     const shimFgos = path.join(tempProj, '.fgos', 'installation', 'bin', 'fgos');
     const versionRes = runShim(shimFgos, ['version', '--runtime-json'], {
       cwd: tempProj,
-      env: { ...process.env, FGOS_STATE_HOME: tempState, HOME: tempHome },
+      env: { ...withoutActiveRelease(process.env), FGOS_STATE_HOME: tempState, HOME: tempHome },
       encoding: 'utf8',
     });
     assert.equal(versionRes.status, 0, `version --runtime-json must work: ${versionRes.stderr}`);

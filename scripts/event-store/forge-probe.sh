@@ -20,7 +20,7 @@ import { loadNativeAddon } from './src/git/native.mjs';
 import { openStore, ensureEventStoreRefspecs } from './src/event-store/index.mjs';
 const P = process.argv[2];
 const git = sandboxGit(P);
-const loaderOptions = { descriptor: { manifest: JSON.parse(fs.readFileSync('.fgos/runtime/git-addon/native-addon.json')), releaseRoot: process.cwd() } };
+const loaderOptions = { descriptor: { manifest: JSON.parse(fs.readFileSync('.fgos/runtime/git-addon/manifest.json')), releaseRoot: process.cwd() } };
 const addon = loadNativeAddon(loaderOptions);
 const contract = path.join(P, 'contract.json');
 fs.writeFileSync(contract, JSON.stringify({ v: 1, types: [{ type: 'forge.probe', domain: 'forge', schemaVersion: 1, scope: 'project', sealOnWrite: false }] }));

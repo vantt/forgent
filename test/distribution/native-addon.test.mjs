@@ -72,6 +72,7 @@ test('addon test builder respects Cargo target/home and defaults to the normal o
     // Source fingerprints use the actual source tree; symlinks are only test inputs.
     fs.symlinkSync(path.join(root, 'packages'), path.join(repo, 'packages'), 'dir');
     fs.symlinkSync(path.join(root, 'apps'), path.join(repo, 'apps'), 'dir');
+    fs.symlinkSync(path.join(root, 'bin'), path.join(repo, 'bin'), 'dir');
     const builder = path.join(temp, 'cargo');
     fs.writeFileSync(builder, `#!${process.execPath}
 const fs = require('node:fs'), path = require('node:path');
@@ -114,6 +115,7 @@ fs.copyFileSync(process.env.HOST_TEST_BYTES,path.join(output,'fgos'));
       for (const file of ['Cargo.toml', 'Cargo.lock']) fs.copyFileSync(path.join(repo, file), path.join(sibling, file));
       fs.symlinkSync(path.join(root, 'packages'), path.join(sibling, 'packages'), 'dir');
       fs.symlinkSync(path.join(root, 'apps'), path.join(sibling, 'apps'), 'dir');
+      fs.symlinkSync(path.join(root, 'bin'), path.join(sibling, 'bin'), 'dir');
       fs.symlinkSync(path.join(repo, '.fgos'), path.join(sibling, '.fgos'), 'dir');
       const siblingResult = buildAddon({ ...env }, sibling);
       assert.notEqual(fs.realpathSync(siblingResult.manifest), fs.realpathSync(result.manifest), 'shared .fgos keeps distinct checkout manifests');
@@ -146,7 +148,7 @@ test('development host carries and loads the addon from its per-invocation manif
     const repo = path.join(temp, 'checkout');
     fs.cpSync(path.join(root, 'src'), path.join(repo, 'src'), {recursive: true});
     // The distribution builder and the libraries it imports (its one-door census step among them).
-    for (const file of ['scripts/run-rust-dev-host.mjs', 'scripts/build-rust-distribution.mjs', 'scripts/git-one-door-scan.mjs', 'scripts/lib/js-source-lexer.mjs', 'scripts/lib/git-spawn-match.mjs', 'scripts/lib/git-dir-layout.mjs', 'Cargo.lock']) {
+    for (const file of ['scripts/run-rust-dev-host.mjs', 'scripts/lib/dev-host-manifest.mjs', 'scripts/build-rust-distribution.mjs', 'scripts/git-one-door-scan.mjs', 'scripts/lib/js-source-lexer.mjs', 'scripts/lib/git-spawn-match.mjs', 'scripts/lib/git-dir-layout.mjs', 'Cargo.lock']) {
       fs.mkdirSync(path.dirname(path.join(repo, file)), {recursive: true});
       fs.copyFileSync(path.join(root, file), path.join(repo, file));
     }

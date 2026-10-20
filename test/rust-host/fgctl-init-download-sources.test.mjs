@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync, spawn, execFileSync } from 'node:child_process';
 import http from 'node:http';
-import { useReleaseFixture, FGCTL_BIN, fixture, runFgctl, waitForProcess, RELEASE_TARGET, makeDownloadProject, makeReleaseAssets, readActivation } from './fgctl-init-fixture.mjs';
+import { useReleaseFixture, FGCTL_BIN, fixture, runFgctl, waitForProcess, RELEASE_TARGET, makeDownloadProject, makeReleaseAssets, readActivation, withoutActiveRelease } from './fgctl-init-fixture.mjs';
 
 useReleaseFixture();
 
@@ -96,7 +96,7 @@ test('download: with no pin and nothing explicit, init resolves and installs the
     const proc = spawn(FGCTL_BIN, ['init'], {
       cwd: t.proj,
       env: {
-        ...process.env,
+        ...withoutActiveRelease(process.env),
         FGOS_STATE_HOME: t.state,
         HOME: t.home,
         FGCTL_TARGET: RELEASE_TARGET,

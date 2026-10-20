@@ -18,7 +18,8 @@
 // invocation works unchanged on every OS's default shell.
 
 import fs from 'node:fs';
-import { nativeAddonLibraryName, nativeAddonComponent } from './build-rust-distribution.mjs';
+import { nativeAddonLibraryName } from './build-rust-distribution.mjs';
+import { devHostEnv, devHostManifest } from './lib/dev-host-manifest.mjs';
 import { createHash } from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
@@ -26,6 +27,7 @@ import { spawn as spawnAsync, spawnSync, execFileSync } from 'node:child_process
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { acquireFullSuiteQueue, QUEUE_HELD_ENV } from './lib/full-suite-queue.mjs';
+import { PROTOCOL as LOCK_ROUTE_PROTOCOL } from '../src/holder-lock/protocol.mjs';
 import { resolveActiveHostBin } from '../src/util/host-bin-path.mjs';
 import { configEntries, repositoryDirs } from './lib/git-dir-layout.mjs';
 
@@ -47,6 +49,8 @@ export function gitAddonSourceDigest(cwd = REPO_ROOT) {
   for (const file of files.sort()) hash.update(file).update('\0').update(fs.readFileSync(path.join(cwd, file)));
   return hash.digest('hex');
 }
+/** Sidecar of the staged addon directory: the source digest the staged bytes were built from. */
+export const GIT_ADDON_SOURCE_DIGEST_FILE = 'source-digest';
 export function gitAddonDirectory(cwd = REPO_ROOT) {
   // Linked checkouts can share .fgos, but their source payloads and manifests cannot.
   const checkout = createHash('sha256').update(fs.realpathSync(cwd)).digest('hex').slice(0, 16);
@@ -67,7 +71,6 @@ export function ensureGitAddon(env = process.env, cwd = REPO_ROOT, locked = true
     fs.writeFileSync(temporaryAddon, bytes);
     fs.renameSync(temporaryAddon, addon);
   }
-  const record = nativeAddonComponent(addon, path.relative(cwd, addon), cwd);
   // Never an inherited FGOS_HOST_BIN: a release host predates this checkout's sources.
   const sourceHost = ensureHostBin({ ...env, FGOS_HOST_BIN: '' }, cwd);
   const hostBin = path.join(addonDir, process.platform === 'win32' ? 'fgos.exe' : 'fgos');
@@ -77,16 +80,16 @@ export function ensureGitAddon(env = process.env, cwd = REPO_ROOT, locked = true
     fs.writeFileSync(temporaryHost, hostBytes, { mode: 0o755 });
     fs.renameSync(temporaryHost, hostBin);
   }
-  const manifestDir = addonDir;
-  fs.mkdirSync(manifestDir, { recursive: true });
-  const manifest = path.join(manifestDir, 'native-addon.json');
-  const manifestBytes = JSON.stringify({ entries: { fgos: path.relative(cwd, hostBin) }, components: { legacyNode: { root: '.' }, nativeAddon: record }, sourceDigest: gitAddonSourceDigest(cwd) });
+  // The complete release manifest of the staged host, the same shape `npm run fgos:dev` writes; the
+  // host's legacy route and the Node addon loader both read it through the one variable pair.
+  const manifest = path.join(addonDir, 'manifest.json');
+  const manifestBytes = `${JSON.stringify(devHostManifest({ checkoutRoot: cwd, fgosBin: hostBin, addonFile: addon }), null, 2)}\n`;
   if (!fs.existsSync(manifest) || fs.readFileSync(manifest, 'utf8') !== manifestBytes) {
     fs.writeFileSync(`${manifest}.${process.pid}.tmp`, manifestBytes);
     fs.renameSync(`${manifest}.${process.pid}.tmp`, manifest);
   }
-  env.FGOS_HOST_BIN = hostBin;
-  env.FGOS_ACTIVE_MANIFEST_PATH = manifest;
+  fs.writeFileSync(path.join(addonDir, GIT_ADDON_SOURCE_DIGEST_FILE), gitAddonSourceDigest(cwd));
+  Object.assign(env, devHostEnv({}, { fgosBin: hostBin, checkoutRoot: cwd, manifestPath: manifest }));
   return { addon, manifest, hostBin, cargoEnv };
 }
 
@@ -640,14 +643,20 @@ export function runTests({
  * process's env, where the lock driver looks. When one resolves, nothing is
  * built before the queue: a build here, outside the queue, could replace the
  * binary a queued run in another worktree sharing the cargo target is using.
+ * The one exception is a resolved host that does not speak this checkout's
+ * lock protocol (`host-version-mismatch`): a built one replaces it.
  */
 export function queueWithHostBin(options, {
   resolve = () => resolveActiveHostBin().bin,
+  speaksLockProtocol = hostSpeaksLockProtocol,
   ensure = ensureHostBin,
   queue = acquireFullSuiteQueue,
   log = (msg) => console.error(msg),
 } = {}) {
-  if (!resolve()) {
+  const host = resolve();
+  // A host that refuses this checkout's lock protocol (an activation older than a branch that
+  // bumped it) can never serve the queue; a host that does not resolve at all is built the same way.
+  if (!host || !speaksLockProtocol(host)) {
     try {
       const hostBin = ensure(process.env, REPO_ROOT);
       if (hostBin) process.env.FGOS_HOST_BIN = hostBin;
@@ -656,6 +665,12 @@ export function queueWithHostBin(options, {
     }
   }
   return queue(options);
+}
+
+/** Whether `hostBin` answers the lock routes at the protocol this checkout's driver speaks. */
+export function hostSpeaksLockProtocol(hostBin) {
+  const answer = spawnSync(hostBin, ['internal', 'state-root', '--protocol', String(LOCK_ROUTE_PROTOCOL)], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 10_000 });
+  try { return JSON.parse(answer.stdout.trim().split('\n').pop()).protocol === LOCK_ROUTE_PROTOCOL; } catch { return false; }
 }
 
 if (isMainModule(import.meta.url)) {

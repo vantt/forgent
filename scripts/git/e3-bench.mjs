@@ -405,13 +405,13 @@ function compileArtifacts() {
  * Stage the addon and host the way a dev checkout's manifest names them (the shape `npm test` and
  * `npm run fgos:dev` use): the typed rows load it through the written descriptor, and product code
  * that loads the addon on its own (the legacy Land path) finds the same file through
- * FGOS_HOST_BIN and FGOS_ACTIVE_MANIFEST_PATH, so one process never loads two addons. The staging
+ * FGOS_HOST_BIN and the FGOS_ACTIVE_RELEASE_PATH/FGOS_ACTIVE_MANIFEST_PATH pair, so one process never loads two addons. The staging
  * sits inside the checkout because that manifest's paths are relative to the payload root; it is
  * removed when this process exits.
  */
 async function stageAddon(root, addonFile, hostFile = process.env.FGOS_HOST_BIN) {
   if (!hostFile) throw new Error('e3-bench: staging the addon needs the built fgos host (--host or FGOS_HOST_BIN)');
-  const { nativeAddonComponent } = await import('../build-rust-distribution.mjs');
+  const { devHostManifest } = await import('../lib/dev-host-manifest.mjs');
   const staging = privateDir(path.join(CHECKOUT, '.fgos/runtime/e3-bench', `addon-${process.pid}-${crypto.randomUUID()}`));
   process.on('exit', () => fs.rmSync(staging, { recursive: true, force: true }));
   const file = path.join(staging, 'fgos.node');
@@ -420,10 +420,11 @@ async function stageAddon(root, addonFile, hostFile = process.env.FGOS_HOST_BIN)
   const host = path.join(staging, 'fgos');
   fs.copyFileSync(hostFile, host);
   fs.chmodSync(host, 0o755);
-  const manifest = { entries: { fgos: path.relative(CHECKOUT, host) }, components: { legacyNode: { root: '.' }, nativeAddon: nativeAddonComponent(file, path.relative(CHECKOUT, file), CHECKOUT) } };
-  const manifestFile = path.join(staging, 'native-addon.json');
+  const manifest = devHostManifest({ checkoutRoot: CHECKOUT, fgosBin: host, addonFile: file });
+  const manifestFile = path.join(staging, 'manifest.json');
   fs.writeFileSync(manifestFile, JSON.stringify(manifest));
   process.env.FGOS_HOST_BIN = host;
+  process.env.FGOS_ACTIVE_RELEASE_PATH = CHECKOUT;
   process.env.FGOS_ACTIVE_MANIFEST_PATH = manifestFile;
   const descriptorFile = path.join(root, 'addon-descriptor.json');
   fs.writeFileSync(descriptorFile, JSON.stringify({ manifest, releaseRoot: CHECKOUT }));
