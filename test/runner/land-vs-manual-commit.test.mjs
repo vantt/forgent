@@ -36,6 +36,7 @@ const item = (id, verify = 'true') => ({ id, verify });
 
 test('two lands into one target exclude each other under the slot, and the second merges onto the first one\'s result', { skip }, async () => {
   const repoRoot = initRepo();
+  activateGitFixture(repoRoot);
   addBranch(repoRoot, 'fgw/item-a', 'a.txt', 'a\n');
   addBranch(repoRoot, 'fgw/item-b', 'b.txt', 'b\n');
   const log = path.join(repoRoot, '.git', 'verify-order.log').replaceAll('\\', '/');
@@ -62,6 +63,7 @@ test('two lands into one target exclude each other under the slot, and the secon
 
 test('a checkpoint that holds main while a land waits for it finishes first; the land then reports the moved trunk and loses nothing', { skip }, async () => {
   const repoRoot = initRepo();
+  activateGitFixture(repoRoot);
   addBranch(repoRoot, 'fgw/item-a', 'a.txt', 'a\n');
   const fgosDir = path.join(repoRoot, '.fgos');
   fs.mkdirSync(fgosDir, { recursive: true });
@@ -94,6 +96,7 @@ test('a checkpoint that holds main while a land waits for it finishes first; the
 
 test('with the hook, a manual commit attempted inside the land\'s ref update is refused while the land holds main; the land completes and no manual commit appears', { skip }, async () => {
   const repoRoot = initRepo();
+  activateGitFixture(repoRoot);
   addBranch(repoRoot, 'fgw/item-a', 'a.txt', 'a\n');
   installHook(repoRoot);
   const attemptLog = path.join(mkTempDir('fgos-land-attempt-'), 'attempt.log');
@@ -128,6 +131,7 @@ exit 0
 
 test('without the hook (raw git outside fgOS), a manual commit that slips in before the land is detected by the CAS: the land reports it and the commit survives', { skip }, async () => {
   const repoRoot = initRepo();
+  activateGitFixture(repoRoot);
   addBranch(repoRoot, 'fgw/item-a', 'a.txt', 'a\n');
   const fgosDir = path.join(repoRoot, '.fgos');
   const tipBefore = mainTip(repoRoot);
@@ -152,6 +156,7 @@ test('without the hook (raw git outside fgOS), a manual commit that slips in bef
 
 test('a file staged in main before the land refuses it even outside the item\'s own file set: the working-tree sync would delete it, so the trunk does not move and the staged file is kept', { skip }, async () => {
   const repoRoot = initRepo();
+  activateGitFixture(repoRoot);
   addBranch(repoRoot, 'fgw/item-a', 'a.txt', 'a\n');
   fs.writeFileSync(path.join(repoRoot, 'staged.txt'), 'staged by a person\n');
   git(repoRoot, ['add', 'staged.txt']);
@@ -168,6 +173,7 @@ test('a file staged in main before the land refuses it even outside the item\'s 
 
 test('staged .fgos event files in main are fgOS\'s own: they survive the land content-intact and staged, they do not refuse it', { skip }, async () => {
   const repoRoot = initRepo();
+  activateGitFixture(repoRoot);
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '{"seq":1}\n');
   git(repoRoot, ['add', '-f', '.fgos/events.jsonl']);
@@ -190,6 +196,7 @@ test('staged .fgos event files in main are fgOS\'s own: they survive the land co
 
 test('an unstaged edit on an unrelated path survives the land untouched', { skip }, async () => {
   const repoRoot = initRepo();
+  activateGitFixture(repoRoot);
   addBranch(repoRoot, 'fgw/item-a', 'a.txt', 'a\n');
   fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'edited by a person, not staged\n');
 
@@ -202,6 +209,7 @@ test('an unstaged edit on an unrelated path survives the land untouched', { skip
 
 test('a file staged in main that is part of the item\'s own file set refuses the land: the trunk does not move and the staged change is kept', { skip }, async () => {
   const repoRoot = initRepo();
+  activateGitFixture(repoRoot);
   addBranch(repoRoot, 'fgw/item-a', 'a.txt', 'a\n');
   fs.writeFileSync(path.join(repoRoot, 'a.txt'), 'a person\'s own edit\n');
   git(repoRoot, ['add', 'a.txt']);
@@ -217,6 +225,7 @@ test('a file staged in main that is part of the item\'s own file set refuses the
 
 test('promoting a member does not hold the main mutex during verify: another withMainCheckout gets in while verify runs', { skip }, async () => {
   const repoRoot = initRepo();
+  activateGitFixture(repoRoot);
   addBranch(repoRoot, 'fgw/member-a', 'member-a.txt', 'member a work\n');
   resolveIntegrationBranch(repoRoot, 'root-x');
   const fgosDir = path.join(repoRoot, '.fgos');

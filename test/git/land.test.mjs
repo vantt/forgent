@@ -316,3 +316,13 @@ test('prepare waits only for its own full destination slot and pins the target a
     f.close();
   }
 });
+
+test('untracked verification output never blocks publication of the frozen candidate', () => {
+  const f = fixture(); try {
+    const p = f.port(); const { candidate: c } = p.prepare({ operationId: 'untracked-output', request: f.request });
+    fs.writeFileSync(path.join(c.worktree, 'build-artifact.txt'), 'built by setup\n');
+    const receipt = p.publish(evidence(c));
+    assert.equal(receipt.localEffect.publishedOid, c.candidate);
+    assert.equal(f.git('ls-tree', '--name-only', c.candidate, 'build-artifact.txt'), '');
+  } finally { f.close(); }
+});

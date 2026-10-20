@@ -108,3 +108,17 @@ test('a red source catchup aborts Sync without moving source or destination', as
     assert.equal(f.git('rev-parse', 'fgw/source'), f.request.source);
   } finally { f.close(); }
 });
+
+test('root verification reuse tolerates a pinned target that advanced only on paths the source never touched', async () => {
+  const f = rootFixture();
+  try {
+    fs.writeFileSync(path.join(f.repo, 'disjoint'), 'target only\n'); f.git('add', 'disjoint'); f.git('commit', '-qm', 'disjoint target advance');
+    const target = f.git('rev-parse', 'main');
+    const result = await mergeRootIntoMainCas(f.repo, {
+      id: 'source', verify: 'exit 9', branchHeadAtReturn: f.request.source,
+    }, 'source');
+    assert.equal(result.outcome, 'merged', JSON.stringify(result));
+    assert.equal(result.check.skipped, true);
+    assert.deepEqual(f.git('show', '-s', '--format=%P', 'main').split(' '), [target, f.request.source]);
+  } finally { f.close(); }
+});

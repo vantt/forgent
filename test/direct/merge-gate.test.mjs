@@ -7,6 +7,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { prepareActivatedGitFixture } from '../helpers/run-unit-with-port.mjs';
 
 const execGit = (cwd, args) => execFileSync('git', args, { cwd, encoding: 'utf8' });
 
@@ -39,6 +40,7 @@ test('approve gate: aborts cleanly on test failure without modifying main', asyn
   addTestWork(fgosDir, 'tsk-test', { status: 'awaiting-approval' });
   execGit(cwd, ['add', '.fgos']);
   execGit(cwd, ['commit', '-m', 'add work']);
+  prepareActivatedGitFixture(cwd);
   
   execGit(cwd, ['branch', 'fgw/tsk-test', 'HEAD']);
   
@@ -99,6 +101,7 @@ test('root-into-main merge gate: verify sees the merged tree\'s own declared dep
   execGit(cwd, ['add', 'package.json']);
   execGit(cwd, ['commit', '-m', 'declare dependency']);
   fs.mkdirSync(path.join(cwd, '.fgos'));
+  prepareActivatedGitFixture(cwd);
 
   execGit(cwd, ['branch', 'fgw/tsk-dep', 'HEAD']);
   execGit(cwd, ['checkout', 'fgw/tsk-dep']);
@@ -126,6 +129,7 @@ test('root-into-main merge gate: verify runs under the trunk\'s merge slot but w
   execGit(cwd, ['config', 'user.email', 'test@example.com']);
   execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
   fs.mkdirSync(path.join(cwd, '.fgos'));
+  prepareActivatedGitFixture(cwd);
   execGit(cwd, ['branch', 'fgw/tsk-lock', 'HEAD']);
   execGit(cwd, ['checkout', 'fgw/tsk-lock']);
   fs.writeFileSync(path.join(cwd, 'feature.txt'), 'feature\n');
@@ -143,14 +147,14 @@ test('root-into-main merge gate: verify runs under the trunk\'s merge slot but w
   }
 
   const fgosDir = path.join(cwd, '.fgos');
-  assert.equal(probe('merge-slot', { fgosDir, ref: 'main' }).result, 'held', 'the trunk\'s slot is held while the merge verifies');
+  assert.equal(probe('merge-slot', { fgosDir, ref: encodeURIComponent('refs/heads/main') }).result, 'held', 'the trunk\'s slot is held while the merge verifies');
   const entered = await withMainCheckout(createLockScope('concurrent'), 'concurrent', () => 'in', { fgosDir });
   assert.equal(entered, 'in', 'the main mutex is free while verify runs');
 
   const result = await merging;
   assert.equal(result.outcome, 'merged', `expected merged, got ${result.outcome}: ${result.check?.output ?? ''}`);
   assert.equal(probe('main-checkout', { fgosDir }).result, 'free', 'the main mutex is released after landing');
-  assert.equal(probe('merge-slot', { fgosDir, ref: 'main' }).result, 'free', 'the slot is released after landing');
+  assert.equal(probe('merge-slot', { fgosDir, ref: encodeURIComponent('refs/heads/main') }).result, 'free', 'the slot is released after landing');
   assert.ok(fs.existsSync(path.join(cwd, 'feature.txt')), 'main checkout working tree synced to the merge');
 });
 
@@ -164,15 +168,16 @@ test('root-into-main merge gate: a second merge into the same trunk is refused a
   execGit(cwd, ['config', 'user.email', 'test@example.com']);
   execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
   fs.mkdirSync(path.join(cwd, '.fgos'));
+  prepareActivatedGitFixture(cwd);
   execGit(cwd, ['branch', 'fgw/tsk-slot', 'HEAD']);
   const mainBefore = execGit(cwd, ['rev-parse', 'main']).trim();
 
-  const holder = await holdLockInChild('merge-slot', { fgosDir: path.join(cwd, '.fgos'), ref: 'main' });
+  const holder = await holdLockInChild('merge-slot', { fgosDir: path.join(cwd, '.fgos'), ref: encodeURIComponent('refs/heads/main') });
   try {
     const err = await mergeRootIntoMainCas(cwd, { id: 'tsk-slot', verify: 'true' }, 'fgw/tsk-slot', { timeoutMs: 60000, lockWaitMs: 0 }).then(() => null, (e) => e);
     assert.ok(err instanceof MergeError, `expected MergeError, got ${err}`);
     assert.equal(err.code, 'lock-held');
-    assert.match(err.message, /merge slot of "main" is held by another process/);
+    assert.match(err.message, /merge slot of "refs\/heads\/main" is held by another process/);
     assert.ok(err.holders.includes(holder.child.pid));
     assert.equal(execGit(cwd, ['rev-parse', 'main']).trim(), mainBefore);
   } finally {
@@ -191,6 +196,7 @@ test('root-into-main merge gate: with lockWaitMs 0 a busy main checkout refuses 
   execGit(cwd, ['config', 'user.email', 'test@example.com']);
   execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
   fs.mkdirSync(path.join(cwd, '.fgos'));
+  prepareActivatedGitFixture(cwd);
   execGit(cwd, ['branch', 'fgw/tsk-busy', 'HEAD']);
   const verifyRan = path.join(cwd, '.fgos', 'verify-ran').replaceAll('\\', '/');
 
@@ -214,6 +220,7 @@ async function casRepoWithSetup(commands) {
   execGit(cwd, ['config', 'user.email', 'test@example.com']);
   execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
   fs.mkdirSync(path.join(cwd, '.fgos'));
+  prepareActivatedGitFixture(cwd);
   fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ worktreeSetup: { commands } }));
   execGit(cwd, ['branch', 'fgw/tsk-setup', 'HEAD']);
   execGit(cwd, ['checkout', 'fgw/tsk-setup']);
@@ -253,6 +260,7 @@ test('root-into-main merge gate: a path in ownFileSet dirtied on repoRoot AFTER 
   execGit(cwd, ['add', 'owned.txt']);
   execGit(cwd, ['commit', '-m', 'initial']);
   fs.mkdirSync(path.join(cwd, '.fgos'));
+  prepareActivatedGitFixture(cwd);
   execGit(cwd, ['branch', 'fgw/tsk-race', 'HEAD']);
   execGit(cwd, ['checkout', 'fgw/tsk-race']);
   fs.writeFileSync(path.join(cwd, 'owned.txt'), 'from the item\n');
@@ -289,6 +297,7 @@ test('root-into-main merge gate: an UNRELATED path dirtied mid-merge (outside ow
   execGit(cwd, ['config', 'user.email', 'test@example.com']);
   execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
   fs.mkdirSync(path.join(cwd, '.fgos'));
+  prepareActivatedGitFixture(cwd);
   execGit(cwd, ['branch', 'fgw/tsk-race-ok', 'HEAD']);
   execGit(cwd, ['checkout', 'fgw/tsk-race-ok']);
   fs.writeFileSync(path.join(cwd, 'feature.txt'), 'feature\n');
@@ -321,6 +330,7 @@ async function approvableRootRepo(id) {
   addTestWork(fgosDir, id, { status: 'awaiting-approval', verify: 'true' });
   execGit(cwd, ['add', '.fgos']);
   execGit(cwd, ['commit', '-m', 'add work']);
+  prepareActivatedGitFixture(cwd);
   execGit(cwd, ['branch', `fgw/${id}`, 'HEAD']);
   execGit(cwd, ['checkout', `fgw/${id}`]);
   fs.writeFileSync(path.join(cwd, 'produced.txt'), 'ok\n');
@@ -343,14 +353,14 @@ test('approve --no-wait with the trunk\'s merge slot held fails at once naming t
   const { holdLockInChild } = await import('../helpers/hold-lock-in-child.mjs');
   const { listWork } = await import('../../src/state/store.mjs');
   const { cwd, fgosDir } = await approvableRootRepo('tsk-nowait');
-  const holder = await holdLockInChild('merge-slot', { fgosDir, ref: 'main' });
+  const holder = await holdLockInChild('merge-slot', { fgosDir, ref: encodeURIComponent('refs/heads/main') });
   try {
     const started = Date.now();
     await assert.rejects(
       () => approveUseCase({ dir: fgosDir, repoRoot: cwd }, approveOptions('tsk-nowait', { noWait: true })),
       (err) => {
         assert.equal(err.code, 'lock-held');
-        assert.match(err.message, /merge slot of "main" is held by another process/);
+        assert.match(err.message, /merge slot of "refs\/heads\/main" is held by another process/);
         assert.ok(err.holders.includes(holder.child.pid));
         return true;
       },
@@ -367,7 +377,7 @@ test('approve --wait <ms> waits for the held merge slot and lands once the holde
   const { holdLockInChild } = await import('../helpers/hold-lock-in-child.mjs');
   const { listWork } = await import('../../src/state/store.mjs');
   const { cwd, fgosDir } = await approvableRootRepo('tsk-wait');
-  const holder = await holdLockInChild('merge-slot', { fgosDir, ref: 'main' });
+  const holder = await holdLockInChild('merge-slot', { fgosDir, ref: encodeURIComponent('refs/heads/main') });
   setTimeout(() => holder.child.kill('SIGKILL'), 600);
   const result = await approveUseCase({ dir: fgosDir, repoRoot: cwd }, approveOptions('tsk-wait', { noWait: false, waitMs: 15000 }));
   await holder.exited;

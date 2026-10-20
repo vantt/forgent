@@ -745,13 +745,15 @@ impl GitDriver {
             ResolveRepo::Repository(r) => self.checkout_repository(&r)?,
             _ => return Err(recovery("land-candidate-missing")),
         };
+        // Publication commits the frozen candidate, never worktree bytes: untracked
+        // verification/setup output cannot enter the tree, tracked or staged change can.
         if self.land_text(&candidate_repo, &scope, &["rev-parse", "HEAD"], &[])? != c.candidate
             || self.land_text(&candidate_repo, &scope, &["write-tree"], &[])? != c.tree
             || !self
                 .land_text(
                     &candidate_repo,
                     &scope,
-                    &["status", "--porcelain=v1", "-z", "--untracked-files=all"],
+                    &["status", "--porcelain=v1", "-z", "--untracked-files=no"],
                     &[],
                 )?
                 .is_empty()

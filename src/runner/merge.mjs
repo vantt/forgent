@@ -54,7 +54,7 @@ import { listWork } from '../state/store.mjs';
 import { openLeavesSharingTarget, classifyPostLandDrift } from '../state/graph-harness.mjs';
 import { withMainCheckout, withMergeTargetSlot } from './repo-locks.mjs';
 import { checkpointMainFgos } from './main-fgos-checkpoint.mjs';
-import { LockScope, runBorrowed, acquireSync, createLockScope } from '../holder-lock/index.mjs';
+import { LockScope, runBorrowed, acquireSync, createLockScope, lockHolders } from '../holder-lock/index.mjs';
 import { createGitLand } from '../git/land.mjs';
 import { createGitRecovery } from '../git/recovery.mjs';
 import { gitPortOptions } from '../git/inspect.mjs';
@@ -862,7 +862,7 @@ function isAlreadyMerged(repoRoot, branch, ref) {
  * A main-source return is never eligible — it records `headAtReturn`, not
  * `branchHeadAtReturn`, and this returns false for it.
  */
-function mergedTreeAlreadyVerified(repoRoot, item, branch) {
+function mergedTreeAlreadyVerified(repoRoot, item, branch, target = 'HEAD') {
   if (typeof item.branchHeadAtReturn !== 'string' || !item.branchHeadAtReturn) return false;
   let branchTip;
   try {
@@ -871,11 +871,11 @@ function mergedTreeAlreadyVerified(repoRoot, item, branch) {
     return false;
   }
   if (branchTip !== item.branchHeadAtReturn) return false;
-  if (isAlreadyMerged(repoRoot, 'HEAD', branch)) return true;
+  if (isAlreadyMerged(repoRoot, target, branch)) return true;
 
   try {
     const port = inspectGit(repoRoot);
-    const head = resolveRefSha(repoRoot, 'HEAD');
+    const head = resolveRefSha(repoRoot, target);
     const mergeBase = port.compareCommits({ left: branchTip, right: head }).mergeBase;
     if (!mergeBase) return false;
     const pathsSinceBase = (after) => {
@@ -1598,15 +1598,26 @@ export async function performCatchUp(repoRoot, id, item, target, timeoutMs) {
 export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs, lockWaitMs = 60_000, ownFileSet = null, operationId = crypto.randomUUID() } = {}) {
   const targetBranch = detectTrunk(repoRoot);
   if (mergeHeadExists(repoRoot)) return { outcome: 'merge-blocked-other-item', branch };
+  if (lockWaitMs === 0) {
+    // No-wait: refuse in milliseconds when the main checkout is busy, instead
+    // of after a full verify that cannot publish. Released before Land starts.
+    try {
+      await withMainCheckout(new LockScope('merge-root-into-main'), 'precheck', () => {}, { fgosDir: path.join(repoRoot, '.fgos') });
+    } catch (err) {
+      throw toMergeLockError(err, { branch });
+    }
+  }
   const options = gitPortOptions(repoRoot, { mutation: true });
   const port = createGitLand(options);
+  const destination = `refs/heads/${targetBranch}`;
+  let phase = 'prepare';
   try {
     const { candidate, receipt: previous } = port.prepare({
       operationId,
       waitMs: lockWaitMs,
       request: {
         source: resolveRefSha(repoRoot, branch),
-        destination: `refs/heads/${targetBranch}`,
+        destination,
         message: `merge ${branch} into ${targetBranch}`,
         squash: false,
         footprint: ownFileSet ? [...ownFileSet] : null,
@@ -1621,10 +1632,9 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs, 
         receipt: previous,
         landSettlement: { repoIdentity: operation.repoIdentity ?? operation.intent?.repoIdentity, operationId, settlementKind: 'delivered' } };
     }
-    // Eligibility still belongs to Work. Compare the actual candidate tree,
-    // not merely ancestry of a target read before Land acquired its slot.
-    const skipRedundantChecks = item.branchHeadAtReturn === candidate.source
-      && inspectGit(repoRoot).diff({ before: candidate.source, after: candidate.candidate, maxEntries: 1 }).entries.length === 0;
+    // Eligibility still belongs to Work, decided against the exact source and
+    // target Land pinned for this candidate, never a target read before it.
+    const skipRedundantChecks = mergedTreeAlreadyVerified(repoRoot, item, candidate.source, candidate.target);
     let check;
     if (!skipRedundantChecks) {
       try {
@@ -1641,6 +1651,7 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs, 
       };
     }
     if (!check.passed) return { outcome: 'verify-fail', branch, check };
+    phase = 'publish';
     const receipt = port.publish({
       source: candidate.source, target: candidate.target,
       candidate: candidate.candidate, treeDigest: candidate.treeDigest,
@@ -1661,9 +1672,14 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs, 
     }
     if (cause === 'land-conflict-aborted') return { outcome: 'conflict', branch };
     if (cause === 'main-checkout-dirty-mid-merge') return { outcome: cause, branch };
-    if (cause === 'lock-acquire-unavailable') {
-      throw new MergeError(`cannot merge "${branch}" into "${targetBranch}": ${err.message}`, {
-        branch, targetRef: targetBranch, code: 'lock-held', holders: [], lock: detail.detail?.lock ?? null,
+    if (typeof cause === 'string' && cause.startsWith('lock-acquire-unavailable')) {
+      // Land waits for its own full-ref slot at prepare and for main at publish.
+      const fgosDir = path.join(repoRoot, '.fgos');
+      const [lock, params, label] = phase === 'prepare'
+        ? ['merge-slot', { fgosDir, ref: encodeURIComponent(destination) }, `merge slot of "${destination}"`]
+        : ['main-checkout', { fgosDir }, 'main checkout (land)'];
+      throw new MergeError(`cannot merge "${branch}" into "${targetBranch}": ${label} is held by another process.`, {
+        branch, targetRef: targetBranch, code: 'lock-held', holders: lockHolders(lock, params).pids ?? [], lock,
       });
     }
     // Preserve Land's stale result, including operation identity and recovery
