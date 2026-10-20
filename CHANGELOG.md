@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- A conductor Workflow case now moves past its entry milestones: when a Unit settles with `pass` (or `findings`), its activity's `produces` milestones are proposed as achieved with the digest of their subject (the Unit's reports, or for a delivery milestone the paths it wrote, backed by a verify receipt for that digest). Before, the settle recorded nothing, so `fgos run --case C --activity implement-item` stayed refused with `entry-milestone-unmet` after `validate-plan` passed.
+
 - `npm test` now prepares the release fgos, fgctl and native addon it tests against (incremental), so the suite is green on a fresh machine, not only in CI.
 
 - `npm test` ends with a `suite:` line: test files, `test()` calls and wall time against the committed `test/suite-baseline.json`. It fails when a test body is copied byte for byte into a second file and the baseline does not list that clone, and warns on titles shared across files and on new unmarked `fgos init` or network calls in tests. `node scripts/test-proof-inventory.mjs --duplicates` lists the clones and shared titles; `--write-baseline [--wall-seconds <s>]` refreshes the baseline.
