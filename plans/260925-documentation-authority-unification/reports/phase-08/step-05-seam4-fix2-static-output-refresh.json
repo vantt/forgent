@@ -1,0 +1,19 @@
+{
+  "notGeneratedThisTurn": true,
+  "changes": [
+    {
+      "path": ".agents/skills/fgos-run/SKILL.md",
+      "fromSha256": "ada46a1bde59383e81d92b734fbc8f15ebb6b6cd0860f4aa965cea642eeda8a2",
+      "toSha256": "20cee5cc4dd226836a4a0ac456435c7f08a524fd28a431a052f06cda22218a42",
+      "commit": "2b04bfe7c1f748c2f17beca4a6695c968ada2bd5",
+      "reason": "L12-73 already-accounted main merge refreshed fgos-run generated skill and canonical source outside authored Step 5 consumer population."
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-run/SKILL.md",
+      "fromSha256": "ada46a1bde59383e81d92b734fbc8f15ebb6b6cd0860f4aa965cea642eeda8a2",
+      "toSha256": "20cee5cc4dd226836a4a0ac456435c7f08a524fd28a431a052f06cda22218a42",
+      "commit": "2b04bfe7c1f748c2f17beca4a6695c968ada2bd5",
+      "reason": "L12-73 already-accounted main merge refreshed fgos-run generated skill and canonical source outside authored Step 5 consumer population."
+    }
+  ]
+}

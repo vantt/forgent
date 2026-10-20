@@ -1,0 +1,2332 @@
+{
+  "rule": "R11 pinned declaration/import root closure",
+  "operations": [
+    {
+      "file": "scripts/check-doc-candidate-status.mjs",
+      "id": "dynamic-006573",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-candidate-status.mjs",
+      "id": "dynamic-006574",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-candidate-status.mjs",
+      "id": "dynamic-006582",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006605",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006608",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006609",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006616",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006617",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006622",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006623",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006630",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006678",
+      "from": [
+        "REJECT",
+        "preserve",
+        "accumulator"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006686",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006688",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006691",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006692",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006693",
+      "from": [
+        "REJECT",
+        "preserve",
+        "accumulator"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006694",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006709",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006738",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006739",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006788",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006791",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006792",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006793",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006794",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006796",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006803",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006804",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006805",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006806",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006810",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006811",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006812",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006818",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006819",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006820",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006821",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006822",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006823",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006830",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": []
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-007069",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-007070",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007084",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007085",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007087",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007089",
+      "from": [
+        "REJECT",
+        "preserve",
+        "guard"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007091",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007096",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007097",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007099",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007100",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007105",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007106",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007107",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007116",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007119",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007120",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007121",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007122",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007126",
+      "from": [
+        "REJECT",
+        "preserve",
+        "scalar-pass-through"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007127",
+      "from": [
+        "REJECT",
+        "preserve",
+        "scalar-pass-through"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/doc-alias-resolver.mjs",
+      "id": "dynamic-007307",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/doc-alias-resolver.mjs",
+      "id": "dynamic-007312",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/doc-alias-resolver.mjs",
+      "id": "dynamic-007313",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/doc-alias-resolver.mjs",
+      "id": "dynamic-007315",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/doc-alias-resolver.mjs",
+      "id": "dynamic-007316",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007557",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007589",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007590",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007600",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007608",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007625",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007664",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007697",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007699",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007702",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007703",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007716",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007717",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007726",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007731",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007732",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007733",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007734",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007735",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007736",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007738",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007739",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007740",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007743",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007771",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/measure-p08-performance.mjs",
+      "id": "dynamic-008308",
+      "from": [
+        "REJECT",
+        "preserve",
+        "scalar-pass-through"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/measure-p08-performance.mjs",
+      "id": "dynamic-008309",
+      "from": [
+        "REJECT",
+        "preserve",
+        "scalar-pass-through"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/measure-p08-performance.mjs",
+      "id": "dynamic-008310",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/measure-verify-cost.mjs",
+      "id": "dynamic-008362",
+      "from": [
+        "REJECT",
+        "preserve",
+        "scalar-pass-through"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/measure-verify-cost.mjs",
+      "id": "dynamic-008363",
+      "from": [
+        "REJECT",
+        "preserve",
+        "scalar-pass-through"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008569",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008648",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008649",
+      "from": [
+        "ADMIT",
+        "preserve",
+        null
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/test-select-coverage-map.mjs",
+      "id": "dynamic-008907",
+      "from": [
+        "REJECT",
+        "preserve",
+        "scalar-pass-through"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/test-select-coverage-map.mjs",
+      "id": "dynamic-008908",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/test-select-coverage-map.mjs",
+      "id": "dynamic-008912",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/test-select-promote.mjs",
+      "id": "dynamic-008999",
+      "from": [
+        "REJECT",
+        "preserve",
+        "scalar-pass-through"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/test-select-promote.mjs",
+      "id": "dynamic-009000",
+      "from": [
+        "REJECT",
+        "preserve",
+        "scalar-pass-through"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-01.mjs",
+      "id": "dynamic-009159",
+      "from": [
+        "REJECT",
+        "preserve",
+        "scalar-pass-through"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-01.mjs",
+      "id": "dynamic-009160",
+      "from": [
+        "REJECT",
+        "preserve",
+        "scalar-pass-through"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-01.mjs",
+      "id": "dynamic-009161",
+      "from": [
+        "REJECT",
+        "preserve",
+        "scalar-pass-through"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-01.mjs",
+      "id": "dynamic-009162",
+      "from": [
+        "REJECT",
+        "preserve",
+        "scalar-pass-through"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009191",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009192",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009210",
+      "from": [
+        "REJECT",
+        "preserve",
+        "scalar-pass-through"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009214",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009217",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009218",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009223",
+      "from": [
+        "REJECT",
+        "preserve",
+        "scalar-pass-through"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009224",
+      "from": [
+        "REJECT",
+        "preserve",
+        "scalar-pass-through"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009225",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009226",
+      "from": [
+        "REJECT",
+        "preserve",
+        "scalar-pass-through"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009227",
+      "from": [
+        "REJECT",
+        "preserve",
+        "scalar-pass-through"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009229",
+      "from": [
+        "REJECT",
+        "preserve",
+        "scalar-pass-through"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009230",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009231",
+      "from": [
+        "REJECT",
+        "preserve",
+        "scalar-pass-through"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009232",
+      "from": [
+        "REJECT",
+        "preserve",
+        "scalar-pass-through"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009233",
+      "from": [
+        "REJECT",
+        "preserve",
+        "scalar-pass-through"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009234",
+      "from": [
+        "REJECT",
+        "preserve",
+        "guard"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009235",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009236",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009237",
+      "from": [
+        "REJECT",
+        "preserve",
+        "finding-path-field"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009238",
+      "from": [
+        "REJECT",
+        "preserve",
+        "finding-path-field"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009239",
+      "from": [
+        "REJECT",
+        "preserve",
+        "finding-path-field"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009240",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009241",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009242",
+      "from": [
+        "REJECT",
+        "preserve",
+        "finding-path-field"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009259",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009261",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009263",
+      "from": [
+        "REJECT",
+        "preserve",
+        "caller-data-formatting"
+      ],
+      "to": [
+        "REJECT",
+        "preserve",
+        "plans-report-artifact"
+      ],
+      "rootEvidence": [
+        "plans"
+      ]
+    }
+  ]
+}

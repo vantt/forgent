@@ -1,0 +1,4076 @@
+{
+  "ruling": "R10 no further re-review; disposition stays preserve and no Phase 9 action changes",
+  "count": 195,
+  "changes": [
+    {
+      "file": ".githooks/pre-commit",
+      "id": "reference-000112",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": ".githooks/pre-commit",
+      "id": "reference-000113",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "reference-000165",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "reference-000166",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "reference-000167",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "reference-000175",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "reference-000176",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "reference-000179",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "reference-000180",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "reference-000188",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "id": "reference-000197",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "id": "reference-000198",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "id": "reference-000199",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "id": "dynamic-009778",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "id": "dynamic-009786",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/report/enduser-index.mjs",
+      "id": "dynamic-009792",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-projections.mjs",
+      "id": "dynamic-013905",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-projections.mjs",
+      "id": "dynamic-013908",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/build-rust-distribution.mjs",
+      "id": "dynamic-006369",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/build-rust-distribution.mjs",
+      "id": "dynamic-006415",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006461",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006471",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006472",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006476",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006480",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-candidate-status.mjs",
+      "id": "dynamic-006573",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-candidate-status.mjs",
+      "id": "dynamic-006574",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-candidate-status.mjs",
+      "id": "dynamic-006582",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006605",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006608",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006609",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006616",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006617",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006622",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006623",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006630",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006686",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006691",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006732",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006738",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006739",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006753",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006758",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006791",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006792",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006793",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006794",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006796",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006803",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006804",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006805",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006806",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006810",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006811",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006812",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006818",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006819",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006820",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006821",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006822",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006823",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006830",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006835",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006880",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-007069",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-007070",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007105",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007106",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007107",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007119",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007120",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007121",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007122",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-locked-decisions-heading-drift.mjs",
+      "id": "dynamic-007236",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/doc-alias-resolver.mjs",
+      "id": "dynamic-007307",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/doc-alias-resolver.mjs",
+      "id": "dynamic-007312",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/doc-alias-resolver.mjs",
+      "id": "dynamic-007313",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/doc-alias-resolver.mjs",
+      "id": "dynamic-007316",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/doc-alias-resolver.mjs",
+      "id": "dynamic-007342",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007559",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007589",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007590",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007626",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007646",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007697",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007699",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007702",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007709",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007726",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007731",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007732",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007733",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007734",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007735",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007736",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007738",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007739",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007740",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007742",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007743",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007749",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007761",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007765",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007795",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "dynamic-007796",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "dynamic-007827",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "dynamic-007839",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "rootSetWitness"
+      ]
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "dynamic-007847",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "dynamic-007848",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "dynamic-007850",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "dynamic-007851",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "dynamic-007853",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "dynamic-007857",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "dynamic-007859",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-canary.mjs",
+      "id": "dynamic-008105",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-canary.mjs",
+      "id": "dynamic-008108",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008154",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008167",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/measure-verify-cost.mjs",
+      "id": "dynamic-008327",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/next-doc-id.mjs",
+      "id": "dynamic-008410",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "scripts/prepare-release.mjs",
+      "id": "dynamic-008441",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/prepare-release.mjs",
+      "id": "dynamic-008452",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/prepare-release.mjs",
+      "id": "dynamic-008453",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/prepare-release.mjs",
+      "id": "dynamic-008457",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/prepare-release.mjs",
+      "id": "dynamic-008465",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/project-agents.mjs",
+      "id": "dynamic-008536",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008569",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008570",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008604",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008608",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008609",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008610",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008611",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008612",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008632",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008640",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008648",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008649",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008650",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008651",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008654",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-01.mjs",
+      "id": "dynamic-009114",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-01.mjs",
+      "id": "dynamic-009115",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-01.mjs",
+      "id": "dynamic-009116",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-01.mjs",
+      "id": "dynamic-009117",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/report/capability-plan-lint.mjs",
+      "id": "dynamic-009715",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/report/capability-plan-lint.mjs",
+      "id": "dynamic-009735",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/report/capability-plan-lint.mjs",
+      "id": "dynamic-009736",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/report/capability-plan-lint.mjs",
+      "id": "dynamic-009737",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/report/capability-plan-lint.mjs",
+      "id": "dynamic-009738",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/setup/agy-permissions.mjs",
+      "id": "reference-003793",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/bin-discovery.mjs",
+      "id": "reference-003794",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/checks.mjs",
+      "id": "reference-003795",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/git-hooks.mjs",
+      "id": "reference-003797",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-013978",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-014010",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-014011",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "targetSetOrConstruction"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003801",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003822",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003824",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003825",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003827",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003831",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003832",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003835",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003836",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003837",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003838",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003841",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003842",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003843",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003844",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003847",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003848",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003849",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003851",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003852",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003856",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014306",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "parityObligation",
+        "pathOperand",
+        "pathOperandWitness",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014318",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "parityObligation",
+        "pathOperand",
+        "pathOperandWitness",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014329",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "parityObligation",
+        "pathOperand",
+        "pathOperandWitness",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014330",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "parityObligation",
+        "pathOperand",
+        "pathOperandWitness",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014334",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "parityObligation",
+        "pathOperand",
+        "pathOperandWitness",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014335",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "parityObligation",
+        "pathOperand",
+        "pathOperandWitness",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014336",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "parityObligation",
+        "pathOperand",
+        "pathOperandWitness",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014337",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "parityObligation",
+        "pathOperand",
+        "pathOperandWitness",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014342",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "parityObligation",
+        "pathOperand",
+        "pathOperandWitness",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014343",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "parityObligation",
+        "pathOperand",
+        "pathOperandWitness",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014344",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "parityObligation",
+        "pathOperand",
+        "pathOperandWitness",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "reference-003859",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "reference-003860",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "reference-003861",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "parityObligation",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectionRule"
+      ]
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015055",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "parityObligation",
+        "pathOperand",
+        "pathOperandWitness",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015058",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "parityObligation",
+        "pathOperand",
+        "pathOperandWitness",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015212",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "admission",
+        "nonDocumentUse",
+        "parityObligation",
+        "pathOperand",
+        "pathOperandWitness",
+        "proofCommand",
+        "proofScope",
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,3973 @@
+{
+  "kind": "Pinned source checked before each correction",
+  "checks": [
+    {
+      "file": "src/report/decision-index.mjs",
+      "id": "dynamic-009761",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "5ad753196470debd2f502b3c00994c1d75a9ed0c576c5cf8188eb8600f0a09a2",
+      "line": 18,
+      "text": "  return path.join(repoRoot, 'docs', 'decisions', 'index.md');"
+    },
+    {
+      "file": "src/report/decision-index.mjs",
+      "id": "dynamic-009767",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "5ad753196470debd2f502b3c00994c1d75a9ed0c576c5cf8188eb8600f0a09a2",
+      "line": 91,
+      "text": "  const indexPath = indexPathFor(repoRoot);"
+    },
+    {
+      "file": "src/setup/instruction-projections.mjs",
+      "id": "dynamic-013890",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "9d239c9f1d139f07cbc6bfc02701a7f138b38aad9fa2ac3f5061a34ccd357c8f",
+      "line": 247,
+      "text": "  const destinationPath = options.destinationPath ?? PORTABLE_AGENTS_DESTINATION;"
+    },
+    {
+      "file": "src/setup/instruction-projections.mjs",
+      "id": "dynamic-013891",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "9d239c9f1d139f07cbc6bfc02701a7f138b38aad9fa2ac3f5061a34ccd357c8f",
+      "line": 247,
+      "text": "  const destinationPath = options.destinationPath ?? PORTABLE_AGENTS_DESTINATION;"
+    },
+    {
+      "file": "src/setup/instruction-projections.mjs",
+      "id": "dynamic-013892",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "9d239c9f1d139f07cbc6bfc02701a7f138b38aad9fa2ac3f5061a34ccd357c8f",
+      "line": 252,
+      "text": "  const destinationRelativePath = safeRelativePath(destinationPath, 'Instruction projection destination path');"
+    },
+    {
+      "file": "src/setup/instruction-projections.mjs",
+      "id": "dynamic-013893",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "9d239c9f1d139f07cbc6bfc02701a7f138b38aad9fa2ac3f5061a34ccd357c8f",
+      "line": 262,
+      "text": "    destinationPath: destinationRelativePath,"
+    },
+    {
+      "file": "src/setup/instruction-projections.mjs",
+      "id": "dynamic-013899",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "9d239c9f1d139f07cbc6bfc02701a7f138b38aad9fa2ac3f5061a34ccd357c8f",
+      "line": 281,
+      "text": "  const destinationPath = path.join(projectRoot, computed.destinationRelativePath);"
+    },
+    {
+      "file": "src/setup/instruction-projections.mjs",
+      "id": "dynamic-013900",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "9d239c9f1d139f07cbc6bfc02701a7f138b38aad9fa2ac3f5061a34ccd357c8f",
+      "line": 281,
+      "text": "  const destinationPath = path.join(projectRoot, computed.destinationRelativePath);"
+    },
+    {
+      "file": "src/setup/instruction-projections.mjs",
+      "id": "dynamic-013912",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "9d239c9f1d139f07cbc6bfc02701a7f138b38aad9fa2ac3f5061a34ccd357c8f",
+      "line": 332,
+      "text": "  const destinationPath = path.join(projectRoot, computed.destinationRelativePath);"
+    },
+    {
+      "file": "src/setup/instruction-projections.mjs",
+      "id": "dynamic-013913",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "9d239c9f1d139f07cbc6bfc02701a7f138b38aad9fa2ac3f5061a34ccd357c8f",
+      "line": 332,
+      "text": "  const destinationPath = path.join(projectRoot, computed.destinationRelativePath);"
+    },
+    {
+      "file": "src/setup/instruction-projections.mjs",
+      "id": "dynamic-013920",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "9d239c9f1d139f07cbc6bfc02701a7f138b38aad9fa2ac3f5061a34ccd357c8f",
+      "line": 60,
+      "text": "    cursor = path.join(cursor, part);"
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "reference-003560",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "line": 339,
+      "text": "  { prefix: 'docs/specs', useRatchetClassify: true, area: 'Legacy spec (unmapped)', authorityStatus: 'legacy-current', corpus: 'platform-authority', gap: true },"
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "reference-003561",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "line": 328,
+      "text": "  { prefix: 'docs/how-to', area: 'End-user documentation (Diataxis)', authorityStatus: 'non-authority', fileClass: 'maintained-authority', corpus: 'user-knowledge' },"
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "reference-003565",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "line": 329,
+      "text": "  { prefix: 'docs/tutorials', area: 'End-user documentation (Diataxis)', authorityStatus: 'non-authority', fileClass: 'maintained-authority', corpus: 'user-knowledge' },"
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "reference-003566",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "line": 330,
+      "text": "  { prefix: 'docs/reference', area: 'End-user documentation (Diataxis)', authorityStatus: 'non-authority', fileClass: 'maintained-authority', corpus: 'user-knowledge' },"
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "reference-003568",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "line": 340,
+      "text": "  { prefix: 'docs/architect', useRatchetClassify: true, area: 'Legacy architect (unmapped)', authorityStatus: 'legacy-current', corpus: 'platform-authority', gap: true },"
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "reference-003570",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "line": 331,
+      "text": "  { prefix: 'docs/explanation', area: 'End-user documentation (Diataxis)', authorityStatus: 'non-authority', fileClass: 'maintained-authority', corpus: 'user-knowledge' },"
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "reference-003627",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "c66cacf0b62d7c97737c570254ec91a44cf334cd7a74efb1149c21bffa20a8d5",
+      "line": 107,
+      "text": "  const mirror = source.startsWith('docs/architect/') && isEvidenceMirrorPath(source) && target.startsWith('docs/platform/') && isEvidenceMirrorPath(target) && sourceItem?.blobSha && sourceItem.blobSha === targetItem?.blobSha;"
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "reference-003629",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "c66cacf0b62d7c97737c570254ec91a44cf334cd7a74efb1149c21bffa20a8d5",
+      "line": 158,
+      "text": "    const target = item.path.startsWith('docs/architect/') ? item.path.replace('docs/architect/', 'docs/platform/') : null;"
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "reference-003632",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "c66cacf0b62d7c97737c570254ec91a44cf334cd7a74efb1149c21bffa20a8d5",
+      "line": 158,
+      "text": "    const target = item.path.startsWith('docs/architect/') ? item.path.replace('docs/architect/', 'docs/platform/') : null;"
+    },
+    {
+      "file": "scripts/verify-phase-01.mjs",
+      "id": "reference-003636",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "e089db66f5bdb206c6a201ecf1cc2d71c58454a1fa94c7a87606598c3526198f",
+      "line": 413,
+      "text": "      if (name.startsWith('docs/specs/') && name !== 'docs/specs/reading-map.md') {"
+    },
+    {
+      "file": "scripts/verify-phase-01.mjs",
+      "id": "reference-003637",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "e089db66f5bdb206c6a201ecf1cc2d71c58454a1fa94c7a87606598c3526198f",
+      "line": 416,
+      "text": "      if (name.startsWith('docs/architect/')) {"
+    },
+    {
+      "file": "scripts/verify-phase-01.mjs",
+      "id": "reference-003640",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "e089db66f5bdb206c6a201ecf1cc2d71c58454a1fa94c7a87606598c3526198f",
+      "line": 413,
+      "text": "      if (name.startsWith('docs/specs/') && name !== 'docs/specs/reading-map.md') {"
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008116",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "a6560aa2eb34a1245ebd83ee781f033253ff7652df5896dcc205e327d18ef5f4",
+      "line": 120,
+      "text": "  const targetDirs = ['how-to', 'explanation', 'reference', 'tutorials', 'tutorial', 'decisions'];"
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008117",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "a6560aa2eb34a1245ebd83ee781f033253ff7652df5896dcc205e327d18ef5f4",
+      "line": 123,
+      "text": "    const fullDir = path.join(docsDir, dirName);"
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008118",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "a6560aa2eb34a1245ebd83ee781f033253ff7652df5896dcc205e327d18ef5f4",
+      "line": 123,
+      "text": "    const fullDir = path.join(docsDir, dirName);"
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008119",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "a6560aa2eb34a1245ebd83ee781f033253ff7652df5896dcc205e327d18ef5f4",
+      "line": 129,
+      "text": "        const fullPath = path.join(fullDir, f);"
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008120",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "a6560aa2eb34a1245ebd83ee781f033253ff7652df5896dcc205e327d18ef5f4",
+      "line": 129,
+      "text": "        const fullPath = path.join(fullDir, f);"
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008121",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "a6560aa2eb34a1245ebd83ee781f033253ff7652df5896dcc205e327d18ef5f4",
+      "line": 130,
+      "text": "        const relPath = path.relative(path.dirname(docsDir), fullPath);"
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008122",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "a6560aa2eb34a1245ebd83ee781f033253ff7652df5896dcc205e327d18ef5f4",
+      "line": 146,
+      "text": "  const dataPath = path.join(outputDir, 'inventory-data.json');"
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008123",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "a6560aa2eb34a1245ebd83ee781f033253ff7652df5896dcc205e327d18ef5f4",
+      "line": 146,
+      "text": "  const dataPath = path.join(outputDir, 'inventory-data.json');"
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008124",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "a6560aa2eb34a1245ebd83ee781f033253ff7652df5896dcc205e327d18ef5f4",
+      "line": 147,
+      "text": "  const reportPath = path.join(outputDir, 'inventory-report.md');"
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008125",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "a6560aa2eb34a1245ebd83ee781f033253ff7652df5896dcc205e327d18ef5f4",
+      "line": 147,
+      "text": "  const reportPath = path.join(outputDir, 'inventory-report.md');"
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008134",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "a6560aa2eb34a1245ebd83ee781f033253ff7652df5896dcc205e327d18ef5f4",
+      "line": 186,
+      "text": "  const docsDir = path.join(repoRoot, 'docs');"
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008135",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "a6560aa2eb34a1245ebd83ee781f033253ff7652df5896dcc205e327d18ef5f4",
+      "line": 186,
+      "text": "  const docsDir = path.join(repoRoot, 'docs');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015034",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1002,
+      "text": "      fs.writeFileSync(path.join(targetSkillDir, 'SKILL.md'), content, 'utf8');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015035",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1004,
+      "text": "    const packagedSkillFile = path.join(targetSkillDir, 'SKILL.md');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015038",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1024,
+      "text": "  const manifestPath = path.join(targetOutputDir, 'gemini-extension.json');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015039",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1024,
+      "text": "  const manifestPath = path.join(targetOutputDir, 'gemini-extension.json');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015045",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1042,
+      "text": "  const docPath = path.join(targetOutputDir, 'GEMINI.md');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015046",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1042,
+      "text": "  const docPath = path.join(targetOutputDir, 'GEMINI.md');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015047",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1054,
+      "text": "    const tomlPath = path.join(commandsDir, `${verb}.toml`);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015048",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1054,
+      "text": "    const tomlPath = path.join(commandsDir, `${verb}.toml`);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015049",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1054,
+      "text": "    const tomlPath = path.join(commandsDir, `${verb}.toml`);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015050",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1055,
+      "text": "    const packagedRelPath = `skills/${s.name}/SKILL.md`;"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015051",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1055,
+      "text": "    const packagedRelPath = `skills/${s.name}/SKILL.md`;"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015062",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1089,
+      "text": "  const sourceRelativePath = path.relative(projectRoot, sourcePath).replaceAll('\\\\', '/');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015063",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1091,
+      "text": "  const tmpPath = `${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015064",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1091,
+      "text": "  const tmpPath = `${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015065",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1137,
+      "text": "  const agentsSkillsRoot = targetAgentsSkills ?? path.join(projectRoot, '.agents', 'skills');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015066",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1137,
+      "text": "  const agentsSkillsRoot = targetAgentsSkills ?? path.join(projectRoot, '.agents', 'skills');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015067",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1138,
+      "text": "  const coreSkillsRoot = path.join(projectRoot, 'core', 'skills');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015068",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1138,
+      "text": "  const coreSkillsRoot = path.join(projectRoot, 'core', 'skills');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015069",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1139,
+      "text": "  const domainsRoot = path.join(projectRoot, 'domains');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015070",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1139,
+      "text": "  const domainsRoot = path.join(projectRoot, 'domains');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015071",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1160,
+      "text": "    const targetShared = path.join(agentsSkillsRoot, '_shared');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015072",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1162,
+      "text": "      const targetPath = path.join(targetShared, fragment.relativeFragmentPath);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015073",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1162,
+      "text": "      const targetPath = path.join(targetShared, fragment.relativeFragmentPath);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015074",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1164,
+      "text": "      copyAssembledFile(projectRoot, path.join(projectRoot, fragment.sourcePath), targetPath);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015075",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1172,
+      "text": "    const sourcePath = path.join(projectRoot, skill.canonicalDir);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015076",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1172,
+      "text": "    const sourcePath = path.join(projectRoot, skill.canonicalDir);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015077",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1173,
+      "text": "    const targetPath = path.join(agentsSkillsRoot, skill.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015078",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1173,
+      "text": "    const targetPath = path.join(agentsSkillsRoot, skill.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015079",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1191,
+      "text": "        const orphanPath = path.join(agentsSkillsRoot, entry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015080",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1191,
+      "text": "        const orphanPath = path.join(agentsSkillsRoot, entry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015081",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1241,
+      "text": "  const sourceAgentsSkills = path.join(packageRoot, '.agents', 'skills');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015082",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1245,
+      "text": "  const targetAgentsSkills = path.join(targetRoot, '.agents', 'skills');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015083",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1246,
+      "text": "  const targetClaudeSkills = path.join(targetRoot, '.claude', 'skills');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015084",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1252,
+      "text": "  const copied = path.resolve(packageRoot) !== path.resolve(targetRoot);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015085",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1252,
+      "text": "  const copied = path.resolve(packageRoot) !== path.resolve(targetRoot);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015086",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 127,
+      "text": "  const relPath = sourceRelativePath.replaceAll('\\\\', '/');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015090",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 145,
+      "text": "  const skillMdPath = path.join(wrapperDirPath, 'SKILL.md');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015091",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 145,
+      "text": "  const skillMdPath = path.join(wrapperDirPath, 'SKILL.md');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015092",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 171,
+      "text": "      const sourcePath = path.join(agentsSkillsRoot, entry.name, 'SKILL.md');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015093",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 171,
+      "text": "      const sourcePath = path.join(agentsSkillsRoot, entry.name, 'SKILL.md');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015094",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 177,
+      "text": "      const wrapperDir = path.join(claudeSkillsRoot, entry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015095",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 177,
+      "text": "      const wrapperDir = path.join(claudeSkillsRoot, entry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015096",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 178,
+      "text": "      const wrapperPath = path.join(wrapperDir, 'SKILL.md');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015097",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 178,
+      "text": "      const wrapperPath = path.join(wrapperDir, 'SKILL.md');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015098",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 179,
+      "text": "      const sourceRelativePath = path.relative(wrapperDir, sourcePath).replaceAll('\\\\', '/');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015099",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 184,
+      "text": "      const skillDir = path.join(agentsSkillsRoot, entry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015100",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 184,
+      "text": "      const skillDir = path.join(agentsSkillsRoot, entry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015101",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 188,
+      "text": "        const subSource = path.join(skillDir, subEntry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015102",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 189,
+      "text": "        const subTarget = path.join(wrapperDir, subEntry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015103",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 202,
+      "text": "      const orphanPath = path.join(claudeSkillsRoot, entry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015104",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 202,
+      "text": "      const orphanPath = path.join(claudeSkillsRoot, entry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015105",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 219,
+      "text": "    const sourcePath = path.join(sourceDir, entry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015106",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 219,
+      "text": "    const sourcePath = path.join(sourceDir, entry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015107",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 220,
+      "text": "    const targetPath = path.join(targetDir, entry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015108",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 220,
+      "text": "    const targetPath = path.join(targetDir, entry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015109",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 251,
+      "text": "    const sourceDir = path.join(agentsSkillsRoot, entry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015110",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 251,
+      "text": "    const sourceDir = path.join(agentsSkillsRoot, entry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015111",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 252,
+      "text": "    const targetDir = path.join(pluginSkillsRoot, entry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015112",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 252,
+      "text": "    const targetDir = path.join(pluginSkillsRoot, entry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015113",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 269,
+      "text": "    targetRelDir: '.agents/skills',"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015114",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 277,
+      "text": "    targetRelDir: '.claude/skills',"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015115",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 285,
+      "text": "    targetRelDir: 'plugins/fgOS/skills',"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015116",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 293,
+      "text": "    targetRelDir: '.gemini/extensions/fgos',"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015117",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 308,
+      "text": "        if (!best || idx > best.idx) best = { idx, root: targetPath.slice(0, idx) };"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015118",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 313,
+      "text": "        if (!best || endIdx > best.idx) best = { idx: endIdx, root: targetPath.slice(0, endIdx) };"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015120",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 324,
+      "text": "    fs.existsSync(path.join(root, '.agents', 'skills', skillName, 'SKILL.md')) ||"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015121",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 325,
+      "text": "    fs.existsSync(path.join(root, 'core', 'skills', skillName, 'SKILL.md'))"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015122",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 329,
+      "text": "  const domainsDir = path.join(root, 'domains');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015123",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 329,
+      "text": "  const domainsDir = path.join(root, 'domains');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015124",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 333,
+      "text": "        if (fs.existsSync(path.join(domainsDir, domain, 'skills', skillName, 'SKILL.md'))) {"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015128",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 346,
+      "text": "      fs.existsSync(path.join(root, 'core', 'skills', '_shared')) ||"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015129",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 347,
+      "text": "      fs.existsSync(path.join(root, '.agents', 'skills', '_shared'))"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015130",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 352,
+      "text": "    fs.existsSync(path.join(root, 'core', 'skills', '_shared', fragmentSub)) ||"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015131",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 353,
+      "text": "    fs.existsSync(path.join(root, '.agents', 'skills', '_shared', fragmentSub))"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015132",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 357,
+      "text": "  const domainsDir = path.join(root, 'domains');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015133",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 357,
+      "text": "  const domainsDir = path.join(root, 'domains');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015134",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 361,
+      "text": "        if (fs.existsSync(path.join(domainsDir, domain, 'skills', '_shared', fragmentSub))) {"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015136",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 377,
+      "text": "  const candidateDir = path.isAbsolute(targetPath)"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015137",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 378,
+      "text": "    ? (targetPath.includes(path.join('.claude', 'skills', skillDirName))"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015138",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 379,
+      "text": "        ? path.join(root, '.claude', 'skills', skillDirName)"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015139",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 381,
+      "text": "    : path.join(root, '.claude', 'skills', skillDirName);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015140",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 384,
+      "text": "    const skillMd = path.join(candidateDir, 'SKILL.md');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015142",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 436,
+      "text": "  const normalized = rel.split(path.sep).join('/');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015144",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 466,
+      "text": "  const normalized = rel.split(path.sep).join('/');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015153",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 541,
+      "text": "  const coreSkillsRoot = path.join(projectRoot, 'core', 'skills');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015154",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 541,
+      "text": "  const coreSkillsRoot = path.join(projectRoot, 'core', 'skills');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015155",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 542,
+      "text": "  const domainsRoot = path.join(projectRoot, 'domains');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015156",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 542,
+      "text": "  const domainsRoot = path.join(projectRoot, 'domains');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015157",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 550,
+      "text": "      const skillDir = path.join(coreSkillsRoot, entry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015158",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 550,
+      "text": "      const skillDir = path.join(coreSkillsRoot, entry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015159",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 551,
+      "text": "      const skillFile = path.join(skillDir, 'SKILL.md');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015160",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 554,
+      "text": "      const relPath = path.relative(projectRoot, skillDir).replaceAll('\\\\', '/');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015162",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 571,
+      "text": "        skillFilePath: path.relative(projectRoot, skillFile).replaceAll('\\\\', '/'),"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015163",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 584,
+      "text": "      const domainSkillsRoot = path.join(domainsRoot, domainEntry.name, 'skills');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015164",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 584,
+      "text": "      const domainSkillsRoot = path.join(domainsRoot, domainEntry.name, 'skills');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015165",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 590,
+      "text": "        const skillDir = path.join(domainSkillsRoot, entry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015166",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 590,
+      "text": "        const skillDir = path.join(domainSkillsRoot, entry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015167",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 591,
+      "text": "        const skillFile = path.join(skillDir, 'SKILL.md');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015168",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 594,
+      "text": "        const relPath = path.relative(projectRoot, skillDir).replaceAll('\\\\', '/');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015170",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 611,
+      "text": "          skillFilePath: path.relative(projectRoot, skillFile).replaceAll('\\\\', '/'),"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015172",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 63,
+      "text": "    .join('/');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015176",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 651,
+      "text": "      const geminiCmdPath = geminiCommandPathForIntent(skill.intentId);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015190",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 746,
+      "text": "  const coreSkillsRoot = path.join(projectRoot, 'core', 'skills');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015191",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 746,
+      "text": "  const coreSkillsRoot = path.join(projectRoot, 'core', 'skills');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015192",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 747,
+      "text": "  const domainsRoot = path.join(projectRoot, 'domains');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015193",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 747,
+      "text": "  const domainsRoot = path.join(projectRoot, 'domains');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015197",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 76,
+      "text": "  const tmpPath = `${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015198",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 76,
+      "text": "  const tmpPath = `${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015201",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 776,
+      "text": "        const fullPath = path.join(currentDir, entry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015202",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 776,
+      "text": "        const fullPath = path.join(currentDir, entry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015203",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 780,
+      "text": "          const projectRelPath = path.relative(projectRoot, fullPath).replaceAll('\\\\', '/');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015204",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 783,
+      "text": "            pathToSources.set(collisionKey, { relPath: entryRel, sources: [] });"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015207",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 797,
+      "text": "  scanShared(path.join(coreSkillsRoot, '_shared'), 'core');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015208",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 802,
+      "text": "      scanShared(path.join(domainsRoot, domainEntry.name, 'skills', '_shared'), `domains/${domainEntry.name}`);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015211",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 820,
+      "text": "  let rel = path.relative(fromDir, toPath).split(path.sep).join('/');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015213",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 826,
+      "text": "  return toPosixRelativePath(path.dirname(filePath), path.join(skillsDir, '_shared', fragmentPath));"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015214",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 831,
+      "text": "  const roots = ["
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015215",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 832,
+      "text": "    path.join(projectRoot, 'core', 'skills', '_shared'),"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015216",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 833,
+      "text": "    path.join(projectRoot, '.agents', 'skills', '_shared'),"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015217",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 835,
+      "text": "  const domainsRoot = path.join(projectRoot, 'domains');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015218",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 835,
+      "text": "  const domainsRoot = path.join(projectRoot, 'domains');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015219",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 839,
+      "text": "      roots.push(path.join(domainsRoot, domainEntry.name, 'skills', '_shared'));"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015220",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 843,
+      "text": "    const resolved = path.resolve(root);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015221",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 861,
+      "text": "    const normalizedWinPath = path.win32.normalize(candidatePath);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015222",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 863,
+      "text": "    return match ? match[1].split('\\\\').join('/') : null;"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015223",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 866,
+      "text": "  const resolved = path.resolve(candidatePath);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015224",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 874,
+      "text": "    const matchedRoot = isPathInside(root.real, real)"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015225",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 880,
+      "text": "    const matchedPath = matchedRoot === root.real ? real : resolved;"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015226",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 880,
+      "text": "    const matchedPath = matchedRoot === root.real ? real : resolved;"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015227",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 881,
+      "text": "    const fragmentPath = path.relative(matchedRoot, matchedPath).split(path.sep).join('/');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015228",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 881,
+      "text": "    const fragmentPath = path.relative(matchedRoot, matchedPath).split(path.sep).join('/');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015230",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 889,
+      "text": "  const absoluteProjectPathPattern = /(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/\\s`)\"']+[\\\\/][^\\\\/\\s`)\"']+[\\\\/]|\\/)[^`\\n)\"']+/g;"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015231",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 891,
+      "text": "    const fragmentPath = fragmentPathForCanonicalReference(rawRef, sharedRoots);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015233",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 915,
+      "text": "  const sharedRoots = canonicalSharedRoots(projectRoot);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015234",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 918,
+      "text": "      const fullPath = path.join(dir, entry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015235",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 918,
+      "text": "      const fullPath = path.join(dir, entry.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015239",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 968,
+      "text": "  const commandsDir = path.join(targetOutputDir, 'commands', 'fgos');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015240",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 968,
+      "text": "  const commandsDir = path.join(targetOutputDir, 'commands', 'fgos');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015241",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 970,
+      "text": "  const skillsDir = path.join(targetOutputDir, 'skills');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015242",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 970,
+      "text": "  const skillsDir = path.join(targetOutputDir, 'skills');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015243",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 977,
+      "text": "      const targetShared = path.join(skillsDir, '_shared');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015244",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 979,
+      "text": "        const targetPath = path.join(targetShared, fragment.relativeFragmentPath);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015245",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 979,
+      "text": "        const targetPath = path.join(targetShared, fragment.relativeFragmentPath);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015246",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 981,
+      "text": "        atomicCopyFileSync(path.join(projectRoot, fragment.sourcePath), targetPath);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015247",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 989,
+      "text": "    const targetSkillDir = path.join(skillsDir, s.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015248",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 989,
+      "text": "    const targetSkillDir = path.join(skillsDir, s.name);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015249",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 990,
+      "text": "    const sourcePath = (s.canonicalDir && projectRoot) ? path.join(projectRoot, s.canonicalDir) : null;"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015250",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 990,
+      "text": "    const sourcePath = (s.canonicalDir && projectRoot) ? path.join(projectRoot, s.canonicalDir) : null;"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015251",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 997,
+      "text": "        atomicCopyFileSync(sourcePath, path.join(targetSkillDir, 'SKILL.md'));"
+    },
+    {
+      "file": "src/report/knowledge-resolver.mjs",
+      "id": "dynamic-009810",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "eab342bb4296e20fdbc6742cec084be0924e80cfa6d3f7e525395959b6bd0751",
+      "line": 32,
+      "text": "  const activeDocs = Object.values(view.docs).filter((d) => d.currentPath === path && isLive(d));"
+    },
+    {
+      "file": "src/report/knowledge-resolver.mjs",
+      "id": "dynamic-009811",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "eab342bb4296e20fdbc6742cec084be0924e80cfa6d3f7e525395959b6bd0751",
+      "line": 45,
+      "text": "    (d) => d.currentPath === path || (Array.isArray(d.aliases) && d.aliases.includes(path))"
+    },
+    {
+      "file": "src/report/knowledge-resolver.mjs",
+      "id": "dynamic-009812",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "eab342bb4296e20fdbc6742cec084be0924e80cfa6d3f7e525395959b6bd0751",
+      "line": 45,
+      "text": "    (d) => d.currentPath === path || (Array.isArray(d.aliases) && d.aliases.includes(path))"
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "id": "dynamic-009768",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
+      "line": 103,
+      "text": "  return path.join(repoRoot, 'docs', 'enduser-docs-index.json');"
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "id": "dynamic-009769",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
+      "line": 117,
+      "text": "  const manifestPath = manifestPathFor(repoRoot);"
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "id": "dynamic-009774",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
+      "line": 28,
+      "text": "    dirEntries = fs.readdirSync(quadrantDir, { withFileTypes: true });"
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "id": "dynamic-009775",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
+      "line": 35,
+      "text": "    const absPath = path.join(quadrantDir, dirEntry.name);"
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "id": "dynamic-009776",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
+      "line": 35,
+      "text": "    const absPath = path.join(quadrantDir, dirEntry.name);"
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "id": "dynamic-009777",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
+      "line": 36,
+      "text": "    const docPath = path.relative(repoRoot, absPath).split(path.sep).join('/');"
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "id": "dynamic-009778",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
+      "line": 36,
+      "text": "    const docPath = path.relative(repoRoot, absPath).split(path.sep).join('/');"
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "id": "dynamic-009779",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
+      "line": 49,
+      "text": "  const knowledgeDir = path.join(repoRoot, 'docs', 'knowledge');"
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "id": "dynamic-009780",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
+      "line": 49,
+      "text": "  const knowledgeDir = path.join(repoRoot, 'docs', 'knowledge');"
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "id": "dynamic-009781",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
+      "line": 59,
+      "text": "    const purposeDir = path.join(knowledgeDir, purposeEntry.name);"
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "id": "dynamic-009782",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
+      "line": 59,
+      "text": "    const purposeDir = path.join(knowledgeDir, purposeEntry.name);"
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "id": "dynamic-009783",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
+      "line": 69,
+      "text": "      const absPath = path.join(purposeDir, file.name);"
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "id": "dynamic-009784",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
+      "line": 69,
+      "text": "      const absPath = path.join(purposeDir, file.name);"
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "id": "dynamic-009785",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
+      "line": 76,
+      "text": "      const docPath = path.relative(repoRoot, absPath).split(path.sep).join('/');"
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "id": "dynamic-009786",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
+      "line": 76,
+      "text": "      const docPath = path.relative(repoRoot, absPath).split(path.sep).join('/');"
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "id": "dynamic-009787",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
+      "line": 92,
+      "text": "    scanDirAsQuadrant(repoRoot, path.join(repoRoot, 'docs', quadrant), quadrant, docEntries);"
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "id": "dynamic-009778",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
+      "line": 36,
+      "text": "    const docPath = path.relative(repoRoot, absPath).split(path.sep).join('/');"
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "id": "dynamic-009786",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
+      "line": 76,
+      "text": "      const docPath = path.relative(repoRoot, absPath).split(path.sep).join('/');"
+    },
+    {
+      "file": "src/report/enduser-index.mjs",
+      "id": "dynamic-009792",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "373da334b9cd862b2c3a0fbf4fffb3fe010f244872702dbfceb25eada5c5e650",
+      "line": 88,
+      "text": "    if (outcome.docPath === docPath) {"
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "id": "dynamic-009788",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
+      "line": 94,
+      "text": "      scanDirAsQuadrant(repoRoot, path.join(repoRoot, 'docs', alias), quadrant, docEntries);"
+    },
+    {
+      "file": "src/report/enduser-index.mjs",
+      "id": "dynamic-009791",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "373da334b9cd862b2c3a0fbf4fffb3fe010f244872702dbfceb25eada5c5e650",
+      "line": 38,
+      "text": "export const QUADRANT_DIR_ALIASES = Object.freeze({"
+    },
+    {
+      "file": "scripts/build-rust-distribution.mjs",
+      "id": "dynamic-006415",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "be87d54ee9740239123a8fdf71496eee5b641deb6fdc678826b86a0a8260fe4c",
+      "line": 383,
+      "text": "      const full = path.join(dir, ent);"
+    },
+    {
+      "file": "scripts/build-rust-distribution.mjs",
+      "id": "dynamic-006369",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "be87d54ee9740239123a8fdf71496eee5b641deb6fdc678826b86a0a8260fe4c",
+      "line": 185,
+      "text": "  return [...new Set(sourceFiles.map((file) => path.relative(resolvedRepo, path.resolve(resolvedRepo, file)).replaceAll('\\\\', '/')).filter((file) => !allowed || allowed.has(file)))].sort();"
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006476",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "5e7fa8b9548c34479e270ec666bbf8132f7fc7c38177dbac71f8d74848f9baad",
+      "line": 61,
+      "text": "  console.error(`FAIL: ${path.relative(repoRoot, BACKLOG)} does not exist.`);"
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006480",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "5e7fa8b9548c34479e270ec666bbf8132f7fc7c38177dbac71f8d74848f9baad",
+      "line": 92,
+      "text": "  console.error(`FAIL: ${path.relative(repoRoot, DOC)} does not exist — nothing has been reconciled.`);"
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006461",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "5e7fa8b9548c34479e270ec666bbf8132f7fc7c38177dbac71f8d74848f9baad",
+      "line": 107,
+      "text": "  if (sections.has(id)) fail(`${id}: appears more than once in RECONCILIATION.md`);"
+    },
+    {
+      "file": "scripts/doc-alias-resolver.mjs",
+      "id": "dynamic-007342",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "8f9d33e109752670e70f8bcc51c54bcb3f9182a6c6bd6eb1fd42f2842fd5844c",
+      "line": 87,
+      "text": "      if (!retired && !entry.toOwner.startsWith(OWNER_ROOT)) add('owner-outside-platform', `${label}: toOwner \"${entry.toOwner}\" must be under ${OWNER_ROOT}`, entry.aliasId);"
+    },
+    {
+      "file": "scripts/doc-alias-resolver.mjs",
+      "id": "dynamic-007315",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "8f9d33e109752670e70f8bcc51c54bcb3f9182a6c6bd6eb1fd42f2842fd5844c",
+      "line": 260,
+      "text": "    console.error(`doc-alias-resolver error loading ${tablePath}: ${err.message}`);"
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006694",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "947d4752810d5d6e4efa0f931b57853d348e690051b4ccdfc94217dbf0f17229",
+      "line": 712,
+      "text": "      console.error(`check-doc-constitution error loading inventory: ${err.message}. The shards are not committed; regenerate with: ${regenerateCommand({ inventoryPath, identityRegistryPath: path.resolve(cwd, IDENTITY_REGISTRY_PATH), cwd })}`);"
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006688",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "947d4752810d5d6e4efa0f931b57853d348e690051b4ccdfc94217dbf0f17229",
+      "line": 680,
+      "text": "      if (!fs.existsSync(inventoryPath)) throw new Error(`File not found: ${inventoryPath}`);"
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006692",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "947d4752810d5d6e4efa0f931b57853d348e690051b4ccdfc94217dbf0f17229",
+      "line": 693,
+      "text": "        if (!registry && decisions.some((shard) => (shard.registryGaps || []).length)) throw new Error(`registry-gap decisions require ${registryPath}`);"
+    },
+    {
+      "file": "scripts/check-locked-decisions-heading-drift.mjs",
+      "id": "dynamic-007236",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "fa87a9f833b12c43cf60322aac482a8bd5e5e7cb889868ed4592816efc80b7f8",
+      "line": 125,
+      "text": "      `  - ${f.file}: owns a decisions table under \"${f.heading}\" instead of \"## Locked decisions\"`,"
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007557",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "line": 1268,
+      "text": "  const raw = readBlobAtCommit(commitSha, `${PHASE_DIR}/transitional-switchboard.json`, repoRoot);"
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007771",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "line": 760,
+      "text": "    const raw = readBlobAtCommit(commitSha, `${PHASE_DIR}/shipped-path-conventions-inventory.json`, repoRoot);"
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007749",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "line": 56,
+      "text": "  return execFileSync('git', ['show', `${commitSha}:${fileRel}`], {"
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007625",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "line": 160,
+      "text": "  return [...SCAN_ROOTS, ...ADDITIONAL_ROOT_FILES, `${PHASE_DIR}/transitional-switchboard.json`];"
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007664",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "line": 1842,
+      "text": "  lines.push(`- \\`${INVENTORY_MANIFEST_PATH}\\``);"
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007742",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "line": 36,
+      "text": "const OUTPUT_PARTS_PREFIXES = OUTPUT_MANIFEST_PATHS.map((p) => `${p.replace(/\\.json$/, '')}.parts/`);"
+    },
+    {
+      "file": "scripts/knowledge-canary.mjs",
+      "id": "dynamic-008105",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "68b294c8d21c7fde8be258af6eacaa066bf1b60bf724e692e8a61da02622a529",
+      "line": 30,
+      "text": "  execSync(`node \"${fgosBin}\" doc reserve t1 guide ${docPath}`, { cwd: repoRoot });"
+    },
+    {
+      "file": "scripts/knowledge-canary.mjs",
+      "id": "dynamic-008108",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "68b294c8d21c7fde8be258af6eacaa066bf1b60bf724e692e8a61da02622a529",
+      "line": 43,
+      "text": "  const attestOut = execSync(`node \"${fgosBin}\" knowledge attest --doc-path ${docPath} --capture-id canary-capture`, { cwd: repoRoot, encoding: 'utf8' });"
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008154",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "f57899d74a05230a03daa78f531605fd01f64bc9d2271719d97fa7954cb21936",
+      "line": 138,
+      "text": "      throw new Error(`knowledge-migration: '${inventoryPath}' must contain a JSON array, got ${typeof inventory === 'object' && inventory !== null ? JSON.stringify(Object.keys(inventory)) : typeof inventory}`);"
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008167",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "f57899d74a05230a03daa78f531605fd01f64bc9d2271719d97fa7954cb21936",
+      "line": 206,
+      "text": "        `doc '${docId}' is already at its target '${targetPath}', but the inventory's oldPath '${item.oldPath}' is neither its currentPath nor a recorded alias -- that old path is not traceable anywhere; reconcile the inventory row or restore the alias before this run can be considered clean`"
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "dynamic-007796",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "line": 100,
+      "text": "  return execFileSync('git', ['show', `${commitSha}:${fileRel}`], {"
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "dynamic-007859",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "line": 727,
+      "text": "  lines.push(`- **Surfaces Scanned:** ${inventory.surfacesScanned.join(', ')}`);"
+    },
+    {
+      "file": "scripts/measure-verify-cost.mjs",
+      "id": "dynamic-008327",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "314c461c359f54f978a64494ea87884db14e563be96920387601e47c74bc37c4",
+      "line": 270,
+      "text": "  lines.push(`Nguồn: \\`.fgos/events.jsonl\\` (${totalEvents} dòng tại thời điểm chạy). Số liệu thật, không suy đoán — xem \\`docs/history/tsk-vms-verify-cost-audit/\\` cho phương pháp đầy đủ.`);"
+    },
+    {
+      "file": "scripts/project-agents.mjs",
+      "id": "dynamic-008536",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "8af93fe4d0c75957a82da98b5c4dfa5aabba78fd4e60338b8cac861996b0e468",
+      "line": 291,
+      "text": "    console.log(`projected ${relPath} -> .claude/agents/${name}.md`);"
+    },
+    {
+      "file": "scripts/prepare-release.mjs",
+      "id": "dynamic-008452",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "fd0c0ff8fef18c2c69713314e49fdc8a2e02b203fc2073210180b01483120da5",
+      "line": 169,
+      "text": "  const changelogPath = path.join(root, 'CHANGELOG.md');"
+    },
+    {
+      "file": "scripts/prepare-release.mjs",
+      "id": "dynamic-008453",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "fd0c0ff8fef18c2c69713314e49fdc8a2e02b203fc2073210180b01483120da5",
+      "line": 169,
+      "text": "  const changelogPath = path.join(root, 'CHANGELOG.md');"
+    },
+    {
+      "file": "scripts/prepare-release.mjs",
+      "id": "dynamic-008441",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "fd0c0ff8fef18c2c69713314e49fdc8a2e02b203fc2073210180b01483120da5",
+      "line": 123,
+      "text": "    throw new Error(`CHANGELOG.md already contains a release heading for ${tag}`);"
+    },
+    {
+      "file": "scripts/prepare-release.mjs",
+      "id": "dynamic-008457",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "fd0c0ff8fef18c2c69713314e49fdc8a2e02b203fc2073210180b01483120da5",
+      "line": 202,
+      "text": "      `git add ${updates.map(([filePath]) => path.relative(root, filePath)).join(' ')}`,"
+    },
+    {
+      "file": "scripts/prepare-release.mjs",
+      "id": "dynamic-008465",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "fd0c0ff8fef18c2c69713314e49fdc8a2e02b203fc2073210180b01483120da5",
+      "line": 263,
+      "text": "    console.log(`- ${file}`);"
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008654",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "c66cacf0b62d7c97737c570254ec91a44cf334cd7a74efb1149c21bffa20a8d5",
+      "line": 704,
+      "text": "        const reportPath = path.relative(repoRoot, resolve('--verdicts')).split(path.sep).join('/');"
+    },
+    {
+      "file": "scripts/verify-phase-01.mjs",
+      "id": "dynamic-009114",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "e089db66f5bdb206c6a201ecf1cc2d71c58454a1fa94c7a87606598c3526198f",
+      "line": 116,
+      "text": "      execFileSync('git', ['cat-file', '-e', `${fixedEndSha}:${filePath}`], {"
+    },
+    {
+      "file": "scripts/verify-phase-01.mjs",
+      "id": "dynamic-009115",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "e089db66f5bdb206c6a201ecf1cc2d71c58454a1fa94c7a87606598c3526198f",
+      "line": 124,
+      "text": "    const content = execFileSync('git', ['show', `${fixedEndSha}:${filePath}`], {"
+    },
+    {
+      "file": "scripts/verify-phase-01.mjs",
+      "id": "dynamic-009116",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "e089db66f5bdb206c6a201ecf1cc2d71c58454a1fa94c7a87606598c3526198f",
+      "line": 130,
+      "text": "    const parentDir = path.posix.dirname(filePath);"
+    },
+    {
+      "file": "scripts/verify-phase-01.mjs",
+      "id": "dynamic-009117",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "e089db66f5bdb206c6a201ecf1cc2d71c58454a1fa94c7a87606598c3526198f",
+      "line": 147,
+      "text": "        const resolvedTarget = normpath(path.posix.join(parentDir, targetFile));"
+    },
+    {
+      "file": "src/report/capability-plan-lint.mjs",
+      "id": "dynamic-009735",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "7dab2f9aaa2d97fcb33ed9d0ddc378aec9ee314f2f4e960808514ce96797c212",
+      "line": 648,
+      "text": "      ? textOrPath"
+    },
+    {
+      "file": "src/report/capability-plan-lint.mjs",
+      "id": "dynamic-009736",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "7dab2f9aaa2d97fcb33ed9d0ddc378aec9ee314f2f4e960808514ce96797c212",
+      "line": 649,
+      "text": "      : (typeof textOrPath === 'string' && fs.existsSync(textOrPath) ? path.dirname(textOrPath) : null);"
+    },
+    {
+      "file": "src/report/capability-plan-lint.mjs",
+      "id": "dynamic-009715",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "7dab2f9aaa2d97fcb33ed9d0ddc378aec9ee314f2f4e960808514ce96797c212",
+      "line": 283,
+      "text": "        resolvedPath = contentOrPath;"
+    },
+    {
+      "file": "src/report/capability-plan-lint.mjs",
+      "id": "dynamic-009737",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "7dab2f9aaa2d97fcb33ed9d0ddc378aec9ee314f2f4e960808514ce96797c212",
+      "line": 657,
+      "text": "  if (typeof textOrPath === 'string' && !textOrPath.includes('\\n') && fs.existsSync(textOrPath)) {"
+    },
+    {
+      "file": "src/report/capability-plan-lint.mjs",
+      "id": "dynamic-009738",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "7dab2f9aaa2d97fcb33ed9d0ddc378aec9ee314f2f4e960808514ce96797c212",
+      "line": 664,
+      "text": "  if (typeof textOrPath === 'string' && !textOrPath.includes('\\n') && fs.existsSync(textOrPath)) {"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015055",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1060,
+      "text": "      `packaged_source = \"${packagedRelPath}\"`,"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015058",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1063,
+      "text": "      `prompt = \"Read and follow the packaged fgOS skill instructions at ${packagedRelPath}, inside this fgos extension's own install directory, directly.\"`,"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014334",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3730,
+      "text": "        message: `${indexPathFor(root)} not found -- nothing to check${nextHasRows ? ' (run fgos decision-index to adopt it)' : ''}`,"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014335",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3735,
+      "text": "      message: `${indexPathFor(root)} not found, but state.decisions has platform-scoped decisions to index -- run fgos decision-index`,"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014336",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3739,
+      "text": "    return { passed: true, message: `${indexPathFor(root)} up to date` };"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014337",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3743,
+      "text": "    message: `${indexPathFor(root)} is stale relative to state.decisions -- run fgos decision-index`,"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014318",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3644,
+      "text": "      message: `${manifestPathFor(root)} not found -- nothing to check (project has not generated an end-user doc index yet)`,"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014329",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3681,
+      "text": "    return { changed: false, message: `${manifestRelPath} already up to date (${count} tài liệu)` };"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014330",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3683,
+      "text": "  return { changed: true, message: `regenerated ${manifestRelPath} (${count} tài liệu)` };"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014342",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3772,
+      "text": "      return { changed: false, message: `skipped -- ${err.message}` };"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014343",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3777,
+      "text": "    return { changed: false, message: `${result.path} already up to date` };"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014344",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3779,
+      "text": "  return { changed: true, message: `regenerated ${result.path}` };"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014306",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3514,
+      "text": "    return { passed: true, message: `README.md's pinned install tag \"${tag}\" exists` };"
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006471",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "5e7fa8b9548c34479e270ec666bbf8132f7fc7c38177dbac71f8d74848f9baad",
+      "line": 16,
+      "text": "const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');"
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006472",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "5e7fa8b9548c34479e270ec666bbf8132f7fc7c38177dbac71f8d74848f9baad",
+      "line": 16,
+      "text": "const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');"
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008570",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "c66cacf0b62d7c97737c570254ec91a44cf334cd7a74efb1149c21bffa20a8d5",
+      "line": 238,
+      "text": "      unitsOf: context.unitsOf, repoRoot: context.repoRoot,"
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008604",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "c66cacf0b62d7c97737c570254ec91a44cf334cd7a74efb1149c21bffa20a8d5",
+      "line": 562,
+      "text": "    vocabulary, registry: context.registry, unitsOf: context.unitsOf, repoRoot: context.repoRoot,"
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008632",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "c66cacf0b62d7c97737c570254ec91a44cf334cd7a74efb1149c21bffa20a8d5",
+      "line": 661,
+      "text": "        const context = loadProposalContext(resolve('--inventory'), path.resolve(cwd, values.get('--repo-root') || '.'));"
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008640",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "c66cacf0b62d7c97737c570254ec91a44cf334cd7a74efb1149c21bffa20a8d5",
+      "line": 677,
+      "text": "      const context = loadProposalContext(resolve('--inventory'), path.resolve(cwd, values.get('--repo-root') || '.'));"
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008650",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "c66cacf0b62d7c97737c570254ec91a44cf334cd7a74efb1149c21bffa20a8d5",
+      "line": 703,
+      "text": "        const repoRoot = path.resolve(cwd, values.get('--repo-root') || '.');"
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008651",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "c66cacf0b62d7c97737c570254ec91a44cf334cd7a74efb1149c21bffa20a8d5",
+      "line": 703,
+      "text": "        const repoRoot = path.resolve(cwd, values.get('--repo-root') || '.');"
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008164",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "f57899d74a05230a03daa78f531605fd01f64bc9d2271719d97fa7954cb21936",
+      "line": 200,
+      "text": "      const oldPathTraceable = item.oldPath === existingDoc.currentPath || (existingDoc.aliases || []).includes(item.oldPath);"
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008165",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "f57899d74a05230a03daa78f531605fd01f64bc9d2271719d97fa7954cb21936",
+      "line": 200,
+      "text": "      const oldPathTraceable = item.oldPath === existingDoc.currentPath || (existingDoc.aliases || []).includes(item.oldPath);"
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008166",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "f57899d74a05230a03daa78f531605fd01f64bc9d2271719d97fa7954cb21936",
+      "line": 200,
+      "text": "      const oldPathTraceable = item.oldPath === existingDoc.currentPath || (existingDoc.aliases || []).includes(item.oldPath);"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014432",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 4145,
+      "text": "      const isOwnPath = captureId === doc.currentPath || (doc.aliases || []).includes(captureId);"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014433",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 4145,
+      "text": "      const isOwnPath = captureId === doc.currentPath || (doc.aliases || []).includes(captureId);"
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "dynamic-007853",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "line": 641,
+      "text": "    literalCurrentPath: 0,"
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008159",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "f57899d74a05230a03daa78f531605fd01f64bc9d2271719d97fa7954cb21936",
+      "line": 164,
+      "text": "    const sourcePath = existingDoc ? existingDoc.currentPath : item.oldPath;"
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008160",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "f57899d74a05230a03daa78f531605fd01f64bc9d2271719d97fa7954cb21936",
+      "line": 164,
+      "text": "    const sourcePath = existingDoc ? existingDoc.currentPath : item.oldPath;"
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-013978",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "line": 428,
+      "text": "    const relToRoot = path.relative(realContainmentRoot, realEntryPath);"
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-014010",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "line": 649,
+      "text": "            filePath: toPosixPath(path.relative(projectRoot, path.join(componentsRoot, componentName))),"
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-014011",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "line": 649,
+      "text": "            filePath: toPosixPath(path.relative(projectRoot, path.join(componentsRoot, componentName))),"
+    },
+    {
+      "file": "scripts/next-doc-id.mjs",
+      "id": "dynamic-008410",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "7e88c69cf6c78b4cce5240d3fcc34a1182fc963933435827a58974df5458bc9d",
+      "line": 42,
+      "text": "  const text = fs.readFileSync(path.resolve(cwd, file), 'utf8');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015060",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1078,
+      "text": "  return `${frontmatter}${header}\\n${sourceContent.slice(frontmatter.length)}`;"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015062",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1089,
+      "text": "  const sourceRelativePath = path.relative(projectRoot, sourcePath).replaceAll('\\\\', '/');"
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006880",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "b4a0532f0ee5e83dbe8db7159673fa1133f4b48c89545a4d2972ca2748df78b6",
+      "line": 321,
+      "text": "    const sourcePath = claim.sourcePath;"
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006732",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "b4a0532f0ee5e83dbe8db7159673fa1133f4b48c89545a4d2972ca2748df78b6",
+      "line": 1048,
+      "text": "    const key = `${ref.receiptCommit}:${ref.receiptPath}`;"
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006753",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "b4a0532f0ee5e83dbe8db7159673fa1133f4b48c89545a4d2972ca2748df78b6",
+      "line": 1176,
+      "text": "    (!scoped || pathInScope(row.sourcePath, scope) || namespaces.some((prefix) => prefix.endsWith('/') ? row.sourcePath.startsWith(prefix) : row.sourcePath === prefix)) &&"
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006758",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "b4a0532f0ee5e83dbe8db7159673fa1133f4b48c89545a4d2972ca2748df78b6",
+      "line": 1185,
+      "text": "  const inScope = (p) => pathInScope(p, scope);"
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006835",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "b4a0532f0ee5e83dbe8db7159673fa1133f4b48c89545a4d2972ca2748df78b6",
+      "line": 1454,
+      "text": "  const scopeProblem = findUnmatchedScope(scope, inventory);"
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007761",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "line": 657,
+      "text": "export function normalizeDocTarget(rawTarget, sourcePath = '') {"
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007765",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "line": 672,
+      "text": "export function extractLinks(content, sourcePath = '') {"
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007626",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "line": 1602,
+      "text": "  const byPathAnchor = (a, b) => compareText(normalizePosix(a.sourcePath), normalizePosix(b.sourcePath)) || compareText(a.sourceAnchor, b.sourceAnchor) || compareText(a.claimId, b.claimId);"
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007559",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "line": 1281,
+      "text": "    .map(([key, paths]) => ({ key, paths: [...paths].sort(), rationale: 'Same normalized area/title; requires semantic duplicate/conflict review before promotion.' }))"
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007646",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+      "line": 1729,
+      "text": "    .map(([sha, pathsForSha]) => ({ blobSha: sha, paths: [...pathsForSha].sort() }))"
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "dynamic-007857",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "line": 677,
+      "text": "    totalUniquePathsCount: items.length,"
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "dynamic-007827",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "line": 456,
+      "text": "  let commit = options?.commit ?? (typeof dirs === 'object' && !Array.isArray(dirs) ? dirs.commit : null);"
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008608",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "c66cacf0b62d7c97737c570254ec91a44cf334cd7a74efb1149c21bffa20a8d5",
+      "line": 589,
+      "text": "  const temporaryRoot = path.join(os.tmpdir(), 'fgos-work');"
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008609",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "c66cacf0b62d7c97737c570254ec91a44cf334cd7a74efb1149c21bffa20a8d5",
+      "line": 589,
+      "text": "  const temporaryRoot = path.join(os.tmpdir(), 'fgos-work');"
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008610",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "c66cacf0b62d7c97737c570254ec91a44cf334cd7a74efb1149c21bffa20a8d5",
+      "line": 591,
+      "text": "  const temporary = fs.mkdtempSync(path.join(temporaryRoot, 'doc-review-'));"
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008611",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "c66cacf0b62d7c97737c570254ec91a44cf334cd7a74efb1149c21bffa20a8d5",
+      "line": 592,
+      "text": "  const sourceFile = path.join(temporary, 'source'), targetFile = path.join(temporary, 'target');"
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008612",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "c66cacf0b62d7c97737c570254ec91a44cf334cd7a74efb1149c21bffa20a8d5",
+      "line": 592,
+      "text": "  const sourceFile = path.join(temporary, 'source'), targetFile = path.join(temporary, 'target');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015117",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 308,
+      "text": "        if (!best || idx > best.idx) best = { idx, root: targetPath.slice(0, idx) };"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015118",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 313,
+      "text": "        if (!best || endIdx > best.idx) best = { idx: endIdx, root: targetPath.slice(0, endIdx) };"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015084",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1252,
+      "text": "  const copied = path.resolve(packageRoot) !== path.resolve(targetRoot);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015085",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1252,
+      "text": "  const copied = path.resolve(packageRoot) !== path.resolve(targetRoot);"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015136",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 377,
+      "text": "  const candidateDir = path.isAbsolute(targetPath)"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015172",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 63,
+      "text": "    .join('/');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015142",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 436,
+      "text": "  const normalized = rel.split(path.sep).join('/');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015144",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 466,
+      "text": "  const normalized = rel.split(path.sep).join('/');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015222",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 863,
+      "text": "    return match ? match[1].split('\\\\').join('/') : null;"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015228",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 881,
+      "text": "    const fragmentPath = path.relative(matchedRoot, matchedPath).split(path.sep).join('/');"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015230",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 889,
+      "text": "  const absoluteProjectPathPattern = /(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/\\s`)\"']+[\\\\/][^\\\\/\\s`)\"']+[\\\\/]|\\/)[^`\\n)\"']+/g;"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015086",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 127,
+      "text": "  const relPath = sourceRelativePath.replaceAll('\\\\', '/');"
+    },
+    {
+      "file": "bin/fgos.mjs",
+      "id": "reference-000277",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "64ace4da89dbc1222c6d3c0d634272c9b043d1c268a257ed2e2e09385a5eb198",
+      "line": 3064,
+      "text": "        'authoritative-match requires --quadrant <docs/quadrant-dir>',"
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "reference-003641",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+      "line": 1760,
+      "text": "        quadrant: { type: 'string', description: 'The docs/<quadrant> directory to scan (e.g. docs/how-to).' },"
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "reference-003652",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+      "line": 1767,
+      "text": "      'fgos authoritative-match --quadrant docs/how-to --topic \"claiming a work item\"',"
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "reference-003653",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+      "line": 1768,
+      "text": "      'fgos authoritative-match --quadrant docs/how-to --check-duplicates',"
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "reference-003659",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+      "line": 638,
+      "text": "    examples: ['fgos compound tsk-3o3 --doc-type how-to --doc-path docs/how-to/example.md'],"
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "reference-003643",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+      "line": 846,
+      "text": "        scope: { type: 'string', description: 'An area slug (e.g. \"repo\", or one matching docs/specs/<area>.md) marking this as a platform/repo-wide decision (tsk-1lv-2 D4), rendered into docs/decisions/index.md by \"fgos decision-index\". Optional; omit for an item-scoped (--id) or unscoped decision.' },"
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "reference-003666",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+      "line": 846,
+      "text": "        scope: { type: 'string', description: 'An area slug (e.g. \"repo\", or one matching docs/specs/<area>.md) marking this as a platform/repo-wide decision (tsk-1lv-2 D4), rendered into docs/decisions/index.md by \"fgos decision-index\". Optional; omit for an item-scoped (--id) or unscoped decision.' },"
+    },
+    {
+      "file": "src/report/capability-plan-lint.mjs",
+      "id": "reference-003690",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "7dab2f9aaa2d97fcb33ed9d0ddc378aec9ee314f2f4e960808514ce96797c212",
+      "line": 17,
+      "text": "// (docs/how-to/author-a-plan-loop-track.md)."
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-014034",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "line": 99,
+      "text": "  const indexPath = path.join(projectRoot, 'docs', 'decisions', 'index.md');"
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-014035",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+      "line": 99,
+      "text": "  const indexPath = path.join(projectRoot, 'docs', 'decisions', 'index.md');"
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "reference-000161",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
+      "line": 131,
+      "text": "/// `docs/specs/distribution.md` row 5b it is only ever created by"
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "reference-000182",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
+      "line": 13,
+      "text": "//! `gateway.token` field (the global config file `docs/specs/distribution.md`"
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008156",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "f57899d74a05230a03daa78f531605fd01f64bc9d2271719d97fa7954cb21936",
+      "line": 150,
+      "text": "    const targetPath = `docs/knowledge/${purposeSlug}/${item.role}.md`;"
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008157",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "f57899d74a05230a03daa78f531605fd01f64bc9d2271719d97fa7954cb21936",
+      "line": 150,
+      "text": "    const targetPath = `docs/knowledge/${purposeSlug}/${item.role}.md`;"
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008173",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "f57899d74a05230a03daa78f531605fd01f64bc9d2271719d97fa7954cb21936",
+      "line": 249,
+      "text": "    const srcAbs = path.join(repoRoot, move.oldPath);"
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008174",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "f57899d74a05230a03daa78f531605fd01f64bc9d2271719d97fa7954cb21936",
+      "line": 250,
+      "text": "    const destAbs = path.join(repoRoot, move.newPath);"
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008186",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "f57899d74a05230a03daa78f531605fd01f64bc9d2271719d97fa7954cb21936",
+      "line": 58,
+      "text": "    if (!fs.existsSync(path.join(repoRoot, move.oldPath))) {"
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008188",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "f57899d74a05230a03daa78f531605fd01f64bc9d2271719d97fa7954cb21936",
+      "line": 67,
+      "text": "    if (move.oldPath !== move.newPath && fs.existsSync(path.join(repoRoot, move.newPath))) {"
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008162",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "f57899d74a05230a03daa78f531605fd01f64bc9d2271719d97fa7954cb21936",
+      "line": 189,
+      "text": "    const targetFileReachable = existingDoc && fs.existsSync(path.join(repoRoot, targetPath));"
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "reference-003572",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "line": 814,
+      "text": "  lines.push('2. Shipped skill templates and plugin wrappers that refer to consumer-project contracts (`.fgos/`, `docs/how-to/`, `domains/`, `core/skills/`) must remain stable.');"
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "reference-003573",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "line": 257,
+      "text": "    norm === 'docs/specs' ||"
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "reference-003575",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "line": 259,
+      "text": "    norm === 'docs/architect' ||"
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "reference-003578",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "line": 190,
+      "text": "    norm.startsWith('docs/how-to') ||"
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "reference-003579",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "line": 256,
+      "text": "    norm.startsWith('docs/specs/') ||"
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "reference-003584",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "line": 191,
+      "text": "    norm.startsWith('docs/tutorials') ||"
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "reference-003585",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "line": 192,
+      "text": "    norm.startsWith('docs/reference') ||"
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "reference-003586",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "line": 393,
+      "text": "      norm.startsWith('docs/how-to/') ||"
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "reference-003588",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "line": 258,
+      "text": "    norm.startsWith('docs/architect/') ||"
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "reference-003590",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "line": 193,
+      "text": "    norm.startsWith('docs/explanation') ||"
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "reference-003591",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "line": 269,
+      "text": "    norm === 'docs/architecture-map.md' ||"
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "reference-003594",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "line": 394,
+      "text": "      norm.startsWith('docs/explanation/') ||"
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "reference-003597",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "line": 722,
+      "text": "  lines.push('retiring `docs/specs/runner.md` in favor of `docs/platform/runner/spec.md` at Phase 08 cutover)');"
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "reference-003601",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "line": 410,
+      "text": "    if (norm === 'docs/specs/platform-foundations.md') {"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003802",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 4193,
+      "text": "  const inventoryPath = path.join(root, 'docs/history/compound-learn-artifact-registry/reports/inventory-data.json');"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003803",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3915,
+      "text": "  return fs.existsSync(path.join(root, 'docs/doc-registry.md')) || fs.existsSync(path.join(root, 'docs/doc-registry.json'));"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003828",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3930,
+      "text": "  const mdPath = path.join(root, 'docs/doc-registry.md');"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003829",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3961,
+      "text": "  const mdPath = path.join(root, 'docs/doc-registry.md');"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003833",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3931,
+      "text": "  const jsonPath = path.join(root, 'docs/doc-registry.json');"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003834",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3962,
+      "text": "  const jsonPath = path.join(root, 'docs/doc-registry.json');"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003839",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3915,
+      "text": "  return fs.existsSync(path.join(root, 'docs/doc-registry.md')) || fs.existsSync(path.join(root, 'docs/doc-registry.json'));"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014352",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3824,
+      "text": "  if (!fs.existsSync(path.join(root, 'core', 'instructions'))) {"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014356",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3852,
+      "text": "  if (!fs.existsSync(path.join(root, 'core', 'instructions'))) {"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014361",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3915,
+      "text": "  return fs.existsSync(path.join(root, 'docs/doc-registry.md')) || fs.existsSync(path.join(root, 'docs/doc-registry.json'));"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014362",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3915,
+      "text": "  return fs.existsSync(path.join(root, 'docs/doc-registry.md')) || fs.existsSync(path.join(root, 'docs/doc-registry.json'));"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014367",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3930,
+      "text": "  const mdPath = path.join(root, 'docs/doc-registry.md');"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014368",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3930,
+      "text": "  const mdPath = path.join(root, 'docs/doc-registry.md');"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014369",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3931,
+      "text": "  const jsonPath = path.join(root, 'docs/doc-registry.json');"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014370",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3931,
+      "text": "  const jsonPath = path.join(root, 'docs/doc-registry.json');"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014376",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3961,
+      "text": "  const mdPath = path.join(root, 'docs/doc-registry.md');"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014377",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3961,
+      "text": "  const mdPath = path.join(root, 'docs/doc-registry.md');"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014378",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3962,
+      "text": "  const jsonPath = path.join(root, 'docs/doc-registry.json');"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014379",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3962,
+      "text": "  const jsonPath = path.join(root, 'docs/doc-registry.json');"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014397",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 4035,
+      "text": "  const docsDir = path.join(root, 'docs');"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014398",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 4035,
+      "text": "  const docsDir = path.join(root, 'docs');"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014399",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 4040,
+      "text": "    const absPath = path.join(docsDir, relPath);"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014400",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 4040,
+      "text": "    const absPath = path.join(docsDir, relPath);"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014401",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 4045,
+      "text": "      candidates.push({ path: path.join('docs', relPath), authoritativeFor });"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014402",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 4045,
+      "text": "      candidates.push({ path: path.join('docs', relPath), authoritativeFor });"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014443",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 4193,
+      "text": "  const inventoryPath = path.join(root, 'docs/history/compound-learn-artifact-registry/reports/inventory-data.json');"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014444",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 4193,
+      "text": "  const inventoryPath = path.join(root, 'docs/history/compound-learn-artifact-registry/reports/inventory-data.json');"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014446",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 4220,
+      "text": "      if (fs.existsSync(path.join(root, oldPath))) continue; // not migrated yet -- still where the inventory says"
+    },
+    {
+      "file": ".githooks/pre-commit",
+      "id": "reference-000112",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "ebcefc2815d02910532f1642afff4b7ee1b22ce20d9c5859e8ec44e1019f2943",
+      "line": 14,
+      "text": "// (see docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md"
+    },
+    {
+      "file": ".githooks/pre-commit",
+      "id": "reference-000113",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "ebcefc2815d02910532f1642afff4b7ee1b22ce20d9c5859e8ec44e1019f2943",
+      "line": 355,
+      "text": "// STALE-WORKTREE-INDEX (tsk-1d7, docs/history/stale-worktree-index-guard/"
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "reference-000165",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
+      "line": 2352,
+      "text": "        // A real target OUTSIDE docs/history/ that the traversal payload"
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "reference-000166",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
+      "line": 840,
+      "text": "/// this session, e.g. `docs/history/<feature>/`, shares this prefix)."
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "reference-000167",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
+      "line": 44,
+      "text": "/// D7 of `docs/history/herdr-web-dashboard/CONTEXT.md`: bind mặc định"
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "reference-000175",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
+      "line": 2271,
+      "text": "    // filesystem reads under a real temp `docs/history/<feature>/` tree"
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "reference-000176",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
+      "line": 826,
+      "text": "/// own \"what the agent did\" block must read from (D3 of docs/history/"
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "reference-000179",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
+      "line": 1261,
+      "text": "    // gateway's own origin (D2 of docs/history/herdr-web-dashboard-plan-"
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "reference-000180",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
+      "line": 689,
+      "text": "/// per D1 of docs/history/herdr-web-dashboard-plan-realignment/CONTEXT.md"
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "reference-000188",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
+      "line": 1,
+      "text": "//! tsk-7l9-2: fgOS gateway — the REST surface `docs/history/fgos-interface-daemon/`"
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "id": "reference-000197",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "b60e289295c3daad726e988d63674e7f344d554577864b34e470d89ccad90df3",
+      "line": 2,
+      "text": "//! (`search` + `execute`, D9 in `docs/history/fgos-interface-daemon/"
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "id": "reference-000198",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "b60e289295c3daad726e988d63674e7f344d554577864b34e470d89ccad90df3",
+      "line": 4,
+      "text": "//! `build_router` already serves (D1 in `docs/history/fgos-gateway-mcp-"
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "id": "reference-000199",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "b60e289295c3daad726e988d63674e7f344d554577864b34e470d89ccad90df3",
+      "line": 213,
+      "text": "    // under a second. NOT a D9 sandbox-privilege reopen (`docs/history/"
+    },
+    {
+      "file": "core/skills/_shared/capability-catalog.md",
+      "id": "reference-000279",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "3ccd086bc1c45fa7ce778d0963f879db18d8ab94c7468e5791baff8fbb3b49e0",
+      "line": 5,
+      "text": "together form one shared awareness cluster (`docs/history/agent-coordination-foundation/plan.md`):"
+    },
+    {
+      "file": "core/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-000280",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "49e1fc021d5aa79b882ec8beb1669bf0a6b4a1ff1b15ee592a566483d10fb2c4",
+      "line": 12,
+      "text": "`docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md` D2)."
+    },
+    {
+      "file": "core/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-000281",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "49e1fc021d5aa79b882ec8beb1669bf0a6b4a1ff1b15ee592a566483d10fb2c4",
+      "line": 151,
+      "text": "`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: an executor"
+    },
+    {
+      "file": "core/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-000282",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "49e1fc021d5aa79b882ec8beb1669bf0a6b4a1ff1b15ee592a566483d10fb2c4",
+      "line": 224,
+      "text": "`docs/history/two-layer-dispatch/DISCUSSION.md` D12: this is an optional,"
+    },
+    {
+      "file": "core/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-000283",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "49e1fc021d5aa79b882ec8beb1669bf0a6b4a1ff1b15ee592a566483d10fb2c4",
+      "line": 33,
+      "text": "(`docs/history/agent-coordination-foundation/plan.md`):"
+    },
+    {
+      "file": "core/skills/_shared/planning-capability-awareness.md",
+      "id": "reference-000284",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "4b4862f70896950a94951ebe0c1bfcdda842bc4d13536f870de58b64eb3deb94",
+      "line": 7,
+      "text": "(`docs/history/agent-coordination-foundation/plan.md`), not hidden inside"
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-planning/SKILL.md",
+      "id": "reference-002278",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "fd2ea486b4b913e7e3f15f6f161f159cd350bfe8b26376042819d7b31c675d4c",
+      "line": 15,
+      "text": "Turns the decisions locked in `docs/history/<feature>/CONTEXT.md` into"
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-planning/SKILL.md",
+      "id": "reference-002279",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "fd2ea486b4b913e7e3f15f6f161f159cd350bfe8b26376042819d7b31c675d4c",
+      "line": 16,
+      "text": "`docs/history/<feature>/plan.md` — the mode, the approach, and the shape a"
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "id": "reference-002280",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+      "line": 64,
+      "text": "  list of files expected to touch (at minimum `docs/history/<feature>/plan.md`"
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "id": "reference-002281",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+      "line": 68,
+      "text": "  fgos edit \"<item-id>\" --footprint \"docs/history/<feature>/plan.md,<file1>,<file2>\""
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-validating/SKILL.md",
+      "id": "reference-002282",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "fa831842240da6d8b77ad4193a09c1ccf8ea7972608ec31fc3966c2511b06d0c",
+      "line": 15,
+      "text": "Proves `docs/history/<feature>/plan.md` against repo reality before an item"
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "id": "reference-002283",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "a6309b897ca51eed64c361807c084c32e03a33e8da26d89b5932513fe985dfc7",
+      "line": 14,
+      "text": "fgos gate-check \"<item-id>\" --gate validateApprove --plan \"docs/history/<feature>/plan.md\" --children '<the child-spec JSON array from plan.md, or []>' --cost \"<REVERSIBLE|EXPENSIVE>\""
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "id": "reference-002284",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "a6309b897ca51eed64c361807c084c32e03a33e8da26d89b5932513fe985dfc7",
+      "line": 65,
+      "text": "fgos decision --id \"<item-id>\" --text \"auto-approved validateApprove gate for <item-id> at level <level>\" --rationale \"gate-bypass level <level> permits auto-approval per the gate-bypass feature's own locked decisions (see docs/history/gate-bypass/CONTEXT.md)\" --relation \"touches:<the gate-bypass feature's own decision item, from docs/history/gate-bypass/CONTEXT.md>\" --kind engine"
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "id": "reference-002285",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "a6309b897ca51eed64c361807c084c32e03a33e8da26d89b5932513fe985dfc7",
+      "line": 65,
+      "text": "fgos decision --id \"<item-id>\" --text \"auto-approved validateApprove gate for <item-id> at level <level>\" --rationale \"gate-bypass level <level> permits auto-approval per the gate-bypass feature's own locked decisions (see docs/history/gate-bypass/CONTEXT.md)\" --relation \"touches:<the gate-bypass feature's own decision item, from docs/history/gate-bypass/CONTEXT.md>\" --kind engine"
+    },
+    {
+      "file": "domains/coding/task-specs/shape-plan.md",
+      "id": "reference-002286",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "591e766e58c8d28bc703bf28cdd2930dc031d9fff2d57cc4e231e31f4b09f7e5",
+      "line": 12,
+      "text": "- `docs/history/<feature>/plan.md`: the literal token `Mode: <lane>` —"
+    },
+    {
+      "file": "plugins/fgOS/skills/approve/SKILL.md",
+      "id": "reference-002336",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "223db0a2171ec07fc5790edc7048685c6f98c1a72b65491c504cc915309791d2",
+      "line": 189,
+      "text": "   git show \"fgw/<id>:docs/history/<id>/iron-law-evidence.md\""
+    },
+    {
+      "file": "plugins/fgOS/skills/merge-loop/SKILL.md",
+      "id": "reference-002409",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "35d99ac7831e3eea531afcdd7669c7eb106082a43fa320c77407552967f03e92",
+      "line": 98,
+      "text": "git show \"fgw/<id>:docs/history/<id>/iron-law-evidence.md\" 2>/dev/null"
+    },
+    {
+      "file": "plugins/fgOS/skills/terminal-close/close.sh",
+      "id": "reference-002422",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "0ddfcc36dfad61392248ce67bb903f26ff2ae34f9a8a169cc343ef87be067e50",
+      "line": 4,
+      "text": "# (docs/history/fgos-terminal-close-autoclose/CONTEXT.md D2, mirrors"
+    },
+    {
+      "file": "plugins/fgOS/skills/terminal/rename.sh",
+      "id": "reference-002426",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "f5dc67dab59851a891667bb474670d48bc83b2f6292adae6051be78dd976dd15",
+      "line": 4,
+      "text": "# docs/history/fgos-terminal-pane-rename/CONTEXT.md): never touches .fgos/"
+    },
+    {
+      "file": "plugins/fgOS/skills/terminal/rename.sh",
+      "id": "reference-002427",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "f5dc67dab59851a891667bb474670d48bc83b2f6292adae6051be78dd976dd15",
+      "line": 89,
+      "text": "# (docs/history/fgos-terminal-pane-rename/CONTEXT.md, outstanding questions)"
+    },
+    {
+      "file": "plugins/fgOS/skills/terminal/rename.sh",
+      "id": "reference-002428",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "f5dc67dab59851a891667bb474670d48bc83b2f6292adae6051be78dd976dd15",
+      "line": 22,
+      "text": "# Capability gate (D5, docs/history/orchestrator-worker-slots/DISCUSSION.md"
+    },
+    {
+      "file": "scripts/backfill-status-category.mjs",
+      "id": "reference-002430",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "bff22a3805f8a38f1c7d93b7cee3b53ee5b6dde0d978b4fdbfb760c1cc3622d6",
+      "line": 11,
+      "text": "// (`docs/history/phase-2-status-category-schema/DISCUSSION.md`"
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "reference-002437",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "5e7fa8b9548c34479e270ec666bbf8132f7fc7c38177dbac71f8d74848f9baad",
+      "line": 4,
+      "text": "// docs/history/backlog-execution-reconciliation/RECONCILIATION.md."
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "reference-002440",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "5e7fa8b9548c34479e270ec666bbf8132f7fc7c38177dbac71f8d74848f9baad",
+      "line": 18,
+      "text": "const DOC = path.join(repoRoot, 'docs/history/backlog-execution-reconciliation/RECONCILIATION.md');"
+    },
+    {
+      "file": "scripts/check-decision-codes.baseline.json",
+      "id": "reference-002473",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "b273e8becf2ba18475bf03a85a508d5022ff254e1d7a0de272387e8c01c5d3ad",
+      "line": 42,
+      "text": "    \"test('return: the item\\\\'s own docs/history/<id>/iron-law-evidence.md is exempt from footprintDiffHits (tsk-4hl self-exempt, avoids self-flagging every Iron-Law-gated item)', () => {\","
+    },
+    {
+      "file": "scripts/check-decision-codes.mjs",
+      "id": "reference-002474",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "14737563df573c4d1181129cadb8b432f0492f8025c57ce1a485effc0fb39bb5",
+      "line": 8,
+      "text": "// still owns (docs/history/decision-code-check-enforcement/CONTEXT.md"
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "reference-002491",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "4a396fef453dbaaa1415dca5875d236e784ae0766e3aaa17bba0ee726ba2af6e",
+      "line": 48,
+      "text": "const NON_AUTHORITY_CONSUMER_PREFIXES = ['docs/history/', 'archive/', 'plans/', '.fgos/'];"
+    },
+    {
+      "file": "scripts/check-locked-decisions-heading-drift.mjs",
+      "id": "reference-003554",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "fa87a9f833b12c43cf60322aac482a8bd5e5e7cb889868ed4592816efc80b7f8",
+      "line": 2,
+      "text": "// check-locked-decisions-heading-drift.mjs — detects a docs/history/<feature>/"
+    },
+    {
+      "file": "scripts/fgos-shell-integration.sh",
+      "id": "reference-003557",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "70336ebd67d7cc9439a2bdd9220d54b298361bc6e54b159599f25d3579388a9d",
+      "line": 25,
+      "text": "# existed (docs/history/global-project-config-awareness/CONTEXT.md D2)."
+    },
+    {
+      "file": "scripts/fgos-shell-integration.sh",
+      "id": "reference-003558",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "70336ebd67d7cc9439a2bdd9220d54b298361bc6e54b159599f25d3579388a9d",
+      "line": 13,
+      "text": "# 4-tier resolution (tsk-2qc-1 D2/D3/D4, docs/history/install-setup-"
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "reference-003583",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+      "line": 262,
+      "text": "    norm.startsWith('docs/history/') ||"
+    },
+    {
+      "file": "scripts/herdr-cockpit.sh",
+      "id": "reference-003606",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "486b87ae6e1ffd877971dd21b0fec7d375c8b83d0e83f1972cfa4b700720eddd",
+      "line": 24,
+      "text": "# checkout, on purpose (unlike docs/history/herdr-interim-cockpit's"
+    },
+    {
+      "file": "scripts/knowledge-bootstrap.mjs",
+      "id": "reference-003608",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "6ffd1b84d5ebf773b52806cd9d47007e60f4999a0f36b43bca4cc50d0f649543",
+      "line": 250,
+      "text": "  const dataPath = path.join(repoRoot, 'docs/history/compound-learn-artifact-registry/reports/inventory-data.json');"
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "reference-003609",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "a6560aa2eb34a1245ebd83ee781f033253ff7652df5896dcc205e327d18ef5f4",
+      "line": 187,
+      "text": "  const outputDir = path.join(repoRoot, 'docs/history/compound-learn-artifact-registry/reports');"
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "reference-003610",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "f57899d74a05230a03daa78f531605fd01f64bc9d2271719d97fa7954cb21936",
+      "line": 126,
+      "text": "  const inventoryPath = path.join(repoRoot, 'docs/history/compound-learn-artifact-registry/reports/inventory-data.json');"
+    },
+    {
+      "file": "scripts/measure-verify-cost.mjs",
+      "id": "reference-003617",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "314c461c359f54f978a64494ea87884db14e563be96920387601e47c74bc37c4",
+      "line": 270,
+      "text": "  lines.push(`Nguồn: \\`.fgos/events.jsonl\\` (${totalEvents} dòng tại thời điểm chạy). Số liệu thật, không suy đoán — xem \\`docs/history/tsk-vms-verify-cost-audit/\\` cho phương pháp đầy đủ.`);"
+    },
+    {
+      "file": "scripts/measure-verify-cost.mjs",
+      "id": "reference-003618",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "314c461c359f54f978a64494ea87884db14e563be96920387601e47c74bc37c4",
+      "line": 3,
+      "text": "// không phải suy đoán (docs/history/tsk-vms-verify-cost-audit/CONTEXT.md)."
+    },
+    {
+      "file": "scripts/migrate-status-proposed-to-awaiting-approval.mjs",
+      "id": "reference-003619",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "ac3fd799390ee06d504b49f497f41f117526b961d4ebaf3883fca91b63cf2546",
+      "line": 20,
+      "text": "// reading the dry-run report first (docs/history/status-proposed-rename/"
+    },
+    {
+      "file": "scripts/probe-storytelling-material.mjs",
+      "id": "reference-003621",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "360c13abeff9239f891f38cb829d901f0e331f98c42ee9cd2e81d3e49437d39a",
+      "line": 5,
+      "text": "// (docs/history/storytelling-material-probe/CONTEXT.md D1-D9). Là phép"
+    },
+    {
+      "file": "scripts/project-agents.mjs",
+      "id": "reference-003622",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "8af93fe4d0c75957a82da98b5c4dfa5aabba78fd4e60338b8cac861996b0e468",
+      "line": 15,
+      "text": "// Tool-scope field authority (D1, docs/history/agent-executor-agent-definitions/CONTEXT.md):"
+    },
+    {
+      "file": "scripts/project-agents.mjs",
+      "id": "reference-003623",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "8af93fe4d0c75957a82da98b5c4dfa5aabba78fd4e60338b8cac861996b0e468",
+      "line": 6,
+      "text": "// Canonical root location (D5, D24, docs/history/agent-executor-agent-definitions/CONTEXT.md):"
+    },
+    {
+      "file": "scripts/verify-fanout-overlap.mjs",
+      "id": "reference-003635",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "7d26533f3dac3d728d5f10ad20404565d9ca85c8371b71e5dfbbaa672e0b212b",
+      "line": 2,
+      "text": "// verify-fanout-overlap.mjs — D10 (docs/history/execution-fanout/CONTEXT.md):"
+    },
+    {
+      "file": "src/report/capability-plan-lint.mjs",
+      "id": "reference-003691",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "7dab2f9aaa2d97fcb33ed9d0ddc378aec9ee314f2f4e960808514ce96797c212",
+      "line": 7,
+      "text": "// capability-plan-lint.mjs — static/read-only harness (docs/history/"
+    },
+    {
+      "file": "src/report/context-render.mjs",
+      "id": "reference-003692",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "21f0d004ecc62a6be3d059f2c4911dd9dd9fcd3c646d348625e8277efb750fdb",
+      "line": 4,
+      "text": "// docs/history/canonical-decision-projection/DISCUSSION.md round 6: \"it"
+    },
+    {
+      "file": "src/setup/agy-permissions.mjs",
+      "id": "reference-003793",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "0dd7e2fc1297acf09f0e04236ab69f2c88dcfdc04cb9a0d7f14468973195d97f",
+      "line": 3,
+      "text": "// docs/history/agy-permission-capability-allowlist/). Mirrors git-hooks.mjs's"
+    },
+    {
+      "file": "src/setup/bin-discovery.mjs",
+      "id": "reference-003794",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "fbbe06965041a25c07ca954efb9d3f82b327bed894bbc19221315b703b10f8c5",
+      "line": 2,
+      "text": "// D2/D4 of docs/history/install-setup-external-project-reliability/"
+    },
+    {
+      "file": "src/setup/checks.mjs",
+      "id": "reference-003795",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "b5280315dd8712ff69e6e2f85a2db87d9e0ddd21c828bfb648d63bfb4e1bfaa4",
+      "line": 2,
+      "text": "// docs/history/setup-doctor-config-registry/): the doctor check registry"
+    },
+    {
+      "file": "src/setup/git-hooks.mjs",
+      "id": "reference-003797",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "bc64f3591e3fa896770a66491ef5bb1711c81aec96ba821d038cdd051f3addb6",
+      "line": 29,
+      "text": "// worktree's own branch currently has checked out (tsk-2u5, docs/history/"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003801",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 2199,
+      "text": "// main-checkout-guard-warnings (tsk-1vc-3 D6, docs/history/tsk-1vc-silent-eventlog-loss-detection/CONTEXT.md):"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003822",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 2879,
+      "text": "// docs/history/orchestrator-worker-slots/plan.md §Shape T1: the worker-slot"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003824",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 18,
+      "text": "// (docs/history/doctor-fix-gate-bypass/CONTEXT.md D3, tsk-2qz): a module may"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003825",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 4,
+      "text": "// D1/D2, docs/history/setup-doctor-config-registry/): the one place a module"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003827",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 484,
+      "text": "// `docs/history/setup-doctor-config-registry/plan.md`'s \"Real blast radius\""
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003831",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 2508,
+      "text": "// docs/history/pi-executor-runtime-capacity/RESEARCH.md Round 4."
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003832",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 2959,
+      "text": "// docs/history/tsk-516-approve-reverify-scope/CONTEXT.md D6: the invariant"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003835",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 2225,
+      "text": "// docs/history/global-project-config-awareness/CONTEXT.md D1: reports which"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003836",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 2563,
+      "text": "// (D1, docs/history/agent-coordination-foundation/plan.md's P2-runtime) --"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003837",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3528,
+      "text": "// tsk-2m5 (docs/history/stage-status-driving-coordination/): the"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003838",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 1748,
+      "text": "// tsk-5m7 (docs/history/tsk-3bn-merge-conductor-harness-v2/): a real"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003841",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3060,
+      "text": "// ironLaw.level (docs/history/iron-law-gate-human-ux/CONTEXT.md D3/D7) — its"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003842",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3193,
+      "text": "// tsk-4xg (docs/history/tsk-4xg-plugin-marketplace-doctor-check/): a new"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003843",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 2453,
+      "text": "  // P2-runtime (docs/history/agent-coordination-foundation/plan.md):"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003844",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 2381,
+      "text": "// tsk-2uf-3 (docs/history/dispatch-activation-and-handoff-redesign/"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003847",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3581,
+      "text": "// tsk-48w (D14 of docs/history/herdr-web-dashboard-plan-realignment/"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003848",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 215,
+      "text": " * Register a fix (D3, docs/history/doctor-fix-gate-bypass/CONTEXT.md):"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003849",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 2034,
+      "text": "// events-jsonl-not-truncated (tsk-cgg, docs/history/events-jsonl-git-"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003851",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3431,
+      "text": "// tsk-3ip (docs/history/automated-changelog-compound-learn/DISCUSSION.md"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003852",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3619,
+      "text": "// tsk-1m0 (docs/history/doctor-check-enduser-docs-index-stale/CONTEXT.md):"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003856",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 2810,
+      "text": "// gate-bypass.json's real registry entry (docs/history/doctor-fix-gate-bypass/"
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "reference-003859",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 4,
+      "text": "// D7 of docs/history/core-foundation-domain-boundary/DISCUSSION.md)."
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "reference-003860",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 1114,
+      "text": " * (D7 of docs/history/core-foundation-domain-boundary/DISCUSSION.md)."
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "reference-003861",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+      "line": 3,
+      "text": "// docs/history/install-setup-external-project-reliability/CONTEXT.md,"
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "author-s4-fix2-eb6a372b3db42920",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+      "line": 1416,
+      "text": "      'fgos run \"Port the parser to the new AST\" --writes src/parser --worktree ../wt-parser --pattern code-change --input docs/ast.md --verify \"npm test\"',"
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "author-s4-fix2-4c3ad4d2292e4bcc",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+      "line": 1725,
+      "text": "    description: '(Re)generate the end-user doc read-by-tag index, keyed by Diataxis quadrant (tutorial/how-to/reference/explanation). Enumerates docs/<quadrant>/, writes docs/enduser-docs-index.json with each entry\\'s purpose/audience (fixed quadrant mapping), docPath, title, and sourceCaptureId (the compound-learn capture that produced the doc, or null when none is recorded). Never touches .fgos/state.json, but does write a real file outside .fgos/ (externalEffect) -- skipped when the computed content is unchanged.',"
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "author-s4-fix2-4c3ad4d2292e4bcc",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+      "line": 1725,
+      "text": "    description: '(Re)generate the end-user doc read-by-tag index, keyed by Diataxis quadrant (tutorial/how-to/reference/explanation). Enumerates docs/<quadrant>/, writes docs/enduser-docs-index.json with each entry\\'s purpose/audience (fixed quadrant mapping), docPath, title, and sourceCaptureId (the compound-learn capture that produced the doc, or null when none is recorded). Never touches .fgos/state.json, but does write a real file outside .fgos/ (externalEffect) -- skipped when the computed content is unchanged.',"
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "author-s4-fix2-284fae1afd0a9579",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+      "line": 1725,
+      "text": "    description: '(Re)generate the end-user doc read-by-tag index, keyed by Diataxis quadrant (tutorial/how-to/reference/explanation). Enumerates docs/<quadrant>/, writes docs/enduser-docs-index.json with each entry\\'s purpose/audience (fixed quadrant mapping), docPath, title, and sourceCaptureId (the compound-learn capture that produced the doc, or null when none is recorded). Never touches .fgos/state.json, but does write a real file outside .fgos/ (externalEffect) -- skipped when the computed content is unchanged.',"
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "author-s4-fix2-eeb16b2ec8753726",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+      "line": 1756,
+      "text": "    description: 'Read-only: skeleton-match a topic against every docs/<quadrant>/*.md doc\\'s own authoritative_for frontmatter (fgos-coding-compounding\\'s find-before-create doctrine, tsk-1lv-6) -- returns the matching doc path, or null when none claims the topic. --check-duplicates runs the harness-backstop scan instead: reports every group of 2+ docs claiming the same subject.',"
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "author-s4-fix2-eeb16b2ec8753726",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+      "line": 1756,
+      "text": "    description: 'Read-only: skeleton-match a topic against every docs/<quadrant>/*.md doc\\'s own authoritative_for frontmatter (fgos-coding-compounding\\'s find-before-create doctrine, tsk-1lv-6) -- returns the matching doc path, or null when none claims the topic. --check-duplicates runs the harness-backstop scan instead: reports every group of 2+ docs claiming the same subject.',"
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "author-s4-fix2-28be85887d8c6306",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+      "line": 1760,
+      "text": "        quadrant: { type: 'string', description: 'The docs/<quadrant> directory to scan (e.g. docs/how-to).' },"
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "author-s4-fix2-28be85887d8c6306",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+      "line": 1760,
+      "text": "        quadrant: { type: 'string', description: 'The docs/<quadrant> directory to scan (e.g. docs/how-to).' },"
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "author-s4-fix2-15552953f3fae4ce",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+      "line": 1828,
+      "text": "      'fgos doc reserve worktree-reclaim guide docs/worktree-reclaim/guide.md',"
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "author-s4-fix2-8e692e7b0bd77c76",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+      "line": 1849,
+      "text": "    examples: ['fgos knowledge status', 'fgos knowledge attest --doc-path docs/worktree/guide.md --capture-id tsk-123'],"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "author-s4-fix2-637e1faa7e3c92ca",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3467,
+      "text": "    return { passed: true, message: 'CHANGELOG.md not found -- nothing to check (project has not adopted a changelog yet)' };"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "author-s4-fix2-619b6195bf114bda",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3481,
+      "text": "  description: 'CHANGELOG.md ## [Unreleased] section has at least one pending entry (observe/remind only, never blocks merge -- tsk-3ip)',"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "author-s4-fix2-104d57a71afab5e4",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3499,
+      "text": "    return { passed: true, message: 'README.md not found -- nothing to check' };"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "author-s4-fix2-6cbfeda4008ea5df",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3504,
+      "text": "    return { passed: true, message: 'README.md has no pinned-tag install command -- nothing to check' };"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "author-s4-fix2-20e88056a2daa3aa",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3514,
+      "text": "    return { passed: true, message: `README.md's pinned install tag \"${tag}\" exists` };"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "author-s4-fix2-b75674e7a307ed78",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3518,
+      "text": "    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "author-s4-fix2-255319fd051b6a94",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3524,
+      "text": "  description: 'README.md\\'s recommended install command pins a git tag that actually exists (tsk-2t8)',"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "author-s4-fix2-2a45460821f48dec",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3678,
+      "text": "  if (!fs.existsSync(manifestPathFor(root))) return { changed: false, message: 'skipped -- no end-user doc index in this project (run fgos docs-index to adopt)' };"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "author-s4-fix2-a8e9503a9eafcad1",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3688,
+      "text": "  description: 'docs/enduser-docs-index.json covers every on-disk end-user doc (tsk-1m0)',"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "author-s4-fix2-70cc3f725650c613",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3766,
+      "text": "  if (!fs.existsSync(indexPathFor(root)) && !isFgosSourceCheckout(root)) return { changed: false, message: 'skipped -- no decision index in this project (run fgos decision-index to adopt)' };"
+    },
+    {
+      "file": "scripts/knowledge-bootstrap.mjs",
+      "id": "author-s4-fix2-a440ba62f0b352d2",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "6ffd1b84d5ebf773b52806cd9d47007e60f4999a0f36b43bca4cc50d0f649543",
+      "line": 23,
+      "text": "  const rawData = fs.readFileSync(inventoryDataPath, 'utf8');"
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-08912b8301b10321",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "2e0cd5cd4e216a77ad108e187e109135571c0ca57e53bda77efcc2cef4e6331d",
+      "line": 29,
+      "text": "| p-8d04c7f1 | Watch js-yaml security advisories. js-yaml is vendored as one file (`src/util/third-party/js-yaml.mjs`, upgrade procedure in `docs/specs/distribution.md` decision history), so `npm audit` and Dependabot no longer see it. Open it on every advisory for js-yaml, and review at least when a release is staged. | A named owner checks the js-yaml advisory feed on a stated cadence or hooks it into release staging, and an advisory leads to the documented upgrade procedure | proposed | vendor-js-yaml-single-yaml-door |"
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-a20431be6e7a6997",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "2e0cd5cd4e216a77ad108e187e109135571c0ca57e53bda77efcc2cef4e6331d",
+      "line": 44,
+      "text": "| STR70a | **Checkpoint distillate + record chốt 3-phần lên gate (fgOS core, KHÔNG bị chặn)** — nửa không-vướng của STR70 (tách 2026-07-21, per `docs/history/gate-dialogue-continuity/CONTEXT.md`'s locked decisions). Verb non-transitioning ghi distillate {câu hỏi diễn giải lại, options + trục so sánh, leaning + lý do quote nguyên văn người, đã-loại, còn-treo} lên `gates[id]`, LWW, chiếu qua `awaitingContext`; verb DÙNG CHUNG người/agent — nhưng ĐIỀU KIỆN TIÊN QUYẾT là fold `actor` vào gate record (hiện `gates[id]` chỉ giữ `ask`/`answer`/`parentSnapshotAtAsk`, KHÔNG actor — `repo/src/state/replay.mjs:126-134`) để phân biệt note-người vs tóm-tắt-agent. Record bền lúc chốt nở thành CẤU TRÚC 3 phần: vì-sao / mốc-trao-đổi / đánh-đổi (không còn `reason` một dòng). Tiền lệ verb non-transitioning đã có: `decision`/`outcome` (`repo/docs/specs/work-state.md:647-675`). Đều là fact bền hợp core, KHÔNG lật STR46's own foundational decision. | `awaitingContext` mang distillate + record 3-phần; `actor` chiếu vào gate phân biệt được nguồn; distillate human-overridable, chỉ `answer` authoritative | proposed | — |"
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-f02a917bdfe98c52",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "2e0cd5cd4e216a77ad108e187e109135571c0ca57e53bda77efcc2cef4e6331d",
+      "line": 107,
+      "text": "- [STR47] Audit thống nhất **loại-hình công việc** + **hệ đặt tên/đánh mã** đang chạy song song trong hệ thống — chưa có review nào gộp chung: (a) `kind` work-item (`classify.mjs`: bug/feature/chore/docs, mặc định `task`) — đủ chưa, thiếu loại nào (vd spike, review); (b) nhiều hệ mã số tách biệt cùng sống mà chưa giải thích ranh giới ở một chỗ: P# tuần tự (docs/backlog.md, PBI sản phẩm), D-hex (decision record, per-feature CONTEXT.md + `.bee/decisions.jsonl`), R# (rule trong docs/specs/runner.md), C1-C9 (contract trong architecture-map.md), cell-id `<feature>-N` (bee); (c) tên feature kebab-case tự đặt tay, không qua cửa sinh id nào — dễ trùng/lệch nghĩa khi hai việc đặt tên gần nhau — done"
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-033b8befd0b861df",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "2e0cd5cd4e216a77ad108e187e109135571c0ca57e53bda77efcc2cef4e6331d",
+      "line": 116,
+      "text": "- [STR57] **Story (đổi tên khỏi \"PBI\") `P<n>` → `STR<n>`** (chốt tại `docs/id-systems-audit.md`, làm SAU CÙNG trong nhóm docs-rename — rủi ro/chi phí cao nhất, đụng ID đang SỐNG): đổi ID mọi dòng `docs/backlog.md` hiện có (P1..P52) sang `STR<n>` giữ nguyên số, cập nhật quy ước sinh id tại `.claude/skills/bee-scribing/references/scribing-reference.md:297,303`, quét mọi trích dẫn \"P<n>\" trong `docs/specs/*.md`, `docs/architecture-map.md`, `docs/history/*/CONTEXT.md` đổi theo. Giải quyết dứt điểm va chạm ký tự với severity `P1/P2/P3` (không cần đổi severity, xem `docs/id-systems-audit.md` #11) — done"
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-84005ca08befe2c0",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "2e0cd5cd4e216a77ad108e187e109135571c0ca57e53bda77efcc2cef4e6331d",
+      "line": 123,
+      "text": "- [STR64] **[fgOS work — per decision `df90b761`, KHÔNG phải bee-tooling; mọi tham chiếu `bee-*`/`scribing`/`compounding`/`docs-manager` dưới đây là NGUỒN DISTILL, không phải đích sửa — xem compound-learn-enduser-docs's own decision on this]** **Reconcile map:** \"scribing+compounding\" → khâu compound-learn của fgOS; \"skill export/docs-manager/documentation-management.md\" → skill export/tích luỹ đọc-theo-tag của fgOS (CHƯA xây). **Đã giao (feature compound-learn-enduser-docs, ~slice 1-2, reviewed):** bước (1) taxonomy Diataxis + bước (2) tag `docType` capture-time + 1 doc how-to thật. **CÒN LẠI (lý do reopen từ `done`, per STR73 premature-done + decision `f5f7f6d3`):** bước (3) skill export/tích luỹ đọc-theo-tag (soát `docs-manager`/`documentation-management.md` trước khi viết mới, YAGNI) + bước (4) backfill; mới 1/4 quadrant (how-to). **[bước-3 shape locked 2026-07-21, decision `1d336d8a` / CONTEXT's locked decisions]:** bước-3 giao **INDEX đọc-theo-tag** (machine-readable, key theo quadrant + purpose/audience + source-capture linkage), KHÔNG gộp/viết lại doc; docs-manager/ck:docs/documentation-management.md đã soát — không tái dùng được, build skill fgOS mới. CoS bậc-3 diễn giải lại + **user-accepted**: index đóng bước-3, phần gộp tài liệu (\"gộp sống\") là slice sau. **Row KHÔNG flip `done` chỉ vì xong bước-3** (per STR73). — nguyên văn ticket gốc (design reference): **Compound-learn embodiment (p50-workflow-induct slice 2) + tài liệu hướng end-user** — p50-workflow-induct's own decision đã defer \"compound-learn\" sang slice 2 từ đầu. Đào sâu `bee-compounding`/`bee-scribing`/`feedback.mjs` (2026-07-20) cho thấy bee có input cơ học ổn (CONTEXT/plan/report/cell-trace) và output \"spec hiện trạng\" ổn (`docs/specs/`, việc của scribing), nhưng **thiếu hẳn trục tài liệu HƯỚNG END-USER** (installation guide/runbook/usage/domain-knowledge/workflow-guide/Q&A) — bee chỉ phân loại theo trục kỹ sư (`pattern/decision/failure`). Đề xuất, người dùng đã đồng ý toàn bộ 2026-07-20, xếp theo impact: (1) chốt taxonomy trước — map vào khung **Diataxis** (Tutorial/How-to/Reference/Explanation) thay vì bịa danh sách riêng; (2) gắn tag phân loại NGAY tại khâu `scribing`+`compounding` lúc ghi nhận (field nhỏ thêm vào, không xây cơ chế mới) — tránh dồn nợ raw-chưa-phân-loại; (3) SAU ĐÓ mới xây skill export/tích luỹ đọc theo tag — soát lại `docs-manager` agent + skill `docs`/`documentation-management.md` đã có trước khi viết mới (YAGNI); (4) backfill nội dung cũ (critical-patterns.md, docs/decisions/) ưu tiên thấp nhất — done"
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-26fc8d2f9269bc9a",
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "sourceSha256": "2e0cd5cd4e216a77ad108e187e109135571c0ca57e53bda77efcc2cef4e6331d",
+      "line": 130,
+      "text": "- [STR72] **Decision-supersession phải đồng bộ NGƯỢC về artifact nguồn (ticket/backlog/spec/CONTEXT), không chỉ ghi decision-log — nếu không, framing đã-bị-supersede tái xuất và tái sinh kết luận sai** (đào tận gốc 2026-07-21 từ hiện tượng \"mọi phiên đọc STR64 là bee-tooling dù đã chốt fgOS\"). **Root cause:** khi một quyết định đổi chiều (supersede), thay đổi rơi vào decision-log NHƯNG không lan về artifact nguồn đã gieo quyết định gốc — dòng STR64 trong `backlog.md` vẫn viết như bee-tooling, nên mọi phiên vào bằng entry-point tự nhiên (ticket ở mặt chữ) tái-suy kết luận cũ; bản sửa (`df90b761`) nằm ở artifact RIÊNG (log) họ không đối chiếu, và ban đầu còn chỉ \"narrated in prose\", chưa gọi CLI verb → chuỗi decision máy-đọc còn không thấy supersession một thời gian (phải tới `27052dd7` mới formal). Source cũ là attractor mạnh hơn một correction chôn trong log. **Áp cho fgOS y hệt:** một work-item đổi framing mà ticket/`docs/specs` không cập nhật → phiên fgOS tái-suy kết luận cũ; đây là năng lực compound-engineering fgOS phải có, không chỉ vá bee. **Đề xuất (cần bee-exploring shape chi tiết):** (1) supersede kèm bước bắt buộc \"reconcile source artifacts\" — cập nhật/đánh dấu ticket/backlog/spec/CONTEXT mà decision-bị-supersede đã trích; (2) hoặc backlog-row/spec mang con trỏ tới decision cai-quản, để người đọc thấy inline \"framing dòng này đã bị supersede bởi X\"; (3) consistency-check (grooming) phát hiện row/spec mâu thuẫn với một active decision đã supersede framing gốc; (4) supersede LUÔN qua CLI verb máy-đọc, không chỉ prose. — done"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003845",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 2045,
+      "text": "// manual command (docs/how-to/resolve-an-events-jsonl-truncation.md), not"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003850",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "line": 3063,
+      "text": "// documented as never touching Iron Law (docs/explanation/gate-bypass-"
+    },
+    {
+      "file": "src/setup/git-hooks.mjs",
+      "id": "reference-003796",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "bc64f3591e3fa896770a66491ef5bb1711c81aec96ba821d038cdd051f3addb6",
+      "line": 85,
+      "text": " * retained, per docs/specs/distribution.md) -- never throws."
+    },
+    {
+      "file": ".githooks/pre-commit",
+      "id": "dynamic-000545",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "ebcefc2815d02910532f1642afff4b7ee1b22ce20d9c5859e8ec44e1019f2943",
+      "line": 327,
+      "text": "      headContent = execFileSync('git', ['show', `HEAD:${p}`], { cwd: committingToplevel, encoding: 'utf8', maxBuffer });"
+    },
+    {
+      "file": ".githooks/pre-commit",
+      "id": "dynamic-000546",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "ebcefc2815d02910532f1642afff4b7ee1b22ce20d9c5859e8ec44e1019f2943",
+      "line": 328,
+      "text": "      stagedContent = execFileSync('git', ['show', `:${p}`], { cwd: committingToplevel, encoding: 'utf8', maxBuffer });"
+    },
+    {
+      "file": ".githooks/pre-commit",
+      "id": "dynamic-000541",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "ebcefc2815d02910532f1642afff4b7ee1b22ce20d9c5859e8ec44e1019f2943",
+      "line": 304,
+      "text": "    return { error: `commit refused: could not run \"git diff --cached\" to check staged modifications under \".fgos/\" (${err.message}) -- refusing to commit (fail-closed).` };"
+    },
+    {
+      "file": ".githooks/pre-commit",
+      "id": "dynamic-000565",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "ebcefc2815d02910532f1642afff4b7ee1b22ce20d9c5859e8ec44e1019f2943",
+      "line": 485,
+      "text": "    refuse(`commit refused: this commit stages a deletion under \".fgos/\" (${fgosDeletions.join(', ')}) -- .fgos/ is fgOS's own runner state and must never be committed as deleted. A linked worktree never keeps a working-tree copy of .fgos/ by design (ADR0020); if you ran \"git add -A\" here, unstage these paths first (e.g. \"git restore --staged .fgos\").`);"
+    },
+    {
+      "file": ".githooks/pre-commit",
+      "id": "dynamic-000551",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "ebcefc2815d02910532f1642afff4b7ee1b22ce20d9c5859e8ec44e1019f2943",
+      "line": 39,
+      "text": "const ROOT_FILE_ALLOWLIST = new Set(["
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "id": "dynamic-000766",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "b60e289295c3daad726e988d63674e7f344d554577864b34e470d89ccad90df3",
+      "line": 126,
+      "text": "async fn search_contract(root: &std::path::Path, query: Option<String>) -> Result<String, String> {"
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "id": "dynamic-000772",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "b60e289295c3daad726e988d63674e7f344d554577864b34e470d89ccad90df3",
+      "line": 42,
+      "text": "use std::path::PathBuf;"
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "id": "dynamic-000770",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "sourceSha256": "b60e289295c3daad726e988d63674e7f344d554577864b34e470d89ccad90df3",
+      "line": 394,
+      "text": "            Err(message.join(\"\\n\"))"
+    }
+  ]
+}

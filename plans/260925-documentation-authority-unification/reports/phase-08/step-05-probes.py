@@ -72,6 +72,16 @@ run('An admitted tuple cannot omit its own pathOperand','d-own-operand',lambda r
 def lost_successor(rs,rc,ix):
  e=next(e for r in rs for e in r['references'] if e['disposition']=='preserve');e['matchedExpression']='docs/decisions/0027-removed.md';e['successorNote']=None
 run('A preserved retired decision cannot lose its live successor','e-retired-successor',lost_successor)
+def templated_block(rs,rc,ix):
+ r=next(r for r in rs if r['file']=='src/cli/command-registry.mjs')
+ for i,id in enumerate(['reference-003641','reference-003643']):
+  e=find_ref(rs,id);e['blockedReason']=r['file']+": operand '"+e['matchedExpression']+"' at line "+str(20+i)+" requires the approved candidate input."
+run('R12 rejects same-file operand and line substitutions in template blockers','b-real-blocker',templated_block)
+def admit_plan(rs,rc,ix):
+ r=next(r for r in m.rows('step-05-records/generators-skills-and-support.jsonl') if r['file']=='scripts/check-doc-constitution.mjs')
+ next(e for e in r['dynamicTraces'] if e['id']=='dynamic-006605').update(admission='ADMIT',nonDocumentUse=None)
+ rs.append(r)
+run('R11 rejects a plans-only default even when called through a gate','r11-plans-boundary',admit_plan)
 base=m.check(BASE,RECEIPTS,INDEX)
 assert base['failureCount']==0,base['failures'][:3]
 covered={p['owningRule'] for p in probes};assert covered==set(m.RULES)

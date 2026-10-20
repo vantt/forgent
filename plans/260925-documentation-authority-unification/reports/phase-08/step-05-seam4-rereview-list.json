@@ -1123,7 +1123,7 @@
       "file": ".githooks/pre-commit",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "c8d372f9d854e0489c299b3536090103cfb803787e9a5ae3cddef13501f730b0",
+      "recordSha256": "c09b2fab016d5e566dfac33fce71a2ccdbc98a5739bbcc4ff4d99a1875387469",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "ebcefc2815d02910532f1642afff4b7ee1b22ce20d9c5859e8ec44e1019f2943"
     },
@@ -1131,7 +1131,7 @@
       "file": "bin/fgos.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "55d475e9abd037a1cf198757dab302a477b0db30d558e6b8099f2536798f10ec",
+      "recordSha256": "0dbd683e51640e9b8a808d27b2da3b4605c43bb1cb64bf07cb26b30ff6f6d3f5",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "64ace4da89dbc1222c6d3c0d634272c9b043d1c268a257ed2e2e09385a5eb198"
     },
@@ -1139,7 +1139,7 @@
       "file": "src/cli/command-registry.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "c5e926b4b6f8e455962d0666b610e0573845b546e0e17f4e0d66d8aaadd787f9",
+      "recordSha256": "cb67105c6ac7d8036952eef2d4db28ccbe13f31909868a15c43567cb42522c5b",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17"
     },
@@ -1147,7 +1147,7 @@
       "file": "src/intake/plan.mjs",
       "generated": false,
       "itemsChanged": false,
-      "recordSha256": "d1b2cda2d238dcdfdced7de83fd4335890281035e95c52eef9665eb2b0d5b94b",
+      "recordSha256": "ba30f74c898a4f614d4d601d7824c0d752e4bf9faa651efecf5c304a28212164",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "c3c72be35468420d9f42bcf23a0bdec9e48a11c1f4d8dd6bb4b9be09f4c60dc6"
     },
@@ -1155,7 +1155,7 @@
       "file": "src/intake/verify-pattern-check.mjs",
       "generated": false,
       "itemsChanged": false,
-      "recordSha256": "295a9c61eb81eba3220efe0d519cbda2892b8a0ba8b4c4799c3126b40ce85baa",
+      "recordSha256": "40fa1e25c7bef858a05c168a3bdcaa6ee137055e60d656f76776e73490f43ce5",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "1cfe3feb6375b999c4b851f6e9ef8fce7b1fb1209a81c29dd0a043939cb69e0c"
     },
@@ -1171,7 +1171,7 @@
       "file": "src/runner/merge.mjs",
       "generated": false,
       "itemsChanged": false,
-      "recordSha256": "0af3af04b125f5504d6384b3376b0fc236a60582cead0df835cb484cb5fc5392",
+      "recordSha256": "f853ff512c689547cf8fc009b37edcddb88d8fc0aa9e29bd519f30dc7114329c",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "8ccdb5441f10f806a1753d47394b4c74c655d02c5c7a03f7a1af56ce08024eb4"
     },
@@ -1179,7 +1179,7 @@
       "file": "src/runner/worktree.mjs",
       "generated": false,
       "itemsChanged": false,
-      "recordSha256": "3e99754120dfa959a9c6aef1ee29c5b932bd23b41a6f91f21e81896ec38aa50c",
+      "recordSha256": "718eb1fae957a37fac90cace75bd294294fd682c38ce2bca0f9b4dc7eb7fb8fa",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "c99b08a8ba3c0b597223b28d2aeaa4616d533f59da9fefed512815d81f58848d"
     },
@@ -1187,7 +1187,7 @@
       "file": "src/state/events-jsonl-truncation-guard.mjs",
       "generated": false,
       "itemsChanged": false,
-      "recordSha256": "469fe14f432c3cfe97010d329e944fb668c72f1563928a906c446acc2014ecb8",
+      "recordSha256": "60f620648eb3835095f4f742b880ab58d88b8a6ede46fdef110aa85a7dd0d4bc",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "b4dd68558622a872395138a790bc63926ebdf60323b880c6f69b23ca3d7ee0ab"
     },
@@ -1195,7 +1195,7 @@
       "file": "apps/fgos-gateway/src/gateway.rs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "ea812006a6442cf482129ea4675b3cbc085d9ca14bd855148a5556f341cc419d",
+      "recordSha256": "d6d3985896ade6a1bf371751e33843dc5e5b36d99362329711f468602db70ce8",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6"
     },
@@ -1203,7 +1203,7 @@
       "file": "apps/fgos-gateway/src/mcp.rs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "677e2082adb512e520b42b5efc2aafe79607207f9f7d82bec2c89029e90778ee",
+      "recordSha256": "53767c556db8d8aabfe34540bbad69dc687121c0323309f4118ecfab32e4cbe9",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "b60e289295c3daad726e988d63674e7f344d554577864b34e470d89ccad90df3"
     },
@@ -1219,7 +1219,7 @@
       "file": "src/report/decision-index.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "18fb8577ac6e47b86c22f982467e2ecd0af757238608cd6c95569c2e8b5b03b0",
+      "recordSha256": "e3b6ef565fb47ee0d126de8b2dc3995e40b906811482ed609528171e457323f3",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "5ad753196470debd2f502b3c00994c1d75a9ed0c576c5cf8188eb8600f0a09a2"
     },
@@ -1267,7 +1267,7 @@
       "file": "src/report/enduser-index-generate.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "e05b027573fb55a9a6189f013cbe117e7f7cb15a0f38bd95b71af80132dcbda6",
+      "recordSha256": "5aa9e332f790dc7f73b3e2cf133c69c2b55f177d80230ae125b37a2ec76b1282",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15"
     },
@@ -1275,7 +1275,7 @@
       "file": "src/report/enduser-index.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "b88ed646b6b84d4ff5fd387a3e8707f54b1c34c8a6862fc165ce3e68c92c946b",
+      "recordSha256": "771776ea550427ff047d8fc00b194c7ab58878bcb649e6f631f8987005cdbd87",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "373da334b9cd862b2c3a0fbf4fffb3fe010f244872702dbfceb25eada5c5e650"
     },
@@ -1299,7 +1299,7 @@
       "file": "src/report/knowledge-resolver.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "a39b1e273d9ba9c5c80aa029b6287122fd3c05a90af819cf564bc74dcea2e160",
+      "recordSha256": "048e48d957aa50f83f84c27bd5738f444a99bfd387d6edcac76c243d19aff5b3",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "eab342bb4296e20fdbc6742cec084be0924e80cfa6d3f7e525395959b6bd0751"
     },
@@ -1315,7 +1315,7 @@
       "file": "src/setup/instruction-projections.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "9bc5dd11165323e20b533f0ef002b2bece24aea141613240b614713cb338e37a",
+      "recordSha256": "6331577a0e376f785b3f2299dd47f8caf8200c442309ba32f597d76a3f6326a3",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "9d239c9f1d139f07cbc6bfc02701a7f138b38aad9fa2ac3f5061a34ccd357c8f"
     },
@@ -1323,7 +1323,7 @@
       "file": ".agents/skills/_shared/capability-catalog.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "b93daeb20a21db8dbb9543055e21fdf89c2499bdb1e63c886688027cc76ee8ce",
+      "recordSha256": "a7884a7eadde1b5fae883d755b30c304ed33adeea94786029c1c548e54107e3d",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b"
     },
@@ -1331,7 +1331,7 @@
       "file": ".agents/skills/_shared/catchup-self-recovery.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "07cc70cfd3f286abf42c093805e383a02299819e32d27d9424a265aa63208600",
+      "recordSha256": "88810ba20cb288663e0a67b22d1b9e24f2f8debdf7505630f91471f8b4c856bd",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "922265f0c21121259b026a428710d40dac0150dbcefe0ad958dd91fc8ed78ce1"
     },
@@ -1347,7 +1347,7 @@
       "file": ".agents/skills/_shared/coding-worker-contract.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "d42e77df6e58d24470a005a03b4bc22af608f27a2cd97453be4878f56c0ea21b",
+      "recordSha256": "3e018c366ad9345ed58ab3c9142f3067f67305efd0c6dba32eae8c45be656108",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "8693dea64c22d19a0c09791d77910435cfeecba56eea387aff4854000eedafad"
     },
@@ -1355,7 +1355,7 @@
       "file": ".agents/skills/_shared/executor-dispatch-fallback.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "8448d4cd846162a758bf981774ca804ddc8a8a9528972b5d1aceae0ee5bb5309",
+      "recordSha256": "a7df6f7ddcec0ae3d283c0608da5f1b9faed99091d0f1c985f4e0c86b23ba240",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "678291e7b79e17ce8a82845ededfbb2ec0612700cf0f7297a26f03245f3241ed"
     },
@@ -1371,7 +1371,7 @@
       "file": ".agents/skills/_shared/planning-capability-awareness.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "51dd75cc0136eac34477f942da62295a6c4b3b3fee36d7d7b9f4dafa68892072",
+      "recordSha256": "7c524b3ee72ef7e6d91f6277e7fea5674f2c188fea3ef38393afe02358de41d7",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec"
     },
@@ -1379,7 +1379,7 @@
       "file": ".agents/skills/distill/SKILL.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "027950051559facce9cfe0c2f8112e22477c0d128da19d2826ee9b630b91bef1",
+      "recordSha256": "15275fed2a489b12c177d837934f4d70c251a4568a09dc33ee1e44c3985bbfd6",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "76dc97fe8f8c7eabdb0ac44425b3fca2a39474f03e2d35b39512a399b7e3e1b4"
     },
@@ -1387,7 +1387,7 @@
       "file": ".agents/skills/distill/references/consult-protocol.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "77f6c5974a14b7e3c731265d4ff1a6506b12781d26b9e9613e3474be63dc0e6d",
+      "recordSha256": "4cf2a488ce8b9c5cfd3f5ec34ae3fbec567816d6af70c123dbf602c0b69a07a0",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "7ec5aa4089421501593c89f9a9b0bb48acc5941f3c8dc1f1094bd25887977503"
     },
@@ -1395,7 +1395,7 @@
       "file": ".agents/skills/distill/references/deep-dive-protocol.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "f33cb4ea3ea619103b6b2f906c02f1d6666632ca3ff3cd08669bd05075830c05",
+      "recordSha256": "b7fc92f7393f0d822fcdf01054107249177459a547b653680ea64bb547434dda",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "68b6d315bae45d3710dd2b3be685d8f1db11fe7369fdcdfa778e1ad72ab80536"
     },
@@ -1403,7 +1403,7 @@
       "file": ".agents/skills/distill/references/extract-rules.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "8172ec6a9b377952320c90183f34d7ae02c4f51b661550c7e032fc0a22f0d69d",
+      "recordSha256": "8bb44eba4f810aa840f2ee29dfa5ed921de7149ddf0cdb17ca9e815af529753e",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "0274798f6e0e24c576bf5f721ebd1a74559f1a044536902748aa6df7fa3122a8"
     },
@@ -1411,7 +1411,7 @@
       "file": ".agents/skills/distill/scripts/distill.mjs",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "0d58303c335d3b7c54b694b0950e01c37721cf7864e33bac3463dcf6a941fca5",
+      "recordSha256": "5fe5f9e063de03f2602d7e540e80cebae7773950d8b8027c39bd2584f3b23823",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536"
     },
@@ -1419,7 +1419,7 @@
       "file": ".agents/skills/distill/scripts/migrate-porting-state-backfill.mjs",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "517f1c551f21299e8497aa20e0a08359c109fbf0c6e91de0c0a6de38cd4d3f09",
+      "recordSha256": "024c8642a1f411d8fe95f45571d18fb4eb1bb4219e4e4aff5535b9b0e532e3b9",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "c523725488e427c51ec7544007d6a38f143d116daf55b23eced002c2c081ac6a"
     },
@@ -1427,7 +1427,7 @@
       "file": ".agents/skills/fgos-clarifying/SKILL.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "5d58a146efa9b39ffafcc02db53ffee211d54f4f1c9fd86854d3787d5e72debc",
+      "recordSha256": "d1b0146bb6f985f2d6aae5b6d26e61cc8f015a66bc55a95dcebf244d62ba8a7d",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "a3850c3acab72f5bc422c17b0a6f1a03b0e884872e65fe66c5b3caf22a226bf9"
     },
@@ -1435,7 +1435,7 @@
       "file": ".agents/skills/fgos-coding-discovering/SKILL.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "490fddaebeb690bba6655dec8bb1c9dae20f763a1870aa4d61085514d1c953c4",
+      "recordSha256": "b1db8da5045c752dadb365eee3b781483b65e42c42eb5b0ed982ce0a79044d27",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "1ca9a909f183948bb4e38e094d49814bb74152414b44f265346417e31ad28b7d"
     },
@@ -1443,7 +1443,7 @@
       "file": ".agents/skills/fgos-coding-exploring/SKILL.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "d14cd91c94c82b8b8d7d81613e62b68fcfcb684bdd64a6f39a2d1550624dc00d",
+      "recordSha256": "550bb84b748cf3c383122c80277459ff55f0323ff42371ee7a5bd9980fadb62c",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "d42b22ebdfa6017b435556206ea0349e4f35d6a3650f409b09e77986e1263cd1"
     },
@@ -1451,7 +1451,7 @@
       "file": ".agents/skills/fgos-coding-exploring/references/gate-mechanics.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "ee6f7a8275d72662ab2c2c40b42db32352bfd1bf49c4af16b63e5bdf0eccc49c",
+      "recordSha256": "6736ea554ffab90fefef0b2e151ad055d204e935174b63aac54d94c86ee09bbc",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25"
     },
@@ -1459,7 +1459,7 @@
       "file": ".agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "ad4b8fc096663f2e1ef8767971c6fc846c334273858ebf41da3f695f32f6e570",
+      "recordSha256": "fb6e50bd976a91bd6f7894d8789e57083efedc38abe82ce982dc50fca0032d4a",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277"
     },
@@ -1467,7 +1467,7 @@
       "file": ".agents/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "30b501f616900a48977bf10bf0b3bbd1e5bca3d66c1ff97cb1ce0311b948d185",
+      "recordSha256": "b2cf6ac5de6ba42f36180e331f454e118e153f7f60f6bd498dd9c9dbef44cbc4",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "0e110141b2c45f175b117d6c8c68b46a5a2bb463883cacc0971611dc45e0c7f2"
     },
@@ -1475,7 +1475,7 @@
       "file": ".agents/skills/fgos-coding-implement/SKILL.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "e984d5979b574b24a1fd8ffc02fc800b01be83d7908563ddf62321daae2ffa0c",
+      "recordSha256": "dec6a7d3c17515c37bfb020cd4557680d235c7a25ee67acccdd28b8d5dd09686",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "9a20fc209673928ce5fb414af91940e9760ced0f264dd5e4673078cc070cfcdd"
     },
@@ -1491,7 +1491,7 @@
       "file": ".agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "8a01900042054ed3b2b13f2dc3a97cace28eb5a29de984c73be6a7b113037c36",
+      "recordSha256": "7ddc6d22535878c23a3a7c80aeb3898de2dbbef2fcb8d3e3b027c9ab2b1e8085",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "67a43a6daaa2d3a2a199cfbcbf7058b7c4a1bfe3440b43fe6297de68b5860588"
     },
@@ -1499,7 +1499,7 @@
       "file": ".agents/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "a495a7efc9037ad6de501fab3484d871d3648e0299de5cb7af73b59f97589b0f",
+      "recordSha256": "acb206b23648998c757f5e788460f2f2bf0a699e40d9d93eeb7a4ed95328266b",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0"
     },
@@ -1507,7 +1507,7 @@
       "file": ".agents/skills/fgos-coding-knowledge/SKILL.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "5fa7cd1662f4dc2d206518c39efc12d1171eea0a66f7e97b7f3d53191e05d66e",
+      "recordSha256": "df0adcfda0b6f8129be15ea0105286f1a259776b42a3474ac5c1e73864c872d6",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "175d01cc7e6ca027ba704eac796f1e41a03c929977da0f03c8d993b6f47af94f"
     },
@@ -1515,7 +1515,7 @@
       "file": ".agents/skills/fgos-coding-planning/SKILL.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "072d9fe8c4c7fb190e854519fb124d7affb965d278a0b4a1464ef943a5b4b1b8",
+      "recordSha256": "ff59542f07dea5ec919495f08f235b14252d0812ebe9cb0ce011ca40917c7144",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57"
     },
@@ -1531,7 +1531,7 @@
       "file": ".agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "194360360a4af58246ec27365116919063a1a172b97ac0505f961865bc771ecc",
+      "recordSha256": "c58b9ba4823bf38451e8d427154e4e16d19c35b96fd536e4347048ac9074b968",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "49fed6b7fb21fab69354cb383c8857926d3636c53f08e8c040e4763f1a50aa70"
     },
@@ -1539,7 +1539,7 @@
       "file": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "5776beeba74770edf027a5175110d4ab46db8f065b441a82f81decb390efa838",
+      "recordSha256": "9feab40d67b19f729119eef4c8a616853107ec208be3636624266975687a44bd",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0"
     },
@@ -1547,7 +1547,7 @@
       "file": ".agents/skills/fgos-coding-shaping/SKILL.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "469325216d3cae876d117d2f805f1b42bd82442d4d805bdc9692d54cf629e248",
+      "recordSha256": "9eccf21e15a30bf871507e72c654dd48f11d0824b54ccf5997c1816c3b3086ec",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "2faa2da065e638c09210d0515d0550d13b26605afa018a496f0eb1819438ecf3"
     },
@@ -1555,7 +1555,7 @@
       "file": ".agents/skills/fgos-coding-validating/SKILL.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "e20d800e95f6fb9d4208f2d8da7d2407c4f55537fad1a9c331e2a19cedc08bff",
+      "recordSha256": "ae64e52ae3989679236259fe94ab0c53ac80ff4cc48f33c38d1409749cc85ba2",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f"
     },
@@ -1563,7 +1563,7 @@
       "file": ".agents/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "3751f197eae5d0285d39722f183228428e437d62819a7b1b711e13ea1fee0cbc",
+      "recordSha256": "d1212391753d6779b405be3bc3edb08ef97bf925bfa3bf58b6fc4486c352da63",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f"
     },
@@ -1571,7 +1571,7 @@
       "file": ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "cbd4b8d4a303d3f0b2be4c80b204b62c80f181486de4f227ae043059ee96666e",
+      "recordSha256": "01d25925c4c51b6a027fd3b2312deb8bfbdc2021411e04c2541d3d85596717ce",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec"
     },
@@ -1579,7 +1579,7 @@
       "file": ".agents/skills/fgos-indexing/SKILL.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "4df9e40b56605aea00dcf36d13728da150a623336b991a630a25e86f92143c64",
+      "recordSha256": "744cb619d471fe03f35d6c2e6f12e34c4c65876b95b9c1c1b6e9c268359bd183",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "8a9b3e7a4610124e763ec3440a87b6b3bd18d07f3fc178e1e19cf7d531eb3e96"
     },
@@ -1587,7 +1587,7 @@
       "file": ".agents/skills/fgos-researching/SKILL.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "c1aaa259defc6adfbc90edb8e12116889afa489774845a3737a4b7a10256af10",
+      "recordSha256": "bca4b1c1d2f4be6eadb0435afffbb911a373e61a04ffdc3fa110947d06a9a0bb",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "6d05b64859a57d3363f8ae9b391db7cecf19e481bc06b9abc8748ed128ac2213"
     },
@@ -1603,7 +1603,7 @@
       "file": ".claude/skills/distill/scripts/distill.mjs",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "3419d8bc7d5aa7efb50078d68690cbc5ea5e15079562507dcfb334c8a6a0b34c",
+      "recordSha256": "aad502221d776ceea9147cef0fd12f918da5a4483f5bb9b080b57ca45c6a02c6",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "3119c407434f1ec03704ae1da7a1ef7c8c767018b719586dbdc313e2b7c22536"
     },
@@ -1611,7 +1611,7 @@
       "file": ".claude/skills/distill/scripts/migrate-porting-state-backfill.mjs",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "d8895876c819902599b3e4cafb268680db035c6fe1b22fccf0607efeaebd8ff8",
+      "recordSha256": "cd6d56e721a8128310ecde5d58ffe040877dbeebaa2f734334c6c1b12469fabd",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "c523725488e427c51ec7544007d6a38f143d116daf55b23eced002c2c081ac6a"
     },
@@ -1699,7 +1699,7 @@
       "file": "core/skills/_shared/capability-catalog.md",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "a73c2e7729ef4663c9ca0df5d4741b40396b808f533247166d75015a163f4589",
+      "recordSha256": "445b9b350cd89a8864b6c01328bcb255810ed7c8c80fafc0b8c9349921143c09",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "3ccd086bc1c45fa7ce778d0963f879db18d8ab94c7468e5791baff8fbb3b49e0"
     },
@@ -1707,7 +1707,7 @@
       "file": "core/skills/_shared/catchup-self-recovery.md",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "a85c5856100772b4f03b196237e89726d05d33dd98a6cc10e10800bd04858b21",
+      "recordSha256": "f76176542294fe648afd7bbad9fa7ca06af21c398975f45bf54256f1a03894ad",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "84afa75b23b685d1357210eb31f0b257fbbe959fc519598e9992e1fcf3e091a8"
     },
@@ -1723,7 +1723,7 @@
       "file": "core/skills/_shared/executor-dispatch-fallback.md",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "75e2db3a9f1f6bae8a7613cd8ced47bae242301efe05c295c46e1626293aad73",
+      "recordSha256": "2548ae25b030aa6994e1da2885a9e0227cce4383a67b55111d0baf2edadd7012",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "49e1fc021d5aa79b882ec8beb1669bf0a6b4a1ff1b15ee592a566483d10fb2c4"
     },
@@ -1739,7 +1739,7 @@
       "file": "core/skills/_shared/planning-capability-awareness.md",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "6ca3337dc64895309168e871f483a06eaa117040293a1de1efb6e4d344ae8c15",
+      "recordSha256": "c20131cd5a6c4f9654dfca65a6a038210d0c072c00ab4f25cd876f0dc2679d99",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "4b4862f70896950a94951ebe0c1bfcdda842bc4d13536f870de58b64eb3deb94"
     },
@@ -1747,7 +1747,7 @@
       "file": "core/skills/distill/SKILL.md",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "820b8866116aff3a11b7c8a9a94f813cec61d99e822dff89c5630f23c1199415",
+      "recordSha256": "98fd4d7d49a2e4c0ef1a9da20bbf5a36cd50a8d04cb4fb9b7e2e2029aee4b6fd",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "4b45bcab0699be58354933be096ebd4943a8ca7b26f81e91f40d356a01643ca7"
     },
@@ -1755,7 +1755,7 @@
       "file": "core/skills/distill/references/consult-protocol.md",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "1810075e6ed263f3444738c1394289c06d92e8a21ebe6f359ff6a2f06cdd7ff2",
+      "recordSha256": "25117392c4538d16da8a0bb88abb376a8858dbb7aef688d0d5bc72212986d451",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "f435be045fea0a10a367d0dac428a512444694041877cff9a57991dada0a73e4"
     },
@@ -1763,7 +1763,7 @@
       "file": "core/skills/distill/references/deep-dive-protocol.md",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "a9a2b13db2e5ca07cbdad483da266d8c22fcaaf65388f837960396b89bc91f4e",
+      "recordSha256": "487216b8431c0d8faf163494043c00b8a48baf9aa9a1c5489af08411a648a0f2",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "dc6c43de2ffdb23e581b19f2d46a72affbc2279d92f7ccb971fd567c5e7d9961"
     },
@@ -1771,7 +1771,7 @@
       "file": "core/skills/distill/references/extract-rules.md",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "133112b7af2395da976cd77368882c4b280c193f47d596cad34310757dc7824e",
+      "recordSha256": "d1742e9847b999b4696ac72e02e88b6ff71998440157cc66438d0f92d363dc90",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "bd27a5dde54a78556fb4e7603dd7930217d2e6972b049bc99ea8e33402d316de"
     },
@@ -1843,7 +1843,7 @@
       "file": "docs/backlog.md",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "e3a9c6bb13e6ef6dcb99230e5f66a68be91356aecff0ffadfd71659538fcd4ea",
+      "recordSha256": "21f5725dda342bc37c043a0efc5eb8ec1b3a74894ab0f7504f7daa51475d9312",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "2e0cd5cd4e216a77ad108e187e109135571c0ca57e53bda77efcc2cef4e6331d"
     },
@@ -1907,7 +1907,7 @@
       "file": "domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "7dbf270d306ac73261e52035d18e1c84a4438a9d349dacf0c42920ce9b02fd1b",
+      "recordSha256": "594b73833221157eae0a06214160c048b1f4720b4741bd5b8a39af83c694a4cb",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "6b188d5ee25ba155e7988e694d7a0dafef07589cbdbd51b304d6c54449564042"
     },
@@ -1955,7 +1955,7 @@
       "file": "domains/coding/skills/fgos-coding-planning/SKILL.md",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "b90a06e5670d1d63a71471aee763c968f59a194803c964626485751cbe1435a7",
+      "recordSha256": "f48e6dbd02e8557484d2140d19ea7fc635d1586f79f22082a30c9172a6b7604f",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "fd2ea486b4b913e7e3f15f6f161f159cd350bfe8b26376042819d7b31c675d4c"
     },
@@ -1979,7 +1979,7 @@
       "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "8d4ac70e99919b3e855c69823f8e8635913b342e829d477015b2b4dc853c803e",
+      "recordSha256": "20aab22faee555e0bdae3475f0137f00ee855b3190c6dd71fe2044b297234ae0",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d"
     },
@@ -1995,7 +1995,7 @@
       "file": "domains/coding/skills/fgos-coding-validating/SKILL.md",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "d57160d2cff4088beb2ace884e59c7b0d2806bec82b2449b9a94b64c1bbd8899",
+      "recordSha256": "db5272354d06f188ee18dc6165528b4cd910b1d936ee3e121814cb86954264b1",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "fa831842240da6d8b77ad4193a09c1ccf8ea7972608ec31fc3966c2511b06d0c"
     },
@@ -2011,7 +2011,7 @@
       "file": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "61bf02744bdcb08f09659a64c9b4a023c1fd784f2d8343b2383e56432eca5599",
+      "recordSha256": "029d1bf501d42e48bc7569eb2d3fd49c57199a39a7673c20b608a9e1f26a665e",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "a6309b897ca51eed64c361807c084c32e03a33e8da26d89b5932513fe985dfc7"
     },
@@ -2019,7 +2019,7 @@
       "file": "domains/coding/task-specs/shape-plan.md",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "8063978085efb2f5a5703010e564ce360c50de689a61a79d5b98fab4c256b206",
+      "recordSha256": "f6dc8e2e7860609d6919c8d098f45c17373a8c8bcd918857fba9d24d2edd7ecd",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "591e766e58c8d28bc703bf28cdd2930dc031d9fff2d57cc4e231e31f4b09f7e5"
     },
@@ -2067,7 +2067,7 @@
       "file": "plugins/fgOS/skills/_shared/capability-catalog.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "b04c82bc92ca46f064b5b52c83a46a29537c430642c75487a12cc771b522ee4e",
+      "recordSha256": "8d5986b1f73037e94a3f4f0caf82844e0f237cdc3b6ac2fed39afdbbfd0657ed",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b"
     },
@@ -2075,7 +2075,7 @@
       "file": "plugins/fgOS/skills/_shared/catchup-self-recovery.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "178d1383c7ab72af33ec8b006b421558874831cea6de1615480d28e26c92a1c7",
+      "recordSha256": "683f299c697bff11991b1043b33e9991fd1f8421aa31bed258685474518e94f4",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "922265f0c21121259b026a428710d40dac0150dbcefe0ad958dd91fc8ed78ce1"
     },
@@ -2091,7 +2091,7 @@
       "file": "plugins/fgOS/skills/_shared/coding-worker-contract.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "37ec2f44c0bbb169aa4e7e7b6319e5f1dfd1304655a83da72dbf1755a58d149c",
+      "recordSha256": "5ad49fcf1f866ea32354334f447915850c53a72fc49ce6b915c4498fb6c36715",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "8693dea64c22d19a0c09791d77910435cfeecba56eea387aff4854000eedafad"
     },
@@ -2099,7 +2099,7 @@
       "file": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "7a0c5226895b00dea19b1fb28085d3987a3a87984328f767bde9776f82f8d425",
+      "recordSha256": "59298776cc48b2ba554b97848887a59bdb3c5f6e05f15a478edab33f56660be8",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "678291e7b79e17ce8a82845ededfbb2ec0612700cf0f7297a26f03245f3241ed"
     },
@@ -2115,7 +2115,7 @@
       "file": "plugins/fgOS/skills/_shared/planning-capability-awareness.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "dd3e2119631bac062f9c5edbe86e3a20bfdc7511364682cb24c64c9313a28f8e",
+      "recordSha256": "aae1df010c981fda7756a41bf56d1b2a8b1d67a5c498f8181cd7709dcbbbde86",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec"
     },
@@ -2131,7 +2131,7 @@
       "file": "plugins/fgOS/skills/approve/SKILL.md",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "7dbe249dafd500db84380d4c104dc75cb200ad133a249c19404a8b798cefbfc2",
+      "recordSha256": "c29d3e4b47c1ae7f99d35924a0279a0b268b0c3fecd4a27b1163e7658889eb46",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "223db0a2171ec07fc5790edc7048685c6f98c1a72b65491c504cc915309791d2"
     },
@@ -2147,7 +2147,7 @@
       "file": "plugins/fgOS/skills/cleanup-loop/SKILL.md",
       "generated": false,
       "itemsChanged": false,
-      "recordSha256": "a33725295dbce6117ec4b8cb6c6261bbc8f3b6c2b2845267b355a103390f51d8",
+      "recordSha256": "885fb69588e5ce4353627417b0755fbcb5ec79d7bf8cc6f0efc36627363928db",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "952474402b90ec3582ad8b55e1c5a03cfc98c11630c3b7c522bb244a235ed871"
     },
@@ -2211,7 +2211,7 @@
       "file": "plugins/fgOS/skills/fgos-clarifying/SKILL.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "510bbc156d487545b049562bf60c475111e8631b89d2f0315b5afba5135eb363",
+      "recordSha256": "54ba45adbf6d7bb8444a0006608a2efdea8f6b1ff37163ffee1aae5a5e94e87f",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "a3850c3acab72f5bc422c17b0a6f1a03b0e884872e65fe66c5b3caf22a226bf9"
     },
@@ -2219,7 +2219,7 @@
       "file": "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "98b6c9bdae690aec094b263e9aca19a9cfcbcab5ade4a38ffdf3d792782e08a2",
+      "recordSha256": "ad02aac9db114201da4cc582f5199303bfde79df16c343569ab22341f070dd9e",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "1ca9a909f183948bb4e38e094d49814bb74152414b44f265346417e31ad28b7d"
     },
@@ -2227,7 +2227,7 @@
       "file": "plugins/fgOS/skills/fgos-coding-exploring/SKILL.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "cad2beb80de6dfa744603cded8ad06f7326960a4df92ecf5e986407e6f7f72f1",
+      "recordSha256": "8e12419b3dead7f43563b1e07ac54d9a60fcf9392abc8cb7aa1141f3f1037c5e",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "d42b22ebdfa6017b435556206ea0349e4f35d6a3650f409b09e77986e1263cd1"
     },
@@ -2235,7 +2235,7 @@
       "file": "plugins/fgOS/skills/fgos-coding-exploring/references/gate-mechanics.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "065f7fb15a0154c403899d9e93c96b2c3de8b1475f2bc93010fef55a937fe284",
+      "recordSha256": "862b91fadd35bd0bf67187dc9903ac0e10f6f4d9d6f8aa776bd4fc090568a053",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25"
     },
@@ -2243,7 +2243,7 @@
       "file": "plugins/fgOS/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "0dd76446a623181cd3f796324944d03766f5aaf1b06922fa5e0202854cfd8dbc",
+      "recordSha256": "d50042aa3dddc3c2711df54815c3876962e06b379f32e45ac4839c32b01b8017",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277"
     },
@@ -2251,7 +2251,7 @@
       "file": "plugins/fgOS/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "619dd0b8748facf0b6666d5504195f0487ee0eb929834b4e4981865d29442421",
+      "recordSha256": "621e650013144126813f4b793766b272a5800d15719db4c5c0cbdca7433f5306",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "0e110141b2c45f175b117d6c8c68b46a5a2bb463883cacc0971611dc45e0c7f2"
     },
@@ -2259,7 +2259,7 @@
       "file": "plugins/fgOS/skills/fgos-coding-implement/SKILL.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "bee6ebeace1212339834627571ec0c51fc3d5183a7e469f6ce41e330dcc8f78e",
+      "recordSha256": "69ff884d5cef151011e3b7aec967900976eac4dd2d099f8b78c1b53b6dedc37a",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "9a20fc209673928ce5fb414af91940e9760ced0f264dd5e4673078cc070cfcdd"
     },
@@ -2275,7 +2275,7 @@
       "file": "plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "b28608e85b194d350ae7c79b958312cec40654c6a044e022a974ae646d59d0ef",
+      "recordSha256": "6ac90a0fb4ba2e17a3a93116dcf828a1d2e1bc583ce959ba561df337e4e9b2a4",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "67a43a6daaa2d3a2a199cfbcbf7058b7c4a1bfe3440b43fe6297de68b5860588"
     },
@@ -2283,7 +2283,7 @@
       "file": "plugins/fgOS/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "cf9bda42a8686578e2b409331be6eeab8bfaaeb5eff336ca425fc230910f8946",
+      "recordSha256": "a7f060bf3369615049374ecd8b3b051d7801a8f62cbfb97ca1ba0efc777a7986",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0"
     },
@@ -2291,7 +2291,7 @@
       "file": "plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "3f2b86ee76cf41a4b05c6ff5c08ed12785fe497f3568ca2cbe404e5a51f335ef",
+      "recordSha256": "f3c4d5b56ad14662a64ca73331d14f7ac2a0951083f458c245a9795c2ad6e54d",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "175d01cc7e6ca027ba704eac796f1e41a03c929977da0f03c8d993b6f47af94f"
     },
@@ -2299,7 +2299,7 @@
       "file": "plugins/fgOS/skills/fgos-coding-planning/SKILL.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "885782308d57ebbb0cb24436ab3e3f2527421b3eb34c4459e2a82ad5fb4b4aac",
+      "recordSha256": "81ac900c7c65a6be3d607d96a3c95eca9de4d1d7c7a6ef9b71bea6edecc727e3",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57"
     },
@@ -2315,7 +2315,7 @@
       "file": "plugins/fgOS/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "9b47fbe391978f5b12bde315db11dac93bffc0f992463f879afb72671ce0df08",
+      "recordSha256": "4af6f7c5bcdb585694b274f26bca70642621bd6d5defd48cf986a433b68b44d1",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "49fed6b7fb21fab69354cb383c8857926d3636c53f08e8c040e4763f1a50aa70"
     },
@@ -2323,7 +2323,7 @@
       "file": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "f0c167abcab4b3d9c347f20e3ced4aff5b0c51a57a3131954ba7b1c4b5f1077b",
+      "recordSha256": "2d6a8266790b75710a787430b8a9f9302a58b5c1d170c6bf2ffaf3ed01c9d336",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0"
     },
@@ -2331,7 +2331,7 @@
       "file": "plugins/fgOS/skills/fgos-coding-shaping/SKILL.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "94c2e74b0c713ad5bf0b7b16018d96ee37041f668d06b8c4e7d23a0bccbb40e8",
+      "recordSha256": "fd9cfcaa715c30aee839daa4f3bfe633b78af05d218518e13309e663bff28115",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "2faa2da065e638c09210d0515d0550d13b26605afa018a496f0eb1819438ecf3"
     },
@@ -2339,7 +2339,7 @@
       "file": "plugins/fgOS/skills/fgos-coding-validating/SKILL.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "fbdb145e9b8802ea632da9f4be858be0f0a5667e07299ece8636955e2be9f4ab",
+      "recordSha256": "b0fe95343b70708cae12aefcd9c23de33302609ca3940eff2b07ade4d1630c7d",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f"
     },
@@ -2347,7 +2347,7 @@
       "file": "plugins/fgOS/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "e12f4df53af8a14b682b1f0ffe652d6854b78fde96575e5f692e05e1bfdd4393",
+      "recordSha256": "9d966d8d42f7e45fd44ef284744e2538a674ad306a492cf93c367b1eecbad5e6",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f"
     },
@@ -2355,7 +2355,7 @@
       "file": "plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "d86cd73eeaa9f8e0ad2cc03474cfd4fc114e88491be05015800d30f81528633f",
+      "recordSha256": "bca7fb34dea24f7e067fc39c2533159c0da466e46b53015760dc594184535b70",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec"
     },
@@ -2363,7 +2363,7 @@
       "file": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "e7373eaaf8715a740ff8420a1afe9f015d7890201acaa9f93479fbd50e21a3e4",
+      "recordSha256": "f1f49e566007c4eb0a92398e9af25e09eeef3dd3943281076c65217795159d9f",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "8a9b3e7a4610124e763ec3440a87b6b3bd18d07f3fc178e1e19cf7d531eb3e96"
     },
@@ -2371,7 +2371,7 @@
       "file": "plugins/fgOS/skills/fgos-researching/SKILL.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "387d8ed6f9a6b051ae8baa731bf1239b5613e304d0dfcacffd46114e3d7928d4",
+      "recordSha256": "1d722d148770e2b72bdb5908b19199c489d578f12753771f23aa51574d075cd6",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "6d05b64859a57d3363f8ae9b391db7cecf19e481bc06b9abc8748ed128ac2213"
     },
@@ -2419,7 +2419,7 @@
       "file": "plugins/fgOS/skills/merge-loop/SKILL.md",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "f3ded5000ef96b7c89a1ccd7db0be392297f187f2258b57e508b3bc05095d333",
+      "recordSha256": "7872bad834f9d68c0679d64efbe508a53ada7a1524d74efabd044c40bf6f377a",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "35d99ac7831e3eea531afcdd7669c7eb106082a43fa320c77407552967f03e92"
     },
@@ -2475,7 +2475,7 @@
       "file": "plugins/fgOS/skills/retro-loop/SKILL.md",
       "generated": false,
       "itemsChanged": false,
-      "recordSha256": "ed81df2ed8578e65edaf05e8c6adde1180df6602c76032a1e8f4c2a14c522595",
+      "recordSha256": "1de5a1970dd56d2f162effa4d4452201636d9bff1f15cb80180ec6a479d4871a",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "b134815fe10d13c4351a4d5f11b5e18db796b086afacc2767a062c218f7c892d"
     },
@@ -2539,7 +2539,7 @@
       "file": "plugins/fgOS/skills/terminal-close/close.sh",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "21a60dae555346b6c0b71c077c509c7a75b4dfcf29560733bad873bc53fd539b",
+      "recordSha256": "ca2bf792db3e7bf23e4e1046fda3c183f730128b3d977d625edef21704717fca",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "0ddfcc36dfad61392248ce67bb903f26ff2ae34f9a8a169cc343ef87be067e50"
     },
@@ -2555,7 +2555,7 @@
       "file": "plugins/fgOS/skills/terminal/rename.sh",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "bd983c980c8ec4234086463be87f7eedcdd3f42b0291f5d964509f549f130bfc",
+      "recordSha256": "b1e6bf139a36497c67688204d62d65d4e3a18a166d36b721d128d766b54ced1f",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "f5dc67dab59851a891667bb474670d48bc83b2f6292adae6051be78dd976dd15"
     },
@@ -2579,7 +2579,7 @@
       "file": "scripts/backfill-status-category.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "d134fdc0c8cc0cbf18eed40cde71dcb8b28703dd4924709cd55582dfafdd1b58",
+      "recordSha256": "b508e83f018b6aca9dfa0aa72d361bf29db10c4f917c7e6f17c09b5257a01471",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "bff22a3805f8a38f1c7d93b7cee3b53ee5b6dde0d978b4fdbfb760c1cc3622d6"
     },
@@ -2603,7 +2603,7 @@
       "file": "scripts/build-rust-distribution.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "d1024827912258a4048644373427225c0584480cc05a00f50388fa7eeda62eef",
+      "recordSha256": "2ae20ebbff5fb4c010bb113ab98be2c81d0fe466bb3fc4ee66a1eb14c3da8bcc",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "be87d54ee9740239123a8fdf71496eee5b641deb6fdc678826b86a0a8260fe4c"
     },
@@ -2619,7 +2619,7 @@
       "file": "scripts/check-backlog-reconciliation.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "d0d4bfa5e9c7c6dab7c09caf75a90a25685d20fcac8ff06e88425b22e1abd0f3",
+      "recordSha256": "a694895dfe3d382c10ccdbba26112ee51fe288db72c2e79ccd0d177548b4f496",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "5e7fa8b9548c34479e270ec666bbf8132f7fc7c38177dbac71f8d74848f9baad"
     },
@@ -2627,7 +2627,7 @@
       "file": "scripts/check-decision-codes.baseline.json",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "15e3170b60aa0cca0150d44df513716f9ff5158ffdddcb9a0e93986b75e381c8",
+      "recordSha256": "70271d249102e6c74c34d573eed2007878d2a89c5deb59f9663721fbe4aa1a9a",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "b273e8becf2ba18475bf03a85a508d5022ff254e1d7a0de272387e8c01c5d3ad"
     },
@@ -2635,7 +2635,7 @@
       "file": "scripts/check-decision-codes.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "9ccce2e7b030d92b8ef70458005b92c64deaf4834f5b75d113726d7b6f5ee818",
+      "recordSha256": "33daed24bb59966a7b4605bacce12fa68895056b8fc2e02d6988b5f92aa7cd2c",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "14737563df573c4d1181129cadb8b432f0492f8025c57ce1a485effc0fb39bb5"
     },
@@ -2651,7 +2651,7 @@
       "file": "scripts/check-doc-candidate-status.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "621cd88eaf8116c8098f646850f96fcfbad1e04aaf544f15b3f8a4e3bb83246e",
+      "recordSha256": "69dde22726a3d35980af356a69f6bc43519717e4e3f73e6caba8623de71f8525",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "f06732e0f838efe638a4df8372cd3d934e4b61dfcea0ec69cb129b94c556ab94"
     },
@@ -2659,7 +2659,7 @@
       "file": "scripts/check-doc-constitution.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "b75438e757266e68edb58fba8fedcb476222cbc4821c3b1e21d1c0da64f6376c",
+      "recordSha256": "94cce7e8e275e4a6cf81f94169f5f0fdd98ef10a051c08137fb76c3cf4ab89ad",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "947d4752810d5d6e4efa0f931b57853d348e690051b4ccdfc94217dbf0f17229"
     },
@@ -2667,7 +2667,7 @@
       "file": "scripts/check-doc-inventory-gates.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "8e649d6657cee6efaa662af82770d6a84ce8b5ceed30cbb8e38ac3ebe4be20e1",
+      "recordSha256": "56f16b81b5dbcdeaf4fb94d544b49d6b144aa1110b60f62eb9c9fd42f6cf04d2",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "b4a0532f0ee5e83dbe8db7159673fa1133f4b48c89545a4d2972ca2748df78b6"
     },
@@ -2675,7 +2675,7 @@
       "file": "scripts/check-doc-retirement.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "b58611ffc43dcf61527014e85ce36481f088ec128ee86ef427348a9309243aaf",
+      "recordSha256": "e7e03cc8efc9142467e93dd7d2469fd34702478616d4959c4cb02b198e8510b0",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "4a396fef453dbaaa1415dca5875d236e784ae0766e3aaa17bba0ee726ba2af6e"
     },
@@ -2699,7 +2699,7 @@
       "file": "scripts/check-locked-decisions-heading-drift.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "17fb20aff4607a3b76bbc9a8cdb0524f80399f7d375bd275bee51af324cd626b",
+      "recordSha256": "0c43e42826771c05afcbd7ed5b86a48d1cedf0dd585eb5f113c0d2627c7e1fc4",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "fa87a9f833b12c43cf60322aac482a8bd5e5e7cb889868ed4592816efc80b7f8"
     },
@@ -2747,7 +2747,7 @@
       "file": "scripts/doc-alias-resolver.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "3d9d78316e3e88efbf82453e7c838255ab68dcc042177fee056afd0822cf6174",
+      "recordSha256": "c3ce1c7dbdfc71b2f234f4d56ad2cee2163b1c388b831b9bed8cf1a9d28c50c5",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "8f9d33e109752670e70f8bcc51c54bcb3f9182a6c6bd6eb1fd42f2842fd5844c"
     },
@@ -2755,7 +2755,7 @@
       "file": "scripts/doc-binding-repair.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "6b320e261f4fcc230d877741abde0d587ba50789c2827078838bf6c794df514f",
+      "recordSha256": "1e479d417831ec4d8614a057583f09141eaa737d2cf630b9e2ec84a76c6804c7",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "39b05039c7f8856197e646d6e88b5b9961f047cb4b1133dba69b4539bf61f8eb"
     },
@@ -2827,7 +2827,7 @@
       "file": "scripts/fgos-shell-integration.sh",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "87ec1afa99dd7397b7baa8dea9f1bc717ba304e91a6661b586b1762deb7862e6",
+      "recordSha256": "5cfffe7a71f8d81536b0b7c7cfb54ef764af3c4cdf997aed570bc13393c350fa",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "70336ebd67d7cc9439a2bdd9220d54b298361bc6e54b159599f25d3579388a9d"
     },
@@ -2835,7 +2835,7 @@
       "file": "scripts/generate-doc-inventory.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "f22d00f98983ebc71092dacc5cb0dd4d122daf8c21617791e83167d5562e72cf",
+      "recordSha256": "21987a01be10a6a67c342789e906c520835e6d73dfc3b438eee2a4f1d26fa57e",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f"
     },
@@ -2843,7 +2843,7 @@
       "file": "scripts/generate-shipped-path-inventory.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "48ab0b8bb787ee5e160cbdc3d29be9830d096c87d715de830675b30f418865bc",
+      "recordSha256": "9ace9cff42f68fa39735e0b594a2c915acd06d3f55aa7008aae532d9ab29e52c",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284"
     },
@@ -2867,7 +2867,7 @@
       "file": "scripts/herdr-cockpit.sh",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "e3fdd53006059a687f796735c389ad213a801cf677c55b20802b3f8829a4cd2f",
+      "recordSha256": "9dad8c6471653ce2f4b239ab963af851252c71733c55f8c915e6c14e077d1f1b",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "486b87ae6e1ffd877971dd21b0fec7d375c8b83d0e83f1972cfa4b700720eddd"
     },
@@ -2891,7 +2891,7 @@
       "file": "scripts/knowledge-bootstrap.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "725506357364e9f07cac3ccc00600d03c8175a40e560568731aa8f9d6377e610",
+      "recordSha256": "73cfaf7d15b9bd3acdde17a0bcc55c93cd41be61385f82048c85206bab37a727",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "6ffd1b84d5ebf773b52806cd9d47007e60f4999a0f36b43bca4cc50d0f649543"
     },
@@ -2899,7 +2899,7 @@
       "file": "scripts/knowledge-canary.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "7692fae86ea24fe3a92a752cd62d13ecbdd85eb9ea5132c8a4de42b63e873899",
+      "recordSha256": "9de58642b8ef33108a7f1feaa831d0a91fafd2806d0b3719c6b257e0f4ac6640",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "68b294c8d21c7fde8be258af6eacaa066bf1b60bf724e692e8a61da02622a529"
     },
@@ -2907,7 +2907,7 @@
       "file": "scripts/knowledge-classifier.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "064407d1cd9ea9cda676df4e3bc629aaa718550a52b0eaba565966718cc3f15b",
+      "recordSha256": "b388269d116126de123ba38fa14f88905ecb6447ccd5cd1315ab9d400c2c272a",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "a6560aa2eb34a1245ebd83ee781f033253ff7652df5896dcc205e327d18ef5f4"
     },
@@ -2915,7 +2915,7 @@
       "file": "scripts/knowledge-migration.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "01187106639eff5f9d49dd231e770a591fa5d90901c6971080155a65de2e0153",
+      "recordSha256": "19fdd19acdfc0aa6896710c856d6a8a4448b89c4c90c75e7a0c6b04ae1b565e2",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "f57899d74a05230a03daa78f531605fd01f64bc9d2271719d97fa7954cb21936"
     },
@@ -2971,7 +2971,7 @@
       "file": "scripts/measure-p08-performance.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "a90df7e7f44598a84f4f77e9cf0d6829c2bf4cff44861bab2e92ff2b1983ad70",
+      "recordSha256": "939b76ac884c72cc392421de7f35d916c3d38c70ff7b74caedb17bb3f8df1867",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "2ab686e2e3f880f584a2f9278a6bbb27a49d71effcdb65215f1cbd3865099e3e"
     },
@@ -2979,7 +2979,7 @@
       "file": "scripts/measure-verify-cost.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "c85b895f6b7936593e4fef52dc09bedb86a31bc657df925e59ecc9807241052c",
+      "recordSha256": "bfb2bf79640ef2b289a64c2dc3300ededca39294526f2b451918d563af2d26b7",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "314c461c359f54f978a64494ea87884db14e563be96920387601e47c74bc37c4"
     },
@@ -2995,7 +2995,7 @@
       "file": "scripts/migrate-status-proposed-to-awaiting-approval.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "e13a37c0afeea46d2135fdd6ae25d176f6f7154f3992ad74346aa170f814c030",
+      "recordSha256": "af72cf974af5500b6bb010f09a4d00fa84c276591499420311f4a849db7023c5",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "ac3fd799390ee06d504b49f497f41f117526b961d4ebaf3883fca91b63cf2546"
     },
@@ -3011,7 +3011,7 @@
       "file": "scripts/next-doc-id.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "aa48618a98aab2ec8188c3ff2b8c2119dda4f9b3c8055d29a9d3c838f4eaaf4f",
+      "recordSha256": "cded6adb6c27598ef0c4b4a044a3b9b445d6f09e39116694524418d8869d0625",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "7e88c69cf6c78b4cce5240d3fcc34a1182fc963933435827a58974df5458bc9d"
     },
@@ -3027,7 +3027,7 @@
       "file": "scripts/prepare-release.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "1a33fc68bb741573d12bdb05ea47ca670c31828d05808620cb41c680d0be94f5",
+      "recordSha256": "7a3bcf679f8239d92bfeb2a3fa6d52b48af2f44aa7c62b57970e774a18f683bb",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "fd0c0ff8fef18c2c69713314e49fdc8a2e02b203fc2073210180b01483120da5"
     },
@@ -3035,7 +3035,7 @@
       "file": "scripts/probe-storytelling-material.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "e78732899f6533e69a169d59b315aae9e95ac4fb4160d8eeae70e89e0569f9f3",
+      "recordSha256": "81bb018c6a53e9e75be63a51e8e51fd760bebb9380e4aae3fe2e8b3bc2b12235",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "360c13abeff9239f891f38cb829d901f0e331f98c42ee9cd2e81d3e49437d39a"
     },
@@ -3043,7 +3043,7 @@
       "file": "scripts/project-agents.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "4e3da83a95911d68c0e0561f0e1952bb6c6d842e4c619ce3f87f6cd587130ab7",
+      "recordSha256": "3ad8b712151092bfe39c8f1dac1ad4339180d0f0e4617996b854dae6ffe98624",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "8af93fe4d0c75957a82da98b5c4dfa5aabba78fd4e60338b8cac861996b0e468"
     },
@@ -3051,7 +3051,7 @@
       "file": "scripts/propose-doc-decisions.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "0dc7555a9ebb5939ba2548c72a5266bcb47caf4bd191be210ac92b846828bc54",
+      "recordSha256": "e62f1fbe66bf36b66751e2e0cf67ec68f6764989c446ec6c7dfde2829c3bf3f0",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "c66cacf0b62d7c97737c570254ec91a44cf334cd7a74efb1149c21bffa20a8d5"
     },
@@ -3123,7 +3123,7 @@
       "file": "scripts/test-select-coverage-map.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "f215e55998e4cb5e89bf8992e1545424abdb2171949740fc34776bf181e9e64b",
+      "recordSha256": "0c7785ff9a005d059c64c6c68926e79e6ec5956e215c39ef4b7e7d8b5cb78976",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "8e4fbb903bb3c9e3680c946cbaeb8f5116a474c2bb873e96589bee1b4c56a431"
     },
@@ -3147,7 +3147,7 @@
       "file": "scripts/test-select-promote.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "39bd1bbb1a1d51c7a3486d8ca62091969ebb9deffcd08bc9ac90c28dc44b061c",
+      "recordSha256": "7e5f232c612f8572faf32ae08cc1f3e15dffc68d50284835fec8cc33c6b7c21c",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "a0da23143e4dfb674a89f419b87a70b84af33f874507e635467f2bc5dbc6b2fe"
     },
@@ -3179,7 +3179,7 @@
       "file": "scripts/verify-fanout-overlap.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "36254856816bb2c0a0397a86bb334d31c59a401ab835bd9bc20879429052b28b",
+      "recordSha256": "027cba522839cf6603f899bf8b2783fc9ba6efb30969ef096a593dd9d6d153f5",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "7d26533f3dac3d728d5f10ad20404565d9ca85c8371b71e5dfbbaa672e0b212b"
     },
@@ -3187,7 +3187,7 @@
       "file": "scripts/verify-phase-01.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "224d4fd29ffa004b76641c690c373e4ac7369437ad119125edae731c8e99c950",
+      "recordSha256": "1d5e9ce7e260ce97c2e9c888db1511b36ce5f726949084ef4655a1d94aeec792",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "e089db66f5bdb206c6a201ecf1cc2d71c58454a1fa94c7a87606598c3526198f"
     },
@@ -3195,7 +3195,7 @@
       "file": "scripts/verify-phase-02.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "001d3dbf6afe9d860fbc609e81145102e5e8e25ebf56c809c27908f45cad3487",
+      "recordSha256": "da28dea644be034712d936dacbdb41d661f6cb4ee1b62b89b215f707a3175bb2",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "b1dde4be037978da35fc84008e8c2eeae2f70a0514491c60be3363a28301583f"
     },
@@ -3219,7 +3219,7 @@
       "file": "src/report/capability-plan-lint.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "2ff346d20a2c8df657dc9e722a28eeb9c8ebac94e7b41ee63c235bb13fff891d",
+      "recordSha256": "2f00a5f89973cde4a3b28709cf574ed6f04592c22f0986f6741a700784dd5878",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "7dab2f9aaa2d97fcb33ed9d0ddc378aec9ee314f2f4e960808514ce96797c212"
     },
@@ -3227,7 +3227,7 @@
       "file": "src/report/context-render.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "73d8313449d2ac6bf73d4ae488689952ce5677c7068dd1667947e09dcd9afbff",
+      "recordSha256": "77c48c652750c82d6867498abefb60fe1106e7bdc6f0d2a26e5d349373ff29b1",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "21f0d004ecc62a6be3d059f2c4911dd9dd9fcd3c646d348625e8277efb750fdb"
     },
@@ -3259,7 +3259,7 @@
       "file": "src/setup/agy-permissions.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "708dd2548135733639ac93c0ac597cdf6dc2f3a405d71e8c3bc3ada98341f7e8",
+      "recordSha256": "4cbf51a8af76fc11540ef913f1527045a683638f6d5fef88b419461d1351722b",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "0dd7e2fc1297acf09f0e04236ab69f2c88dcfdc04cb9a0d7f14468973195d97f"
     },
@@ -3275,7 +3275,7 @@
       "file": "src/setup/bin-discovery.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "754f4d9ba19412bd00ad12ffa6eb5ecb18ec4e6178e33bbbf21fa7adc9c0997f",
+      "recordSha256": "24ea6ecb2fa790871026ee536dfec065af971343fd3edc7e490ccb6dbff81dc5",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "fbbe06965041a25c07ca954efb9d3f82b327bed894bbc19221315b703b10f8c5"
     },
@@ -3291,7 +3291,7 @@
       "file": "src/setup/checks.mjs",
       "generated": false,
       "itemsChanged": false,
-      "recordSha256": "609d747e56bf3d6fd822baa63cfa7124174913eea0612fb7ce77bd37749e85c1",
+      "recordSha256": "8489d13a4da7706456fc45e596a0048127940f8b3527d7ec5cc3115e405e6168",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "b5280315dd8712ff69e6e2f85a2db87d9e0ddd21c828bfb648d63bfb4e1bfaa4"
     },
@@ -3347,7 +3347,7 @@
       "file": "src/setup/git-hooks.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "929adcde0743ca567f06c2b53e82e5fc92462238a449bc1cb4be57190e1a123a",
+      "recordSha256": "974ebb55ca5cae34d6d91e3a6544cb900b04f056d10a46bea11e848a899c740a",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "bc64f3591e3fa896770a66491ef5bb1711c81aec96ba821d038cdd051f3addb6"
     },
@@ -3371,7 +3371,7 @@
       "file": "src/setup/instruction-registry.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "7abdc339474667948871ce035aeaeacb1252120efa23d0c672bbc0d6fa00c947",
+      "recordSha256": "5c7a36400750f653820888c7ba2f86c9afb15d5a57a49dd5b03270b06b56bab1",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697"
     },
@@ -3403,7 +3403,7 @@
       "file": "src/setup/registrations.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "ce7235da35dc7830af8104e99083278680b096d9bf050f4f084c3a87d25b0bc4",
+      "recordSha256": "f24ae136149e09ac29017244f9562ce06dc6681514b1446b82604ecf29936d22",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518"
     },
@@ -3427,7 +3427,7 @@
       "file": "src/setup/skill-wrappers.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "0eb77506667870a0dd9c2bb173bc7afde07ef85eee2ae8d278dd11b5661540fe",
+      "recordSha256": "060d446a0b82a87b8e44a7c8b2dfb3ef977ba2c6a290114e2fb2ac9e1e94f8b7",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b"
     },
@@ -142553,5 +142553,6 @@
       ]
     }
   ],
-  "inputCommit": "d23a6aa3a09fae1cd039918b718e322177cb273e"
+  "inputCommit": "d23a6aa3a09fae1cd039918b718e322177cb273e",
+  "currentBindingRuling": "L12-74; changes since this first scope are separately listed in step-05-seam4-rereview2-list.json."
 }

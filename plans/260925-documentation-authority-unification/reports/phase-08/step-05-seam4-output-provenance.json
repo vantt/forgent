@@ -687,14 +687,14 @@
     },
     {
       "path": ".agents/skills/fgos-run/SKILL.md",
-      "sha256": "ada46a1bde59383e81d92b734fbc8f15ebb6b6cd0860f4aa965cea642eeda8a2",
-      "bytes": 7700,
+      "sha256": "20cee5cc4dd226836a4a0ac456435c7f08a524fd28a431a052f06cda22218a42",
+      "bytes": 7762,
       "mode": "100644",
-      "provenance": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf:.agents/skills/fgos-run/SKILL.md",
+      "provenance": "2b04bfe7c1f748c2f17beca4a6695c968ada2bd5:.agents/skills/fgos-run/SKILL.md",
       "source": "core/skills/fgos-run/SKILL.md",
       "generator": "scripts/build-skill-wrappers.mjs",
       "provenanceStatus": "header/static tracked output; same-run generation not performed",
-      "sourceSha256": "1e1ebada1abc36f8d1313f78d28cbe6fd9cbfb160ae7f1f2aa2031bb349c2afc",
+      "sourceSha256": "b33a70eb0dbd2a0470053ab033b6eaadf5d70ff03bf3a7eca454e171eb32b1ba",
       "payloadEqualsSourceAtPin": true
     },
     {
@@ -2061,14 +2061,14 @@
     },
     {
       "path": "plugins/fgOS/skills/fgos-run/SKILL.md",
-      "sha256": "ada46a1bde59383e81d92b734fbc8f15ebb6b6cd0860f4aa965cea642eeda8a2",
-      "bytes": 7700,
+      "sha256": "20cee5cc4dd226836a4a0ac456435c7f08a524fd28a431a052f06cda22218a42",
+      "bytes": 7762,
       "mode": "100644",
-      "provenance": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf:plugins/fgOS/skills/fgos-run/SKILL.md",
+      "provenance": "2b04bfe7c1f748c2f17beca4a6695c968ada2bd5:plugins/fgOS/skills/fgos-run/SKILL.md",
       "source": "core/skills/fgos-run/SKILL.md",
       "generator": "scripts/build-skill-wrappers.mjs",
       "provenanceStatus": "header/static tracked output; same-run generation not performed",
-      "sourceSha256": "1e1ebada1abc36f8d1313f78d28cbe6fd9cbfb160ae7f1f2aa2031bb349c2afc",
+      "sourceSha256": "b33a70eb0dbd2a0470053ab033b6eaadf5d70ff03bf3a7eca454e171eb32b1ba",
       "payloadEqualsSourceAtPin": true
     }
   ],

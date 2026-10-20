@@ -1074,3 +1074,19 @@ Step 0 binding check: 0 candidate files changed, 0 direct bindings checked, 0 gr
 Consumer overlaps: Step 3 has 0 overlaps (`step-00-l12-73-step3-deferred-rebinds.json` is empty). Step 4 has 2 overlaps (`CHANGELOG.md` in `step04-017.jsonl:1`, `core/skills/fgos-run/SKILL.md` in `step04-030.jsonl:9`), deferred once to Step 7 final assembly under L12-58(1). Step 5 has 0 primary consumer overlaps across all 291 authored records; `CHANGELOG.md` is in `coCutPaths` of 11 authored records (deferred to Step 7 / Phase 9 co-cut assembly). Receipt: `step-00-l12-73-consumer-overlaps.json`.
 
 Runner supplies the real commit; Lead owes ordinary L12-11 actual-commit accounting and independent Step 0 review. No git write, fgOS CLI, docs/code/consumer edit, live state/secrets read, authority flip, generator/build, full npm/cargo or installed parity is claimed. `needsWrites: []`.
+
+
+## Second review closure / L12-74 — in progress (2026-10-21)
+
+Acknowledged and read the complete authoritative brief. Verifying pinned source operands before applying R10–R16 and every per-report ruling. Extending only the record checker/probes in this report directory, then sweeping all Step 5 records. No CLI, build, code/docs/skills/baseline edits or git writes.
+
+
+## Second review closure / L12-74 — completed author handback (2026-10-21)
+
+Applied all R10–R16 and per-report rulings as records only, with pinned source counter-evidence and the verbatim Lead rulings in owner-answers.md. Initial shared-rule hits a–e: **0 / 272 / 86 / 0 / 0**; R11 **135** (R12 is part of b). Final shared and full checkers: **0 failures**.
+
+Full Step 5 remains **291 records / 2,419 original refs / 5,654 original tuples**; 79 total author slots, including 20 new this turn. Source pins and original identities conserved. **78/78 rejecting probes** (44 pilot +34 generator), including both new R11/R12 negatives; the first 33/34 generator result and repaired no-op fixture are retained and explained. Three new source-comment hunks compose into two source-only specs, with scratch apply/rollback and real owning-test names; no source patch is applied.
+
+`step-05-seam4-rereview2-list.json`: **22 files (18 source /4 generated), 342 action-or-slot entries**. R10 excludes 195 admission-only changes and owner/label-only repairs; 16 occurrence owner pointers and 86 generated admitted render-joins are corrected. Four output inventories actually own 1,902 canonical state refs; the brief's 2,402 prose count is corrected without changing census identities. Two static fgos-run render hashes reflect the already-accounted L12-73 merge, without generation.
+
+Runner owns commits. Lead owns independent re-review, final Step 7 assembly and missing Phase 9 state/runtime/generator proof; no acceptance or cutover is claimed. No CLI, build, services, cargo/npm suite, consumer/code/docs/skills/baseline edit, live state/secrets read or git write. Markdown preview remains with Lead. `needsWrites: []`. Final evidence: `step-05-seam4-fix2-verification.json`.

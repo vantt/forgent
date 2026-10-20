@@ -20,6 +20,7 @@
     "passage-outcome",
     "patches",
     "pinned-passage",
+    "r11-plans-boundary",
     "receipts",
     "rejections",
     "retiring-retained",
@@ -548,9 +549,38 @@
           "error": "condition false"
         }
       ]
+    },
+    {
+      "name": "R12 rejects same-file operand and line substitutions in template blockers",
+      "owningRule": "b-real-blocker",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "b-real-blocker",
+          "where": "src/cli/command-registry.mjs:reference-003641",
+          "error": "condition false"
+        },
+        {
+          "rule": "b-real-blocker",
+          "where": "src/cli/command-registry.mjs:reference-003643",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "R11 rejects a plans-only default even when called through a gate",
+      "owningRule": "r11-plans-boundary",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "r11-plans-boundary",
+          "where": "scripts/check-doc-constitution.mjs:dynamic-006605",
+          "error": "condition false"
+        }
+      ]
     }
   ],
-  "passed": 42,
-  "total": 42,
+  "passed": 44,
+  "total": 44,
   "failures": []
 }

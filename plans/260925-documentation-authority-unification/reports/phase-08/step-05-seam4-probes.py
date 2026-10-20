@@ -16,6 +16,7 @@ def run(name,rule,mutate=None,override=None,packets=False):
  try:out=m.check(rs,rc,ss,ix,check_packets=packets)
  finally:m.read=reader
  caught=[f for f in out['failures'] if f['rule']==rule];probes.append({'name':name,'owningRule':rule,'pass':bool(caught),'caught':caught[:2]})
+ print('probe '+str(len(probes))+': '+name+(' — rejected' if caught else ' — NOT REJECTED'),flush=True)
 def ref(rs):return next(e for r in rs for e in r['references'])
 def dyn(rs):return next(d for r in rs for d in r['dynamicTraces'])
 run('Dropping a promoted generated-output reference cannot shrink coverage','s4-coverage',lambda rs,rc,ss,ix:next(r for r in rs if r['file']=='docs/doc-registry.json')['references'].pop())
@@ -51,7 +52,7 @@ def wrong_field_role(rs,rc,ss,ix):
 run('Equal alias and capture strings cannot borrow each others field role','s4-spans',wrong_field_role)
 def item(rs,id):return next(e for r in rs for e in r['references']+r['dynamicTraces']+r.get('authorAddedReferences',[]) if e.get('id',e.get('referenceId'))==id)
 run('Literal-literal same passage admission is all-pairs','a-passage-agreement',lambda rs,rc,ss,ix:item(rs,'reference-000002').__setitem__('admission','REJECT'))
-run('Dynamic-dynamic nested path operation must agree','a-passage-agreement',lambda rs,rc,ss,ix:item(rs,'dynamic-006739').__setitem__('admission','REJECT'))
+run('Dynamic-dynamic nested path operation must agree','a-passage-agreement',lambda rs,rc,ss,ix:item(rs,'dynamic-009775').__setitem__('admission','REJECT'))
 run('Literal-dynamic shared retained root must agree','a-passage-agreement',lambda rs,rc,ss,ix:item(rs,'dynamic-001704').__setitem__('disposition','parked'))
 def shared_block(rs,rc,ss,ix):
  pairs=[(r,e) for r in rs for e in r['references'] if e['disposition']=='parked'];r,e=pairs[0];q,t=next((q,t) for q,t in pairs if q['file']!=r['file']);t['blockedReason']=e['blockedReason']
@@ -62,6 +63,12 @@ run('Unknown nonDocumentUse category is rejected','d-own-operand',lambda rs,rc,s
 run('Borrowed neighbouring path cannot replace own operand','d-own-operand',lambda rs,rc,ss,ix:item(rs,'dynamic-001704').__setitem__('pathOperand','function requireRoot(args)'))
 run('Wrapped retired citation requires its live narrative successor','e-retired-successor',lambda rs,rc,ss,ix:item(rs,'reference-002431').__setitem__('successorNote',None))
 run('An existing unrelated heading cannot impersonate the decision successor','e-retired-successor',lambda rs,rc,ss,ix:item(rs,'reference-002431').__setitem__('successorNote','docs/platform/component-boundary.md#18-implementation-reality-additional-boundaries-found-in-code'))
+def templated_block(rs,rc,ss,ix):
+ r=next(r for r in rs if r['file']=='scripts/knowledge-migration.mjs')
+ es=[e for e in r['dynamicTraces'] if e['id'] in ['dynamic-008173','dynamic-008186']]
+ for i,e in enumerate(es):e['blockedReason']=r['file']+": operation '"+str(e['originalTuple'][4])+"' at line "+str(10+i)+" requires an authorized inventory export."
+run('R12 rejects operand-swapped blockers in separate passages of one file','b-real-blocker',templated_block)
+run('R11 rejects admission of a plan-only report constant','r11-plans-boundary',lambda rs,rc,ss,ix:item(rs,'dynamic-006605').update(admission='ADMIT',nonDocumentUse=None))
 assert {p['owningRule'] for p in probes}==set(m.RULES)
 out={'kind':'Seam4 rejecting mutation probes','baselineFailures':baseline['failureCount'],'rulesCovered':sorted(m.RULES),'passed':sum(p['pass'] for p in probes),'total':len(probes),'probes':probes,'failures':[p for p in probes if not p['pass']]}
 (P/'step-05-seam4-probes-result.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n');print(json.dumps({k:v for k,v in out.items() if k!='probes'}));sys.exit(bool(out['failures']))

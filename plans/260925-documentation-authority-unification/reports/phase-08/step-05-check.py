@@ -19,10 +19,12 @@ def candidate(r):
  before=(ROOT/r['file']).read_text();edits={}
  for e in r['references']:
   if e['disposition']!='patch':continue
-  assert len(e['sourceSpans'])==1,'patch must bind complete physical token'
-  a,b=m.bounds(before,e['sourceSpans'])[0];replacement=e['proposedReplacement']
-  if (a,b) in edits:assert edits[a,b]==replacement,'duplicate qualified refs disagree'
-  edits[a,b]=replacement
+  bounds=m.bounds(before,e['sourceSpans'])
+  replacements=e.get('sourceSpanReplacements',[e['proposedReplacement']])
+  assert len(bounds)==len(replacements),'each physical source span has one explicit replacement'
+  for (a,b),replacement in zip(bounds,replacements):
+   if (a,b) in edits:assert edits[a,b]==replacement,'duplicate qualified refs disagree'
+   edits[a,b]=replacement
  ranges=sorted(edits)
  assert all(a>=ranges[i-1][1] for i,(a,b) in enumerate(ranges) if i),'overlapping distinct patch ranges'
  after=before
@@ -239,7 +241,7 @@ def check(rs,receipts=None,index=None,check_packets=True):
     assert e['passage']=='\n'.join(before.splitlines()[a-1:b])
    test('source-spans',loc,spans)
    if e['admission']=='ADMIT':test('receipts',loc,lambda e=e:e.get('proofCommand') and e.get('parityObligation') and e['receiptId'] in rec)
-   if e['admission']=='REJECT':test('rejections',loc,lambda e=e:e['disposition']=='preserve' and e['role']=='comment' and e['passage'] and repr(e['passage']) in e['reason'] and 'L12-' in e['reason'])
+   if e['admission']=='REJECT':test('rejections',loc,lambda e=e:e['disposition']=='preserve' and (e['role']=='comment' or e['role']=='usage-placeholder' and e.get('nonDocumentUse')=='caller-data-formatting' and e['matchedExpression']=='docs/quadrant-dir>' and '<docs/quadrant-dir>' in e['passage']) and e['passage'] and repr(e['passage']) in e['reason'] and 'L12-' in e['reason'])
    if e['disposition']=='parked':test('parks',loc,lambda e=e:e['admission']=='ADMIT' and e['blockedReason'] and e['dependency'] and e['blockedCategory'] and e['dependencyCategory'] and e['timing']=='phase9' and not e['diffHunk'])
    if e['role']=='synthetic-fixture':
     def fixture(e=e):

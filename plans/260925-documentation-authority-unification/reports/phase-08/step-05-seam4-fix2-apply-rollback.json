@@ -1,0 +1,23 @@
+{
+  "proof": "Source-only proposed diffs applied and reversed in scratch, never applied to consumers",
+  "files": [
+    {
+      "file": "src/setup/registrations.mjs",
+      "beforeSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "afterSha256": "f702e6f8139f4e2ce01f4a1168d8d5ecfa9ef84d531f29a6c3e08875c61d2c76",
+      "restoredSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "forwardExit": 0,
+      "rollbackExit": 0,
+      "scratchOnly": true
+    },
+    {
+      "file": "src/setup/git-hooks.mjs",
+      "beforeSha256": "bc64f3591e3fa896770a66491ef5bb1711c81aec96ba821d038cdd051f3addb6",
+      "afterSha256": "a80e017e9137548eb29a62f5dfee46d95c24398d0ef6c06af57f307c57744c4f",
+      "restoredSha256": "bc64f3591e3fa896770a66491ef5bb1711c81aec96ba821d038cdd051f3addb6",
+      "forwardExit": 0,
+      "rollbackExit": 0,
+      "scratchOnly": true
+    }
+  ]
+}

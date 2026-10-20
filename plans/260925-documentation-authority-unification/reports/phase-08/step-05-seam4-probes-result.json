@@ -7,6 +7,7 @@
     "c-render-owner",
     "d-own-operand",
     "e-retired-successor",
+    "r11-plans-boundary",
     "s4-carries",
     "s4-coverage",
     "s4-greps",
@@ -22,8 +23,8 @@
     "s4-review",
     "s4-spans"
   ],
-  "passed": 32,
-  "total": 32,
+  "passed": 34,
+  "total": 34,
   "probes": [
     {
       "name": "Dropping a promoted generated-output reference cannot shrink coverage",
@@ -308,7 +309,7 @@
       "caught": [
         {
           "rule": "a-passage-agreement",
-          "where": "scripts/check-doc-inventory-gates.mjs:dynamic-006738/dynamic-006739",
+          "where": "src/report/enduser-index-generate.mjs:dynamic-009775/dynamic-009776",
           "error": "condition false"
         }
       ]
@@ -337,7 +338,7 @@
         },
         {
           "rule": "b-real-blocker",
-          "where": "docs/doc-registry.json:reference-000387",
+          "where": "docs/decisions/index.md:reference-000311",
           "error": "condition false"
         }
       ]
@@ -411,6 +412,35 @@
           "rule": "e-retired-successor",
           "where": "scripts/backfill-status-category.mjs:reference-002431",
           "error": "successor heading must own the cited decision id"
+        }
+      ]
+    },
+    {
+      "name": "R12 rejects operand-swapped blockers in separate passages of one file",
+      "owningRule": "b-real-blocker",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "b-real-blocker",
+          "where": "scripts/knowledge-migration.mjs:dynamic-008173",
+          "error": "condition false"
+        },
+        {
+          "rule": "b-real-blocker",
+          "where": "scripts/knowledge-migration.mjs:dynamic-008186",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "R11 rejects admission of a plan-only report constant",
+      "owningRule": "r11-plans-boundary",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "r11-plans-boundary",
+          "where": "scripts/check-doc-constitution.mjs:dynamic-006605",
+          "error": "condition false"
         }
       ]
     }

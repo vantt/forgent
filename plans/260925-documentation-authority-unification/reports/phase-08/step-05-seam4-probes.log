@@ -1,1 +1,35 @@
-{"kind": "Seam4 rejecting mutation probes", "baselineFailures": 0, "rulesCovered": ["a-passage-agreement", "b-real-blocker", "c-render-owner", "d-own-operand", "e-retired-successor", "s4-carries", "s4-coverage", "s4-greps", "s4-inheritance", "s4-lexical", "s4-operand", "s4-outputs", "s4-parks", "s4-patches", "s4-pins", "s4-receipts", "s4-retiring-retained", "s4-review", "s4-spans"], "passed": 32, "total": 32, "failures": []}
+probe 1: Dropping a promoted generated-output reference cannot shrink coverage — rejected
+probe 2: False whole-file digest is rejected — rejected
+probe 3: Forged current physical token is rejected — rejected
+probe 4: Inherited source-slot identity is not a copied approval — rejected
+probe 5: Scalar glob guard cannot become an admitted path operation — rejected
+probe 6: Document currentPath comparison cannot be discarded as unrelated scalar — rejected
+probe 7: A park must keep its own dependency — rejected
+probe 8: Retiring-root target cannot use a retained witness — rejected
+probe 9: Full-file after hash cannot be invented — rejected
+probe 10: Inverse rollback must restore pinned bytes — rejected
+probe 11: Test grep proof cannot disappear — rejected
+probe 12: Generated output cannot receive a manual diff — rejected
+probe 13: Sorted output set cannot claim an invented digest — rejected
+probe 14: Unrun generator parity cannot become a pass — rejected
+probe 15: One of 165 inherited pilot ids cannot disappear — rejected
+probe 16: One original unresolved carry cannot disappear — rejected
+probe 17: Whole-file lexical occurrence cannot disappear — rejected
+probe 18: Oversized review part metadata is rejected — rejected
+probe 19: Missing source caller declaration is rejected — rejected
+probe 20: An invented owning test cannot count as proof — rejected
+probe 21: An uncomputed generated intermediate cannot claim a candidate hash — rejected
+probe 22: Equal alias and capture strings cannot borrow each others field role — rejected
+probe 23: Literal-literal same passage admission is all-pairs — rejected
+probe 24: Dynamic-dynamic nested path operation must agree — rejected
+probe 25: Literal-dynamic shared retained root must agree — rejected
+probe 26: A verbatim blocker reused in different files is rejected — rejected
+probe 27: A generated preserve owner cannot acquire an own park — rejected
+probe 28: Every admitted tuple needs exact own pathOperand — rejected
+probe 29: Unknown nonDocumentUse category is rejected — rejected
+probe 30: Borrowed neighbouring path cannot replace own operand — rejected
+probe 31: Wrapped retired citation requires its live narrative successor — rejected
+probe 32: An existing unrelated heading cannot impersonate the decision successor — rejected
+probe 33: R12 rejects operand-swapped blockers in separate passages of one file — rejected
+probe 34: R11 rejects admission of a plan-only report constant — rejected
+{"kind": "Seam4 rejecting mutation probes", "baselineFailures": 0, "rulesCovered": ["a-passage-agreement", "b-real-blocker", "c-render-owner", "d-own-operand", "e-retired-successor", "r11-plans-boundary", "s4-carries", "s4-coverage", "s4-greps", "s4-inheritance", "s4-lexical", "s4-operand", "s4-outputs", "s4-parks", "s4-patches", "s4-pins", "s4-receipts", "s4-retiring-retained", "s4-review", "s4-spans"], "passed": 34, "total": 34, "failures": []}

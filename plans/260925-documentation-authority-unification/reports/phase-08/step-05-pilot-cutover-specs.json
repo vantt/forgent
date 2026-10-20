@@ -1745,17 +1745,23 @@
       "symbolOrPassage": [
         "  return {\n    passed: false,\n    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n  };\n}",
         "  return {\n    passed: false,\n    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,\n  };\n}",
-        "  }\n  if (missing.length > 0) {\n    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };\n  }\n  return { passed: true, message: 'every domain\\'s taskSpecMap entry and operation resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };"
+        "  }\n  if (missing.length > 0) {\n    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };\n  }\n  return { passed: true, message: 'every domain\\'s taskSpecMap entry and operation resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };",
+        "// reason this check exists. The\n// re-baseline-after-acknowledgment step is a deliberate, documented\n// manual command (docs/how-to/resolve-an-events-jsonl-truncation.md), not\n// a blanket `doctor --fix` sweep.\n// Tầng A/T5 (TA-D10): checks baseline-0 AND every per-writer file under",
+        "// OWN key, modeled on gateBypass's three registrations immediately above but\n// deliberately never folded into that section: gateBypass's floor is\n// documented as never touching Iron Law (docs/explanation/gate-bypass-\n// design.md), and reusing its level vocabulary here would erase that line.\n//\n// `ask` is both the default this fix writes and what every unreadable value"
       ],
       "oldText": [
         "docs/how-to/cut-a-fgos-release-tag.md",
         "docs/how-to/resolve-an-events-jsonl-truncation.md",
-        "docs/how-to/write-a-task-spec.md"
+        "docs/how-to/write-a-task-spec.md",
+        "docs/how-to/resolve-an-events-jsonl-truncation.md",
+        "docs/explanation/gate-bypass-\n// design.md"
       ],
       "newText": [
         "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
         "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
-        "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md"
+        "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
+        "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+        "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md"
       ],
       "sourceSpans": [
         {
@@ -1775,14 +1781,34 @@
           "columnStart": 142,
           "columnEndExclusive": 174,
           "text": "docs/how-to/write-a-task-spec.md"
+        },
+        {
+          "line": 2045,
+          "columnStart": 20,
+          "columnEndExclusive": 69,
+          "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
+        },
+        {
+          "line": 3063,
+          "columnStart": 43,
+          "columnEndExclusive": 72,
+          "text": "docs/explanation/gate-bypass-"
+        },
+        {
+          "line": 3064,
+          "columnStart": 1,
+          "columnEndExclusive": 13,
+          "text": "// design.md"
         }
       ],
-      "diff": "--- a/src/setup/registrations.mjs\n+++ b/src/setup/registrations.mjs\n@@ -871,7 +871,7 @@\n     }\n   }\n   if (missing.length > 0) {\n-    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };\n+    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md` };\n   }\n   return { passed: true, message: 'every domain\\'s taskSpecMap entry and operation resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };\n }\n@@ -2091,7 +2091,7 @@\n   }\n   return {\n     passed: false,\n-    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,\n+    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md`,\n   };\n }\n \n@@ -3515,7 +3515,7 @@\n   }\n   return {\n     passed: false,\n-    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n+    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n   };\n }\n \n",
-      "expectedAfterSha256": "e5a0579e471f1e173a045ffd28eed898cbc2d7c2462db3c3d438836e9a489d62",
+      "diff": "--- a/src/setup/registrations.mjs\n+++ b/src/setup/registrations.mjs\n@@ -871,7 +871,7 @@\n     }\n   }\n   if (missing.length > 0) {\n-    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };\n+    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md` };\n   }\n   return { passed: true, message: 'every domain\\'s taskSpecMap entry and operation resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };\n }\n@@ -2042,7 +2042,7 @@\n // erase the loud signal before a human ever saw it, defeating the\n // reason this check exists. The\n // re-baseline-after-acknowledgment step is a deliberate, documented\n-// manual command (docs/how-to/resolve-an-events-jsonl-truncation.md), not\n+// manual command (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md), not\n // a blanket `doctor --fix` sweep.\n // Tầng A/T5 (TA-D10): checks baseline-0 AND every per-writer file under\n // .fgos/events/, each against its OWN entry in the shared guard sidecar\n@@ -2091,7 +2091,7 @@\n   }\n   return {\n     passed: false,\n-    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,\n+    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md`,\n   };\n }\n \n@@ -3060,7 +3060,7 @@\n // ironLaw.level (docs/history/iron-law-gate-human-ux/CONTEXT.md D3/D7) — its\n // OWN key, modeled on gateBypass's three registrations immediately above but\n // deliberately never folded into that section: gateBypass's floor is\n-// documented as never touching Iron Law (docs/explanation/gate-bypass-\n+// documented as never touching Iron Law (docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-\n // design.md), and reusing its level vocabulary here would erase that line.\n //\n // `ask` is both the default this fix writes and what every unreadable value\n@@ -3515,7 +3515,7 @@\n   }\n   return {\n     passed: false,\n-    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n+    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n   };\n }\n \n",
+      "expectedAfterSha256": "f702e6f8139f4e2ce01f4a1168d8d5ecfa9ef84d531f29a6c3e08875c61d2c76",
       "targetOwner": [
         "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
         "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
-        "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md"
+        "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
+        "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+        "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md"
       ],
       "claimAnchorProof": [
         {
@@ -1811,11 +1837,20 @@
           "alias": "docs/how-to/write-a-task-spec.md",
           "targetSha256": "dfdd678642adb8b4795088759d783a024d5b9afb41227bb96f907af173659083",
           "claim": "live currentPath lookup; no writer destination adopts an alias"
+        },
+        {
+          "rule": "Unique conserved knowledge holder, exact filename; comment-only pointer repair.",
+          "targetSha256": "da410923253f4bdf8219b75fae8176ce4e97b9114e4a2172dbb19adfea460862"
+        },
+        {
+          "rule": "Unique conserved knowledge holder, exact filename; comment-only pointer repair.",
+          "targetSha256": "062af6c9bf24067dd2c739af0ad913014dc068b95ea6165393a51e324a19522f"
         }
       ],
       "receiptId": "setup-doctor-roots-pilot",
       "coCutPaths": [
         "CHANGELOG.md",
+        "test/runner/dispatch-executor-profile.test.mjs",
         "test/setup/checks.test.mjs"
       ],
       "expectedOutputSets": [
@@ -1824,11 +1859,11 @@
           "referenceId": "reference-003804",
           "edgeId": "class6-l-000378",
           "line": 3518,
-          "currentExpression": "    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,",
-          "candidateExpression": "    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,",
+          "currentExpression": "  return {\n    passed: false,\n    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n  };\n}",
+          "candidateExpression": "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
           "oldPointer": "docs/how-to/cut-a-fgos-release-tag.md",
           "newPointer": "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
-          "intent": "Only this emitted/navigation pointer changes; surrounding output and status/category/exit behavior stay equal.",
+          "intent": "Exact source pointer correction; comment-only repairs change no runtime output.",
           "evidence": {
             "target": "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
             "docId": "how-to-cut-a-fgos-release-tag:cut-a-fgos-release-tag",
@@ -1844,11 +1879,11 @@
           "referenceId": "reference-003806",
           "edgeId": "class6-l-000355",
           "line": 2094,
-          "currentExpression": "    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,",
-          "candidateExpression": "    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md`,",
+          "currentExpression": "  return {\n    passed: false,\n    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,\n  };\n}",
+          "candidateExpression": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
           "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
           "newPointer": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
-          "intent": "Only this emitted/navigation pointer changes; surrounding output and status/category/exit behavior stay equal.",
+          "intent": "Exact source pointer correction; comment-only repairs change no runtime output.",
           "evidence": {
             "target": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
             "docId": "how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events-jsonl-truncation:resolve-an-events-jsonl-truncation",
@@ -1864,11 +1899,11 @@
           "referenceId": "reference-003811",
           "edgeId": "class6-l-000351",
           "line": 874,
-          "currentExpression": "    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };",
-          "candidateExpression": "    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md` };",
+          "currentExpression": "  }\n  if (missing.length > 0) {\n    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };\n  }\n  return { passed: true, message: 'every domain\\'s taskSpecMap entry and operation resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };",
+          "candidateExpression": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
           "oldPointer": "docs/how-to/write-a-task-spec.md",
           "newPointer": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
-          "intent": "Only this emitted/navigation pointer changes; surrounding output and status/category/exit behavior stay equal.",
+          "intent": "Exact source pointer correction; comment-only repairs change no runtime output.",
           "evidence": {
             "target": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
             "docId": "how-to-write-a-task-spec:write-a-task-spec",
@@ -1877,6 +1912,36 @@
             "alias": "docs/how-to/write-a-task-spec.md",
             "targetSha256": "dfdd678642adb8b4795088759d783a024d5b9afb41227bb96f907af173659083",
             "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        },
+        {
+          "file": "src/setup/registrations.mjs",
+          "referenceId": "reference-003845",
+          "edgeId": "class6-l-000354",
+          "line": 2045,
+          "currentExpression": "// reason this check exists. The\n// re-baseline-after-acknowledgment step is a deliberate, documented\n// manual command (docs/how-to/resolve-an-events-jsonl-truncation.md), not\n// a blanket `doctor --fix` sweep.\n// Tầng A/T5 (TA-D10): checks baseline-0 AND every per-writer file under",
+          "candidateExpression": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+          "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+          "newPointer": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+          "intent": "Exact source pointer correction; comment-only repairs change no runtime output.",
+          "evidence": {
+            "rule": "Unique conserved knowledge holder, exact filename; comment-only pointer repair.",
+            "targetSha256": "da410923253f4bdf8219b75fae8176ce4e97b9114e4a2172dbb19adfea460862"
+          }
+        },
+        {
+          "file": "src/setup/registrations.mjs",
+          "referenceId": "reference-003850",
+          "edgeId": "class6-l-000374",
+          "line": 3063,
+          "currentExpression": "// OWN key, modeled on gateBypass's three registrations immediately above but\n// deliberately never folded into that section: gateBypass's floor is\n// documented as never touching Iron Law (docs/explanation/gate-bypass-\n// design.md), and reusing its level vocabulary here would erase that line.\n//\n// `ask` is both the default this fix writes and what every unreadable value",
+          "candidateExpression": "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md",
+          "oldPointer": "docs/explanation/gate-bypass-\n// design.md",
+          "newPointer": "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md",
+          "intent": "Exact source pointer correction; comment-only repairs change no runtime output.",
+          "evidence": {
+            "rule": "Unique conserved knowledge holder, exact filename; comment-only pointer repair.",
+            "targetSha256": "062af6c9bf24067dd2c739af0ad913014dc068b95ea6165393a51e324a19522f"
           }
         }
       ],
@@ -1890,11 +1955,11 @@
           "referenceId": "reference-003804",
           "edgeId": "class6-l-000378",
           "line": 3518,
-          "currentExpression": "    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,",
-          "candidateExpression": "    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,",
+          "currentExpression": "  return {\n    passed: false,\n    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n  };\n}",
+          "candidateExpression": "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
           "oldPointer": "docs/how-to/cut-a-fgos-release-tag.md",
           "newPointer": "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
-          "intent": "Only this emitted/navigation pointer changes; surrounding output and status/category/exit behavior stay equal.",
+          "intent": "Exact source pointer correction; comment-only repairs change no runtime output.",
           "evidence": {
             "target": "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
             "docId": "how-to-cut-a-fgos-release-tag:cut-a-fgos-release-tag",
@@ -1910,11 +1975,11 @@
           "referenceId": "reference-003806",
           "edgeId": "class6-l-000355",
           "line": 2094,
-          "currentExpression": "    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,",
-          "candidateExpression": "    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md`,",
+          "currentExpression": "  return {\n    passed: false,\n    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,\n  };\n}",
+          "candidateExpression": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
           "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
           "newPointer": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
-          "intent": "Only this emitted/navigation pointer changes; surrounding output and status/category/exit behavior stay equal.",
+          "intent": "Exact source pointer correction; comment-only repairs change no runtime output.",
           "evidence": {
             "target": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
             "docId": "how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events-jsonl-truncation:resolve-an-events-jsonl-truncation",
@@ -1930,11 +1995,11 @@
           "referenceId": "reference-003811",
           "edgeId": "class6-l-000351",
           "line": 874,
-          "currentExpression": "    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };",
-          "candidateExpression": "    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md` };",
+          "currentExpression": "  }\n  if (missing.length > 0) {\n    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };\n  }\n  return { passed: true, message: 'every domain\\'s taskSpecMap entry and operation resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };",
+          "candidateExpression": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
           "oldPointer": "docs/how-to/write-a-task-spec.md",
           "newPointer": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
-          "intent": "Only this emitted/navigation pointer changes; surrounding output and status/category/exit behavior stay equal.",
+          "intent": "Exact source pointer correction; comment-only repairs change no runtime output.",
           "evidence": {
             "target": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
             "docId": "how-to-write-a-task-spec:write-a-task-spec",
@@ -1943,6 +2008,36 @@
             "alias": "docs/how-to/write-a-task-spec.md",
             "targetSha256": "dfdd678642adb8b4795088759d783a024d5b9afb41227bb96f907af173659083",
             "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        },
+        {
+          "file": "src/setup/registrations.mjs",
+          "referenceId": "reference-003845",
+          "edgeId": "class6-l-000354",
+          "line": 2045,
+          "currentExpression": "// reason this check exists. The\n// re-baseline-after-acknowledgment step is a deliberate, documented\n// manual command (docs/how-to/resolve-an-events-jsonl-truncation.md), not\n// a blanket `doctor --fix` sweep.\n// Tầng A/T5 (TA-D10): checks baseline-0 AND every per-writer file under",
+          "candidateExpression": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+          "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+          "newPointer": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+          "intent": "Exact source pointer correction; comment-only repairs change no runtime output.",
+          "evidence": {
+            "rule": "Unique conserved knowledge holder, exact filename; comment-only pointer repair.",
+            "targetSha256": "da410923253f4bdf8219b75fae8176ce4e97b9114e4a2172dbb19adfea460862"
+          }
+        },
+        {
+          "file": "src/setup/registrations.mjs",
+          "referenceId": "reference-003850",
+          "edgeId": "class6-l-000374",
+          "line": 3063,
+          "currentExpression": "// OWN key, modeled on gateBypass's three registrations immediately above but\n// deliberately never folded into that section: gateBypass's floor is\n// documented as never touching Iron Law (docs/explanation/gate-bypass-\n// design.md), and reusing its level vocabulary here would erase that line.\n//\n// `ask` is both the default this fix writes and what every unreadable value",
+          "candidateExpression": "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md",
+          "oldPointer": "docs/explanation/gate-bypass-\n// design.md",
+          "newPointer": "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md",
+          "intent": "Exact source pointer correction; comment-only repairs change no runtime output.",
+          "evidence": {
+            "rule": "Unique conserved knowledge holder, exact filename; comment-only pointer repair.",
+            "targetSha256": "062af6c9bf24067dd2c739af0ad913014dc068b95ea6165393a51e324a19522f"
           }
         }
       ],
@@ -1954,7 +2049,7 @@
         "Step 7 composes and de-duplicates shared co-cut test diffs by file/content; do not apply the same pinned test diff twice. Recompute combined hashes after all seams are assembled."
       ],
       "order": "Phase 9 atomic consumer cutover; no apply-now action",
-      "rollbackDiff": "--- a/src/setup/registrations.mjs\n+++ b/src/setup/registrations.mjs\n@@ -871,7 +871,7 @@\n     }\n   }\n   if (missing.length > 0) {\n-    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md` };\n+    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };\n   }\n   return { passed: true, message: 'every domain\\'s taskSpecMap entry and operation resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };\n }\n@@ -2091,7 +2091,7 @@\n   }\n   return {\n     passed: false,\n-    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md`,\n+    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,\n   };\n }\n \n@@ -3515,7 +3515,7 @@\n   }\n   return {\n     passed: false,\n-    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n+    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n   };\n }\n \n",
+      "rollbackDiff": "--- a/src/setup/registrations.mjs\n+++ b/src/setup/registrations.mjs\n@@ -871,7 +871,7 @@\n     }\n   }\n   if (missing.length > 0) {\n-    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md` };\n+    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };\n   }\n   return { passed: true, message: 'every domain\\'s taskSpecMap entry and operation resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };\n }\n@@ -2042,7 +2042,7 @@\n // erase the loud signal before a human ever saw it, defeating the\n // reason this check exists. The\n // re-baseline-after-acknowledgment step is a deliberate, documented\n-// manual command (docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md), not\n+// manual command (docs/how-to/resolve-an-events-jsonl-truncation.md), not\n // a blanket `doctor --fix` sweep.\n // Tầng A/T5 (TA-D10): checks baseline-0 AND every per-writer file under\n // .fgos/events/, each against its OWN entry in the shared guard sidecar\n@@ -2091,7 +2091,7 @@\n   }\n   return {\n     passed: false,\n-    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md`,\n+    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,\n   };\n }\n \n@@ -3060,7 +3060,7 @@\n // ironLaw.level (docs/history/iron-law-gate-human-ux/CONTEXT.md D3/D7) — its\n // OWN key, modeled on gateBypass's three registrations immediately above but\n // deliberately never folded into that section: gateBypass's floor is\n-// documented as never touching Iron Law (docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-\n+// documented as never touching Iron Law (docs/explanation/gate-bypass-\n // design.md), and reusing its level vocabulary here would erase that line.\n //\n // `ask` is both the default this fix writes and what every unreadable value\n@@ -3515,7 +3515,7 @@\n   }\n   return {\n     passed: false,\n-    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n+    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n   };\n }\n \n",
       "timing": "phase9",
       "readiness": "pending / cutover-patch-only; never execution-ready",
       "coCutTestGreps": [
@@ -1997,6 +2092,24 @@
             "docs\\/how-to\\/write-a-task-spec\\.md"
           ],
           "matches": []
+        },
+        {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/explanation/gate-bypass-\n// design.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/explanation/gate-bypass-\n// design.md",
+            "docs\\/explanation\\/gate-bypass-\n\\/\\/ design.md",
+            "docs\\/explanation\\/gate-bypass-\n\\/\\/ design\\.md"
+          ],
+          "matches": [
+            {
+              "file": "test/runner/dispatch-executor-profile.test.mjs",
+              "line": 193,
+              "text": "// design.md §3.7's ExecutorProfile target vocabulary, made real additive",
+              "sourceSha256": "0471818d68f8cac62abbfb9a2aa0997d05c0123c1098c7bb9950ef73213e4e93"
+            }
+          ]
         }
       ],
       "coCutTestEdits": [
@@ -2042,6 +2155,182 @@
             }
           ],
           "disposition": "patch"
+        },
+        {
+          "file": "test/setup/checks.test.mjs",
+          "referenceId": "reference-003845",
+          "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55",
+          "grepMatches": [
+            {
+              "file": "test/setup/checks.test.mjs",
+              "line": 342,
+              "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+              "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
+            }
+          ],
+          "newPointer": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+          "substitutions": [],
+          "expectedAfterSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55",
+          "grepDecisions": [
+            {
+              "match": {
+                "file": "test/setup/checks.test.mjs",
+                "line": 342,
+                "text": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+                "sourceSha256": "9f8a488c8565b2ee1b79dc3b19674f3bfa3441c02b49cb515228e94743037b55"
+              },
+              "reason": "L12-69: existing historical test-title/comment provenance; the comment-pointer repair changes no fixture or assertion.",
+              "oldLine": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+              "newLine": "test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {",
+              "disposition": "preserve"
+            }
+          ],
+          "disposition": "preserve",
+          "diff": null,
+          "rollbackDiff": null
+        },
+        {
+          "file": "test/runner/dispatch-executor-profile.test.mjs",
+          "referenceId": "reference-003850",
+          "sourceSha256": "0471818d68f8cac62abbfb9a2aa0997d05c0123c1098c7bb9950ef73213e4e93",
+          "grepMatches": [
+            {
+              "file": "test/runner/dispatch-executor-profile.test.mjs",
+              "line": 193,
+              "text": "// design.md §3.7's ExecutorProfile target vocabulary, made real additive",
+              "sourceSha256": "0471818d68f8cac62abbfb9a2aa0997d05c0123c1098c7bb9950ef73213e4e93"
+            }
+          ],
+          "newPointer": "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md",
+          "substitutions": [],
+          "expectedAfterSha256": "0471818d68f8cac62abbfb9a2aa0997d05c0123c1098c7bb9950ef73213e4e93",
+          "grepDecisions": [
+            {
+              "match": {
+                "file": "test/runner/dispatch-executor-profile.test.mjs",
+                "line": 193,
+                "text": "// design.md §3.7's ExecutorProfile target vocabulary, made real additive",
+                "sourceSha256": "0471818d68f8cac62abbfb9a2aa0997d05c0123c1098c7bb9950ef73213e4e93"
+              },
+              "reason": "L12-69: existing historical test-title/comment provenance; the comment-pointer repair changes no fixture or assertion.",
+              "oldLine": "// design.md §3.7's ExecutorProfile target vocabulary, made real additive",
+              "newLine": "// design.md §3.7's ExecutorProfile target vocabulary, made real additive",
+              "disposition": "preserve"
+            }
+          ],
+          "disposition": "preserve",
+          "diff": null,
+          "rollbackDiff": null
+        }
+      ],
+      "additionalSemanticTestGreps": [
+        {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/explanation/gate-bypass-design.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/explanation/gate-bypass-design.md",
+            "docs\\/explanation\\/gate-bypass-design.md",
+            "docs\\/explanation\\/gate-bypass-design\\.md"
+          ],
+          "matches": []
+        }
+      ],
+      "semanticGrepNote": "The pinned citation wraps across two comment lines. The mandatory raw-token grep splits its patterns at newline and therefore also returns a generic // design.md comment; that hit is preserved as dated test provenance. This additional unwrapped-path grep covers the semantic citation separately."
+    },
+    {
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "file": "src/setup/git-hooks.mjs",
+      "sourceSha256": "bc64f3591e3fa896770a66491ef5bb1711c81aec96ba821d038cdd051f3addb6",
+      "mode": "100644",
+      "receiptId": "setup-doctor-roots-pilot",
+      "coCutPaths": [
+        "CHANGELOG.md"
+      ],
+      "coCutTestGreps": [
+        {
+          "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+          "oldPointer": "docs/specs/distribution.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/specs/distribution.md",
+            "docs\\/specs\\/distribution.md",
+            "docs\\/specs\\/distribution\\.md"
+          ],
+          "matches": []
+        }
+      ],
+      "coCutTestEdits": [],
+      "expectedOutputSets": [
+        {
+          "file": "src/setup/git-hooks.mjs",
+          "referenceId": "reference-003796",
+          "edgeId": "class6-l-000343",
+          "line": 85,
+          "currentExpression": " * to run repeatedly (e.g. every `npm install`/`npm pack`, or every `fgos\n * setup`). No-ops silently when installed as a dependency (no `.git`\n * retained, per docs/specs/distribution.md) -- never throws.\n *\n * FILL-ONLY, never overwrite (matches this verb's other two side effects --",
+          "candidateExpression": "docs/platform/packaging-distribution/spec.md#pointers-implementation",
+          "oldPointer": "docs/specs/distribution.md",
+          "newPointer": "docs/platform/packaging-distribution/spec.md#pointers-implementation",
+          "intent": "Exact source pointer correction; comment-only repairs change no runtime output.",
+          "evidence": {
+            "rule": "Pointers (implementation) owns contributor hooks/manual setup:hooks passage, lines 803–812.",
+            "targetSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25"
+          }
+        }
+      ],
+      "intentionalBehaviorDeltas": [
+        {
+          "file": "src/setup/git-hooks.mjs",
+          "referenceId": "reference-003796",
+          "edgeId": "class6-l-000343",
+          "line": 85,
+          "currentExpression": " * to run repeatedly (e.g. every `npm install`/`npm pack`, or every `fgos\n * setup`). No-ops silently when installed as a dependency (no `.git`\n * retained, per docs/specs/distribution.md) -- never throws.\n *\n * FILL-ONLY, never overwrite (matches this verb's other two side effects --",
+          "candidateExpression": "docs/platform/packaging-distribution/spec.md#pointers-implementation",
+          "oldPointer": "docs/specs/distribution.md",
+          "newPointer": "docs/platform/packaging-distribution/spec.md#pointers-implementation",
+          "intent": "Exact source pointer correction; comment-only repairs change no runtime output.",
+          "evidence": {
+            "rule": "Pointers (implementation) owns contributor hooks/manual setup:hooks passage, lines 803–812.",
+            "targetSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25"
+          }
+        }
+      ],
+      "testTargets": [
+        "env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/install-git-hooks.test.mjs"
+      ],
+      "prerequisites": [
+        "Step 7 composes source comment pointer with all shared proposed source hunks; Phase 9 runs owning proof."
+      ],
+      "order": "Source before cutover",
+      "timing": "phase9",
+      "readiness": "pending independent review and Phase 9 proof",
+      "symbolOrPassage": [
+        " * to run repeatedly (e.g. every `npm install`/`npm pack`, or every `fgos\n * setup`). No-ops silently when installed as a dependency (no `.git`\n * retained, per docs/specs/distribution.md) -- never throws.\n *\n * FILL-ONLY, never overwrite (matches this verb's other two side effects --"
+      ],
+      "oldText": [
+        "docs/specs/distribution.md"
+      ],
+      "newText": [
+        "docs/platform/packaging-distribution/spec.md#pointers-implementation"
+      ],
+      "sourceSpans": [
+        {
+          "line": 85,
+          "columnStart": 18,
+          "columnEndExclusive": 44,
+          "text": "docs/specs/distribution.md"
+        }
+      ],
+      "diff": "--- a/src/setup/git-hooks.mjs\n+++ b/src/setup/git-hooks.mjs\n@@ -82,7 +82,7 @@\n  * clone, a file for a linked worktree -- existsSync is true for both). Idempotent: safe\n  * to run repeatedly (e.g. every `npm install`/`npm pack`, or every `fgos\n  * setup`). No-ops silently when installed as a dependency (no `.git`\n- * retained, per docs/specs/distribution.md) -- never throws.\n+ * retained, per docs/platform/packaging-distribution/spec.md#pointers-implementation) -- never throws.\n  *\n  * FILL-ONLY, never overwrite (matches this verb's other two side effects --\n  * shell-rc.mjs's insertSourceLine only ever appends, config-merge.mjs's\n",
+      "rollbackDiff": "--- a/src/setup/git-hooks.mjs\n+++ b/src/setup/git-hooks.mjs\n@@ -82,7 +82,7 @@\n  * clone, a file for a linked worktree -- existsSync is true for both). Idempotent: safe\n  * to run repeatedly (e.g. every `npm install`/`npm pack`, or every `fgos\n  * setup`). No-ops silently when installed as a dependency (no `.git`\n- * retained, per docs/platform/packaging-distribution/spec.md#pointers-implementation) -- never throws.\n+ * retained, per docs/specs/distribution.md) -- never throws.\n  *\n  * FILL-ONLY, never overwrite (matches this verb's other two side effects --\n  * shell-rc.mjs's insertSourceLine only ever appends, config-merge.mjs's\n",
+      "expectedAfterSha256": "a80e017e9137548eb29a62f5dfee46d95c24398d0ef6c06af57f307c57744c4f",
+      "targetOwner": [
+        "docs/platform/packaging-distribution/spec.md"
+      ],
+      "claimAnchorProof": [
+        {
+          "rule": "Pointers (implementation) owns contributor hooks/manual setup:hooks passage, lines 803–812.",
+          "targetSha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25"
         }
       ]
     }

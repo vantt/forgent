@@ -1,0 +1,261 @@
+{
+  "rule": "R2 occurrence alignment, not text-first owner selection",
+  "changes": [
+    {
+      "file": ".agents/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-000020",
+      "from": {
+        "kind": "step5",
+        "file": "core/skills/_shared/executor-dispatch-fallback.md",
+        "id": "reference-000281"
+      },
+      "to": {
+        "kind": "step5",
+        "file": "core/skills/_shared/executor-dispatch-fallback.md",
+        "id": "reference-000282"
+      },
+      "generatedLine": 225,
+      "sourceLine": 224
+    },
+    {
+      "file": ".agents/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-000028",
+      "from": {
+        "kind": "step5",
+        "file": "core/skills/_shared/executor-dispatch-fallback.md",
+        "id": "reference-000281"
+      },
+      "to": {
+        "kind": "step5",
+        "file": "core/skills/_shared/executor-dispatch-fallback.md",
+        "id": "reference-000282"
+      },
+      "generatedLine": 225,
+      "sourceLine": 224
+    },
+    {
+      "file": ".agents/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+      "id": "reference-000043",
+      "from": {
+        "kind": "step5",
+        "file": "core/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+        "id": "reference-000288"
+      },
+      "to": {
+        "kind": "step5",
+        "file": "core/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+        "id": "reference-000290"
+      },
+      "generatedLine": 21,
+      "sourceLine": 21
+    },
+    {
+      "file": ".agents/skills/fgos-coding-exploring/SKILL.md",
+      "id": "reference-000053",
+      "from": {
+        "kind": "inheritedSourceSlots",
+        "file": "domains/coding/skills/fgos-coding-exploring/SKILL.md",
+        "index": 0
+      },
+      "to": {
+        "kind": "inheritedSourceSlots",
+        "file": "domains/coding/skills/fgos-coding-exploring/SKILL.md",
+        "index": 2
+      },
+      "generatedLine": 132,
+      "sourceLine": 131
+    },
+    {
+      "file": ".agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+      "id": "reference-000056",
+      "from": {
+        "kind": "inheritedSourceSlots",
+        "file": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+        "index": 0
+      },
+      "to": {
+        "kind": "inheritedSourceSlots",
+        "file": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+        "index": 1
+      },
+      "generatedLine": 173,
+      "sourceLine": 172
+    },
+    {
+      "file": ".agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "id": "reference-000070",
+      "from": {
+        "kind": "inheritedSourceSlots",
+        "file": "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+        "index": 0
+      },
+      "to": {
+        "kind": "inheritedSourceSlots",
+        "file": "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+        "index": 2
+      },
+      "generatedLine": 26,
+      "sourceLine": 25
+    },
+    {
+      "file": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "id": "reference-000073",
+      "from": {
+        "kind": "step5",
+        "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "id": "reference-002280"
+      },
+      "to": {
+        "kind": "step5",
+        "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "id": "reference-002281"
+      },
+      "generatedLine": 69,
+      "sourceLine": 68
+    },
+    {
+      "file": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "id": "reference-000077",
+      "from": {
+        "kind": "step5",
+        "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "id": "reference-002280"
+      },
+      "to": {
+        "kind": "step5",
+        "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "id": "reference-002281"
+      },
+      "generatedLine": 69,
+      "sourceLine": 68
+    },
+    {
+      "file": ".claude/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+      "id": "reference-000106",
+      "from": {
+        "kind": "step5",
+        "file": "core/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+        "id": "reference-000288"
+      },
+      "to": {
+        "kind": "step5",
+        "file": "core/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+        "id": "reference-000290"
+      },
+      "generatedLine": 21,
+      "sourceLine": 21
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-002324",
+      "from": {
+        "kind": "step5",
+        "file": "core/skills/_shared/executor-dispatch-fallback.md",
+        "id": "reference-000281"
+      },
+      "to": {
+        "kind": "step5",
+        "file": "core/skills/_shared/executor-dispatch-fallback.md",
+        "id": "reference-000282"
+      },
+      "generatedLine": 225,
+      "sourceLine": 224
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-002332",
+      "from": {
+        "kind": "step5",
+        "file": "core/skills/_shared/executor-dispatch-fallback.md",
+        "id": "reference-000281"
+      },
+      "to": {
+        "kind": "step5",
+        "file": "core/skills/_shared/executor-dispatch-fallback.md",
+        "id": "reference-000282"
+      },
+      "generatedLine": 225,
+      "sourceLine": 224
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-exploring/SKILL.md",
+      "id": "reference-002361",
+      "from": {
+        "kind": "inheritedSourceSlots",
+        "file": "domains/coding/skills/fgos-coding-exploring/SKILL.md",
+        "index": 0
+      },
+      "to": {
+        "kind": "inheritedSourceSlots",
+        "file": "domains/coding/skills/fgos-coding-exploring/SKILL.md",
+        "index": 2
+      },
+      "generatedLine": 132,
+      "sourceLine": 131
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+      "id": "reference-002364",
+      "from": {
+        "kind": "inheritedSourceSlots",
+        "file": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+        "index": 0
+      },
+      "to": {
+        "kind": "inheritedSourceSlots",
+        "file": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+        "index": 1
+      },
+      "generatedLine": 173,
+      "sourceLine": 172
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "id": "reference-002378",
+      "from": {
+        "kind": "inheritedSourceSlots",
+        "file": "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+        "index": 0
+      },
+      "to": {
+        "kind": "inheritedSourceSlots",
+        "file": "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+        "index": 2
+      },
+      "generatedLine": 26,
+      "sourceLine": 25
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "id": "reference-002381",
+      "from": {
+        "kind": "step5",
+        "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "id": "reference-002280"
+      },
+      "to": {
+        "kind": "step5",
+        "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "id": "reference-002281"
+      },
+      "generatedLine": 69,
+      "sourceLine": 68
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "id": "reference-002385",
+      "from": {
+        "kind": "step5",
+        "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "id": "reference-002280"
+      },
+      "to": {
+        "kind": "step5",
+        "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "id": "reference-002281"
+      },
+      "generatedLine": 69,
+      "sourceLine": 68
+    }
+  ]
+}

@@ -1,0 +1,1196 @@
+{
+  "rules": {
+    "a-passage-agreement": "All pairs of overlapping operation intervals on the same line/passage agree in admission and effective disposition; independent adjacent expressions have distinct source intervals.",
+    "b-real-blocker": "R12: no boilerplate dependency shared after quoted operands, paths, IDs and line numbers are normalized; copies join their source passage; serialized state rows use their accepted per-file input dependency.",
+    "c-render-owner": "Every generated source-copy reference/tuple derives its disposition from the exact source owner; a park cites an actually parked source owner.",
+    "d-own-operand": "Each admitted dynamic tuple has its exact document-yielding sub-expression pathOperand in its pinned passage; every rejection names a closed R5 nonDocumentUse category.",
+    "e-retired-successor": "Preserved retired decision citations carry a live successorNote with a real heading anchor.",
+    "r11-plans-boundary": "R11: an operation rooted only in plans/** is rejected as plans-report-artifact; trace pinned declarations and imported constants, not adjacent context."
+  },
+  "checks": {
+    "a-passage-agreement": 684,
+    "d-own-operand": 5654,
+    "b-real-blocker": 1982,
+    "c-render-owner": 522,
+    "e-retired-successor": 9,
+    "r11-plans-boundary": 116
+  },
+  "failures": [
+    {
+      "rule": "b-real-blocker",
+      "where": ".agents/skills/_shared/executor-dispatch-fallback.md:reference-000025",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000008",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000009",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000010",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000012",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000014",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000017",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000018",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000021",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000022",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000023",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000024",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000025",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000033",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000034",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000036",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000037",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000038",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000039",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000041",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000048",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000053",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000054",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000078",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000093",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000096",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000097",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000108",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000109",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000119",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000121",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000122",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000123",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000127",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000128",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000132",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000137",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000138",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000139",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000148",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/distill.mjs:dynamic-000152",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/migrate-porting-state-backfill.mjs:dynamic-000154",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/migrate-porting-state-backfill.mjs:dynamic-000155",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".agents/skills/distill/scripts/migrate-porting-state-backfill.mjs:dynamic-000156",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": ".agents/skills/fgos-clarifying/SKILL.md:reference-000046",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000179",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000180",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000181",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000183",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000185",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000188",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000189",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000192",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000193",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000194",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000195",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000196",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000204",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000205",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000207",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000208",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000209",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000210",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000212",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000219",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000224",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000225",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000249",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000264",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000267",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000268",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000279",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000280",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000290",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000292",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000293",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000294",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000298",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000299",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000303",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000308",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000309",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000310",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000319",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/distill.mjs:dynamic-000323",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/migrate-porting-state-backfill.mjs:dynamic-000325",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/migrate-porting-state-backfill.mjs:dynamic-000326",
+      "error": "condition false"
+    },
+    {
+      "rule": "c-render-owner",
+      "where": ".claude/skills/distill/scripts/migrate-porting-state-backfill.mjs:dynamic-000327",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "docs/backlog.md:author-s4-ebdf0bbf30f386bc",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "docs/backlog.md:author-s4-3b7f91d826c53538",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "docs/backlog.md:author-s4-a20431be6e7a6997",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "docs/backlog.md:author-s4-30b59397818b58a4",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "docs/backlog.md:author-s4-929e1de7d7453fd2",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "docs/backlog.md:author-s4-7c7d595e2f389ade",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "docs/backlog.md:author-s4-92d207a36a483d36",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "docs/backlog.md:author-s4-52877e7c60f16d3d",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "docs/backlog.md:author-s4-19c252476bfb8f58",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "docs/backlog.md:author-s4-2e799bbe055b244b",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "docs/backlog.md:author-s4-45dc2cd894385e72",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "docs/backlog.md:author-s4-721bff23faa8d622",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "docs/backlog.md:author-s4-c9433d21d5c1e93a",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "docs/backlog.md:author-s4-229e8a5afb1230ae",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "docs/backlog.md:author-s4-06e8be879d39deb1",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "docs/backlog.md:author-s4-68c3eab88fa07af7",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "docs/backlog.md:author-s4-bb81392549cc3486",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "docs/backlog.md:author-s4-6f302576938a67b2",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "docs/backlog.md:author-s4-4676c20acaf7573e",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "docs/backlog.md:author-s4-d72e383c7545e538",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "docs/backlog.md:author-s4-cdc5db14089ef6ef",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md:reference-002329",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "plugins/fgOS/skills/fgos-clarifying/SKILL.md:reference-002354",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-candidate-status.mjs:dynamic-006573",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-candidate-status.mjs:dynamic-006574",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-candidate-status.mjs:dynamic-006582",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-constitution.mjs:dynamic-006605",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-constitution.mjs:dynamic-006608",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-constitution.mjs:dynamic-006609",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-constitution.mjs:dynamic-006616",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-constitution.mjs:dynamic-006617",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-constitution.mjs:dynamic-006622",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-constitution.mjs:dynamic-006623",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-constitution.mjs:dynamic-006630",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-constitution.mjs:dynamic-006678",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-constitution.mjs:dynamic-006686",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-constitution.mjs:dynamic-006688",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-constitution.mjs:dynamic-006691",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-constitution.mjs:dynamic-006692",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-constitution.mjs:dynamic-006693",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-constitution.mjs:dynamic-006694",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-constitution.mjs:dynamic-006701",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-constitution.mjs:dynamic-006709",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-constitution.mjs:dynamic-006712",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-inventory-gates.mjs:dynamic-006738",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-inventory-gates.mjs:dynamic-006739",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-inventory-gates.mjs:dynamic-006788",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-inventory-gates.mjs:dynamic-006791",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-inventory-gates.mjs:dynamic-006794",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-inventory-gates.mjs:dynamic-006796",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-inventory-gates.mjs:dynamic-006806",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-inventory-gates.mjs:dynamic-006810",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-inventory-gates.mjs:dynamic-006811",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-inventory-gates.mjs:dynamic-006812",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-inventory-gates.mjs:dynamic-006818",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-inventory-gates.mjs:dynamic-006819",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-inventory-gates.mjs:dynamic-006822",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-inventory-gates.mjs:dynamic-006823",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-inventory-gates.mjs:dynamic-006830",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-inventory-gates.mjs:dynamic-007069",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-inventory-gates.mjs:dynamic-007070",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-retirement.mjs:dynamic-007084",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-retirement.mjs:dynamic-007085",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-retirement.mjs:dynamic-007087",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-retirement.mjs:dynamic-007089",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-retirement.mjs:dynamic-007091",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-retirement.mjs:dynamic-007093",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-retirement.mjs:dynamic-007095",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-retirement.mjs:dynamic-007096",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-retirement.mjs:dynamic-007097",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-retirement.mjs:dynamic-007098",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-retirement.mjs:dynamic-007099",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-retirement.mjs:dynamic-007100",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-retirement.mjs:dynamic-007104",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-retirement.mjs:dynamic-007105",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-retirement.mjs:dynamic-007106",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-retirement.mjs:dynamic-007107",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-retirement.mjs:dynamic-007115",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-retirement.mjs:dynamic-007116",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-retirement.mjs:dynamic-007119",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-retirement.mjs:dynamic-007120",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-retirement.mjs:dynamic-007121",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-retirement.mjs:dynamic-007122",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-retirement.mjs:dynamic-007126",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/check-doc-retirement.mjs:dynamic-007127",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/doc-alias-resolver.mjs:dynamic-007307",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/doc-alias-resolver.mjs:dynamic-007312",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/doc-alias-resolver.mjs:dynamic-007313",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/doc-alias-resolver.mjs:dynamic-007315",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/doc-alias-resolver.mjs:dynamic-007316",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/generate-doc-inventory.mjs:dynamic-007557",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/generate-doc-inventory.mjs:dynamic-007625",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/generate-doc-inventory.mjs:dynamic-007726",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "scripts/generate-shipped-path-inventory.mjs:reference-003573",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "scripts/generate-shipped-path-inventory.mjs:reference-003575",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "scripts/generate-shipped-path-inventory.mjs:reference-003579",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "scripts/generate-shipped-path-inventory.mjs:reference-003588",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "scripts/generate-shipped-path-inventory.mjs:reference-003591",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "scripts/generate-shipped-path-inventory.mjs:reference-003597",
+      "error": "condition false"
+    },
+    {
+      "rule": "b-real-blocker",
+      "where": "scripts/generate-shipped-path-inventory.mjs:reference-003601",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/measure-p08-performance.mjs:dynamic-008308",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/measure-p08-performance.mjs:dynamic-008309",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/measure-p08-performance.mjs:dynamic-008310",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/measure-verify-cost.mjs:dynamic-008362",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/measure-verify-cost.mjs:dynamic-008363",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/test-select-coverage-map.mjs:dynamic-008907",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/test-select-coverage-map.mjs:dynamic-008908",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/test-select-coverage-map.mjs:dynamic-008912",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/test-select-promote.mjs:dynamic-008999",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/test-select-promote.mjs:dynamic-009000",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-01.mjs:dynamic-009159",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-01.mjs:dynamic-009160",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-01.mjs:dynamic-009161",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-01.mjs:dynamic-009162",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009191",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009192",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009210",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009214",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009216",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009217",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009218",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009220",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009221",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009222",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009223",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009224",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009225",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009226",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009227",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009229",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009230",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009231",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009232",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009233",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009234",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009235",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009236",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009237",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009238",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009239",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009240",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009241",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009242",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009259",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009261",
+      "error": "condition false"
+    },
+    {
+      "rule": "r11-plans-boundary",
+      "where": "scripts/verify-phase-02.mjs:dynamic-009263",
+      "error": "condition false"
+    },
+    {
+      "rule": "a-passage-agreement",
+      "where": "src/setup/registrations.mjs:dynamic-014307/author-s4-fix2-b75674e7a307ed78",
+      "error": "condition false"
+    }
+  ],
+  "failureCount": 235
+}

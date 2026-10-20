@@ -2,9 +2,9 @@
 Source intervals describe operations, not the ±3/40 context windows. Adjacent
 independent expressions (e.g. a role label and currentPath) are not one operand.
 """
-import re,collections,json,pathlib,importlib.util,itertools,functools
+import re,collections,json,pathlib,importlib.util,itertools,functools,subprocess
 P=pathlib.Path(__file__).resolve().parent;ROOT=P.parents[3]
-CATEGORIES={'root-only','scalar-pass-through','state-event-store','non-document-fs-probe','clone-directory','cargo-output-directory','accumulator','guard','text-label-join','table-row-serialization','finding-path-field','caller-data-formatting','comment-or-type','config-or-metadata','generated-data-text'}
+CATEGORIES={'root-only','scalar-pass-through','state-event-store','non-document-fs-probe','clone-directory','cargo-output-directory','accumulator','guard','text-label-join','table-row-serialization','finding-path-field','caller-data-formatting','comment-or-type','config-or-metadata','generated-data-text','plans-report-artifact'}
 RULES={'a-passage-agreement':'All pairs of overlapping operation intervals on the same line/passage agree in admission and effective disposition; independent adjacent expressions have distinct source intervals.','b-real-blocker':'No listed boilerplate or verbatim blocker shared by parks in different files; every park names the missing input/obligation for its own file.','c-render-owner':'Every generated source-copy reference/tuple derives its disposition from the exact source owner; a park cites an actually parked source owner.','d-own-operand':'Each admitted dynamic tuple has its exact document-yielding sub-expression pathOperand in its pinned passage; every rejection names a closed R5 nonDocumentUse category.','e-retired-successor':'Preserved retired decision citations carry a live successorNote with a real heading anchor.'}
 def idof(e):return e.get('referenceId',e.get('id'))
 def allitems(r):return r['references']+r['dynamicTraces']+r.get('authorAddedReferences',[])
@@ -29,11 +29,101 @@ def owner(locator,by):
 def retired(e):
  text=e.get('matchedExpression') or (e.get('originalTuple') or [None]*5)[4] or ''
  return bool(re.search(r'docs/decisions/\d{4}-|\b0000-index\.md',text))
+def normalise_blocker(text):
+ """R12 compare dependencies after removing operand, id and line disguises."""
+ text=re.sub(r"`[^`]*`|\"[^\"]*\"|'[^']*'", '<operand>', text or '')
+ text=re.sub(r'\b(?:reference|dynamic|author-s4)[-\w]*|\b(?:D-ADR|tsk-)[\w-]+', '<id>', text)
+ text=re.sub(r'(?<!\w)\d+(?:[–:-]\d+)*', '<number>', text)
+ # Unquoted path prefixes and location carriers are operands too.
+ text=re.sub(r'(?:[\w.-]+/)+[\w.*<>/-]+(?::[^\s]+)?', '<path>', text)
+ return re.sub(r'\s+', ' ', text).strip().lower()
+
+def passage_key(r,e):
+ # Copies are one source passage, not new blockers; serialized state rows have
+ # no hand-written passage (Lead gen Q1 explicitly accepts file-specific input).
+ if r.get('generated'):
+  if e.get('sourceOwner'):return json.dumps(e['sourceOwner'],sort_keys=True)
+  return ('state-output',r['file'])
+ spans=intervals(e)
+ return (r['file'],tuple(sorted({x['line'] for x in spans})))
+
+@functools.lru_cache(None)
+def source_at(pin,file):
+ return subprocess.check_output(['git','show',pin+':'+file],cwd=ROOT,text=True)
+@functools.lru_cache(None)
+def path_bindings(pin,file):
+ text=source_at(pin,file);bindings=collections.defaultdict(list)
+ # Declarations only: no caller/path metadata from neighbouring messages.
+ for match in re.finditer(r'\b(?:const|let|var)\s+(\w+)\s*=\s*',text):
+  rest=text[match.end():];end=rest.find(';');rhs=rest[:end] if 0<=end<1200 else rest.split('\n')[0]
+  if re.match(r'(?:async\s*)?(?:function|\([^)]*\)\s*=>|\w+\s*=>)',rhs):continue
+  bindings[match[1]].append(rhs)
+ for match in re.finditer(r"import\s*\{([^}]+)\}\s*from\s*['\"](\.[^'\"]+)['\"]",text,re.S):
+  imported=str((pathlib.PurePosixPath(file).parent/match[2]))
+  import posixpath
+  imported=posixpath.normpath(imported)
+  for token in match[1].split(','):
+   names=token.strip().split(' as ')
+   if names[0]:bindings[names[-1]].append(('import',imported,names[0]))
+ for match in re.finditer(r'for\s*\(const\s+\[([^]]+)\]\s+of\s+(\w+)',text):
+  for name in re.findall(r'\b\w+\b',match[1]):bindings[name].append(match[2])
+ return dict(bindings)
+def identifiers(expr):
+ templates=' '.join(re.findall(r'\$\{([^}]+)\}',expr))
+ code=re.sub(r"\"(?:\\.|[^\"\\])*\"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`",' ',expr)
+ return set(re.findall(r'\b[A-Za-z_$][\w$]*\b',code+' '+templates))
+def literal_roots(expr):
+ roots=set()
+ if re.search(r"(?:^|[\s'\"`/])(?:\.\./)*plans(?:/|['\"])",expr):roots.add('plans')
+ if re.search(r"(?:^|['\"`/])docs(?:/|['\"])",expr) or re.search(r"['\"](?:README|CHANGELOG|AGENTS|CLAUDE)\.md['\"]",expr):roots.add('documents')
+ return roots
+@functools.lru_cache(None)
+def binding_roots(pin,file):
+ bindings=path_bindings(pin,file);values={name:set() for name in bindings};deps={name:set() for name in bindings}
+ for name,rhss in bindings.items():
+  for rhs in rhss:
+   if isinstance(rhs,tuple):
+    _,f,n=rhs
+    if n.isupper() and f!=file:
+     values[name].update(literal_roots(' '.join(x for x in path_bindings(pin,f).get(n,[]) if isinstance(x,str))))
+     # Imported public constants may themselves depend on local plan roots.
+     todo=[n];seen=set()
+     while todo:
+      key=todo.pop()
+      if key in seen:continue
+      seen.add(key)
+      for x in path_bindings(pin,f).get(key,[]):
+       if isinstance(x,str):values[name].update(literal_roots(x));todo.extend(z for z in re.findall(r'\b[A-Z][A-Z_0-9]+\b',x) if z not in seen)
+   else:
+    values[name].update(literal_roots(rhs));deps[name].update(identifiers(rhs))
+ for _ in range(len(values)+1):
+  changed=False
+  for name in values:
+   new=set().union(*(values.get(dep,set()) for dep in deps[name])) if deps[name] else set()
+   if not new<=values[name]:values[name].update(new);changed=True
+  if not changed:break
+ return values
+@functools.lru_cache(None)
+def expression_roots(pin,file,expr):
+ roots=literal_roots(expr);values=binding_roots(pin,file)
+ for name in identifiers(expr):roots.update(values.get(name,set()))
+ return roots
+
+def plans_only(r,e):
+ if not r.get('wholeFileRead',True):return False
+ pin=r['authorInputCommit'];file=r['file']
+ expr=e.get('pathOperand') or (e.get('operationWitness') or {}).get('text') or (e.get('originalTuple') or [None]*5)[4] or e.get('matchedExpression','')
+ roots=expression_roots(pin,file,expr)
+ return roots=={'plans'}
+
+RULES['b-real-blocker']='R12: no boilerplate dependency shared after quoted operands, paths, IDs and line numbers are normalized; copies join their source passage; serialized state rows use their accepted per-file input dependency.'
+RULES['r11-plans-boundary']='R11: an operation rooted only in plans/** is rejected as plans-report-artifact; trace pinned declarations and imported constants, not adjacent context.'
+
 def check(rs,context=None):
  by={r['file']:r for r in (context or rs)};errors=[];counts=collections.Counter();blocks=collections.defaultdict(set)
  for r in (context or rs):
   for e in allitems(r):
-   if e.get('disposition')=='parked':blocks[e.get('blockedReason')].add(r['file'])
+   if e.get('disposition')=='parked':blocks[normalise_blocker(e.get('blockedReason'))].add(str(passage_key(r,e)))
  def test(rule,loc,fn):
   counts[rule]+=1
   try:assert fn()
@@ -46,7 +136,7 @@ def check(rs,context=None):
    if e.get('disposition')=='parked':
     def blocker(e=e):
      b=e.get('blockedReason') or ''
-     return bool(b and f in b and len(blocks[b])==1 and not re.search(r'depends on supplied roots|no bounded artifact/export supplied|preserve gate bytes|exact source slot / source-data parity must own',b,re.I))
+     return bool(b and f in b and len(blocks[normalise_blocker(b)])==1 and not re.search(r'depends on supplied roots|no bounded artifact/export supplied|preserve gate bytes|exact source slot / source-data parity must own',b,re.I))
     test('b-real-blocker',loc,blocker)
    if r.get('generated') and r.get('sourceRenderProvenance',{}).get('sourceFile'):
     def render(e=e):
@@ -54,10 +144,14 @@ def check(rs,context=None):
      if 'originalTuple' not in e:
       assert e['disposition']==('parked' if disp=='parked' else 'render-join')
       assert e['sourceOwnerDisposition']==disp
-     else:assert (e['admission'],e['disposition'])==(o['admission'],disp)
+     else:
+      assert e['admission']==o['admission']
+      assert e['disposition']==('parked' if disp=='parked' else 'render-join' if e['admission']=='ADMIT' else 'preserve')
+      assert e['sourceOwnerDisposition']==disp
      if e['disposition']=='parked':assert e['sourceOwner']['file'] in e['blockedReason'] and disp=='parked'
      return True
     test('c-render-owner',loc,render)
+   if plans_only(r,e):test('r11-plans-boundary',loc,lambda e=e:e['admission']=='REJECT' and e.get('nonDocumentUse')=='plans-report-artifact')
    if 'originalTuple' in e:
     def operand(e=e):
      if e['admission']=='REJECT':return e.get('nonDocumentUse') in CATEGORIES and not e.get('pathOperand')

@@ -1,0 +1,20 @@
+{
+  "rules": {
+    "a-passage-agreement": "All pairs of overlapping operation intervals on the same line/passage agree in admission and effective disposition; independent adjacent expressions have distinct source intervals.",
+    "b-real-blocker": "R12: no boilerplate dependency shared after quoted operands, paths, IDs and line numbers are normalized; copies join their source passage; serialized state rows use their accepted per-file input dependency.",
+    "c-render-owner": "Every generated source-copy reference/tuple derives its disposition from the exact source owner; a park cites an actually parked source owner.",
+    "d-own-operand": "Each admitted dynamic tuple has its exact document-yielding sub-expression pathOperand in its pinned passage; every rejection names a closed R5 nonDocumentUse category.",
+    "e-retired-successor": "Preserved retired decision citations carry a live successorNote with a real heading anchor.",
+    "r11-plans-boundary": "R11: an operation rooted only in plans/** is rejected as plans-report-artifact; trace pinned declarations and imported constants, not adjacent context."
+  },
+  "checks": {
+    "a-passage-agreement": 683,
+    "c-render-owner": 522,
+    "d-own-operand": 5654,
+    "b-real-blocker": 1957,
+    "e-retired-successor": 10,
+    "r11-plans-boundary": 136
+  },
+  "failures": [],
+  "failureCount": 0
+}

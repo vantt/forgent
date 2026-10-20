@@ -1,6 +1,1042 @@
 {
   "changes": [
     {
+      "id": "dynamic-015034",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(targetSkillDir, 'SKILL.md')\"."
+    },
+    {
+      "id": "dynamic-015035",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(targetSkillDir, 'SKILL.md')\"."
+    },
+    {
+      "id": "dynamic-015038",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(targetOutputDir, 'gemini-extension.json')\"."
+    },
+    {
+      "id": "dynamic-015039",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'manifestPath = path.join(targetOutputDir'."
+    },
+    {
+      "id": "dynamic-015045",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(targetOutputDir, 'GEMINI.md')\"."
+    },
+    {
+      "id": "dynamic-015046",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'docPath = path.join(targetOutputDir'."
+    },
+    {
+      "id": "dynamic-015047",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'tomlPath = path.join(commandsDir'."
+    },
+    {
+      "id": "dynamic-015048",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'path.join(commandsDir, `${verb}.toml`)'."
+    },
+    {
+      "id": "dynamic-015050",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'packagedRelPath = `skills/${s.name}/SKILL.md`'."
+    },
+    {
+      "id": "dynamic-015062",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "REJECT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R16/R5 own operation is caller-data-formatting and supplies no document-location operand. Own census operand 'sourceRelativePath = path.relative(projectRoot'."
+    },
+    {
+      "id": "dynamic-015064",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'tmpPath = `${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`'."
+    },
+    {
+      "id": "dynamic-015065",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(projectRoot, '.agents', 'skills')\"."
+    },
+    {
+      "id": "dynamic-015066",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'agentsSkillsRoot = targetAgentsSkills ?? path.join(projectRoot'."
+    },
+    {
+      "id": "dynamic-015067",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(projectRoot, 'core', 'skills')\"."
+    },
+    {
+      "id": "dynamic-015068",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'coreSkillsRoot = path.join(projectRoot'."
+    },
+    {
+      "id": "dynamic-015069",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(projectRoot, 'domains')\"."
+    },
+    {
+      "id": "dynamic-015070",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'domainsRoot = path.join(projectRoot'."
+    },
+    {
+      "id": "dynamic-015071",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(agentsSkillsRoot, '_shared')\"."
+    },
+    {
+      "id": "dynamic-015072",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'targetPath = path.join(targetShared'."
+    },
+    {
+      "id": "dynamic-015073",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'path.join(targetShared, fragment.relativeFragmentPath)'."
+    },
+    {
+      "id": "dynamic-015074",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'path.join(projectRoot, fragment.sourcePath)'."
+    },
+    {
+      "id": "dynamic-015075",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'sourcePath = path.join(projectRoot'."
+    },
+    {
+      "id": "dynamic-015076",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'path.join(projectRoot, skill.canonicalDir)'."
+    },
+    {
+      "id": "dynamic-015077",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'targetPath = path.join(agentsSkillsRoot'."
+    },
+    {
+      "id": "dynamic-015078",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'path.join(agentsSkillsRoot, skill.name)'."
+    },
+    {
+      "id": "dynamic-015079",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'orphanPath = path.join(agentsSkillsRoot'."
+    },
+    {
+      "id": "dynamic-015080",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'path.join(agentsSkillsRoot, entry.name)'."
+    },
+    {
+      "id": "dynamic-015081",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(packageRoot, '.agents', 'skills')\"."
+    },
+    {
+      "id": "dynamic-015082",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(targetRoot, '.agents', 'skills')\"."
+    },
+    {
+      "id": "dynamic-015083",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(targetRoot, '.claude', 'skills')\"."
+    },
+    {
+      "id": "dynamic-015084",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "REJECT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R16/R5 own operation is config-or-metadata and supplies no document-location operand. Own census operand 'path.resolve(packageRoot)'."
+    },
+    {
+      "id": "dynamic-015085",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "REJECT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R16/R5 own operation is config-or-metadata and supplies no document-location operand. Own census operand 'path.resolve(targetRoot)'."
+    },
+    {
+      "id": "dynamic-015086",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "REJECT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R16/R5 own operation is config-or-metadata and supplies no document-location operand. Own census operand \"relPath = sourceRelativePath.replaceAll('\\\\\\\\'\"."
+    },
+    {
+      "id": "dynamic-015090",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(wrapperDirPath, 'SKILL.md')\"."
+    },
+    {
+      "id": "dynamic-015091",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'skillMdPath = path.join(wrapperDirPath'."
+    },
+    {
+      "id": "dynamic-015092",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'sourcePath = path.join(agentsSkillsRoot'."
+    },
+    {
+      "id": "dynamic-015093",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(agentsSkillsRoot, entry.name, 'SKILL.md')\"."
+    },
+    {
+      "id": "dynamic-015094",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'wrapperDir = path.join(claudeSkillsRoot'."
+    },
+    {
+      "id": "dynamic-015095",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'path.join(claudeSkillsRoot, entry.name)'."
+    },
+    {
+      "id": "dynamic-015096",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'wrapperPath = path.join(wrapperDir'."
+    },
+    {
+      "id": "dynamic-015097",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(wrapperDir, 'SKILL.md')\"."
+    },
+    {
+      "id": "dynamic-015098",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'sourceRelativePath = path.relative(wrapperDir'."
+    },
+    {
+      "id": "dynamic-015099",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'skillDir = path.join(agentsSkillsRoot'."
+    },
+    {
+      "id": "dynamic-015100",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'path.join(agentsSkillsRoot, entry.name)'."
+    },
+    {
+      "id": "dynamic-015101",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'path.join(skillDir, subEntry.name)'."
+    },
+    {
+      "id": "dynamic-015102",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'path.join(wrapperDir, subEntry.name)'."
+    },
+    {
+      "id": "dynamic-015103",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'orphanPath = path.join(claudeSkillsRoot'."
+    },
+    {
+      "id": "dynamic-015104",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'path.join(claudeSkillsRoot, entry.name)'."
+    },
+    {
+      "id": "dynamic-015105",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'sourcePath = path.join(sourceDir'."
+    },
+    {
+      "id": "dynamic-015106",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'path.join(sourceDir, entry.name)'."
+    },
+    {
+      "id": "dynamic-015107",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'targetPath = path.join(targetDir'."
+    },
+    {
+      "id": "dynamic-015108",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'path.join(targetDir, entry.name)'."
+    },
+    {
+      "id": "dynamic-015109",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'sourceDir = path.join(agentsSkillsRoot'."
+    },
+    {
+      "id": "dynamic-015110",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'path.join(agentsSkillsRoot, entry.name)'."
+    },
+    {
+      "id": "dynamic-015111",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'targetDir = path.join(pluginSkillsRoot'."
+    },
+    {
+      "id": "dynamic-015112",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'path.join(pluginSkillsRoot, entry.name)'."
+    },
+    {
+      "id": "dynamic-015113",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"targetRelDir: '.agents/skills'\"."
+    },
+    {
+      "id": "dynamic-015114",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"targetRelDir: '.claude/skills'\"."
+    },
+    {
+      "id": "dynamic-015115",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"targetRelDir: 'plugins/fgOS/skills'\"."
+    },
+    {
+      "id": "dynamic-015116",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"targetRelDir: '.gemini/extensions/fgos'\"."
+    },
+    {
+      "id": "dynamic-015117",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "REJECT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R16/R5 own operation is config-or-metadata and supplies no document-location operand. Own census operand 'root: targetPath.slice(0'."
+    },
+    {
+      "id": "dynamic-015118",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "REJECT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R16/R5 own operation is config-or-metadata and supplies no document-location operand. Own census operand 'root: targetPath.slice(0'."
+    },
+    {
+      "id": "dynamic-015120",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(root, '.agents', 'skills', skillName, 'SKILL.md')\"."
+    },
+    {
+      "id": "dynamic-015121",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(root, 'core', 'skills', skillName, 'SKILL.md')\"."
+    },
+    {
+      "id": "dynamic-015122",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(root, 'domains')\"."
+    },
+    {
+      "id": "dynamic-015123",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'domainsDir = path.join(root'."
+    },
+    {
+      "id": "dynamic-015124",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(domainsDir, domain, 'skills', skillName, 'SKILL.md')\"."
+    },
+    {
+      "id": "dynamic-015128",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(root, 'core', 'skills', '_shared')\"."
+    },
+    {
+      "id": "dynamic-015129",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(root, '.agents', 'skills', '_shared')\"."
+    },
+    {
+      "id": "dynamic-015130",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(root, 'core', 'skills', '_shared', fragmentSub)\"."
+    },
+    {
+      "id": "dynamic-015131",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(root, '.agents', 'skills', '_shared', fragmentSub)\"."
+    },
+    {
+      "id": "dynamic-015132",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(root, 'domains')\"."
+    },
+    {
+      "id": "dynamic-015133",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'domainsDir = path.join(root'."
+    },
+    {
+      "id": "dynamic-015134",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(domainsDir, domain, 'skills', '_shared', fragmentSub)\"."
+    },
+    {
       "id": "dynamic-015135",
       "from": [
         "ADMIT",
@@ -11,7 +1047,78 @@
         "preserve"
       ],
       "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
       "reason": "L12-72: src/setup/skill-wrappers.mjs: root-only; own operation 'const root = resolveProjectRoot(targetPath, projectRoot);' does not read, write, probe or emit a document path. Own census operand 'root = resolveProjectRoot(targetPath'."
+    },
+    {
+      "id": "dynamic-015136",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "REJECT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R16/R5 own operation is config-or-metadata and supplies no document-location operand. Own census operand 'candidateDir = path.isAbsolute(targetPath)'."
+    },
+    {
+      "id": "dynamic-015137",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join('.claude', 'skills', skillDirName)\"."
+    },
+    {
+      "id": "dynamic-015138",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(root, '.claude', 'skills', skillDirName)\"."
+    },
+    {
+      "id": "dynamic-015139",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(root, '.claude', 'skills', skillDirName)\"."
+    },
+    {
+      "id": "dynamic-015140",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(candidateDir, 'SKILL.md')\"."
     },
     {
       "id": "dynamic-015141",
@@ -24,7 +1131,22 @@
         "preserve"
       ],
       "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
       "reason": "L12-72: src/setup/skill-wrappers.mjs: root-only; own operation 'const root = resolveProjectRoot(targetPath, projectRoot);' does not read, write, probe or emit a document path. Own census operand 'root = resolveProjectRoot(targetPath'."
+    },
+    {
+      "id": "dynamic-015142",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "REJECT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R16/R5 own operation is config-or-metadata and supplies no document-location operand. Own census operand \"join('/')\"."
     },
     {
       "id": "dynamic-015143",
@@ -37,7 +1159,134 @@
         "preserve"
       ],
       "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
       "reason": "L12-72: src/setup/skill-wrappers.mjs: root-only; own operation 'const root = resolveProjectRoot(sourcePath, projectRoot);' does not read, write, probe or emit a document path. Own census operand 'root = resolveProjectRoot(sourcePath'."
+    },
+    {
+      "id": "dynamic-015144",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "REJECT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R16/R5 own operation is config-or-metadata and supplies no document-location operand. Own census operand \"join('/')\"."
+    },
+    {
+      "id": "dynamic-015153",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(projectRoot, 'core', 'skills')\"."
+    },
+    {
+      "id": "dynamic-015154",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'coreSkillsRoot = path.join(projectRoot'."
+    },
+    {
+      "id": "dynamic-015155",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(projectRoot, 'domains')\"."
+    },
+    {
+      "id": "dynamic-015156",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'domainsRoot = path.join(projectRoot'."
+    },
+    {
+      "id": "dynamic-015157",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'skillDir = path.join(coreSkillsRoot'."
+    },
+    {
+      "id": "dynamic-015158",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'path.join(coreSkillsRoot, entry.name)'."
+    },
+    {
+      "id": "dynamic-015159",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(skillDir, 'SKILL.md')\"."
+    },
+    {
+      "id": "dynamic-015160",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'relPath = path.relative(projectRoot'."
     },
     {
       "id": "dynamic-015161",
@@ -50,7 +1299,106 @@
         "preserve"
       ],
       "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
       "reason": "L12-72: src/setup/skill-wrappers.mjs: finding-path-field; own operation 'canonicalDir: relPath,' does not read, write, probe or emit a document path. Own census operand 'canonicalDir: relPath'."
+    },
+    {
+      "id": "dynamic-015162",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'skillFilePath: path.relative(projectRoot'."
+    },
+    {
+      "id": "dynamic-015163",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'domainSkillsRoot = path.join(domainsRoot'."
+    },
+    {
+      "id": "dynamic-015164",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(domainsRoot, domainEntry.name, 'skills')\"."
+    },
+    {
+      "id": "dynamic-015165",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'skillDir = path.join(domainSkillsRoot'."
+    },
+    {
+      "id": "dynamic-015166",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'path.join(domainSkillsRoot, entry.name)'."
+    },
+    {
+      "id": "dynamic-015167",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(skillDir, 'SKILL.md')\"."
+    },
+    {
+      "id": "dynamic-015168",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'relPath = path.relative(projectRoot'."
     },
     {
       "id": "dynamic-015169",
@@ -63,7 +1411,176 @@
         "preserve"
       ],
       "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
       "reason": "L12-72: src/setup/skill-wrappers.mjs: finding-path-field; own operation 'canonicalDir: relPath,' does not read, write, probe or emit a document path. Own census operand 'canonicalDir: relPath'."
+    },
+    {
+      "id": "dynamic-015170",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'skillFilePath: path.relative(projectRoot'."
+    },
+    {
+      "id": "dynamic-015172",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "REJECT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R16/R5 own operation is config-or-metadata and supplies no document-location operand. Own census operand \"join('/')\"."
+    },
+    {
+      "id": "dynamic-015176",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'geminiCmdPath = geminiCommandPathForIntent(skill.intentId)'."
+    },
+    {
+      "id": "dynamic-015190",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(projectRoot, 'core', 'skills')\"."
+    },
+    {
+      "id": "dynamic-015191",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'coreSkillsRoot = path.join(projectRoot'."
+    },
+    {
+      "id": "dynamic-015192",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(projectRoot, 'domains')\"."
+    },
+    {
+      "id": "dynamic-015193",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'domainsRoot = path.join(projectRoot'."
+    },
+    {
+      "id": "dynamic-015198",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'tmpPath = `${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`'."
+    },
+    {
+      "id": "dynamic-015201",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'fullPath = path.join(currentDir'."
+    },
+    {
+      "id": "dynamic-015202",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'path.join(currentDir, entry.name)'."
+    },
+    {
+      "id": "dynamic-015203",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'projectRelPath = path.relative(projectRoot'."
+    },
+    {
+      "id": "dynamic-015204",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'relPath: entryRel'."
     },
     {
       "id": "dynamic-015205",
@@ -76,6 +1593,7 @@
         "preserve"
       ],
       "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
       "reason": "L12-72: src/setup/skill-wrappers.mjs: finding-path-field; own operation 'relativeFragmentPath: entryRel,' does not read, write, probe or emit a document path. Own census operand 'relativeFragmentPath: entryRel'."
     },
     {
@@ -89,7 +1607,302 @@
         "preserve"
       ],
       "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
       "reason": "L12-72: src/setup/skill-wrappers.mjs: finding-path-field; own operation 'sourcePath: projectRelPath,' does not read, write, probe or emit a document path. Own census operand 'sourcePath: projectRelPath'."
+    },
+    {
+      "id": "dynamic-015207",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(coreSkillsRoot, '_shared')\"."
+    },
+    {
+      "id": "dynamic-015208",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(domainsRoot, domainEntry.name, 'skills', '_shared')\"."
+    },
+    {
+      "id": "dynamic-015211",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"join('/')\"."
+    },
+    {
+      "id": "dynamic-015213",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(skillsDir, '_shared', fragmentPath)\"."
+    },
+    {
+      "id": "dynamic-015214",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'roots = ['."
+    },
+    {
+      "id": "dynamic-015215",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(projectRoot, 'core', 'skills', '_shared')\"."
+    },
+    {
+      "id": "dynamic-015216",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(projectRoot, '.agents', 'skills', '_shared')\"."
+    },
+    {
+      "id": "dynamic-015217",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(projectRoot, 'domains')\"."
+    },
+    {
+      "id": "dynamic-015218",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'domainsRoot = path.join(projectRoot'."
+    },
+    {
+      "id": "dynamic-015219",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(domainsRoot, domainEntry.name, 'skills', '_shared')\"."
+    },
+    {
+      "id": "dynamic-015220",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'path.resolve(root)'."
+    },
+    {
+      "id": "dynamic-015221",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'normalizedWinPath = path.win32.normalize(candidatePath)'."
+    },
+    {
+      "id": "dynamic-015222",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "REJECT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R16/R5 own operation is config-or-metadata and supplies no document-location operand. Own census operand \"join('/')\"."
+    },
+    {
+      "id": "dynamic-015223",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'path.resolve(candidatePath)'."
+    },
+    {
+      "id": "dynamic-015224",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'matchedRoot = isPathInside(root.real'."
+    },
+    {
+      "id": "dynamic-015225",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'matchedPath = matchedRoot === root.real ? real : resolved'."
+    },
+    {
+      "id": "dynamic-015226",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'matchedRoot === root.real ? real : resolved'."
+    },
+    {
+      "id": "dynamic-015227",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'fragmentPath = path.relative(matchedRoot'."
+    },
+    {
+      "id": "dynamic-015228",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "REJECT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R16/R5 own operation is config-or-metadata and supplies no document-location operand. Own census operand \"join('/')\"."
+    },
+    {
+      "id": "dynamic-015230",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "REJECT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R16/R5 own operation is config-or-metadata and supplies no document-location operand. Own census operand 'absoluteProjectPathPattern = /(?:[A-Za-z]:[\\\\\\\\/]|\\\\\\\\\\\\\\\\[^\\\\\\\\/\\\\s`)\"\\']+[\\\\\\\\/][^\\\\\\\\/\\\\s`)\"\\']+[\\\\\\\\/]|\\\\/)[^`\\\\n)\"\\']+/g'."
+    },
+    {
+      "id": "dynamic-015231",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'fragmentPath = fragmentPathForCanonicalReference(rawRef'."
     },
     {
       "id": "dynamic-015232",
@@ -102,7 +1915,232 @@
         "preserve"
       ],
       "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
       "reason": "L12-72: src/setup/skill-wrappers.mjs: accumulator; own operation 'function rewritePackagedSkillReferences(content, filePath, skillsDir, sharedRoots = [], projectRoot) {' does not read, write, probe or emit a document path. Own census operand 'sharedRoots = []'."
+    },
+    {
+      "id": "dynamic-015233",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'sharedRoots = canonicalSharedRoots(projectRoot)'."
+    },
+    {
+      "id": "dynamic-015234",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'fullPath = path.join(dir'."
+    },
+    {
+      "id": "dynamic-015235",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'path.join(dir, entry.name)'."
+    },
+    {
+      "id": "dynamic-015239",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(targetOutputDir, 'commands', 'fgos')\"."
+    },
+    {
+      "id": "dynamic-015240",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'commandsDir = path.join(targetOutputDir'."
+    },
+    {
+      "id": "dynamic-015241",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(targetOutputDir, 'skills')\"."
+    },
+    {
+      "id": "dynamic-015242",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'skillsDir = path.join(targetOutputDir'."
+    },
+    {
+      "id": "dynamic-015243",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(skillsDir, '_shared')\"."
+    },
+    {
+      "id": "dynamic-015244",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'targetPath = path.join(targetShared'."
+    },
+    {
+      "id": "dynamic-015245",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'path.join(targetShared, fragment.relativeFragmentPath)'."
+    },
+    {
+      "id": "dynamic-015246",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'path.join(projectRoot, fragment.sourcePath)'."
+    },
+    {
+      "id": "dynamic-015247",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'targetSkillDir = path.join(skillsDir'."
+    },
+    {
+      "id": "dynamic-015248",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'path.join(skillsDir, s.name)'."
+    },
+    {
+      "id": "dynamic-015249",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'sourcePath = (s.canonicalDir && projectRoot) ? path.join(projectRoot'."
+    },
+    {
+      "id": "dynamic-015250",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand 'path.join(projectRoot, s.canonicalDir)'."
+    },
+    {
+      "id": "dynamic-015251",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "subsequentRuling": "L12-74",
+      "reason": "L12-74: R14 fixed non-docs skill/instruction roots; projection regeneration is a Phase 9 run, not a source-code change. Own census operand \"path.join(targetSkillDir, 'SKILL.md')\"."
     }
   ]
 }

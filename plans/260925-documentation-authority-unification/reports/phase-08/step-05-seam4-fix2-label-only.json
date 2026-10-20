@@ -1,0 +1,7635 @@
+{
+  "ruling": "R10 no disposition, proposed diff or slot change",
+  "count": 475,
+  "changes": [
+    {
+      "file": ".githooks/pre-commit",
+      "id": "reference-000110",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "changedFields": [
+        "aliasWriteCheck"
+      ]
+    },
+    {
+      "file": ".githooks/pre-commit",
+      "id": "reference-000111",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "changedFields": [
+        "aliasWriteCheck"
+      ]
+    },
+    {
+      "file": ".githooks/pre-commit",
+      "id": "dynamic-000536",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": ".githooks/pre-commit",
+      "id": "dynamic-000541",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": ".githooks/pre-commit",
+      "id": "dynamic-000545",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": ".githooks/pre-commit",
+      "id": "dynamic-000546",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": ".githooks/pre-commit",
+      "id": "dynamic-000551",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": ".githooks/pre-commit",
+      "id": "dynamic-000565",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": ".githooks/pre-commit",
+      "id": "dynamic-000566",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": ".githooks/pre-commit",
+      "id": "dynamic-000571",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "bin/fgos.mjs",
+      "id": "reference-000228",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "changedFields": [
+        "aliasWriteCheck"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "reference-003641",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "dependency",
+        "parityObligation",
+        "reason"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "reference-003643",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "dependency",
+        "parityObligation",
+        "reason"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "reference-003649",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "changedFields": [
+        "aliasWriteCheck"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "reference-003652",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "dependency",
+        "parityObligation",
+        "reason"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "reference-003653",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "dependency",
+        "parityObligation",
+        "reason"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "reference-003655",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "changedFields": [
+        "aliasWriteCheck"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "reference-003659",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "dependency",
+        "parityObligation",
+        "reason"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "reference-003664",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "changedFields": [
+        "aliasWriteCheck"
+      ]
+    },
+    {
+      "file": "src/cli/command-registry.mjs",
+      "id": "reference-003666",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "dependency",
+        "parityObligation",
+        "reason"
+      ]
+    },
+    {
+      "file": "src/intake/plan.mjs",
+      "id": "reference-003682",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "changedFields": [
+        "aliasWriteCheck"
+      ]
+    },
+    {
+      "file": "src/intake/verify-pattern-check.mjs",
+      "id": "reference-003687",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "changedFields": [
+        "aliasWriteCheck"
+      ]
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "id": "reference-003749",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "changedFields": [
+        "aliasWriteCheck"
+      ]
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "id": "reference-003784",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "changedFields": [
+        "aliasWriteCheck"
+      ]
+    },
+    {
+      "file": "src/state/events-jsonl-truncation-guard.mjs",
+      "id": "reference-003868",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "changedFields": [
+        "aliasWriteCheck"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "reference-000161",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "dependency",
+        "parityObligation",
+        "proofScope",
+        "reason"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "reference-000182",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "dependency",
+        "parityObligation",
+        "proofScope",
+        "reason"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "dynamic-000664",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "dynamic-000665",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "dynamic-000693",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "dynamic-000694",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "dynamic-000733",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "dynamic-000734",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "dynamic-000735",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "dynamic-000736",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "dynamic-000739",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "dynamic-000742",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "dynamic-000743",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "dynamic-000758",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "dynamic-000759",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "dynamic-000760",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "dynamic-000761",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "dynamic-000762",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "id": "dynamic-000766",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "id": "dynamic-000767",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "id": "dynamic-000768",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "id": "dynamic-000770",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "id": "dynamic-000772",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "id": "dynamic-000777",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "id": "dynamic-000778",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "id": "dynamic-000782",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "id": "dynamic-000783",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "id": "dynamic-000787",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "id": "dynamic-000788",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "id": "dynamic-009788",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "src/report/enduser-index.mjs",
+      "id": "dynamic-009791",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": ".agents/skills/_shared/capability-catalog.md",
+      "id": "reference-000001",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/_shared/capability-catalog.md",
+      "id": "reference-000002",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/_shared/catchup-self-recovery.md",
+      "id": "reference-000003",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/_shared/coding-worker-contract.md",
+      "id": "reference-000014",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/_shared/coding-worker-contract.md",
+      "id": "reference-000015",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/_shared/coding-worker-contract.md",
+      "id": "reference-000016",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/_shared/coding-worker-contract.md",
+      "id": "reference-000017",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/_shared/coding-worker-contract.md",
+      "id": "reference-000018",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-000019",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-000020",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason",
+        "sourceOwner"
+      ]
+    },
+    {
+      "file": ".agents/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-000021",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-000022",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-000023",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "dependency",
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-000024",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-000025",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "dependency",
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-000026",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-000027",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-000028",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason",
+        "resolverWitness",
+        "sourceOwner"
+      ]
+    },
+    {
+      "file": ".agents/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-000029",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/_shared/planning-capability-awareness.md",
+      "id": "reference-000030",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/_shared/planning-capability-awareness.md",
+      "id": "reference-000031",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/distill/SKILL.md",
+      "id": "reference-000032",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/distill/SKILL.md",
+      "id": "reference-000033",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/distill/references/consult-protocol.md",
+      "id": "reference-000034",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/distill/references/consult-protocol.md",
+      "id": "reference-000035",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/distill/references/deep-dive-protocol.md",
+      "id": "reference-000036",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/distill/references/extract-rules.md",
+      "id": "reference-000037",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/distill/scripts/distill.mjs",
+      "id": "reference-000038",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/distill/scripts/distill.mjs",
+      "id": "reference-000039",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/distill/scripts/distill.mjs",
+      "id": "reference-000040",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+      "id": "reference-000041",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+      "id": "reference-000042",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+      "id": "reference-000043",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason",
+        "sourceOwner"
+      ]
+    },
+    {
+      "file": ".agents/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+      "id": "reference-000044",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-clarifying/SKILL.md",
+      "id": "reference-000045",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-clarifying/SKILL.md",
+      "id": "reference-000046",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "dependency",
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-discovering/SKILL.md",
+      "id": "reference-000047",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-discovering/SKILL.md",
+      "id": "reference-000048",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-discovering/SKILL.md",
+      "id": "reference-000049",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-discovering/SKILL.md",
+      "id": "reference-000050",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-exploring/SKILL.md",
+      "id": "reference-000051",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-exploring/SKILL.md",
+      "id": "reference-000052",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-exploring/SKILL.md",
+      "id": "reference-000053",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason",
+        "resolverWitness",
+        "sourceOwner"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-exploring/references/gate-mechanics.md",
+      "id": "reference-000054",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-exploring/references/gate-mechanics.md",
+      "id": "reference-000055",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+      "id": "reference-000056",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason",
+        "sourceOwner"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+      "id": "reference-000057",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+      "id": "reference-000058",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-implement/SKILL.md",
+      "id": "reference-000059",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-implement/SKILL.md",
+      "id": "reference-000060",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "id": "reference-000061",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "id": "reference-000062",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+      "id": "reference-000063",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-knowledge/SKILL.md",
+      "id": "reference-000064",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "dependency",
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-planning/SKILL.md",
+      "id": "reference-000065",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-planning/SKILL.md",
+      "id": "reference-000066",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-planning/SKILL.md",
+      "id": "reference-000067",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-planning/SKILL.md",
+      "id": "reference-000068",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "id": "reference-000069",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "id": "reference-000070",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason",
+        "resolverWitness",
+        "sourceOwner"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "id": "reference-000071",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "id": "reference-000072",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "id": "reference-000073",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason",
+        "resolverWitness",
+        "sourceOwner"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "id": "reference-000074",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "id": "reference-000075",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "id": "reference-000076",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "id": "reference-000077",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason",
+        "resolverWitness",
+        "sourceOwner"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-shaping/SKILL.md",
+      "id": "reference-000078",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-shaping/SKILL.md",
+      "id": "reference-000079",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-shaping/SKILL.md",
+      "id": "reference-000080",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-shaping/SKILL.md",
+      "id": "reference-000081",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-shaping/SKILL.md",
+      "id": "reference-000082",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-shaping/SKILL.md",
+      "id": "reference-000083",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-shaping/SKILL.md",
+      "id": "reference-000084",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-validating/SKILL.md",
+      "id": "reference-000085",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-validating/SKILL.md",
+      "id": "reference-000086",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+      "id": "reference-000087",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "id": "reference-000088",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "id": "reference-000089",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason",
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "id": "reference-000090",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "id": "reference-000091",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "id": "reference-000092",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "id": "reference-000093",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-indexing/SKILL.md",
+      "id": "reference-000094",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-indexing/SKILL.md",
+      "id": "reference-000095",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-indexing/SKILL.md",
+      "id": "reference-000096",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-indexing/SKILL.md",
+      "id": "reference-000097",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-indexing/SKILL.md",
+      "id": "reference-000098",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-researching/SKILL.md",
+      "id": "reference-000099",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".agents/skills/fgos-researching/SKILL.md",
+      "id": "reference-000100",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".claude/skills/distill/scripts/distill.mjs",
+      "id": "reference-000101",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".claude/skills/distill/scripts/distill.mjs",
+      "id": "reference-000102",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".claude/skills/distill/scripts/distill.mjs",
+      "id": "reference-000103",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".claude/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+      "id": "reference-000104",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".claude/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+      "id": "reference-000105",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": ".claude/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+      "id": "reference-000106",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason",
+        "sourceOwner"
+      ]
+    },
+    {
+      "file": ".claude/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+      "id": "reference-000107",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "core/skills/_shared/capability-catalog.md",
+      "id": "reference-000279",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "core/skills/_shared/catchup-self-recovery.md",
+      "id": "author-s4-8e863912803691cb",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "changedFields": [
+        "aliasWriteCheck",
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "core/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-000280",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "core/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-000281",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "core/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-000282",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "core/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-000283",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "core/skills/_shared/planning-capability-awareness.md",
+      "id": "reference-000284",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "core/skills/distill/SKILL.md",
+      "id": "author-s4-02dbb72237d16b13",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation"
+      ]
+    },
+    {
+      "file": "core/skills/distill/SKILL.md",
+      "id": "author-s4-d850c96d2c6cd9c8",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation"
+      ]
+    },
+    {
+      "file": "core/skills/distill/references/consult-protocol.md",
+      "id": "author-s4-4afc360a89b23ab3",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation"
+      ]
+    },
+    {
+      "file": "core/skills/distill/references/consult-protocol.md",
+      "id": "author-s4-c3ebac9cdbfb5622",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation"
+      ]
+    },
+    {
+      "file": "core/skills/distill/references/consult-protocol.md",
+      "id": "author-s4-70517ef48b450a2e",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation"
+      ]
+    },
+    {
+      "file": "core/skills/distill/references/deep-dive-protocol.md",
+      "id": "author-s4-6ea5f9926ce47697",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation"
+      ]
+    },
+    {
+      "file": "core/skills/distill/references/extract-rules.md",
+      "id": "author-s4-19e5f544bc9e1935",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation"
+      ]
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-ebdf0bbf30f386bc",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-3b7f91d826c53538",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-08912b8301b10321",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "dependency",
+        "parityObligation",
+        "physicalPriorJoins",
+        "proofScope",
+        "reason"
+      ]
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-a20431be6e7a6997",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "dependency",
+        "parityObligation",
+        "physicalPriorJoins",
+        "proofScope",
+        "reason"
+      ]
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-30b59397818b58a4",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-929e1de7d7453fd2",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-7c7d595e2f389ade",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-92d207a36a483d36",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-52877e7c60f16d3d",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-19c252476bfb8f58",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-2e799bbe055b244b",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-5caf17775c40c6b0",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-45dc2cd894385e72",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-721bff23faa8d622",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-c9433d21d5c1e93a",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-229e8a5afb1230ae",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-09018bba15ce7bfe",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-06e8be879d39deb1",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-68c3eab88fa07af7",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-bb81392549cc3486",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-6f302576938a67b2",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-4676c20acaf7573e",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-d72e383c7545e538",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "docs/backlog.md",
+      "id": "author-s4-cdc5db14089ef6ef",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+      "id": "author-s4-2f25ab8977a40bd5",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "changedFields": [
+        "aliasWriteCheck",
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-planning/SKILL.md",
+      "id": "reference-002278",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-planning/SKILL.md",
+      "id": "reference-002279",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "id": "reference-002280",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "id": "reference-002281",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-validating/SKILL.md",
+      "id": "reference-002282",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "id": "reference-002283",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "id": "reference-002284",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "id": "reference-002285",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "domains/coding/task-specs/shape-plan.md",
+      "id": "reference-002286",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/capability-catalog.md",
+      "id": "reference-002305",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/capability-catalog.md",
+      "id": "reference-002306",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/catchup-self-recovery.md",
+      "id": "reference-002307",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/coding-worker-contract.md",
+      "id": "reference-002318",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/coding-worker-contract.md",
+      "id": "reference-002319",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/coding-worker-contract.md",
+      "id": "reference-002320",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/coding-worker-contract.md",
+      "id": "reference-002321",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/coding-worker-contract.md",
+      "id": "reference-002322",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-002323",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-002324",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason",
+        "sourceOwner"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-002325",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-002326",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-002327",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "dependency",
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-002328",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-002329",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "dependency",
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-002330",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-002331",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-002332",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason",
+        "resolverWitness",
+        "sourceOwner"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+      "id": "reference-002333",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/planning-capability-awareness.md",
+      "id": "reference-002334",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/planning-capability-awareness.md",
+      "id": "reference-002335",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/approve/SKILL.md",
+      "id": "reference-002336",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+      "id": "reference-002339",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "changedFields": [
+        "aliasWriteCheck"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-clarifying/SKILL.md",
+      "id": "reference-002353",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-clarifying/SKILL.md",
+      "id": "reference-002354",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "dependency",
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
+      "id": "reference-002355",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
+      "id": "reference-002356",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
+      "id": "reference-002357",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
+      "id": "reference-002358",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-exploring/SKILL.md",
+      "id": "reference-002359",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-exploring/SKILL.md",
+      "id": "reference-002360",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-exploring/SKILL.md",
+      "id": "reference-002361",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason",
+        "resolverWitness",
+        "sourceOwner"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-exploring/references/gate-mechanics.md",
+      "id": "reference-002362",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-exploring/references/gate-mechanics.md",
+      "id": "reference-002363",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+      "id": "reference-002364",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason",
+        "sourceOwner"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+      "id": "reference-002365",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+      "id": "reference-002366",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-implement/SKILL.md",
+      "id": "reference-002367",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-implement/SKILL.md",
+      "id": "reference-002368",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "id": "reference-002369",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+      "id": "reference-002370",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+      "id": "reference-002371",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md",
+      "id": "reference-002372",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "dependency",
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-planning/SKILL.md",
+      "id": "reference-002373",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-planning/SKILL.md",
+      "id": "reference-002374",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-planning/SKILL.md",
+      "id": "reference-002375",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-planning/SKILL.md",
+      "id": "reference-002376",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "id": "reference-002377",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "id": "reference-002378",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason",
+        "resolverWitness",
+        "sourceOwner"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+      "id": "reference-002379",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "id": "reference-002380",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "id": "reference-002381",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason",
+        "resolverWitness",
+        "sourceOwner"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "id": "reference-002382",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "id": "reference-002383",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "id": "reference-002384",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "id": "reference-002385",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason",
+        "resolverWitness",
+        "sourceOwner"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-shaping/SKILL.md",
+      "id": "reference-002386",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-shaping/SKILL.md",
+      "id": "reference-002387",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-shaping/SKILL.md",
+      "id": "reference-002388",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-shaping/SKILL.md",
+      "id": "reference-002389",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-shaping/SKILL.md",
+      "id": "reference-002390",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-shaping/SKILL.md",
+      "id": "reference-002391",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-shaping/SKILL.md",
+      "id": "reference-002392",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-validating/SKILL.md",
+      "id": "reference-002393",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-validating/SKILL.md",
+      "id": "reference-002394",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+      "id": "reference-002395",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "id": "reference-002396",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "id": "reference-002397",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason",
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "id": "reference-002398",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "id": "reference-002399",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "id": "reference-002400",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "id": "reference-002401",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+      "id": "reference-002402",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+      "id": "reference-002403",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+      "id": "reference-002404",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+      "id": "reference-002405",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-indexing/SKILL.md",
+      "id": "reference-002406",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-researching/SKILL.md",
+      "id": "reference-002407",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-researching/SKILL.md",
+      "id": "reference-002408",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "render-join"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/merge-loop/SKILL.md",
+      "id": "reference-002409",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/retro-loop/SKILL.md",
+      "id": "reference-002416",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "changedFields": [
+        "aliasWriteCheck"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/terminal-close/close.sh",
+      "id": "reference-002422",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/terminal/rename.sh",
+      "id": "reference-002426",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/terminal/rename.sh",
+      "id": "reference-002427",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/terminal/rename.sh",
+      "id": "reference-002428",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "scripts/backfill-status-category.mjs",
+      "id": "reference-002430",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "scripts/build-rust-distribution.mjs",
+      "id": "author-s4-18ebd6c076cec0b2",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation"
+      ]
+    },
+    {
+      "file": "scripts/build-rust-distribution.mjs",
+      "id": "author-s4-02201350783aced0",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation"
+      ]
+    },
+    {
+      "file": "scripts/build-rust-distribution.mjs",
+      "id": "author-s4-6fd853eada213080",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation"
+      ]
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "reference-002437",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "reference-002440",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "scripts/check-decision-codes.baseline.json",
+      "id": "reference-002473",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "scripts/check-decision-codes.mjs",
+      "id": "reference-002474",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006678",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006688",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006692",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006693",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006694",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "id": "dynamic-006709",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006788",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "author-s4-read-7ddb4df1ef9d807b",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "author-s4-read-39292fd3f1fb9f33",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "author-s4-read-b69d83cb90133af5",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "reference-002491",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007084",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007085",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007087",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007089",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007091",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007096",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007097",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007099",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007100",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007116",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007126",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "id": "dynamic-007127",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/check-locked-decisions-heading-drift.mjs",
+      "id": "reference-003554",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "scripts/doc-alias-resolver.mjs",
+      "id": "dynamic-007315",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/fgos-shell-integration.sh",
+      "id": "reference-003557",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "scripts/fgos-shell-integration.sh",
+      "id": "reference-003558",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007551",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007557",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007600",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007608",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007625",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007664",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007703",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007708",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "pathOperand",
+        "pathOperandWitness",
+        "reason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007716",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007717",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007771",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007783",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007784",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007785",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007786",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007793",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007794",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason",
+        "rejectedAsUnrelatedReason"
+      ]
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "reference-003573",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "reason",
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "reference-003575",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "reason",
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "reference-003583",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "reference-003591",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "reason",
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "reference-003597",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "reason",
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "reference-003601",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "parityObligation",
+        "reason",
+        "resolverWitness"
+      ]
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "dynamic-007835",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "rootSetWitness"
+      ]
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "dynamic-007840",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role",
+        "rootSetWitness"
+      ]
+    },
+    {
+      "file": "scripts/herdr-cockpit.sh",
+      "id": "reference-003606",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-bootstrap.mjs",
+      "id": "reference-003608",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "reference-003609",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "reference-003610",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008156",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008157",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008173",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008174",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008186",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008188",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "scripts/measure-p08-performance.mjs",
+      "id": "dynamic-008308",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/measure-p08-performance.mjs",
+      "id": "dynamic-008309",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/measure-p08-performance.mjs",
+      "id": "dynamic-008310",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/measure-verify-cost.mjs",
+      "id": "reference-003617",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "scripts/measure-verify-cost.mjs",
+      "id": "reference-003618",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "scripts/measure-verify-cost.mjs",
+      "id": "dynamic-008362",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/measure-verify-cost.mjs",
+      "id": "dynamic-008363",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/migrate-status-proposed-to-awaiting-approval.mjs",
+      "id": "reference-003619",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "scripts/probe-storytelling-material.mjs",
+      "id": "reference-003621",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "scripts/project-agents.mjs",
+      "id": "reference-003622",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "scripts/project-agents.mjs",
+      "id": "reference-003623",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "scripts/test-select-coverage-map.mjs",
+      "id": "dynamic-008907",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/test-select-coverage-map.mjs",
+      "id": "dynamic-008908",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/test-select-coverage-map.mjs",
+      "id": "dynamic-008912",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/test-select-promote.mjs",
+      "id": "dynamic-008999",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/test-select-promote.mjs",
+      "id": "dynamic-009000",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-fanout-overlap.mjs",
+      "id": "reference-003635",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-01.mjs",
+      "id": "dynamic-009159",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-01.mjs",
+      "id": "dynamic-009160",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-01.mjs",
+      "id": "dynamic-009161",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-01.mjs",
+      "id": "dynamic-009162",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-01.mjs",
+      "id": "dynamic-009168",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-01.mjs",
+      "id": "dynamic-009169",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-01.mjs",
+      "id": "dynamic-009170",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009191",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009192",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009210",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009214",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009217",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009218",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009223",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009224",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009225",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009226",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009227",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009229",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009230",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009231",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009232",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009233",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009234",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009235",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009236",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009237",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009238",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009239",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009240",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009241",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009242",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009259",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009261",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-02.mjs",
+      "id": "dynamic-009263",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "nonDocumentUse",
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    },
+    {
+      "file": "src/report/capability-plan-lint.mjs",
+      "id": "reference-003691",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "src/report/context-render.mjs",
+      "id": "reference-003692",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-013969",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-013971",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-013972",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-013973",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-013974",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-013975",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-013976",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-013977",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-013983",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-013984",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-013985",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-013993",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-013994",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-013995",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-013996",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-013997",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-013998",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-013999",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-014000",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-014001",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-014002",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-014004",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-014005",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-014012",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-014013",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-014014",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-014015",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-014020",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-014021",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-014022",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-014023",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-014024",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-014025",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-014034",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "proofScope",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "id": "dynamic-014035",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "proofScope",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003802",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "dependency",
+        "parityObligation",
+        "reason"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003828",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "dependency",
+        "parityObligation",
+        "reason"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003829",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "dependency",
+        "parityObligation",
+        "reason"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003833",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "dependency",
+        "parityObligation",
+        "reason"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003834",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "dependency",
+        "parityObligation",
+        "reason"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014207",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014299",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014300",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014301",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014302",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014307",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "changedFields": [
+        "operationWitness",
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014367",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "proofScope",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014368",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "proofScope",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014369",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "proofScope",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014370",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "proofScope",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014376",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "proofScope",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014377",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "proofScope",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014378",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "proofScope",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014379",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "proofScope",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014397",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "proofScope",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014398",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "proofScope",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014399",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "proofScope",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014400",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "proofScope",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014401",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "proofScope",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014402",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "proofScope",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014443",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "proofScope",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014444",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "proofScope",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014446",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "parked"
+      },
+      "changedFields": [
+        "blockedReason",
+        "parityObligation",
+        "proofScope",
+        "reason",
+        "stateExportDependency"
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "dynamic-014907",
+      "from": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "to": {
+        "admission": "ADMIT",
+        "disposition": "patch"
+      },
+      "changedFields": [
+        "proofScope"
+      ]
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015060",
+      "from": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "to": {
+        "admission": "REJECT",
+        "disposition": "preserve"
+      },
+      "changedFields": [
+        "reason",
+        "rejectedAsUnrelatedReason",
+        "role"
+      ]
+    }
+  ]
+}

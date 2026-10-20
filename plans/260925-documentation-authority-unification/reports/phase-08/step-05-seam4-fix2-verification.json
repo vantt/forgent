@@ -1,0 +1,196 @@
+{
+  "kind": "L12-74 records-only second-review closure",
+  "inputCommit": "2b04bfe7c1f748c2f17beca4a6695c968ada2bd5",
+  "checker": {
+    "files": 291,
+    "failureCount": 0,
+    "command": "env -u CLAUDE_CODE_SESSION_ID PYTHONDONTWRITEBYTECODE=1 python3 -B plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+    "exit": 0
+  },
+  "initialHitCounts": {
+    "a-passage-agreement": 0,
+    "b-real-blocker": 272,
+    "c-render-owner": 86,
+    "d-own-operand": 0,
+    "e-retired-successor": 0,
+    "r11-plans-boundary": 135
+  },
+  "probes": {
+    "pilotPassed": 44,
+    "pilotTotal": 44,
+    "generatorPassed": 34,
+    "generatorTotal": 34,
+    "totalPassed": 78,
+    "total": 78,
+    "firstGeneratorResultRetained": "step-05-seam4-fix2-first-probes-result.json",
+    "repairedProbe": "R11 retired the old admitted plans fixture; use nested enduser path operands 009775/009776 for passage disagreement."
+  },
+  "rereview": {
+    "fileCount": 22,
+    "sourceFiles": 18,
+    "generatedFiles": 4,
+    "actionOrSlotEntries": 342,
+    "newSlots": 20,
+    "admissionOnlyExcluded": 195,
+    "pendingIndependentReview": true
+  },
+  "originalIdsTuplesAndSourcePinsConserved": true,
+  "originalReferences": 2419,
+  "originalTuples": 5654,
+  "physicalSourcePins": 290,
+  "canonicalRecordHashBindingsMatch": true,
+  "rereviewRecordHashBindingsMatch": true,
+  "allSpecTestTargetsExist": true,
+  "sourceOnlyProposedApplyRollback": "step-05-seam4-fix2-apply-rollback.json",
+  "scope": {
+    "allowedWritePrefix": "plans/260925-documentation-authority-unification/reports/phase-08/",
+    "allGitChangesInScope": true,
+    "changedPaths": [
+      "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-admission-rules.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-full-check-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-full-check.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-check-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-cutover-specs.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-parity-receipts.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-probes-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-probes.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-decision-index.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-enduser-index.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-instructions.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-admission-check-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-carry-corrections.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-check-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-output-provenance.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-rereview-list.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-admission-only.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-apply-rollback.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-complete.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-first-probes-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-handback.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-initial-sweep.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-interim-sweep.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-label-only.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-owner-joins.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-refinements.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-root-sweep.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-source-evidence.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-specs.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-static-output-refresh.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-sweep.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-rereview2-list.json"
+    ],
+    "gitWrites": false,
+    "needsWrites": []
+  },
+  "whitespace": {
+    "command": "git diff --check",
+    "exit": 0
+  },
+  "notRun": [
+    "fgOS CLI",
+    "runtime/npm/cargo suites",
+    "build/generator",
+    "gateway/service",
+    "live state/config/secrets read",
+    "independent semantic re-review",
+    "cutover"
+  ],
+  "evidence": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-full-check-result.json",
+      "sha256": "a86c184fe299a1470030345568fc5339f1c092907c20a6a49b43c92b5ff1ae7c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-full-check.log",
+      "sha256": "c22545f3e3f0ebfaf501d602a133a43ed6a0ff15e1b9f80333cf802266f2944a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-probes-result.json",
+      "sha256": "1c657c27239de46a4712a71565346ea6bf19d8c642900f0867b34eb166ebb63b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-probes.log",
+      "sha256": "ed5a4641a73331a1c84a2cdcfc76a1f7bc1170db25a5ff214213f49b7cd12c57"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes-result.json",
+      "sha256": "1a90490c6e2be4509331cad7a21b54ae3412afb6d680bd4d218c14d62ba18675"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes.log",
+      "sha256": "bea209cfba9322dc72d8afaace9195f5842348b99035bf122cd93793711b642e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-sweep.json",
+      "sha256": "a51bec016401e8a4a0e2fa49a19c95c0a5febe38743d39a40e99b24702739e1e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-rereview2-list.json",
+      "sha256": "37385d57599669aaac641ecc22dd59fc282807919e3d9f95ec9a184811b191a7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-apply-rollback.json",
+      "sha256": "3a6a634225b4226c9281424453029990aa07cfd1814814c899f399083ae2cb91"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-source-evidence.json",
+      "sha256": "0f2635a4f3d00b35eb3452306276588330c62d5349c260b018fec384c5e34e06"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-owner-joins.json",
+      "sha256": "3a841e16059888f374a2f1a424cc19a7e6908f95766c94d9d24fb33666f81842"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-fix2-static-output-refresh.json",
+      "sha256": "734d7ef8d6fb31db9b04aba9507ce8d9ba69f2b1eba9db2c017fba524a7e47ec"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-admission-rules.py",
+      "sha256": "8a2c66aeb0a0ca7bd968911cb7e8a1cee7762b87a20c5f39d3d6205cf1667422"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+      "sha256": "666a866d7ec311478dbc9cfc0f62f55c6423999b15725b615a3bef8ae04d3de8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py",
+      "sha256": "a59d36f661d03d96cc8d168ec8dd316b79161904145d04d3e8a50e0b63df7cf5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-check.py",
+      "sha256": "8e30cd1b6dee7de8bf2be7ead4fd9f678d5bc888fd4ff3fc60f69962d8bc98f9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes.py",
+      "sha256": "3f549f26f14dd9eeb216decd84c49f16a76b43a3a78747acd1ce2aff5c65ed36"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-cutover-specs.json",
+      "sha256": "a028bcc159f918aad75f7c9eae6b39db27d37b5f32a3684f1b18a8c3ebbf482b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-parity-receipts.json",
+      "sha256": "2010f4bfaa1776a2654c4f955760bec5dd33c5052f850c83e60dd06b2b5062b6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+      "sha256": "4a8184858ff24a2187e5472338cad06adcb1510d27a3df751749e7cc976e8db7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+      "sha256": "3f151873cc6403eb239bebd0bcef1a5e9174805294b5604f158ea43db47f3f4f"
+    }
+  ]
+}
