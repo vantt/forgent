@@ -88,11 +88,11 @@ function pinnedPersonaFor(unitRecord, seatId, persona) {
  * defines keeps today's rendering by name; the one-liner already refuses it before the run. A definition
  * that exists but cannot be parsed or has the wrong shape throws its named problem.
  */
-function unitPersonaPin(persona, mainRoot) {
+function unitPersonaPin(persona, mainRoot, workflow) {
   if (typeof persona !== 'string') return null;
   try {
-    const { name, digest, text } = resolveAgentDefinition(persona, { projectRoot: mainRoot });
-    return { name, digest, text };
+    const { name, digest, text, identity } = resolveAgentDefinition(persona, { projectRoot: mainRoot, workflow });
+    return { name, digest, text, identity };
   } catch (err) {
     if (err instanceof AgentNotFoundError) return null;
     throw err;
@@ -421,6 +421,7 @@ async function assertAccountPinsBeforeRun(unit, runnerConfig, options) {
  * @param {string} [options.resumeUnitRunId] Unit run ID to resume
  * @param {string} [options.repoRoot] Main repository root
  * @param {string} [options.cwd] Current working directory / worktree
+ * @param {{ workflowDir?: string|null, owningDomain?: string|null }} [options.personaScope] Where the persona lookup starts for the workflow this unit belongs to (a case passes it); omitted, workspace and core only
  * @param {string} [options.worktree] Explicit worktree path
  * @param {object} [options.session] Session context { provider, tier, hasNativeAgent, herdrPresent, headless }
  * @param {object} [options.declared] Work step operation this unit runs: { workId, domain, workflow,
@@ -676,7 +677,7 @@ async function runUnitBody(options, scope) {
     const unitDir = path.join(assignmentsDir, unitRunId);
     // A persona file that cannot be parsed or has the wrong shape refuses the run here, before the unit
     // directory exists, instead of seating a silently different persona.
-    const personaPin = unitPersonaPin(unit.persona, mainRoot);
+    const personaPin = unitPersonaPin(unit.persona, mainRoot, options.personaScope);
     let resolved;
     try {
       // A blind unit's roles each get their copies in their own directory at dispatch, so nothing is copied here.

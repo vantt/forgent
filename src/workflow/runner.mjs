@@ -43,6 +43,7 @@ import { runUnit, snapshotRunnerConfig, detectHerdrPresent } from '../runner/exe
 import { CaseAdmissionRefusedError } from '../runner/execution/case-admission-port.mjs';
 import { createCaseAdmissionPort } from './case-admission-port.mjs';
 import { closeCaseUnderHold } from './case-close.mjs';
+import { workflowPersonaScope } from './loader.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 
@@ -83,6 +84,8 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
   // The one port every Unit of this run is admitted and settled through: it never acquires `advance`,
   // because this proposer already holds it.
   const port = createCaseAdmissionPort({ repoRoot: mainRoot, caseId: workflowRunId, heldAdvance: hold });
+  // Where the persona lookup of this run's Units starts: the workflow's own folder and owning domain, from its location.
+  const personaScope = workflowPersonaScope(workflow.id, { packageRoot: mainRoot });
 
   // A run recorded before cases existed is opened on its first advance, with its guide's defaults.
   {
@@ -353,6 +356,7 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
                 cwd: unitWorktree,
                 worktree: unitWorktree,
                 pattern: unitPatternOf(u.template),
+                personaScope,
                 overrides: await (async () => {
                   let unitAccount = state.account ?? null;
                   if (unitAccount !== null) {

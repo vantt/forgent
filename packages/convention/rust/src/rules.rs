@@ -12,6 +12,28 @@ pub struct RuleSet {
     pub rules: Vec<Rule>,
     #[serde(default)]
     pub identifiers: Vec<IdentifierRule>,
+    #[serde(default, rename = "definitionFiles")]
+    pub definition_files: Vec<DefinitionFileRule>,
+}
+
+/// The file name of a definition (`wf.<name>.yaml`, `agent.<name>.yaml`): a fixed prefix and suffix
+/// around a name that follows one of the identifier rules.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DefinitionFileRule {
+    pub id: String,
+    pub prefix: String,
+    pub suffix: String,
+    pub name_identifier: String,
+}
+
+impl DefinitionFileRule {
+    /// The name inside `file_name`, or None when the file name does not follow this rule.
+    pub fn name_of<'a>(&self, file_name: &'a str, identifiers: &[IdentifierRule]) -> Option<&'a str> {
+        let name = file_name.strip_prefix(self.prefix.as_str())?.strip_suffix(self.suffix.as_str())?;
+        let rule = identifiers.iter().find(|rule| rule.id == self.name_identifier)?;
+        rule.check(name).ok().map(|_| name)
+    }
 }
 
 /// A name that becomes a path or ref segment: the first character, the rest, a length cap and
@@ -253,6 +275,10 @@ impl RuleSet {
 
     pub fn identifier(&self, id: &str) -> Option<&IdentifierRule> {
         self.identifiers.iter().find(|rule| rule.id == id)
+    }
+
+    pub fn definition_file(&self, id: &str) -> Option<&DefinitionFileRule> {
+        self.definition_files.iter().find(|rule| rule.id == id)
     }
 
     pub fn placement_rules(&self) -> impl Iterator<Item = &Rule> {

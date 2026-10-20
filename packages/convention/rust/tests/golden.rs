@@ -260,3 +260,19 @@ fn identifier_cases_are_the_behavior_source() {
         assert_eq!(got, case["expectedError"].as_str(), "{value:?}");
     }
 }
+
+#[test]
+fn definition_file_cases_are_the_behavior_source() {
+    let fixture: Value = serde_json::from_str(GOLDEN).unwrap();
+    let cases = fixture["definitionFileCases"].as_array().expect("definitionFileCases");
+    assert!(!cases.is_empty());
+    let rules = packaged_rules();
+    for case in cases {
+        let rule = rules
+            .definition_file(case["rule"].as_str().unwrap())
+            .expect("definition file rule exists");
+        let file_name = case["fileName"].as_str().unwrap();
+        let got = rule.name_of(file_name, &rules.identifiers);
+        assert_eq!(got, case["expectedName"].as_str(), "{file_name:?}");
+    }
+}

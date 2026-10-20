@@ -181,10 +181,10 @@ export function unitOverridesOf(unit, seatPersonas = [], options = {}) {
   const applyTimeout = unitTimeoutMs === undefined && timeoutMs !== null;
 
   const seatScoped = unit.template?.pattern === 'panel'
-    ? seatPersonas.map(({ seat, name, digest, text }) => ({
+    ? seatPersonas.map(({ seat, name, digest, text, identity }) => ({
       scope: { unit: unit.id, seat },
       persona: name,
-      personaPin: { name, digest, text },
+      personaPin: { name, digest, text, ...(identity === undefined ? {} : { identity }) },
       origin: 'workflow',
       ...(effort !== null ? { reasoningEffort: effort } : {}),
       ...(applyTimeout ? { timeoutMs } : {}),

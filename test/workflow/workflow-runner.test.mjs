@@ -2014,8 +2014,8 @@ test('a named persona lands on its own seat only, mixed with a lens and an insta
   // Pinned at start, in the event and the projection, with the digest of the exact bytes.
   const installed = fs.readFileSync(path.resolve('core/agents/council-assumptions.yaml'), 'utf8');
   const expected = [
-    { seat: 'member-2', name: 'finance-controller', tier: 'workspace', source: 'fgos/agents/finance-controller.yaml', digest: sha256(personaText), text: personaText },
-    { seat: 'member-3', name: 'council-assumptions', tier: 'core', source: 'core/agents/council-assumptions.yaml', digest: sha256(installed), text: installed },
+    { seat: 'member-2', name: 'finance-controller', tier: 'workspace', source: 'fgos/agents/finance-controller.yaml', identity: 'workspace:fgos/agents/finance-controller', digest: sha256(personaText), text: personaText },
+    { seat: 'member-3', name: 'council-assumptions', tier: 'core', source: 'core/agents/council-assumptions.yaml', identity: 'core:core/agents/council-assumptions', digest: sha256(installed), text: installed },
   ];
   assert.deepEqual(state.seats.seats, seats);
   assert.deepEqual(state.seats.personas, expected);
@@ -2100,8 +2100,9 @@ test('unknown, colliding, duplicated and malformed persona entries refuse the st
   writeWorkspacePersona(tmp, 'wrong-shape', 'name: other\ndescription: x\n');
 
   const refused = [
-    [['good lens', '@nobody-here'], /persona "nobody-here" not found; searched fgos\/agents \(.*domains\/\*\/agents \(.*core\/agents \(/],
-    [['good lens', '@shared-name'], /persona "shared-name" is defined more than once in the domains\/\*\/agents tier \(domains\/finance\/agents\/shared-name\.yaml, domains\/hr\/agents\/shared-name\.yaml\)/],
+    [['good lens', '@nobody-here'], /persona "nobody-here" not found; searched fgos\/agents \(.*core\/agents \(/],
+    // A domain's persona is invisible to a core workflow, so the name is simply not found.
+    [['good lens', '@shared-name'], /persona "shared-name" not found; searched fgos\/agents \(.*core\/agents \(/],
     [['@finance-controller', '@finance-controller'], /seat 2 repeats seat 1/],
     [['good lens', '@'], /names a persona \("@"\)/],
     [['good lens', '@Finance-Controller'], /names a persona/],
