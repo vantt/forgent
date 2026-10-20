@@ -8,7 +8,7 @@ import { execFileSync } from 'node:child_process';
 import { resolvePlan, resolveCallerPlanVerdict, resolveContentRoot, findUncoveredLockedDecisions } from '../../src/intake/plan.mjs';
 import { computeImpact, computePriority } from '../../src/state/priority-formula.mjs';
 import { addWork, listWork, StoreError, categoryOf, moveWork, readRawEvents, recordGateApprove, addDecision } from '../../src/state/store.mjs';
-import { appendEvent } from '../../src/state/events.mjs';
+import { appendEvent } from '../helpers/legacy-event-fixture.mjs';
 import { acquireClaim } from '../../src/state/runtime-coordination.mjs';
 import { createWorktree } from '../../src/runner/worktree.mjs';
 

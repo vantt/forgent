@@ -6,7 +6,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { checkDispatchAttestation } from '../../src/runner/attestation-guard.mjs';
-import { appendEvent } from '../../src/state/events.mjs';
+import { appendEvent } from '../helpers/legacy-event-fixture.mjs';
 
 function git(dir, args) {
   return execFileSync('git', args, { cwd: dir, encoding: 'utf8', shell: false }).trim();

@@ -1,3 +1,5 @@
+import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 // identity-before-lock.test.mjs -- the identity bridge never runs the host
 // binary while the calling process holds the state lock.
 //
@@ -7,7 +9,6 @@
 // the real host. A fresh Node process (empty identity cache) runs the real
 // write paths against a real git repo reached through a symlinked path, so
 // lexical and canonical forms of the same .fgos dir both occur.
-import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
@@ -87,7 +88,7 @@ const claim = await claimPort.claimWork(dir, { id: 'item-a', actor: 'session', i
 store.settleClaim(dir, { id: 'item-a', claimId: claim.claimId, finalStatus: 'todo' });
 const runtime = claims.acquireClaim(dir, { id: 'item-c', actor: 'session' });
 claims.releaseClaim(dir, { id: 'item-c', claimId: runtime.claimId });
-events.appendEvent(store.resolveWriterLogPath(dir), { type: 'test.note', payload: null }, dir);
+claims.withMainState(dir, tx => tx.append({ type: 'executor.dispatch', payload: { note: 'identity probe' } }));
 porting.addPorting(dir, { id: 'p1', title: 'Widget' });
 porting.movePorting(dir, { id: 'p1', to: 'planned', expectedStatus: 'candidate' });
 `;

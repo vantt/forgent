@@ -1,7 +1,7 @@
 // claim-port.mjs — single choke-point for all claim flows (tsk-53f D1).
 //
 // Every claim (CLI take, CLI pick, runner claimItem) goes through this module.
-// Centralizes: main checkout mutex around the .fgos checkpoint only
+// Centralizes: claim capacity and durable preconditions under the Work gate
 // (repo-locks.mjs), the worker-slot ceiling check + acquireClaim in one state
 // transaction (runtime claim only — tsk-40m retired the durable
 // moveWork(to:'doing') claim-time write entirely; doing is derived purely from
@@ -15,9 +15,7 @@ import { foldEvents } from '../state/replay.mjs';
 import { isResolvedStatus, resolveRoot } from '../state/frontier.mjs';
 import { getDomain, stepForPhase, effectiveStep } from '../state/domain-registry.mjs';
 import { visitCount } from './anti-loop.mjs';
-import { withMainCheckout } from './repo-locks.mjs';
-import { checkpointMainFgos } from './main-fgos-checkpoint.mjs';
-import { LockScope, HolderLockError } from '../holder-lock/index.mjs';
+import { LockScope } from '../holder-lock/index.mjs';
 import { createClaimWorktree, branchNameFor, branchExists, currentHead, resolveRefSha } from './worktree.mjs';
 import { lastActivityAt, isReclaimEligible } from './claim-liveness.mjs';
 import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
@@ -101,18 +99,6 @@ export async function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoo
   // a fresh worktree forks from and the commit recorded on the claim.
   const head = currentHead(repoRoot);
   const scope = new LockScope('claim');
-
-  // The main checkout mutex (rank 50) is held only for the `.fgos` checkpoint.
-  // The ceiling check below no longer leans on it: it runs inside the `state`
-  // transaction, so two claims for the last slot still cannot both pass.
-  try {
-    await withMainCheckout(scope, 'claim', (mainHandle) => checkpointMainFgos(mainHandle, dir, repoRoot), { fgosDir: dir, waitMs });
-  } catch (err) {
-    if (err instanceof HolderLockError && err.code === 'lock-held') {
-      throw new ClaimError('lock-held', `claimWork: ${err.message}`, { holders: err.holders, lock: err.lock, timedOut: err.timedOut });
-    }
-    throw err;
-  }
 
   // Tầng A (T2/T3): events now live under baseline-0 (.fgos/events.jsonl)
   // PLUS every per-writer file under .fgos/events/ -- readRawEvents(dir)

@@ -1,3 +1,5 @@
+import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 // test/state/decision-scope-field.test.mjs — tsk-1lv-2 (D4): `state.decisions`
 // gains an optional `scope` field for platform/repo-wide decisions
 // (`--id` stays the item-scoped axis, unchanged). `addDecision` itself
@@ -6,7 +8,6 @@
 // prove the round-trip through the real store, then the CLI-level
 // `--scope` flag wiring.
 
-import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 import assert from 'node:assert/strict';
@@ -21,7 +22,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 
 function tmpDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-decision-scope-'));
+  return initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-decision-scope-')));
 }
 
 function run(cwd, args) {
@@ -33,7 +34,7 @@ function envelopeData(stdout) {
 }
 
 function initCwd() {
-  const cwd = tmpDir();
+  const cwd = path.dirname(tmpDir());
   assert.equal(run(cwd, ['init']).status, 0);
   return cwd;
 }

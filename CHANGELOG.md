@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Event history moves from tracked JSONL files to the Event Store; every existing fgOS project must run `fgos events migrate` with its writers stopped. `fgos repair` is removed.
+- Added `fgos events sync|status|export|migrate`; `fgos rebuild` rebuilds all registered consumer views. Setup registers Event Store fetch refspecs and doctor diagnoses integrity, publication and migration readiness.
+- Added `eventStore.seal.intervalSec` (300), `eventStore.sync.intervalSec` (300; 0 disables automatic sync), `eventStore.rebuild.maxAttempts` (5), and `eventStore.remote` (`origin`). Commands seal due streams at start/end and owner sessions synchronize at command end; dispatched workers do not push.
+- Event output `seq` is now an origin/stream position, not a global ordinal; use `h` for identity. Porting keeps its public API, writes `project:porting`, and uses `dir` only for its derived view location.
+- Work verbs now refuse on Windows with `event-store-unsupported-platform`.
+
+
 - All Work history readers now use Event Store, including Rust observation/friction readers and docs indexing. Unavailable history refuses docs-index without overwriting its manifest. Retired actor/status/category event-file rewrite scripts and replay snapshot readers are removed.
 
 - Work replay records concurrent precondition conflicts deterministically; rebuild preserves the previous cache on failure, and dispatch attestation reads the Event Store with failures propagated. The storytelling probe now accepts `--dir <.fgos-directory>` in place of `--log <file>`.

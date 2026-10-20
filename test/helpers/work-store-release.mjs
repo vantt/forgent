@@ -30,7 +30,7 @@ process.on('exit', () => fs.rmSync(release, { recursive: true, force: true }));
 export function initializeWorkRepository(repo) {
   fs.mkdirSync(repo, { recursive: true });
   const git = (...args) => execFileSync('git', ['-C', repo, ...args], { stdio: 'pipe' });
-  git('init', '-q');
+  git('init', '-q', '-b', 'main');
   git('config', 'user.name', 'Fixture'); git('config', 'user.email', 'fixture@example.test');
   git('config', 'fgos.machineId', 'work-fixture');
   const locks = path.join(repo, '.git/fgos/events/locks');

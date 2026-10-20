@@ -1,3 +1,5 @@
+import { prepareWorkStore } from '../state/work-event-store.mjs';
+import { resolveWriterIdentity } from '../util/session-identity.mjs';
 import os from 'node:os';
 // merge.mjs — the approval-gate merge engine (per pr-lifecycle D1-D5):
 // mechanics that turn an approved proposal into a merged, verified `done`
@@ -53,7 +55,6 @@ import { listSessions } from './session.mjs';
 import { listWork } from '../state/store.mjs';
 import { openLeavesSharingTarget, classifyPostLandDrift } from '../state/graph-harness.mjs';
 import { withMainCheckout, withMergeTargetSlot, addWorktree } from './repo-locks.mjs';
-import { checkpointMainFgos } from './main-fgos-checkpoint.mjs';
 import { LockScope, runBorrowed } from '../holder-lock/index.mjs';
 
 /** Raised only for a genuinely unexpected git failure (e.g. `git merge
@@ -757,13 +758,6 @@ export async function withMergeSlot(scope, lockRoot, targetRef, fn, { waitMs } =
   }
 }
 
-/** Commit the `.fgos` event files of the main checkout under the main
- * mutex, so the merge below starts from a clean `.fgos`. */
-function checkpointUnderMainCheckout(scope, lockRoot, { waitMs } = {}) {
-  const fgosDir = path.join(lockRoot, '.fgos');
-  return withMainCheckout(scope, 'checkpoint', (mainHandle) => checkpointMainFgos(mainHandle, fgosDir, lockRoot), { fgosDir, waitMs });
-}
-
 /**
  * Merge `item`'s branch into its target. The caller already holds the
  * target's merge slot (`withMergeSlot`) and passes the scope that holds it:
@@ -786,9 +780,11 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = re
   const postLandFiles = changedFiles(repoRoot, item, { trunk: postLandTarget });
 
   try {
-    await checkpointUnderMainCheckout(scope, lockRoot, { waitMs });
+    const { store } = prepareWorkStore(path.join(lockRoot, '.fgos'), path.join(lockRoot, '.fgos'));
+    store.seal('project', scope);
     const result = await mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRoot, scope, waitMs });
     if (result.outcome !== 'merged') return result;
+    promoteLandedStreams(store, item.id, String(resolveWriterIdentity(path.join(lockRoot, '.fgos')).id), scope);
     // Detection is read-only work and must never widen the critical section.
     return {
       ...result,
@@ -1009,6 +1005,7 @@ export function formatFgosWriteRejectedDetail(branch, paths, targetLabel) {
 // own pre-merge content; every other staged `.fgos/` path is left alone and
 // still falls through to fgos-write-rejected.
 function isMergeUnionPath(repoRoot, relPath) {
+  if (relPath === '.fgos/events' || relPath === '.fgos/events.jsonl' || relPath.startsWith('.fgos/events/')) return false;
   const output = git(repoRoot, ['check-attr', 'merge', '--', relPath]);
   return output.trim().endsWith(': union');
 }
@@ -1257,6 +1254,7 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRo
     // when it's absent.
     const effectiveBranchHeadAtTake = item.lastAttempt?.branchHeadAtTake ?? item.branchHeadAtTake;
     for (const fgosPath of fgosPaths) {
+      if (fgosPath === '.fgos/events' || fgosPath === '.fgos/events.jsonl' || fgosPath.startsWith('.fgos/events/')) continue;
       const unchangedOnBranch = isUnchangedSinceBranchHeadAtTake(repoRoot, branch, fgosPath, effectiveBranchHeadAtTake);
       if (!isMergeUnionPath(repoRoot, fgosPath) && !unchangedOnBranch) {
         continue;
@@ -1359,40 +1357,6 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRo
   }
 
   try {
-    // tsk-3tp (D2): sweep dirty/untracked files under .fgos/events/ and .fgos/events.jsonl into the staged merge commit
-    //
-    // tsk-3tp (fix, review r1): `.fgos` only ever exists under `lockRoot`
-    // (ADR0020 strips it from every ephemeral worktree — see
-    // `docs/explanation/why-mergerunneritem-takes-a-separate-lockroot-param.md`),
-    // so both the pathspec base AND the git-command cwd below must be
-    // `lockRoot`, not `repoRoot` — mirroring the checkpoint at the start of
-    // `mergeRunnerItem`, which already got this right. Resolving/running against `repoRoot` instead made this block
-    // a silent no-op (git refuses an out-of-repository pathspec, swallowed
-    // by the catch below) for every leaf->parent approve and promote-engine
-    // merge — i.e. every merge where `lockRoot !== repoRoot`. `lockRoot`
-    // defaults to `repoRoot`, so the root->main approve path (where the two
-    // are already the same) is unaffected by this change.
-    const sweepFgosDir = path.join(lockRoot, '.fgos');
-    const sweepLogPath = path.join(sweepFgosDir, 'events.jsonl');
-    const sweepEventsDirPath = path.join(sweepFgosDir, 'events');
-    const sweepPathspecs = [];
-    if (fs.existsSync(sweepLogPath)) {
-      sweepPathspecs.push(path.relative(lockRoot, sweepLogPath) || '.fgos/events.jsonl');
-    }
-    if (fs.existsSync(sweepEventsDirPath)) {
-      sweepPathspecs.push(path.relative(lockRoot, sweepEventsDirPath));
-    }
-    if (sweepPathspecs.length > 0) {
-      try {
-        const statusOut = git(lockRoot, ['status', '--porcelain', '--', ...sweepPathspecs]).trim();
-        if (statusOut.length > 0) {
-          git(lockRoot, ['add', ...sweepPathspecs]);
-        }
-      } catch {
-        // non-blocking
-      }
-    }
-
     // On the main checkout the commit writes the shared index, so it runs
     // under the main mutex and the pre-commit hook sees a borrower. In a
     // disposable worktree it touches nothing shared and commits directly.
@@ -1688,8 +1652,11 @@ async function mergeRootIntoMainCasUnderSlot(scope, repoRoot, item, branch, { ti
     } catch (e) {}
   }
 
+  const { store } = prepareWorkStore(path.join(repoRoot, '.fgos'), path.join(repoRoot, '.fgos'));
+  store.seal('project', scope);
   const landed = await landCasMergeUnderLock(scope, repoRoot, { branch, targetBranch, targetTip, commitSha, ownFileSet, waitMs });
   if (landed) return landed;
+  promoteLandedStreams(store, item.id, String(resolveWriterIdentity(path.join(repoRoot, '.fgos')).id), scope);
   return { outcome: 'merged', branch, check };
 }
 
@@ -1735,9 +1702,9 @@ async function landCasMergeUnderLock(scope, repoRoot, { branch, targetBranch, ta
         if (stagedPaths.length > 0) {
           return { outcome: 'main-checkout-dirty-mid-merge', branch, stagedPaths };
         }
-        // Staged `.fgos` event files are swept into main's index on purpose
-        // (see the sweep in mergeRunnerItemLocked) and are fgOS's own: keep
-        // them across the sync instead of refusing every land behind them.
+        // Preserve other fgOS-owned staged files across the checkout sync.
+        // Event truth is never staged or restored by Land.
+        if (staged.some(p => p === '.fgos/events' || p === '.fgos/events.jsonl' || p.startsWith('.fgos/events/'))) return { outcome: 'fgos-write-rejected', branch };
         stagedFgos = staged.filter(isFgosPath)
           .filter((p) => fs.existsSync(path.join(repoRoot, p)))
           .map((p) => ({ p, content: fs.readFileSync(path.join(repoRoot, p)) }));
@@ -1775,4 +1742,15 @@ async function landCasMergeUnderLock(scope, repoRoot, { branch, targetBranch, ta
   } catch (err) {
     throw toMergeLockError(err, { branch });
   }
+}
+
+/** Work owns promotion policy; Git Land knows nothing about event streams. */
+export function promoteLandedStreams(store, branch, writer, heldRanks) {
+  const stream = `branch:${branch}`;
+  const status = store.status(heldRanks);
+  if (!status.streams.some(row => row.stream === stream)) return [];
+  const read = store.read({ streams: ['project', stream], project: false }, heldRanks);
+  const throughSeq = Math.max(0, ...read.events.filter(event => event.stream === stream && event.origin === store.ownOrigin).map(event => event.seq));
+  if (!throughSeq || read.events.some(event => event.type === 'store.promote' && event.payload?.stream === stream && event.payload.throughSeq >= throughSeq)) return [];
+  return [store.promote({ branch: stream, throughSeq, cursor: read.cursor.cover, writer }, heldRanks)];
 }

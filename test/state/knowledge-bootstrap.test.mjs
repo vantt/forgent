@@ -1,4 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -9,7 +10,7 @@ import { rebuild, initStore, registerTopicStore, registerDocStore, retireDocStor
 import { assertActiveDocCardinality } from '../../src/state/knowledge-registry.mjs';
 
 test('knowledge-bootstrap - missing field rejects before writing entries', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-')));
   try {
     initStore(tmpDir);
     const dataPath = path.join(tmpDir, 'bad-inventory.json');
@@ -31,7 +32,7 @@ test('knowledge-bootstrap - missing field rejects before writing entries', () =>
 });
 
 test('knowledge-bootstrap - idempotency and invariant check', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-')));
   try {
     const dataPath = path.join(tmpDir, 'valid-inventory.json');
     const inventory = [
@@ -66,7 +67,7 @@ test('knowledge-bootstrap - idempotency and invariant check', () => {
 });
 
 test('knowledge-bootstrap - refuses (does not silently skip) a topic whose purposeSlug drifted from the registry', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-')));
   try {
     const dataPath = path.join(tmpDir, 'inventory.json');
     const first = [
@@ -94,7 +95,7 @@ test('knowledge-bootstrap - refuses (does not silently skip) a topic whose purpo
 });
 
 test('knowledge-bootstrap - refuses (does not silently skip) a doc whose currentPath drifted from the registry', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-')));
   try {
     const dataPath = path.join(tmpDir, 'inventory.json');
     const first = [
@@ -122,7 +123,7 @@ test('knowledge-bootstrap - refuses (does not silently skip) a doc whose current
 });
 
 test('knowledge-bootstrap - a drift refusal on a LATER row leaves NO partial write from earlier rows in the same run', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-')));
   try {
     const dataPath = path.join(tmpDir, 'inventory.json');
 
@@ -157,7 +158,7 @@ test('knowledge-bootstrap - a drift refusal on a LATER row leaves NO partial wri
 });
 
 test('knowledge-bootstrap - a later row that fails the REDUCER\'s own validation (e.g. invalid mode) leaves an earlier row\'s topic/doc uncreated too', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-')));
   try {
     const dataPath = path.join(tmpDir, 'inventory.json');
     // t1's row is entirely valid; t2's row has a mode the reducer's own
@@ -184,7 +185,7 @@ test('knowledge-bootstrap - a later row that fails the REDUCER\'s own validation
 });
 
 test('knowledge-bootstrap - refuses (does not report idempotent success) a doc the registry already retired', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-')));
   try {
     const dataPath = path.join(tmpDir, 'inventory.json');
     const first = [
@@ -208,7 +209,7 @@ test('knowledge-bootstrap - refuses (does not report idempotent success) a doc t
 });
 
 test('knowledge-bootstrap - refuses a doc the registry already superseded', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-')));
   try {
     const dataPath = path.join(tmpDir, 'inventory.json');
     const first = [
@@ -227,7 +228,7 @@ test('knowledge-bootstrap - refuses a doc the registry already superseded', () =
 });
 
 test('knowledge-bootstrap - refuses a topic the registry already retired', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-')));
   try {
     const dataPath = path.join(tmpDir, 'inventory.json');
     const first = [
@@ -251,7 +252,7 @@ test('knowledge-bootstrap - refuses a topic the registry already retired', () =>
 });
 
 test('knowledge-bootstrap - refuses a live doc whose framework or mode drifted from the registry', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-')));
   try {
     const dataPath = path.join(tmpDir, 'inventory.json');
     const first = [
@@ -274,7 +275,7 @@ test('knowledge-bootstrap - refuses a live doc whose framework or mode drifted f
 });
 
 test('knowledge-bootstrap - refuses (does not report idempotent success) a doc whose sourceCaptureIds never recorded the inventory row\'s own oldPath', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-'));
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bootstrap-test-')));
   try {
     const dataPath = path.join(tmpDir, 'inventory.json');
     const inventory = [

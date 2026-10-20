@@ -11,17 +11,8 @@ import { initStore, addWork, addOutcome } from '../../src/state/store.mjs';
 import { generateEnduserDocsIndex } from '../../src/report/enduser-index-generate.mjs';
 
 // These are named mechanism families, not an allowance for arbitrary readers.
-const removalUnit = new Set([
-  'bin/fgos.mjs', // repair verb only
-  'src/runner/merge.mjs', // Land/restore file handling
-  'src/runner/main-fgos-checkpoint.mjs',
-  'src/setup/registrations.mjs', // retired compaction/truncation checks only
-  'src/state/events.mjs', 'src/state/event-log.mjs',
-  'src/state/events-compaction.mjs', 'src/state/events-jsonl-truncation-guard.mjs',
-  'scripts/events-jsonl-truncation-guard.mjs',
-]);
+const parsingOnly = new Set(['src/state/events.mjs', 'src/state/event-log.mjs']);
 const separateStores = new Set([
-  'src/state/porting-store.mjs', // phase 09 requirement 7, separate consumer
   'src/workflow/store.mjs', 'src/workflow/case-admission-port.mjs',
   'scripts/backfill-unit-summaries.mjs', 'scripts/migration-proof-2a.mjs',
   'scripts/regenerate-observe-fixtures.mjs', // coordination journal + explicit export
@@ -40,11 +31,11 @@ test('Work reader census: zero consumers of legacy files outside the facade', t 
     const pattern = /['"]events\.jsonl['"]|\bjoin\([^\n]*['"]events['"]|\b(?:readAllEventsFromDir|readEventsFromByte)\b|import\s*\{[^}]*\breadEvents\b[^}]*\}\s*from/;
     if (!pattern.test(code)) continue;
     if (file.startsWith('src/event-store/') || file.startsWith('packages/event-store/') || file.startsWith('packages/git/node-addon/')) continue;
-    if (removalUnit.has(file) || separateStores.has(file) || inventoryAndMetadata.has(file)) continue;
+    if (parsingOnly.has(file) || separateStores.has(file) || inventoryAndMetadata.has(file)) continue;
     unexpected.push(file);
   }
   assert.deepEqual(unexpected, []);
-  t.diagnostic('0 unclassified Work readers; allowed: owning facade/crate, migration/export inventory, metadata, fixtures, separate journals, requirement-9 removal families, requirement-7 porting consumer.');
+  t.diagnostic('0 unclassified Work readers; allowed: owning facade/crate, migration/export inventory, metadata, fixtures, separate journals and explicit JSONL parsing utilities.');
 });
 
 test('docs index reads captures without legacy files and preserves its manifest on corrupt history', t => {

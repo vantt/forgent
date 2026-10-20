@@ -95,6 +95,10 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions, remote 
       const ranks = outsideGate(heldRanks);
       return call(() => native.sealAll(streams, ranks, hotLockDepth()));
     },
+    promote({ branch, throughSeq, cursor, writer, ts = new Date().toISOString() }, heldRanks) {
+      const ranks = outsideGate(heldRanks);
+      return call(() => native.promote({ branch, throughSeq, cursor, writer, ts }, ranks, hotLockDepth()));
+    },
     sync({ remote = 'origin', noPush = false } = {}, heldRanks) {
       const ranks = outsideGate(heldRanks);
       return call(() => native.sync(remote, noPush, ranks, hotLockDepth()));
@@ -146,7 +150,7 @@ export function eventStoreAddonAvailable(loaderOptions) {
   return typeof native.resolveEventStore === 'function' && typeof native.openStore === 'function'
     && typeof native.eventStoreFacts === 'function' && typeof native.ensureEventStoreRefspecs === 'function'
     && typeof native.mintEventStoreMachineId === 'function'
-    && ['read', 'append', 'sync', 'status', 'exportJsonl', 'exportLegacyLayout', 'readLegacyFromHead', 'importLegacy', 'legacyLayout'].every(name => typeof native.EventStore?.prototype?.[name] === 'function');
+    && ['read', 'append', 'promote', 'sync', 'status', 'exportJsonl', 'exportLegacyLayout', 'readLegacyFromHead', 'importLegacy', 'legacyLayout'].every(name => typeof native.EventStore?.prototype?.[name] === 'function');
 }
 
 export function mintEventStoreMachineId(stateRoot, hostname, loaderOptions) {

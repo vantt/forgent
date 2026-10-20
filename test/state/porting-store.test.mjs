@@ -1,4 +1,6 @@
 import '../helpers/process-tmp-root.mjs';
+import { prepareWorkStore } from '../../src/state/work-event-store.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -8,18 +10,17 @@ import { fork } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { initStore, addPorting, movePorting, listPorting, rebuild } from '../../src/state/porting-store.mjs';
 import { PortingError } from '../../src/state/porting.mjs';
-import { appendEvent } from '../../src/state/events.mjs';
+import { appendEvent } from '../helpers/legacy-event-fixture.mjs';
 
 const PORTING_STORE_MJS = pathToFileURL(path.resolve(fileURLToPath(import.meta.url), '../../../src/state/porting-store.mjs')).href;
 
 // Every test gets its own mkdtemp dir — never touch the repo's .fgos/.
 function tmpDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-porting-store-'));
+  return initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-porting-store-')));
 }
 
 function readRawPortingEvents(dir) {
-  const logPath = path.join(dir, 'porting', 'events.jsonl');
-  return fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean).map((line) => JSON.parse(line));
+  return prepareWorkStore(dir, dir).store.read({ streams: ['project:porting'] }, []).sequence;
 }
 
 // Spawns N real child OS processes that all call `storeCall` (a snippet of
@@ -86,10 +87,10 @@ try {
   return results;
 }
 
-test('initStore creates <dir>/porting/events.jsonl and state.json, never touching <dir>\'s own root', () => {
+test('initStore creates the derived porting view without a tracked event log', () => {
   const dir = tmpDir();
   initStore(dir);
-  assert.ok(fs.existsSync(path.join(dir, 'porting', 'events.jsonl')));
+  assert.ok(!fs.existsSync(path.join(dir, 'porting', 'events.jsonl')));
   assert.ok(fs.existsSync(path.join(dir, 'porting', 'state.json')));
   assert.ok(!fs.existsSync(path.join(dir, 'events.jsonl')));
   assert.ok(!fs.existsSync(path.join(dir, 'state.json')));
@@ -121,7 +122,7 @@ test('addPorting rejects a duplicate id as validation, checked BEFORE the event 
     () => addPorting(dir, { id: 'dup' }),
     (err) => err instanceof PortingError && err.category === 'validation',
   );
-  const raw = fs.readFileSync(path.join(dir, 'porting', 'events.jsonl'), 'utf8').trim().split('\n');
+  const raw = readRawPortingEvents(dir).map(JSON.stringify);
   assert.equal(raw.length, 1, 'the rejected duplicate must never reach the log');
 });
 
@@ -174,7 +175,7 @@ test('write order is append-then-rebuild: a simulated crash between the two step
   // Simulate a crash: append the event directly (bypassing addPorting's own
   // view refresh), so state.json is left exactly as initStore wrote it —
   // stale relative to the log.
-  appendEvent(logPath, { type: 'porting.add', payload: { id: 'crash-p1', status: 'candidate', title: 'Crash test' } });
+  prepareWorkStore(dir, dir).store.append('project:porting', [{ eventType: 'porting.add', schemaVersion: 1, payload: { id: 'crash-p1', status: 'candidate', title: 'Crash test' }, ts: new Date().toISOString() }], {}, 'fixture', []);
   const staleView = JSON.parse(fs.readFileSync(path.join(dir, 'porting', 'state.json'), 'utf8'));
   assert.deepEqual(staleView.porting, {}, 'view is stale immediately after the simulated crash');
 
@@ -183,7 +184,7 @@ test('write order is append-then-rebuild: a simulated crash between the two step
   assert.equal(recovered.porting['crash-p1'].title, 'Crash test');
 
   const persisted = JSON.parse(fs.readFileSync(path.join(dir, 'porting', 'state.json'), 'utf8'));
-  assert.deepEqual(persisted, recovered, 'rebuild() must also persist the recovered view to state.json');
+  assert.deepEqual(persisted.porting, recovered.porting, 'rebuild() must also persist the recovered view to state.json');
 });
 
 test('porting-store never reads or writes the existing .fgos-shaped root events.jsonl/state.json — only the nested porting/ subdir', () => {

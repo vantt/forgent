@@ -27,7 +27,6 @@ import { noteLockHeld, noteLockReleased, resolveWriterIdentity } from '../util/s
 import { HotLockError, hotLockDepth, enterHotLock } from '../holder-lock/hot-guard.mjs';
 export { HotLockError, hotLockDepth } from '../holder-lock/hot-guard.mjs';
 import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
-import { appendEventCore } from './event-log.mjs';
 
 const RESOURCES = Object.freeze(['state', 'porting-events']);
 const WAIT_TIMEOUT_MS = 5000;
@@ -295,26 +294,14 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, eve
     eventStore,
     head,
     writer,
-    /** Work stages typed events; the legacy porting gate still appends a log. */
-    append(logPath, opts) {
-      if (staging && opts === undefined && logPath && typeof logPath === 'object') {
-        opts = logPath;
-        guard();
-      } else {
-        guard(logPath);
-      }
-      if (!staging) return appendEventCore(logPath, opts, fgosDir, tx);
+    /** Only a prepared consumer gate may acknowledge typed events. */
+    append(opts) {
+      guard();
+      if (!staging || !commitEvents) throw new HotLockError('state-tx-consumer-required', 'append requires a prepared consumer gate');
       if (typeof opts?.type !== 'string' || !opts.type.trim()) throw new HotLockError('validation', 'event type is required');
       const event = { type: opts.type.trim(), payload: structuredClone(opts.payload ?? null), ts: new Date().toISOString() };
       events.push(event);
       return event;
-    },
-    /** One already-built log line (the primitive `append` writes through). */
-    appendLine(logPath, line) {
-      guard(logPath);
-      if (staging) throw new HotLockError('state-tx-raw-append', 'staged transactions append typed events only');
-      fs.mkdirSync(path.dirname(logPath), { recursive: true });
-      fs.appendFileSync(logPath, line, 'utf8');
     },
     writeJson(target, value) {
       tx.writeText(target, `${JSON.stringify(value, null, 2)}\n`);

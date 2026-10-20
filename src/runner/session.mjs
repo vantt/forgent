@@ -1,3 +1,4 @@
+import { maintainEventStore } from '../event-store/maintenance.mjs';
 // session.mjs — opt-in per-session git worktree lifecycle for fgos
 // multi-session checkout (backlog P35). A Session is one work-item's isolated
 // view of the git-tracked source tree, backed by a detached-HEAD worktree,
@@ -439,6 +440,7 @@ export function endSession(repoRoot, sessionId, { force = false } = {}) {
     return { ...entry };
   } finally {
     lock.release();
+    maintainEventStore(repoRoot, { shutdown: true });
   }
 }
 

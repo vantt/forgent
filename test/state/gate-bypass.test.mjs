@@ -1,9 +1,10 @@
+import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 // test/state/gate-bypass.test.mjs — docs/history/gate-bypass/plan.md Piece 1.
 // Covers the two cases the plan's risk map flagged as needing explicit proof:
 // the completeness scan must never false-negative on an incomplete artifact,
 // and the D4 hard-gate floor must hold even at the highest level.
 
-import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -24,7 +25,7 @@ import {
 import { addWork } from '../../src/state/store.mjs';
 
 function tmpDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gate-bypass-'));
+  return initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gate-bypass-')));
 }
 
 // The shared-config-file read path (docs/history/doctor-fix-gate-bypass/
@@ -35,6 +36,7 @@ function tmpDir() {
 // otherwise land on the shared, uncontrolled `os.tmpdir()` itself.
 function tmpFgosDir() {
   const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gate-bypass-repo-'));
+  initializeWorkRepository(repoRoot);
   const fgosDir = path.join(repoRoot, '.fgos');
   fs.mkdirSync(fgosDir, { recursive: true });
   return fgosDir;

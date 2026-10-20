@@ -1,9 +1,9 @@
+import '../helpers/process-tmp-root.mjs';
 // checks-doctor-config.test.mjs -- config/CLI-wiring/doctor-runtime checks
 // tách khỏi checks.test.mjs (tsk-25b), tiếp tục cùng invariant chẻ cơ học D2
 // mà tsk-3um/tsk-67g đã lập: mỗi file test/setup/*.test.mjs dưới ~30s để
 // `node --test` trải suite ra các core. Thân test bê nguyên văn; chỉ
 // import/helper đổi cho khớp phần nào file này thật sự dùng.
-import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import { DEFAULT_TERMINAL_CONFIG } from '../../src/terminal-control/config.mjs';
 import {
@@ -32,7 +32,7 @@ import {
   withHome,
 } from './helpers/setup-checks-harness.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
-import { DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC } from '../../src/state/events-jsonl-truncation-guard.mjs';
+import { EVENT_STORE_DEFAULTS } from '../../src/event-store/index.mjs';
 import { DEFAULT_CAPABILITY_SLOTS, DEFAULT_IRON_LAW_LEVEL, PI_EXECUTOR_DEFAULT, DEFAULT_DOC_REGISTRY_SETTINGS } from '../../src/setup/registrations.mjs';
 
 const EXTERNAL_CLAUDE_GUARDED_TEST_FILES = [
@@ -249,7 +249,7 @@ test('config-not-stale passes when the existing config already has every default
       terminal: DEFAULT_TERMINAL_CONFIG,
       gateway: { port: 4170, token: null },
       ironLaw: { level: DEFAULT_IRON_LAW_LEVEL },
-      checkpoint: { fallbackIntervalSec: DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC },
+      eventStore: EVENT_STORE_DEFAULTS,
       docRegistry: DEFAULT_DOC_REGISTRY_SETTINGS,
       eventStore: { remote: 'origin' },
     }),

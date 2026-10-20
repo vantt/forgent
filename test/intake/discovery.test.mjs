@@ -8,7 +8,8 @@ import { execFileSync } from 'node:child_process';
 import { resolveDiscovery, RETIRED_P14_PLACEHOLDER, FALLBACK_VERIFY, classificationPatchFromVerdict, assertCallerClassification } from '../../src/intake/discovery.mjs';
 import { computeImpact, computePriority } from '../../src/state/priority-formula.mjs';
 import { addWork, listWork, StoreError, categoryOf, putInAwaiting, answerAwaiting, moveWork, recordGateApprove, readRawEvents } from '../../src/state/store.mjs';
-import { appendEvent, readEvents } from '../../src/state/events.mjs';
+import { readEvents } from '../../src/state/events.mjs';
+import { appendEvent } from '../helpers/legacy-event-fixture.mjs';
 import { createWorktree } from '../../src/runner/worktree.mjs';
 import { acquireClaim } from '../../src/state/runtime-coordination.mjs';
 

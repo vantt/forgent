@@ -1,3 +1,4 @@
+import { maintainEventStore } from '../event-store/maintenance.mjs';
 // loop.mjs — the sequential runner loop (per D2/D3/D4/D5, A1): startup reap
 // → frontier → anti-loop gate → claim → isolated worktree → dispatch →
 // goal-check → propose/park/halt. One item at a time (A1), FIFO head first
@@ -1779,33 +1780,39 @@ export async function runWatch(options = {}) {
   const queue = options.queue ?? createWriteQueue({ onCommit: () => { committed = true; } });
   const breaker = options.breaker ?? createMissBreaker(options.breakerThreshold ?? BREAKER_MISSES);
 
-  while (!options.signal?.aborted) {
-    committed = false;
-    let result;
-    try {
-      result = await runOnce({ ...options, queue, breaker });
-    } catch (err) {
-      // A cycle-level throw must never terminate the watch loop (D8) — report
-      // it via onCycle and keep going, same accepted-risk class as the
-      // hot-loop niche noted below.
-      options.onCycle?.({ outcome: 'error', error: err });
-      result = null;
-    }
-    if (result) options.onCycle?.(result);
-    if (options.signal?.aborted) break;
-    if (!committed) {
-      // Narrow accepted niche: a cycle that commits something and then
-      // throws still sets `committed = true`, so the NEXT cycle starts
-      // immediately with no backoff (a hot loop). This is bounded in
-      // practice by MAX_VISITS/parking moving state toward quiescence, same
-      // accepted-risk class as the doc's W10 note — no throttling added.
+  const storeRoot = options.dir ? path.dirname(options.dir) : options.repoRoot ?? options.cwd ?? process.cwd();
+  try {
+    while (!options.signal?.aborted) {
+      maintainEventStore(storeRoot);
+      committed = false;
+      let result;
       try {
-        await delay(options.pollFallbackMs ?? 5000, null, { signal: options.signal });
-      } catch {
-        // AbortError from the delay mid-wait — let the while condition exit
-        // the loop naturally on the next check rather than rethrowing.
-        break;
+        result = await runOnce({ ...options, queue, breaker });
+      } catch (err) {
+        // A cycle-level throw must never terminate the watch loop (D8) — report
+        // it via onCycle and keep going, same accepted-risk class as the
+        // hot-loop niche noted below.
+        options.onCycle?.({ outcome: 'error', error: err });
+        result = null;
+      }
+      if (result) options.onCycle?.(result);
+      if (options.signal?.aborted) break;
+      if (!committed) {
+        // Narrow accepted niche: a cycle that commits something and then
+        // throws still sets `committed = true`, so the NEXT cycle starts
+        // immediately with no backoff (a hot loop). This is bounded in
+        // practice by MAX_VISITS/parking moving state toward quiescence, same
+        // accepted-risk class as the doc's W10 note — no throttling added.
+        try {
+          await delay(options.pollFallbackMs ?? 5000, null, { signal: options.signal });
+        } catch {
+          // AbortError from the delay mid-wait — let the while condition exit
+          // the loop naturally on the next check rather than rethrowing.
+          break;
+        }
       }
     }
+  } finally {
+    maintainEventStore(storeRoot, { shutdown: true });
   }
 }

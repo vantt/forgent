@@ -6,7 +6,6 @@ import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { acquireSync, acquire, probe, runBorrowed, createLockScope, LockHandle } from '../../src/holder-lock/index.mjs';
-import { runOpportunisticMainCheckoutChecks } from '../../src/state/events-jsonl-truncation-guard.mjs';
 import { checkpointMainFgos } from '../../src/runner/main-fgos-checkpoint.mjs';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 import { git, mkTempDir, initRepo, installHook, initRepoWithHook, commitAsSession, commitCount, sessionEnv, HOOK_TEST_SKIP } from '../helpers/main-checkout-hook-repo.mjs';
@@ -49,18 +48,14 @@ function subjects(repoRoot) {
   return git(repoRoot, ['log', '--format=%s']);
 }
 
-test('checkpointMainFgos commits .fgos through the borrowed mutex: the hook sees a borrower, and main is free once the holder lets go', { skip }, () => {
+test('checkpointMainFgos has no event duty and makes no checkout commit', { skip }, () => {
   const repoRoot = initRepoWithHook();
   const fgosDir = makeCheckpointDue(repoRoot);
+  const before = commitCount(repoRoot);
   const handle = acquireMain(fgosDir);
-  try {
-    withChecksEnabled(() => checkpointMainFgos(handle, fgosDir, repoRoot));
-  } finally {
-    handle.release();
-  }
-  assert.match(subjects(repoRoot), /chore\(\.fgos\): fallback events checkpoint/);
-  assert.equal(git(repoRoot, ['status', '--porcelain', '--', '.fgos/events.jsonl']).trim(), '');
-  assert.equal(probe('main-checkout', { fgosDir }).result, 'free');
+  try { assert.deepEqual(checkpointMainFgos(handle, fgosDir, repoRoot), { changed: false }); }
+  finally { handle.release(); }
+  assert.equal(commitCount(repoRoot), before);
 });
 
 test('checkpointMainFgos without the live main handle throws', { skip }, () => {
@@ -190,34 +185,6 @@ test('a commit in another worktree never touches the main lock, even while fgOS 
   }
 });
 
-test('a checkpoint whose commit fails resets the index while still holding main', { skip }, () => {
-  const repoRoot = initRepoWithHook();
-  const fgosDir = makeCheckpointDue(repoRoot);
-  // A failing commit-msg hook makes the checkpoint's commit fail for real.
-  const failing = path.join(repoRoot, '.githooks', 'commit-msg');
-  fs.writeFileSync(failing, '#!/bin/sh\nexit 1\n');
-  fs.chmodSync(failing, 0o755);
-  const before = commitCount(repoRoot);
-  const handle = acquireMain(fgosDir);
-  const seen = { resetWhileHeld: null, commitFailed: false };
-  try {
-    const commit = (args) => {
-      if (args[0] === 'reset') seen.resetWhileHeld = !handle.released && probe('main-checkout', { fgosDir }).result === 'held';
-      const res = runBorrowed(handle, { command: 'git', args, cwd: repoRoot });
-      if (res.exit !== 0) {
-        if (args[0] === 'commit') seen.commitFailed = true;
-        throw new Error(`git ${args[0]} failed`);
-      }
-    };
-    withChecksEnabled(() => runOpportunisticMainCheckoutChecks(fgosDir, repoRoot, { commit }));
-  } finally {
-    handle.release();
-  }
-  assert.equal(seen.commitFailed, true);
-  assert.equal(seen.resetWhileHeld, true, 'the reset must run while the caller still holds main');
-  assert.equal(commitCount(repoRoot), before);
-  assert.equal(git(repoRoot, ['diff', '--cached', '--name-only']).trim(), '', 'the failed commit left nothing staged');
-});
 
 test('a stale FGOS_LOCK_FD with no descriptor open falls through to the probe: free passes, held refuses', { skip }, async () => {
   const repoRoot = initRepoWithHook();

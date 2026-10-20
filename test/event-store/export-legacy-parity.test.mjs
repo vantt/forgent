@@ -8,7 +8,7 @@ import { createHash } from 'node:crypto';
 import { fixture, append, loaderOptions } from './phase07-fixture.mjs';
 import { decodeLegacyFiles } from '../../src/event-store/index.mjs';
 import { foldEvents } from '../../src/state/replay.mjs';
-import { listPorting } from '../../src/state/porting-store.mjs';
+import { foldPortingEvents } from '../../src/state/porting-store.mjs';
 import { exportUseCase } from '../../src/verbs/events/export.mjs';
 const canonical = value => `${JSON.stringify(Object.fromEntries(Object.keys(value).sort().map(k => [k, value[k]])))}\n`;
 function pin(f, files) {
@@ -102,7 +102,7 @@ test('real legacy subtrees export with exact production Work and porting reader 
   assert.equal(fs.readFileSync(path.join(out, 'events/a.jsonl'), 'utf8'), event('work.add', { id: 'one', title: 'A' }));
   assert.equal(foldEvents(raw.legacyOrder).work.one.title, 'C');
   assert.equal(raw.legacyOrder.some(e => e.type.startsWith('porting.')), false);
-  assert.equal(listPorting(out).porting.p.status, 'accepted');
+  assert.equal(foldPortingEvents(fs.readFileSync(path.join(out, 'porting/events.jsonl'), 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse)).porting.p.status, 'accepted');
   assert.equal(fs.readFileSync(path.join(out, 'porting/events.jsonl'), 'utf8').startsWith(historical), true);
   assert.equal(fs.existsSync(path.join(out, 'events/v4-project-porting.jsonl')), false);
   assert.equal(fs.existsSync(path.join(out, 'porting/workspace/events.jsonl')), false);
@@ -132,7 +132,7 @@ test('porting legacy import and rollback retain physical log order across clock 
   pin(f, [{ name: 'porting/events.jsonl', bytes: lines }]);
   const out = path.join(f.temp, 'porting-difference');
   const result = exportUseCase(f.ctx, { out, format: 'legacy-layout' });
-  assert.equal(listPorting(out).porting.p.status, 'accepted');
+  assert.equal(foldPortingEvents(fs.readFileSync(path.join(out, 'porting/events.jsonl'), 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse)).porting.p.status, 'accepted');
   assert.equal(result.parity.equal, true);
   assert.deepEqual(result.parity.differences, []);
 });

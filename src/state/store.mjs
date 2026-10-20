@@ -105,46 +105,6 @@ export function categoryOf(err) {
   return err && typeof err.category === 'string' ? err.category : 'unexpected';
 }
 
-// Compatibility path for legacy appenders scheduled for the later removal
-// unit. Work's gated appenders no longer call this resolver.
-const EVENTS_SUBDIR = 'events';
-
-function eventsDirOf(dir) {
-  return path.join(dir, EVENTS_SUBDIR);
-}
-
-// TA-D11 naming: `<writer-id>-<openTs>.jsonl`, openTs compact
-// `YYYYMMDDTHHMMSSmmmZ` (no separators) so a writer's second file after a
-// future compaction never collides with its first.
-function formatCompactTs(date) {
-  return date.toISOString().replace(/[-:]/g, '').replace('.', '');
-}
-
-// Resolves the ONE currently-open file for this writer under
-// `.fgos/events/` (TA-D2/TA-D11): reuse it if a prior write in this same
-// writer identity already opened one, otherwise open a new one now. Never
-// writes to the frozen baseline events.jsonl (TA-D12).
-export function resolveWriterLogPath(dir) {
-  const dirPath = eventsDirOf(dir);
-  fs.mkdirSync(dirPath, { recursive: true });
-  const writerId = String(resolveWriterIdentity(dir).id);
-  const prefix = `${writerId}-`;
-  let existing = [];
-  try {
-    existing = fs
-      .readdirSync(dirPath, { withFileTypes: true })
-      .filter((entry) => entry.isFile() && entry.name.startsWith(prefix) && entry.name.endsWith('.jsonl'))
-      .map((entry) => entry.name)
-      .sort(); // the compact ts suffix sorts lexicographically -> last = newest = the open one
-  } catch (err) {
-    if (err.code !== 'ENOENT') throw err;
-  }
-  if (existing.length > 0) {
-    return path.join(dirPath, existing[existing.length - 1]);
-  }
-  return path.join(dirPath, `${prefix}${formatCompactTs(new Date())}.jsonl`);
-}
-
 // Full readers are forbidden under the hot mutex. Gate callbacks use tx.view.
 function readAllEvents(dir, options) {
   if (hotLockDepth() > 0) throw new StoreError('event-store-full-read-under-state', 'full Work history read inside state gate');

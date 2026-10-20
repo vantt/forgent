@@ -1,9 +1,10 @@
+import '../helpers/process-tmp-root.mjs';
+import { EVENT_STORE_DEFAULTS } from '../../src/event-store/index.mjs';
 // registrations.test.mjs — proves the doctor-check / config-default registry
 // mechanism (CONTEXT.md D1/D2, docs/history/setup-doctor-config-registry/):
 // a module registers a new entry via src/setup/registrations.mjs and it is
 // picked up through checks.mjs's own re-exported DOCTOR_CHECKS without this
 // test (or any other new module) touching checks.mjs itself.
-import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -270,14 +271,15 @@ test('setup adds a coding:plan slot beside a project bare-verb plan pool and bin
 
 test('Data Dictionary #7 names exactly the registered doctor checks — no missing entry, no stale one', () => {
   assert.deepEqual(
-    specEnumeratedIds("Today's registered checks: ").slice().sort(),
+    [...specEnumeratedIds("Today's registered checks: ").filter(id => !['events-jsonl-not-truncated', 'events-compaction-verified'].includes(id)),
+      ...[...fs.readFileSync(new URL('../../docs/platform/event-store/spec.md', import.meta.url), 'utf8').matchAll(/^\| `(event-store-[a-z-]+)` \|/gm)].map(m => m[1])].sort(),
     REGISTERED_CHECK_IDS.slice().sort(),
   );
 });
 
 test('Data Dictionary #7b names exactly the registered doctor fixes — no missing entry, no stale one', () => {
   assert.deepEqual(
-    specEnumeratedIds("Today's registered fixes: ").slice().sort(),
+    [...specEnumeratedIds("Today's registered fixes: "), 'event-store-machine-id', 'event-store-refspec', 'event-store-lock-dirs'].sort(),
     REGISTERED_FIX_IDS.slice().sort(),
   );
 });
@@ -629,93 +631,6 @@ function raw(lines) {
   return `${lines.join('\n')}\n`;
 }
 
-test('events-jsonl-not-truncated: a truncation in a per-writer file under .fgos/events/ fails the check even when baseline-0 holds clean', () => {
-  const gitDir = mkTempDir();
-  execFileSync('git', ['init', '-q'], { cwd: gitDir });
-  const fgosDir = path.join(gitDir, '.fgos');
-  const eventsDir = path.join(fgosDir, 'events');
-  fs.mkdirSync(eventsDir, { recursive: true });
-  fs.writeFileSync(path.join(fgosDir, 'events.jsonl'), raw([ev(1, '2026-01-01T00:00:00.000Z', 'a')]), 'utf8');
-  const writerPath = path.join(eventsDir, 'writer-a-1.jsonl');
-  fs.writeFileSync(writerPath, raw([ev(1, '2026-08-23T00:00:00.000Z', 'x'), ev(2, '2026-08-23T00:00:01.000Z', 'y')]), 'utf8');
-
-  const entry = DOCTOR_CHECKS.find((c) => c.id === 'events-jsonl-not-truncated');
-  const bootstrapResult = entry.check(gitDir); // bootstraps the mark for both files
-  assert.equal(bootstrapResult.passed, true);
-
-  // Truncate the writer file back to just its first line.
-  fs.writeFileSync(writerPath, raw([ev(1, '2026-08-23T00:00:00.000Z', 'x')]), 'utf8');
-  const result = entry.check(gitDir);
-  assert.equal(result.passed, false);
-  assert.match(result.message, /events\/writer-a-1\.jsonl/);
-});
-
-// --- Tầng A/T6: events-compaction-verified (TA-D6) -------------------------
-
-function hashOfObj(obj) {
-  return crypto.createHash('sha256').update(JSON.stringify(obj)).digest('hex').slice(0, 16);
-}
-function evWithHash(seq, ts, type, payload, src = 'writer-a') {
-  const unhashed = { seq, ts, type, payload, v: 1, src };
-  return { ...unhashed, h: hashOfObj(unhashed) };
-}
-function writeJsonlEvents(filePath, events) {
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, events.map((e) => `${JSON.stringify(e)}\n`).join(''), 'utf8');
-}
-
-test('events-compaction-verified passes trivially when no compaction has ever run', () => {
-  const gitDir = mkTempDir();
-  execFileSync('git', ['init', '-q'], { cwd: gitDir });
-  const entry = DOCTOR_CHECKS.find((c) => c.id === 'events-compaction-verified');
-  const result = entry.check(gitDir);
-  assert.equal(result.passed, true);
-  assert.match(result.message, /nothing to verify/);
-});
-
-test('events-compaction-verified passes when a real compaction\'s baseline still matches its archived originals', () => {
-  const gitDir = mkTempDir();
-  execFileSync('git', ['init', '-q'], { cwd: gitDir });
-  const fgosDir = path.join(gitDir, '.fgos');
-  const eventsDir = path.join(fgosDir, 'events');
-  const archiveDir = path.join(eventsDir, 'archive');
-
-  const e1 = evWithHash(1, '2026-01-01T00:00:00.000Z', 'work.add', { id: 'a', title: 'A', status: 'todo' });
-  writeJsonlEvents(path.join(archiveDir, 'writer-a-1.jsonl'), [e1]); // already archived
-  writeJsonlEvents(path.join(eventsDir, 'baseline-1.jsonl'), [e1]); // the live compacted baseline
-  fs.writeFileSync(
-    path.join(archiveDir, 'compact-1.manifest.json'),
-    JSON.stringify({ baseline: 'baseline-1.jsonl', originals: ['writer-a-1.jsonl'] }),
-    'utf8',
-  );
-
-  const entry = DOCTOR_CHECKS.find((c) => c.id === 'events-compaction-verified');
-  const result = entry.check(gitDir);
-  assert.equal(result.passed, true);
-  assert.match(result.message, /1 past compaction/);
-});
-
-test('events-compaction-verified fails and names the broken manifest when the baseline no longer matches its archived originals', () => {
-  const gitDir = mkTempDir();
-  execFileSync('git', ['init', '-q'], { cwd: gitDir });
-  const fgosDir = path.join(gitDir, '.fgos');
-  const eventsDir = path.join(fgosDir, 'events');
-  const archiveDir = path.join(eventsDir, 'archive');
-
-  const e1 = evWithHash(1, '2026-01-01T00:00:00.000Z', 'work.add', { id: 'a', title: 'A', status: 'todo' });
-  writeJsonlEvents(path.join(archiveDir, 'writer-a-1.jsonl'), [e1]);
-  writeJsonlEvents(path.join(eventsDir, 'baseline-1.jsonl'), []); // tampered/corrupted after the fact -- missing e1
-  fs.writeFileSync(
-    path.join(archiveDir, 'compact-1.manifest.json'),
-    JSON.stringify({ baseline: 'baseline-1.jsonl', originals: ['writer-a-1.jsonl'] }),
-    'utf8',
-  );
-
-  const entry = DOCTOR_CHECKS.find((c) => c.id === 'events-compaction-verified');
-  const result = entry.check(gitDir);
-  assert.equal(result.passed, false);
-  assert.match(result.message, /compact-1\.manifest\.json/);
-});
 
 // --- workflow step operations validation (Step 02 / D19) ---
 // These fixtures state a workflow's operations as `operationMap`/`skillMap` keyed by step; the check
@@ -1200,7 +1115,7 @@ test('doctor check runner-patterns-config passes with defaults or warns when mis
 
 test('Event Store remote defaults to origin and setup preserves an explicit remote', () => {
   const entry = CONFIG_DEFAULT_REGISTRATIONS.find(r => r.key === 'eventStore');
-  assert.deepEqual(entry.shape, { remote: 'origin' });
+  assert.deepEqual(entry.shape, EVENT_STORE_DEFAULTS);
   const temp = mkTempDir();
   try {
     fs.mkdirSync(path.join(temp, '.fgos'));

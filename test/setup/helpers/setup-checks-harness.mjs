@@ -1,3 +1,4 @@
+import { initializeWorkRepository } from '../../helpers/work-store-release.mjs';
 // setup-checks-harness.mjs -- bộ đồ nghề dùng chung của các file test dựng
 // môi trường thật cho `fgos setup`/`fgos doctor`, tách nguyên văn ra khỏi
 // test/setup/checks.test.mjs khi file đó được chẻ nhỏ (tsk-67g).
@@ -29,8 +30,14 @@ import {
   DEFAULT_HERDR_WEB_DASHBOARD_SETTINGS,
 } from '../../../src/setup/registrations.mjs';
 import { DEFAULT_INVARIANT_CHECK_COMMANDS } from '../../../src/config/shared-config-file.mjs';
-import { initStore, addWork } from '../../../src/state/store.mjs';
-import { appendEvent } from '../../../src/state/events.mjs';
+import { initStore as initWorkStore, addWork } from '../../../src/state/store.mjs';
+import { appendWorkEvent } from '../../helpers/work-event-fixture.mjs';
+function appendEvent(logPath, event) { return appendWorkEvent(path.dirname(logPath), event); }
+
+function initStore(dir) {
+  initializeWorkRepository(path.dirname(dir));
+  return initWorkStore(dir);
+}
 
 const __dirname = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -107,6 +114,7 @@ function withHome(homeDir, fn) {
 
 function initRepo(prefix) {
   const dir = mkTemp(prefix);
+  initializeWorkRepository(dir);
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: dir });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: dir });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: dir });

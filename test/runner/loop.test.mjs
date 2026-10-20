@@ -8,7 +8,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 import { initStore, addWork, moveWork, listWork, readRawEvents, readyWork, recordClaimAttempt } from '../../src/state/store.mjs';
-import { appendEvent } from '../../src/state/events.mjs';
+import { appendEvent } from '../helpers/legacy-event-fixture.mjs';
 import { acquireClaim } from '../../src/state/runtime-coordination.mjs';
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
 import { createWorktree, removeWorktree, createBranchRef, branchNameFor } from '../../src/runner/worktree.mjs';
@@ -104,8 +104,6 @@ function writeCommittingExecutor(scriptDir, counterFile, produce = 'output.txt')
   fs.writeFileSync(
     scriptPath,
     `
-import fs from 'node:fs';
-import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 fs.writeFileSync(${JSON.stringify(produce)}, 'produced by worker ' + Date.now() + '\\n');
 `,
@@ -122,8 +120,6 @@ function writeChunkyCommittingExecutor(scriptDir, counterFile) {
   fs.writeFileSync(
     scriptPath,
     `
-import fs from 'node:fs';
-import { execFileSync } from 'node:child_process';
 const prompt = process.argv[2] ?? '';
 const match = prompt.match(/test -f (\\S+)/);
 const file = match ? match[1] : 'output.txt';
@@ -142,7 +138,6 @@ function writeNonCommittingExecutor(scriptDir, counterFile) {
   fs.writeFileSync(
     scriptPath,
     `
-import fs from 'node:fs';
 fs.writeFileSync('output.txt', 'uncommitted\\n');
 `,
   );
@@ -155,7 +150,6 @@ function writeNoChangeExecutor(scriptDir, counterFile) {
   fs.writeFileSync(
     scriptPath,
     `
-import fs from 'node:fs';
 `,
   );
   return scriptPath;
@@ -171,7 +165,6 @@ function writeHoldingExecutor(scriptDir) {
   fs.writeFileSync(
     scriptPath,
     `
-import fs from 'node:fs';
 fs.writeFileSync('output.txt', 'produced by worker\\n');
 fs.writeFileSync('.started', '');
 const until = Date.now() + 20000;
@@ -211,9 +204,6 @@ function writeIntervalExecutor(scriptDir, sleepMs = 300) {
   fs.writeFileSync(
     scriptPath,
     `
-import fs from 'node:fs';
-import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 const prompt = process.argv[2] ?? '';
 const match = prompt.match(/test -f (\\S+)/);
 const file = match ? match[1] : 'output.txt';
@@ -239,7 +229,6 @@ function writeFlakyThenFixingExecutor(scriptDir, counterFile) {
   fs.writeFileSync(
     scriptPath,
     `
-import fs from 'node:fs';
 const priorRuns = ${priorUnitRunsSource(repoOfCounter(counterFile))};
 if (priorRuns === 0) {
   fs.writeFileSync('junk.txt', 'wrong output from the failed first attempt\\n');
@@ -1639,8 +1628,6 @@ function writeDiscoveringExecutor(scriptDir, counterFile, bodies, { commit = tru
   fs.writeFileSync(
     scriptPath,
     `
-import fs from 'node:fs';
-import { execFileSync } from 'node:child_process';
 ${emit}
 ${commitLines}
 `,
@@ -2098,8 +2085,6 @@ function writeDiscoveryVerdictExecutor(scriptDir, counterFile, verdictBody) {
   fs.writeFileSync(
     scriptPath,
     `
-import fs from 'node:fs';
-import { execFileSync } from 'node:child_process';
 ${emit}
 fs.writeFileSync('RESEARCH.md', 'findings\\n');
 `,
@@ -2868,9 +2853,6 @@ function writeValidatePlanHappyExecutor(scriptDir) {
   fs.writeFileSync(
     scriptPath,
     `
-import fs from 'node:fs';
-import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 const prompt = process.argv.slice(2).join(' ');
 // The loop's own worker prompt (# Goal) carries the claim line too, since it
 // runs as a Unit; only a driver operation's prompt is answered with a claim.
@@ -3210,8 +3192,6 @@ function writeValidatePlanOnceExecutor(scriptDir) {
   fs.writeFileSync(
     scriptPath,
     `
-import fs from 'node:fs';
-import path from 'node:path';
 const prompt = process.argv.slice(2).join(' ');
 // The loop's own worker prompt (\"# Goal\") also carries the claim line now
     // (it runs as a Unit); only a driver operation's prompt is answered with a claim.
@@ -3258,8 +3238,6 @@ function writeEvidenceRefsOnlyExecutor(scriptDir) {
   fs.writeFileSync(
     scriptPath,
     `
-import fs from 'node:fs';
-import path from 'node:path';
 const prompt = process.argv.slice(2).join(' ');
 // The loop's own worker prompt (# Goal) carries the claim line too, since it
 // runs as a Unit; only a driver operation's prompt is answered with a claim.
@@ -3299,8 +3277,6 @@ function writeBrokenResultExecutor(scriptDir) {
   fs.writeFileSync(
     scriptPath,
     `
-import fs from 'node:fs';
-import path from 'node:path';
 const prompt = process.argv.slice(2).join(' ');
 // The loop's own worker prompt (# Goal) carries the claim line too, since it
 // runs as a Unit; only a driver operation's prompt is answered with a claim.
@@ -3324,8 +3300,6 @@ function writeNotReadyExecutor(scriptDir) {
   fs.writeFileSync(
     scriptPath,
     `
-import fs from 'node:fs';
-import path from 'node:path';
 const prompt = process.argv.slice(2).join(' ');
 // The loop's own worker prompt (# Goal) carries the claim line too, since it
 // runs as a Unit; only a driver operation's prompt is answered with a claim.
@@ -3378,8 +3352,6 @@ function writeReadyNoReportExecutor(scriptDir) {
   fs.writeFileSync(
     scriptPath,
     `
-import fs from 'node:fs';
-import path from 'node:path';
 const prompt = process.argv.slice(2).join(' ');
 // The loop's own worker prompt (# Goal) carries the claim line too, since it
 // runs as a Unit; only a driver operation's prompt is answered with a claim.
@@ -3421,8 +3393,6 @@ function writeReadyFailExitExecutor(scriptDir) {
   fs.writeFileSync(
     scriptPath,
     `
-import fs from 'node:fs';
-import path from 'node:path';
 const prompt = process.argv.slice(2).join(' ');
 // The loop's own worker prompt (# Goal) carries the claim line too, since it
 // runs as a Unit; only a driver operation's prompt is answered with a claim.

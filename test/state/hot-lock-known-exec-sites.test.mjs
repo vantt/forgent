@@ -1,3 +1,4 @@
+import '../helpers/process-tmp-root.mjs';
 // The guard catches the three places that started a child process inside the
 // old events lock: `currentHead` in a claim, `getMainFgosDir` in
 // `acquireClaim`, `assertPlanEvidence` in `moveWork`. The code of those places
@@ -10,7 +11,6 @@
 // spy outside the guard records every execFileSync made at critical-section
 // depth, with its stack.
 
-import '../helpers/process-tmp-root.mjs';
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
@@ -36,15 +36,17 @@ before(() => {
     return;
   }
   // The lock under test, and the files that must agree with it, from this checkout.
-  for (const file of ['src/state/hot-lock.mjs', 'src/state/event-log.mjs', 'src/state/events.mjs', 'packages/holder-lock/contracts/lock-registry.v1.json']) {
+  for (const file of ['src/state/hot-lock.mjs', 'packages/holder-lock/contracts/lock-registry.v1.json']) {
     fs.copyFileSync(path.join(ROOT, file), path.join(tree, file));
   }
   // The lock door the hot lock calls through, whole, so its modules agree with each other.
   fs.cpSync(path.join(ROOT, 'src/holder-lock'), path.join(tree, 'src/holder-lock'), { recursive: true });
   // The baseline callers still use the pre-cutover names; give them to the
   // copied events module as thin wrappers over the real hot lock.
-  fs.appendFileSync(path.join(tree, 'src/state/events.mjs'), `
-export { appendEventCore as appendEventLocked };
+  const oldEvents = path.join(tree, 'src/state/events.mjs');
+  fs.writeFileSync(oldEvents, fs.readFileSync(oldEvents, 'utf8').replace('export function withEventsLock(', 'function withLegacyEventsLock('));
+  fs.appendFileSync(oldEvents, `
+import { withStateTx } from './hot-lock.mjs';
 export function withEventsLock(logPath, fn, fgosDir = path.dirname(logPath)) {
   const parent = path.dirname(logPath);
   const porting = path.basename(parent) === 'porting';
@@ -62,8 +64,6 @@ after(() => {
 const SCRIPT = `
 import childProcess from 'node:child_process';
 import nodeModule from 'node:module';
-import fs from 'node:fs';
-import path from 'node:path';
 const tree = process.argv[1];
 const repo = process.argv[2];
 const mod = (rel) => import(path.join(tree, rel));

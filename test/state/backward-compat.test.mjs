@@ -1,3 +1,5 @@
+import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 // test/state/backward-compat.test.mjs — D7b backward-compatible replay.
 //
 // Fixture generation recipe (test/fixtures/phase1-events.jsonl, committed,
@@ -34,7 +36,6 @@
 // D7b's default-injection (src/state/replay.mjs) has to handle, alone and
 // mixed with new (v-carrying) events on the same log.
 
-import '../helpers/process-tmp-root.mjs';
 import '../helpers/work-store-release.mjs';
 import { fixture, loaderOptions } from '../event-store/phase07-fixture.mjs';
 import { decodeLegacyFiles } from '../../src/event-store/index.mjs';
@@ -44,7 +45,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { appendEvent } from '../../src/state/events.mjs';
+import { appendEvent } from '../helpers/legacy-event-fixture.mjs';
 import { foldEvents } from '../../src/state/replay.mjs';
 import { listWork } from '../../src/state/store.mjs';
 import { DEFAULTS, SCHEMA_VERSION } from '../../src/state/work.mjs';
@@ -60,7 +61,7 @@ function foldFixture(file) {
 }
 
 function tmpDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-backward-compat-'));
+  return initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-backward-compat-')));
 }
 
 const EXPECTED_OLD_VIEW = {

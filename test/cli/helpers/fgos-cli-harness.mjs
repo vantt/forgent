@@ -1,3 +1,5 @@
+import { initializeWorkRepository } from '../../helpers/work-store-release.mjs';
+import { appendWorkEvent } from '../../helpers/work-event-fixture.mjs';
 // fgos-cli-harness.mjs -- bộ đồ nghề dùng chung của các file test CLI, tách
 // nguyên văn ra khỏi test/cli/fgos.test.mjs khi file đó được chẻ nhỏ (tsk-3um).
 // Không có test nào ở đây: chỉ import, hằng số và helper mà các file test bên
@@ -16,8 +18,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { addOutcome, recordFriction, addDiscovery, moveWork, moveStep, addWork, editWork, listWork, StoreError, resolveWriterLogPath, rebuild, initStore } from '../../../src/state/store.mjs';
-import { appendEvent } from '../../../src/state/events.mjs';
+import { addOutcome, recordFriction, addDiscovery, moveWork, moveStep, addWork, editWork, listWork, readRawEvents, StoreError, rebuild, initStore } from '../../../src/state/store.mjs';
+import { appendEvent } from '../../helpers/legacy-event-fixture.mjs';
 import { releaseClaim } from '../../../src/state/runtime-coordination.mjs';
 import { createSession, endSession } from '../../../src/runner/session.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../../src/state/fgos-file-registry.mjs';
@@ -74,12 +76,13 @@ function rawTmpCwd() {
 // explicitly afterward are unaffected — a harmless no-op second call.
 function tmpCwd() {
   const cwd = rawTmpCwd();
+  initializeWorkRepository(cwd);
   assert.equal(run(cwd, ['init']).status, 0, 'tmpCwd(): "fgos init" failed to bootstrap .fgos/');
   return cwd;
 }
 
 function initFgosFixtureInProcess(cwd) {
-  const dir = path.join(cwd, '.fgos');
+  const dir = initializeWorkRepository(cwd);
   initStore(dir);
   try {
     writeCoexistenceManifest(cwd, dir);
@@ -108,6 +111,7 @@ function fgosTemplateSourceDir() {
 
 function tmpCwdFromTemplate() {
   const cwd = rawTmpCwd();
+  initializeWorkRepository(cwd);
   fs.cpSync(fgosTemplateSourceDir(), path.join(cwd, '.fgos'), { recursive: true });
   return cwd;
 }
@@ -152,24 +156,7 @@ function envelopeData(stdout) {
 // before" or "find the event with type X" check keeps working unchanged
 // regardless of which physical file the CLI actually wrote to.
 function eventLines(cwd) {
-  const lines = [];
-  if (fs.existsSync(logPath(cwd))) {
-    lines.push(...fs.readFileSync(logPath(cwd), 'utf8').split('\n').filter(Boolean));
-  }
-  const eventsDir = path.join(cwd, '.fgos', 'events');
-  let names = [];
-  try {
-    names = fs
-      .readdirSync(eventsDir, { withFileTypes: true })
-      .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
-      .map((entry) => entry.name);
-  } catch {
-    names = [];
-  }
-  for (const name of names) {
-    lines.push(...fs.readFileSync(path.join(eventsDir, name), 'utf8').split('\n').filter(Boolean));
-  }
-  return lines;
+  return readRawEvents(path.join(cwd, '.fgos')).map(event => JSON.stringify(event));
 }
 
 // Effective view (durable status overlaid with any active runtime claim,
@@ -209,7 +196,7 @@ function stateView(cwd) {
 // test/state/store.test.mjs's own moveToDurableDoingForTest uses.
 function moveToDurableDoingForTest(cwd, id, from = 'todo', extra = {}) {
   const dir = path.join(cwd, '.fgos');
-  appendEvent(resolveWriterLogPath(dir), { type: 'work.move', payload: { id, from, to: 'doing', ...extra } }, dir);
+  appendWorkEvent(dir, { type: 'work.move', payload: { id, from, to: 'doing', ...extra } }, dir);
   rebuild(dir);
 }
 

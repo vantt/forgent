@@ -1,10 +1,10 @@
+import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 // test/state/show-list-move-consistency.test.mjs — tsk-38i:
 // Read-path consistency regression guard between show, list, and move's precondition read.
 // Asserts that listWork (used by show and list) and rebuildViewFromDir (used by moveWork's precondition)
 // report identical stage and status for an item during and immediately following an approve-like state transition.
 
-import '../helpers/process-tmp-root.mjs';
-import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

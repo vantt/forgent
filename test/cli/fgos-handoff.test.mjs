@@ -1,16 +1,17 @@
+import '../helpers/process-tmp-root.mjs';
+import { appendWorkEvent } from '../helpers/work-event-fixture.mjs';
 // test/cli/fgos-handoff.test.mjs — the CLI surface for the multi-role
 // handoff verb (tsk-2t9c D1/D4/D5/D8). Named under test/cli per repo
 // convention for a new bin/fgos.mjs subcommand's own coverage, though it
 // also exercises store.mjs's recordCall end to end (add -> handoff ->
 // replay -> holder) since the CLI is a thin wrapper over it.
-import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { addWork, moveWork, StoreError, recordCall, recordCallReturn, listWork, resolveWriterLogPath, rebuild } from '../../src/state/store.mjs';
-import { appendEvent } from '../../src/state/events.mjs';
+import { addWork, moveWork, StoreError, recordCall, recordCallReturn, listWork, rebuild } from '../../src/state/store.mjs';
+import { appendEvent } from '../helpers/legacy-event-fixture.mjs';
 
 function tmpDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-handoff-cli-'));
@@ -25,7 +26,7 @@ function tmpDir() {
 // own edge validation, is the direct, honest way to get there (same
 // technique test/state/store.test.mjs's own moveToDurableDoingForTest uses).
 function moveToDurableDoingForTest(dir, id, from = 'todo') {
-  appendEvent(resolveWriterLogPath(dir), { type: 'work.move', payload: { id, from, to: 'doing' } }, dir);
+  appendWorkEvent(dir, { type: 'work.move', payload: { id, from, to: 'doing' } }, dir);
   rebuild(dir);
 }
 

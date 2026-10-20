@@ -290,6 +290,58 @@ impl EventStore {
         Ok(Value::Array(results.into_iter().map(sealed).collect()))
     }
     #[napi]
+    pub fn promote(
+        &self,
+        request: Value,
+        held_ranks: Vec<u32>,
+        hot_lock_depth: u32,
+    ) -> Result<Value> {
+        let (driver, repo, machine) = self.context(&held_ranks, hot_lock_depth)?;
+        if let Some(reason) = &self.write_refusal {
+            return Err(error(reason));
+        }
+        #[derive(Deserialize)]
+        #[serde(rename_all = "camelCase", deny_unknown_fields)]
+        struct Request {
+            branch: String,
+            through_seq: u64,
+            cursor: append::Positions,
+            writer: String,
+            ts: String,
+        }
+        let Request {
+            branch,
+            through_seq,
+            cursor,
+            writer,
+            ts,
+        } = serde_json::from_value(request).map_err(error)?;
+        if !(1..=9_007_199_254_740_991).contains(&through_seq) {
+            return Err(error("invalid promote sequence"));
+        }
+        let branch = StreamId::parse(&branch).map_err(error)?;
+        serde_json::to_value(
+            fgos_event_store::promote::promote(
+                driver,
+                repo,
+                &self.registry,
+                fgos_event_store::promote::PromoteRequest {
+                    layout: &self.layout,
+                    machine,
+                    branch: &branch,
+                    through_seq,
+                    writer: &writer,
+                    ts: &ts,
+                    cursor: &cursor,
+                    held_ranks: &held_ranks,
+                    hot_lock_depth,
+                },
+            )
+            .map_err(error)?,
+        )
+        .map_err(error)
+    }
+    #[napi]
     pub fn sync(
         &self,
         remote: String,

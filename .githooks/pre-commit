@@ -268,76 +268,11 @@ function currentFgwBranchIfMainCheckout(repoRoot) {
   return /^fgw\//.test(branch) ? branch : null;
 }
 
-function countLines(str) {
-  let count = 0;
-  for (let i = 0; i < str.length; i++) {
-    if (str[i] === '\n') count++;
-  }
-  return count;
-}
-
-// tsk-1i3 -- staged .fgos/* content-precedence guard on main/default branch.
-// Refuses any commit staging a modification (--diff-filter=M) of an append-only
-// .fgos/**/*.jsonl log whose staged line count is strictly lower than HEAD's own
-// line count for that same path (D1-D4).
-function stagedFgosModificationsRegressLineCount(committingToplevel) {
-  let branch;
-  try {
-    branch = execFileSync(
-      'git',
-      ['symbolic-ref', '--short', '-q', 'HEAD'],
-      { cwd: committingToplevel, encoding: 'utf8' },
-    ).trim();
-  } catch {
-    branch = '';
-  }
-  if (/^fgw\//.test(branch)) return { regressedPaths: [] };
-
-  let output;
-  try {
-    output = execFileSync(
-      'git',
-      ['diff', '--cached', '--name-only', '--diff-filter=M'],
-      { cwd: committingToplevel, encoding: 'utf8' },
-    );
-  } catch (err) {
-    return { error: `commit refused: could not run "git diff --cached" to check staged modifications under ".fgos/" (${err.message}) -- refusing to commit (fail-closed).` };
-  }
-
-  const modifiedFgosPaths = output
-    .split('\n')
-    .filter((p) => p !== '')
-    // Only the append-only logs (events.jsonl and the like) are guarded: a stale worktree's older log
-    // must never replace main's newer one. A config or state file is edited on purpose, and a
-    // legitimate edit may remove lines from it.
-    .filter((p) => p.startsWith('.fgos/') && p.endsWith('.jsonl'));
-
-  if (modifiedFgosPaths.length === 0) return { regressedPaths: [] };
-
-  const regressedPaths = [];
-  for (const p of modifiedFgosPaths) {
-    let headContent, stagedContent;
-    try {
-      // maxBuffer (tsk-1i3 follow-up hotfix): execFileSync's default 1MB
-      // maxBuffer is smaller than .fgos/events.jsonl's real size (10MB+),
-      // throwing ENOBUFS on every commit that touches it and wrongly
-      // refusing the commit as "could not read blob" -- raised generously
-      // since this reads a whole git blob into memory once per commit.
-      const maxBuffer = 1024 * 1024 * 200;
-      headContent = execFileSync('git', ['show', `HEAD:${p}`], { cwd: committingToplevel, encoding: 'utf8', maxBuffer });
-      stagedContent = execFileSync('git', ['show', `:${p}`], { cwd: committingToplevel, encoding: 'utf8', maxBuffer });
-    } catch (err) {
-      return { error: `commit refused: could not read blob for "${p}" via "git show" -- refusing to commit against an unreadable ref/blob (fail-closed).` };
-    }
-
-    const headLines = countLines(headContent);
-    const stagedLines = countLines(stagedContent);
-    if (stagedLines < headLines) {
-      regressedPaths.push({ path: p, headLines, stagedLines });
-    }
-  }
-
-  return { regressedPaths };
+// Event truth never re-enters the checkout. The cutover adds one fence file.
+function addedEventPathRefusal(cwd) {
+  const added = execFileSync('git', ['diff', '--cached', '--name-only', '--diff-filter=A', '-z'], { cwd, encoding: 'utf8' }).split('\0');
+  const forbidden = added.filter(p => p.startsWith('.fgos/events/') || (p.startsWith('.fgos/events') && p !== '.fgos/events'));
+  return forbidden.length ? `commit refused: retired event paths cannot be added: ${forbidden.join(', ')}` : null;
 }
 
 // STALE-WORKTREE-INDEX (tsk-1d7, docs/history/stale-worktree-index-guard/
@@ -483,6 +418,9 @@ async function main() {
     return;
   }
 
+  const eventRefusal = addedEventPathRefusal(committingToplevel);
+  if (eventRefusal) { refuse(eventRefusal); return; }
+
   await warnOnConventionViolations(committingToplevel);
 
   if (!hookRunsAtHome(repoRoot, committingToplevel)) {
@@ -495,17 +433,6 @@ async function main() {
   const fgwBranch = currentFgwBranchIfMainCheckout(repoRoot);
   if (fgwBranch) {
     refuse(`commit refused: main checkout is on branch ${fgwBranch} -- checkout back to the default branch and use "fgos pick <id>" for item work.`);
-    return;
-  }
-
-  const fgosRegressed = stagedFgosModificationsRegressLineCount(committingToplevel);
-  if (fgosRegressed.error) {
-    refuse(fgosRegressed.error);
-    return;
-  }
-  if (fgosRegressed.regressedPaths.length > 0) {
-    const paths = fgosRegressed.regressedPaths.map((r) => r.path).join(', ');
-    refuse(`commit refused: this commit stages a modification under ".fgos/" (${paths}) whose line count is lower than HEAD -- .fgos/ files must not regress in content on main, main is left unchanged. See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);
     return;
   }
 

@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import { getMainFgosDir } from '../src/state/runtime-coordination.mjs';
+import { maintainEventStore } from '../src/event-store/maintenance.mjs';
 // bin/fgos.mjs — legacy-node payload entry for fgOS.
 //
 // Ownership boundary: This file is the `legacy-node` payload entry, staged whole
@@ -42,7 +44,7 @@ import { findAuthoritativeMatch, findDuplicateAuthoritativeClaims } from '../src
 import { checkVerifyForC4 } from '../src/intake/verify-pattern-check.mjs';
 import { parseFrontmatter } from '../src/report/frontmatter.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability, toolsFromExecutors } from '../src/state/tool-registry.mjs';
-import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
+import { EventLogError } from '../src/state/events.mjs';
 import { foldEvents } from '../src/state/replay.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
@@ -271,7 +273,7 @@ function excludeIronLawEvidence(files, id) {
 // moved under this gitignored bucket -- kept here too since this regex is
 // evaluated against whatever path list a caller hands it, not only
 // `git diff --name-only` (which would never surface an ignored path).
-const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|events\/.*\.jsonl|events\/archive\/.*|logs\/.*|locks\/.*|observe\/.*|events-jsonl\.truncation-guard\..*|main-checkout-guard-warnings\..*)$/;
+const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(logs\/.*|locks\/.*|observe\/.*|main-checkout-guard-warnings\..*)$/;
 function excludeFgosPaths(files) {
   return files.filter((f) => !FGOS_NOISE_ONLY_PATHS.test(normalizePath(f)));
 }
@@ -2940,20 +2942,28 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
 
 
 
-    case 'rebuild': {
-      const view = rebuild(dir);
-      return { workCount: Object.keys(view.work).length, decisionCount: view.decisions.length };
+    case 'events': {
+      const sub = positional[0];
+      const ctx = { cwd: path.dirname(dir), trustedMain: path.dirname(getMainFgosDir(dir)), writer: String(resolveWriterIdentity(dir).id) };
+      if (sub === 'sync') {
+        const { syncUseCase } = await import('../src/verbs/events/sync.mjs');
+        return syncUseCase(ctx, { remote: flags.remote, noPush: flags['no-push'] });
+      } else if (sub === 'status') {
+        const { statusUseCase } = await import('../src/verbs/events/status.mjs');
+        return statusUseCase(ctx, { remote: flags.remote });
+      } else if (sub === 'export') {
+        const { exportUseCase } = await import('../src/verbs/events/export.mjs');
+        return exportUseCase(ctx, { out: flags.out, format: flags.format, stream: flags.stream, since: flags.since });
+      } else if (sub === 'migrate') {
+        const { migrateUseCase } = await import('../src/verbs/events/migrate.mjs');
+        return migrateUseCase(ctx, { baseline: flags.baseline, check: flags.check });
+      }
+      throw new StoreError('validation', 'events requires sync|status|export|migrate');
     }
 
-    // Operator-invoked repair (per readEvents' fail-closed 'corrupt-log'
-    // halt, events.mjs): scoped ONLY to the common crash-mid-append shape —
-    // a truncated final line, every other line already parses. Any other
-    // corruption shape still refuses (events.mjs's own guarantee, unchanged
-    // here). Backs up the original log before truncating, then re-validates.
-    case 'repair': {
-      const logPath = path.join(dir, 'events.jsonl');
-      const { backupPath, droppedLine, eventCount } = repairTruncatedLastLine(logPath);
-      return { logPath, backupPath, eventCount, droppedLine };
+    case 'rebuild': {
+      const { rebuildStoreUseCase } = await import('../src/verbs/events/rebuild.mjs');
+      return rebuildStoreUseCase({ cwd: path.dirname(dir), trustedMain: path.dirname(getMainFgosDir(dir)) });
     }
 
     // Rollup view theo bộ (P24, request-class per D1: a pure read — never
@@ -4484,7 +4494,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|repair|rollup|take|return|review|approve|sync-root|reject|catchup|triage|session|gateway|goal|tool|setup|doctor|lock|lock-status|main-checkout-reset> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|events|rollup|take|return|review|approve|sync-root|reject|catchup|triage|session|gateway|goal|tool|setup|doctor|lock|lock-status|main-checkout-reset> ...`);
   }
 }
 
@@ -4864,7 +4874,7 @@ const STORE_MISSING_WARNING_VERBS = new Set([
 const MUTATING_ONLY_VERBS = new Set([
   'submit', 'take', 'pick', 'move', 'edit', 'ask', 'answer', 'gate-approve', 'reject',
   'add', 'discover', 'plan', 'retrospective', 'cleanup', 'compound', 'resolve-park-reason',
-  'handoff', 'handoff-return', 'decision', 'report', 'topic', 'doc', 'repair',
+  'handoff', 'handoff-return', 'decision', 'report', 'topic', 'doc',
 ]);
 
 const MUTATING_SUBCOMMAND_PREDICATES = {
@@ -5059,6 +5069,7 @@ async function main() {
   // `parseArgs` sits inside the try for exactly this reason: outside it, an
   // arg-parse fault never reached this catch at all and could not be recorded.
   let faultClass = 'arg-parse';
+  let eventMaintenance;
   let dir;
   try {
     const { flags, positional } = parseArgs(rest);
@@ -5079,7 +5090,7 @@ async function main() {
     // tsk-4fu-2: a verb registered `requiresExistingStore: true`
     // (command-registry.mjs) reads/writes through this `dir` — refuse
     // before ever reaching its handler when `.fgos/` isn't there yet,
-    // instead of letting `appendEventCore`'s own `mkdirSync` silently
+    // instead of silently allowing a mutation to create a second store
     // create a fresh, empty one (the worktree phantom-store hazard this
     // item closes). `init` is deliberately never in that set — it is the
     // one legitimate door that creates `.fgos/` — but gets the opposite
@@ -5163,6 +5174,10 @@ async function main() {
     // above already answers it without new machinery. The error itself still
     // comes from `runVerb` unchanged.
     faultClass = entry ? null : 'unknown-verb';
+    const opensEvents = entry?.requiresExistingStore || STORE_MISSING_WARNING_VERBS.has(verb) || ['events', 'init', 'doctor', 'setup', 'rebuild', 'decision-index', 'docs-index', 'knowledge'].includes(verb);
+    const maintenance = { trustedMain: path.dirname(getMainFgosDir(dir)), dispatched: Number(process.env.FGOS_DISPATCH_DEPTH || 0) > 0 };
+    if (opensEvents && !(verb === 'events' && positional[0] === 'migrate')) eventMaintenance = maintenance;
+    if (opensEvents && verb !== 'init' && !(verb === 'events' && positional[0] === 'migrate')) maintainEventStore(path.dirname(dir), maintenance);
     const data = await runVerb(verb, flags, positional, dir, rest);
     if (flags.pretty && (verb === 'setup' || verb === 'doctor')) {
       process.stdout.write(renderPretty(verb, data));
@@ -5219,6 +5234,8 @@ async function main() {
     } else {
       process.exitCode = EXIT_CODES[categoryOf(err)] ?? 1;
     }
+  } finally {
+    if (eventMaintenance) maintainEventStore(path.dirname(dir), { ...eventMaintenance, end: true });
   }
 }
 

@@ -1,3 +1,4 @@
+import { maintainEventStore } from '../event-store/maintenance.mjs';
 // gateway-control.mjs — one-door lifecycle for the fgos gateway
 // (REST API + web dashboard, apps/fgos-gateway/src/gateway.rs) as a detached
 // background process, so an agent never hand-rolls nohup/tmux/systemd
@@ -315,6 +316,7 @@ export function stopGateway(fgosDir) {
     return { alreadyStopped: false, pid: entry.pid, port: entry.port };
   } finally {
     lock.release();
+    maintainEventStore(path.dirname(fgosDir), { shutdown: true });
   }
 }
 

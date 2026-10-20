@@ -1,3 +1,5 @@
+import '../helpers/process-tmp-root.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 // checks.test.mjs -- registry check của `fgos doctor` cùng phần chứng minh ở
 // mức CLI rằng `fgos doctor` (có/không --pretty) hành xử đúng CTR001/D7.
 // Harness spawnSync thật, không mock chính process CLI.
@@ -12,7 +14,6 @@
 // của chính work-item store ở lại đây; phần config/CLI-wiring/doctor runtime
 // tách sang checks-doctor-config.test.mjs cạnh đó -- cùng D2 (chẻ cơ học,
 // mỗi file dưới ~30s) tsk-3um/tsk-67g đã áp dụng.
-import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import { DEFAULT_TERMINAL_CONFIG } from '../../src/terminal-control/config.mjs';
 import {
@@ -47,7 +48,7 @@ import {
   writeEnduserManifest,
 } from './helpers/setup-checks-harness.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
-import { DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC } from '../../src/state/events-jsonl-truncation-guard.mjs';
+import { EVENT_STORE_DEFAULTS } from '../../src/event-store/index.mjs';
 import { DEFAULT_CAPABILITY_SLOTS, DEFAULT_IRON_LAW_LEVEL, PI_EXECUTOR_DEFAULT } from '../../src/setup/registrations.mjs';
 import { addDecision } from '../../src/state/store.mjs';
 import { createSession } from '../../src/runner/session.mjs';
@@ -101,7 +102,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'invariant-checks-configured',
       'worktree-setup-configured',
       'writer-identity-resolvable',
-      'events-jsonl-not-truncated',
       'cli-version-visible',
       'worker-slots-ceiling-usable',
       'workflow-capabilities-configured',
@@ -139,7 +139,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'bwrap-available',
       'curl-available',
       'main-checkout-guard-warnings',
-      'events-compaction-verified',
       'no-stuck-merge-abort',
       'coordination-protocol-fixtures-valid',
       'coordination-example-requests-valid',
@@ -207,6 +206,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'global-model-policies-portable',
       'capability-rigor-ceiling',
       'coordination-protocol-dead-vocabulary',
+      ...['git-version', 'open-root', 'machine-id', 'refspec', 'unsealed', 'integrity', 'sync', 'native-addon', 'legacy-layout', 'orphan-branches'].map(name => `event-store-${name}`),
     ].sort(),
   );
 });
@@ -338,62 +338,6 @@ test('leaf-notify-drift fails and names the leaf when a live session branch over
 
 // ─── events-jsonl-not-truncated (tsk-cgg) ──────────────────────────────────
 
-test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {
-  assert.equal(
-    FIX_REGISTRATIONS.some((f) => f.id === 'events-jsonl-not-truncated'),
-    false,
-  );
-});
-
-test('events-jsonl-not-truncated passes and bootstraps a mark on first run against a healthy log', () => {
-  const dir = initRepo('checks-truncguard-bootstrap-');
-  const fgosDir = path.join(dir, '.fgos');
-  initStore(fgosDir);
-  addWork(fgosDir, { id: 'a', title: 'a', kind: 'feature', risk: 'light', verify: 'true', status: 'todo', deps: [], refs: [] });
-
-  const { passed, message } = checkById('events-jsonl-not-truncated').check(dir);
-  assert.equal(passed, true);
-  assert.match(message, /truncation guard holds/);
-  assert.equal(fs.existsSync(path.join(fgosDir, 'runtime', 'events-jsonl.truncation-guard.json')), true, 'a passing check advances/bootstraps the mark');
-  fs.rmSync(dir, { recursive: true, force: true });
-});
-
-test('events-jsonl-not-truncated fails when the log was truncated then reappended past the old mark', () => {
-  const dir = initRepo('checks-truncguard-break-');
-  const fgosDir = path.join(dir, '.fgos');
-  initStore(fgosDir);
-  const logPath = path.join(fgosDir, 'events.jsonl');
-  fs.appendFileSync(logPath, `${JSON.stringify({ seq: 1, ts: '2026-01-01T00:00:00.000Z', type: 'orig', payload: null })}\n`);
-  fs.appendFileSync(logPath, `${JSON.stringify({ seq: 2, ts: '2026-01-01T00:00:01.000Z', type: 'orig', payload: null })}\n`);
-
-  const first = checkById('events-jsonl-not-truncated').check(dir);
-  assert.equal(first.passed, true, 'first run bootstraps clean');
-
-  // Simulate a stash-style truncation: revert to just line 1, then append a
-  // DIFFERENT event reusing seq 2.
-  fs.writeFileSync(logPath, `${JSON.stringify({ seq: 1, ts: '2026-01-01T00:00:00.000Z', type: 'orig', payload: null })}\n`, 'utf8');
-  fs.appendFileSync(logPath, `${JSON.stringify({ seq: 2, ts: '2026-01-01T09:00:00.000Z', type: 'post-truncation', payload: null })}\n`);
-
-  const { passed, message } = checkById('events-jsonl-not-truncated').check(dir);
-  assert.equal(passed, false);
-  assert.match(message, /truncation detected/);
-  assert.match(message, /resolve-an-events-jsonl-truncation/);
-  fs.rmSync(dir, { recursive: true, force: true });
-});
-
-// ─── work-classification-vocabulary (tsk-6ax) ──────────────────────────────
-// Scoped to OPEN items only (matches the item's own "no open item may carry
-// risk/kind outside its domain's vocabulary" wording) — a resolved item's
-// stale classification no longer feeds decompose.mjs's heavy-risk gate or
-// priority-formula.mjs's risk discount, so flagging it would just be noise.
-//
-// `addWork` itself rejects an out-of-vocabulary risk/kind at the write door
-// (validateWorkShape, untouched-field grandfathering does not apply to a
-// brand-new item — every field is "touched"). A legacy-value fixture has to
-// be constructed the same way test/state/backward-compat.test.mjs's own
-// frozen fixtures are: a raw `work.add` event appended directly, bypassing
-// the write door entirely — the exact shape a real pre-vocabulary log
-// entry has.
 
 test('work-classification-vocabulary passes on an empty store', () => {
   const dir = initRepo('checks-classification-empty-');
@@ -645,6 +589,7 @@ test('changelog-unreleased-stale passes when ## [Unreleased] has a pending entry
 
 test('enduser-docs-index-stale passes when docs/enduser-docs-index.json does not exist yet', () => {
   const tmp = mkTemp('fgos-enduser-index-check-');
+  initializeWorkRepository(tmp);
   writeEnduserDoc(tmp, 'how-to', 'sample.md', 'Sample Doc');
   const { passed, message } = checkById('enduser-docs-index-stale').check(tmp);
   assert.equal(passed, true);
@@ -654,6 +599,7 @@ test('enduser-docs-index-stale passes when docs/enduser-docs-index.json does not
 
 test('enduser-docs-index-stale fails and reports a count (not a path list) when a doc on disk is missing from the index', () => {
   const tmp = mkTemp('fgos-enduser-index-check-');
+  initializeWorkRepository(tmp);
   writeEnduserDoc(tmp, 'how-to', 'sample.md', 'Sample Doc');
   writeEnduserDoc(tmp, 'how-to', 'second.md', 'Second Doc');
   writeEnduserManifest(tmp, [
@@ -668,6 +614,7 @@ test('enduser-docs-index-stale fails and reports a count (not a path list) when 
 
 test('enduser-docs-index-stale passes when the index already covers every on-disk doc', () => {
   const tmp = mkTemp('fgos-enduser-index-check-');
+  initializeWorkRepository(tmp);
   writeEnduserDoc(tmp, 'how-to', 'sample.md', 'Sample Doc');
   writeEnduserManifest(tmp, [
     { quadrant: 'how-to', purpose: 'x', audience: 'y', docPath: 'docs/how-to/sample.md', title: 'Sample Doc', sourceCaptureId: null },
@@ -680,6 +627,7 @@ test('enduser-docs-index-stale passes when the index already covers every on-dis
 
 test('enduser-docs-index-stale fails and reports orphan count when an index entry has no matching doc on disk', () => {
   const tmp = mkTemp('fgos-enduser-index-check-');
+  initializeWorkRepository(tmp);
   writeEnduserDoc(tmp, 'how-to', 'sample.md', 'Sample Doc');
   writeEnduserManifest(tmp, [
     { quadrant: 'how-to', purpose: 'x', audience: 'y', docPath: 'docs/how-to/sample.md', title: 'Sample Doc', sourceCaptureId: null },
@@ -693,6 +641,7 @@ test('enduser-docs-index-stale fails and reports orphan count when an index entr
 
 test('enduser-docs-index-stale counts a doc under docs/decisions toward the explanation quadrant (alias, D6)', () => {
   const tmp = mkTemp('fgos-enduser-index-check-');
+  initializeWorkRepository(tmp);
   writeEnduserDoc(tmp, 'decisions', '0001-example.md', 'Example Decision');
   writeEnduserManifest(tmp, []);
   const { passed, message } = checkById('enduser-docs-index-stale').check(tmp);
@@ -703,6 +652,7 @@ test('enduser-docs-index-stale counts a doc under docs/decisions toward the expl
 
 test('enduser-docs-index-stale fix regenerates the index via the same path fgos docs-index uses, resolving the drift', () => {
   const tmp = mkTemp('fgos-enduser-index-fix-');
+  initializeWorkRepository(tmp);
   writeEnduserDoc(tmp, 'how-to', 'sample.md', 'Sample Doc');
   writeEnduserManifest(tmp, []);
   assert.equal(checkById('enduser-docs-index-stale').check(tmp).passed, false);
@@ -719,6 +669,7 @@ test('enduser-docs-index-stale fix regenerates the index via the same path fgos 
 
 test('enduser-docs-index-stale fix is idempotent -- a second run reports changed:false', () => {
   const tmp = mkTemp('fgos-enduser-index-fix-');
+  initializeWorkRepository(tmp);
   writeEnduserDoc(tmp, 'how-to', 'sample.md', 'Sample Doc');
   fs.writeFileSync(path.join(tmp, 'docs', 'enduser-docs-index.json'), '[]\n');
   fixById('enduser-docs-index-stale').fix(tmp);
@@ -899,6 +850,7 @@ test('tool-registry-configured passes when no tool-capable executor is declared 
 
 test('tool-registry-configured passes when every declared tool is checked present (full)', () => {
   const cwd = mkTemp('fgos-tool-registry-full-');
+  initializeWorkRepository(cwd);
   execFileSync('git', ['init', '-q'], { cwd });
   spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
   declareExecutor(cwd, 'echo-tool', { kind: 'tool', for: ['test-capability'], invocations: [{ via: 'cli', command: 'echo', args: [] }] });
@@ -912,6 +864,7 @@ test('tool-registry-configured passes when every declared tool is checked presen
 
 test('tsk-3oa2: tool-registry-configured FAILS when a declared tool is missing or never checked (degraded) -- no longer a silent passed:true', () => {
   const cwd = mkTemp('fgos-tool-registry-degraded-');
+  initializeWorkRepository(cwd);
   execFileSync('git', ['init', '-q'], { cwd });
   spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
   declareExecutor(cwd, 'never-checked-tool', { kind: 'tool', for: ['test-capability'], invocations: [{ via: 'cli', command: 'echo', args: [] }] });
@@ -1055,7 +1008,7 @@ test('config-not-stale passes when the existing config already has every default
       gateway: { port: 4170, token: null },
       ironLaw: { level: DEFAULT_IRON_LAW_LEVEL },
       docRegistry: { enforce: false },
-      checkpoint: { fallbackIntervalSec: DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC },
+      eventStore: EVENT_STORE_DEFAULTS,
     }),
   );
   const { passed } = checkById('config-not-stale').check(cwd);

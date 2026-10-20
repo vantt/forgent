@@ -312,12 +312,11 @@ export function leftoverTempPrefixes(root, readdir = fs.readdirSync) {
 export const SENSITIVE_FGOS_FILES = new Set(['secrets.local.env', 'secrets.env']);
 
 // Derived files that any read of the live store may rewrite: the state view is a cache folded
-// from the event log, and the truncation guard records the last log size it saw. A test that
+// from the Event Store. A test that
 // reads the store therefore refreshes them without leaking anything; test-written state still
 // shows up as added or changed event, observe and work files, which stay guarded.
 export const DERIVED_FGOS_FILES = new Set([
   path.join('cache', 'state.json'),
-  path.join('runtime', 'events-jsonl.truncation-guard.json'),
 ]);
 
 /**

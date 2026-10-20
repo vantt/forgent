@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { appendEvent } from '../../src/state/events.mjs';
+import { appendEvent } from '../helpers/legacy-event-fixture.mjs';
 import { foldEvents, viewRevision, serializeView } from '../../src/state/replay.mjs';
 import { decodeLegacyFiles } from '../../src/event-store/index.mjs';
 import { loaderOptions } from '../event-store/phase07-fixture.mjs';
