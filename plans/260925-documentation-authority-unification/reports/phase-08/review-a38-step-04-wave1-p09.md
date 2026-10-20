@@ -1,0 +1,53 @@
+# Review a38 — Step 4 wave 1, part 09 (set step04-009, root instructions)
+
+Pin read: ef62747dd (author input). Payload `step-04-wave1-p09.json`. Sources read whole through EOF: `AGENTS.md` (396 lines; managed block 316-396 joined to core/instructions sources, no root projection hunk), `CLAUDE.md` (11 lines), `core/instructions/design-principles.md` (45 lines). Targets and Step 3 precedents read at the same pin.
+
+Stratum for all three files: mandatory (root source/projection boundary). Set step04-009 part 09: 3 files, 27 slots reviewed, 2 files rework (AGENTS.md, design-principles.md), 1 ok.
+
+Binding rules used: L12-26(3) (a legacy path that exists at the pin outside `docs/specs/**` and `docs/architect/**`, and every root authority, is retained in place and preserved unless an approved alias retires it; `alias-table.json` has `entries: []`), L12-30(6) (description must stay true after repoint), L12-30(2)/L12-32 (park reasons name the smallest real blocker, no boilerplate), L12-7/L12-58 (render and managed block are joins only). Phase 9 (`phase-09...md` lines 23, 55, 79) retires only `docs/specs/**` and `docs/architect/**`. The switchboard (`docs/platform/documentation/switchboard.md` rows 49, 50, 78, 84, 86) keeps `docs/platform-foundations.md` as the authoritative law text ("target file is summary/entry"), keeps `docs/distribution-vision.md` as retained historical vision, and keeps `docs/routing-handoff-contract.md`. The accepted Step 3 population treats the same expressions that way: `docs/platform-foundations.md` 20 preserve + 23 row-flip, `docs/distribution-vision.md` 26 preserve + 5 row-flip, `docs/architecture-manifest.json` 31 preserve, `docs/routing-handoff-contract.md` 13 preserve.
+
+## AGENTS.md — verdict: rework (24 slots reviewed, 6 outcome defects)
+
+### Outcome defects
+
+1. **instructions-001** (line 8, `docs/platform-foundations.md`): patched to `docs/platform/platform-foundations.md#l5-definition-of-done-sáu-câu-hỏi`. Wrong disposition and false adjacent description. The root file is retained authority (L12-26(3), switchboard row 49 and 84; Phase 9 does not retire it), so the reference must preserve. Independently, the patched line still says "L1-L10 locked design laws", which describes the whole law document while the new anchor narrows the link to the L5 heading alone (L12-30(6)). Correction: preserve, no diff hunk; remove the line-8 hunk from the diff.
+2. **instructions-017** (line 63, "a locked law in `docs/platform-foundations.md`"): patched to `docs/platform/platform-foundations.md#luật-nền-platform-forgent-phase-0-compound-learning-stack`. Same rule. Correction: preserve, drop the hunk. (The anchor does exist, at candidate line 86, but the retained root file owns the binding text.)
+3. **instructions-022** (line 138, "Laws in `docs/platform-foundations.md` are fixed until their named review threshold"): same patch, same defect. The sentence says the laws are fixed in the root document, and the switchboard says the root owns "binding wording, rationale, sources, review thresholds". Correction: preserve, drop the hunk.
+4. **instructions-019** (line 118) and **instructions-020** (line 130), `docs/distribution-vision.md`: patched to `docs/platform/vision.md`. Two defects. (a) Wrong disposition: the file is a retained root (L12-26(3) names it explicitly; switchboard row 78 says retained historical vision; Step 3 preserved all 26 of its non-row-flip citations). (b) Wrong target and false description: `docs/platform/vision.md` is the whole-platform mission north star (sections Purpose, Mission); a grep of it for distribution, cài đặt, setup and doctor finds nothing. The patched text "`docs/platform/vision.md` sets the direction for this repo's own cài đặt/setup/doctor story" and the later "per the vision doc, project config always overwrites global" are false for that holder. The record's reason ("later Phase 9 conservation must carry the distribution vision in full") is a plan, not evidence. Census desired owner was `docs/platform/packaging-distribution/history/distribution-vision.md`, also not a basis for a retained root path. Correction: preserve both, drop both hunks.
+5. **instructions-021** (line 130, `docs/specs/distribution.md`): parked with a reason about "the RUL9/RUL11 diagnostic/fix contract ... the live doctor contract differs from the stated reversal/gloss or lacks the exact token row". The source passage is "read `docs/distribution-vision.md` and `docs/specs/distribution.md` first — a new module gets a spec/config-registry entry before it gets code". It makes no RUL9/RUL11 or doctor-reversal claim, so the park reason is copied from another file's edge (L12-30(2) boilerplate, L12-32(1)). `docs/specs/distribution.md` is under the retiring tree, so the correct outcome is a Phase 9 patch to the candidate area spec `docs/platform/packaging-distribution/spec.md` (exists at the pin; Step 3 patches the same expression there 6 times, L12-30(7) bare area pointer), consistent with the census owner `packaging-distribution/README.md` as the alternative portal choice. Correction: patch to `docs/platform/packaging-distribution/spec.md` (no anchor, whole-file read-first pointer); the adjacent sentence is generic and stays true. If Lead prefers the portal README, choose one and apply it consistently with the Step 3 majority.
+
+### Slots confirmed ok
+
+- 002 (L9 `docs/specs/system-overview.md` to `docs/platform/system-overview/spec.md`): the target has Area Map, Shared Entities, Cross-Area Flows, so the gloss is true.
+- 003, 012, 014 (`docs/specs/reading-map.md` to `docs/reading-map.md`): retained merge destination (Phase 9 line 23). Patches render correctly. 013 (`docs/specs/` on line 40) parked as description rewrite, sibling 012 patched without touching it; consistent with Step 3 (`docs/specs/` parks 7).
+- 004, 015 (`docs/backlog.md`), 005, 016 (`docs/routing-handoff-contract.md`): preserve is correct (retained roots, Step 3 precedent).
+- 006 (`docs/decisions/index.md` preserve): path exists and is the generated index. See Lead question 1.
+- 007, 018 (`docs/specs/<area>.md`): park as description rewrite, consistent with Step 3 (5 parks).
+- 008, 009 (`docs/specs/runner.md` to `docs/platform/runner/decisions/h-36d872fbb0e5.md#0030-...`): holder exists, `### 0030 — Thêm bậc ưu tiên #2 "Release con người"...` at candidate line 921 states the four priorities; anchor is the extractor form used elsewhere. The heading hunk renders.
+- 010, 011, 023, 024 (`docs/specs/platform-foundations.md`, D-ADR0035/0054/0062): park on P8-DOC-GAP-02 is right. A grep at the pin of `docs/platform/**` and `docs/knowledge/**` finds no live holder of the mission-boundary, RUL11 or RUL104 narratives (runner decision "0035" is an unrelated mutation-gate trust decision; candidate platform-foundations has no decision narrative). Live pointers park, as Step 3 does (9 parks).
+- Managed block (316-396): correctly handled as a join only; the three registry sources named (`decision-question.md`, `platform-laws.md`, `design-principles.md`) match lines 328, 337, 361. No root projection hunk. The platform-laws edges (025-036) belong to that source's own record.
+
+## CLAUDE.md — verdict: ok (1 slot reviewed)
+
+- instructions-057 (`@AGENTS.md`, line 11): preserve is correct. It is an import token, not a document path; the prose names it bare and un-backticked as required.
+
+## core/instructions/design-principles.md — verdict: rework (2 slots, 2 outcome defects)
+
+- **instructions-038** (source line 30) and its render join **instructions-037** (AGENTS.md line 380): `docs/architecture-manifest.json` parked as "Phase 9 carry: map the exact registered-session merge-into-main exemption/return progress distinction in this comment to a live post-merge holder...". The source sentence is "Checked by `test/architecture.test.mjs` against `docs/architecture-manifest.json`". The reason (and the `searchWitness.assessment`, `dependency`, `blockedCategory`) describes an unrelated code comment, so it is a false park reason (L12-30(2), L12-32(1), L12-30(5)). The path exists at the pin, is a live stable contract file read by the architecture test, sits outside the retiring trees, and Step 3 preserves it 31 times (L12-26(3): retained path). Correction: 038 preserve, reason "retained path exists at author pin: `docs/architecture-manifest.json`; stable contract reference read by `test/architecture.test.mjs`"; 037 render join follows the source (preserve), no render diff; clear the dependency fields and the searchWitness boilerplate.
+
+## Record-text notes (not rework)
+
+- AGENTS.md `rootInstructionBoundary.managedRanges` starts at 317; the start marker `<!-- fgos:instruction-projection:start -->` is at line 316 (end marker at 396).
+- 009 patched text reads `<path#anchor>'s "Lịch sử quyết định" § D-ADR0030`: the possessive after a link is awkward now that the target is the decision holder itself, which already sits in its own "Lịch sử quyết định" section; consider noting this for the Phase 9 normalizer (does not alter disposition).
+- Census lines (019 at 116, 020 at 128, 037 at 378) are correctly rebound to pin lines 118, 130, 380.
+
+## Lead-judgment questions
+
+1. Line 14 packs `docs/decisions/index.md` (006, preserve) and the false-for-candidate claim "narrative lives in `docs/specs/<area>.md`'s own ... sections" (007, park) in one sentence. Step 3 parked the `docs/decisions/index.md` edge itself in one comparable live paragraph (maps-j-07431) but preserved it elsewhere. Keep as authored, or make 006 follow 007 as one unit? I found no ruling forcing either; the current split is defensible.
+2. Line 70 ("A settled decision goes into `docs/decisions/`") is a present-tense write instruction to a directory whose corpus was retired (line 27 itself says so; only `index.md` remains). It has no census edge and no `authorAddedEdge`. Under L12-31(6) a missed live reference should be added with a disposition (likely park as description rewrite, paired with 018 on the next line). Lead to decide whether directory-form `docs/decisions/` counts as an edge; I flag it as a possible missed reference, not a confirmed defect.
+3. Phase 9 line 23 requires resolving "the digest-bound AGENTS two-line A34 residual" before root-instruction cutover. The record is silent on it; confirm it is carried by the Step 7 packet rather than by this record.
+
+## Counts
+
+- Part 09 / step04-009 / mandatory stratum: 3 files, 27 slots, 2 files rework (AGENTS.md: 001, 017, 019, 020, 021, 022; design-principles.md: 037, 038); 1 file ok.
+- Rework rate for this part 2/3, above the 3% bound; the expansion and the other part (p10) are Lead's.
