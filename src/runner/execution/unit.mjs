@@ -1,7 +1,7 @@
 // src/runner/execution/unit.mjs — Unit data contract and validator (Wave B / Phase 2)
 // Architecture guard: MUST NOT import src/state/**, src/runner/coordination/**, src/runner/worktree.mjs, or src/runner/merge.mjs
 
-import { RunnerConfigError, assertRunTimeoutMs } from '../dispatch/config.mjs';
+import { RunnerConfigError, assertRunTimeoutMs, MODEL_POLICY_TIERS } from '../dispatch/config.mjs';
 import { RIGOR_VALUES } from '../rigor.mjs';
 import { checkDeclaredSeats } from './seat-resolver.mjs';
 import { canonicalizeWriteEntry } from '../dispatch/write-scope.mjs';
@@ -298,7 +298,7 @@ export function validateUnit(raw) {
   let seats;
   if (raw.seats !== undefined) {
     try {
-      seats = Object.freeze(checkDeclaredSeats(raw.seats, 'unit.seats'));
+      seats = Object.freeze(checkDeclaredSeats(raw.seats, 'unit.seats', { tiers: MODEL_POLICY_TIERS }));
     } catch (err) {
       throw new RunnerConfigError(err.message);
     }

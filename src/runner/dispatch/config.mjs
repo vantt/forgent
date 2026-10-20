@@ -17,6 +17,7 @@
 // committed (per D2's durability policy) so it is reviewable like any other
 // source file, but that also means it carries the same trust level as code:
 // only apply it from a checkout you already trust.
+import { CHECKER_SEATS } from '../execution/seat-resolver.mjs';
 import { RIGOR_VALUES } from '../rigor.mjs';
 import { canonicalizeWriteEntry } from './write-scope.mjs';
 import { RUN_TIMEOUT_MIN_MS, RUN_TIMEOUT_MAX_MS, runTimeoutProblem } from './run-timeout.mjs';
@@ -1380,16 +1381,7 @@ function validateCapabilitiesShape(capabilities, label) {
   }
 }
 
-/**
- * The checker seats a reviewed unit can name, with the role each takes. `tester` is a seat of its own:
- * its role is `reviewer` for taste lookup only, and its result is not a verdict (no assessment is
- * required of it, and it backs no verdict receipt).
- */
-export const CHECKER_SEATS = Object.freeze({
-  reviewer: Object.freeze({ role: 'reviewer', verdict: true }),
-  'red-team': Object.freeze({ role: 'red-team', verdict: true }),
-  tester: Object.freeze({ role: 'reviewer', verdict: false }),
-});
+export { CHECKER_SEATS };
 
 export const VALID_CHECKER_SEATS = Object.freeze(new Set(Object.keys(CHECKER_SEATS)));
 

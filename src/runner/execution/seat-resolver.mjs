@@ -16,10 +16,20 @@
 
 import { assertSeatId } from '../../convention/seat-id.mjs';
 import { RIGOR_VALUES, resolveStrongerRigor } from '../rigor.mjs';
-import { CHECKER_SEATS, MODEL_POLICY_TIERS, RunnerConfigError } from '../dispatch/config.mjs';
 import { resolvePattern } from './patterns/presets.mjs';
 
 export const SEAT_ROLES = Object.freeze(['producer', 'synthesizer', 'reviewer', 'red-team', 'judge']);
+
+/**
+ * The checker seats a reviewed unit can name, with the role each takes. `tester` is a seat of its own:
+ * its role is `reviewer` for taste lookup only, and its result is not a verdict (no assessment is
+ * required of it, and it backs no verdict receipt).
+ */
+export const CHECKER_SEATS = Object.freeze({
+  reviewer: Object.freeze({ role: 'reviewer', verdict: true }),
+  'red-team': Object.freeze({ role: 'red-team', verdict: true }),
+  tester: Object.freeze({ role: 'reviewer', verdict: false }),
+});
 
 /** The pseudo-seats the runner itself writes results for; never declared, never bound. */
 export const VERIFY_SEAT = 'verify';
@@ -35,10 +45,11 @@ export const DEFAULT_CHECKERS_BY_RIGOR = Object.freeze({
 const DECLARED_KEYS = new Set(['seat', 'role', 'persona', 'tier']);
 
 /** Thrown when a unit's pattern cannot be given a valid seat list. */
-export class SeatResolutionError extends RunnerConfigError {
+export class SeatResolutionError extends Error {
   constructor(message, code = 'invalid-seats') {
-    super(message, { code });
+    super(message);
     this.name = 'SeatResolutionError';
+    this.code = code;
   }
 }
 
@@ -60,7 +71,7 @@ export function capabilityRigorOf(runnerConfig, capability) {
   const [prefix, verb] = capability.includes(':') ? capability.split(':') : [null, null];
   const rigor = [capability, prefix ? `${prefix}:*` : null, verb].filter(Boolean).map((key) => capabilities[key]?.rigor).find((r) => r !== undefined);
   if (rigor !== undefined && !RIGOR_VALUES.includes(rigor)) {
-    throw new RunnerConfigError(`invalid capability rigor "${rigor}" for "${capability}". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);
+    throw new RangeError(`invalid capability rigor "${rigor}" for "${capability}". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);
   }
   return rigor;
 }
@@ -105,9 +116,10 @@ export function requiresDistinctFamilies(unit, runnerConfig) {
 
 /**
  * Validate declared seats `[{ seat, role, persona?, tier? }]` and return them as plain entries in the
- * declared order. Ids follow Convention's seat id rule and are unique; roles come from SEAT_ROLES.
+ * declared order. Ids follow Convention's seat id rule and are unique; roles come from SEAT_ROLES. A
+ * caller that owns the tier ladder passes it as `tiers` to have each seat's `tier` checked against it.
  */
-export function checkDeclaredSeats(raw, label = 'seats') {
+export function checkDeclaredSeats(raw, label = 'seats', { tiers } = {}) {
   if (!Array.isArray(raw) || raw.length === 0) throw new SeatResolutionError(`${label} must be a non-empty array of { seat, role }`);
   const seen = new Set();
   return raw.map((entry, index) => {
@@ -121,7 +133,7 @@ export function checkDeclaredSeats(raw, label = 'seats') {
     seen.add(entry.seat);
     if (!SEAT_ROLES.includes(entry.role)) throw new SeatResolutionError(`${at}.role must be one of [${SEAT_ROLES.join(', ')}], got ${JSON.stringify(entry.role)}`, 'invalid-seat-role');
     if (entry.persona !== undefined && (typeof entry.persona !== 'string' || !entry.persona.trim())) throw new SeatResolutionError(`${at}.persona must be a non-empty string`);
-    if (entry.tier !== undefined && !MODEL_POLICY_TIERS.includes(entry.tier)) throw new SeatResolutionError(`${at}.tier must be one of [${MODEL_POLICY_TIERS.join(', ')}], got ${JSON.stringify(entry.tier)}`, 'invalid-seat-tier');
+    if (entry.tier !== undefined && tiers && !tiers.includes(entry.tier)) throw new SeatResolutionError(`${at}.tier must be one of [${tiers.join(', ')}], got ${JSON.stringify(entry.tier)}`, 'invalid-seat-tier');
     return Object.freeze({ seat: entry.seat, role: entry.role, ...(entry.persona ? { persona: entry.persona.trim() } : {}), ...(entry.tier ? { tier: entry.tier } : {}) });
   });
 }

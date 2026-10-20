@@ -304,9 +304,9 @@ test('a reviewed run that cannot launch its next round ends at the last evaluati
     { id: 'u', objective: 'x', capability: 'docs:write', writes: [] },
     { patterns: { reviewed: { maxRounds: 2 } } },
     {
-      runRole: async ({ role, round = 1 }) => {
-        roles.push(`${role}/${round}`);
-        return { role, round, outcome: role === 'producer' ? 'pass' : 'findings', findings: ['fix this'] };
+      runRole: async ({ seat, round = 1 }) => {
+        roles.push(`${seat.seat}/${round}`);
+        return { seat: seat.seat, round, outcome: seat.seat === 'producer' ? 'pass' : 'findings', findings: ['fix this'] };
       },
       hasLaunchRoom: (seats) => { roles.push(`room?${seats}`); return false; },
     },
@@ -324,8 +324,11 @@ test('the planned seat launches follow the pattern the run will use', () => {
   assert.equal(seatLaunchesOf({ pattern: 'reviewed', unit, runnerConfig: cfg }), 4, 'producer and one checker, two rounds');
   assert.equal(seatLaunchesOf({ pattern: 'reviewed', unit: { ...unit, rigor: 'high' }, runnerConfig: cfg }), 6);
   assert.equal(seatLaunchesOf({ pattern: 'code-change', unit, runnerConfig: cfg }) > 0, true);
-  assert.equal(seatLaunchesOf({ pattern: { pattern: 'panel', params: { members: 3 } }, unit, runnerConfig: cfg }), 4, 'three panelists and the synthesizer');
-  assert.equal(seatLaunchesOf({ pattern: 'debate', unit, runnerConfig: cfg }), 5, 'two sides in two rounds and the judge');
-  assert.equal(seatLaunchesOf({ pattern: { pattern: 'debate', params: { rebuttal: false } }, unit, runnerConfig: cfg }), 3);
+  const panelUnit = { ...unit, seats: [{ seat: 'a', role: 'producer' }, { seat: 'b', role: 'producer' }, { seat: 'c', role: 'producer' }, { seat: 'chair', role: 'synthesizer' }] };
+  assert.equal(seatLaunchesOf({ pattern: 'panel', unit: panelUnit, runnerConfig: cfg }), 4, 'three members and the synthesizer');
+  const debateUnit = { ...unit, seats: [{ seat: 'pro', role: 'producer' }, { seat: 'con', role: 'producer' }, { seat: 'judge', role: 'judge' }] };
+  assert.equal(seatLaunchesOf({ pattern: 'debate', unit: debateUnit, runnerConfig: cfg }), 5, 'two sides in two rounds and the judge');
+  assert.equal(seatLaunchesOf({ pattern: { pattern: 'debate', params: { rebuttal: false } }, unit: debateUnit, runnerConfig: cfg }), 3);
+  assert.throws(() => seatLaunchesOf({ pattern: 'panel', unit, runnerConfig: cfg }), /must declare its seats/);
   assert.equal(seatLaunchesOf({ pattern: 'unheard-of', unit, runnerConfig: cfg }), null);
 });

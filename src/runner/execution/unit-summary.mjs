@@ -45,12 +45,12 @@ function workflowLink(value) {
 function unitHasActiveRun(unitDir, record) {
   if (fs.existsSync(path.join(unitDir, 'pending-inline.json'))) return true;
   if (record.execution?.status) return record.execution.status !== 'settled';
-  for (const role of fs.readdirSync(unitDir, { withFileTypes: true })) {
-    if (!role.isDirectory()) continue;
-    const roleDir = path.join(unitDir, role.name);
-    for (const round of fs.readdirSync(roleDir, { withFileTypes: true })) {
+  for (const seatEntry of fs.readdirSync(unitDir, { withFileTypes: true })) {
+    if (!seatEntry.isDirectory()) continue;
+    const seatDir = path.join(unitDir, seatEntry.name);
+    for (const round of fs.readdirSync(seatDir, { withFileTypes: true })) {
       if (!round.isDirectory() || !/^\d+(?:-fb\d+)?$/.test(round.name)) continue;
-      const runsDir = path.join(roleDir, round.name, 'runs');
+      const runsDir = path.join(seatDir, round.name, 'runs');
       if (!fs.existsSync(runsDir)) continue;
       for (const run of fs.readdirSync(runsDir, { withFileTypes: true })) {
         if (run.isDirectory()
