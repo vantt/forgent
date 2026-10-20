@@ -42,6 +42,8 @@ function writeAtomic(file, content) {
   fs.renameSync(tmp, file);
 }
 
+// Sandbox class "skill-owned reference clone": every call targets a reference
+// clone under the learning area, never the user's project repository.
 function git(repoDir, args, opts = {}) {
   try {
     return execFileSync("git", ["-C", repoDir, ...args], {
@@ -291,7 +293,10 @@ function deltaGitRepo(root, name, meta) {
   const repo = cloneDir(root, name, meta);
   if (!fs.existsSync(path.join(repo, ".git")))
     fail(`clone missing at ${path.relative(root, repo)}`, `git-repo deltas are computed against a local clone`, `git clone ${meta.url} ${path.relative(root, repo)}`);
-  if (git(repo, ["pull", "--ff-only", "--quiet"], { soft: true, quietErr: true }) === null)
+  // The only Git write: a fast-forward pull, and only into a skill-owned clone under upstreams/.
+  if (!path.resolve(repo).startsWith(path.resolve(root, CLONES_DIR) + path.sep))
+    console.error(`(warn: clone is outside ${CLONES_DIR}/ — not pulled, using local state)`);
+  else if (git(repo, ["pull", "--ff-only", "--quiet"], { soft: true, quietErr: true }) === null)
     console.error("(warn: pull failed — using local state)");
   const head = git(repo, ["rev-parse", "--short", "HEAD"]);
   const last = meta.last_analyzed_commit;

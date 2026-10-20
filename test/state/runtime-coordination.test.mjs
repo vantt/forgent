@@ -4,14 +4,20 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import childProcess, { fork } from 'node:child_process';
-import { syncBuiltinESMExports } from 'node:module';
+import { fork } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { initStore, addWork, settleClaim, listWork, readyWork, moveWork, editWork, graphWhatIf, footprintConflicts, computedSchedule, staleDoingAdvisory, readRawEvents, addDecision, recordGateApprove, StoreError } from '../../src/state/store.mjs';
 import { acquireClaim, releaseClaim, readClaim, readClaims, buildEffectiveView, getItemDurableRevision, ClaimError } from '../../src/state/runtime-coordination.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
+import { loadNativeAddon } from '../../src/git/native.mjs';
 
 const STORE_MJS = pathToFileURL(path.resolve(fileURLToPath(import.meta.url), '../../../src/state/store.mjs')).href;
+
+// Event timestamps have millisecond resolution and a claim counts an event of its own item that shares
+// its acquisition millisecond as one it caused (settleClaim's same-writer drift check). With no Git
+// child to start, an item can now be added and claimed inside one millisecond; a test that needs the
+// item to predate its claim waits one clock tick between the two.
+const clockTick = () => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 5);
 
 function makeTmpDir() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-claim-test-'));
@@ -117,6 +123,7 @@ test('settleClaim settles directly (no durable intermediate doing) and releases 
 test('settleClaim CAS validation failure', () => {
   const dir = makeTmpDir();
   addWork(dir, { id: 'tsk-1', title: 'Task 3', kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'standard', verify: 'npm test', domain: 'coding' });
+  clockTick();
 
   const claim = acquireClaim(dir, {
     id: 'tsk-1',
@@ -259,23 +266,23 @@ test('readClaims resolves the main checkout once, not once per claim file', () =
     fs.writeFileSync(path.join(claimsDir, `tsk-${i}.json`), JSON.stringify({ id: `tsk-${i}`, claimId: `clm-${i}` }), 'utf8');
   }
 
-  const original = childProcess.execFileSync;
+  // The main checkout is resolved by Git Inspect's `resolveRepo`; count its calls at the addon.
+  const { GitInspect } = loadNativeAddon();
+  const original = GitInspect.prototype.call;
   let resolves = 0;
-  childProcess.execFileSync = function countingExecFileSync(file, args, ...rest) {
-    if (Array.isArray(args) && args.includes('--git-common-dir')) resolves += 1;
-    return original.call(this, file, args, ...rest);
+  GitInspect.prototype.call = function countingCall(method, args) {
+    if (method === 'resolveRepo') resolves += 1;
+    return original.call(this, method, args);
   };
-  syncBuiltinESMExports();
   let claims;
   try {
     claims = readClaims(dir);
   } finally {
-    childProcess.execFileSync = original;
-    syncBuiltinESMExports();
+    GitInspect.prototype.call = original;
   }
 
   assert.deepEqual(Object.keys(claims).sort(), ['tsk-1', 'tsk-2', 'tsk-3', 'tsk-4', 'tsk-5']);
-  assert.equal(resolves, 1, 'one git spawn for the whole read, however many claims are open');
+  assert.equal(resolves, 1, 'one Inspect resolution for the whole read, however many claims are open');
 });
 
 // tsk-40m code-review finding (blocker, TOCTOU race): settleClaim validated
@@ -531,6 +538,7 @@ test('settleClaim with an invalid finalStatus writes NOTHING durably -- no parti
 test('settleClaim on a CAS/revision conflict leaves the claim untouched -- a failed settle must never destroy still-legitimate coordination state', () => {
   const dir = makeTmpDir();
   addWork(dir, { id: 'tsk-1', title: 'Task 13', kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'standard', verify: 'npm test', domain: 'coding' });
+  clockTick();
   const claim = acquireClaim(dir, { id: 'tsk-1', actor: 'session', preClaimStatus: 'todo', preClaimRevision: 'a-revision-that-will-never-match' });
 
   assert.throws(

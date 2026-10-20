@@ -512,7 +512,9 @@ export function compareResults(testCase, resultA, resultB) {
     }
   }
 
-  // 3. Check spawned children unless explicitly ignored
+  // 3. Check spawned children unless explicitly ignored. The Git driver names its per-process floor
+  // probe directory after the process (`git-floor-<pid>-<n>`); that token differs between two runs.
+  const childArgsKey = (args) => JSON.stringify(args).replace(/git-floor-\d+-\d+/g, 'git-floor-<pid>-<n>');
   if (!testCase.ignoreChildren) {
     const childrenA = resultA.spawnedChildren;
     const childrenB = resultB.spawnedChildren;
@@ -524,7 +526,7 @@ export function compareResults(testCase, resultA, resultB) {
       for (let i = 0; i < childrenA.length; i++) {
         const cmdA = path.basename(childrenA[i].cmd);
         const cmdB = path.basename(childrenB[i].cmd);
-        if (cmdA !== cmdB || JSON.stringify(childrenA[i].args) !== JSON.stringify(childrenB[i].args)) {
+        if (cmdA !== cmdB || childArgsKey(childrenA[i].args) !== childArgsKey(childrenB[i].args)) {
           differences.push(
             `Spawned child mismatch at index ${i}: ${JSON.stringify(childrenA[i])} !== ${JSON.stringify(childrenB[i])}`
           );

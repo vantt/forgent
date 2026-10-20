@@ -496,6 +496,11 @@ pub struct BorrowOutcome {
     pub leftovers_killed: u32,
 }
 
+/// Environment marker of a watched borrow: unique per run, inherited by every
+/// descendant of the child.
+#[cfg(unix)]
+const WATCH_ENV: &str = "FGOS_BORROW_WATCH";
+
 /// Explicit I/O and execution bound for [`run_borrowed_io`].
 #[derive(Debug, Clone)]
 pub struct BorrowIo {
@@ -518,6 +523,10 @@ pub struct BorrowIoOutcome {
     pub stdout: Vec<u8>,
     /// Captured binary stderr.
     pub stderr: Vec<u8>,
+    /// Pids of processes carrying the watched run's marker that were still alive after
+    /// leftover cleanup (they left the borrow's process tree and dropped the
+    /// borrowed descriptor). Always empty for an unwatched run.
+    pub escaped: Vec<u32>,
 }
 
 /// Result of a bounded cooperative child termination.
@@ -958,25 +967,41 @@ fn borrowed_request(handle: &Handle, spec: &BorrowSpec) -> Result<MappedSpawn, B
 /// its existing borrow path and refuses this form before starting a child.
 /// The spec's stdio is superseded by explicit input and captured output.
 pub fn run_borrowed_io(handle: &impl AsRef<Handle>, spec: &BorrowSpec, io: &BorrowIo) -> Result<BorrowIoOutcome, BorrowError> {
-    let handle = handle.as_ref();
+    run_borrowed_io_with(handle.as_ref(), spec, io, false)
+}
+
+/// [`run_borrowed_io`] that also marks the child's environment with a per-run
+/// token and reports in `escaped` every process still alive after leftover
+/// cleanup that inherited it (a descendant that left the process tree and
+/// dropped the borrowed descriptor). Only Linux scans; elsewhere `escaped`
+/// stays empty.
+pub fn run_borrowed_io_watched(handle: &impl AsRef<Handle>, spec: &BorrowSpec, io: &BorrowIo) -> Result<BorrowIoOutcome, BorrowError> {
+    run_borrowed_io_with(handle.as_ref(), spec, io, true)
+}
+
+fn run_borrowed_io_with(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo, watch: bool) -> Result<BorrowIoOutcome, BorrowError> {
     validate(handle)?;
     #[cfg(not(unix))]
     {
-        let _ = (handle, spec, io);
+        let _ = (handle, spec, io, watch);
         Err(BorrowError::IoUnsupported)
     }
     #[cfg(unix)]
     {
-        run_borrowed_io_posix(handle, spec, io)
+        run_borrowed_io_posix(handle, spec, io, watch)
     }
 }
 
 #[cfg(unix)]
-fn run_borrowed_io_posix(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo) -> Result<BorrowIoOutcome, BorrowError> {
+fn run_borrowed_io_posix(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo, watch: bool) -> Result<BorrowIoOutcome, BorrowError> {
     use std::io::Write;
     let drv = driver::current();
     let mut explicit = spec.clone();
     explicit.stdio = BorrowStdio::Null;
+    let watch_token = format!("{}-{}", std::process::id(), std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_or(0, |d| d.as_nanos()));
+    if watch {
+        explicit.env.insert(WATCH_ENV.to_string(), watch_token.clone());
+    }
     let mut request = borrowed_request(handle, &explicit)?;
     request.stdio = [MappedStdio::Piped; 3];
     drv.prepare_borrow(&mut request);
@@ -1082,7 +1107,11 @@ fn run_borrowed_io_posix(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo) -> R
     // Drain bytes already in the pipes after root exit and leftover cleanup.
     while capture_chunk(&mut stdout, &mut out, io.stdout_limit, "stdout")? == Some(true) {}
     while capture_chunk(&mut stderr, &mut err, io.stderr_limit, "stderr")? == Some(true) {}
-    Ok(BorrowIoOutcome { outcome, stdout: out, stderr: err })
+    #[cfg(target_os = "linux")]
+    let escaped = if watch { fgos_process::containment::environment_marked(WATCH_ENV, &watch_token) } else { Vec::new() };
+    #[cfg(not(target_os = "linux"))]
+    let escaped = Vec::new();
+    Ok(BorrowIoOutcome { outcome, stdout: out, stderr: err, escaped })
 }
 
 #[cfg(unix)]

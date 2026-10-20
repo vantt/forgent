@@ -1,8 +1,10 @@
 import '../helpers/process-tmp-root.mjs';
+import { activateGitFixture, discardFixtureWorktree } from './worktree-native-fixture.helper.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { createLockScope } from '../../src/holder-lock/index.mjs';
+import { landRunnerItem } from '../../src/runner/merge.mjs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
@@ -10,6 +12,7 @@ import {
   createWorktree,
   createClaimWorktree,
   createDispatchWorktree,
+  removeDispatchWorktree,
   createBranchRef,
   removeWorktree,
   listLeftovers,
@@ -20,7 +23,7 @@ import {
   resyncClaimWorktree,
   resyncWorktree,
   refreshUnstartedBranch,
-  withMergeEphemeralWorktree,
+  createVerifyCheckout,
   checkoutDirtyPaths,
   realpathOrSelf,
   WorktreeError,
@@ -39,6 +42,7 @@ function initTempRepo() {
   fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
   return repoRoot;
 }
 
@@ -53,9 +57,9 @@ function commitOnWorktree(worktreePath, filename, contents) {
 }
 
 /**
- * Advances `branch` the same way `withMergeEphemeralWorktree` lands a merge
- * in production (tsk-2cd): a DETACHED checkout at the branch's current tip,
- * a real commit made there, then a plain ref update — never
+ * Advances `branch` from outside any checkout of it (tsk-2cd): a DETACHED
+ * checkout at the branch's current tip, a real commit made there, then a
+ * plain ref update — never
  * a checkout of `branch` itself, so this never collides with any existing
  * non-detached checkout of it (e.g. a claim worktree already reattached to
  * it). Returns the new tip commit.
@@ -163,7 +167,7 @@ test('createWorktree reclaims a branch already checked out at an orphaned path s
   removeWorktree(repoRoot, second.path);
 });
 
-test('createWorktree reclaims a branch registered as checked out at a path that is already gone from disk (prune), instead of throwing', () => {
+test('createWorktree prunes a missing checkout with owned create evidence and preserves its branch', () => {
   const repoRoot = initTempRepo();
   const worktreeDir = mkWorktreeDir();
   const first = createWorktree(repoRoot, 'item-e', { worktreeDir });
@@ -258,7 +262,7 @@ test('reclaimOrphanedCheckout refuses (throws, does not remove) a checkout with 
   assert.equal(fs.existsSync(wt.path), true);
   assert.equal(fs.existsSync(path.join(wt.path, 'in-progress.txt')), true);
 
-  removeWorktree(repoRoot, wt.path, { force: true });
+  discardFixtureWorktree(repoRoot, wt.path);
 });
 
 test('reclaimOrphanedCheckout refuses (throws, does not remove) a checkout that resolves to repoRoot itself (tsk-k8u D1)', () => {
@@ -286,15 +290,16 @@ test('createWorktree does not leak its freshly-allocated directory when the reus
 
   assert.deepEqual(after, before);
 
-  removeWorktree(repoRoot, wt.path, { force: true });
+  discardFixtureWorktree(repoRoot, wt.path);
 });
 
 test('reclaimOrphanedCheckout still reclaims normally when the only "change" is the .fgos removal createWorktree itself performs', () => {
   const repoRoot = initTempRepo();
-  fs.mkdirSync(path.join(repoRoot, '.fgos'));
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '');
   execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'track .fgos'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
   const worktreeDir = mkWorktreeDir();
   const wt = createWorktree(repoRoot, 'item-i', { worktreeDir });
   commitOnWorktree(wt.path, 'attempt.txt', 'real work\n');
@@ -433,6 +438,7 @@ test('createBranchRef is idempotent: a second call on an existing branch is a no
   fs.writeFileSync(path.join(repoRoot, 'advance.txt'), 'advanced\n');
   execFileSync('git', ['add', 'advance.txt'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'advance base'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
 
   const second = createBranchRef(repoRoot, 'root-b', { baseRef: initialBranch });
   assert.equal(second.created, false);
@@ -448,6 +454,7 @@ test('tsk-386: createBranchRef with no baseRef at all resolves through detectTru
   fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
   const masterTip = branchTip(repoRoot, 'master');
 
   // Finding 8's own failure scenario: the pre-fix hardcoded default would
@@ -459,79 +466,31 @@ test('tsk-386: createBranchRef with no baseRef at all resolves through detectTru
   assert.equal(branchTip(repoRoot, 'fgw/master-trunk-item'), masterTip, 'branch forks from the real detected trunk (master), never a nonexistent hardcoded "main"');
 });
 
-test('tsk-386: withMergeEphemeralWorktree\'s own createBranchRef fallback resolves through detectTrunk on a master-trunk repo (the exact Finding 8 failure scenario)', async () => {
-  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-worktree-test-master-merge-'));
-  execFileSync('git', ['init', '-q', '-b', 'master'], { cwd: repoRoot });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
-  fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
-  execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
-  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: repoRoot });
-  const masterTip = branchTip(repoRoot, 'master');
 
-  // fgw/never-dispatched-master genuinely does not exist yet -- this is
-  // exactly the "first session-driven root merge" scenario the finding
-  // names: a host repo whose trunk is master hitting
-  // createDetachedMergeWorktree's own fallback.
-  const result = await withMergeEphemeralWorktree(repoRoot, 'never-dispatched-master', async (worktree) => {
-    assert.equal(worktree.startCommit, masterTip, 'fallback-created branch is seeded from the real detected trunk (master)');
-    return 'fn-ran';
-  });
 
-  assert.equal(result, 'fn-ran');
-  assert.equal(branchTip(repoRoot, 'fgw/never-dispatched-master'), masterTip);
-});
-
-test('withMergeEphemeralWorktree falls back to createBranchRef (seeded from main) instead of throwing when fgw/<id> was never created early', async () => {
-  const repoRoot = initTempRepo();
-  execFileSync('git', ['branch', '-M', 'main'], { cwd: repoRoot });
-  // seed a tracked .fgos/ so finishWorktreeSetup's strip is meaningfully
-  // exercised on the fallback path too, not just the already-exists path.
-  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(repoRoot, '.fgos', 'marker.txt'), 'x\n');
-  execFileSync('git', ['add', '.fgos/marker.txt'], { cwd: repoRoot });
-  execFileSync('git', ['commit', '-q', '-m', 'seed .fgos'], { cwd: repoRoot });
-  const mainTip = branchTip(repoRoot, 'main');
-
-  assert.throws(() => branchTip(repoRoot, 'fgw/never-dispatched'), 'precondition: branch genuinely does not exist yet');
-
-  const result = await withMergeEphemeralWorktree(repoRoot, 'never-dispatched', async (worktree) => {
-    assert.equal(worktree.branch, 'fgw/never-dispatched');
-    assert.equal(worktree.startCommit, mainTip, 'fallback-created branch is seeded from main\'s current tip');
-    assert.equal(fs.existsSync(path.join(worktree.path, '.fgos')), false, 'finishWorktreeSetup strips .fgos on the fallback path too');
-    return 'fn-ran';
-  });
-
-  assert.equal(result, 'fn-ran');
-  assert.equal(branchTip(repoRoot, 'fgw/never-dispatched'), mainTip, 'the branch now exists, created by the fallback');
-
-  const listing = execFileSync('git', ['worktree', 'list', '--porcelain'], { cwd: repoRoot, encoding: 'utf8' });
-  assert.doesNotMatch(listing, /fgw\/never-dispatched/, 'the ephemeral checkout is removed on the way out');
-});
-
-test('withMergeEphemeralWorktree leaves an already-existing fgw/<id> branch untouched by the fallback (checkout at its real tip, not reset to main)', async () => {
+test('createVerifyCheckout checks out a root branch at its real current tip, and leaves the branch itself untouched', () => {
   const repoRoot = initTempRepo();
   execFileSync('git', ['branch', '-M', 'main'], { cwd: repoRoot });
   createBranchRef(repoRoot, 'already-dispatched', { baseRef: 'main' });
   const advancedTip = advanceBranchExternally(repoRoot, 'fgw/already-dispatched', 'leaf-work.txt', 'leaf commit\n');
+  activateGitFixture(repoRoot);
 
-  const result = await withMergeEphemeralWorktree(repoRoot, 'already-dispatched', async (worktree) => {
-    assert.equal(worktree.startCommit, advancedTip, 'checkout must be at the branch\'s real current tip, not reset to main');
-    return 'ok';
-  });
-
-  assert.equal(result, 'ok');
-  assert.equal(branchTip(repoRoot, 'fgw/already-dispatched'), advancedTip, 'branch tip is unchanged when fn makes no new commit');
+  const checkout = createVerifyCheckout(repoRoot, branchTip(repoRoot, 'fgw/already-dispatched'));
+  try {
+    assert.equal(execFileSync('git', ['rev-parse', 'HEAD'], { cwd: checkout, encoding: 'utf8' }).trim(), advancedTip, 'checkout must be at the branch\'s real current tip, not reset to main');
+  } finally {
+    removeWorktree(repoRoot, checkout, { force: true });
+  }
+  assert.equal(branchTip(repoRoot, 'fgw/already-dispatched'), advancedTip, 'branch tip is unchanged');
 });
 
-test('tsk-4yv: withMergeEphemeralWorktree removes the detached worktree it just registered when finishWorktreeSetup fails -- never leaks an unreclaimed detached checkout', async () => {
-  // Finding 7: this is specifically the DETACHED case
-  // (createDetachedMergeWorktree, used by approve's own leaf-merge path via
-  // withMergeEphemeralWorktree) -- reclaimOrphanedCheckout/findCheckoutPath
-  // are both branch-keyed and skip a `detached` worktree stanza entirely, so
-  // unlike the branch-attached createWorktree case, nothing else in the
-  // codebase would ever reclaim a leaked detached checkout. A repeated npm
-  // registry flake during approve would accumulate full checkouts under tmp
+test('tsk-4yv: verifying an already-landed leaf removes the detached checkout it registered when dependency provisioning fails -- never leaks an unreclaimed detached checkout', async () => {
+  // Finding 7: this is specifically the DETACHED case (the verification
+  // checkout landRunnerItem stands up for a target no checkout holds) --
+  // reclaimOrphanedCheckout/checkoutPathForBranch are both branch-keyed and skip
+  // a `detached` worktree stanza entirely, so nothing else in the codebase
+  // would ever reclaim a leaked detached checkout. A repeated npm registry
+  // flake during approve would accumulate full checkouts under tmp
   // indefinitely, exactly the scenario this fix closes.
   const repoRoot = initTempRepo();
   execFileSync('git', ['branch', '-M', 'main'], { cwd: repoRoot });
@@ -541,12 +500,17 @@ test('tsk-4yv: withMergeEphemeralWorktree removes the detached worktree it just 
   fs.writeFileSync(path.join(repoRoot, 'package.json'), '{not valid json');
   execFileSync('git', ['add', 'package.json'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'commit a malformed package.json'], { cwd: repoRoot });
-  execFileSync('git', ['branch', 'fgw/broken-dep-merge-item'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
+  // The leaf already landed on its root: approve's retry path verifies the
+  // root branch's tree in a detached checkout, since no checkout holds it.
+  execFileSync('git', ['branch', 'fgw/broken-dep-leaf'], { cwd: repoRoot });
+  execFileSync('git', ['branch', 'fgw/broken-dep-root'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '--allow-empty', '-m', 'unrelated main advance'], { cwd: repoRoot });
 
-  await assert.rejects(() => withMergeEphemeralWorktree(repoRoot, 'broken-dep-merge-item', async () => 'unreachable'), SyntaxError);
+  await assert.rejects(() => landRunnerItem(repoRoot, { id: 'broken-dep-leaf', verify: 'true' }, { target: 'fgw/broken-dep-root' }), SyntaxError);
 
   const listing = execFileSync('git', ['worktree', 'list', '--porcelain'], { cwd: repoRoot, encoding: 'utf8' });
-  assert.doesNotMatch(listing, /broken-dep-merge-item/, 'the detached merge worktree must not remain registered after finishWorktreeSetup failed');
+  assert.doesNotMatch(listing, /fgos-worktrees\/verify-/, 'the detached verification checkout must not remain registered after provisioning failed');
 });
 
 test('createWorktree with opts.baseRef forks a new branch from that ref\'s tip, not from repoRoot\'s current HEAD', () => {
@@ -561,6 +525,7 @@ test('createWorktree with opts.baseRef forks a new branch from that ref\'s tip, 
   fs.writeFileSync(path.join(repoRoot, 'side-only.txt'), 'side content\n');
   execFileSync('git', ['add', 'side-only.txt'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'side commit'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
   execFileSync('git', ['checkout', '-q', initialBranch], { cwd: repoRoot });
 
   // initialBranch (current HEAD) then advances independently, so it now
@@ -568,6 +533,7 @@ test('createWorktree with opts.baseRef forks a new branch from that ref\'s tip, 
   fs.writeFileSync(path.join(repoRoot, 'main-only.txt'), 'main only\n');
   execFileSync('git', ['add', 'main-only.txt'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'main-only commit'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
 
   const wt = createWorktree(repoRoot, 'leaf-a', { worktreeDir, baseRef: 'side' });
 
@@ -594,10 +560,11 @@ test('createWorktree with opts.baseRef forks a new branch from that ref\'s tip, 
 
 test('createWorktree removes a git-tracked .fgos/ from the fresh worktree entirely — no stale copy, no symlink (ADR0020)', () => {
   const repoRoot = initTempRepo();
-  fs.mkdirSync(path.join(repoRoot, '.fgos'));
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '{"seq":1}\n');
   execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'seed .fgos/events.jsonl'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
 
   const worktreeDir = mkWorktreeDir();
   const wt = createWorktree(repoRoot, 'item-h', { worktreeDir });
@@ -660,7 +627,7 @@ test('createClaimWorktree reattaches to the live checkout of fgw/<id> instead of
   const listing = execFileSync('git', ['worktree', 'list', '--porcelain'], { cwd: repoRoot, encoding: 'utf8' });
   assert.equal(listing.split('\n').filter((l) => l === 'branch refs/heads/fgw/reattach-clean').length, 1);
 
-  removeWorktree(repoRoot, first.path, { force: true });
+  discardFixtureWorktree(repoRoot, first.path);
 });
 
 test('createClaimWorktree reattaches a DIRTY checkout with its uncommitted work intact (where createWorktree refuses outright)', () => {
@@ -679,7 +646,7 @@ test('createClaimWorktree reattaches a DIRTY checkout with its uncommitted work 
   // it relies on is untouched, the claim wrapper just never reaches it
   assert.throws(() => createWorktree(repoRoot, 'reattach-dirty', { worktreeDir }), WorktreeError);
 
-  removeWorktree(repoRoot, first.path, { force: true });
+  discardFixtureWorktree(repoRoot, first.path);
 });
 
 // --- resync guard: a reattached claim worktree may have fallen behind its
@@ -696,7 +663,7 @@ test('resyncClaimWorktree is a no-op when the worktree is already at its branch 
   const result = resyncClaimWorktree(repoRoot, wt.path, branchNameFor('resync-same-tip'));
 
   assert.equal(result.resynced, false);
-  removeWorktree(repoRoot, wt.path, { force: true });
+  discardFixtureWorktree(repoRoot, wt.path);
 });
 
 test('createClaimWorktree auto-resyncs a clean reattach whose branch advanced via an external (merge-style) ref update', () => {
@@ -721,7 +688,7 @@ test('createClaimWorktree auto-resyncs a clean reattach whose branch advanced vi
     newTip,
   );
 
-  removeWorktree(repoRoot, second.path, { force: true });
+  discardFixtureWorktree(repoRoot, second.path);
 });
 
 test('createClaimWorktree refuses to resync (and never resets) a reattach that is both behind its branch AND has real uncommitted work', () => {
@@ -743,7 +710,7 @@ test('createClaimWorktree refuses to resync (and never resets) a reattach that i
   assert.equal(fs.readFileSync(path.join(first.path, 'in-progress.txt'), 'utf8'), 'not yet committed\n');
   assert.equal(fs.existsSync(path.join(first.path, 'plan.md')), false, 'a refused resync must never partially apply');
 
-  removeWorktree(repoRoot, first.path, { force: true });
+  discardFixtureWorktree(repoRoot, first.path);
 });
 
 test('createClaimWorktree\'s dirty-and-behind refusal points at the stale-vs-real diagnostic recipe', () => {
@@ -768,7 +735,7 @@ test('createClaimWorktree\'s dirty-and-behind refusal points at the stale-vs-rea
     /docs\/how-to\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\.md/,
   );
 
-  removeWorktree(repoRoot, first.path, { force: true });
+  discardFixtureWorktree(repoRoot, first.path);
 });
 
 test('createClaimWorktree refuses to resync a reattach whose last-synced commit is not an ancestor of the branch\'s current tip (a rewrite/divergence)', () => {
@@ -791,7 +758,7 @@ test('createClaimWorktree refuses to resync a reattach whose last-synced commit 
     WorktreeError,
   );
 
-  removeWorktree(repoRoot, first.path, { force: true });
+  discardFixtureWorktree(repoRoot, first.path);
 });
 
 test('createClaimWorktree still reattaches a DIRTY checkout whose branch never moved -- the resync guard is a no-op, not a new refusal (tsk-2cd)', () => {
@@ -810,7 +777,7 @@ test('createClaimWorktree still reattaches a DIRTY checkout whose branch never m
   assert.equal(second.reused, true);
   assert.equal(fs.readFileSync(path.join(first.path, 'in-progress.txt'), 'utf8'), 'not yet committed\n');
 
-  removeWorktree(repoRoot, first.path, { force: true });
+  discardFixtureWorktree(repoRoot, first.path);
 });
 
 test('resyncClaimWorktree re-strips .fgos/ after its own reset --hard (tsk-1d7 bundled fix, ADR0020)', () => {
@@ -844,7 +811,7 @@ test('resyncClaimWorktree re-strips .fgos/ after its own reset --hard (tsk-1d7 b
     'resyncClaimWorktree\'s own reset --hard must not resurrect .fgos/ on disk (ADR0020)',
   );
 
-  removeWorktree(repoRoot, first.path, { force: true });
+  discardFixtureWorktree(repoRoot, first.path);
 });
 
 // --- resync-worktree repair verb (tsk-1d7, docs/history/
@@ -863,7 +830,7 @@ test('resyncWorktree is a no-op when the worktree is already at its branch tip',
   const result = resyncWorktree(repoRoot, wt.path, branch);
 
   assert.deepEqual(result, { resynced: false, reason: 'already-in-sync' });
-  removeWorktree(repoRoot, wt.path, { force: true });
+  discardFixtureWorktree(repoRoot, wt.path);
 });
 
 test('resyncWorktree refuses a diverged (rewritten) branch, same as resyncClaimWorktree', () => {
@@ -879,7 +846,7 @@ test('resyncWorktree refuses a diverged (rewritten) branch, same as resyncClaimW
 
   assert.throws(() => resyncWorktree(repoRoot, wt.path, branch), WorktreeError);
 
-  removeWorktree(repoRoot, wt.path, { force: true });
+  discardFixtureWorktree(repoRoot, wt.path);
 });
 
 test('resyncWorktree with nothing staged resets cleanly to the branch tip (reapplied: false)', () => {
@@ -901,7 +868,7 @@ test('resyncWorktree with nothing staged resets cleanly to the branch tip (reapp
   );
   assert.equal(fs.existsSync(path.join(wt.path, 'plan.md')), true);
 
-  removeWorktree(repoRoot, wt.path, { force: true });
+  discardFixtureWorktree(repoRoot, wt.path);
 });
 
 test('resyncWorktree reapplies staged content (a new file) after resetting to the moved branch tip', () => {
@@ -936,7 +903,7 @@ test('resyncWorktree reapplies staged content (a new file) after resetting to th
   const staged = execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: wt.path, encoding: 'utf8' }).trim();
   assert.equal(staged, 'my-change.md', 'the reapplied content must land back in the index, not just the working tree');
 
-  removeWorktree(repoRoot, wt.path, { force: true });
+  discardFixtureWorktree(repoRoot, wt.path);
 });
 
 test('resyncWorktree refuses on a real conflict, preserving the patch file for manual review', () => {
@@ -974,7 +941,7 @@ test('resyncWorktree refuses on a real conflict, preserving the patch file for m
   const patchContent = fs.readFileSync(path.join(patchDirBefore, filesAfter.find((f) => !filesBefore.includes(f))), 'utf8');
   assert.match(patchContent, /seed\.txt/, 'the preserved patch must contain the staged change that could not be reapplied');
 
-  removeWorktree(repoRoot, wt.path, { force: true });
+  discardFixtureWorktree(repoRoot, wt.path);
 });
 
 test('resyncWorktree refuses on stray dirt beyond what was staged, never guessing a merge', () => {
@@ -997,7 +964,7 @@ test('resyncWorktree refuses on stray dirt beyond what was staged, never guessin
   assert.equal(fs.existsSync(path.join(wt.path, 'plan.md')), false, 'a refused resync must never partially apply');
   assert.equal(fs.readFileSync(path.join(wt.path, 'forgot-to-add.md'), 'utf8'), '# oops\n');
 
-  removeWorktree(repoRoot, wt.path, { force: true });
+  discardFixtureWorktree(repoRoot, wt.path);
 });
 
 test('resyncWorktree re-strips .fgos/ after its own reset --hard (tsk-1d7 bundled fix, ADR0020)', () => {
@@ -1027,7 +994,7 @@ test('resyncWorktree re-strips .fgos/ after its own reset --hard (tsk-1d7 bundle
     'resyncWorktree\'s own reset --hard must not resurrect .fgos/ on disk (ADR0020)',
   );
 
-  removeWorktree(repoRoot, wt.path, { force: true });
+  discardFixtureWorktree(repoRoot, wt.path);
 });
 
 // --- tsk-jg4: orphaned-patch crash-window detection ---------------------
@@ -1074,7 +1041,7 @@ test('resyncWorktree refuses when a prior run left an orphaned patch file for th
   assert.equal(fs.existsSync(orphanedPatchPath), true, 'the orphaned patch must be preserved for manual review, never auto-deleted');
 
   fs.rmSync(orphanedPatchPath, { force: true });
-  removeWorktree(repoRoot, wt.path, { force: true });
+  discardFixtureWorktree(repoRoot, wt.path);
 });
 
 test('resyncWorktree is unaffected by an orphaned patch file belonging to a DIFFERENT branch', () => {
@@ -1104,7 +1071,7 @@ test('resyncWorktree is unaffected by an orphaned patch file belonging to a DIFF
   assert.equal(fs.existsSync(unrelatedPatchPath), true, 'an unrelated branch\'s own orphaned patch must be left alone');
 
   fs.rmSync(unrelatedPatchPath, { force: true });
-  removeWorktree(repoRoot, wt.path, { force: true });
+  discardFixtureWorktree(repoRoot, wt.path);
 });
 
 test('createClaimWorktree ignores a checkout outside its own worktreeDir (a runner dispatch checkout is never reattached to)', () => {
@@ -1121,10 +1088,10 @@ test('createClaimWorktree ignores a checkout outside its own worktreeDir (a runn
   assert.equal(claim.reused, true, 'still a branch reuse — just not a checkout reattach');
   assert.equal(fs.existsSync(dispatch.path), false, 'the out-of-dir checkout goes through the normal reclaim path');
 
-  removeWorktree(repoRoot, claim.path, { force: true });
+  discardFixtureWorktree(repoRoot, claim.path);
 });
 
-test('createClaimWorktree falls through to a fresh checkout when the registered path is gone from disk', () => {
+test('createClaimWorktree prunes an owned missing registration before allocating a fresh checkout', () => {
   const repoRoot = initTempRepo();
   const worktreeDir = mkWorktreeDir();
   const first = createClaimWorktree(repoRoot, 'reattach-vanished', { worktreeDir });
@@ -1141,7 +1108,7 @@ test('createClaimWorktree falls through to a fresh checkout when the registered 
   // the branch's own commit survived — reused, not recreated
   assert.equal(fs.existsSync(path.join(second.path, 'context.md')), true);
 
-  removeWorktree(repoRoot, second.path, { force: true });
+  discardFixtureWorktree(repoRoot, second.path);
 });
 
 test('createDispatchWorktree still allocates a FRESH directory on a reused branch — the reattach never leaks to the runner retry path', () => {
@@ -1157,7 +1124,7 @@ test('createDispatchWorktree still allocates a FRESH directory on a reused branc
   assert.equal(fs.existsSync(first.path), false, 'the previous attempt\'s checkout is reclaimed as before');
   assert.equal(fs.existsSync(path.join(retry.path, 'attempt.txt')), true, 'same branch, so its commit is there');
 
-  removeWorktree(repoRoot, retry.path, { force: true });
+  discardFixtureWorktree(repoRoot, retry.path);
 });
 
 // --- provisionDependencies (tsk-2vd D1/D2) --------------------------------
@@ -1204,7 +1171,7 @@ test('provisionDependencies runs npm ci when package-lock.json is present', () =
   assert.equal(fs.existsSync(path.join(worktreeDir, 'node_modules', 'fgos-test-localdep', 'package.json')), true);
 });
 
-test('createWorktree provisions a declared dependency into the fresh worktree automatically', () => {
+test('createWorktree and createVerifyCheckout provision a declared dependency, and runner teardown removes both checkouts with what provisioning placed', () => {
   const repoRoot = initTempRepo();
   const worktreeDir = mkWorktreeDir();
   const localDep = mkLocalDependency();
@@ -1214,10 +1181,22 @@ test('createWorktree provisions a declared dependency into the fresh worktree au
   );
   execFileSync('git', ['add', 'package.json'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'declare a dependency'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
 
   const wt = createWorktree(repoRoot, 'item-deps', { worktreeDir });
 
   assert.equal(fs.existsSync(path.join(wt.path, 'node_modules', 'fgos-test-localdep', 'package.json')), true);
+  // The ignored install would make the Worktree port refuse; teardown sets
+  // aside exactly what provisioning recorded, so nothing is left behind.
+  const failures = [];
+  removeDispatchWorktree(repoRoot, wt.path, (line) => failures.push(line));
+  assert.deepEqual(failures, []);
+  assert.deepEqual(fs.readdirSync(worktreeDir), [], 'no checkout or set-aside directory is left');
+
+  const verify = createVerifyCheckout(repoRoot, branchTip(repoRoot, 'HEAD'));
+  assert.equal(fs.existsSync(path.join(verify, 'node_modules', 'fgos-test-localdep', 'package.json')), true);
+  removeWorktree(repoRoot, verify, { force: true });
+  assert.deepEqual(fs.readdirSync(path.dirname(verify)).filter((name) => name.includes(path.basename(verify))), []);
 });
 
 test('createWorktree provisions dependencies after git worktree add and leaves its lock scope empty', () => {
@@ -1230,6 +1209,7 @@ test('createWorktree provisions dependencies after git worktree add and leaves i
   );
   execFileSync('git', ['add', 'package.json'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'declare a dependency'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
 
   const scope = createLockScope('provision-after-add');
   const wt = createWorktree(repoRoot, 'item-deps-nocb', { worktreeDir, scope });
@@ -1249,6 +1229,7 @@ test('tsk-4yv: createWorktree removes the worktree it just registered when finis
   fs.writeFileSync(path.join(repoRoot, 'package.json'), '{not valid json');
   execFileSync('git', ['add', 'package.json'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'commit a malformed package.json'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
 
   assert.throws(() => createWorktree(repoRoot, 'item-broken-dep', { worktreeDir }), SyntaxError);
 

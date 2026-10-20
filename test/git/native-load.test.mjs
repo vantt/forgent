@@ -115,7 +115,7 @@ test('staged release and npm-relative manifests resolve their own addon without 
       fs.mkdirSync(path.dirname(host), { recursive: true }); fs.writeFileSync(host, 'fixture host');
       const record = { ...manifest.components.nativeAddon, path: path.relative(releaseRoot, nativePath) };
       fs.writeFileSync(path.join(channel === 'release' ? releaseRoot : payload, channel === 'release' ? 'manifest.json' : 'native-addon.json'), JSON.stringify({ entries: { fgos: 'bin/fgos' }, components: { legacyNode: { root: channel === 'release' ? 'libexec/legacy-node' : '.' }, nativeAddon: record } }));
-      const script = `import {loadNativeAddon} from ${JSON.stringify(new URL(`file://${path.join(payload, 'src/git/native.mjs')}`).href)}; const a=loadNativeAddon({hostBin:${JSON.stringify(channel === 'release' ? host : null)}}); console.log(JSON.stringify({version:a.versions().napi,helper:a.helperExe}));`;
+      const script = `import {loadNativeAddon, nativeHelperExe} from ${JSON.stringify(new URL(`file://${path.join(payload, 'src/git/native.mjs')}`).href)}; const a=loadNativeAddon({hostBin:${JSON.stringify(channel === 'release' ? host : null)}}); console.log(JSON.stringify({version:a.versions().napi,helper:nativeHelperExe(a)}));`;
       const result = JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', script], { cwd: os.tmpdir(), encoding: 'utf8' }));
       assert.equal(result.version, 8);
       assert.equal(result.helper, host);

@@ -10,6 +10,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { confinedRunnerConfig } from '../runner/loop-worker-fixture.helper.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+import { activateGitFixture } from '../helpers/git-fixture.mjs';
 
 // Workers run confined (bwrap) as Unit runs; the runner child inherits this
 // file-local backend registry through its environment.
@@ -50,6 +51,7 @@ function initTempRepo() {
   fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'root commit'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
   return repoRoot;
 }
 

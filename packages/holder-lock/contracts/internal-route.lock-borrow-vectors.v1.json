@@ -3,7 +3,7 @@
   "command": "fgos internal lock-borrow-vectors",
   "description": "Runs the borrow vectors against a throwaway repository with real git: a borrowed description must not leak to any background process. Red means doctor FAIL and fgctl activate refuses. There is no switch that disables borrowing at run time.",
   "argv": {
-    "required": ["--protocol 1"],
+    "required": ["--protocol 2"],
     "optional": [
       { "flag": "--vector <name>", "repeatable": true, "meaning": "run only the named vectors; default all four" },
       { "flag": "--keep-repo", "meaning": "keep the temporary repository for diagnosis and print its path in detail" }
@@ -49,8 +49,8 @@
     "meaning": "a sibling process with the same FGOS_LOCK_FD value that opened the file itself is not a borrower (lock-fd --borrowed-check answers not-borrower)"
   },
   "stdout": {
-    "v": 1,
-    "protocol": 1,
+    "v": 2,
+    "protocol": 2,
     "result": { "enum": ["pass", "fail"] },
     "vectors": [{ "name": "string", "result": { "enum": ["pass", "fail"] }, "elapsedMs": "number", "detail": "string" }],
     "sibling": { "result": { "enum": ["pass", "fail"] }, "detail": "string" },

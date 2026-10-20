@@ -1,5 +1,6 @@
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
+import { activateGitFixture } from '../runner/worktree-native-fixture.helper.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -28,6 +29,7 @@ function acquireMain(fgosDir, label = 'test') {
 
 /** A tracked-looking events file the checkpoint will find dirty and due. */
 function makeCheckpointDue(repoRoot) {
+  activateGitFixture(repoRoot);
   const fgosDir = path.join(repoRoot, '.fgos');
   fs.mkdirSync(fgosDir, { recursive: true });
   fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ checkpoint: { fallbackIntervalSec: 0 } }));

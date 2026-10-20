@@ -21,7 +21,8 @@ export function seedFileLocalBwrapRegistry(executable = '/usr/bin/bwrap') {
   const prevXdgState = process.env.XDG_STATE_HOME;
   if (!process.env.XDG_STATE_HOME) {
     const stateDir = path.join(dir, 'fgos-state');
-    fs.mkdirSync(stateDir, { recursive: true });
+    // The Git driver refuses a state root that is group or world writable, whatever the umask.
+    fs.mkdirSync(path.join(stateDir, 'fgos'), { recursive: true, mode: 0o700 });
     process.env.XDG_STATE_HOME = stateDir;
   }
   after(() => {

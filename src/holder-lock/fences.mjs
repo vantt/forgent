@@ -25,7 +25,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { listAssignmentRuns } from '../runner/dispatch/assignment-layout.mjs';
 import { resolveHostBin } from '../util/host-bin.mjs';
 import { resolveStateRoot } from './state-root.mjs';
@@ -114,21 +114,10 @@ function isPidAlive(pid) {
  * `path.resolve` gives and in its `realpath` form, because the old lock
  * name was computed from whichever form the caller passed. A claim's
  * checkout is always one of these worktrees, so claims add no path of
- * their own.
+ * their own. Holder-lock sits below Git, so the caller lists the worktrees.
  */
-function dispatchCwds(workspaceRoot) {
-  const roots = new Set([path.resolve(workspaceRoot)]);
-  let listing = '';
-  try {
-    listing = execFileSync('git', ['worktree', 'list', '--porcelain'], {
-      cwd: workspaceRoot, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'ignore'],
-    });
-  } catch {
-    // Not a git checkout: only the root itself can have been a dispatch cwd.
-  }
-  for (const line of listing.split('\n')) {
-    if (line.startsWith('worktree ')) roots.add(path.resolve(line.slice('worktree '.length)));
-  }
+function dispatchCwds(workspaceRoot, worktrees) {
+  const roots = new Set([path.resolve(workspaceRoot), ...worktrees.map((dir) => path.resolve(dir))]);
   const cwds = new Set();
   for (const root of roots) {
     cwds.add(root);
@@ -151,20 +140,13 @@ function accountLockDirs(providerRuntimeDir) {
 
 /**
  * Every target ref an old merge could have taken a slot for: each local
- * branch. The slot name is `merge-slot--<encodeURIComponent(ref)>.lock`
- * (the formula of the deleted `mergeSlotLockFile`, recorded in the registry
- * row so this module does not depend on the deleted code).
+ * branch, as the caller lists it (short name). The slot name is
+ * `merge-slot--<encodeURIComponent(ref)>.lock` (the formula of the deleted
+ * `mergeSlotLockFile`, recorded in the registry row so this module does not
+ * depend on the deleted code).
  */
-function mergeSlotCandidates(workspaceRoot) {
-  let listing = '';
-  try {
-    listing = execFileSync('git', ['for-each-ref', 'refs/heads', '--format=%(refname:lstrip=2)'], {
-      cwd: workspaceRoot, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'ignore'],
-    });
-  } catch {
-    // Not a git checkout: no branch, so no merge slot was ever taken.
-  }
-  return [...new Set(listing.split('\n').map((line) => line.trim()).filter(Boolean))].sort();
+function mergeSlotCandidates(branches) {
+  return [...new Set(branches.filter(Boolean))].sort();
 }
 
 // Old paths that depend on what exists at cutover time; fixed paths come
@@ -176,8 +158,8 @@ const ENUMERATED_V1_PATHS = {
   recovery: ({ fgosDir }) => [...listAssignmentRuns(fgosDir)]
     .filter(({ runDir }) => !fs.existsSync(path.join(runDir, 'attempt.lock')))
     .map(({ runDir }) => path.join(runDir, '.recovery.lock')),
-  'merge-slot': ({ fgosDir, workspaceRoot }) => mergeSlotCandidates(workspaceRoot).map((ref) => path.join(fgosDir, `merge-slot--${encodeURIComponent(ref)}.lock`)),
-  'dispatch-cwd': ({ fgosDir, workspaceRoot }) => dispatchCwds(workspaceRoot).map((cwd) => path.join(fgosDir, `dispatch--${encodeURIComponent(cwd)}.lock`)),
+  'merge-slot': ({ fgosDir, branches }) => mergeSlotCandidates(branches).map((ref) => path.join(fgosDir, `merge-slot--${encodeURIComponent(ref)}.lock`)),
+  'dispatch-cwd': ({ fgosDir, workspaceRoot, worktrees }) => dispatchCwds(workspaceRoot, worktrees).map((cwd) => path.join(fgosDir, `dispatch--${encodeURIComponent(cwd)}.lock`)),
   'provider-account': ({ providerRuntimeDir }) => accountLockDirs(providerRuntimeDir),
   'provider-state': ({ providerRuntimeDir }) => (isDirectory(providerRuntimeDir) ? [path.join(providerRuntimeDir, 'state-lock')] : []),
 };
@@ -203,14 +185,20 @@ function v1PathsOf(lock, context) {
  * cutover owner) whose fence is not `none`. A path under `<stateRoot>` (the
  * machine-scope install lock) is placed once for the machine: the state
  * root is `stateRoot` when given, else the process's own resolution, asked
- * only when such a lock is among the owners.
+ * only when such a lock is among the owners. `worktrees` (linked worktree
+ * directories) and `branches` (short local branch names) are the
+ * workspace's Git listing, read by the caller; both are empty outside a
+ * repository.
  */
-export function fenceTargets({ fgosDir, workspaceRoot, providerRuntimeDir = defaultProviderRuntimeDir(), stateRoot, owners = CUTOVER_OWNERS } = {}) {
+export function fenceTargets({ fgosDir, workspaceRoot, worktrees, branches, providerRuntimeDir = defaultProviderRuntimeDir(), stateRoot, owners = CUTOVER_OWNERS } = {}) {
   if (!fgosDir) throw new Error('fenceTargets requires fgosDir');
+  if (!Array.isArray(worktrees) || !Array.isArray(branches)) throw new Error('fenceTargets requires the workspace listing: worktrees and branches (empty outside a repository)');
   let resolvedStateRoot = stateRoot ? path.resolve(stateRoot) : null;
   const context = {
     fgosDir: path.resolve(fgosDir),
     workspaceRoot: path.resolve(workspaceRoot ?? path.dirname(fgosDir)),
+    worktrees,
+    branches,
     providerRuntimeDir,
     stateRoot: () => (resolvedStateRoot ??= path.resolve(resolveStateRoot({ fgosDir }).stateRoot)),
   };
@@ -450,8 +438,9 @@ function hostError(code, message, extra = {}) {
   return err;
 }
 
-function scanWorkspace(hostBin, root, excludePids, timeoutMs) {
+function scanWorkspace(hostBin, { root, worktrees }, excludePids, timeoutMs) {
   const args = ['internal', 'quiesce-scan', '--protocol', String(SCAN_PROTOCOL), '--root', root];
+  for (const dir of worktrees) args.push('--dir', dir);
   for (const pid of excludePids) args.push('--exclude-pid', String(pid));
   const res = spawnSync(hostBin, args, { encoding: 'utf8', timeout: timeoutMs, stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 16 * 1024 * 1024 });
   if (res.error) {
@@ -482,7 +471,10 @@ function scanWorkspace(hostBin, root, excludePids, timeoutMs) {
 
 /**
  * Ask the host's `quiesce-scan` whether any fgOS process other than this
- * one (and its ancestors) is still running for each workspace. Returns
+ * one (and its ancestors) is still running for each workspace. A workspace
+ * is its root path, or `{root, worktrees}` with the linked worktree
+ * directories the caller listed through Git (holder-lock never lists them
+ * itself); a bare root scans that directory alone. Returns
  * `{status, blockers, scans, detail}` with status `clean`, `blocked` (a
  * process was found or an entry could not be read, listed in `blockers`)
  * or `needs-attest` (this platform cannot scan; a person has to confirm).
@@ -490,10 +482,11 @@ function scanWorkspace(hostBin, root, excludePids, timeoutMs) {
  */
 export function checkStopped({ workspaces, hostBin, excludePids = ownPidChain(), timeoutMs = SCAN_TIMEOUT_MS } = {}) {
   if (!Array.isArray(workspaces) || workspaces.length === 0) throw new Error('checkStopped requires at least one workspace root');
-  const roots = workspaces.map((root) => path.resolve(root));
-  const bin = hostBin ?? resolveHostBin(roots[0]);
+  const listed = workspaces.map((workspace) => (typeof workspace === 'string' ? { root: workspace, worktrees: [] } : workspace))
+    .map(({ root, worktrees = [] }) => ({ root: path.resolve(root), worktrees: worktrees.map((dir) => path.resolve(dir)) }));
+  const bin = hostBin ?? resolveHostBin(listed[0].root);
   if (!bin) throw hostError('host-unavailable', 'Rust host binary unavailable (FGOS_HOST_BIN unset and no active installation manifest)');
-  const scans = roots.map((root) => scanWorkspace(bin, root, excludePids, timeoutMs));
+  const scans = listed.map((workspace) => scanWorkspace(bin, workspace, excludePids, timeoutMs));
   const blockers = [];
   for (const scan of scans) {
     for (const proc of scan.processes) blockers.push({ kind: 'process', workspace: scan.root, ...proc });
@@ -513,13 +506,13 @@ export function checkStopped({ workspaces, hostBin, excludePids = ownPidChain(),
  * cannot scan needs `attested: true` (a person confirmed that nothing is
  * running) before anything is placed.
  */
-export function fenceCutover({ workspaces, fgosDir, workspaceRoot, providerRuntimeDir, stateRoot, owners, hostBin, excludePids, attested = false, now } = {}) {
+export function fenceCutover({ workspaces, fgosDir, workspaceRoot, worktrees, branches, providerRuntimeDir, stateRoot, owners, hostBin, excludePids, attested = false, now } = {}) {
   const scanOptions = { workspaces, hostBin, ...(excludePids ? { excludePids } : {}) };
   const before = checkStopped(scanOptions);
   if (before.status === 'blocked' || (before.status === 'needs-attest' && !attested)) {
     return { status: before.status, before, fences: null, after: null };
   }
-  const fences = placeFences({ fgosDir, workspaceRoot, providerRuntimeDir, stateRoot, ...(owners ? { owners } : {}), ...(now ? { now } : {}) });
+  const fences = placeFences({ fgosDir, workspaceRoot, worktrees, branches, providerRuntimeDir, stateRoot, ...(owners ? { owners } : {}), ...(now ? { now } : {}) });
   if (!fences.ok) return { status: fences.error, before, fences, after: null };
   const after = checkStopped(scanOptions);
   return { status: after.status === 'blocked' ? 'placed-then-blocked' : 'placed', before, fences, after };

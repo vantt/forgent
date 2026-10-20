@@ -23,7 +23,7 @@ fn temp_dir(tag: &str) -> PathBuf {
 }
 
 fn hold_args(lock: &Path, work: &Path, wait: &[&str]) -> Vec<String> {
-    let mut args = ["internal", "lock-hold", "--protocol", "1", "--path"].map(String::from).to_vec();
+    let mut args = ["internal", "lock-hold", "--protocol", "2", "--path"].map(String::from).to_vec();
     args.push(lock.to_string_lossy().into_owned());
     args.extend(["--mode", "ex", "--work"].map(String::from));
     args.push(work.to_string_lossy().into_owned());
@@ -114,12 +114,12 @@ fn an_unknown_request_is_refused_by_name_and_probe_sees_held_and_free() {
     fs::write(work.join("req-1.json"), r#"{"op":"nope"}"#).unwrap();
     assert_eq!(wait_for(&work.join("result-1.json"), "result-1.json")["error"], "request-unknown");
 
-    let probe_out = Command::new(fgos()).args(["internal", "lock-fd", "--protocol", "1", "--probe"]).arg(&lock).stdin(Stdio::null()).output().unwrap();
+    let probe_out = Command::new(fgos()).args(["internal", "lock-fd", "--protocol", "2", "--probe"]).arg(&lock).stdin(Stdio::null()).output().unwrap();
     assert_eq!(probe_out.status.code(), Some(10));
     assert!(String::from_utf8_lossy(&probe_out.stdout).contains("\"result\":\"held\""));
     helper.kill().unwrap();
     helper.wait().unwrap();
-    let free = Command::new(fgos()).args(["internal", "lock-fd", "--protocol", "1", "--probe"]).arg(&lock).stdin(Stdio::null()).output().unwrap();
+    let free = Command::new(fgos()).args(["internal", "lock-fd", "--protocol", "2", "--probe"]).arg(&lock).stdin(Stdio::null()).output().unwrap();
     assert_eq!(free.status.code(), Some(0));
     assert!(String::from_utf8_lossy(&free.stdout).contains("\"result\":\"free\""));
     let _ = fs::remove_dir_all(&dir);

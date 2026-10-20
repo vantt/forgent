@@ -86,7 +86,7 @@ fn a_hook_inside_the_job_is_a_borrower_and_a_sibling_outside_it_is_not() {
         &repo,
         "pre-commit",
         &format!(
-            "#!/bin/sh\necho \"$FGOS_LOCK_JOB\" > '{job}'\n'{fgos}' internal lock-fd --protocol 1 --borrowed-check '{lock}' > '{marker}'\nwhile [ ! -f '{go}' ]; do sleep 0.05; done\nexit 0\n",
+            "#!/bin/sh\necho \"$FGOS_LOCK_JOB\" > '{job}'\n'{fgos}' internal lock-fd --protocol 2 --borrowed-check '{lock}' > '{marker}'\nwhile [ ! -f '{go}' ]; do sleep 0.05; done\nexit 0\n",
             job = sh_path(&jobfile),
             fgos = sh_path(&fgos()),
             lock = sh_path(&resource.path),
@@ -102,7 +102,7 @@ fn a_hook_inside_the_job_is_a_borrower_and_a_sibling_outside_it_is_not() {
         assert_eq!(hook_says["result"], "borrower", "{hook_says}");
 
         let sibling = Command::new(fgos())
-            .args(["internal", "lock-fd", "--protocol", "1", "--borrowed-check"])
+            .args(["internal", "lock-fd", "--protocol", "2", "--borrowed-check"])
             .arg(&resource.path)
             .env("FGOS_LOCK_JOB", &job_env)
             .stdin(Stdio::null())

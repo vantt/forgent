@@ -1,8 +1,16 @@
 # Phase 07: caller migration, three-core deletion, one-door gate
 
-- **Depends on:** phases 01-06 merged; the Event Store legacy cutover landed on every workspace (spec §12 ordering); plan 6.4 landed or explicitly rebased against (shared `run.mjs`).
+- **Depends on:** phases 01-06 merged; plan 6.4 landed or explicitly rebased against (shared `run.mjs`).
 - **Branch / worktree:** integration branch `git/p07-switch`, worktree `.claude/worktrees/git-p07`; sub-lanes `git/p07-<family>` merge into it. Nothing reaches main until phase 08's gate passes, because the switch is one release (Q4).
 - **Model / effort:** sonnet for the mechanical moves, opus reviewer per family; 44h (resized from the phase 02 census).
+
+**Status:** in progress on `git/p07-switch`; board owner decision 2026-10-20 11:34 (Asia/Saigon): foundation layers first, Work later. Phase 07 does not wait for the Event Store Work cutover.
+
+**Unit 2 checkpoint:** the owner resolved Unit 1's four blockers. The Unit commit/sync adapters now call native ScopedCommit/Sync; raw Git bodies are removed. Native support preserves literal selected filenames, declared legacy event checkpoints/archives, owned-only diagnostic replay, recorded baselines/operation ids, custody-backed continuation and clean-start abort timing. See [Unit 2 report](../reports/phase-lead-261020-1150-git-p07-u2-commit-core-switch.md). This is an integration-branch change, not phase-07 acceptance or permission to land. The remaining families, shared matcher/definition switch and phase-08 proof gates remain open.
+
+**Unit 20 checkpoint:** V-GATE is built (item 4): the data-flow scan `scripts/git-one-door-scan.mjs`, the runtime spy preloaded by `scripts/run-tests.mjs`, the nine seeded probes in `test/git/one-door.test.mjs`, the build-written `packages/git/contracts/mutation-census.v1.json` and doctor `git-mutation-one-door`. The census is not empty yet; the open sites and the owner questions are in the [unit 20 report](../reports/phase-lead-261020-2002-git-p07-u20-one-door-gate.md).
+
+**Unit 24 checkpoint:** the pre-merge risk review's H1-H3, M1, M2, M4-M6 and L1 are fixed; M3 and L2-L4 are follow-ups. The scan now judges the whole declared product, which reveals one skill-text site (a `git mv` sentence in `domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md` and its render) whose source is outside the unit's write scope. See the [unit 24 report](../reports/phase-lead-261020-2339-git-p07-u24-review-fixes.md).
 
 ## Context
 
@@ -15,7 +23,7 @@
 2. **Switch every row of §13 in this release** (thin adapters: input/output/error translation only; no git subprocess, matcher, lock policy, cleanup or recovery in an adapter; output fields and timing kept):
    - `src/runner/execution/commit-unit-work.mjs` → ScopedCommit + Sync with the `custody` handle from phase 04; the direct `pre-commit` spawn goes through `git hook run` or is dropped (G-062).
    - `src/runner/execution/unit-sync.mjs` → thin Sync adapter.
-   - `src/runner/merge.mjs` → Land, Sync, SafeRestore, Refs, Worktree; numbering, verification policy and state stay consumer; decision renumbering becomes declared candidate bytes. Event sweep and post-CAS re-stage are already gone with the Event Store cutover; confirm none remain.
+   - `src/runner/merge.mjs` → Land, Sync, SafeRestore, Refs, Worktree; numbering, verification policy and state stay consumer; decision renumbering becomes declared candidate bytes. Event sweep and post-CAS event changes call the temporary Work adapter below, using declared Land candidate paths and a separate ScopedCommit/Checkpoint operation after CAS; no raw re-stage remains.
    - `src/runner/worktree.mjs` → Worktree, Refs, Remote; provisioning stays in Execution outside Git locks; `resyncClaimWorktree` → SafeRestore; `resyncWorktree` → SafeRestore `apply` with `reapplyLocalDelta`; `refreshUnstartedBranch` → `fastForwardCheckedOut` under custody; `ensureBranchPushed` drops `push -u` (RepositoryConfig by name when upstream is needed).
    - `src/workflow/integrate.mjs` → **deleted**; its callers use Worktree create, Land and guarded cleanup; target resolution through Inspect `resolveRef` (unknown, never throw), only when a Unit has a worktree or the workflow has an integrate step.
    - `src/runner/repo-locks.mjs` → keep holder delegation; remove `runWorktreeAdd`.
@@ -35,14 +43,14 @@
    - **Holder-lock's own git listings** cannot import Git (Git depends on holder-lock): `src/holder-lock/fences.mjs:123`, `:161` take the worktree list and refs as parameters from their setup-layer caller (`src/setup/holder-lock-checks.mjs`, which calls Inspect); the `quiesce-scan` route (`packages/holder-lock/rust/src/route.rs:474`) takes the linked worktree dirs as `--dir` arguments from its caller instead of running `git worktree list`. Holder-lock `run_borrowed` stays the driver's borrow primitive (phase 01 requirement 1).
    - **`write-scope.mjs` leaf contract:** `src/workflow/definition.mjs:2-7` calls it an import-free leaf and `test/state/domain-registry-compiled.test.mjs` copies it alone. The signed RUL84 rule (one Rust matcher, Node facade) wins: the comment in `definition.mjs` and that test are retargeted to load the facade with the addon (kept assertion, retargeted import, never weakened), and the architecture manifest records the new edge.
    - Rust readers in `packages/distribution`, `packages/herdr-fgos-common`, `packages/observe` → Inspect through `fgos-git` in-process (reads only).
-   - Event-file rows (`src/state/events-jsonl-truncation-guard.mjs`, the event duty of `src/runner/main-fgos-checkpoint.mjs`, `src/state/events-compaction.mjs`, the `merge.mjs` sweep and post-CAS re-stage): deleted by the Event Store cutover (Event Store §19). This phase verifies none survives; the non-event checkpoint duty moves to the Checkpoint adapter (phase 05).
+   - Event-file rows (`src/state/events-jsonl-truncation-guard.mjs`, the event duty of `src/runner/main-fgos-checkpoint.mjs`, `src/state/events-compaction.mjs`, the `merge.mjs` sweep and post-CAS changes): retain Work’s legacy tracked `.fgos/events.jsonl`, shards and `merge=union` for now. Route every Git effect through the temporary Work adapter below; the non-event checkpoint duty also uses Checkpoint (phase 05). The WORK lane deletes the adapter and event duties together with its Event Store cutover.
 
    Classification findings F-E1..F-E10 (spec §13) and where each lands:
 
    | Finding | Site | Lands in |
    |---|---|---|
-   | F-E1 | checkpoint spawn site `main-fgos-checkpoint.mjs:17` (argv injected by callers) | Event Store cutover (event duty); Checkpoint adapter here (non-event) |
-   | F-E2 | Land event sweep and post-CAS re-stage `merge.mjs:1362-1389`, `:1739-1767` | Event Store cutover; verified gone here |
+   | F-E1 | checkpoint spawn site `main-fgos-checkpoint.mjs:17` (argv injected by callers) | Temporary Work adapter → Checkpoint / ScopedCommit (declared event files); non-event → Checkpoint |
+   | F-E2 | Land event sweep and post-CAS re-stage `merge.mjs:1362-1389`, `:1739-1767` | Temporary Work adapter → declared Land candidate paths; post-CAS → separate ScopedCommit / Checkpoint |
    | F-E3 | `resyncWorktree` | SafeRestore `reapplyLocalDelta` |
    | F-E4 | `refreshUnstartedBranch` | Refs `fastForwardCheckedOut` |
    | F-E5 | `ensureBranchPushed` `push -u` (`worktree.mjs:332`) | Remote push without `-u`; CHANGELOG |
@@ -51,6 +59,21 @@
    | F-E8 | skill text `core/skills/fgos-run/SKILL.md:25` | `fgos worktree create` (phase 03) |
    | F-E9 | production sandbox probe `borrow_vectors.rs:78` | named exemption class, census proof |
    | F-E10 | hook-file replay `commit-unit-work.mjs:424-430` | `git hook run` or dropped (G-062) |
+
+### Temporary Work adapter (owner decision 2026-10-20 11:34)
+
+Use the clearly named Work-side `src/state/legacy-event-git-adapter.mjs`; it translates declared paths and receipts only. Work owns event discovery, truncation/compaction verification and timing outside Git locks. Git owns all Git effects and custody/lock/recovery policy. No raw Git exception is added:
+
+| Legacy duty | Port and boundary |
+|---|---|
+| `main-fgos-checkpoint.mjs` event checkpoint; truncation-guard callback | Checkpoint (`ScopedCommit.checkpointTrackedFiles`) with exact declared tracked event paths under borrowed main authority; Work runs truncation guard first |
+| `merge.mjs` pre-land event sweep | Work declares exact candidate paths/bytes to Land; no implicit sweep in Git |
+| `merge.mjs` post-CAS event changes | Separate declared ScopedCommit / Checkpoint operation under main authority after Land; never an unjournaled re-stage |
+| `events-compaction.mjs` commits | ScopedCommit with exact old/new paths after Work verifies its candidate; Work retains archive/guard policy |
+
+**Unit 2 port prerequisite implemented:** the existing ScopedCommit/Checkpoint request accepts typed `legacyEvents: {exactPaths}` for the retired event layout only, under main 50. The temporary Work adapter and the existing native hook grant-check door use that declaration; ordinary `.fgos` payloads remain excluded/refused. Work-event/Land owners still wire their callers; Land has no implicit sweep. WORK removes the adapter, declaration and grant branch together at Event Store cutover.
+
+Legacy tracked event files, writer shards, truncation guard and `merge=union` remain until WORK cuts over. WORK owns deletion of this adapter and every legacy event duty in that same cutover. This is a temporary consumer of typed ports, never a second Git core. E6 event assertions are **kept/retargeted**, not retired before that cutover.
 
 3. **Delete the three parallel cores in this release:** Workflow integrate (lock-free writer), the Work merge/worktree core (git-spawning bodies of `merge.mjs` and `worktree.mjs` and their helpers), the Unit commit/sync core (`commit-unit-work.mjs` and `unit-sync.mjs` bodies). A compatibility export may contain only translation and is deleted with its last import in the same change.
 4. **One-door gate (V-GATE, D9):** `scripts/git-one-door-scan.mjs` (static: every `child_process`, `runBorrowed`, `execSync`/shell and Rust `Command::new` site whose binary can be `git` or a hook by data flow, wrappers and their callers counted); `test/helpers/git-spawn-spy.mjs` preloaded by `scripts/run-tests.mjs` records every `git` or hook spawn from `src`, `bin` or `scripts` and fails the suite on any; `test/git/one-door.test.mjs` with nine seeded false-negative probes under `test/fixtures/git-one-door/` (callback argv, `runBorrowed` facade, argv in a variable or mutated, global options before the verb, wrapper prepending the verb, Rust variable binary, shell string, direct hook replay and skill text, read verbs that write). The build writes `packages/git/contracts/mutation-census.v1.json`; doctor `git-mutation-one-door` checks it is empty and its digest matches the payload.
@@ -75,11 +98,12 @@ Owned by this phase (one sub-lane per family, disjoint):
 | Setup and scripts | `src/setup/git-hooks.mjs`, `scripts/knowledge-migration.mjs`, `scripts/test-select-mutate.mjs`, `scripts/install-git-hooks.mjs` |
 | Rust readers | `packages/distribution/rust/src/{workspace,lib}.rs`, `packages/herdr-fgos-common/rust/src/fgos.rs`, `packages/observe/rust/src/sources/*` |
 | Gate | `scripts/git-one-door-scan.mjs`, `scripts/run-tests.mjs`, `test/helpers/git-spawn-spy.mjs`, `test/git/one-door.test.mjs`, `test/fixtures/git-one-door/**`, `packages/git/contracts/mutation-census.v1.json`, `scripts/build-rust-distribution.mjs` (census step), `packages/distribution/rust/src/manifest.rs` (required key) |
+| Temporary Work event adapter | `src/state/legacy-event-git-adapter.mjs`, `src/state/events-jsonl-truncation-guard.mjs`, `src/state/events-compaction.mjs`, `src/runner/main-fgos-checkpoint.mjs`; Land owner alone edits `merge.mjs` call sites |
 | Shared at the end (lead only) | `CHANGELOG.md`, `src/setup/registrations.mjs`, `docs/architecture-manifest.json`, `test/test-ownership.mjs`, skill sources and render surfaces |
 
 ## Steps
 
-1. Re-run the phase 02 census with the §12 rule; publish it as the checklist in the phase report.
+1. Re-run the phase 02 census with the §12 rule; publish it as the checklist in the phase report. Current reproducible candidate inventory: [Git 07 census](../reports/scout-261020-1135-git-p07-census.md), generated by the since-retired `scripts/git-p07-census.py` (unit 20 replaced it with `scripts/git-one-door-scan.mjs`, the V-GATE scan). Its ownership/order section reserves shared files and keeps all integration work off main until phase 08.
 2. Gate tooling and seeded probes first (they must fail on today's tree, proving detection).
 3. Sub-lanes switch their families in parallel; each removes its old writer bodies in the same commit series.
 4. Test preservation labelling and lesson map; fix retargeted imports without weakening.

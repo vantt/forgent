@@ -86,7 +86,7 @@ The sequence between Unit run / Workflow run completion and git branch integrati
 run completed
   -> verify run status: pass / completed
   -> git merge --no-ff <cell-branch> (into target branch)
-  -> git worktree remove <worktree-path>
+  -> fgos worktree remove <worktree-path> --delivered-to <target-branch>
 ```
 
 1. **No Run Git Authority:** A Unit run possesses zero git merge authority. Merging into the base/target branch is strictly a driver action performed outside the unit run.

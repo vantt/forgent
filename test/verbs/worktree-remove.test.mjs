@@ -133,7 +133,7 @@ test('worktree remove is registered with a required --delivered-to', () => {
 });
 
 test('CLI adapter removes a provisioned, delivered worktree and reports a missing --delivered-to as a usage error', skip, async () => {
-  const { ensureHostBin, REPO_ROOT } = await import('../../scripts/run-tests.mjs');
+  const { ensureHostBin, REPO_ROOT } = await import('../../scripts/lib/git-addon-stage.mjs');
   const f = fixture('files', true);
   try {
     const built = ensureHostBin({ ...process.env, FGOS_HOST_BIN: '' }, REPO_ROOT);

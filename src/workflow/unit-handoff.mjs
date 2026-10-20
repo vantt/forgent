@@ -8,13 +8,15 @@
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import os from 'node:os';
+import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
+import { createWorktreeCheckoutSync } from '../runner/repo-locks.mjs';
+import { removeWorktree, deleteBranchRef } from '../runner/worktree.mjs';
+import { createLockScope } from '../holder-lock/index.mjs';
 
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 import { matchesWriteScope } from '../runner/dispatch/write-scope.mjs';
-import { nulPaths } from '../util/git-paths.mjs';
 import { anonymousInputName, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER, resolveUnitInputs } from '../runner/execution/handoff-refs.mjs';
-import { cleanupWorkflowWorktree, resolveIntegrationTarget } from './integrate.mjs';
 import { digestUnitRunReports } from './ref-digests.mjs';
 
 const GATE_ANSWER_NOTE_CHARS = 200;
@@ -258,8 +260,8 @@ export function assertWriteChains(workflow) {
 /**
  * Paths a unit's producer changed outside the unit's write scope: those its commits report as out
  * of scope, and any path the unit's branch changed since its base outside the scope -- every
- * commit on it, a resumed round's or one the producer made itself included. Paths come from
- * `git diff -z`, so a name git would quote (non-ASCII, spaces) is matched as it is. The scope is
+ * commit on it, a resumed round's or one the producer made itself included. Inspect returns
+ * literal path bytes, so a name Git would quote (non-ASCII, spaces) is matched as it is. The scope is
  * the one the Unit run recorded (its `writes` widened to generated render targets).
  */
 export function outOfScopeWrites(mainRoot, { unitRunId, writes, results, branch, baseSha }) {
@@ -268,7 +270,7 @@ export function outOfScopeWrites(mainRoot, { unitRunId, writes, results, branch,
     scope = JSON.parse(fs.readFileSync(path.join(mainRoot, '.fgos', 'assignments', unitRunId, 'unit.json'), 'utf8')).writeScope ?? writes;
   } catch { /* the template's writes are the scope the run started from */ }
   const changed = branch && baseSha
-    ? nulPaths(gitOut(mainRoot, ['diff', '-z', '--no-renames', '--no-relative', '--name-only', baseSha, branch, '--']) ?? '')
+    ? workflowChangedPaths(mainRoot, baseSha, branch)
     : results.flatMap((result) => result?.commit?.files ?? []);
   // What the branch itself carries outside the scope: the part a writer built on it inherits.
   const onBranch = changed.filter((file) => !matchesWriteScope(file, scope));
@@ -282,21 +284,72 @@ export function singleWriteBaseOf(workflow, stepId) {
   return base && !base.refused ? base : null;
 }
 
-function gitOk(cwd, args) {
-  try {
-    execFileSync('git', args, { cwd, stdio: 'ignore' });
-    return true;
-  } catch {
-    return false;
-  }
+export function workflowInspect(cwd) {
+  return createGitInspect(gitPortOptions(cwd));
 }
 
-export function gitOut(cwd, args) {
+export function workflowCommit(cwd, name) {
+  try { return workflowInspect(cwd).resolveCommit({ name }); }
+  catch { return null; }
+}
+
+export function workflowCheckout(cwd) {
+  const inspect = workflowInspect(cwd);
+  const repo = inspect.resolveRepo();
+  if (repo.notARepository) return { commonDir: null, ref: null };
+  let cursor;
+  do {
+    const page = inspect.listWorktrees({ cursor, maxEntries: 4096 });
+    const row = page.entries.find(row => Buffer.from(row.path).toString() === repo.worktreeRoot);
+    if (row) return { commonDir: repo.commonDir, ref: row.branch?.replace(/^refs\/heads\//, '') ?? 'HEAD' };
+    cursor = page.nextCursor;
+  } while (cursor);
+  throw new RunnerConfigError('checkout registration not found');
+}
+
+function workflowChangedPaths(cwd, before, after) {
+  const inspect = workflowInspect(cwd);
+  const right = inspect.resolveCommit({ name: after });
+  if (!right) throw new RunnerConfigError('cannot resolve writing branch');
+  const paths = [];
+  let cursor;
+  do {
+    const page = inspect.diff({ before, after: right, cursor, maxEntries: 4096 });
+    paths.push(...page.entries.map(entry => Buffer.from(entry.path).toString()));
+    cursor = page.nextCursor;
+  } while (cursor);
+  return paths;
+}
+
+export function resolveIntegrationTarget({ repoRoot, workflow } = {}) {
+  const declared = workflow?.steps?.find(step => step.kind === 'integrate' && step.target)?.target;
   try {
-    return execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
-  } catch {
-    return null;
-  }
+    const inspect = workflowInspect(repoRoot);
+    if (declared) {
+      const name = declared.startsWith('refs/') ? declared : `refs/heads/${declared}`;
+      return inspect.resolveRef({ name }).kind === 'direct' ? declared : null;
+    }
+    const target = inspect.resolveTrunk();
+    if (target.kind !== 'known') return null;
+    return target.value.replace(/^refs\/heads\//, '').replace(/^refs\/remotes\/[^/]+\//, '');
+  } catch { return null; }
+}
+
+export function createWorkflowWorktree({ repoRoot, branch, baseRef = 'HEAD', worktreeDir, scope = createLockScope('workflow-worktree') }) {
+  if (!repoRoot || !branch) throw new RunnerConfigError('createWorkflowWorktree requires repoRoot and branch');
+  const worktreePath = path.resolve(worktreeDir ?? fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wf-wt-')));
+  const existing = workflowInspect(repoRoot).resolveRef({ name: `refs/heads/${branch}` });
+  createWorktreeCheckoutSync(scope, repoRoot, { path: worktreePath, branch, base: existing.kind === 'direct' ? existing.oid : baseRef });
+  return { worktreePath: fs.realpathSync(worktreePath), branch };
+}
+
+export function cleanupWorkflowWorktree({ repoRoot, worktreePath, branch, deleteBranch = true, deliveredTo }) {
+  if (!repoRoot || !worktreePath) throw new RunnerConfigError('cleanupWorkflowWorktree requires repoRoot and worktreePath');
+  const expected = branch ? workflowCommit(repoRoot, branch) : null;
+  // The existing Execution adapter takes custody and delegates removal/prune to Git.
+  // A refusal propagates; neither checkout bytes nor branch are deleted on failure.
+  removeWorktree(repoRoot, worktreePath, { ...(deliveredTo ? { deliveredTo } : {}) });
+  if (deleteBranch && branch && expected) deleteBranchRef(repoRoot, branch, expected);
 }
 
 /**
@@ -306,9 +359,11 @@ export function gitOut(cwd, args) {
  * Unit that failed, was refused, or never finished keeps its worktree for investigation.
  */
 export function settleUnitWorktrees({ mainRoot, state, workflow }) {
-  const integrationTarget = resolveIntegrationTarget({ repoRoot: mainRoot, workflow });
   const removed = [];
   const kept = [];
+  if (!Object.values(state.steps).some(step => Object.values(step.units).some(unit => unit.worktreePath))) return { removed, kept };
+  const integrationTarget = resolveIntegrationTarget({ repoRoot: mainRoot, workflow });
+  const deliveredTo = integrationTarget ? workflowCommit(mainRoot, integrationTarget) : null;
   for (const step of Object.values(state.steps)) {
     for (const unit of Object.values(step.units)) {
       if (!unit.worktreePath) continue;
@@ -319,21 +374,32 @@ export function settleUnitWorktrees({ mainRoot, state, workflow }) {
       } else if (!fs.existsSync(unit.worktreePath)) {
         removed.push(entry);
         continue;
-      } else if (unit.branch && !gitOk(mainRoot, ['merge-base', '--is-ancestor', unit.branch, integrationTarget])) {
-        reason = 'branch not integrated';
-      } else if ((gitOut(unit.worktreePath, ['status', '--porcelain', '--untracked-files=normal']) ?? 'unknown').trim() !== '') {
-        reason = 'worktree has uncommitted changes';
+      } else {
+        try {
+          const source = unit.branch ? workflowCommit(mainRoot, unit.branch) : null;
+          if (unit.branch && (!source || !deliveredTo || workflowInspect(mainRoot).ancestry({ ancestor: source, descendant: deliveredTo }).answer !== 'yes')) {
+            reason = 'branch not integrated';
+          } else if (workflowInspect(unit.worktreePath).status({ untracked: 'normal', maxEntries: 1 }).entries.length !== 0) {
+            reason = 'worktree has uncommitted changes';
+          }
+        } catch (err) { reason = `worktree inspection refused: ${err.message}`; }
       }
       if (reason) {
         kept.push({ ...entry, reason });
         continue;
       }
-      cleanupWorkflowWorktree({
-        repoRoot: mainRoot,
-        worktreePath: unit.worktreePath,
-        branch: unit.branch,
-        deleteBranch: Boolean(unit.branch),
-      });
+      try {
+        cleanupWorkflowWorktree({
+          repoRoot: mainRoot,
+          worktreePath: unit.worktreePath,
+          branch: unit.branch,
+          deleteBranch: Boolean(unit.branch),
+          deliveredTo,
+        });
+      } catch (err) {
+        kept.push({ ...entry, reason: `cleanup refused: ${err.message}` });
+        continue;
+      }
       removed.push(entry);
     }
   }

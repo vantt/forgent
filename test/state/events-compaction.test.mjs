@@ -1,5 +1,6 @@
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
+import { activateGitFixture } from '../runner/worktree-native-fixture.helper.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -191,11 +192,13 @@ test('compactColdWriterFiles is a no-op when cold event count is below the thres
 });
 
 test('compactColdWriterFiles archives cold files into events/archive/, writes a baseline + manifest, and the whole-dir view is deep-equal before/after', () => {
-  const dir = mkTempDir('compaction-success-');
+  const repoRoot = mkTempDir('compaction-success-');
+  const dir = path.join(repoRoot, '.fgos');
   const eventsDir = path.join(dir, 'events');
-  execFileSync('git', ['init', '-q'], { cwd: dir });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: dir });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: dir });
+  fs.mkdirSync(dir);
+  execFileSync('git', ['init', '-q'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
   fs.writeFileSync(path.join(dir, 'events.jsonl'), '', 'utf8');
 
   const coldAPath = path.join(eventsDir, 'writer-a-1.jsonl');
@@ -206,17 +209,20 @@ test('compactColdWriterFiles archives cold files into events/archive/, writes a 
   ]);
   writeJsonl(coldBPath, [ev(1, '2026-01-01T00:00:01.000Z', 'work.add', { id: 'b', title: 'B', status: 'todo' }, 'writer-b')]);
 
-  execFileSync('git', ['add', '.'], { cwd: dir });
-  execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: dir });
+  execFileSync('git', ['add', '.'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: repoRoot });
 
+  activateGitFixture(repoRoot);
   const viewBefore = rebuildViewFromDir(dir);
 
   const now = Date.now();
   setMtime(coldAPath, now - 1000 * 60 * 60 * 48);
   setMtime(coldBPath, now - 1000 * 60 * 60 * 48);
 
-  const result = compactColdWriterFiles(dir, { nowMs: now, idleThresholdMs: 1000 * 60 * 60 * 24, eventThreshold: 2, repoRoot: dir });
+  const result = compactColdWriterFiles(dir, { nowMs: now, idleThresholdMs: 1000 * 60 * 60 * 24, eventThreshold: 2, repoRoot });
   assert.equal(result.compacted, true);
+  assert.equal(result.commit?.status, 'committed', JSON.stringify(result.warnings));
+  assert.equal(execFileSync('git', ['status', '--porcelain', '--', '.fgos/events'], { cwd: repoRoot, encoding: 'utf8' }).trim(), '');
   assert.equal(result.totalEvents, 3);
   assert.deepEqual(result.archived.sort(), ['writer-a-1.jsonl', 'writer-b-1.jsonl']);
 
@@ -234,7 +240,7 @@ test('compactColdWriterFiles archives cold files into events/archive/, writes a 
 
   const viewAfter = rebuildViewFromDir(dir);
   assert.deepEqual(viewAfter, viewBefore, 'compaction must never change the folded view');
-  fs.rmSync(dir, { recursive: true, force: true });
+  fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
 test('compactColdWriterFiles gate-red: a torn/corrupted write of the candidate baseline is caught, nothing gets archived, and the candidate file itself is removed', () => {

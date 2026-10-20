@@ -3,7 +3,7 @@ import path from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
 import { createGitInspect } from '../../git/inspect.mjs';
 import { createGitWorktree } from '../../git/worktree.mjs';
-import { setProvisionedAside } from '../../runner/worktree.mjs';
+import { removeProvisioned } from '../../runner/worktree.mjs';
 
 const OID = /^(?:[0-9a-f]{40}|[0-9a-f]{64})$/;
 
@@ -45,13 +45,6 @@ export function removeWorktreeUseCase(ctx, options, loaderOptions) {
     .update(JSON.stringify({ path: target, expectedTip, deliveredTo: delivered }))
     .digest('hex');
   const port = createGitWorktree({ ...base, writer: ctx.writer }, loaderOptions);
-  const provisioned = setProvisionedAside(ctx.stateRoot, target);
-  try {
-    port.remove({ path: target, expectedTip, deliveredTo: delivered.oid, evidenceDigest, operationId: `worktree-${randomUUID()}` });
-  } catch (err) {
-    provisioned.restore();
-    throw err;
-  }
-  provisioned.discard();
+  removeProvisioned(ctx.stateRoot, target, () => port.remove({ path: target, expectedTip, deliveredTo: delivered.oid, evidenceDigest, operationId: `worktree-${randomUUID()}` }));
   return { removed: true, path: target, expectedTip, deliveredTo: delivered.oid, deliveredToRef: delivered.ref, evidenceDigest };
 }

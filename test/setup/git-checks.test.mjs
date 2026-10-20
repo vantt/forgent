@@ -40,6 +40,6 @@ test('an unused controller fence does not turn a channel without activation red'
 test('an addon-less compatibility channel reports informational Git rows', () => {
   const module = pathToFileURL(path.resolve('src/setup/git-checks.mjs')).href;
   const script = `import {checkGit} from ${JSON.stringify(module)}; console.log(JSON.stringify(checkGit(process.cwd(),'git-component-compatible')));`;
-  const result = JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', script], { encoding: 'utf8', env: { ...process.env, FGOS_HOST_BIN: '', FGOS_ACTIVE_MANIFEST_PATH: '' } }));
-  assert.equal(result.passed, true); assert.match(result.message, /^info: addon not shipped/);
+  const result = JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', script], { encoding: 'utf8', env: { ...process.env, FGOS_ACTIVE_RELEASE_PATH: '', FGOS_ACTIVE_MANIFEST_PATH: '' } }));
+  assert.equal(result.passed, true); assert.match(result.message, /^info: addon not shipped on this channel: onboard this project with `fgctl init`/);
 });

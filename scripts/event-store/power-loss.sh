@@ -52,7 +52,7 @@ done
 node=$(command -v node)
 modprobe dm-flakey 2>/dev/null || true
 dmsetup targets | grep -q '^flakey' || die "dm-flakey target unavailable (modprobe dm-flakey)"
-[ -f "$checkout/.fgos/runtime/git-addon/native-addon.json" ] || die "build the addon first as yourself: node scripts/git-addon.mjs"
+[ -f "$checkout/.fgos/runtime/git-addon/manifest.json" ] || die "build the addon first as yourself: node scripts/git-addon.mjs"
 
 as_user() { setpriv --reuid="$SUDO_UID" --regid="$SUDO_GID" --init-groups env HOME="$(getent passwd "$SUDO_UID" | cut -d: -f6)" "$@"; }
 as_user mkdir -p "$image_dir"

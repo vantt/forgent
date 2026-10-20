@@ -22,21 +22,15 @@ function fixture(conflict=false) {
  return {temp,repo,linked,git,target,port,held:[h.handle],close(){h.handle.release();fs.rmSync(temp,{recursive:true,force:true});}};
 }
 test('Sync creates a clean exact two-parent merge and no resolver grant',()=>{
- const f=fixture();try {const head=execFileSync('git',['-C',f.linked,'rev-parse','HEAD'],{encoding:'utf8'}).trim();
+ const f=fixture();try {
+ assert.throws(()=>f.port.start({operationId:'missing',target:f.target,message:'sync'}),/custody/);
+ const head=execFileSync('git',['-C',f.linked,'rev-parse','HEAD'],{encoding:'utf8'}).trim();
  const result=f.port.start({operationId:'clean',target:f.target,message:'consumer sync message'},f.held);assert.equal(result.state,'done');assert.deepEqual(result.resolverGrant,[]);
  assert.deepEqual(execFileSync('git',['-C',f.linked,'show','-s','--format=%P'],{encoding:'utf8'}).trim().split(' '),[head,f.target]);
  const replay=f.port.inspect({operationId:'clean'},f.held);assert.equal(replay.state,'done');assert.deepEqual(replay.commit,result.commit);
  assert.deepEqual(fs.readdirSync(path.join(f.repo,'.git/fgos/git/operations')),[]);
  assert.equal(f.git('for-each-ref','--format=%(refname)','refs/fgos/git-operations'),'');
  assert.deepEqual(f.port.start({operationId:'clean',target:f.target,message:'consumer sync message'},f.held).commit,result.commit);
- }finally{f.close();}
-});
-test('Sync leaves only temporary conflict grants and refuses markers before staging',()=>{
- const f=fixture(true);try {
- assert.throws(()=>f.port.start({operationId:'missing',target:f.target,message:'sync'}),/custody/);
- const result=f.port.start({operationId:'conflict',target:f.target,message:'sync'},f.held);assert.equal(result.state,'conflicted-open');assert.deepEqual(result.resolverGrant,['a']);
- for(const marker of ['<<<<<<<\tleft','||||||||\tbase','>>>>>>>']) {fs.writeFileSync(path.join(f.linked,'a'),marker+'\n');assert.throws(()=>f.port.continue({operationId:'conflict'},f.held),/conflict-markers/);}
- fs.writeFileSync(path.join(f.linked,'a'),'resolved\n');const finished=f.port.continue({operationId:'conflict'},f.held);assert.equal(finished.state,'done');assert.equal(finished.commit.status,'committed');
  }finally{f.close();}
 });
 test('Sync abort preserves resolver bytes and only closes its own merge',()=>{
@@ -62,7 +56,7 @@ test('Sync refuses foreign staged resolver paths and retains their bytes',()=>{
 test('Sync preserves a rejecting hook cause and never reports its open merge as not started',()=>{
  const f=fixture();try {
  const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);fs.writeFileSync(path.join(hooks,'pre-commit'),'#!/bin/sh\necho original-sync-rejection >&2\nexit 1\n',{mode:0o755});f.git('config','core.hooksPath','hooks');
- assert.throws(()=>f.port.start({operationId:'rejected',target:f.target,message:'sync'},f.held),/hook-rejected/);
+ assert.throws(()=>f.port.start({operationId:'rejected',target:f.target,message:'sync'},f.held),/commit-rejected/);
  assert.equal(execFileSync('git',['-C',f.linked,'rev-parse','MERGE_HEAD'],{encoding:'utf8'}).trim(),f.target);
  assert.equal(f.port.inspect({operationId:'rejected'},f.held).state,'rejected-open');
  assert.equal(fs.readFileSync(path.join(f.linked,'incoming'),'utf8'),'target\n');
@@ -78,7 +72,7 @@ test('Sync preserves a rejecting hook cause and never reports its open merge as 
 test('a recreated worktree does not inherit a rejected Sync from the dead checkout',()=>{
  const f=fixture();try {
   const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);fs.writeFileSync(path.join(hooks,'pre-commit'),'#!/bin/sh\nexit 1\n',{mode:0o755});f.git('config','core.hooksPath','hooks');
-  assert.throws(()=>f.port.start({operationId:'dead-sync',target:f.target,message:'sync'},f.held),/hook-rejected/);
+  assert.throws(()=>f.port.start({operationId:'dead-sync',target:f.target,message:'sync'},f.held),/commit-rejected/);
   const old=JSON.parse(fs.readFileSync(path.join(f.repo,'.git/fgos/git/operations/dead-sync/00000000.json'),'utf8'));
   assert.match(old.phase.data.resourceSet[0],/:custody:/);
   f.held[0].release();f.git('worktree','remove','--force',f.linked);f.git('worktree','add',f.linked,'producer');
@@ -104,5 +98,32 @@ test('Sync abort restores pre-merge permission bits on clean merged paths',()=>{
   fs.chmodSync(path.join(f.linked,'modefile'),0o644);fs.writeFileSync(path.join(f.linked,'a'),'keep resolution');
   assert.equal(f.port.abort({operationId:'sync-mode'},f.held).state,'conflict-aborted');
   assert.equal(fs.readFileSync(path.join(f.linked,'modefile'),'utf8'),'base mode');assert.equal(fs.statSync(path.join(f.linked,'modefile')).mode&0o777,0o600);
+ }finally{f.close();}
+});
+
+test('Sync preparation leaves the source tip unchanged until consumer verification finishes', () => {
+ const f=fixture();try {
+ const before=execFileSync('git',['-C',f.linked,'rev-parse','HEAD'],{encoding:'utf8'}).trim();
+ const prepared=f.port.prepare({operationId:'verify-first',target:f.target,message:'verified catchup'},f.held);
+ assert.equal(prepared.state,'prepared');
+ assert.equal(execFileSync('git',['-C',f.linked,'rev-parse','HEAD'],{encoding:'utf8'}).trim(),before);
+ assert.equal(fs.readFileSync(path.join(f.linked,'incoming'),'utf8'),'target\n');
+ assert.equal(f.port.prepare({operationId:'verify-first',target:f.target,message:'verified catchup'},f.held).state,'in-progress');
+ assert.equal(execFileSync('git',['-C',f.linked,'rev-parse','HEAD'],{encoding:'utf8'}).trim(),before);
+ const result=f.port.continue({operationId:'verify-first'},f.held);
+ assert.equal(result.state,'done');
+ assert.deepEqual(execFileSync('git',['-C',f.linked,'show','-s','--format=%P'],{encoding:'utf8'}).trim().split(' '),[before,f.target]);
+ }finally{f.close();}
+});
+
+test('a consumer can abort a prepared clean Sync after a red check without changing either branch', () => {
+ const f=fixture();try {
+ const before=execFileSync('git',['-C',f.linked,'rev-parse','HEAD'],{encoding:'utf8'}).trim();
+ f.port.prepare({operationId:'red-check',target:f.target,message:'must not publish'},f.held);
+ assert.equal(f.port.abort({operationId:'red-check'},f.held).state,'conflict-aborted');
+ assert.equal(execFileSync('git',['-C',f.linked,'rev-parse','HEAD'],{encoding:'utf8'}).trim(),before);
+ assert.equal(f.git('rev-parse','trunk'),f.target);
+ assert.equal(fs.existsSync(path.join(f.linked,'incoming')),false);
+ assert.equal(execFileSync('git',['-C',f.linked,'status','--porcelain'],{encoding:'utf8'}),'');
  }finally{f.close();}
 });

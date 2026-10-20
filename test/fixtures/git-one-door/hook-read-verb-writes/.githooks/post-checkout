@@ -1,0 +1,4 @@
+#!/bin/sh
+# Read verbs in their write forms: both change the repository.
+git reflog expire --expire=now --all
+git symbolic-ref HEAD refs/heads/other

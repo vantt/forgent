@@ -12,7 +12,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
+import { runUnitWithPort as runUnit, prepareActivatedGitFixture } from '../../helpers/run-unit-with-port.mjs';
+import { createGitRepositoryConfig } from '../../../src/git/index.mjs';
+import { resolveStateRoot } from '../../../src/holder-lock/index.mjs';
 import { validateUnit } from '../../../src/runner/execution/unit.mjs';
 import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
@@ -71,6 +73,7 @@ function setup({ mainFiles = { 'base.txt': 'from main\n' }, branchFiles = { 'min
       patterns: { defaultRule: { mutatingMinRigor: 'standard' } },
     },
   }, null, 2));
+  prepareActivatedGitFixture(repoRoot);
   return { repoRoot, worktree, script };
 }
 
@@ -319,7 +322,7 @@ function refusingHook(repoRoot, message) {
   const hooks = path.join(repoRoot, 'refusing-hooks');
   fs.mkdirSync(hooks, { recursive: true });
   fs.writeFileSync(path.join(hooks, 'pre-commit'), `#!/bin/sh\necho "${message}" >&2\nexit 1\n`, { mode: 0o755 });
-  gitIn(repoRoot, 'config', 'core.hooksPath', hooks);
+  createGitRepositoryConfig({stateRoot:resolveStateRoot({fgosDir:path.join(repoRoot,'.fgos')}).stateRoot,repoPath:repoRoot,trustedMain:repoRoot}).ensureHooks({ownedPath:hooks,operationId:'owned-refusing-hook'});
   return () => gitIn(repoRoot, 'config', '--unset', 'core.hooksPath');
 }
 
@@ -397,7 +400,7 @@ test('a sync ref that names no commit, or a sync from the main checkout, is refu
   );
   await assert.rejects(
     () => runUnit({ unitData: { id: 'u', capability: 'docs:write', writes: ['docs'], syncBase: 'main' }, repoRoot, cwd: repoRoot }),
-    (e) => e instanceof RunnerConfigError && /linked worktree/.test(e.message),
+    (e) => e instanceof RunnerConfigError && /resolves to the main checkout.*must run in a linked git worktree/.test(e.message),
   );
   assert.deepEqual(runs(), []);
 });

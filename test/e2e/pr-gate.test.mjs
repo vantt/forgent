@@ -11,6 +11,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { confinedRunnerConfig } from '../runner/loop-worker-fixture.helper.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+import { initFixtureRepo } from '../helpers/git-fixture.mjs';
 
 // Workers run confined (bwrap) as Unit runs; the runner child inherits this
 // file-local backend registry through its environment.
@@ -50,15 +51,7 @@ function mkTempDir(prefix) {
 }
 
 function initTempRepo() {
-  const repoRoot = mkTempDir('fgos-pr-gate-e2e-repo-');
-  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
-  fs.writeFileSync(path.join(repoRoot, '.gitignore'), '.fgos/cache/\n');
-  fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
-  execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd: repoRoot });
-  execFileSync('git', ['commit', '-q', '-m', 'root commit'], { cwd: repoRoot });
-  return repoRoot;
+  return initFixtureRepo(mkTempDir('fgos-pr-gate-e2e-repo-'), { branch: 'main', message: 'root commit' });
 }
 
 function fgos(cwd, args) {

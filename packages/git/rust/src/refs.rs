@@ -23,6 +23,7 @@ pub(crate) fn failure(cause: impl std::fmt::Display) -> OperationError {
         exit_code: None,
         signal: None,
         stderr: vec![],
+        detail: None,
     }
 }
 pub(crate) fn classified(code: ResultCode, cause: impl std::fmt::Display) -> OperationError {
@@ -300,24 +301,28 @@ pub(crate) fn install_pin(
     } else {
         64
     });
-    let pinned = driver.publication_call(
-        repo,
-        admin,
-        &[
-            "-c",
-            "core.fsync=all",
-            "update-ref",
-            "--no-deref",
-            pin.as_str(),
-            candidate.as_str(),
-            &zero,
-        ],
-        &[],
-        false,
-        Duration::from_secs(30),
-    )?;
-    if !pinned.success || direct(driver, repo, &pin)? != ExpectedTip::Oid(candidate.clone()) {
-        return Err(recovery("pin-recovery-required"));
+    // A durable intent can outlive pin installation but precede Prepared.
+    // Reuse only the exact candidate; a different/symbolic pin still refuses.
+    if direct(driver, repo, &pin)? != ExpectedTip::Oid(candidate.clone()) {
+        let pinned = driver.publication_call(
+            repo,
+            admin,
+            &[
+                "-c",
+                "core.fsync=all",
+                "update-ref",
+                "--no-deref",
+                pin.as_str(),
+                candidate.as_str(),
+                &zero,
+            ],
+            &[],
+            false,
+            Duration::from_secs(30),
+        )?;
+        if !pinned.success || direct(driver, repo, &pin)? != ExpectedTip::Oid(candidate.clone()) {
+            return Err(recovery("pin-recovery-required"));
+        }
     }
     sync_refs(repo, &pin)?;
     let objects = repo.common_dir().join("objects");
@@ -650,7 +655,7 @@ impl GitDriver {
                 }
             }
             if !self
-                .status(target, Untracked::All, None, 1)?
+                .status(target, Untracked::All, Submodules::Configured, Ignored::Excluded, None, 1)?
                 .entries
                 .is_empty()
             {
@@ -814,7 +819,7 @@ impl GitDriver {
             scope.validate().map_err(failure)?;
             if let Some(target) = tree {
                 if !self
-                    .status(target, Untracked::All, None, 1)?
+                    .status(target, Untracked::All, Submodules::Configured, Ignored::Excluded, None, 1)?
                     .entries
                     .is_empty()
                 {
@@ -893,7 +898,7 @@ impl GitDriver {
                     return Err(result.error("checkout-recovery-required"));
                 }
                 if !self
-                    .status(target, Untracked::All, None, 1)?
+                    .status(target, Untracked::All, Submodules::Configured, Ignored::Excluded, None, 1)?
                     .entries
                     .is_empty()
                 {
@@ -957,12 +962,44 @@ impl GitDriver {
     }
 }
 
+/// Worktree effects only (§5 Worktree rows): a caller that already holds this
+/// repository's verified worktree-admin, with nothing above 40, lends it.
+pub(crate) fn adopt_worktree_admin<'a>(
+    repo: &RepoHandle,
+    held: Vec<BorrowedHandle<'a>>,
+) -> Result<LockScope<'a>> {
+    require_lock_scope_platform()?;
+    let scope = LockScope::seeded(held).map_err(failure)?;
+    if let Some(admin) = scope.handle("worktree-admin") {
+        let expected = repo
+            .trusted_main_root()
+            .join(".fgos/locks/worktree-admin.lock");
+        if admin.path() != expected
+            || scope
+                .holding()
+                .map_err(failure)?
+                .iter()
+                .any(|h| h.rank > 40)
+        {
+            return Err(failure("worktree-admin-authority-mismatch"));
+        }
+        scope.validate().map_err(failure)?;
+        return Ok(scope);
+    }
+    acquire_admin(repo, scope)
+}
+
+/// Refs, Land, Remote and their recovery take worktree-admin themselves; a
+/// held 40 (or anything above it) is a `lock-order-violation` (§5 Refs row).
 pub(crate) fn acquire_worktree_admin<'a>(
     repo: &RepoHandle,
     held: Vec<BorrowedHandle<'a>>,
 ) -> Result<LockScope<'a>> {
     require_lock_scope_platform()?;
-    let mut scope = LockScope::seeded(held).map_err(failure)?;
+    acquire_admin(repo, LockScope::seeded(held).map_err(failure)?)
+}
+
+fn acquire_admin<'a>(repo: &RepoHandle, mut scope: LockScope<'a>) -> Result<LockScope<'a>> {
     scope
         .assert_can_acquire("worktree-admin")
         .map_err(failure)?;
@@ -1050,7 +1087,7 @@ impl GitDriver {
                 };
                 let custody = scope.handle("dispatch-cwd").ok_or_else(|| failure("checkout-custody-required"))?;
                 if custody.path() != custody_lock_path(repo,Path::new(path))? { return Err(failure("checkout-custody-mismatch")); }
-                if !self.status(&target,Untracked::All,None,1)?.entries.is_empty() {
+                if !self.status(&target,Untracked::All,Submodules::Configured, Ignored::Excluded, None,1)?.entries.is_empty() {
                     return Err(recovery("ref-checkout-recovery-required"));
                 }
             }

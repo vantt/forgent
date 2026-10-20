@@ -8,6 +8,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS } from '../../src/setup/checks.mjs';
 import { REPO_ROOT, buildRustDistribution, hashFile, listLegacyNodeSourceFiles, nativeAddonLibraryName } from '../../scripts/build-rust-distribution.mjs';
+import { inspectRepo } from '../../scripts/lib/git-ports.mjs';
 
 const CLI = fileURLToPath(new URL('../../bin/fgos.mjs', import.meta.url));
 const ID = 'active-release-matches-checkout';
@@ -38,7 +39,7 @@ function fixture(t) {
     artifactDigest: `sha256:${'a'.repeat(64)}`,
     entries: { fgos: 'bin/fgos', fgosRunner: 'bin/fgos-runner' },
     components: { legacyNode: { root, entry: 'bin/fgos.mjs' } },
-    files: listLegacyNodeSourceFiles(source).map((relative) => {
+    files: listLegacyNodeSourceFiles(source, () => inspectRepo(source)).map((relative) => {
       const staged = put(release, `${root}/${relative}`, fs.readFileSync(path.join(source, relative)));
       return { path: `${root}/${relative}`, kind: 'file', digest: hashFile(staged) };
     }),
@@ -61,7 +62,7 @@ function fixture(t) {
     }
     fs.rmSync(temp, { recursive: true, force: true });
   });
-  return { temp, source, release, outside, manifest, writeManifest, activate };
+  return { temp, source, release, outside, manifest, writeManifest, activate, suiteEnv: env };
 }
 
 function run(source) {
@@ -176,6 +177,9 @@ test('linked worktree skips activation owned only by main, including inherited s
   execFileSync('git', ['-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', 'fixture'], { cwd: f.source });
   const linked = path.join(f.temp, 'linked');
   execFileSync('git', ['worktree', 'add', '-q', '-b', 'linked', linked], { cwd: f.source });
+  // Resolving the main checkout goes through the Git addon, which this process finds through the
+  // suite's manifest variable; the check itself reads only the release variable below.
+  process.env.FGOS_ACTIVE_MANIFEST_PATH = f.suiteEnv.FGOS_ACTIVE_MANIFEST_PATH;
   put(linked, 'src/one.mjs', 'different worktree');
   for (const explicit of [false, true]) {
     if (explicit) process.env.FGOS_ACTIVE_RELEASE_PATH = f.release;
@@ -349,7 +353,7 @@ test('git-ignored setup hooks and skills under a declared payload directory are 
   put(f.source, '.agents/keep.md', 'kept');
   execFileSync('git', ['init', '-q'], { cwd: f.source });
   put(f.source, '.gitignore', '.agents/hooks.json\n.agents/skills/instruction-audit/\n');
-  f.manifest.files = listLegacyNodeSourceFiles(f.source).map((relative) => {
+  f.manifest.files = listLegacyNodeSourceFiles(f.source, () => inspectRepo(f.source)).map((relative) => {
     const staged = put(f.release, `libexec/legacy-node/${relative}`, fs.readFileSync(path.join(f.source, relative)));
     return { path: `libexec/legacy-node/${relative}`, kind: 'file', digest: hashFile(staged) };
   });

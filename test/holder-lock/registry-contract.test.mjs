@@ -273,7 +273,7 @@ test('lock-fd adds the path probe and the read-only predecessor state', () => {
 
 test('lock-hold names its argv and every work-directory file', () => {
   assert.equal(lockHoldContract.command, 'fgos internal lock-hold');
-  assert.deepEqual(lockHoldContract.argv.required, ['--protocol 1', '--path <lockFile>', '--mode ex|sh', '--work <dir>']);
+  assert.deepEqual(lockHoldContract.argv.required, ['--protocol 2', '--path <lockFile>', '--mode ex|sh', '--work <dir>']);
   assert.deepEqual(lockHoldContract.argv.wait.exactlyOne.map((entry) => entry.flag.split(' ')[0]), ['--try', '--wait-ms']);
   assert.deepEqual(Object.keys(lockHoldContract.workDir.files).sort(), ['err-<n>.log', 'out-<n>.log', 'ready.json', 'req-<n>.json', 'result-<n>.json', 'started-<n>.json']);
   assert.deepEqual(Object.keys(lockHoldContract.exitCodes), ['0', '2', '3', '10', '11', '12', '70']);
@@ -310,7 +310,7 @@ test('Git repo-config is a rank 80 leaf and Node leaves the held controller path
     const old = join(dir, '.fgos/locks/activation.lock');
     fs.mkdirSync(dirname(old), { recursive: true });
     fs.writeFileSync(old, 'held inode');
-    const options = { fgosDir: join(dir, '.fgos'), workspaceRoot: dir, stateRoot: join(dir, 'state'), owners: ['4.4'] };
+    const options = { fgosDir: join(dir, '.fgos'), workspaceRoot: dir, worktrees: [], branches: [], stateRoot: join(dir, 'state'), owners: ['4.4'] };
     assert.equal(placeFences(options).ok, true);
     assert.equal(fs.readFileSync(old, 'utf8'), 'held inode');
     const status = fenceStatus(options);

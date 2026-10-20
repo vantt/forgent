@@ -8,8 +8,24 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-import { changedPaths, commitOnBranch, commitUnitWork, gitContext } from '../../../src/runner/execution/commit-unit-work.mjs';
+import { changedPaths, commitOnBranch, commitUnitWork as nativeCommitUnitWork, preflightUnitWorktree, gitContext } from '../../../src/runner/execution/commit-unit-work.mjs';
 
+import { acquireSync, createLockScope, resolveStateRoot } from '../../../src/holder-lock/index.mjs';
+import { createGitRepositoryConfig } from '../../../src/git/index.mjs';
+const baselines = new Map(), custody = new Map();
+function commitUnitWork(args) {
+  return nativeCommitUnitWork({ baseline: baselines.get(args.worktree), custody: custody.get(args.worktree), ...args });
+}
+function fixtureAuthority(main, tree = main) {
+  const fence = path.join(main, '.fgos/locks/activation.lock');
+  fs.mkdirSync(fence, { recursive: true });
+  fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({lock:'activation',by:'fgos git',at:'fixture'}));
+  if (main !== tree) {
+    const lease = acquireSync(createLockScope(), 'dispatch-cwd', { fgosDir: path.join(main, '.fgos'), cwd: tree });
+    assert.equal(lease.result, 'acquired'); custody.set(tree, lease.handle);
+  }
+  baselines.set(tree, preflightUnitWorktree({ worktree: tree, repoRoot: main, custody: custody.get(tree), scope: ['**'] }).baseline);
+}
 function git(cwd, ...args) {
   return execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
 }
@@ -24,6 +40,7 @@ function makeRepo(files = { 'README.md': 'hi\n' }) {
   for (const [rel, content] of Object.entries(files)) write(dir, rel, content);
   git(dir, 'add', '-A');
   git(dir, 'commit', '-qm', 'init');
+  fixtureAuthority(dir);
   return dir;
 }
 
@@ -125,6 +142,18 @@ test('h. .fgos is never committed, even under a bare ** scope', () => withRepo(u
   assert.deepEqual(committed(dir), ['a.txt']);
 }));
 
+test('tracked modified .fgos files stay out of a broad scoped commit', () => withRepo({ '.fgos/config.json': 'base\n' }, (dir) => {
+  write(dir, '.fgos/config.json', 'modified\n');
+  write(dir, 'a.txt');
+  const r = commitUnitWork({ worktree: dir, repoRoot: dir, unitId: 'u1', summary: 's', scope: ['**'], changedFiles: ['.fgos/config.json', 'a.txt'] });
+  assert.equal(r.status, 'committed', r.error);
+  assert.deepEqual(r.files, ['a.txt']);
+  assert.deepEqual(r.outOfScope, []);
+  assert.deepEqual(committed(dir), ['a.txt']);
+  assert.equal(git(dir, 'show', 'HEAD:.fgos/config.json'), 'base\n');
+  assert.equal(fs.readFileSync(path.join(dir, '.fgos/config.json'), 'utf8'), 'modified\n');
+}));
+
 test('i. a pre-commit hook that adds a file is caught after the commit', () => withRepo(undefined, (dir) => {
   fs.mkdirSync(path.join(dir, '.hooks'));
   fs.writeFileSync(path.join(dir, '.hooks/pre-commit'), '#!/bin/sh\necho sneaky > sneaky.txt\ngit add sneaky.txt\n', { mode: 0o755 });
@@ -222,6 +251,7 @@ test('l. scope ** keeps the old behaviour: every change outside .fgos is committ
 
 test('m. excludePaths are never committed and are echoed as preExistingInScope', () => withRepo({ 'docs/wip.md': 'old\n' }, (dir) => {
   write(dir, 'docs/wip.md', 'half-written by a person\n');
+  baselines.set(dir, preflightUnitWorktree({ worktree: dir, repoRoot: dir, scope: ['docs'] }).baseline);
   write(dir, 'docs/new.md');
   const r = commitUnitWork({ worktree: dir, repoRoot: dir, unitId: 'u1', summary: 's', scope: ['docs'], changedFiles: [], excludePaths: ['docs/wip.md'] });
   assert.deepEqual(r.files, ['docs/new.md']);
@@ -260,6 +290,7 @@ test('a submodule with only dirty content is not a change to commit, and does no
   try {
     git(dir, '-c', 'protocol.file.allow=always', 'submodule', 'add', '-q', sub, 'sm');
     git(dir, 'commit', '-qm', 'add submodule');
+    baselines.set(dir, preflightUnitWorktree({worktree:dir,repoRoot:dir,scope:['**']}).baseline);
     fs.writeFileSync(path.join(dir, 'sm', 'inner.txt'), 'dirty\n');
     write(dir, 'top.txt');
     const r = commitUnitWork({ worktree: dir, repoRoot: dir, unitId: 'u1', summary: 's', scope: ['**'] });
@@ -283,6 +314,8 @@ test('an untracked nested repository is staged under its own name, as add -A alw
 }));
 
 test('an intent-to-add rename in the worktree column yields both halves, not a garbled path', () => withRepo({ 'old.txt': 'o\n'.repeat(20) }, (dir) => {
+  // This path-parser fixture excludes native lock artifacts; the store-selection fixtures above do not.
+  fs.appendFileSync(path.join(dir, '.git/info/exclude'), '\n.fgos/\n');
   fs.renameSync(path.join(dir, 'old.txt'), path.join(dir, 'new.txt'));
   git(dir, 'add', '-N', 'new.txt');
   assert.deepEqual(changedPaths(gitContext({ worktree: dir, repoRoot: dir })).sort(), ['new.txt', 'old.txt']);
@@ -294,7 +327,9 @@ function withLinkedWorktree(fn) {
   const wt = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-commit-unit-wt-'));
   fs.rmSync(wt, { recursive: true });
   git(main, 'worktree', 'add', '-q', '-b', 'unit', wt);
+  fixtureAuthority(main, wt);
   try { return fn({ main, wt }); } finally {
+    custody.get(wt)?.release();
     fs.rmSync(wt, { recursive: true, force: true });
     fs.rmSync(main, { recursive: true, force: true });
   }
@@ -398,8 +433,11 @@ test('a pre-commit hook refusing a sync merge commit is reported hook-refused wi
     const target=head(repoRoot);
     const hooks=path.join(repoRoot,'hooks');fs.mkdirSync(hooks);
     fs.writeFileSync(path.join(hooks,'pre-commit'),'#!/bin/sh\necho original-refusal >&2\nexit 1\n',{mode:0o755});
-    git(repoRoot,'config','core.hooksPath',hooks);
-    const result=startSyncMerge({worktree:linked,repoRoot,ref:'main',sha:target});
+    git(repoRoot,'config','--unset','core.hooksPath');
+    createGitRepositoryConfig({stateRoot:resolveStateRoot({fgosDir:path.join(repoRoot,'.fgos')}).stateRoot,repoPath:repoRoot,trustedMain:repoRoot}).ensureHooks({ownedPath:hooks,operationId:'owned-test-hook'});
+    fixtureAuthority(repoRoot, linked);
+    const result=startSyncMerge({worktree:linked,repoRoot,ref:'main',sha:target,custody:custody.get(linked)});
+    custody.get(linked).release();
     assert.equal(result.reason,'hook-refused');assert.match(result.error,/original-refusal/);
   });
 });

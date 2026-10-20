@@ -16,7 +16,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 import { hostBin, routeEnv } from '../holder-lock/driver.mjs';
-import { PROTOCOL } from '../holder-lock/protocol.mjs';
+import { RUN_SUPERVISOR_PROTOCOL as PROTOCOL } from '../run-supervisor/protocol.mjs';
 import { readSharedConfig } from '../config/shared-config-file.mjs';
 import { loadGlobalConfig } from '../config/global-config.mjs';
 import { resolveRuntimeSocketDir, ensureRuntimeSocketDir, RuntimeDirError, SOCKET_PATH_MAX_BYTES } from '../run-supervisor/runtime-dir.mjs';

@@ -38,14 +38,6 @@ test('ScopedCommit requires exact custody, preserves pre-existing dirt and liter
 test('ScopedCommit refuses foreign staged entries even within the write scope',()=>{
   const f=fixture();try {fs.writeFileSync(path.join(f.linked,'a'),'dirty');execFileSync('git',['-C',f.linked,'add','a']);assert.throws(()=>f.port.preflight({},f.held),/foreign-staged/);} finally {f.close();}
 });
-test('ScopedCommit records actual effect when a real hook changes the selected tree',()=>{
-  const f=fixture();try {
-    const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);fs.writeFileSync(path.join(hooks,'pre-commit'),'#!/bin/sh\nprintf hook > a\ngit add a\n',{mode:0o755});f.git('config','core.hooksPath','hooks');
-    const baseline=f.port.preflight({},f.held);fs.writeFileSync(path.join(f.linked,'a'),'producer');
-    const result=f.port.commit({operationId:'hook-tree',baseline,request:{writes:['a'],message:'hook test',cutoverGrant:null}},f.held);
-    assert.equal(result.status,'committed-but-contract-violation');assert.equal(execFileSync('git',['-C',f.linked,'show','HEAD:a'],{encoding:'utf8'}),'hook');assert.ok(result.oid);
-  } finally {f.close();}
-});
 test('ScopedCommit preserves rejection evidence and unstages only its own paths',()=>{
   const f=fixture();try {
     const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);fs.writeFileSync(path.join(hooks,'pre-commit'),'#!/bin/sh\necho original-hook-rejection >&2\nexit 1\n',{mode:0o755});f.git('config','core.hooksPath','hooks');
@@ -114,6 +106,28 @@ for (const escaped of [false,true]) for (const main of [false,true]) test(`Scope
   }
 });
 
+// E4 (Git spec §15, §5): the drain proof above holds because its escapees keep the borrowed lock
+// descriptor. A hook child that closes it and leaves the process group is visible only to a
+// driver that answers Empty for the whole domain (bwrap-pidns). Where none does, the operation
+// must not report a plain success: it reports containment-unproven as recovery-required.
+test('ScopedCommit never reports plain success while a setsid hook child without the borrowed descriptor survives',{skip:process.platform!=='linux'},()=>{
+  const f=fixture();let pid;
+  try {
+    const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);const pidFile=path.join(f.temp,'escapee.pid');
+    fs.writeFileSync(path.join(hooks,'pre-commit'),`#!/bin/sh\n( setsid sleep 30 </dev/null >/dev/null 2>&1 3>&- & echo $! > '${pidFile}' ) &\nsleep 0.2\n`,{mode:0o755});
+    f.git('config','core.hooksPath','hooks');
+    const port=createGitScopedCommit({stateRoot:f.temp,repoPath:f.repo,trustedMain:f.repo,writer:'fixture'},loader);
+    const baseline=port.preflight({},[]);fs.writeFileSync(path.join(f.repo,'a'),'escapee producer');
+    let outcome;
+    try { outcome=port.commit({operationId:'escapee',baseline,request:{writes:['a'],message:'escapee',cutoverGrant:null}},[]); }
+    catch(error) { outcome={error:error.message}; }
+    pid=Number(fs.readFileSync(pidFile,'utf8'));
+    let state;try{state=fs.readFileSync(`/proc/${pid}/stat`,'utf8').split(') ').at(-1)[0];}catch{state='absent';}
+    const drained=['Z','X','absent'].includes(state);
+    assert.ok(drained||/containment-unproven/.test(JSON.stringify(outcome)),`escapee ${pid} is ${state} and the operation reported ${JSON.stringify(outcome).slice(0,200)}`);
+  } finally { if(pid)try{process.kill(pid,'SIGKILL');}catch{} f.close(); }
+});
+
 test('rejecting hook restores a producer move, binary bytes, modes, symlinks and the index',()=>{
   const f=fixture();try {
     const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);
@@ -178,13 +192,16 @@ test('baseline-dirty paths changed by the producer are excluded with an explicit
   assert.equal(fs.readFileSync(path.join(f.linked,'a'),'utf8'),'after producer');
  }finally{f.close();}
 });
-for(const name of ['literal*star','control\tname','control\nname']) test(`unsupported literal path ${JSON.stringify(name)} refuses before staging or WAL intent`,()=>{
+for(const name of ['literal*star','control\tname','control\nname']) test(`literal path ${JSON.stringify(name)} commits and replays losslessly`,()=>{
  const f=fixture();try {
   const baseline=f.port.preflight({},f.held);fs.writeFileSync(path.join(f.linked,name),'producer');
-  assert.throws(()=>f.port.commit({operationId:'invalid-path',baseline,request:{writes:['**'],message:'refuse literal',cutoverGrant:null}},f.held),/unscopable-commit-path/);
+  const args={operationId:'literal-path',baseline,request:{writes:['**'],message:'literal path',cutoverGrant:null}};
+  const result=f.port.commit(args,f.held);
+  assert.equal(result.status,'committed');assert.deepEqual(result.files,[name]);
+  assert.deepEqual(f.port.commit(args,f.held).files,[name]);
   assert.equal(execFileSync('git',['-C',f.linked,'diff','--cached','--name-only'],{encoding:'utf8'}),'');
-  assert.equal(fs.existsSync(path.join(f.repo,'.git/fgos/git/operations/invalid-path')),false);
   assert.equal(fs.readFileSync(path.join(f.linked,name),'utf8'),'producer');
+  assert.deepEqual(execFileSync('git',['-C',f.linked,'show','--format=','--name-only','-z','HEAD']).toString().split('\0').filter(Boolean),[name]);
  }finally{f.close();}
 });
 

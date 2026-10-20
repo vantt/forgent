@@ -820,3 +820,24 @@ while True: time.sleep(.01)
         fs::remove_dir_all(dir).unwrap();
     }
 }
+
+#[cfg(target_os = "linux")]
+#[test]
+fn watched_borrow_reports_a_setsid_child_that_dropped_the_borrowed_descriptor() {
+    let _serial = serial();
+    let dir = temp_dir("io-watched-escape");
+    let res = resource(&dir, "io");
+    let handle = held(&res);
+    let script = "( setsid sleep 30 </dev/null >/dev/null 2>&1 3>&- & echo $! > pids ); sleep 0.1";
+    let unwatched = run_borrowed_io(&handle, &shell(script, &dir), &bounds(Vec::new())).unwrap();
+    assert!(unwatched.escaped.is_empty(), "an unwatched run reports nothing");
+    let survivor_pids = || fs::read_to_string(dir.join("pids")).unwrap().trim().parse::<i32>().unwrap();
+    let kill = |pid: i32| unsafe { libc::kill(pid, libc::SIGKILL) };
+    kill(survivor_pids());
+    let watched = run_borrowed_io_watched(&handle, &shell(script, &dir), &bounds(Vec::new())).unwrap();
+    let pid = survivor_pids();
+    kill(pid);
+    assert_eq!(watched.escaped, vec![pid as u32]);
+    let clean = run_borrowed_io_watched(&handle, &shell("true", &dir), &bounds(Vec::new())).unwrap();
+    assert!(clean.escaped.is_empty(), "a run that leaves nothing behind reports nothing");
+}

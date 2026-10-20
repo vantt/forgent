@@ -12,22 +12,9 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { mainCheckoutRoot } from './lib/git-ports.mjs';
 import { readEvents } from '../src/state/events.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
-
-// Cùng pattern `git rev-parse --git-common-dir` mà verify-fanout-overlap.mjs
-// đã dùng (CONTEXT.md D10) — verify command chạy được y nguyên dù cwd là
-// main checkout hay worktree của chính item này (ADR0020: worktree không có
-// `.fgos/` riêng).
-function resolveMainCheckoutRoot() {
-  const gitCommonDir = execFileSync(
-    'git',
-    ['rev-parse', '--path-format=absolute', '--git-common-dir'],
-    { encoding: 'utf8' },
-  ).trim();
-  return path.dirname(gitCommonDir);
-}
 
 function mean(nums) {
   if (nums.length === 0) return null;
@@ -352,10 +339,11 @@ function main() {
   // branch `fgw/<id>` (worktree hiện tại, hoặc ephemeral checkout mà
   // `fgos return` dựng lên khi verify chạy lại) — để file báo cáo nằm
   // trong diff/commit của item, không lặng lẽ rớt vào main checkout dùng
-  // chung của mọi session khác.
-  const mainCheckoutRoot = resolveMainCheckoutRoot();
+  // chung của mọi session khác. Main checkout lấy qua Inspect
+  // `trustedMainRoot` (CONTEXT.md D10), từ bất kỳ checkout nào.
+  const checkoutRoot = mainCheckoutRoot();
   const outputRoot = process.argv[2] ?? process.cwd();
-  const logPath = path.join(mainCheckoutRoot, '.fgos', 'events.jsonl');
+  const logPath = path.join(checkoutRoot, '.fgos', 'events.jsonl');
   const rawEvents = readEvents(logPath);
   const wcLCount = fs.readFileSync(logPath, 'utf8').split('\n').filter((l) => l !== '').length;
 

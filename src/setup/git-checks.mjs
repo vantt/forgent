@@ -4,8 +4,13 @@ import { readSharedConfig } from '../config/shared-config-file.mjs';
 import { mergeWithGlobalConfig } from '../config/global-config.mjs';
 import { randomUUID } from 'node:crypto';
 import { loadNativeAddon } from '../git/native.mjs';
+import { createGitRecovery } from '../git/recovery.mjs';
+import { gitPortOptions } from '../git/inspect.mjs';
 import { resolveStateRoot } from '../holder-lock/state-root.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
+import fs from 'node:fs';
+import { OWN_PAYLOAD_ROOT } from '../run-supervisor/payload-root.mjs';
+import { verifyCensus } from '../../scripts/git-one-door-scan.mjs';
 
 const transportRemedy = 'For actions/checkout use persist-credentials: false, remove its repo-local http.<url>.extraheader, and configure a trusted global credential helper or GIT_CONFIG_GLOBAL-level setting. Doctor never moves credentials automatically.';
 
@@ -52,7 +57,18 @@ export function checkGit(cwd, kind, loaderOptions) {
     }
   } catch (err) {
     if (kind === 'git-transport-config' && /repository-config-untrusted: credential\.helper/.test(err.message)) return { passed: false, message: `${err.message}; ${transportRemedy}` };
-    return { passed: err.code === 'git-addon-not-shipped', message: err.code === 'git-addon-not-shipped' ? 'info: addon not shipped on this channel until M10' : err.message }; }
+    return { passed: err.code === 'git-addon-not-shipped', message: err.code === 'git-addon-not-shipped' ? 'info: addon not shipped on this channel: onboard this project with `fgctl init`' : err.message }; }
+}
+/** The release's mutation census (built from its own payload) lists no Git spawn outside the driver. */
+export function checkMutationOneDoor(payloadRoot = OWN_PAYLOAD_ROOT) {
+  let doc = null;
+  try { doc = JSON.parse(fs.readFileSync(path.join(payloadRoot, 'packages/git/contracts/mutation-census.v1.json'), 'utf8')); } catch { /* reported below */ }
+  return verifyCensus(doc, payloadRoot);
+}
+/** The Git binary fgos-git runs and its floor verdict; Git is only ever spawned by the driver. */
+export function gitFloor(cwd, loaderOptions) {
+  const { root, stateRoot, native } = context(cwd, loaderOptions);
+  return native.inspectGit(stateRoot, cwd, root).floor;
 }
 function initializeWal(cwd) {
   const { root, remote, stateRoot, native } = context(cwd);
@@ -91,6 +107,37 @@ export function fixGitFetchMapping(cwd, loaderOptions) {
   const prepared = fixGitDriverDirectories(cwd, loaderOptions);
   const result = attemptFix(cwd, () => installFetchMapping(cwd, loaderOptions));
   return { ...result, changed: prepared.changed || result.changed };
+}
+/**
+ * Recover every interrupted Land through the one Recovery door, under Land's
+ * own destination, admin, main and recovery locks (Git spec §9, §10 rule 4b).
+ * A chain without a TargetAttempt closes `abandonedBeforeAttempt` whoever
+ * runs it; an attempted chain is recovered only by the writer that started
+ * it, so any other writer gets that writer named instead. Nothing is merged,
+ * re-published or deleted here: candidates stay until Work acknowledges them.
+ */
+export function fixLandRecovery(cwd, loaderOptions, portOptions) {
+  return attemptFix(cwd, () => {
+    const recovery = createGitRecovery(portOptions ?? gitPortOptions(resolveMainCheckoutRoot(cwd) ?? cwd, { mutation: true }), loaderOptions);
+    const recovered = [];
+    const kept = [];
+    for (const operation of recovery.listPending().operations.filter(o => o.kind === 'Land')) {
+      try {
+        recovery.reconcile({ operationId: operation.operationId });
+        recovered.push(operation.operationId);
+      } catch (err) {
+        let cause;
+        try { cause = JSON.parse(err.message).cause; } catch { cause = err.message; }
+        const writer = cause === 'land-authority-mismatch' ? `; only its writer ${operation.intent.writerIdentity} can recover it` : '';
+        kept.push(`${operation.operationId} (${cause}${writer})`);
+      }
+    }
+    if (!recovered.length && !kept.length) return { changed: false, message: 'no interrupted Land operation' };
+    return { changed: recovered.length > 0, message: [
+      recovered.length ? `recovered interrupted Land operations: ${recovered.join(', ')}` : '',
+      kept.length ? `warning: Land operations kept for recovery: ${kept.join('; ')}` : '',
+    ].filter(Boolean).join('; ') };
+  });
 }
 
 export function compatibleGitContracts(versions, floor) {

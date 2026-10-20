@@ -104,3 +104,34 @@ test('a lock directory on a network filesystem is refused by name (guarantee non
     fs.rmSync(lockRoot, { recursive: true, force: true });
   }
 });
+
+test('a host that speaks another route protocol is refused by name, and a protocol-1 answer is never trusted', { skip: process.platform === 'win32' }, () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'holder-lock-protocol-'));
+  try {
+    const script = path.join(dir, 'protocol.mjs');
+    fs.writeFileSync(script, `
+import * as lock from ${JSON.stringify(FACADE_URL)};
+const scope = lock.createLockScope('protocol');
+try { lock.acquireSync(scope, 'main-checkout', { fgosDir: process.env.FGOS_DIR }); process.stdout.write(JSON.stringify({ outcome: 'returned' })); }
+catch (err) { process.stdout.write(JSON.stringify({ code: err.code, reason: err.reason, message: err.message })); }
+`);
+    const run = (hostBody) => {
+      const host = path.join(dir, 'fake-host');
+      fs.writeFileSync(host, `#!/bin/sh\n${hostBody}\n`, { mode: 0o755 });
+      const { FGOS_STATE_ROOT: _noPin, ...env } = process.env;
+      const res = spawnSync(process.execPath, [script], { cwd: dir, env: { ...env, FGOS_HOST_BIN: host, FGOS_DIR: path.join(dir, '.fgos') }, encoding: 'utf8', timeout: 20_000 });
+      assert.equal(res.status, 0, res.stderr);
+      return JSON.parse(res.stdout);
+    };
+    // A host of the first release refuses the protocol this facade sends (2).
+    const refused = run(`case "$*" in *"--protocol 2"*) echo "fgos internal: host-version-mismatch: this host speaks internal protocol 1" >&2; exit 3;; esac; exit 70`);
+    assert.equal(refused.code, 'lock-driver-unavailable');
+    assert.equal(refused.reason, 'host-version-mismatch');
+    // An answer stamped with protocol 1 is rejected as bad output, never read as a lock result.
+    const stale = run(`echo '{"v":1,"protocol":1,"result":"acquired"}'`);
+    assert.equal(stale.code, 'lock-route-bad-output');
+    assert.match(stale.message, /protocol 1, expected 2/);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});

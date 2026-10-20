@@ -12,10 +12,10 @@ export {
 } from './store.mjs';
 export {
   createWorkflowWorktree,
-  mergeWorkflowBranch,
   resolveIntegrationTarget,
   cleanupWorkflowWorktree,
-} from './integrate.mjs';
+} from './unit-handoff.mjs';
+export { mergeWorkflowBranch } from './runner.mjs';
 export { translateUnitsToWorkflow } from './units-source.mjs';
 export { preflightWorkflowSeats } from './case-start.mjs';
 export {

@@ -15,10 +15,10 @@ import { settleAttempt } from './steps/settle-attempt.mjs';
 import { finalizeHome } from './steps/finalize-home.mjs';
 import { cleanupTrust } from './steps/cleanup-trust.mjs';
 import { realpathOrNull, releasePayloadRoot } from './payload-root.mjs';
+import { RUN_SUPERVISOR_PROTOCOL as PROTOCOL } from './protocol.mjs';
 
 export { releasePayloadRoot };
 
-const PROTOCOL = 1;
 const PAYLOAD_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
 const STEPS = Object.freeze({

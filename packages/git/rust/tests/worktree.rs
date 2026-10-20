@@ -640,3 +640,41 @@ fn lock_naming_a_dead_or_unparseable_or_reused_owner_stays_a_finding() {
     late.wait().unwrap();
     assert_eq!(got, "locked-registration");
 }
+
+#[test]
+fn missing_checkout_prune_requires_owned_create_and_preserves_unknown_residue() {
+    let f = Fixture::new();
+    let owned = f.root.join("owned");
+    f.create(&owned);
+    let admin = f.repo.common_dir().join("worktrees/owned");
+    fs::remove_dir_all(&owned).unwrap();
+    fs::write(admin.join("unknown"), "keep").unwrap();
+    assert!(f.driver.prune_missing_worktree(&f.repo, vec![], &owned, "fixture", "prune")
+        .unwrap_err().cause.contains("residue-uncertain"));
+    assert!(admin.join("HEAD").exists());
+    fs::remove_file(admin.join("unknown")).unwrap();
+    f.driver.prune_missing_worktree(&f.repo, vec![], &owned, "fixture", "prune").unwrap();
+    assert!(!admin.exists());
+    let unowned = f.root.join("unowned");
+    git(&f.path, &["worktree", "add", "--detach", unowned.to_str().unwrap()]);
+    fs::remove_dir_all(&unowned).unwrap();
+    assert!(f.driver.prune_missing_worktree(&f.repo, vec![], &unowned, "fixture", "unowned-prune")
+        .unwrap_err().cause.contains("ownership-unproven"));
+    assert!(f.repo.common_dir().join("worktrees/unowned/HEAD").exists());
+}
+
+#[test]
+fn missing_owned_detached_history_keeps_its_registration_when_no_delivery_ref_exists() {
+    let f = Fixture::new();
+    let owned = f.root.join("owned");
+    f.create(&owned);
+    fs::write(owned.join("valuable"), "keep unique history").unwrap();
+    git(&owned, &["add", "valuable"]);
+    git(&owned, &["commit", "-qm", "unique detached history"]);
+    let tip = git(&owned, &["rev-parse", "HEAD"]);
+    fs::remove_dir_all(&owned).unwrap();
+    let error = f.driver.prune_missing_worktree(&f.repo, vec![], &owned, "fixture", "unreachable-prune").unwrap_err();
+    assert!(error.cause.contains("tip-unreachable"));
+    assert_eq!(fs::read_to_string(f.repo.common_dir().join("worktrees/owned/HEAD")).unwrap().trim(), tip);
+    assert_eq!(git(&f.path, &["show", &format!("{tip}:valuable")]), "keep unique history");
+}

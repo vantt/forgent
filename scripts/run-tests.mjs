@@ -18,62 +18,19 @@
 // invocation works unchanged on every OS's default shell.
 
 import fs from 'node:fs';
-import { nativeAddonLibraryName, nativeAddonComponent } from './build-rust-distribution.mjs';
-import { createHash } from 'node:crypto';
+import { REPO_ROOT, ensureGitAddon, ensureHostBin } from './lib/git-addon-stage.mjs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawn as spawnAsync, spawnSync, execFileSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { acquireFullSuiteQueue, QUEUE_HELD_ENV } from './lib/full-suite-queue.mjs';
+import { PROTOCOL as LOCK_ROUTE_PROTOCOL } from '../src/holder-lock/protocol.mjs';
 import { resolveActiveHostBin } from '../src/util/host-bin-path.mjs';
+import { configEntries, repositoryDirs } from './lib/git-dir-layout.mjs';
 
-export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+export { REPO_ROOT };
 export const DEFAULT_TEST_ROOT = path.join(REPO_ROOT, 'test');
-/** Fingerprint every input of the two foundations so a direct test never reuses stale bytes. */
-export function gitAddonSourceDigest(cwd = REPO_ROOT) {
-  const hash = createHash('sha256');
-  const files = ['Cargo.toml', 'Cargo.lock'];
-  for (const component of ['git', 'event-store', 'holder-lock', 'process', 'durable-file', 'canonical-json']) {
-    const base = path.join('packages', component);
-    const walk = (relative) => {
-      for (const entry of fs.readdirSync(path.join(cwd, relative), { withFileTypes: true })) {
-        const file = path.join(relative, entry.name);
-        if (entry.isDirectory()) walk(file);
-        else if (/\.(rs|toml|json)$/.test(entry.name)) files.push(file);
-      }
-    };
-    walk(base);
-  }
-  for (const file of files.sort()) hash.update(file).update('\0').update(fs.readFileSync(path.join(cwd, file)));
-  return hash.digest('hex');
-}
-export function ensureGitAddon(env = process.env, cwd = REPO_ROOT, locked = true) {
-  const dir = path.resolve(cwd, env.CARGO_TARGET_DIR || 'target');
-  const cargoEnv = { ...env, CARGO_TARGET_DIR: dir };
-  execFileSync('cargo', ['build', ...(locked ? ['--locked'] : []), '-p', 'fgos-node-addon'], { cwd, env: cargoEnv, stdio: 'inherit' });
-  const library = nativeAddonLibraryName();
-  const addonDir = path.join(cwd, '.fgos/runtime/git-addon');
-  fs.mkdirSync(addonDir, { recursive: true });
-  const addon = path.join(addonDir, 'fgos.node');
-  const temporaryAddon = `${addon}.${process.pid}.tmp`;
-  const bytes = fs.readFileSync(path.join(dir, 'debug', library));
-  if (!fs.existsSync(addon) || !fs.readFileSync(addon).equals(bytes)) {
-    fs.writeFileSync(temporaryAddon, bytes);
-    fs.renameSync(temporaryAddon, addon);
-  }
-  const record = nativeAddonComponent(addon, path.relative(cwd, addon), cwd);
-  const manifestDir = path.join(cwd, '.fgos/runtime/git-addon');
-  fs.mkdirSync(manifestDir, { recursive: true });
-  const manifest = path.join(manifestDir, 'native-addon.json');
-  const manifestBytes = JSON.stringify({ entries: { fgos: env.FGOS_HOST_BIN ? path.relative(cwd, env.FGOS_HOST_BIN) : '' }, components: { legacyNode: { root: '.' }, nativeAddon: record }, sourceDigest: gitAddonSourceDigest(cwd) });
-  if (!fs.existsSync(manifest) || fs.readFileSync(manifest, 'utf8') !== manifestBytes) {
-    fs.writeFileSync(`${manifest}.${process.pid}.tmp`, manifestBytes);
-    fs.renameSync(`${manifest}.${process.pid}.tmp`, manifest);
-  }
-  return { addon, manifest, cargoEnv };
-}
-
 /**
  * Builds the release-profile artifacts the release-tree tests stage from (`fgos`, `fgctl` and the
  * native addon under `releaseOutputDir()`), as CI does before `npm test`. Incremental: a no-op when
@@ -91,39 +48,6 @@ export function ensureReleaseArtifacts(env = process.env, cwd = REPO_ROOT) {
 
 const TEST_FILE_SUFFIX = '.test.mjs';
 
-/**
- * Ensures FGOS_HOST_BIN is available and points to a runnable host binary.
- * If FGOS_HOST_BIN is already set and runnable, returns it without building.
- * Otherwise, builds fgos with cargo (debug incremental) using checkout's CARGO_TARGET_DIR.
- */
-export function ensureHostBin(env = process.env, cwd = REPO_ROOT) {
-  if (env.FGOS_HOST_BIN) {
-    try {
-      if (fs.existsSync(env.FGOS_HOST_BIN)) {
-        execFileSync(env.FGOS_HOST_BIN, ['version'], { stdio: 'ignore' });
-        return env.FGOS_HOST_BIN;
-      }
-    } catch {}
-  }
-
-  try {
-    execFileSync('cargo', ['--version'], { stdio: 'ignore' });
-  } catch {
-    throw new Error('cargo is required to build fgos host binary for testing, but was not found on PATH');
-  }
-
-  const targetDir = env.CARGO_TARGET_DIR || path.join(cwd, 'target');
-  const binName = process.platform === 'win32' ? 'fgos.exe' : 'fgos';
-  const binPath = path.join(targetDir, 'debug', binName);
-
-  execFileSync('cargo', ['build', '-p', 'fgos'], {
-    cwd,
-    env: { ...env, CARGO_TARGET_DIR: targetDir },
-    stdio: 'inherit',
-  });
-
-  return binPath;
-}
 
 /**
  * Recursively lists every file under `root` whose name ends with
@@ -168,10 +92,28 @@ export function discoverTestFiles(root = DEFAULT_TEST_ROOT) {
  */
 export const GIT_CONFIG_GUARD_PATH = path.join(REPO_ROOT, 'scripts', 'lib', 'test-git-config-guard.mjs');
 
+export const GIT_SPAWN_SPY_PATH = path.join(REPO_ROOT, 'test', 'helpers', 'git-spawn-spy.mjs');
+export const GIT_SPAWN_SPY_LOG_ENV = 'FGOS_GIT_SPAWN_SPY_LOG';
+
 export function buildTestArgv(files, forwardedArgs = []) {
   // The guard is preloaded into every test file's process: a `git config` write that would land in
   // this checkout's own repository is refused there, before it can rewrite the owner's identity.
-  return ['--test', `--import=${pathToFileURL(GIT_CONFIG_GUARD_PATH).href}`, ...forwardedArgs, ...files];
+  // The spy records every `git` or hook spawn product code (src, bin, scripts) starts (one-door gate).
+  return ['--test', `--import=${pathToFileURL(GIT_CONFIG_GUARD_PATH).href}`, `--import=${pathToFileURL(GIT_SPAWN_SPY_PATH).href}`, ...forwardedArgs, ...files];
+}
+
+/** The product Git/hook spawns the spy recorded during a run, one entry per distinct site. */
+export function readGitSpawnLog(file) {
+  let text = '';
+  try { text = fs.readFileSync(file, 'utf8'); } catch { return []; }
+  const sites = new Map();
+  for (const line of text.split('\n').filter(Boolean)) {
+    const entry = JSON.parse(line);
+    const key = `${entry.class ?? ''} ${entry.frame} ${entry.target} ${entry.file} ${entry.args?.[0] ?? ''}`;
+    if (!sites.has(key)) sites.set(key, { ...entry, count: 0 });
+    sites.get(key).count += 1;
+  }
+  return [...sites.values()];
 }
 
 /**
@@ -273,18 +215,17 @@ function startFileWatchdog({ files, env, fileTimeoutMs, pollMs, tempDir, log }) 
  * not this checkout's. Empty when `cwd` is not a repository.
  */
 export const GIT_IDENTITY_KEYS = '^(user|author|committer)\\.';
-export function snapshotGitIdentity(cwd, exec = execFileSync) {
-  const read = (args) => {
-    try {
-      return String(exec('git', ['-C', cwd, 'config', ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] })).split('\n').filter(Boolean);
-    } catch {
-      return []; // No such key (git exits 1) or not a repository: nothing held in this scope.
-    }
-  };
-  const scopes = ['--local'];
-  // Without extensions.worktreeConfig, `--worktree` is just `--local` again.
-  if (read(['--local', '--type=bool', '--get', 'extensions.worktreeConfig'])[0] === 'true') scopes.push('--worktree');
-  return scopes.flatMap((scope) => read([scope, '--get-regexp', GIT_IDENTITY_KEYS]).map((line) => `${scope.slice(2)}: ${line}`)).sort();
+export function snapshotGitIdentity(cwd) {
+  const dirs = repositoryDirs(cwd);
+  if (!dirs) return [];
+  const pattern = new RegExp(GIT_IDENTITY_KEYS);
+  const shared = path.join(dirs.commonDir, 'config');
+  const lines = configEntries(shared, pattern).map((line) => `local: ${line}`);
+  // Without extensions.worktreeConfig, a checkout's config.worktree is not read at all.
+  if (configEntries(shared, /^extensions\.worktreeconfig$/).at(-1)?.split(' ')[1] === 'true') {
+    lines.push(...configEntries(path.join(dirs.gitDir, 'config.worktree'), pattern).map((line) => `worktree: ${line}`));
+  }
+  return lines.sort();
 }
 
 /** What changed between two `snapshotGitIdentity` results: `{ added, removed, changed }`. */
@@ -460,10 +401,14 @@ export function runSelectedTests(files, {
   const supervisor = watchdog && runTemp
     ? startFileWatchdog({ files: relFiles, env: childEnv, fileTimeoutMs, pollMs: watchdogPollMs, tempDir: runTemp, log })
     : null;
+  const spawnLog = path.join(runTemp ?? fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-test-spy-')), 'git-spawn-spy.jsonl');
+  childEnv[GIT_SPAWN_SPY_LOG_ENV] = spawnLog;
+  let gitSpawns = [];
   try {
     const started = Date.now();
     const spawnResult = spawn(execPath, buildTestArgv(relFiles, forwardedArgs), { cwd, env: childEnv, stdio });
     result = { status: spawnResult.status ?? 1, files: relFiles, runTemp, wallSeconds: (Date.now() - started) / 1000 };
+    gitSpawns = readGitSpawnLog(spawnLog);
   } finally {
     if (supervisor) timedOut = supervisor.stop();
     for (const root of [runTemp, fixtureRoot]) {
@@ -504,6 +449,19 @@ export function runSelectedTests(files, {
     log('run-tests: ERROR: test suite left temporary directories behind (name prefix: count):');
     for (const [prefix, count] of Object.entries(tempLeftovers).sort()) log(`  ${prefix}*: ${count}`);
     log('  A test file must import test/helpers/process-tmp-root.mjs first; a killed file leaves its own tree.');
+    result.status = result.status !== 0 ? result.status : 1;
+  }
+
+  // A standalone skill's own spawns are a named class (Git spec §12): counted, not a failure.
+  const standaloneSpawns = gitSpawns.filter((s) => s.class === 'standalone-skill-script');
+  gitSpawns = gitSpawns.filter((s) => !s.class);
+  result.gitSpawns = gitSpawns;
+  result.standaloneSkillSpawns = standaloneSpawns;
+  if (standaloneSpawns.length) log(`run-tests: ${standaloneSpawns.length} standalone-skill-script Git spawn site(s), outside the product one door: ${[...new Set(standaloneSpawns.map((s) => s.skill))].join(', ')}`);
+  if (gitSpawns.length) {
+    log('run-tests: ERROR: product code started git or a hook outside the fgos-git driver (Git spec §12, one door):');
+    for (const s of gitSpawns) log(`  ${s.frame}: ${s.target} ${s.file} ${(s.args ?? []).join(' ')} (${s.count}x)`);
+    log('  Route the call through a typed Git port (src/git/*); a sandbox repository goes through scripts/lib/sandbox-git.mjs.');
     result.status = result.status !== 0 ? result.status : 1;
   }
 
@@ -590,14 +548,20 @@ export function runTests({
  * process's env, where the lock driver looks. When one resolves, nothing is
  * built before the queue: a build here, outside the queue, could replace the
  * binary a queued run in another worktree sharing the cargo target is using.
+ * The one exception is a resolved host that does not speak this checkout's
+ * lock protocol (`host-version-mismatch`): a built one replaces it.
  */
 export function queueWithHostBin(options, {
   resolve = () => resolveActiveHostBin().bin,
+  speaksLockProtocol = hostSpeaksLockProtocol,
   ensure = ensureHostBin,
   queue = acquireFullSuiteQueue,
   log = (msg) => console.error(msg),
 } = {}) {
-  if (!resolve()) {
+  const host = resolve();
+  // A host that refuses this checkout's lock protocol (an activation older than a branch that
+  // bumped it) can never serve the queue; a host that does not resolve at all is built the same way.
+  if (!host || !speaksLockProtocol(host)) {
     try {
       const hostBin = ensure(process.env, REPO_ROOT);
       if (hostBin) process.env.FGOS_HOST_BIN = hostBin;
@@ -606,6 +570,12 @@ export function queueWithHostBin(options, {
     }
   }
   return queue(options);
+}
+
+/** Whether `hostBin` answers the lock routes at the protocol this checkout's driver speaks. */
+export function hostSpeaksLockProtocol(hostBin) {
+  const answer = spawnSync(hostBin, ['internal', 'state-root', '--protocol', String(LOCK_ROUTE_PROTOCOL)], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 10_000 });
+  try { return JSON.parse(answer.stdout.trim().split('\n').pop()).protocol === LOCK_ROUTE_PROTOCOL; } catch { return false; }
 }
 
 if (isMainModule(import.meta.url)) {

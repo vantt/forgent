@@ -116,6 +116,9 @@ pub struct SyncIntent {
     pub head: String,
     pub target: String,
     pub message: String,
+    /// Consumer-declared literal bytes applied after the merge (prepare only).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub files: Vec<crate::LandFile>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -368,7 +371,9 @@ pub(crate) fn worktree_resources(kind: &OperationKind) -> WalResult<Vec<String>>
 impl Intent {
     /// Delete keeps the old object reachable until its terminal receipt.
     pub fn candidate(&self) -> &Tip {
-        if self.next == Tip::Absent {
+        if self.next == Tip::Absent
+            || matches!(&self.kind, OperationKind::Restore(p) if p.request.discard_local_delta)
+        {
             &self.expected
         } else {
             &self.next
@@ -385,7 +390,7 @@ impl Intent {
         }
         if let OperationKind::Restore(p) = &self.kind {
             if !Path::new(&p.worktree).is_absolute() || !checkout_resource_valid(&self.resource_set, &p.worktree)
-                || RefName::parse(&p.reference).is_err() || !digest_valid(&p.snapshot)
+                || (p.reference != "HEAD" && RefName::parse(&p.reference).is_err()) || !digest_valid(&p.snapshot)
                 || canonical_digest(&p.request)? != self.request_digest
                 || self.expected != Tip::Oid(p.request.expected_head.clone()) || self.next != Tip::Oid(p.request.target.clone()) {
                 return Err(corrupt("restore binding"));
@@ -423,7 +428,7 @@ impl Intent {
                 return Err(corrupt("scoped commit binding"));
             }
             for path in paths {
-                if crate::fgos_scope_literal(path).is_err() {
+                if crate::literal_repo_path(path).is_err() {
                     return Err(corrupt("scoped commit path"));
                 }
             }
@@ -438,6 +443,7 @@ impl Intent {
                 target,
                 message,
                 reference,
+                files,
             } = payload.as_ref();
             if !Path::new(worktree).is_absolute()
                 || !checkout_resource_valid(&self.resource_set, worktree)
@@ -446,6 +452,7 @@ impl Intent {
                 || reference
                     .as_ref()
                     .is_some_and(|r| RefName::parse(r).is_err())
+                || crate::land::validate_declared_files(files, "sync").is_err()
             {
                 return Err(corrupt("sync binding"));
             }
@@ -833,10 +840,8 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
                 && clean_modes.iter().all(|(p, mode)| {
                     staged.contains(p) && !conflicts.contains(p) && *mode <= 0o177777
                 })
-                && conflicts
-                    .iter()
-                    .chain(staged)
-                    .all(|p| crate::fgos_scope_literal(p).is_ok())
+                && conflicts.iter().all(|p| crate::fgos_scope_literal(p).is_ok())
+                && staged.iter().all(|p| crate::literal_repo_path(p).is_ok())
         }
         (Phase::SyncState { .. }, Phase::SyncCommitAttempt { tree }) => {
             matches!(i.kind, OperationKind::Sync(_)) && Oid::parse(tree, i.object_format).is_ok()
@@ -938,7 +943,9 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
             },
         ) => expected == i.candidate(),
         (Phase::PinReleaseAttempt { .. }, Phase::PinReleased) => true,
-        (Phase::Outcome(_), Phase::RestoreAcknowledged) => matches!(i.kind, OperationKind::Restore(_)),
+        (Phase::Outcome(_) | Phase::PinReleased, Phase::RestoreAcknowledged) => {
+            matches!(i.kind, OperationKind::Restore(_))
+        }
         _ => false,
     };
     if valid {
@@ -1211,6 +1218,52 @@ impl<F: FileSystem> Wal<F> {
         self.fs.checkpoint("restore-snapshot-durable")?;
         let _: serde_json::Value = self.read_restore_snapshot(&digest)?;
         Ok(digest)
+    }
+    pub(crate) fn store_restore_patch(
+        &self,
+        reference: &str,
+        id: &str,
+        bytes: &[u8],
+    ) -> WalResult<PathBuf> {
+        if !valid_id(id) || (reference != "HEAD" && !reference.starts_with("refs/heads/")) {
+            return Err(corrupt("invalid restore patch identity"));
+        }
+        let branch = reference
+            .trim_start_matches("refs/heads/")
+            .replace('/', "-");
+        let dir = self.common.child("fgos-resync-patches", true, &self.fs)?;
+        let name = format!("{branch}-{id}.patch");
+        install_ordered(
+            &dir.path(),
+            &name,
+            bytes,
+            &FaultAdapter(&self.fs),
+            None,
+            &mut || Ok(()),
+            &[],
+        )
+        .map_err(|e| WalError::Io(e.source))?;
+        Ok(dir.path().join(name).canonicalize()?)
+    }
+    pub(crate) fn clear_restore_patch(
+        &self,
+        reference: &str,
+        id: &str,
+        bytes: &[u8],
+    ) -> WalResult<bool> {
+        let branch = reference
+            .trim_start_matches("refs/heads/")
+            .replace('/', "-");
+        let dir = self.common.child("fgos-resync-patches", false, &self.fs)?;
+        let path = dir.path().join(format!("{branch}-{id}.patch"));
+        if !fs::symlink_metadata(&path).is_ok_and(|m| m.is_file() && !m.file_type().is_symlink())
+            || fs::read(&path)? != bytes
+        {
+            return Ok(false);
+        }
+        fs::remove_file(path)?;
+        dir.file.sync_all()?;
+        Ok(true)
     }
     pub(crate) fn release_restore_snapshots(&self, digests: &[String]) -> WalResult<()> {
         let retained = self.retained(100_000)?;

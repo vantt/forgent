@@ -9,6 +9,7 @@
 // RESEARCH.md round 1). These prove the fix: bare invocation from a linked
 // worktree now resolves to the same main checkout an explicit --dir would.
 import '../helpers/process-tmp-root.mjs';
+import { initFixtureRepo } from '../helpers/git-fixture.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -19,12 +20,7 @@ import { FGOS, NO_CLAUDE_ENV, mkTemp } from './helpers/setup-checks-harness.mjs'
 
 function initGitWithWorktree(prefix) {
   const main = mkTemp(`${prefix}-main-`);
-  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: main });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: main });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: main });
-  fs.writeFileSync(path.join(main, 'seed.txt'), 'seed\n');
-  execFileSync('git', ['add', 'seed.txt'], { cwd: main });
-  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: main });
+  initFixtureRepo(main, { branch: 'main' });
   fs.mkdirSync(path.join(main, '.githooks'));
   const wt = mkTemp(`${prefix}-wt-`);
   fs.rmSync(wt, { recursive: true, force: true });

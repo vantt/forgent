@@ -58,12 +58,16 @@ export function acquireDispatchCwdLockIn(scope, fgosDir, cwd, policy = {}) {
   const params = lockParams(fgosDir, cwd);
   const res = acquireSync(scope, LOCK_NAME, { ...params, ...policy });
   if (res.result === 'acquired') return res.handle;
-  const holderPid = holderPidOf(params);
+  throw dispatchInFlightError(cwd, { pid: holderPidOf(params), lockPath: resolveLock(LOCK_NAME, params).v3Path });
+}
+
+/** The shared live-holder refusal for dispatch and resume (without taking custody). */
+export function dispatchInFlightError(cwd, { pid: holderPid, lockPath }) {
   const holder = holderPid ? ` by process ${holderPid}` : '';
-  throw new DispatchError(
+  return new DispatchError(
     'dispatch-in-flight',
     `dispatch for cwd "${cwd}" is already in flight (held${holder}).`,
-    { cwd, holderPid, lockPath: resolveLock(LOCK_NAME, params).v3Path },
+    { cwd, holderPid, lockPath },
   );
 }
 

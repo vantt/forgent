@@ -15,8 +15,9 @@ import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { performance } from 'node:perf_hooks';
+import { gitVersion, sandboxGit } from '../lib/sandbox-git.mjs';
 
 const SELF = fileURLToPath(import.meta.url);
 const CHECKOUT = path.resolve(path.dirname(SELF), '../..');
@@ -33,12 +34,18 @@ function stats(ms) {
   return { n: ms.length, p50: round(percentile(ms, 0.5)), p95: round(percentile(ms, 0.95)), p99: round(percentile(ms, 0.99)), max: round(Math.max(...ms)), mean: round(ms.reduce((a, b) => a + b, 0) / ms.length) };
 }
 function time(fn) { const t = performance.now(); const value = fn(); return [performance.now() - t, value]; }
+// Land's prepare and publish wait on the event loop, so they are timed to settlement.
+async function timeAsync(fn) { const t = performance.now(); const value = await fn(); return [performance.now() - t, value]; }
 function options(argv) {
   const out = {};
   for (let i = 0; i < argv.length; i++) if (argv[i].startsWith('--')) out[argv[i].slice(2)] = argv[i + 1]?.startsWith('--') || argv[i + 1] === undefined ? true : argv[++i];
   return out;
 }
-function git(args, opts = {}) { return execFileSync('git', args, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], ...opts }).trim(); }
+// Every fixture repository lives under the mode's fresh root; Git reaches it only through the named
+// sandbox door, bound once the root exists. The checkout itself is read through Inspect.
+let git = () => { throw new Error('e3-bench: sandbox root not bound'); };
+const bindSandbox = (root) => { git = sandboxGit(root); return root; };
+const checkoutInspect = ({ index, loader }, state) => index.createGitInspect({ stateRoot: state, repoPath: CHECKOUT, trustedMain: CHECKOUT }, loader);
 function privateDir(dir) { fs.mkdirSync(dir, { recursive: true, mode: 0o700 }); fs.chmodSync(dir, 0o700); return fs.realpathSync(dir); }
 
 /** A bare repository the Publication port accepts: event-seal dir and the activation fence. */
@@ -134,6 +141,7 @@ async function census(args) {
   // This subprocess owns fresh fixture repositories too: --repo/--remote
   // must never turn a raw legacy baseline into a write to a caller's repo.
   const root = fs.mkdtempSync(path.join(args.state, 'e3-census-'));
+  bindSandbox(root);
   const local = bareRepo(path.join(root, 'local.git'));
   const remote = bareRepo(path.join(root, 'remote.git'));
   git(['--git-dir', local, 'remote', 'add', 'origin', remote]);
@@ -151,7 +159,7 @@ async function census(args) {
     tip = next;
     mark(`push-objects-${r}-begin`); port.pushRefs({ remote: 'origin', refs: [['refs/fgos/events/e3-census', 'refs/fgos/events/e3-census']], remoteGrant: grant }); mark(`push-objects-${r}-end`);
     const seeded = commitFor(port, `census seeded ${r}`, [tip]);
-    execFileSync('git', ['--git-dir', local, 'push', '-q', remote, `${seeded}:refs/seed/census-${r}`]);
+    git(['--git-dir', local, 'push', '-q', remote, `${seeded}:refs/seed/census-${r}`]);
     port.compareAndSwap({ expected: tip, next: seeded, operationId: `census-seeded-${r}` });
     tip = seeded;
     mark(`push-no-objects-${r}-begin`); port.pushRefs({ remote: 'origin', refs: [['refs/fgos/events/e3-census', 'refs/fgos/events/e3-census']], remoteGrant: grant }); mark(`push-no-objects-${r}-end`);
@@ -273,6 +281,7 @@ async function scopedCensusWorker(args) {
       try { fs.accessSync(`/nonexistent-e3-marker/${label}-end`); } catch {}
     },
   };
+  bindSandbox(args.root);
   const { index, loader } = await loaders(args.descriptor);
   const rows = await typedOperationRows(args.root, privateDir(path.join(args.root, 'state')), index, loader, 1, observer);
   process.stdout.write(JSON.stringify({phases, diagnosticTimings:rows}));
@@ -282,8 +291,18 @@ async function scopedCensusWorker(args) {
 // branch topology, disk and custody. Fixture setup is outside every sample.
 async function typedOperationRows(root, state, index, loader, samples, observer = {begin() {}, end() {}}) {
   const { acquireSync, createLockScope } = await import('../../src/holder-lock/index.mjs');
-  const { commitUnitWork } = await import('../../src/runner/execution/commit-unit-work.mjs');
-  const { mergeRootIntoMainCas } = await import('../../src/runner/merge.mjs');
+  // Preserve E3's old-core control after its production retirement. This
+  // immutable history fixture is materialized only inside the experiment root;
+  // it is never a production import or a second shipped writer.
+  const baselinePath = 'src/runner/execution/commit-unit-work.mjs';
+  const [found] = checkoutInspect({ index, loader }, state).pathsAtRevision({ revision: '512e8cd2a68300848bf13859d46872f7fbe94951', paths: [[...Buffer.from(baselinePath)]], maxBlobBytes: 1 << 20 });
+  if (found.value.kind !== 'present') throw new Error(`e3-bench: ${baselinePath} at the baseline commit: ${found.value.kind}`);
+  const baseline = Buffer.from(found.value.bytes).toString('utf8');
+  const baselineFile = path.join(root, 'legacy-unit-commit-baseline.mjs');
+  fs.writeFileSync(baselineFile, baseline.replace(/from '([^']+)'/g, (all, specifier) =>
+    specifier.startsWith('.') ? `from '${pathToFileURL(path.resolve(CHECKOUT, path.dirname(baselinePath), specifier)).href}'` : all));
+  const { commitUnitWork } = await import(pathToFileURL(baselineFile).href);
+  const { landRunnerItem } = await import('../../src/runner/merge.mjs');
   const make = label => {
     const repo = path.join(root, label); git(['init', '-q', '--initial-branch=main', repo]);
     git(['-C', repo, 'config', 'user.name', IDENTITY.name]); git(['-C', repo, 'config', 'user.email', IDENTITY.email]);
@@ -337,7 +356,7 @@ async function typedOperationRows(root, state, index, loader, samples, observer 
         // the same fixture disk through the ordinary OS temp-directory input.
         process.env.TMPDIR = root;
         observer.begin('land-legacy');
-        out = await mergeRootIntoMainCas(main,{id:`e3-${i}`,branchHeadAtReturn:source},'source',{ownFileSet:['payload']});
+        out = await landRunnerItem(main,{id:`e3-${i}`,branchHeadAtReturn:source},{branch:'source',ownFileSet:['payload']});
         observer.end('land-legacy');
       } finally {
         if (previousTmpdir === undefined) delete process.env.TMPDIR;
@@ -349,13 +368,13 @@ async function typedOperationRows(root, state, index, loader, samples, observer 
       const port = index.createGitLand({stateRoot:state,repoPath:main,trustedMain:main,writer:WRITER},loader);
       try {
         observer.begin('land-prepare');
-        const [prepareMs,prepared] = time(() => port.prepare({operationId:`land-${i}`,request:{source,target,destination:'refs/heads/main',message:'E3 merge',squash:false,footprint:['payload'],subtree:null,files:[]}}));
+        const [prepareMs,prepared] = await timeAsync(() => port.prepare({operationId:`land-${i}`,request:{source,target,destination:'refs/heads/main',message:'E3 merge',squash:false,footprint:['payload'],subtree:null,files:[]}}));
         observer.end('land-prepare');
         const candidate = prepared.candidate;
         if (!candidate) throw new Error("Land preparation returned no candidate");
         const evidence = {source:candidate.source,target:candidate.target,candidate:candidate.candidate,treeDigest:candidate.treeDigest,evidenceDigest:'e3-verified-fixture'};
         observer.begin('land-publish');
-        const [publishMs] = time(() => port.publish(evidence));
+        const [publishMs] = await timeAsync(() => port.publish(evidence));
         observer.end('land-publish');
         prepare.push(prepareMs); publish.push(publishMs);
         elapsed = prepareMs + publishMs;
@@ -382,20 +401,37 @@ function compileArtifacts() {
   return { addon: path.join(release, 'libfgos_node_addon.so'), fixture: path.join(release, 'examples/e3_fixture'), fgctl: path.join(release, 'fgctl'), host: path.join(release, 'fgos') };
 }
 
-/** Stage the addon as a release-shaped payload and write its loader descriptor. */
-async function stageAddon(root, addonFile) {
-  const { nativeAddonComponent } = await import('../build-rust-distribution.mjs');
-  const releaseRoot = privateDir(path.join(root, 'addon-release'));
-  fs.mkdirSync(path.join(releaseRoot, 'native'));
-  const file = path.join(releaseRoot, 'native/fgos.node');
+/**
+ * Stage the addon and host the way a dev checkout's manifest names them (the shape `npm test` and
+ * `npm run fgos:dev` use): the typed rows load it through the written descriptor, and product code
+ * that loads the addon on its own (the legacy Land path) finds the same file through
+ * FGOS_HOST_BIN and the FGOS_ACTIVE_RELEASE_PATH/FGOS_ACTIVE_MANIFEST_PATH pair, so one process never loads two addons. The staging
+ * sits inside the checkout because that manifest's paths are relative to the payload root; it is
+ * removed when this process exits.
+ */
+async function stageAddon(root, addonFile, hostFile = process.env.FGOS_HOST_BIN) {
+  if (!hostFile) throw new Error('e3-bench: staging the addon needs the built fgos host (--host or FGOS_HOST_BIN)');
+  const { devHostManifest } = await import('../lib/dev-host-manifest.mjs');
+  const staging = privateDir(path.join(CHECKOUT, '.fgos/runtime/e3-bench', `addon-${process.pid}-${crypto.randomUUID()}`));
+  process.on('exit', () => fs.rmSync(staging, { recursive: true, force: true }));
+  const file = path.join(staging, 'fgos.node');
   fs.copyFileSync(addonFile, file);
-  const manifest = { entries: { fgos: '' }, components: { legacyNode: { root: '.' }, nativeAddon: nativeAddonComponent(file, 'native/fgos.node', CHECKOUT) } };
+  fs.chmodSync(file, 0o644);
+  const host = path.join(staging, 'fgos');
+  fs.copyFileSync(hostFile, host);
+  fs.chmodSync(host, 0o755);
+  const manifest = devHostManifest({ checkoutRoot: CHECKOUT, fgosBin: host, addonFile: file });
+  const manifestFile = path.join(staging, 'manifest.json');
+  fs.writeFileSync(manifestFile, JSON.stringify(manifest));
+  process.env.FGOS_HOST_BIN = host;
+  process.env.FGOS_ACTIVE_RELEASE_PATH = CHECKOUT;
+  process.env.FGOS_ACTIVE_MANIFEST_PATH = manifestFile;
   const descriptorFile = path.join(root, 'addon-descriptor.json');
-  fs.writeFileSync(descriptorFile, JSON.stringify({ manifest, releaseRoot }));
+  fs.writeFileSync(descriptorFile, JSON.stringify({ manifest, releaseRoot: CHECKOUT }));
   return descriptorFile;
 }
 
-function environment(root) {
+function environment(root, inspect) {
   const cpu = os.cpus();
   const read = (f) => { try { return fs.readFileSync(f, 'utf8').trim(); } catch { return null; } };
   return {
@@ -403,8 +439,8 @@ function environment(root) {
     kernel: os.release(), memoryGiB: Math.round(os.totalmem() / 2 ** 30),
     filesystem: execFileSync('findmnt', ['-T', root, '-n', '-o', 'SOURCE,FSTYPE,OPTIONS'], { encoding: 'utf8' }).trim(),
     device: read('/sys/block/nvme0n1/device/model'),
-    git: git(['--version']), node: process.version, rustc: execFileSync('rustc', ['--version'], { encoding: 'utf8' }).trim(),
-    loadavg: os.loadavg(), checkoutHead: git(['-C', CHECKOUT, 'rev-parse', 'HEAD']), at: new Date().toISOString(),
+    git: gitVersion(root), node: process.version, rustc: execFileSync('rustc', ['--version'], { encoding: 'utf8' }).trim(),
+    loadavg: os.loadavg(), checkoutHead: inspect.resolveCommit({ name: 'HEAD' }), at: new Date().toISOString(),
   };
 }
 
@@ -412,7 +448,7 @@ async function run(args) {
   const samples = Number(args.samples ?? 500);
   const root = args.root ? path.resolve(args.root) : path.join(CHECKOUT, '.fgos/runtime/e3-bench', new Date().toISOString().replace(/[:.]/g, '-'));
   if (fs.existsSync(root)) throw new Error(`root must be fresh: ${root}`);
-  privateDir(root);
+  bindSandbox(privateDir(root));
   const fstype = execFileSync('findmnt', ['-T', root, '-n', '-o', 'FSTYPE'], { encoding: 'utf8' }).trim();
   if (fstype !== 'ext4') throw new Error(`E3 runs on ext4, not ${fstype}`);
   const artifacts = args.addon && args.fixture && args.fgctl ? { addon: args.addon, fixture: args.fixture, fgctl: args.fgctl, host: args.host ?? process.env.FGOS_HOST_BIN } : compileArtifacts();
@@ -420,12 +456,12 @@ async function run(args) {
   process.env.FGOS_HOST_BIN = fs.realpathSync(artifacts.host);
   for (const k of Object.keys(artifacts)) artifacts[k] = fs.realpathSync(artifacts[k]);
   const descriptor = await stageAddon(root, artifacts.addon);
-  const results = { environment: environment(root), artifacts, rows: {} };
+  const state = privateDir(path.join(root, 'state'));
+  const typedLoader = await loaders(descriptor);
+  const results = { environment: environment(root, checkoutInspect(typedLoader, state)), artifacts, rows: {} };
   const say = (row, value) => { results.rows[row] = value; console.error(`${row}: ${JSON.stringify(value)}`); };
   const fixture = (...a) => JSON.parse(execFileSync(artifacts.fixture, a, { encoding: 'utf8', maxBuffer: 64 << 20 }));
-  const state = privateDir(path.join(root, 'state'));
 
-  const typedLoader = await loaders(descriptor);
   const typedRows = await typedOperationRows(root, state, typedLoader.index, typedLoader.loader, Number(args.typedSamples ?? 30));
   say('scopedCommit', typedRows.scopedCommit);
   say('land', typedRows.land);
@@ -492,9 +528,9 @@ async function run(args) {
       commits.push(git(['--git-dir', repo, 'commit-tree', tree, ...(i ? ['-p', commits[i - 1]] : []), '-m', `raw ${i}`], { env: { ...process.env, GIT_AUTHOR_NAME: 'E3', GIT_AUTHOR_EMAIL: 'e3@fgos.invalid', GIT_COMMITTER_NAME: 'E3', GIT_COMMITTER_EMAIL: 'e3@fgos.invalid' } }));
     }
     say('rawSpawnBaseline', {
-      hashObjectWrite: raw(200, () => execFileSync('git', ['--git-dir', repo, 'hash-object', '-w', '--stdin'], { input: crypto.randomBytes(1024) })),
-      revParse: raw(200, () => execFileSync('git', ['--git-dir', repo, 'rev-parse', '--git-dir'])),
-      updateRefCas: raw(200, (i) => execFileSync('git', ['--git-dir', repo, 'update-ref', '--no-deref', 'refs/fgos/events/raw', commits[i + 1], i ? commits[i] : '0'.repeat(40)])),
+      hashObjectWrite: raw(200, () => git(['--git-dir', repo, 'hash-object', '-w', '--stdin'], { input: crypto.randomBytes(1024) })),
+      revParse: raw(200, () => git(['--git-dir', repo, 'rev-parse', '--git-dir'])),
+      updateRefCas: raw(200, (i) => git(['--git-dir', repo, 'update-ref', '--no-deref', 'refs/fgos/events/raw', commits[i + 1], i ? commits[i] : '0'.repeat(40)])),
     });
   }
 
@@ -749,14 +785,17 @@ async function rollback(root, fgctl, descriptor, index, loader) {
 const at = process.argv.indexOf(SELF);
 const [mode, ...rest] = process.argv.slice(at >= 0 ? at + 1 : 2);
 const args = options(rest);
-/** The rollback row alone: --root <fresh dir> --addon <.node> --fgctl <fgctl>. */
+/** The rollback row alone: --root <fresh dir> --addon <.node> --fgctl <fgctl> [--host <fgos>]. */
 async function rollbackOnly(args) {
   const root = path.resolve(args.root);
   if (fs.existsSync(root)) throw new Error(`root must be fresh: ${root}`);
-  privateDir(root);
-  const descriptor = await stageAddon(root, fs.realpathSync(args.addon));
+  bindSandbox(privateDir(root));
+  const descriptor = await stageAddon(root, fs.realpathSync(args.addon), args.host ?? process.env.FGOS_HOST_BIN);
   const { index, loader } = await loaders(descriptor);
-  console.log(JSON.stringify(await rollback(root, fs.realpathSync(args.fgctl), descriptor, index, loader)));
+  const row = await rollback(root, fs.realpathSync(args.fgctl), descriptor, index, loader);
+  console.log(JSON.stringify(row));
+  // The owner budget: refused by the C5 door or completed, with no record lost or corrupt.
+  if (row.error || row.lostOrMismatchedReceipts !== 0 || !row.tipMatchesLastReceipt) process.exitCode = 1;
 }
 const modes = { run, rollback: rollbackOnly, 'load-probe': loadProbe, writer, idle, census, 'scoped-census': scopedCensus, 'scoped-census-worker': scopedCensusWorker };
 if (at >= 0) {

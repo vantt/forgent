@@ -16,6 +16,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { MANIFEST } from '../test/test-ownership.mjs';
 import { promoteRules, computeRuleHash } from './test-select-promote.mjs';
+import { inspectRepo } from './lib/git-ports.mjs';
 
 function log(msg) { console.log(msg); }
 
@@ -110,7 +111,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const repoArg = process.argv.find((a) => a.startsWith('--repo='));
   const repo = repoArg ? repoArg.split('=')[1] : (() => {
     try {
-      const remote = execFileSync('git', ['remote', 'get-url', 'origin'], { encoding: 'utf8' }).trim();
+      const remote = inspectRepo().remoteUrl({ remote: 'origin' });
       const m = remote.match(/[/:]([^/:]+\/[^/.]+?)(?:\.git)?$/);
       return m ? m[1] : null;
     } catch { return null; }

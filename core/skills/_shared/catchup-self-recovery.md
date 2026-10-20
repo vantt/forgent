@@ -69,7 +69,7 @@ One per block reason. Read `<id>`'s merge target from the envelope's `target` fi
 
 ### Playbook: merge-failed-unclassified
 
-- **Signal**: `{picked: <id>, approve: {blocked, reason: "merge-failed-unclassified"}}` — `git merge --no-commit --no-ff` exited non-zero without staging a real conflict. Stderr is carried in friction detail.
+- **Signal**: `{picked: <id>, approve: {blocked, reason: "merge-failed-unclassified"}}` — the trial merge exited non-zero without staging a real conflict. Stderr is carried in friction detail.
 - **What the machine tries**:
   1. Read stderr first. If it names a condition a retry cannot change (missing ref, "not a git repository", no space left on device, permission error), **stop without retrying** and report stderr.
   2. Otherwise, one `fgos catchup <id>`.
@@ -78,7 +78,7 @@ One per block reason. Read `<id>`'s merge target from the envelope's `target` fi
 
 ### Playbook: merge-conflict
 
-- **Signal**: `{picked: <id>, approve: {blocked, reason: "merge-conflict"}}` — post-merge `git merge --no-commit --no-ff` staged a real textual conflict; merge rolled back and target unchanged.
+- **Signal**: `{picked: <id>, approve: {blocked, reason: "merge-conflict"}}` — the trial merge staged a real textual conflict; merge rolled back and target unchanged.
 - **What the machine tries**: One `fgos catchup <id>` — merges item's target branch back into item's branch in ephemeral worktree, re-runs verify, and on green takes the `blocked -> awaiting-approval` edge.
 - **Stop condition**: The governing ceiling above.
 - **Reported on failure**: The id, `conflictedFiles` list or failing lines from `output`, and target unchanged.

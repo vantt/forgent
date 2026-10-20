@@ -40,10 +40,6 @@ impl GitDriver {
             let OperationKind::ScopedCommit(payload) = &chain.intent().kind else {
                 return Err(failure("cutover-grant-missing"));
             };
-            let grant = payload
-                .cutover_grant
-                .as_ref()
-                .ok_or_else(|| failure("cutover-grant-missing"))?;
             let worktree = &payload.worktree;
             let m = file.metadata().map_err(failure)?;
             if chain.intent().authority_binding != format!("{}:{}", m.dev(), m.ino())
@@ -71,6 +67,18 @@ impl GitDriver {
             }
             let mut staged = self.hook_deletions(repo, index)?;
             staged.sort();
+            // WORK-lane deletion: temporary event-layout authority uses this
+            // same durable ScopedCommit intent and main-50 borrower check.
+            if payload.cutover_grant.is_none() {
+                let request: CommitRequest = serde_json::from_str(&payload.request).map_err(failure)?;
+                let layout = request.legacy_events.ok_or_else(|| failure("cutover-grant-missing"))?;
+                layout.validate_paths(repo)?;
+                if staged.is_empty() || staged.iter().any(|p| !layout.exact_paths.contains(p) || !payload.paths.contains(p)) {
+                    return Err(failure("legacy-event-deletions-mismatch"));
+                }
+                return Ok(());
+            }
+            let grant = payload.cutover_grant.as_ref().ok_or_else(||failure("cutover-grant-missing"))?;
             let mut exact = grant.exact_paths.clone();
             exact.sort();
             if staged.is_empty() || staged != exact {

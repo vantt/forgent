@@ -8,6 +8,8 @@ import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { activateGitFixture } from '../helpers/git-fixture.mjs';
+import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
 import { execFileSync } from 'node:child_process';
 
 import { initStore, addWork, moveWork, listWork, readRawEvents } from '../../src/state/store.mjs';
@@ -39,6 +41,7 @@ function setup() {
   git(repoRoot, 'commit', '-q', '-m', 'init');
   const dir = path.join(repoRoot, '.fgos');
   initStore(dir);
+  activateGitFixture(repoRoot);
   const scriptDir = fs.realpathSync(makeFixtureDir('fgos-loop-rununit-exec-'));
   const worktreeDir = fs.realpathSync(makeFixtureDir('fgos-loop-rununit-wt-'));
   return { repoRoot, dir, scriptDir, worktreeDir };
@@ -122,12 +125,10 @@ test('the human feedback of an item rides into the Unit objective', async () => 
 test('an index someone else staged in the worktree refuses the launch before the worker spawns: worktree-fail, then the retry starts clean', async () => {
   const fx = setup();
   seedItem(fx.dir, { id: 'item-staged' });
-  // Checking out a new worktree stages a stray file before the runner launches anything. The
-  // retry resets the worktree to its dispatch baseline, which clears that index.
-  const hooks = fs.realpathSync(makeFixtureDir('fgos-loop-rununit-hooks-'));
-  fs.writeFileSync(path.join(hooks, 'post-checkout'), '#!/bin/sh\necho stray > stray.txt\ngit add stray.txt\n');
-  fs.chmodSync(path.join(hooks, 'post-checkout'), 0o755);
-  git(fx.repoRoot, 'config', 'core.hooksPath', hooks);
+  // The operator's worktree setup stages a stray file in each new checkout before the runner
+  // launches anything. The retry resets the worktree to its dispatch baseline, which clears that index.
+  const stage = writeWorker(fx.scriptDir, 'stage-stray', `import { execFileSync } from 'node:child_process';\nfs.writeFileSync('stray.txt', 'stray\\n');\nexecFileSync('git', ['add', 'stray.txt']);`);
+  writeSharedConfig(fx.repoRoot, { worktreeSetup: { commands: [`${JSON.stringify(process.execPath)} ${JSON.stringify(stage)}`] } });
   const script = writeWorker(fx.scriptDir, 'producing', PRODUCING);
 
   const result = await runLoop(fx, { executors: { 'fgos-coding-implement': executorFor(script) }, modelPolicies: modelPolicies('node') });

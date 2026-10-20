@@ -2,7 +2,7 @@ import './process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { lexSource } from './js-source-lexer.mjs';
+import { lexSource } from '../../scripts/lib/js-source-lexer.mjs';
 
 // `shape` blanks the inside of every literal, so the text of a regular expression must never show.
 const shapeOf = (source) => lexSource(source).shape;

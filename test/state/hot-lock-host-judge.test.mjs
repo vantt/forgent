@@ -76,7 +76,7 @@ test('the Windows observer reuses a live reading briefly and sees a death at onc
 });
 
 test('the process-observe route of a host refuses a missing pid argument', { skip: NEEDS_HOST }, () => {
-  const out = spawnSync(HOST_BIN, ['internal', 'process-observe', '--protocol', '1'], { encoding: 'utf8' });
+  const out = spawnSync(HOST_BIN, ['internal', 'process-observe', '--protocol', '2'], { encoding: 'utf8' });
   assert.equal(out.status, 2);
   assert.equal(JSON.parse(out.stdout).code, 'usage');
 });

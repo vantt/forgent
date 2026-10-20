@@ -3,7 +3,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { computeArtifactDigest, hashFile, nativeAddonLibraryName, nativeAddonComponent } from './build-rust-distribution.mjs';
+import { nativeAddonLibraryName } from './build-rust-distribution.mjs';
+import { devHostEnv, devHostManifest } from './lib/dev-host-manifest.mjs';
 import { processesInside } from '../src/runner/dispatch/stop-processes-inside.mjs';
 
 const checkoutRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -65,17 +66,6 @@ export function pruneRunDirs(runtimeBase, { now = Date.now(), staleMs = STALE_RU
   }
 }
 
-/** Environment of the staged dev host. FGOS_HOST_BIN names the staged host itself, so a Node client
- * under `npm run fgos:dev` resolves the working-tree host and never the activated one. */
-export function devHostEnv(baseEnv, { fgosBin, checkoutRoot, manifestPath }) {
-  return {
-    ...baseEnv,
-    FGOS_HOST_BIN: fgosBin,
-    FGOS_ACTIVE_RELEASE_PATH: checkoutRoot,
-    FGOS_ACTIVE_MANIFEST_PATH: manifestPath,
-  };
-}
-
 function forwardResult(result, description) {
   if (result.error) {
     throw new Error(`${description}: ${result.error.message}`);
@@ -123,30 +113,7 @@ function main() {
       fs.copyFileSync(path.join(targetDir, 'debug', nativeAddonLibraryName()), temporary);
       fs.chmodSync(temporary, 0o644);
     });
-    const nativeAddon = nativeAddonComponent(addonFile, addonRelative, checkoutRoot);
-    const legacyNodeDigest = hashFile(path.join(checkoutRoot, 'bin/fgos.mjs'));
-    const fgosDigest = hashFile(fgosBin);
-    const manifestWithoutDigest = {
-      schemaVersion: 1,
-      entries: { fgos: binaryRelative },
-      capabilities: ["git-wal-v1"],
-      components: {
-        nativeAddon,
-        legacyNode: { root: '.', entry: 'bin/fgos.mjs', digest: legacyNodeDigest },
-      },
-      requires: { node: '>=18' },
-      target: { os: process.platform, arch: process.arch },
-      stateSchemas: { read: ['2'], write: ['2'], migrations: [] },
-      files: [
-        { path: addonRelative, kind: "file", digest: `sha256:${nativeAddon.digest}`, mode: "644", class: "immutable-runtime" },
-        { path: 'bin/fgos.mjs', kind: 'file', digest: legacyNodeDigest, mode: '755', class: 'legacy-node' },
-        { path: binaryRelative, kind: 'file', digest: fgosDigest, mode: '755', class: 'native-host' },
-      ].sort((a, b) => a.path < b.path ? -1 : a.path > b.path ? 1 : 0),
-    };
-    const manifest = {
-      ...manifestWithoutDigest,
-      artifactDigest: computeArtifactDigest(manifestWithoutDigest),
-    };
+    const manifest = devHostManifest({ checkoutRoot, fgosBin, addonFile });
     const manifestPath = path.join(runtimeDir, 'manifest.json');
     assertLocalPath(`${runtimeBaseRelative}/${path.basename(runtimeDir)}/manifest.json`);
     atomicWrite(manifestPath, (temporary) => {

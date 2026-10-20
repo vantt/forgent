@@ -11,6 +11,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { extractV1Source, probeV1 } from './fixtures/extract-v1.mjs';
 import { placeFences, fenceStatus, fenceTargets, TOMBSTONE_FILE, V1_LOCK_PRESENT } from '../../src/holder-lock/fences.mjs';
+import { workspaceListing } from '../../src/setup/holder-lock-checks.mjs';
 
 const PROBE_TIMEOUT_MS = 15_000;
 const GIT_ENV = { ...process.env, GIT_AUTHOR_NAME: 'fences', GIT_AUTHOR_EMAIL: 'fences@test', GIT_COMMITTER_NAME: 'fences', GIT_COMMITTER_EMAIL: 'fences@test' };
@@ -63,7 +64,7 @@ function tombstoneRecord(lockPath) {
 
 test('placeFences tombstones every old file-lock path of the workspace, in both cwd forms', () => {
   const ws = makeWorkspace('all-paths');
-  const result = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
+  const result = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, ...workspaceListing(ws.root), providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
   assert.equal(result.ok, true, JSON.stringify(result));
   assert.deepEqual(result.skipped, []);
 
@@ -84,7 +85,7 @@ test('placeFences tombstones every old file-lock path of the workspace, in both 
   for (const cwd of cwds) expected.push(path.join(ws.fgosDir, `dispatch--${encodeURIComponent(cwd)}.lock`));
   assert.deepEqual([...result.placed].sort(), [...expected].sort());
 
-  const byOwner = Object.fromEntries(fenceTargets({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot }).map((t) => [t.lock, `fgos ${t.owner}`]));
+  const byOwner = Object.fromEntries(fenceTargets({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, ...workspaceListing(ws.root), providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot }).map((t) => [t.lock, `fgos ${t.owner}`]));
   for (const lockPath of expected) {
     assert.ok(fs.statSync(lockPath).isDirectory(), `${lockPath} is a directory`);
     const record = tombstoneRecord(lockPath);
@@ -92,9 +93,9 @@ test('placeFences tombstones every old file-lock path of the workspace, in both 
     assert.ok(typeof record.lock === 'string' && record.lock, 'names its lock');
     assert.ok(!Number.isNaN(Date.parse(record.at)), 'records when');
   }
-  const locks = new Set(fenceTargets({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot }).map((t) => t.lock));
+  const locks = new Set(fenceTargets({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, ...workspaceListing(ws.root), providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot }).map((t) => t.lock));
   assert.deepEqual([...locks].sort(), ['activation', 'advance', 'dispatch-cwd', 'gateway', 'install', 'main-checkout', 'merge-slot', 'observe', 'porting-events', 'reconcile', 'recovery', 'runner', 'sessions', 'state']);
-  assert.equal(fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot }).complete, true);
+  assert.equal(fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, ...workspaceListing(ws.root), providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot }).complete, true);
 });
 
 test('a run made by the run supervisor after the cutover needs no recovery tombstone', () => {
@@ -103,14 +104,14 @@ test('a run made by the run supervisor after the cutover needs no recovery tombs
   fs.mkdirSync(later, { recursive: true });
   fs.writeFileSync(path.join(later, 'run.json'), JSON.stringify({ runId: 'run-2', assignmentId: 'a2' }));
   fs.writeFileSync(path.join(later, 'attempt.lock'), '');
-  const recovery = fenceTargets({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot })
+  const recovery = fenceTargets({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, ...workspaceListing(ws.root), providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot })
     .filter((t) => t.lock === 'recovery').map((t) => t.path);
   assert.deepEqual(recovery, [path.join(ws.runDir, '.recovery.lock')]);
 });
 
 test('every real v1 acquire fails loudly against the tombstones instead of taking the lock', (t) => {
   const ws = makeWorkspace('v1-acquires');
-  const fenceOptions = { fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot };
+  const fenceOptions = { fgosDir: ws.fgosDir, workspaceRoot: ws.root, ...workspaceListing(ws.root), providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot };
   assert.equal(placeFences(fenceOptions).ok, true);
   const placed = fenceStatus(fenceOptions);
   assert.equal(placed.complete, true);
@@ -157,25 +158,25 @@ test('an old lock file still present stops the placement before anything is writ
   const ws = makeWorkspace('v1-present');
   const gatewayLock = path.join(ws.fgosDir, 'gateway.lock');
   fs.writeFileSync(gatewayLock, String(process.pid));
-  const result = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
+  const result = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, ...workspaceListing(ws.root), providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
   assert.equal(result.ok, false);
   assert.equal(result.error, V1_LOCK_PRESENT);
   assert.deepEqual(result.paths, [gatewayLock]);
   assert.deepEqual(result.placed, []);
   assert.equal(fs.readFileSync(gatewayLock, 'utf8'), String(process.pid), 'the old lock is left as it was');
-  const status = fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
+  const status = fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, ...workspaceListing(ws.root), providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
   assert.deepEqual(status.v1Present, [gatewayLock]);
   assert.equal(status.targets.filter((target) => target.fenced).length, 0, 'no other path was fenced half-way');
   // Once the old holder is gone the same call places everything.
   fs.unlinkSync(gatewayLock);
-  assert.equal(placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot }).ok, true);
+  assert.equal(placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, ...workspaceListing(ws.root), providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot }).ok, true);
 });
 
 test('placing fences twice places nothing the second time and reports every path as skipped', () => {
   const ws = makeWorkspace('idempotent');
-  const first = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
+  const first = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, ...workspaceListing(ws.root), providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
   const records = Object.fromEntries(first.placed.map((lockPath) => [lockPath, fs.readFileSync(path.join(lockPath, TOMBSTONE_FILE), 'utf8')]));
-  const second = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
+  const second = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, ...workspaceListing(ws.root), providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
   assert.equal(second.ok, true);
   assert.deepEqual(second.placed, []);
   assert.deepEqual([...second.skipped].sort(), [...first.placed].sort());
@@ -188,7 +189,7 @@ test('a tombstone directory whose record was never written is completed, not ref
   const ws = makeWorkspace('half-tombstone');
   const runnerLock = path.join(ws.fgosDir, 'runner.lock');
   fs.mkdirSync(runnerLock);
-  const result = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
+  const result = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, ...workspaceListing(ws.root), providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
   assert.equal(result.ok, true, JSON.stringify(result));
   assert.ok(result.placed.includes(runnerLock));
   assert.equal(tombstoneRecord(runnerLock).lock, 'runner');
@@ -196,14 +197,14 @@ test('a tombstone directory whose record was never written is completed, not ref
 
 test('fenceStatus lists every missing path before placement and none after', () => {
   const ws = makeWorkspace('status');
-  const before = fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
+  const before = fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, ...workspaceListing(ws.root), providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
   assert.equal(before.complete, false);
   // Every path is missing: the ones this module places in `missing`, fgctl's controller path in `controllerMissing`.
   assert.equal(before.missing.length + before.controllerMissing.length, before.targets.length);
   assert.deepEqual(before.controllerMissing, [path.join(ws.fgosDir, 'locks', 'activation.lock')]);
   assert.deepEqual(before.v1Present, []);
-  placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
-  const afterwards = fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
+  placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, ...workspaceListing(ws.root), providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
+  const afterwards = fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, ...workspaceListing(ws.root), providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
   assert.equal(afterwards.complete, true);
   assert.deepEqual(afterwards.missing, []);
   assert.deepEqual(afterwards.controllerMissing, [path.join(ws.fgosDir, 'locks', 'activation.lock')], 'placeFences leaves the controller fence to fgctl');

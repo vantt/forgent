@@ -2,7 +2,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { inspectRepo, statusEntries } from './lib/git-ports.mjs';
 import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -136,14 +136,16 @@ function writeText(filePath, text) {
   fs.writeFileSync(filePath, text);
 }
 
-function assertCleanGitStatus(repoRoot, execFile = execFileSync) {
-  let out;
+const readStatus = (repoRoot) => statusEntries(inspectRepo(repoRoot), 'normal');
+
+function assertCleanGitStatus(repoRoot, read = readStatus) {
+  let entries;
   try {
-    out = execFile('git', ['-C', repoRoot, 'status', '--porcelain'], { encoding: 'utf8' });
+    entries = read(repoRoot);
   } catch (err) {
     throw new Error(`Unable to read git status before preparing release: ${err.message}`);
   }
-  if (out.trim()) {
+  if (entries.length) {
     throw new Error('Refusing to prepare a release with a dirty working tree. Commit or stash existing changes first.');
   }
 }
@@ -154,14 +156,14 @@ export function prepareRelease({
   date = new Date().toISOString().slice(0, 10),
   dryRun = false,
   skipCleanCheck = false,
-  execFile = execFileSync,
+  readStatus: read = readStatus,
 } = {}) {
   const { baseVersion, tag } = parseReleaseVersion(version);
   assertIsoDate(date);
   const root = path.resolve(repoRoot);
 
   if (!skipCleanCheck) {
-    assertCleanGitStatus(root, execFile);
+    assertCleanGitStatus(root, read);
   }
 
   const packagePath = path.join(root, 'package.json');

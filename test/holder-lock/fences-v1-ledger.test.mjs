@@ -60,7 +60,7 @@ function ledgerProbes(ledgers) {
 }
 
 function placeFor(ledgers) {
-  return placeFences({ fgosDir: ledgers.fgosDir, workspaceRoot: ledgers.workspaceRoot, providerRuntimeDir: ledgers.providerRuntimeDir });
+  return placeFences({ fgosDir: ledgers.fgosDir, workspaceRoot: ledgers.workspaceRoot, worktrees: [], branches: [], providerRuntimeDir: ledgers.providerRuntimeDir });
 }
 
 test('the real v1 ledger code acquires before the fence and refuses after it', (t) => {
@@ -160,7 +160,7 @@ test('a live v1 holder in a ledger stops the placement and keeps its generation'
     assert.deepEqual(result.placed, [], 'nothing is placed while an old holder is alive, not even the other ledger');
     assert.deepEqual(generations(ledgers.accountLockDir).map((g) => g.name), generationsBefore, 'the holder\'s generation is untouched');
     assert.deepEqual(generations(ledgers.stateLockDir), []);
-    const status = fenceStatus({ fgosDir: ledgers.fgosDir, workspaceRoot: ledgers.workspaceRoot, providerRuntimeDir: ledgers.providerRuntimeDir });
+    const status = fenceStatus({ fgosDir: ledgers.fgosDir, workspaceRoot: ledgers.workspaceRoot, worktrees: [], branches: [], providerRuntimeDir: ledgers.providerRuntimeDir });
     assert.deepEqual(status.v1Present, [ledgers.accountLockDir]);
   } finally {
     holder.kill('SIGKILL');
@@ -217,7 +217,7 @@ test('without a provider-capacity runtime dir there is no ledger to fence', () =
   const fgosDir = path.join(scratch, 'no-ledgers', '.fgos');
   fs.mkdirSync(fgosDir, { recursive: true });
   const providerRuntimeDir = path.join(scratch, 'no-ledgers', 'never-created');
-  const status = fenceStatus({ fgosDir, workspaceRoot: path.dirname(fgosDir), providerRuntimeDir });
+  const status = fenceStatus({ fgosDir, workspaceRoot: path.dirname(fgosDir), worktrees: [], branches: [], providerRuntimeDir });
   assert.deepEqual(status.targets.filter((target) => target.fence === 'blocking-generation'), []);
   assert.equal(fs.existsSync(providerRuntimeDir), false, 'nothing is created in a home that never ran a provider');
 });

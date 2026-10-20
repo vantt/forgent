@@ -5,15 +5,14 @@
 // (tsk-2ej: closes the friction of having no hook-safe, scriptable way to
 // tell an old globally-installed build from a current checkout).
 //
-// Pure data resolution only, same `kernel`-layer discipline
-// command-registry.mjs already documents — this module never imports verb
-// logic, only reads its own package.json and asks git for its own commit.
+// Pure data resolution only — this module never imports verb logic, only
+// reads its own package.json and asks Git Inspect for its own commit.
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
+import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { COMMAND_REGISTRY } from './command-registry.mjs';
 
 const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -23,14 +22,10 @@ export function resolveCliVersionInfo({ packageRoot = PACKAGE_ROOT } = {}) {
   const packageVersion = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8')).version;
   let gitCommit = null;
   try {
-    gitCommit = execFileSync('git', ['rev-parse', '--short', 'HEAD'], {
-      cwd: packageRoot,
-      encoding: 'utf8',
-      shell: false,
-      // stderr is piped away: a release install is not a git checkout, and
-      // git's "fatal: not a git repository" must not reach the terminal.
-      stdio: ['ignore', 'pipe', 'ignore'],
-    }).trim();
+    // The first 12 hex digits of the full commit id; never Git's own
+    // abbreviation, whose length depends on the repository.
+    const head = createGitInspect(gitPortOptions(packageRoot)).resolveCommit({ name: 'HEAD' });
+    if (typeof head === 'string') gitCommit = head.slice(0, 12);
   } catch {
     // Not a git checkout (a real npm/tarball install has no .git) -- no
     // commit to report, never thrown as an error.

@@ -51,6 +51,7 @@ import { DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC } from '../../src/state/events
 import { DEFAULT_CAPABILITY_SLOTS, DEFAULT_IRON_LAW_LEVEL, PI_EXECUTOR_DEFAULT } from '../../src/setup/registrations.mjs';
 import { addDecision } from '../../src/state/store.mjs';
 import { createSession } from '../../src/runner/session.mjs';
+import { activateGitFixture } from '../helpers/git-fixture.mjs';
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
@@ -153,6 +154,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'git-native-locks',
       'git-publication-refspecs',
       'git-durability-capability',
+      'git-mutation-one-door',
       'terminal-config',
       'terminal-allocations',
       'trust-store-readable',
@@ -328,6 +330,7 @@ test('leaf-notify-drift fails and names the leaf when a live session branch over
   initStore(fgosDir);
   addWork(fgosDir, { id: 'landed', title: 'landed', kind: 'feature', risk: 'light', verify: 'true', status: 'done', deps: [], refs: [] });
   addWork(fgosDir, { id: 'leaf', title: 'leaf', kind: 'feature', risk: 'light', verify: 'true', status: 'doing', deps: [], refs: [] });
+  activateGitFixture(dir);
   createSession(dir, { itemId: 'leaf' });
 
   const { passed, message } = checkById('leaf-notify-drift').check(dir);

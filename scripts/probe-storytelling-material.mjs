@@ -13,22 +13,14 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { mainCheckoutRoot } from './lib/git-ports.mjs';
 import { readEvents } from '../src/state/events.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 
-// Cùng pattern `git rev-parse --git-common-dir` mà scripts/measure-verify-
-// cost.mjs và scripts/verify-fanout-overlap.mjs đã dùng — verify command
-// chạy được y nguyên dù cwd là main checkout hay worktree của item này
-// (ADR0020: worktree không có `.fgos/` riêng).
-function resolveMainCheckoutRoot() {
-  const gitCommonDir = execFileSync(
-    'git',
-    ['rev-parse', '--path-format=absolute', '--git-common-dir'],
-    { encoding: 'utf8' },
-  ).trim();
-  return path.dirname(gitCommonDir);
-}
+// Log mặc định đọc từ main checkout (Inspect `trustedMainRoot`, giống
+// scripts/measure-verify-cost.mjs và scripts/verify-fanout-overlap.mjs) —
+// verify command chạy được y nguyên dù cwd là main checkout hay worktree
+// của item này (ADR0020: worktree không có `.fgos/` riêng).
 
 // Bốn khuôn mẫu văn bản đã đo thật (CONTEXT.md D4, đọc trực tiếp từ
 // `.fgos/events.jsonl` ngày 2026-08-09) — literal exact match, không suy
@@ -173,7 +165,7 @@ export function formatReport({ logPath, totalEvents, askVista, decisionVista }) 
 function main() {
   const args = process.argv.slice(2);
   const logIdx = args.indexOf('--log');
-  const logPath = logIdx >= 0 ? args[logIdx + 1] : path.join(resolveMainCheckoutRoot(), '.fgos', 'events.jsonl');
+  const logPath = logIdx >= 0 ? args[logIdx + 1] : path.join(mainCheckoutRoot(), '.fgos', 'events.jsonl');
   const reportIdx = args.indexOf('--report');
   const reportPath = reportIdx >= 0 ? args[reportIdx + 1] : null;
 

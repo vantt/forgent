@@ -1,9 +1,15 @@
 //! Repo observation source and helpers (Lane A2 - Phase F2).
 
-use std::path::Path;
-use std::process::Command;
+use fgos_git::{GitDriver, RepoHandle};
+use std::path::{Path, PathBuf};
 
-/// Counts commits between two revisions using `git rev-list --count`.
+/// The repository holding `root`, opened for the Git component's typed reads;
+/// `None` outside a repository or when the driver refuses it.
+pub(crate) fn open_repository(root: &Path) -> Option<(GitDriver, RepoHandle)> {
+    GitDriver::open_at(root).ok()?
+}
+
+/// Counts commits between two revisions through the Git component.
 /// If `head_at_open` is None, counts all commits up to `head_at_close`.
 /// If `head_at_close` is None, defaults to "HEAD".
 pub fn count_commits_in_range(
@@ -11,72 +17,53 @@ pub fn count_commits_in_range(
     head_at_open: Option<&str>,
     head_at_close: Option<&str>,
 ) -> Result<u64, String> {
-    let close = head_at_close.unwrap_or("HEAD");
-    let range = match head_at_open {
-        Some(open) if !open.is_empty() => format!("{open}..{close}"),
-        _ => close.to_string(),
+    let (driver, repo) = open_repository(root).ok_or("not a git repository")?;
+    let resolve = |name: &str| {
+        driver
+            .resolve_commit_ref(&repo, name)
+            .map_err(|e| e.cause)?
+            .ok_or_else(|| format!("unknown revision {name}"))
     };
-
-    let output = Command::new("git")
-        .arg("-C")
-        .arg(root)
-        .args(["rev-list", "--count", &range])
-        .output()
-        .map_err(|e| format!("failed to execute git rev-list: {e}"))?;
-
-    if !output.status.success() {
-        return Err(String::from_utf8_lossy(&output.stderr).to_string());
-    }
-
-    let text = String::from_utf8_lossy(&output.stdout);
-    text.trim()
-        .parse::<u64>()
-        .map_err(|e| format!("failed to parse commit count '{text}': {e}"))
+    let close = resolve(head_at_close.unwrap_or("HEAD"))?;
+    let open = match head_at_open {
+        Some(open) if !open.is_empty() => Some(resolve(open)?),
+        _ => None,
+    };
+    driver
+        .count_commits(&repo, &close, open.as_ref())
+        .map_err(|e| e.cause)
 }
 
-/// Counts lines of code in tracked files matching `git ls-files :/`.
-pub fn count_lines_of_code(root: &Path) -> Result<u64, String> {
-    let top_output = Command::new("git")
-        .arg("-C")
-        .arg(root)
-        .args(["rev-parse", "--show-toplevel"])
-        .output()
-        .map_err(|e| format!("failed to find git root: {e}"))?;
-
-    let git_top = if top_output.status.success() {
-        let s = String::from_utf8_lossy(&top_output.stdout);
-        std::path::PathBuf::from(s.trim())
-    } else {
-        root.to_path_buf()
-    };
-
-    let output = Command::new("git")
-        .arg("-C")
-        .arg(&git_top)
-        .args(["ls-files", ":/"])
-        .output()
-        .map_err(|e| format!("failed to execute git ls-files: {e}"))?;
-
-    if !output.status.success() {
-        return Err(String::from_utf8_lossy(&output.stderr).to_string());
-    }
-
-    let files_text = String::from_utf8_lossy(&output.stdout);
-    let mut total_lines = 0u64;
-
-    for line in files_text.lines() {
-        let trimmed = line.trim();
-        if trimmed.is_empty() {
-            continue;
+/// The work tree root and every path its index tracks, repository-relative.
+pub(crate) fn tracked_files(root: &Path) -> Result<(PathBuf, Vec<String>), String> {
+    let (driver, repo) = open_repository(root).ok_or("not a git repository")?;
+    let top = repo.work_tree().ok_or("no work tree")?.to_path_buf();
+    let mut files = vec![];
+    let mut cursor = None;
+    loop {
+        let page = driver
+            .tracked_paths(&repo, cursor, 4096)
+            .map_err(|e| e.cause)?;
+        files.extend(page.entries.iter().map(|p| String::from_utf8_lossy(p).into_owned()));
+        if page.complete {
+            return Ok((top, files));
         }
-        let full_path = git_top.join(trimmed);
+        cursor = page.next_cursor;
+    }
+}
+
+/// Counts lines of code in the files the repository's index tracks.
+pub fn count_lines_of_code(root: &Path) -> Result<u64, String> {
+    let (top, files) = tracked_files(root)?;
+    let mut total_lines = 0u64;
+    for file in files {
+        let full_path = top.join(file);
         if full_path.is_file() {
             if let Ok(content) = std::fs::read(&full_path) {
                 total_lines += content.iter().filter(|&&b| b == b'\n').count() as u64;
             }
         }
     }
-
     Ok(total_lines)
 }
 

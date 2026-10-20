@@ -14,6 +14,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { sandboxGit } from './lib/sandbox-git.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -38,11 +39,9 @@ function main() {
 
   try {
     console.log(`Setting up temporary store at ${tmpDir}...`);
-    execFileSync('git', ['init', tmpDir], { stdio: 'pipe' });
-    execFileSync('git', ['commit', '--allow-empty', '-m', 'init'], {
-      cwd: tmpDir,
-      stdio: 'pipe',
-    });
+    const git = sandboxGit(tmpDir);
+    git(['init', tmpDir]);
+    git(['commit', '--allow-empty', '-m', 'init'], { cwd: tmpDir });
 
     // 1. Initialize store with Node CLI
     execFileSync(process.execPath, [path.join(REPO_ROOT, 'bin', 'fgos.mjs'), 'init'], {

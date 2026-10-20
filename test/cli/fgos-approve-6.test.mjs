@@ -210,14 +210,14 @@ test('approve --no-wait fails immediately while another process holds the trunk\
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'wait-no-wait-approve', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'wait-no-wait-approve');
-  const holder = await holdLockInChild('merge-slot', { fgosDir: path.join(cwd, '.fgos'), ref: 'main' });
+  const holder = await holdLockInChild('merge-slot', { fgosDir: path.join(cwd, '.fgos'), ref: encodeURIComponent('refs/heads/main') });
   try {
     const result = run(cwd, ['approve', 'wait-no-wait-approve', '--no-wait']);
 
     // 9 ('merge-fail'), not 7 ('lock-timeout') -- MergeError's category is
     // unconditionally 'merge-fail' for every failure mode.
     assert.equal(result.status, 9, result.stderr);
-    assert.match(result.stderr, /merge slot of "main" is held by another process \(pid \d+/);
+    assert.match(result.stderr, /merge slot of "refs\/heads\/main" is held by another process \(pid \d+/);
     // A run that waited would tag the final error with the time it waited; none appears
     // when the flag skipped the wait. The holder never releases, so a waiting run could not
     // have succeeded either.

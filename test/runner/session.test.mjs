@@ -1,4 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
+import { activateGitFixture } from './worktree-native-fixture.helper.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -30,6 +31,7 @@ function initTempRepo() {
   fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
   // seed .fgos with a real committed store file, as the product repo has
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '');
@@ -50,6 +52,7 @@ function initTempRepoWithCommittedFgos() {
   fs.writeFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '{"seed":true}\n');
   execFileSync('git', ['add', '-A'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'init with committed .fgos'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
   return repoRoot;
 }
 
@@ -423,8 +426,10 @@ test('endSession refuses a diverged session without force, naming the dangling s
     assert.ok(fs.existsSync(sess.worktreePath), 'worktree still present after refusal');
     assert.equal(listSessions(repoRoot).length, 1, 'registry unchanged after refusal');
 
-    // force removes it, knowingly discarding the dangling commit
-    endSession(repoRoot, 'diverged', { force: true });
+    // Force removes the checkout but retains the detached commit durably.
+    const ended = endSession(repoRoot, 'diverged', { force: true });
+    assert.equal(execFileSync('git', ['rev-parse', ended.retainedRef], { cwd: repoRoot, encoding: 'utf8' }).trim(), danglingSha);
+    assert.ok(ended.warnings.some(warning => warning.includes(ended.retainedRef)));
     assert.ok(!fs.existsSync(sess.worktreePath), 'worktree removed with force');
     assert.equal(listSessions(repoRoot).length, 0);
   } finally {
@@ -581,4 +586,21 @@ test('reclaimOrphanedSessions never reclaims the caller\'s own worktree, even wi
   } finally {
     cleanup(repoRoot, sessionsDir);
   }
+});
+
+test('guarded removal refusal preserves the session store link, checkout and registry', () => {
+  const repoRoot = initTempRepo();
+  const sessionsDir = mkSessionsDir();
+  try {
+    const session = createSession(repoRoot, { sessionId: 'preserved', sessionsDir });
+    const tip = commitInside(session.worktreePath);
+    const link = path.join(session.worktreePath, '.fgos');
+    const target = fs.readlinkSync(link);
+    fs.writeFileSync(path.join(session.worktreePath, 'dirty.txt'), 'preserve me\n');
+    assert.throws(() => endSession(repoRoot, session.sessionId, { force: true }), /dirty/);
+    assert.equal(fs.readFileSync(path.join(session.worktreePath, 'dirty.txt'), 'utf8'), 'preserve me\n');
+    assert.equal(fs.readlinkSync(link), target);
+    assert.equal(listSessions(repoRoot).length, 1);
+    assert.equal(execFileSync('git', ['rev-parse', 'HEAD'], { cwd: session.worktreePath, encoding: 'utf8' }).trim(), tip);
+  } finally { cleanup(repoRoot, sessionsDir); }
 });

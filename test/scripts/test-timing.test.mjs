@@ -16,10 +16,15 @@ import {
   summarizeSamples,
   defaultTimedSpawn,
   isGitClean,
+  readStatus,
   parseJUnitTestcases,
   runProfile,
   summarizeProfile,
 } from '../../scripts/test-timing.mjs';
+import { initFixtureRepo } from '../helpers/git-fixture.mjs';
+
+// Porcelain-v1 lines as the status entries `readStatus` returns, so each case below reads as git shows it.
+const status = (text) => () => text.split('\n').filter(Boolean).map((line) => ({ path: line.slice(3), untracked: line.startsWith('??') }));
 
 const SAMPLE_TIME_V_OUTPUT = `\tCommand being timed: "node scripts/run-tests.mjs"
 \tUser time (seconds): 2562.22
@@ -96,26 +101,39 @@ test('hasGnuTimeV reflects injected checks, never touching the real filesystem w
 // --- isGitClean: symlinked build-artifact directories don't count as dirty ---
 
 test('isGitClean is true on a genuinely empty git status', () => {
-  assert.equal(isGitClean('/fake/cwd', () => ''), true);
+  assert.equal(isGitClean('/fake/cwd', status('')), true);
 });
 
 test('isGitClean ignores the bare "?? node_modules" and "?? target" symlink entries this track deliberately creates', () => {
-  assert.equal(isGitClean('/fake/cwd', () => '?? node_modules\n?? target\n'), true);
+  assert.equal(isGitClean('/fake/cwd', status('?? node_modules\n?? target\n')), true);
 });
 
 test('isGitClean still reports dirty for a real untracked directory with the same name shown WITH a trailing slash', () => {
-  assert.equal(isGitClean('/fake/cwd', () => '?? target/\n'), false);
+  assert.equal(isGitClean('/fake/cwd', status('?? target/\n')), false);
 });
 
 test('isGitClean still reports dirty for any real change alongside the symlink entries', () => {
-  assert.equal(isGitClean('/fake/cwd', () => '?? node_modules\n?? target\n M src/foo.mjs\n'), false);
+  assert.equal(isGitClean('/fake/cwd', status('?? node_modules\n?? target\n M src/foo.mjs\n')), false);
+});
+
+test('readStatus reports a symlinked build directory bare and a real untracked directory collapsed with its slash', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'test-timing-status-'));
+  initFixtureRepo(root);
+  const linked = fs.mkdtempSync(path.join(os.tmpdir(), 'test-timing-target-'));
+  fs.appendFileSync(path.join(root, '.gitignore'), '/target/\n');
+  fs.symlinkSync(linked, path.join(root, 'target'));
+  fs.mkdirSync(path.join(root, 'sub'));
+  fs.writeFileSync(path.join(root, 'sub/a.txt'), 'a\n');
+  const untracked = readStatus(root).filter((entry) => entry.untracked).map((entry) => entry.path).sort();
+  assert.deepEqual(untracked, ['sub/', 'target']);
+  assert.equal(isGitClean(root, readStatus, { allowedPrefixes: ['sub'] }), false, 'the edited .gitignore is still a tracked change');
 });
 
 // --- gatherEnvironment -------------------------------------------------------
 
 test('gatherEnvironment reports sha/node/platform/arch/cpuCount/loadavg from injected collaborators', () => {
   const env = gatherEnvironment({
-    exec: () => 'deadbeef\n',
+    resolveHead: () => 'deadbeef',
     loadavg: () => [1.1, 2.2, 3.3],
     cpus: () => [{}, {}, {}, {}],
   });
@@ -351,7 +369,6 @@ test('defaultTimedSpawn survives a child that writes well past spawnSync\'s defa
     forwardedArgs: [],
     cwd: dir,
     env: process.env,
-    timeBinary: '/usr/bin/time',
     logDir: dir,
   });
 
@@ -376,31 +393,31 @@ test('summarizeSamples throws rather than averaging when any sample is invalid',
 
 test('isGitClean ignores untracked paths matching allowedPrefixes', () => {
   assert.equal(
-    isGitClean('/fake/cwd', () => '?? plans/reports/artifacts/sample-1/\n', {
+    isGitClean('/fake/cwd', status('?? plans/reports/artifacts/sample-1/\n'), {
       allowedPrefixes: ['plans/reports/artifacts/sample-1'],
     }),
     true,
   );
   assert.equal(
-    isGitClean('/fake/cwd', () => '?? plans/reports/\n', {
+    isGitClean('/fake/cwd', status('?? plans/reports/\n'), {
       allowedPrefixes: ['plans/reports/artifacts/sample-1'],
     }),
     true,
   );
   assert.equal(
-    isGitClean('/fake/cwd', () => '?? plans/reports/artifacts/sample-1/stdout.log\n', {
+    isGitClean('/fake/cwd', status('?? plans/reports/artifacts/sample-1/stdout.log\n'), {
       allowedPrefixes: ['plans/reports/artifacts/sample-1'],
     }),
     true,
   );
   assert.equal(
-    isGitClean('/fake/cwd', () => '?? other/untracked.txt\n', {
+    isGitClean('/fake/cwd', status('?? other/untracked.txt\n'), {
       allowedPrefixes: ['plans/reports/artifacts/sample-1'],
     }),
     false,
   );
   assert.equal(
-    isGitClean('/fake/cwd', () => ' M src/foo.mjs\n?? plans/reports/artifacts/sample-1/\n', {
+    isGitClean('/fake/cwd', status(' M src/foo.mjs\n?? plans/reports/artifacts/sample-1/\n'), {
       allowedPrefixes: ['plans/reports/artifacts/sample-1'],
     }),
     false,

@@ -133,7 +133,7 @@ test('from inside a linked worktree, fgos resolves to the MAIN checkout bin/fgos
 
   // Overwrite the worktree's own (uncommitted) copy of bin/fgos.mjs with a
   // different marker, so a pass only if the shell function actually
-  // resolved via --git-common-dir to the main checkout's bin/fgos.mjs.
+  // resolved the common dir to the main checkout's bin/fgos.mjs.
   writeBinStub(worktreeRoot, 'fgos', 'WORKTREE_LOCAL_MARKER');
 
   const out = runBash(worktreeRoot, `source "${scriptPath}"; fgos --z`);
@@ -143,6 +143,42 @@ test('from inside a linked worktree, fgos resolves to the MAIN checkout bin/fgos
 
   execFileSync('git', ['worktree', 'remove', '--force', worktreeRoot], { cwd: repoRoot });
   fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test('the root is read from the .git layout on disk: from a nested directory of a linked worktree whose .git file names its gitdir relatively, bash and zsh both resolve the main checkout, exactly as git reports its common dir', () => {
+  const repoRoot = setupRepo();
+  const worktreeRoot = mkTempDir('fgos-shell-integration-wt-rel-');
+  fs.rmSync(worktreeRoot, { recursive: true, force: true });
+  execFileSync('git', ['worktree', 'add', '-q', worktreeRoot, '-b', 'wt-rel'], { cwd: repoRoot });
+  const dotGit = path.join(worktreeRoot, '.git');
+  const gitDir = /^gitdir:\s*(.+?)\s*$/m.exec(fs.readFileSync(dotGit, 'utf8'))[1];
+  fs.writeFileSync(dotGit, `gitdir: ${path.relative(worktreeRoot, gitDir)}\n`);
+  const nested = path.join(worktreeRoot, 'a', 'b');
+  fs.mkdirSync(nested, { recursive: true });
+  const expectedRoot = path.dirname(execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], { cwd: nested, encoding: 'utf8' }).trim());
+  assert.equal(expectedRoot, fs.realpathSync(repoRoot));
+
+  for (const run of [runBash, runZsh]) {
+    const out = run(nested, `source "${scriptPath}"; fgos --z; fgos-runner --y`);
+    assert.match(out, new RegExp(`FGOS_MARKER \\["--z","--dir",${JSON.stringify(JSON.stringify(expectedRoot)).slice(1, -1)}\\]`));
+    assert.match(out, /FGOS_RUNNER_MARKER \["--y"\]/);
+  }
+
+  execFileSync('git', ['worktree', 'remove', '--force', worktreeRoot], { cwd: repoRoot });
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test('a .git file that names no gitdir is not a repository: fgos and fgos-runner fail quietly with the not-a-git-repository error', () => {
+  const dir = mkTempDir('fgos-shell-integration-bad-gitfile-');
+  fs.writeFileSync(path.join(dir, '.git'), 'not a gitfile\n');
+
+  for (const fn of ['fgos', 'fgos-runner']) {
+    const result = spawnSync('bash', ['-c', `source "${scriptPath}"; ${fn} --x`], { cwd: dir, encoding: 'utf8', env: SHELL_ENV });
+    assert.notEqual(result.status, 0);
+    assert.equal(result.stdout, '');
+    assert.equal(result.stderr, `${fn}: not a git repository\n`);
+  }
+  fs.rmSync(dir, { recursive: true, force: true });
 });
 
 test('fgos returns non-zero and prints an error to stderr outside any git repo', () => {

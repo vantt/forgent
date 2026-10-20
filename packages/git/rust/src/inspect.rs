@@ -18,6 +18,7 @@ fn refused(cause: &str) -> OperationError {
         exit_code: None,
         signal: None,
         stderr: vec![],
+        detail: None,
     }
 }
 fn oid(repo: &RepoHandle, bytes: &[u8]) -> Result<Oid> {
@@ -43,6 +44,15 @@ pub enum Untracked {
     Normal,
     All,
 }
+/// Whether `status` also reports ignored paths, Git's `--ignored=traditional`:
+/// a wholly ignored directory is collapsed to `dir/`, and an ignored path
+/// inside a collapsed untracked directory is still listed on its own.
+#[derive(Debug, Clone, Copy, Default)]
+pub enum Ignored {
+    #[default]
+    Excluded,
+    Listed,
+}
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StatusEntry {
@@ -50,12 +60,85 @@ pub struct StatusEntry {
     pub index: u8,
     pub worktree: u8,
     pub untracked: bool,
+    pub ignored: bool,
     pub unmerged: bool,
 }
 #[derive(Debug, Serialize)]
 pub struct DiffEntry {
     pub path: Vec<u8>,
     pub change: u8,
+    /// The old path of a detected rename; only with `DiffScope::renames`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub from: Option<Vec<u8>>,
+}
+/// What a `diff` compares beyond its two objects: an optional literal path
+/// prefix, and whether a rename is reported once under its new path.
+#[derive(Debug, Default)]
+pub struct DiffScope<'a> {
+    pub prefix: Option<&'a str>,
+    pub renames: bool,
+}
+/// The two sides a `diff` compares: two pinned objects, or a commit or the
+/// index against the checkout's live state.
+#[derive(Debug, Clone, Copy)]
+pub enum DiffSides<'a> {
+    /// `before` and `after`, each a commit or a tree (`diff_text`: commits).
+    Objects(&'a Oid, &'a Oid),
+    /// A commit against the index (staged changes).
+    IndexAgainst(&'a Oid),
+    /// A commit against the work tree (staged and unstaged changes).
+    WorktreeAgainst(&'a Oid),
+    /// The index against the work tree (unstaged changes).
+    WorktreeAgainstIndex,
+}
+#[derive(Debug, Clone, Copy, Default)]
+pub enum Submodules {
+    /// Git's own reporting, as configured.
+    #[default]
+    Configured,
+    /// `--ignore-submodules=dirty`: a submodule's own dirt is left out; a
+    /// moved submodule commit is still reported.
+    IgnoreDirty,
+}
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MergeTreeFact {
+    pub tree: Oid,
+    pub conflicted_paths: Vec<Vec<u8>>,
+}
+#[derive(Debug, Serialize)]
+pub struct AttributeFact {
+    pub path: Vec<u8>,
+    pub value: String,
+}
+/// A canonical repository-relative prefix (a trailing `/` is accepted), never
+/// pathspec magic, a glob or a traversal.
+fn literal_prefix(raw: &str) -> Result<&str> {
+    let prefix = raw.strip_suffix('/').unwrap_or(raw);
+    if prefix.is_empty()
+        || prefix.chars().any(char::is_control)
+        || fgos_write_scope::canonicalize(prefix).as_deref() != Ok(prefix)
+    {
+        return Err(refused("invalid-literal-path"));
+    }
+    Ok(prefix)
+}
+/// Bounded canonical repository-relative paths, used under `--literal-pathspecs`.
+fn literal_paths(files: &[String]) -> Result<()> {
+    if files.len() > 4096
+        || files.iter().map(|p| p.len() + 1).sum::<usize>() > LIMIT
+        || files.iter().any(|p| p.contains('*') || p.chars().any(char::is_control)
+            || fgos_write_scope::canonicalize(p).as_deref() != Ok(p.as_str()))
+    {
+        return Err(refused("invalid-literal-path"));
+    }
+    Ok(())
+}
+fn count(bytes: &[u8]) -> Result<u64> {
+    std::str::from_utf8(bytes)
+        .ok()
+        .and_then(|text| text.trim_end_matches('\n').parse().ok())
+        .ok_or_else(|| refused("invalid-count"))
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -137,6 +220,19 @@ impl GitDriver {
             Duration::from_secs(30),
         )
     }
+    /// Work's existing fallback timing read, with bounded literal paths.
+    pub fn last_path_commit_time(&self, repo: &RepoHandle, files: &[String]) -> Result<Option<i64>> {
+        if files.is_empty() {
+            return Err(refused("invalid-literal-path"));
+        }
+        literal_paths(files)?;
+        let mut args = vec!["--literal-pathspecs", "log", "-1", "--format=%ct", "--"];
+        args.extend(files.iter().map(String::as_str));
+        let raw = self.checked(repo, &args, Policy::Inspect)?;
+        let text = std::str::from_utf8(&raw).map_err(|_| refused("invalid-commit-time"))?.trim();
+        if text.is_empty() { return Ok(None); }
+        text.parse().map(Some).map_err(|_| refused("invalid-commit-time"))
+    }
     /// Literal full refs only; missing remains distinct from errors and symbolic.
     pub fn resolve_ref(&self, repo: &RepoHandle, name: &RefName) -> Result<RefValue> {
         let prefix = RefPrefix::parse(name.as_str()).map_err(|_| refused("invalid-ref"))?;
@@ -206,6 +302,8 @@ impl GitDriver {
         &self,
         repo: &RepoHandle,
         untracked: Untracked,
+        submodules: Submodules,
+        ignored: Ignored,
         cursor: Option<InspectCursor>,
         max: usize,
     ) -> Result<InspectPage<StatusEntry>> {
@@ -214,26 +312,30 @@ impl GitDriver {
             Untracked::Normal => "--untracked-files=normal",
             Untracked::All => "--untracked-files=all",
         };
-        let bytes = self.checked(
-            repo,
-            &[
-                "status",
-                "--porcelain=v2",
-                "-z",
-                "--no-renames",
-                untracked,
-                "--ignored=no",
-            ],
-            Policy::Inspect,
-        )?;
+        let mut args = vec![
+            "status",
+            "--porcelain=v2",
+            "-z",
+            "--no-renames",
+            untracked,
+            match ignored {
+                Ignored::Excluded => "--ignored=no",
+                Ignored::Listed => "--ignored=traditional",
+            },
+        ];
+        if let Submodules::IgnoreDirty = submodules {
+            args.push("--ignore-submodules=dirty");
+        }
+        let bytes = self.checked(repo, &args, Policy::Inspect)?;
         let mut entries = vec![];
         for record in records(&bytes)? {
             let entry = match record.first() {
-                Some(b'?') if record.starts_with(b"? ") => StatusEntry {
+                Some(kind @ (b'?' | b'!')) if record.get(1) == Some(&b' ') => StatusEntry {
                     path: record[2..].to_vec(),
-                    index: b'?',
-                    worktree: b'?',
-                    untracked: true,
+                    index: *kind,
+                    worktree: *kind,
+                    untracked: *kind == b'?',
+                    ignored: *kind == b'!',
                     unmerged: false,
                 },
                 Some(b'1') | Some(b'u') => {
@@ -249,6 +351,7 @@ impl GitDriver {
                         index: fields[1][0],
                         worktree: fields[1][1],
                         untracked: false,
+                        ignored: false,
                         unmerged,
                     }
                 }
@@ -261,49 +364,122 @@ impl GitDriver {
         }
         page(entries, &bytes, cursor, max)
     }
-    /// Changes between two pinned objects, with renames disabled so both paths
-    /// of a move appear independently. No cwd-relative or text conversion rules.
+    /// The `diff` arguments naming `sides`, after each pinned object is
+    /// checked to be a commit (or, unless `commits_only`, a tree).
+    fn diff_sides<'a>(
+        &self,
+        repo: &RepoHandle,
+        sides: DiffSides<'a>,
+        commits_only: bool,
+    ) -> Result<Vec<&'a str>> {
+        let require = |value: &Oid| if commits_only { self.require_commit(repo, value) } else { self.require_tree_ish(repo, value) };
+        Ok(match sides {
+            DiffSides::Objects(before, after) => {
+                require(before)?;
+                require(after)?;
+                vec![before.as_str(), after.as_str()]
+            }
+            DiffSides::IndexAgainst(before) => {
+                self.require_commit(repo, before)?;
+                vec!["--cached", before.as_str()]
+            }
+            DiffSides::WorktreeAgainst(before) => {
+                self.require_commit(repo, before)?;
+                vec![before.as_str()]
+            }
+            DiffSides::WorktreeAgainstIndex => vec![],
+        })
+    }
+    /// Changes between the two sides. Renames are disabled unless the scope
+    /// asks for them, so both paths of a move appear independently. No
+    /// cwd-relative or text conversion rules.
     pub fn diff(
         &self,
         repo: &RepoHandle,
-        before: &Oid,
-        after: &Oid,
+        sides: DiffSides<'_>,
+        scope: &DiffScope<'_>,
         cursor: Option<InspectCursor>,
         max: usize,
     ) -> Result<InspectPage<DiffEntry>> {
-        self.require_commit(repo, before)?;
-        self.require_commit(repo, after)?;
-        let bytes = self.checked(
-            repo,
-            &[
-                "diff",
-                "--name-status",
-                "--no-relative",
-                "--no-renames",
-                "--no-ext-diff",
-                "--no-textconv",
-                "-z",
-                before.as_str(),
-                after.as_str(),
-                "--",
-            ],
-            Policy::Inspect,
-        )?;
+        let sides = self.diff_sides(repo, sides, false)?;
+        let pathspec = scope
+            .prefix
+            .map(|p| literal_prefix(p).map(|p| format!(":(literal){p}")))
+            .transpose()?;
+        let mut args = vec![
+            "diff",
+            "--name-status",
+            "--no-relative",
+            if scope.renames { "--find-renames" } else { "--no-renames" },
+            "--no-ext-diff",
+            "--no-textconv",
+            "-z",
+        ];
+        args.extend(sides);
+        args.push("--");
+        args.extend(pathspec.as_deref());
+        let bytes = self.checked(repo, &args, Policy::Inspect)?;
         let fields = records(&bytes)?;
-        if fields.len() % 2 != 0 {
-            return Err(refused("invalid-diff-protocol"));
-        }
         let mut entries = vec![];
-        for pair in fields.chunks(2) {
-            if pair[0].len() != 1 || !b"ACDMTUXB".contains(&pair[0][0]) || pair[1].is_empty() {
+        let mut rest = fields.as_slice();
+        while let Some((status, tail)) = rest.split_first() {
+            let renamed = scope.renames
+                && status.len() > 1
+                && status[0] == b'R'
+                && status[1..].iter().all(u8::is_ascii_digit);
+            let arity = if renamed { 2 } else { 1 };
+            if tail.len() < arity
+                || tail[..arity].iter().any(|p| p.is_empty())
+                || (!renamed && (status.len() != 1 || !b"ACDMTUXB".contains(&status[0])))
+            {
                 return Err(refused("invalid-diff-protocol"));
             }
             entries.push(DiffEntry {
-                path: pair[1].to_vec(),
-                change: pair[0][0],
+                path: tail[arity - 1].to_vec(),
+                change: status[0],
+                from: renamed.then(|| tail[0].to_vec()),
             });
+            rest = &tail[arity..];
         }
         page(entries, &bytes, cursor, max)
+    }
+    /// Bounded patch bytes for review consumers, optionally limited to literal
+    /// paths and to `context` lines around each change. Never runs external
+    /// diff/textconv.
+    pub fn diff_text(
+        &self,
+        repo: &RepoHandle,
+        sides: DiffSides<'_>,
+        paths: &[String],
+        context: Option<u32>,
+        max_bytes: usize,
+    ) -> Result<Vec<u8>> {
+        if max_bytes == 0 || max_bytes > 50 * 1024 * 1024 || context.is_some_and(|n| n > 1_000_000) {
+            return Err(refused("invalid-diff-bound"));
+        }
+        literal_paths(paths)?;
+        let unified = context.map(|n| format!("--unified={n}"));
+        let mut args = vec!["--literal-pathspecs", "diff", "--no-relative", "--no-ext-diff", "--no-textconv"];
+        args.extend(unified.as_deref());
+        args.extend(self.diff_sides(repo, sides, true)?);
+        args.push("--");
+        args.extend(paths.iter().map(String::as_str));
+        let output = self.invoke(
+            Some(repo), repo.trusted_main_root(),
+            &args,
+            Policy::Inspect, None, true, max_bytes, Duration::from_secs(30),
+        )?;
+        if !output.success { return Err(output.error("diff-read-failed")); }
+        Ok(output.stdout)
+    }
+    fn require_tree_ish(&self, repo: &RepoHandle, value: &Oid) -> Result<()> {
+        Oid::parse(value.as_str(), repo.object_format())
+            .map_err(|_| refused("object-format-mismatch"))?;
+        let kind = self.checked(repo, &["cat-file", "-t", value.as_str()], Policy::Inspect)?;
+        if kind != b"commit\n" && kind != b"tree\n" {
+            return Err(refused("expected-commit-or-tree"));
+        }
+        Ok(())
     }
     fn require_commit(&self, repo: &RepoHandle, value: &Oid) -> Result<()> {
         Oid::parse(value.as_str(), repo.object_format())
@@ -605,7 +781,7 @@ impl GitDriver {
         previous_paths: &[Vec<u8>],
         max_bytes: u64,
     ) -> Result<WritesSnapshot> {
-        if max_bytes == 0 || previous_paths.len() > 4096 {
+        if max_bytes == 0 || previous_paths.iter().map(|p| p.len() + 1).sum::<usize>() > crate::driver::PATH_LIMIT {
             return Err(refused("invalid-snapshot-bounds"));
         }
         let head = match self.resolve_head(repo)? {
@@ -616,9 +792,9 @@ impl GitDriver {
             previous_paths.iter().cloned().collect();
         let mut cursor = None;
         loop {
-            let page = self.status(repo, Untracked::All, cursor, 4096)?;
+            let page = self.status(repo, Untracked::All, Submodules::Configured, Ignored::Excluded, cursor, 4096)?;
             paths.extend(page.entries.into_iter().map(|e| e.path));
-            if paths.len() > 4096 {
+            if paths.iter().map(|p| p.len() + 1).sum::<usize>() > crate::driver::PATH_LIMIT {
                 return Err(refused("snapshot-path-limit"));
             }
             if page.complete {
@@ -798,4 +974,326 @@ pub(crate) fn fingerprint(
     _remaining: &mut u64,
 ) -> Result<PathFingerprint> {
     Err(refused("snapshot-platform-unsupported"))
+}
+
+impl GitDriver {
+    pub fn resolve_commit_ref(&self, repo: &RepoHandle, name: &str) -> Result<Option<Oid>> {
+        if name.is_empty() || name.contains('\0') { return Err(refused("invalid-ref-name")); }
+        let revision = format!("{name}^{{commit}}");
+        self.require_floor()?;
+        self.preflight(repo)?;
+        let out = self.invoke(Some(repo), repo.trusted_main_root(), &["rev-parse", "-q", "--verify", "--end-of-options", &revision], Policy::Inspect, None, true, 4096, std::time::Duration::from_secs(30))?;
+        if out.success {
+            Ok(Some(Oid::parse(std::str::from_utf8(&out.stdout).map_err(|_|refused("invalid-oid"))?.trim_end_matches('\n'), repo.object_format()).map_err(|_|refused("invalid-oid"))?))
+        } else if out.code == Some(1) { Ok(None) } else { Err(out.error("ref-resolution-failed")) }
+    }
+}
+
+/// Bounded semantic facts used by checkout lifecycle consumers.
+impl GitDriver {
+    pub fn compare_commits(
+        &self,
+        repo: &RepoHandle,
+        left: &Oid,
+        right: &Oid,
+    ) -> Result<serde_json::Value> {
+        let base = self.checked(
+            repo,
+            &["merge-base", left.as_str(), right.as_str()],
+            Policy::Inspect,
+        )?;
+        let counts = self.checked(
+            repo,
+            &[
+                "rev-list",
+                "--left-right",
+                "--count",
+                &format!("{}...{}", left.as_str(), right.as_str()),
+            ],
+            Policy::Inspect,
+        )?;
+        let counts = std::str::from_utf8(&counts)
+            .map_err(|_| refused("invalid-count"))?
+            .split_whitespace()
+            .map(str::parse::<u64>)
+            .collect::<std::result::Result<Vec<_>, _>>()
+            .map_err(|_| refused("invalid-count"))?;
+        let commits = self.checked(
+            repo,
+            &[
+                "rev-list",
+                &format!("{}..{}", left.as_str(), right.as_str()),
+            ],
+            Policy::Inspect,
+        )?;
+        if counts.len() != 2 {
+            return Err(refused("invalid-count"));
+        }
+        let commits = std::str::from_utf8(&commits)
+            .map_err(|_| refused("invalid-object-id"))?
+            .lines()
+            .collect::<Vec<_>>();
+        Ok(
+            serde_json::json!({"mergeBase":std::str::from_utf8(&base).map_err(|_| refused("invalid-object-id"))?.trim(),"left":counts[0],"right":counts[1],"commits":commits}),
+        )
+    }
+    pub fn list_branches(&self, repo: &RepoHandle, prefix: &str) -> Result<Vec<String>> {
+        RefName::parse(prefix.trim_end_matches('/')).map_err(|_| refused("invalid-ref-prefix"))?;
+        if !prefix.starts_with("refs/heads/") {
+            return Err(refused("invalid-ref-prefix"));
+        }
+        let out = self.checked(
+            repo,
+            &["for-each-ref", "--format=%(refname)", prefix],
+            Policy::Inspect,
+        )?;
+        Ok(std::str::from_utf8(&out)
+            .map_err(|_| refused("invalid-ref-name"))?
+            .lines()
+            .map(str::to_owned)
+            .collect())
+    }
+    pub fn checkout_facts(&self, repo: &RepoHandle, revision: &Oid) -> Result<serde_json::Value> {
+        let reflog = self.checked(
+            repo,
+            &["reflog", "show", "HEAD", "-n", "1", "--format=%H"],
+            Policy::Inspect,
+        )?;
+        let delta = self.checked(
+            repo,
+            &[
+                "diff",
+                "--name-only",
+                "-z",
+                "--no-relative",
+                "--no-ext-diff",
+                "--no-textconv",
+                revision.as_str(),
+                "--",
+                ":!.fgos",
+            ],
+            Policy::Inspect,
+        )?;
+        let staged = self.checked(
+            repo,
+            &[
+                "diff",
+                "--cached",
+                "--binary",
+                "--no-ext-diff",
+                "--no-textconv",
+                revision.as_str(),
+                "--",
+                ":!.fgos",
+            ],
+            Policy::Inspect,
+        )?;
+        let status = self.checked(
+            repo,
+            &[
+                "status",
+                "--porcelain=v1",
+                "-z",
+                "--untracked-files=all",
+                "--",
+                ":!.fgos",
+            ],
+            Policy::Inspect,
+        )?;
+        Ok(
+            serde_json::json!({"lastSynced":std::str::from_utf8(&reflog).map_err(|_| refused("invalid-object-id"))?.trim(),"delta":delta,"stagedPatch":staged,"status":status,"orphanedPatches":self.restore_patch_paths(repo)?}),
+        )
+    }
+    pub fn remote_tracking(
+        &self,
+        repo: &RepoHandle,
+        branch: &RefName,
+        remote: &str,
+    ) -> Result<serde_json::Value> {
+        let name = branch
+            .as_str()
+            .strip_prefix("refs/heads/")
+            .ok_or_else(|| refused("invalid-branch"))?;
+        let out = self.checked(
+            repo,
+            &[
+                "for-each-ref",
+                "--format=%(refname)%00%(upstream)",
+                branch.as_str(),
+            ],
+            Policy::Inspect,
+        )?;
+        let listing = std::str::from_utf8(&out).map_err(|_| refused("invalid-ref-name"))?;
+        let upstream = listing
+            .lines()
+            .filter_map(|line| line.split_once('\0'))
+            .find(|(reference, _)| *reference == branch.as_str())
+            .map_or("", |(_, upstream)| upstream);
+        let url = if upstream.is_empty() {
+            Some(self.remote_url(repo, remote)?)
+        } else {
+            None
+        };
+        Ok(serde_json::json!({"branch":name,"upstream":upstream,"url":url}))
+    }
+}
+
+/// Bounded merge facts for the Land consumer's trusted-side resolutions.
+impl GitDriver {
+    /// The tree `git merge-tree --write-tree` produces for two commits and the
+    /// paths it left conflicted. Exit 1 is the conflicted answer. The command
+    /// may add unreferenced objects; it changes no ref, index or checkout.
+    pub fn merge_tree(&self, repo: &RepoHandle, target: &Oid, source: &Oid) -> Result<MergeTreeFact> {
+        self.require_commit(repo, target)?;
+        self.require_commit(repo, source)?;
+        let out = self.inspect_command(
+            repo,
+            &[
+                "merge-tree",
+                "--write-tree",
+                "-z",
+                "--name-only",
+                "--no-messages",
+                target.as_str(),
+                source.as_str(),
+            ],
+        )?;
+        let conflicted = match (out.success, out.code) {
+            (true, _) => false,
+            (false, Some(1)) => true,
+            _ => return Err(out.error("merge-tree-failed")),
+        };
+        let fields = records(&out.stdout)?;
+        let (tree, paths) = fields
+            .split_first()
+            .ok_or_else(|| refused("invalid-merge-tree-protocol"))?;
+        let tree = oid(repo, tree)?;
+        let mut conflicted_paths: Vec<Vec<u8>> = vec![];
+        for path in paths.iter().filter(|p| !p.is_empty()) {
+            if !conflicted_paths.iter().any(|p| p == path) {
+                conflicted_paths.push(path.to_vec());
+            }
+        }
+        if conflicted != !conflicted_paths.is_empty() {
+            return Err(refused("invalid-merge-tree-protocol"));
+        }
+        Ok(MergeTreeFact { tree, conflicted_paths })
+    }
+    /// One named attribute of literal paths, from the `.gitattributes` of a
+    /// commit or tree, exactly as Git reports it.
+    pub fn attributes(
+        &self,
+        repo: &RepoHandle,
+        revision: &Oid,
+        attribute: &str,
+        paths: &[Vec<u8>],
+    ) -> Result<Vec<AttributeFact>> {
+        self.require_tree_ish(repo, revision)?;
+        if attribute.is_empty()
+            || attribute.starts_with('-')
+            || !attribute.bytes().all(|b| b.is_ascii_alphanumeric() || b"-_.".contains(&b))
+        {
+            return Err(refused("invalid-attribute-name"));
+        }
+        if paths.is_empty()
+            || paths.len() > 4096
+            || paths.iter().any(|p| p.is_empty() || p.contains(&0))
+            || paths.iter().map(|p| p.len() + 1).sum::<usize>() > LIMIT
+        {
+            return Err(refused("invalid-literal-path"));
+        }
+        let mut input = Vec::new();
+        for path in paths {
+            input.extend_from_slice(path);
+            input.push(0);
+        }
+        let source = format!("--source={}", revision.as_str());
+        let bytes = self.inspect_input(repo, &["check-attr", "-z", "--stdin", &source, attribute], &input)?;
+        let fields = records(&bytes)?;
+        if fields.len() != paths.len() * 3 {
+            return Err(refused("invalid-check-attr-protocol"));
+        }
+        fields
+            .chunks(3)
+            .zip(paths)
+            .map(|(record, path)| {
+                if record[0] != path.as_slice() || record[1] != attribute.as_bytes() {
+                    return Err(refused("invalid-check-attr-protocol"));
+                }
+                Ok(AttributeFact {
+                    path: path.clone(),
+                    value: String::from_utf8(record[2].to_vec())
+                        .map_err(|_| refused("invalid-check-attr-protocol"))?,
+                })
+            })
+            .collect()
+    }
+    /// The earliest merge commit on the ancestry path from `ancestor` to
+    /// `descendant` (both commits), or none.
+    pub fn first_ancestry_merge(&self, repo: &RepoHandle, ancestor: &Oid, descendant: &Oid) -> Result<Option<Oid>> {
+        self.require_commit(repo, ancestor)?;
+        self.require_commit(repo, descendant)?;
+        let range = format!("{}..{}", ancestor.as_str(), descendant.as_str());
+        let bytes = self.checked(
+            repo,
+            &["rev-list", "--merges", "--ancestry-path", "--reverse", &range, "--"],
+            Policy::Inspect,
+        )?;
+        bytes
+            .split(|b| *b == b'\n')
+            .find(|line| !line.is_empty())
+            .map(|line| oid(repo, line))
+            .transpose()
+    }
+}
+
+/// Commit counts, times and the index listing for reporting consumers.
+impl GitDriver {
+    /// A commit's committer time, in seconds since the epoch.
+    pub fn commit_time(&self, repo: &RepoHandle, commit: &Oid) -> Result<i64> {
+        self.require_commit(repo, commit)?;
+        let raw = self.checked(repo, &["log", "-1", "--format=%ct", commit.as_str(), "--"], Policy::Inspect)?;
+        std::str::from_utf8(&raw)
+            .ok()
+            .and_then(|text| text.trim_end_matches('\n').parse().ok())
+            .ok_or_else(|| refused("invalid-commit-time"))
+    }
+    /// How many commits `include` reaches that `exclude`, when given, does not.
+    pub fn count_commits(&self, repo: &RepoHandle, include: &Oid, exclude: Option<&Oid>) -> Result<u64> {
+        self.require_commit(repo, include)?;
+        let range = match exclude {
+            Some(exclude) => {
+                self.require_commit(repo, exclude)?;
+                format!("{}..{}", exclude.as_str(), include.as_str())
+            }
+            None => include.as_str().to_owned(),
+        };
+        count(&self.checked(repo, &["rev-list", "--count", &range, "--"], Policy::Inspect)?)
+    }
+    /// How many non-merge commits of `head` have no patch-equivalent commit
+    /// on `upstream` (`rev-list --cherry-pick --right-only --no-merges`).
+    pub fn unmatched_commit_count(&self, repo: &RepoHandle, upstream: &Oid, head: &Oid) -> Result<u64> {
+        self.require_commit(repo, upstream)?;
+        self.require_commit(repo, head)?;
+        let range = format!("{}...{}", upstream.as_str(), head.as_str());
+        count(&self.checked(
+            repo,
+            &["rev-list", "--count", "--cherry-pick", "--right-only", "--no-merges", &range, "--"],
+            Policy::Inspect,
+        )?)
+    }
+    /// The paths the index tracks, repository-relative bytes in index order.
+    pub fn tracked_paths(
+        &self,
+        repo: &RepoHandle,
+        cursor: Option<InspectCursor>,
+        max: usize,
+    ) -> Result<InspectPage<Vec<u8>>> {
+        let bytes = self.checked(repo, &["ls-files", "-z", "--cached", "--full-name"], Policy::Inspect)?;
+        let entries = records(&bytes)?
+            .into_iter()
+            .map(|path| if path.is_empty() { Err(refused("invalid-ls-files-protocol")) } else { Ok(path.to_vec()) })
+            .collect::<Result<Vec<_>>>()?;
+        page(entries, &bytes, cursor, max)
+    }
 }

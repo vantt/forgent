@@ -6,17 +6,12 @@ import path from 'node:path';
 import os from 'node:os';
 import { execSync, execFileSync } from 'node:child_process';
 import { runKnowledgeMigration } from '../../scripts/knowledge-migration.mjs';
+import { initFixtureRepo } from '../helpers/git-fixture.mjs';
 import { initStore, registerTopicStore, registerDocStore, retireDocStore, retireTopicStore, rebuild } from '../../src/state/store.mjs';
 
 function setupGitRepoWithStore() {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-migration-test-'));
-  execSync('git init', { cwd: tmpDir, stdio: 'ignore' });
-  execSync('git config user.name "Test"', { cwd: tmpDir, stdio: 'ignore' });
-  execSync('git config user.email "test@example.com"', { cwd: tmpDir, stdio: 'ignore' });
-
-  const readme = path.join(tmpDir, 'README.md');
-  fs.writeFileSync(readme, '# Test Repo\n', 'utf8');
-  execSync('git add README.md && git commit -m "initial commit"', { cwd: tmpDir, stdio: 'ignore' });
+  initFixtureRepo(tmpDir, { message: 'initial commit' });
 
   const fgosDir = path.join(tmpDir, '.fgos');
   initStore(fgosDir);
@@ -68,6 +63,9 @@ test('knowledge-migration - apply moves file and updates store currentPath and a
 
     const res = runKnowledgeMigration(tmpDir, { dryRun: false });
     assert.equal(res.dryRun, false);
+    const moved = execFileSync('git', ['show', '--no-renames', '--name-status', '--format=', 'HEAD'], { cwd: tmpDir, encoding: 'utf8' });
+    assert.equal(moved, 'D\tdocs/how-to/reclaim.md\nA\tdocs/knowledge/worktree-reclaim/guide.md\n', 'the move is one commit of exactly its two literal paths');
+    assert.equal(execFileSync('git', ['status', '--porcelain', '--', 'docs/how-to', 'docs/knowledge'], { cwd: tmpDir, encoding: 'utf8' }), '');
     assert.equal(res.appliedCount, 1);
 
     const newFile = path.join(tmpDir, 'docs/knowledge/worktree-reclaim/guide.md');
@@ -578,7 +576,7 @@ test('knowledge-migration - a frontmatter-write failure leaves the source file a
   }
 });
 
-test('knowledge-migration - a locked git index (both "git mv" and the fallback "git add" fail) throws instead of reporting silent success', () => {
+test('knowledge-migration - a locked git index makes the scoped commit of the move fail, and apply throws instead of reporting silent success', () => {
   const { tmpDir, fgosDir } = setupGitRepoWithStore();
   try {
     registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'worktree-reclaim' });
@@ -594,15 +592,15 @@ test('knowledge-migration - a locked git index (both "git mv" and the fallback "
     fs.writeFileSync(oldFile, '# Reclaim\n', 'utf8');
     execSync('git add docs/how-to/reclaim.md && git commit -m "add reclaim"', { cwd: tmpDir, stdio: 'ignore' });
 
-    // A stale/held index.lock makes BOTH "git mv" (the primary attempt)
-    // and the fallback "git add" fail -- the exact repro shape (the
-    // fallback path used to swallow this and report success anyway).
+    // A stale/held index.lock makes the move's scoped commit fail -- the
+    // exact repro shape (an earlier fallback path swallowed this and
+    // reported success anyway).
     const lockFile = path.join(tmpDir, '.git', 'index.lock');
     fs.writeFileSync(lockFile, '', 'utf8');
     try {
       assert.throws(() => {
         runKnowledgeMigration(tmpDir, { dryRun: false });
-      }, /git add.*failed to stage it/);
+      }, /the scoped commit failed to record it/);
 
       const view = rebuild(fgosDir);
       assert.equal(view.docs['t1:guide'].currentPath, 'docs/how-to/reclaim.md', 'the registry must NOT claim the move happened when git never tracked it');

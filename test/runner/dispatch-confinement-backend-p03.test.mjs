@@ -8,7 +8,10 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import cp from 'node:child_process';
-import { commitUnitWork } from '../../src/runner/execution/commit-unit-work.mjs';
+import { commitUnitWork, preflightUnitWorktree } from '../../src/runner/execution/commit-unit-work.mjs';
+import { activateGitFixture } from '../helpers/git-fixture.mjs';
+import { admitSuccessor } from '../../src/runner/dispatch/cwd-lock.mjs';
+import { createLockScope } from '../../src/holder-lock/index.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 
 import {
@@ -1277,6 +1280,7 @@ test('a workspace-write producer in a linked worktree cannot write git metadata;
   if (!bwrapOk) return t.skip('no working bwrap on this machine');
   // Outside /tmp: the sandbox mounts a private tmpfs there.
   const base = fs.mkdtempSync(path.join(fs.existsSync('/var/tmp') ? '/var/tmp' : os.tmpdir(), 'fgos-wt-commit-'));
+  let custody = null;
   try {
     const main = path.join(base, 'main');
     const wt = path.join(base, 'wt');
@@ -1285,6 +1289,11 @@ test('a workspace-write producer in a linked worktree cannot write git metadata;
     git(main, 'init', '-q', '-b', 'main');
     git(main, 'commit', '-q', '--allow-empty', '-m', 'init');
     git(main, 'worktree', 'add', '-q', wt, '-b', 'feat');
+    activateGitFixture(main);
+    // The runner holds the worktree's custody and captures its native baseline before the producer launches.
+    custody = admitSuccessor(createLockScope('wt-commit'), path.join(main, '.fgos'), wt);
+    const gitArgs = { worktree: wt, repoRoot: main, custody };
+    const { baseline } = preflightUnitWorktree({ ...gitArgs, scope: ['**'] });
     const objectCount = () => git(main, 'count-objects', '-v').match(/^count: (\d+)/m)[1];
     const mainBefore = git(main, 'rev-parse', 'main');
     const objectsBefore = objectCount();
@@ -1319,14 +1328,16 @@ test('a workspace-write producer in a linked worktree cannot write git metadata;
     assert.equal(fs.readFileSync(path.join(wt, 'f'), 'utf8').trim(), 'produced', 'the worker could write its file');
 
     // Then the runner, outside the sandbox, commits it.
-    const commit = commitUnitWork({ worktree: wt, repoRoot: main, unitId: 'u1', summary: 'Added f\nmore detail', scope: ['**'] });
+    const commit = commitUnitWork({ ...gitArgs, baseline, unitId: 'u1', summary: 'Added f\nmore detail', scope: ['**'] });
     assert.equal(commit.status, 'committed');
     assert.deepEqual(commit.files, ['f']);
     assert.equal(git(wt, 'log', '-1', '--format=%s'), 'chore(u1): Added f\n');
     assert.equal(git(main, 'rev-parse', 'main'), mainBefore, 'refs/heads/main did not move');
     assert.notEqual(objectCount(), objectsBefore, 'the runner (not the worker) added the commit objects');
-    assert.equal(commitUnitWork({ worktree: wt, repoRoot: main, unitId: 'u1', summary: 'again', scope: ['**'] }).status, 'no-changes');
+    const next = preflightUnitWorktree({ ...gitArgs, scope: ['**'] });
+    assert.equal(commitUnitWork({ ...gitArgs, baseline: next.baseline, unitId: 'u1', summary: 'again', scope: ['**'] }).status, 'no-changes');
   } finally {
+    custody?.release();
     fs.rmSync(base, { recursive: true, force: true });
   }
 });

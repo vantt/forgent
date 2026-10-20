@@ -15,7 +15,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import { parseYaml } from '../src/util/yaml.mjs';
-import { lexSource } from './helpers/js-source-lexer.mjs';
+import { lexSource } from '../scripts/lib/js-source-lexer.mjs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -882,7 +882,7 @@ test('A4 boundary guard: dispatch, execution, the dispatch barrel and src/workfl
       .filter((m) => path.posix.normalize(path.posix.join(path.posix.dirname(from), m[3])) === to)
       .map((m) => m[1].split(',').map((x) => x.trim()).filter(Boolean).join(', '));
     assert.deepEqual(named, [imports], edge);
-    assert.equal((source.match(new RegExp(`['"][^'"]*${path.posix.basename(to)}['"]`, 'g')) ?? []).length, 1, `${edge}: imported once, by name`);
+    assert.equal(resolvedRelativeImports(from, source).filter((dep) => dep === to).length, 1, `${edge}: imported once, by name`);
   }
 });
 

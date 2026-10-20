@@ -7,6 +7,7 @@ import path from 'node:path';
 import { spawn, execFileSync } from 'node:child_process';
 import { once } from 'node:events';
 import { probe, resolveLock } from '../../src/holder-lock/index.mjs';
+import { activateGitFixture } from '../helpers/git-fixture.mjs';
 
 const skip = process.platform !== 'linux' ? 'Linux inherited flock and FIFO vectors' : false;
 const admission = new URL('../../src/runner/dispatch/cwd-lock.mjs', import.meta.url).href;
@@ -32,7 +33,7 @@ function fixture(t) {
   git('add', 'seed'); git('commit', '-qm', 'initial');
   const worktree = path.join(root, 'worktree');
   git('worktree', 'add', '-qb', 'unit', worktree);
-  fs.writeFileSync(path.join(worktree, 'result.txt'), 'completed work');
+  activateGitFixture(root);
   const fifo = path.join(root, 'go');
   const ready = path.join(root, 'ready');
   execFileSync('mkfifo', [fifo]);
@@ -58,10 +59,14 @@ for (const killController of [false, true]) {
     const actor = spawn(process.execPath, ['--input-type=module', '-e', `
       import { admitSuccessor } from ${JSON.stringify(admission)};
       import { createLockScope } from ${JSON.stringify(facade)};
-      import { commitUnitWork } from ${JSON.stringify(commit)};
+      import { commitUnitWork, preflightUnitWorktree } from ${JSON.stringify(commit)};
+      import fs from 'node:fs';
       const custody = admitSuccessor(createLockScope('unit'), ${JSON.stringify(f.fgosDir)}, ${JSON.stringify(f.worktree)});
       try {
-        const result = commitUnitWork({ worktree: ${JSON.stringify(f.worktree)}, repoRoot: ${JSON.stringify(f.root)}, custody, unitId: 'custody', summary: 'fix(test): custody commit', scope: ['result.txt'] });
+        const git = { worktree: ${JSON.stringify(f.worktree)}, repoRoot: ${JSON.stringify(f.root)}, custody };
+        const { baseline } = preflightUnitWorktree({ ...git, scope: ['result.txt'] });
+        fs.writeFileSync(${JSON.stringify(path.join(f.worktree, 'result.txt'))}, 'completed work');
+        const result = commitUnitWork({ ...git, baseline, unitId: 'custody', summary: 'fix(test): custody commit', scope: ['result.txt'] });
         if (result.status !== 'committed') throw new Error(JSON.stringify(result));
         custody.clearDomain();
         process.stdout.write(JSON.stringify(result));
@@ -93,14 +98,17 @@ for (const killController of [false, true]) {
 test('custody-backed runner commit accepts hook output above 16 MiB within its 64 MiB limit', { skip }, async (t) => {
   const { admitSuccessor } = await import('../../src/runner/dispatch/cwd-lock.mjs');
   const { createLockScope } = await import('../../src/holder-lock/index.mjs');
-  const { commitUnitWork } = await import('../../src/runner/execution/commit-unit-work.mjs');
+  const { commitUnitWork, preflightUnitWorktree } = await import('../../src/runner/execution/commit-unit-work.mjs');
   const f = fixture(t);
   const hook = path.join(f.root, '.git', 'hooks', 'pre-commit');
   fs.writeFileSync(hook, `#!/bin/sh\n${JSON.stringify(process.execPath)} -e "process.stdout.write('x'.repeat(17 * 1024 * 1024))"\n`);
   const custody = admitSuccessor(createLockScope('large-commit-output'), f.fgosDir, f.worktree);
   try {
-    const result = commitUnitWork({ worktree: f.worktree, repoRoot: f.root, custody, unitId: 'capture', summary: 'fix(test): large hook output', scope: ['result.txt'] });
-    assert.equal(result.status, 'committed');
+    const git = { worktree: f.worktree, repoRoot: f.root, custody };
+    const { baseline } = preflightUnitWorktree({ ...git, scope: ['result.txt'] });
+    fs.writeFileSync(path.join(f.worktree, 'result.txt'), 'completed work');
+    const result = commitUnitWork({ ...git, baseline, unitId: 'capture', summary: 'fix(test): large hook output', scope: ['result.txt'] });
+    assert.equal(result.status, 'committed', JSON.stringify(result).slice(0, 2000));
     assert.deepEqual(result.files, ['result.txt']);
     custody.clearDomain();
   } finally { custody.release(); }

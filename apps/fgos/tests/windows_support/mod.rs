@@ -141,7 +141,7 @@ impl Hold {
     pub fn start_with(exe: &Path, lock: &Path, work: &Path, kill_wait_ms: u64) -> Result<Hold, Value> {
         fs::create_dir_all(work).unwrap();
         let child = Command::new(exe)
-            .args(["internal", "lock-hold", "--protocol", "1", "--path"])
+            .args(["internal", "lock-hold", "--protocol", "2", "--path"])
             .arg(lock)
             .args(["--mode", "ex", "--try", "--kill-wait-ms", &kill_wait_ms.to_string(), "--work"])
             .arg(work)

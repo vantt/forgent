@@ -1,8 +1,8 @@
 //! Workspace root, workspaceId, and workStateId resolution.
 //!
-//! Follows `docs/specs/distribution.md:297` for workspace root discovery:
-//! resolves checkout root via `git rev-parse --path-format=absolute --git-common-dir`
-//! (never `--show-toplevel`, which resolves wrong inside a linked worktree).
+//! Follows `docs/specs/distribution.md:297` for workspace root discovery: the
+//! main checkout of the repository holding the start directory, as the Git
+//! component resolves it (never the linked worktree's own top level).
 //!
 //! Per R2:
 //! - `workspaceId` = first 16 hex chars of `sha256(realpath(workspace root))`
@@ -10,47 +10,26 @@
 
 use sha2::{Digest, Sha256};
 use std::path::{Path, PathBuf};
-use std::process::Command;
 
 #[derive(Debug, thiserror::Error)]
 pub enum WorkspaceError {
     #[error("not a git repository (refusing outside git repository)")]
     NotGitRepository,
-    #[error("git command failed: {0}")]
+    #[error("git repository read refused: {0}")]
     GitCommand(String),
     #[error("failed to resolve workspace root path: {0}")]
     Io(#[from] std::io::Error),
-    #[error("git-common-dir output has no parent directory")]
-    NoParentDir,
 }
 
-/// Resolves the git workspace root via `git rev-parse --path-format=absolute --git-common-dir`.
-///
-/// Established pattern in this repo: `docs/specs/distribution.md:297`.
+/// Resolves the workspace root: the trusted main checkout of the repository
+/// holding `start_dir`, read through the Git component, which creates its own
+/// state root when absent (`fgos init` may run before one exists).
 /// Refuses outside a git repository with `WorkspaceError::NotGitRepository`.
 pub fn resolve_workspace_root(start_dir: &Path) -> Result<PathBuf, WorkspaceError> {
-    let mut cmd = Command::new("git");
-    cmd.args(["rev-parse", "--path-format=absolute", "--git-common-dir"])
-        .current_dir(start_dir);
-
-    let output = match cmd.output() {
-        Ok(out) => out,
-        Err(err) => return Err(WorkspaceError::GitCommand(err.to_string())),
-    };
-
-    if !output.status.success() {
-        return Err(WorkspaceError::NotGitRepository);
-    }
-
-    let common_dir_str = String::from_utf8_lossy(&output.stdout).trim().to_string();
-    if common_dir_str.is_empty() {
-        return Err(WorkspaceError::NotGitRepository);
-    }
-
-    let common_dir = PathBuf::from(common_dir_str);
-    let root = common_dir.parent().ok_or(WorkspaceError::NoParentDir)?;
-
-    let canonical = std::fs::canonicalize(root)?;
+    let (_, repo) = fgos_git::GitDriver::open_at(start_dir)
+        .map_err(|e| WorkspaceError::GitCommand(e.cause))?
+        .ok_or(WorkspaceError::NotGitRepository)?;
+    let canonical = std::fs::canonicalize(repo.trusted_main_root())?;
     let clean = {
         let s = canonical.to_string_lossy();
         if let Some(stripped) = s.strip_prefix(r"\\?\") {

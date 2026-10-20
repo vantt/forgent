@@ -16,7 +16,7 @@ import { runBorrowed } from '../holder-lock/index.mjs';
 // unchanged and load-bearing — a timeout RESOLVES (never rejects/throws)
 // `{passed:false, status:null, ...}`, exactly what spawnSync's own
 // timeout->status:null behavior already gave every caller (runOnce's
-// startupReap/processItem, merge.mjs's mergeRunnerItem, bin/fgos.mjs's
+// startupReap/processItem, merge.mjs's landRunnerItem, bin/fgos.mjs's
 // return/approve verbs) — none of them expect runGoalCheck to ever reject.
 //
 // tsk-53o: a timeout and a genuine verify FAILURE were both indistinguishable
@@ -44,6 +44,10 @@ import { runBorrowed } from '../holder-lock/index.mjs';
 // result settles only after the borrow's leftover sweep. A sweep that cannot
 // prove the lease alone again rejects: that is an authority failure, not a
 // verify verdict.
+// Marks the spawn of a consumer's declared command for the one-door gate (Git spec §12, owner decision
+// Q1): what it runs is the consumer's choice, so the test spy counts it as configured, never as a site.
+const CONSUMER_COMMAND = Symbol.for('fgos.git.consumer-command');
+
 export function runCommand(command, cwd, timeoutMs, { custody } = {}) {
   const maxBuffer = 10 * 1024 * 1024;
   return new Promise((resolve, reject) => {
@@ -55,7 +59,7 @@ export function runCommand(command, cwd, timeoutMs, { custody } = {}) {
     // cliSpawnAdapter.
     const child = custody
       ? runBorrowed(custody, { command: shellCommand(), args: shellArgs(command), cwd, detached: true, stdin: 'ignore', maxOutputBytes: maxBuffer }, { sync: false })
-      : spawn(command, { shell: true, cwd, stdio: ['ignore', 'pipe', 'pipe'] });
+      : spawn(command, { shell: true, cwd, stdio: ['ignore', 'pipe', 'pipe'], [CONSUMER_COMMAND]: true });
     child.stdout.setEncoding('utf8');
     child.stderr.setEncoding('utf8');
 

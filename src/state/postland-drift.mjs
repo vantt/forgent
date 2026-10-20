@@ -5,10 +5,10 @@
 // root) branches cumulative since fork (D6), gated strictly to items with a live
 // session (`listSessions`, D2). Recompute-on-read, no merge-time persistence
 // (D3).
-import { execFileSync } from 'node:child_process';
 import { openLeavesSharingTarget } from './graph-harness.mjs';
 import { listSessions } from '../runner/session.mjs';
-import { nulPaths, GIT_LIST_MAX_BUFFER } from '../util/git-paths.mjs';
+import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
+import { inspectEntries, inspectPath } from '../util/git-paths.mjs';
 
 function requireTrunk(fnName, trunk) {
   if (typeof trunk !== 'string' || trunk === '') {
@@ -17,17 +17,19 @@ function requireTrunk(fnName, trunk) {
   return trunk;
 }
 
-function git(repoRoot, args, maxBuffer) {
-  return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'pipe'], ...(maxBuffer ? { maxBuffer } : {}) });
+// The commit `branch` names as a real local ref, or null when it has none.
+function branchTip(inspect, branch) {
+  try {
+    const ref = inspect.resolveRef({ name: `refs/heads/${branch}` });
+    return ref.kind === 'direct' ? ref.oid : null;
+  } catch {
+    return null;
+  }
 }
 
-function branchExists(repoRoot, branch) {
-  try {
-    git(repoRoot, ['show-ref', '--verify', '--quiet', `refs/heads/${branch}`]);
-    return true;
-  } catch {
-    return false;
-  }
+// Every path the commits from `base` to `tip` change, byte for byte, a rename as both halves.
+function changedPaths(inspect, base, tip) {
+  return inspectEntries((page) => inspect.diff({ ...page, before: base, after: tip })).map((entry) => inspectPath(entry.path));
 }
 
 /**
@@ -58,6 +60,7 @@ export function postLandDrift(repoRoot, view, { trunk, sessions } = {}) {
     sessionsByItem.set(entry.itemId, known);
   }
 
+  let inspect;
   for (const id of Array.from(candidateIds).sort()) {
     const sessionIds = sessionsByItem.get(id) ?? [];
     if (sessionIds.length === 0) continue; // D2: notify only
@@ -65,26 +68,23 @@ export function postLandDrift(repoRoot, view, { trunk, sessions } = {}) {
     const item = work[id];
     if (!item) continue;
 
+    inspect ??= createGitInspect(gitPortOptions(repoRoot));
     const leafBranch = `fgw/${id}`;
-    if (!branchExists(repoRoot, leafBranch)) continue;
+    const leafTip = branchTip(inspect, leafBranch);
+    if (!leafTip) continue;
 
     const targetBranch = item.parent ? `fgw/${item.parent}` : trunk;
-    if (!branchExists(repoRoot, targetBranch)) continue; // D8: skipped silently if target gone
-
-    let mergeBase;
-    try {
-      mergeBase = git(repoRoot, ['merge-base', targetBranch, leafBranch]).trim();
-    } catch {
-      continue;
-    }
-    if (!mergeBase) continue;
+    const targetTip = branchTip(inspect, targetBranch);
+    if (!targetTip) continue; // D8: skipped silently if target gone
 
     let leafFiles = [];
     let targetFiles = [];
     try {
-      // Byte for byte, a rename as both halves: one side moving a file the other edits is shared.
-      leafFiles = nulPaths(git(repoRoot, ['diff', '--name-only', '--no-renames', '--no-relative', '-z', `${mergeBase}...${leafBranch}`], GIT_LIST_MAX_BUFFER));
-      targetFiles = nulPaths(git(repoRoot, ['diff', '--name-only', '--no-renames', '--no-relative', '-z', `${mergeBase}...${targetBranch}`], GIT_LIST_MAX_BUFFER));
+      const { mergeBase } = inspect.compareCommits({ left: targetTip, right: leafTip });
+      if (!mergeBase) continue;
+      // One side moving a file the other edits is shared.
+      leafFiles = changedPaths(inspect, mergeBase, leafTip);
+      targetFiles = changedPaths(inspect, mergeBase, targetTip);
     } catch {
       continue;
     }
