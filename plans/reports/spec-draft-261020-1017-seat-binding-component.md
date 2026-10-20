@@ -185,7 +185,7 @@ Doctor có một dòng kiểm "mọi ghế của mọi preset đã đăng ký đ
 | N6 khác họ | 6 bước 3, rigor đã gộp (sửa O4) |
 | N7–N10, N28 xoay, dự phòng, pin, quarantine | 6 bước 5–6 (giữ nguyên D-ADR0071) |
 | N15 giải thích được | 5.3 |
-| N16, O14 config ngắn | 5.1 lớp 5 (`"<domain>:*"`), 5.2 |
+| N16, O14 config ngắn | 5.1 lớp 5 (`"<prefix>:*"`), 5.2 |
 | N17, D3, D31 một authority | 3 |
 | N18, N35, N36 trần theo capability, quyền override | 5.1 lớp 1, 5.2 `maxTier` capability |
 | N19 đo chi phí | ngoài phạm vi (MP-COST Q2) |
@@ -194,9 +194,11 @@ Doctor có một dòng kiểm "mọi ghế của mọi preset đã đăng ký đ
 ## 8. Chuyển đổi (L10, một đợt cho mỗi contract)
 
 1. Lõi `bindSeat` + port account trong component; mọi bên gọi chuyển sang; xoá tier/model riêng của `assignment-policy`, `dispatch/cli.mjs`, `assignment.mjs`; xoá walker thứ hai.
-2. Config: `prefer` → `families` (MP-C gộp vào đây), `rigorToTier` xoá, thêm `tier`/`maxTier` capability, `roles`, `seats`, nhóm `"<domain>:*"`, `defaults`. Một lệnh `fgos setup` chuyển config cũ sang mới một lần, in diff; các key mới chỉ ở **project config** cho tới khi mọi release trên máy đọc được (N30, D22).
+2. Config: `prefer` → `families` (MP-C gộp vào đây), `rigorToTier` xoá, thêm `tier`/`maxTier` capability, `roles`, `seats`, nhóm `"<prefix>:*"`, `defaults`. Một lệnh `fgos setup` chuyển config cũ sang mới một lần, in diff; các key mới chỉ ở **project config** cho tới khi mọi release trên máy đọc được (N30, D22).
 3. `explain` theo ghế và theo preset; doctor dùng cùng hàm.
 4. Spec: file `docs/specs/seat-binding.md`, dòng mới trong `docs/platform/component-boundary.md`, supersede RUL80/91/98/102/103/106 phần chọn ghế bằng record mới (không sửa tại chỗ).
+
+**Đính chính (owner 13:55):** tiền tố capability **không phải** domain. Domain thật chỉ có `coding`, `marketing` (`domains/`); tiền tố có 10 nhóm (`code`, `coding`, `architecture`, `business`, `delphi`, `group-cognition`, `nominal-group`, `marketing`, `docs`) cùng 6 capability không tiền tố. `"<prefix>:*"` chỉ là cách viết tắt "mọi capability bắt đầu bằng tiền tố này". Taste theo role gắn vào **capability** vì capability là loại việc của nhóm có ghế (red-team ở `code:review` khác red-team ở `marketing:write`). Không có khoá `domains` trong config; "domain" chỉ là đơn vị đóng gói của R2.
 
 #### R.3 Gói domain mang tier, project mang families (owner 13:28)
 
@@ -265,18 +267,18 @@ Vấn đề: "red-team → xai" hợp với review code và phản biện kiến
 
 | Phương án | Khai ở đâu | Lợi | Giá |
 |---|---|---|---|
-| R1 role trong nhóm capability | `capabilities."code:*".roles.red-team`, `capabilities."marketing:*".roles.red-team` | dùng lại lớp nhóm `"<domain>:*"` đã có trong 5.1; không thêm khoá cấp cao; đọc config thấy ngay domain nào chọn gì | lặp nếu nhiều domain cùng ý |
+| R1 role trong nhóm capability | `capabilities."code:*".roles.red-team`, `capabilities."marketing:*".roles.red-team` | dùng lại lớp nhóm `"<prefix>:*"` đã có trong 5.1; không thêm khoá cấp cao; đọc config thấy ngay domain nào chọn gì | lặp nếu nhiều domain cùng ý |
 | R2 role trong config của domain | `domains/<d>/` (file domain) | domain tự mang taste, đi cùng persona và workflow của nó | thêm một nguồn config ngoài `.fgos/config.json`; project muốn đè phải có lớp đè |
 | R3 role trong từng capability | `capabilities.<cap>.roles.<role>` | chính xác nhất | lặp nhiều |
 | R4 global + đè theo domain | `roles` global làm mặc định, R1 đè | ít dòng | chính là thứ owner thấy không hợp: mặc định global vẫn rò sang domain không khai |
 
-Đề xuất: **R1** (và R3 khi cần chính xác, cùng một hình dạng khoá `roles` bên trong capability hoặc nhóm). Không có `roles` cấp runner. Thứ tự lớp 5.1 thành: người > ghế > persona > role trong capability > role trong nhóm domain > capability > nhóm domain > mặc định. Câu cho owner: R1 có đủ không, hay domain cần mang taste theo gói (R2) khi đóng gói domain cho project khác?
+Đề xuất: **R1** (và R3 khi cần chính xác, cùng một hình dạng khoá `roles` bên trong capability hoặc nhóm). Không có `roles` cấp runner. Thứ tự lớp 5.1 thành: người > ghế > persona > role trong capability > role trong nhóm tiền tố > capability > nhóm tiền tố > mặc định. Câu cho owner: R1 có đủ không, hay domain cần mang taste theo gói (R2) khi đóng gói domain cho project khác?
 
 #### R.2 Trình bày lại (13:26)
 
 Ví dụ thật: red-team ở code muốn xai (phá mạnh), ở marketing muốn claude (phê bình giọng thương hiệu kỹ), ở kiến trúc muốn xai.
 
-- **R1 — khai trong config của project, theo nhóm capability của domain:** `capabilities."code:*".roles.red-team.families = ["xai"]`, `capabilities."marketing:*".roles.red-team.families = ["claude"]`. Một file, người chủ project thấy hết. Khi đem domain marketing sang project khác, taste không đi theo; project đó chạy mặc định cho tới khi tự khai.
+- **R1 — khai trong config capability của project (capability hoặc nhóm tiền tố):** `capabilities."code:*".roles.red-team.families = ["xai"]`, `capabilities."marketing:*".roles.red-team.families = ["claude"]`. Một file, người chủ project thấy hết. Khi đem domain marketing sang project khác, taste không đi theo; project đó chạy mặc định cho tới khi tự khai.
 - **R2 — domain tự mang taste trong gói của nó** (`domains/marketing/…`), project đè bằng R1. Taste đi theo domain. Nhưng họ model phụ thuộc máy (máy kia không có account xai thì vô nghĩa), nên taste theo **họ** mang theo gói thì yếu; taste theo **tier** và **độ độc lập** (judge cần flagship, phải khác họ) thì mang đi đâu cũng đúng.
 
 Đề xuất: **R1 ngay** (một nguồn, đúng thẩm quyền config project). **R2 sau, khi đóng gói domain cho project khác (mission #1), và chỉ cho khoá khả chuyển (`tier`), không cho `families`.**
