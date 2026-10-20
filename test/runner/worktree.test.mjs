@@ -4,6 +4,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { createLockScope } from '../../src/holder-lock/index.mjs';
+import { landRunnerItem } from '../../src/runner/merge.mjs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
@@ -21,7 +22,7 @@ import {
   resyncClaimWorktree,
   resyncWorktree,
   refreshUnstartedBranch,
-  withMergeEphemeralWorktree,
+  createVerifyCheckout,
   checkoutDirtyPaths,
   realpathOrSelf,
   WorktreeError,
@@ -55,9 +56,9 @@ function commitOnWorktree(worktreePath, filename, contents) {
 }
 
 /**
- * Advances `branch` the same way `withMergeEphemeralWorktree` lands a merge
- * in production (tsk-2cd): a DETACHED checkout at the branch's current tip,
- * a real commit made there, then a plain ref update — never
+ * Advances `branch` from outside any checkout of it (tsk-2cd): a DETACHED
+ * checkout at the branch's current tip, a real commit made there, then a
+ * plain ref update — never
  * a checkout of `branch` itself, so this never collides with any existing
  * non-detached checkout of it (e.g. a claim worktree already reattached to
  * it). Returns the new tip commit.
@@ -464,81 +465,31 @@ test('tsk-386: createBranchRef with no baseRef at all resolves through detectTru
   assert.equal(branchTip(repoRoot, 'fgw/master-trunk-item'), masterTip, 'branch forks from the real detected trunk (master), never a nonexistent hardcoded "main"');
 });
 
-test('tsk-386: withMergeEphemeralWorktree\'s own createBranchRef fallback resolves through detectTrunk on a master-trunk repo (the exact Finding 8 failure scenario)', async () => {
-  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-worktree-test-master-merge-'));
-  execFileSync('git', ['init', '-q', '-b', 'master'], { cwd: repoRoot });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
-  fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
-  execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
-  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: repoRoot });
-  activateGitFixture(repoRoot);
-  const masterTip = branchTip(repoRoot, 'master');
 
-  // fgw/never-dispatched-master genuinely does not exist yet -- this is
-  // exactly the "first session-driven root merge" scenario the finding
-  // names: a host repo whose trunk is master hitting
-  // createDetachedMergeWorktree's own fallback.
-  const result = await withMergeEphemeralWorktree(repoRoot, 'never-dispatched-master', async (worktree) => {
-    assert.equal(worktree.startCommit, masterTip, 'fallback-created branch is seeded from the real detected trunk (master)');
-    return 'fn-ran';
-  });
 
-  assert.equal(result, 'fn-ran');
-  assert.equal(branchTip(repoRoot, 'fgw/never-dispatched-master'), masterTip);
-});
-
-test('withMergeEphemeralWorktree falls back to createBranchRef (seeded from main) instead of throwing when fgw/<id> was never created early', async () => {
-  const repoRoot = initTempRepo();
-  execFileSync('git', ['branch', '-M', 'main'], { cwd: repoRoot });
-  // seed a tracked .fgos/ so finishWorktreeSetup's strip is meaningfully
-  // exercised on the fallback path too, not just the already-exists path.
-  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(repoRoot, '.fgos', 'marker.txt'), 'x\n');
-  execFileSync('git', ['add', '.fgos/marker.txt'], { cwd: repoRoot });
-  execFileSync('git', ['commit', '-q', '-m', 'seed .fgos'], { cwd: repoRoot });
-  activateGitFixture(repoRoot);
-  const mainTip = branchTip(repoRoot, 'main');
-
-  assert.throws(() => branchTip(repoRoot, 'fgw/never-dispatched'), 'precondition: branch genuinely does not exist yet');
-
-  const result = await withMergeEphemeralWorktree(repoRoot, 'never-dispatched', async (worktree) => {
-    assert.equal(worktree.branch, 'fgw/never-dispatched');
-    assert.equal(worktree.startCommit, mainTip, 'fallback-created branch is seeded from main\'s current tip');
-    assert.equal(fs.existsSync(path.join(worktree.path, '.fgos')), false, 'finishWorktreeSetup strips .fgos on the fallback path too');
-    return 'fn-ran';
-  });
-
-  assert.equal(result, 'fn-ran');
-  assert.equal(branchTip(repoRoot, 'fgw/never-dispatched'), mainTip, 'the branch now exists, created by the fallback');
-
-  const listing = execFileSync('git', ['worktree', 'list', '--porcelain'], { cwd: repoRoot, encoding: 'utf8' });
-  assert.doesNotMatch(listing, /fgw\/never-dispatched/, 'the ephemeral checkout is removed on the way out');
-});
-
-test('withMergeEphemeralWorktree leaves an already-existing fgw/<id> branch untouched by the fallback (checkout at its real tip, not reset to main)', async () => {
+test('createVerifyCheckout checks out a root branch at its real current tip, and leaves the branch itself untouched', () => {
   const repoRoot = initTempRepo();
   execFileSync('git', ['branch', '-M', 'main'], { cwd: repoRoot });
   createBranchRef(repoRoot, 'already-dispatched', { baseRef: 'main' });
   const advancedTip = advanceBranchExternally(repoRoot, 'fgw/already-dispatched', 'leaf-work.txt', 'leaf commit\n');
+  activateGitFixture(repoRoot);
 
-  const result = await withMergeEphemeralWorktree(repoRoot, 'already-dispatched', async (worktree) => {
-    assert.equal(worktree.startCommit, advancedTip, 'checkout must be at the branch\'s real current tip, not reset to main');
-    return 'ok';
-  });
-
-  assert.equal(result, 'ok');
-  assert.equal(branchTip(repoRoot, 'fgw/already-dispatched'), advancedTip, 'branch tip is unchanged when fn makes no new commit');
+  const checkout = createVerifyCheckout(repoRoot, branchTip(repoRoot, 'fgw/already-dispatched'));
+  try {
+    assert.equal(execFileSync('git', ['rev-parse', 'HEAD'], { cwd: checkout, encoding: 'utf8' }).trim(), advancedTip, 'checkout must be at the branch\'s real current tip, not reset to main');
+  } finally {
+    removeWorktree(repoRoot, checkout, { force: true });
+  }
+  assert.equal(branchTip(repoRoot, 'fgw/already-dispatched'), advancedTip, 'branch tip is unchanged');
 });
 
-test('tsk-4yv: withMergeEphemeralWorktree removes the detached worktree it just registered when finishWorktreeSetup fails -- never leaks an unreclaimed detached checkout', async () => {
-  // Finding 7: this is specifically the DETACHED case
-  // (createDetachedMergeWorktree, used by approve's own leaf-merge path via
-  // withMergeEphemeralWorktree) -- reclaimOrphanedCheckout/findCheckoutPath
-  // are both branch-keyed and skip a `detached` worktree stanza entirely, so
-  // unlike the branch-attached createWorktree case, nothing else in the
-  // codebase would ever reclaim a leaked detached checkout. A repeated npm
-  // registry flake during approve would accumulate full checkouts under tmp
+test('tsk-4yv: verifying an already-landed leaf removes the detached checkout it registered when dependency provisioning fails -- never leaks an unreclaimed detached checkout', async () => {
+  // Finding 7: this is specifically the DETACHED case (the verification
+  // checkout landRunnerItem stands up for a target no checkout holds) --
+  // reclaimOrphanedCheckout/findCheckoutPath are both branch-keyed and skip
+  // a `detached` worktree stanza entirely, so nothing else in the codebase
+  // would ever reclaim a leaked detached checkout. A repeated npm registry
+  // flake during approve would accumulate full checkouts under tmp
   // indefinitely, exactly the scenario this fix closes.
   const repoRoot = initTempRepo();
   execFileSync('git', ['branch', '-M', 'main'], { cwd: repoRoot });
@@ -549,12 +500,16 @@ test('tsk-4yv: withMergeEphemeralWorktree removes the detached worktree it just 
   execFileSync('git', ['add', 'package.json'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'commit a malformed package.json'], { cwd: repoRoot });
   activateGitFixture(repoRoot);
-  execFileSync('git', ['branch', 'fgw/broken-dep-merge-item'], { cwd: repoRoot });
+  // The leaf already landed on its root: approve's retry path verifies the
+  // root branch's tree in a detached checkout, since no checkout holds it.
+  execFileSync('git', ['branch', 'fgw/broken-dep-leaf'], { cwd: repoRoot });
+  execFileSync('git', ['branch', 'fgw/broken-dep-root'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '--allow-empty', '-m', 'unrelated main advance'], { cwd: repoRoot });
 
-  await assert.rejects(() => withMergeEphemeralWorktree(repoRoot, 'broken-dep-merge-item', async () => 'unreachable'), SyntaxError);
+  await assert.rejects(() => landRunnerItem(repoRoot, { id: 'broken-dep-leaf', verify: 'true' }, { target: 'fgw/broken-dep-root' }), SyntaxError);
 
   const listing = execFileSync('git', ['worktree', 'list', '--porcelain'], { cwd: repoRoot, encoding: 'utf8' });
-  assert.doesNotMatch(listing, /broken-dep-merge-item/, 'the detached merge worktree must not remain registered after finishWorktreeSetup failed');
+  assert.doesNotMatch(listing, /fgos-worktrees\/verify-/, 'the detached verification checkout must not remain registered after provisioning failed');
 });
 
 test('createWorktree with opts.baseRef forks a new branch from that ref\'s tip, not from repoRoot\'s current HEAD', () => {

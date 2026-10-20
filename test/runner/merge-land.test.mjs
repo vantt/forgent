@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fixture } from '../git/land-fixture.mjs';
-import { mergeRootIntoMainCas } from '../../src/runner/merge.mjs';
+import { landRunnerItem } from '../../src/runner/merge.mjs';
 
 function rootFixture() {
   const f = fixture();
@@ -15,9 +15,9 @@ function rootFixture() {
 test('root publication verifies the frozen Land candidate and returns its exact receipt', async () => {
   const f = rootFixture();
   try {
-    const result = await mergeRootIntoMainCas(f.repo, {
+    const result = await landRunnerItem(f.repo, {
       id: 'source', verify: `node -e "if(require('fs').readFileSync('a','utf8')!=='incoming\\n')process.exit(1)"`,
-    }, 'source', { ownFileSet: new Set(['a']) });
+    }, { branch: 'source', ownFileSet: new Set(['a']) });
     assert.equal(result.outcome, 'merged', JSON.stringify(result));
     assert.equal(result.check.passed, true);
     assert.equal(result.receipt.localEffect.publishedOid, f.git('rev-parse', 'main'));
@@ -33,7 +33,7 @@ test('root publication verifies the frozen Land candidate and returns its exact 
 test('a red root candidate never changes the destination or source and retains operation evidence', async () => {
   const f = rootFixture();
   try {
-    const result = await mergeRootIntoMainCas(f.repo, { id: 'source', verify: 'exit 7' }, 'source');
+    const result = await landRunnerItem(f.repo, { id: 'source', verify: 'exit 7' }, { branch: 'source' });
     assert.equal(result.outcome, 'verify-fail', JSON.stringify(result));
     assert.equal(result.check.status, 7);
     assert.equal(f.git('rev-parse', 'main'), f.request.target);
@@ -48,7 +48,7 @@ test('root construction conflicts preserve both refs and translate the existing 
   try {
     fs.writeFileSync(path.join(f.repo, 'a'), 'divergent main\n'); f.git('commit', '-qam', 'divergence');
     const before = f.git('rev-parse', 'main');
-    const result = await mergeRootIntoMainCas(f.repo, { id: 'source', verify: 'true' }, 'source');
+    const result = await landRunnerItem(f.repo, { id: 'source', verify: 'true' }, { branch: 'source' });
     assert.deepEqual(result, { outcome: 'conflict', branch: 'source' });
     assert.equal(f.git('rev-parse', 'main'), before);
     assert.equal(f.git('rev-parse', 'source'), f.request.source);
@@ -62,7 +62,7 @@ test('root publication detects an external destination writer without rerunning 
     // The command writes only the disposable fixture's destination, as a raw
     // external actor; Land must return its stale result and preserve that tip.
     const command = `git -C '${f.repo}' update-ref refs/heads/main ${f.request.source} ${f.request.target}`;
-    await assert.rejects(mergeRootIntoMainCas(f.repo, { id: 'source', verify: command }, 'source'), /land-target-changed/);
+    await assert.rejects(landRunnerItem(f.repo, { id: 'source', verify: command }, { branch: 'source' }), /land-target-changed/);
     assert.equal(f.git('rev-parse', 'main'), f.request.source);
     assert.equal(f.git('rev-parse', 'source'), f.request.source);
   } finally { f.close(); }
@@ -71,9 +71,9 @@ test('root publication detects an external destination writer without rerunning 
 test('root verification reuse requires the actual candidate tree to equal the returned source', async () => {
   const f = rootFixture();
   try {
-    const result = await mergeRootIntoMainCas(f.repo, {
+    const result = await landRunnerItem(f.repo, {
       id: 'source', verify: 'exit 9', branchHeadAtReturn: f.request.source,
-    }, 'source');
+    }, { branch: 'source' });
     assert.equal(result.outcome, 'merged', JSON.stringify(result));
     assert.equal(result.check.skipped, true);
   } finally { f.close(); }
@@ -114,9 +114,9 @@ test('root verification reuse tolerates a pinned target that advanced only on pa
   try {
     fs.writeFileSync(path.join(f.repo, 'disjoint'), 'target only\n'); f.git('add', 'disjoint'); f.git('commit', '-qm', 'disjoint target advance');
     const target = f.git('rev-parse', 'main');
-    const result = await mergeRootIntoMainCas(f.repo, {
+    const result = await landRunnerItem(f.repo, {
       id: 'source', verify: 'exit 9', branchHeadAtReturn: f.request.source,
-    }, 'source');
+    }, { branch: 'source' });
     assert.equal(result.outcome, 'merged', JSON.stringify(result));
     assert.equal(result.check.skipped, true);
     assert.deepEqual(f.git('show', '-s', '--format=%P', 'main').split(' '), [target, f.request.source]);
@@ -142,7 +142,7 @@ test('a branch that writes under .fgos is refused before Land and leaves the des
   try {
     branchCommit(f, 'stray', 'source', { '.fgos/stray.json': '{}\n' });
     const before = f.git('rev-parse', 'main');
-    const result = await mergeRootIntoMainCas(f.repo, { id: 'stray', verify: 'true' }, 'stray');
+    const result = await landRunnerItem(f.repo, { id: 'stray', verify: 'true' }, { branch: 'stray' });
     assert.deepEqual(result, { outcome: 'fgos-write-rejected', paths: ['.fgos/stray.json'], branch: 'stray' });
     assert.equal(f.git('rev-parse', 'main'), before);
     assert.equal(fs.existsSync(path.join(f.repo, '.fgos/runtime/git-candidates')), false);
@@ -166,7 +166,7 @@ test('a decision-id collision on the index is renumbered and unioned as declared
     fs.writeFileSync(path.join(f.repo, 'docs/decisions/0000-index.md'), index([row('0001', '0001-base.md'), row('0002', '0002-ours.md')]));
     fs.writeFileSync(path.join(f.repo, 'docs/decisions/0002-ours.md'), decision('0002'));
     f.git('add', 'docs'); f.git('commit', '-qm', 'ours decision');
-    const result = await mergeRootIntoMainCas(f.repo, { id: 'theirs', verify: 'true' }, 'theirs');
+    const result = await landRunnerItem(f.repo, { id: 'theirs', verify: 'true' }, { branch: 'theirs' });
     assert.equal(result.outcome, 'merged', JSON.stringify(result));
     assert.equal(result.selfResolved, true);
     const files = f.git('ls-tree', '-r', '--name-only', 'main', '--', 'docs/decisions/').split('\n');

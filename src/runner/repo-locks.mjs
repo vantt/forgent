@@ -1,6 +1,7 @@
-// repo-locks.mjs — the one door to the three repo locks of the runner: the
-// main checkout mutex (rank 50), the per-target merge slot (rank 20) and the
-// worktree-admin mutex (rank 40). Each is a kernel lock on an open file
+// repo-locks.mjs — the one door to the runner's repo locks: the main
+// checkout mutex (rank 50) and the worktree-admin mutex (rank 40). The
+// per-target merge slot (rank 20) belongs to Land's own session (Git spec
+// §9). Each is a kernel lock on an open file
 // description taken through the holder-lock facade: no TTL, no heartbeat, no
 // pid self-recognition. A holder that dies releases by dying.
 //
@@ -15,7 +16,6 @@ import { createGitWorktree } from '../git/worktree.mjs';
 import { acquire, acquireSync, lockHolders, HolderLockError } from '../holder-lock/index.mjs';
 
 const MAIN_CHECKOUT = 'main-checkout';
-const MERGE_SLOT = 'merge-slot';
 const WORKTREE_ADMIN = 'worktree-admin';
 
 // `git worktree add` is short; the synchronous creation helpers wait for the
@@ -61,16 +61,6 @@ async function withRepoLock(scope, name, params, label, fn, { waitMs } = {}) {
  */
 export function withMainCheckout(scope, purpose, fn, { fgosDir, waitMs } = {}) {
   return withRepoLock(scope, MAIN_CHECKOUT, { fgosDir }, `main checkout (${purpose})`, fn, { waitMs });
-}
-
-/**
- * withMergeTargetSlot(scope, lockRoot, targetRef, fn, { waitMs }) — the
- * per-target-ref merge slot. Distinct refs never contend. Must be taken
- * before anything reads the target's tip.
- */
-export function withMergeTargetSlot(scope, lockRoot, targetRef, fn, { waitMs } = {}) {
-  const fgosDir = `${lockRoot}/.fgos`;
-  return withRepoLock(scope, MERGE_SLOT, { fgosDir, ref: encodeURIComponent(targetRef) }, `merge slot of "${targetRef}"`, () => fn(), { waitMs });
 }
 
 /** withWorktreeAdmin(scope, fgosDir, fn, { waitMs }) — serializes `git worktree add`. */

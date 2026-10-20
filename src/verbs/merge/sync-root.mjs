@@ -5,15 +5,15 @@
 // fgw/<parentId> for a nested root — WITHOUT touching the root item's
 // own status/stage (CONTEXT.md's locked contract: this replaces the
 // ad-hoc `git merge` tsk-3bn's own origin incident required by hand).
-// Reuses `mergeRunnerItem`'s exact lock/verify path (constraint #1,
+// Reuses `landRunnerItem`'s exact Land/verify path (constraint #1,
 // fgos-coding-validating's gate) — never a second bespoke merge mechanism.
 // Unlike `approve`'s root-into-main path, this never deletes fgw/<id>
 // afterward: the root stays open for further leaf merges.
 import { execFileSync } from 'node:child_process';
 import { listWork, addDecision, recordFriction, StoreError } from '../../state/store.mjs';
 import {
-  mergeRunnerItem,
-  withMergeSlot,
+  landRunnerItem,
+  acknowledgeLand,
   performCatchUp,
   buildOwnFileSet,
   isWorkingTreeClean as isMainTreeClean,
@@ -24,13 +24,10 @@ import {
   branchExists,
   detectTrunk,
   isMainWorktree,
-  withMergeEphemeralWorktree,
-  currentHead,
+  resolveRefSha,
 } from '../../runner/worktree.mjs';
 import { ironLawForItem, ironLawRefusal } from '../../runner/iron-law-gate.mjs';
 import { readIronLawLevel, recordIronLawSkip, recordIronLawAcknowledge } from './iron-law-level.mjs';
-import { withLockRetry } from '../../runner/lock-wait.mjs';
-import { createLockScope } from '../../holder-lock/index.mjs';
 
 /**
  * @param {{dir: string, repoRoot: string}} ctx - `repoRoot` follows this
@@ -103,14 +100,12 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
   // problem and stays side-effect-free.
   const timeoutMs = resolveTimeoutMs();
   const { noWait, waitMs } = resolveWaitFlags();
-  // Every merge into the target runs under the target's merge slot, taken
-  // through `runMerge` (a single try under --no-wait, a wait otherwise);
-  // `runAndReport` is only ever called with the slot already held in `scope`.
-  const scope = createLockScope('sync-root');
-  const runMerge = (mergeFn) => (noWait ? mergeFn({}) : withLockRetry(mergeFn, { waitMs }));
+  // Land waits for the target's merge slot and the main checkout up to this
+  // budget (no wait under --no-wait, Land's default when no --wait is given).
+  const lockWait = noWait ? { lockWaitMs: 0 } : waitMs !== undefined ? { lockWaitMs: waitMs } : {};
 
-  const runAndReport = async (mergeRoot, lockRoot, itemOverride, slotWaitMs) => {
-    const result = await mergeRunnerItem(mergeRoot, itemOverride, { timeoutMs, lockRoot, scope, waitMs: slotWaitMs });
+  const runAndReport = async (itemOverride, ownFileSet = null) => {
+    const result = await landRunnerItem(repoRoot, itemOverride, { target: targetBranch, timeoutMs, ownFileSet, ...lockWait });
 
     if (result.outcome === 'conflict') {
       recordFriction(dir, {
@@ -171,7 +166,7 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
         errorClass: 'sync-root-unhandled-outcome',
         layer: 'state',
         attempts: 1,
-        detail: `sync-root: mergeRunnerItem returned unrecognized outcome "${result.outcome}" for ${branch} into ${targetBranch}${errText} — refusing to report success`,
+        detail: `sync-root: landRunnerItem returned unrecognized outcome "${result.outcome}" for ${branch} into ${targetBranch}${errText} — refusing to report success`,
       });
       return {
         id,
@@ -188,7 +183,7 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
     // locked contract). Only a real decision record marks this sync
     // happened, same append door `fgos decision` itself uses.
     const { event } = addDecision(dir, {
-      text: `sync-root: merged ${branch} into ${targetBranch} at ${currentHead(mergeRoot)}`,
+      text: `sync-root: merged ${branch} into ${targetBranch} at ${result.receipt?.localEffect.publishedOid ?? resolveRefSha(repoRoot, targetBranch)}`,
       rationale: `fgos sync-root ${id} — closes the drift window this item's own design exists to prevent`,
       id,
       // Engine bookkeeping, not reflection: a branch sync is machinery
@@ -202,19 +197,22 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
       // no retrospective document behind it.
       kind: 'engine',
     });
+    // The decision is Work's durable record of this sync: only now may Land
+    // release the candidate it kept for that acknowledgement (Git spec §9).
+    if (result.landSettlement) {
+      for (const warning of acknowledgeLand(repoRoot, result.landSettlement.operationId, `work-decision:${id}:${event.seq}`)) {
+        process.stderr.write(`fgos: warning: "${id}" is synced; its Land candidate was retained (${warning}).\n`);
+      }
+    }
     return { id, mode: 'sync-root', outcome: 'synced', target: targetBranch, branch, seq: event.seq, output: result.check.output, postLand: result.postLand };
   };
 
   if (item.parent) {
-    // tsk-xyr (§E): same target-slot-outside-the-ephemeral-worktree
-    // ordering as approve's leaf-to-root path above — the slot must be
-    // held before createDetachedMergeWorktree reads the target's tip.
-    // The wait budget goes to the slot's own acquire, the only call here
-    // that can throw lock-held for contention on this target.
-    return await runMerge(({ waitMs: slotWaitMs }) => withMergeSlot(scope, repoRoot, targetBranch, async () => {
+    {
       // tsk-4ax (D3): same inbound-gate catchup as approve's leaf-to-root
-      // path — still inside the slot, so the target provably cannot
-      // move between this check and the land below.
+      // path — through Sync under the branch's own custody, never under the
+      // target's slot: Land pins the target only at prepare and merges from
+      // that pin, so whatever lands on it meanwhile is included.
       let effectiveItem = item;
       let alreadyAncestor = false;
       try {
@@ -262,23 +260,18 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
         }
         effectiveItem = { ...item, branchHeadAtReturn: catchupResult.catchupHead };
       }
-      return await withMergeEphemeralWorktree(repoRoot, item.parent, async (ephemeral) => runAndReport(ephemeral.path, repoRoot, effectiveItem, slotWaitMs));
-    }, { waitMs: slotWaitMs }));
+      return await runAndReport(effectiveItem);
+    }
   }
-  // tsk-66t: a root with no parent merges directly on the shared main
-  // checkout (runAndReport(repoRoot) below), unlike the item.parent
-  // branch above which merges in a throwaway ephemeral worktree. Same
-  // clean-tree gate `approve`'s own local-merge branch already applies
-  // before any git mutation (bin/fgos.mjs's `case 'approve'`) — without
-  // it, a dirty repoRoot here means `git commit --no-edit` (merge.mjs's
-  // mergeRunnerItem) sweeps another session's staged changes into this
-  // merge commit silently.
+  // tsk-66t: a root with no parent lands on the trunk the shared main
+  // checkout holds, unlike the item.parent branch above. Same clean-tree
+  // gate `approve`'s own root-into-main path applies before any git
+  // mutation; Land re-runs it against the same own-file set right before
+  // the ref moves (Git spec §9 step 4) and never commits main's own
+  // staged changes.
   const ownFileSet = buildOwnFileSet(runnerOwnDiff, item.footprint);
   if (!isMainTreeClean(repoRoot, ownFileSet)) {
     throw new StoreError('validation', `sync-root: working tree at "${repoRoot}" is not clean — commit or stash pending changes before syncing "${id}".`);
   }
-  // The merge runs on the main checkout itself, so the slot of the trunk is
-  // what keeps two merges into it apart; the main mutex is taken inside
-  // `mergeRunnerItem` for the steps that write the checkout.
-  return await runMerge(({ waitMs: slotWaitMs }) => withMergeSlot(scope, repoRoot, targetBranch, () => runAndReport(repoRoot, repoRoot, item, slotWaitMs), { waitMs: slotWaitMs }));
+  return await runAndReport(item, ownFileSet);
 }

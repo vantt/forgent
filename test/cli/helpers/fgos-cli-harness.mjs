@@ -23,6 +23,7 @@ import { createSession, endSession } from '../../../src/runner/session.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../../src/state/fgos-file-registry.mjs';
 import { writeCoexistenceManifest } from '../../../src/install/coexist.mjs';
 import { invokeHost } from '../../../src/util/host-bin.mjs';
+import { prepareActivatedGitFixture } from '../../helpers/run-unit-with-port.mjs';
 
 // The CLI under test, resolved by absolute path so it works regardless of
 // the spawned process's cwd (which every test below points at a fresh
@@ -594,10 +595,13 @@ function initGitCwdMain() {
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
-  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/cache/\n.fgos/runtime/\n');
+  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/cache/\n.fgos/runtime/\n.fgos/locks/\n');
   fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd });
   execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });
+  // Runner-source approve lands through native Git Land, which requires
+  // an activated checkout; this is fixture setup, the fence stays mandatory.
+  prepareActivatedGitFixture(cwd);
   return cwd;
 }
 
@@ -606,10 +610,13 @@ function initGitCwdMainFast() {
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
-  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/cache/\n.fgos/runtime/\n');
+  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/cache/\n.fgos/runtime/\n.fgos/locks/\n');
   fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd });
   execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });
+  // Runner-source approve lands through native Git Land, which requires
+  // an activated checkout; this is fixture setup, the fence stays mandatory.
+  prepareActivatedGitFixture(cwd);
   return cwd;
 }
 

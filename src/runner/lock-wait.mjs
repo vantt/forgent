@@ -12,7 +12,7 @@ export const DEFAULT_LOCK_WAIT_MS = 60 * 1000;
 
 /**
  * withLockRetry(fn, { waitMs }) — calls `fn({ waitMs })`. `fn` passes that
- * `waitMs` to the lock door it takes (`withMergeTargetSlot`, `withMainCheckout`,
+ * `waitMs` to the lock door it takes (`withMainCheckout`, `withWorktreeAdmin`,
  * ...), whose acquire waits up to that long and then throws `lock-held`
  * naming the lock and the pids the kernel shows holding it. An explicit
  * `waitMs` is the true wall-clock ceiling; omitted, it is

@@ -16,7 +16,7 @@ import { runBorrowed } from '../holder-lock/index.mjs';
 // unchanged and load-bearing — a timeout RESOLVES (never rejects/throws)
 // `{passed:false, status:null, ...}`, exactly what spawnSync's own
 // timeout->status:null behavior already gave every caller (runOnce's
-// startupReap/processItem, merge.mjs's mergeRunnerItem, bin/fgos.mjs's
+// startupReap/processItem, merge.mjs's landRunnerItem, bin/fgos.mjs's
 // return/approve verbs) — none of them expect runGoalCheck to ever reject.
 //
 // tsk-53o: a timeout and a genuine verify FAILURE were both indistinguishable

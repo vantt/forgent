@@ -8,11 +8,11 @@ import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createLockScope, probe, HolderLockError } from '../../src/holder-lock/index.mjs';
-import { withMainCheckout, withMergeTargetSlot, withWorktreeAdmin, addWorktree } from '../../src/runner/repo-locks.mjs';
+import { withMainCheckout, withWorktreeAdmin, addWorktree } from '../../src/runner/repo-locks.mjs';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 import { HOOK_TEST_SKIP } from '../helpers/main-checkout-hook-repo.mjs';
 
-// The three repo locks (main checkout, merge slot, worktree-admin) across
+// The repo locks of repo-locks.mjs (main checkout, worktree-admin) across
 // real processes. The lock core is exercised with no checkpoint adapter.
 
 const skip = HOOK_TEST_SKIP;
@@ -92,24 +92,17 @@ test('the handle is released when fn throws', { skip }, async () => {
   assert.equal(probe('main-checkout', { fgosDir }).result, 'free');
 });
 
-test('merge slots of different refs do not contend, the same ref does, and ranks only go up inside a scope', { skip }, async () => {
-  const { root, fgosDir } = tempProject();
-  const scope = createLockScope('slots');
-  await withMergeTargetSlot(scope, root, 'main', async () => {
-    await withMergeTargetSlot(createLockScope('other-ref'), root, 'fgw/other', () => {});
-    await assert.rejects(
-      withMergeTargetSlot(createLockScope('same-ref'), root, 'main', () => {}),
-      (err) => err.code === 'lock-held' && /merge slot of "main"/.test(err.message),
-    );
-    // slot (20) -> worktree-admin (40) -> main (50) is the allowed order.
-    await withWorktreeAdmin(scope, fgosDir, async () => {
-      await withMainCheckout(scope, 'land', () => {}, { fgosDir });
-    });
-    // main (50) then worktree-admin (40) is a rank decrease: refused at once.
-    await withMainCheckout(scope, 'land', async () => {
-      await assert.rejects(withWorktreeAdmin(scope, fgosDir, () => {}), (err) => err.code === 'lock-order-violation');
-    }, { fgosDir });
+test('ranks only go up inside a scope: worktree-admin then main is allowed, main then worktree-admin is refused at once', { skip }, async () => {
+  const { fgosDir } = tempProject();
+  const scope = createLockScope('ranks');
+  // worktree-admin (40) -> main (50) is the allowed order.
+  await withWorktreeAdmin(scope, fgosDir, async () => {
+    await withMainCheckout(scope, 'land', () => {}, { fgosDir });
   });
+  // main (50) then worktree-admin (40) is a rank decrease: refused at once.
+  await withMainCheckout(scope, 'land', async () => {
+    await assert.rejects(withWorktreeAdmin(scope, fgosDir, () => {}), (err) => err.code === 'lock-order-violation');
+  }, { fgosDir });
 });
 
 test('addWorktree runs git worktree add under the worktree-admin lock', { skip }, async () => {

@@ -1,9 +1,8 @@
 // approve.mjs — use case behind `fgos approve <id>`.
 //
 // Cổng duyệt — approve (pr-lifecycle D3/D4): merges a runner item's
-// branch into main (spike-proven mechanics: --no-commit --no-ff, verify
-// on the staged tree, commit only on green — runner/merge.mjs's
-// mergeRunnerItem) or, for a pull-door/legacy item (code already on main),
+// branch into its target through Land (verify in the candidate, publish
+// only on green — runner/merge.mjs's landRunnerItem) or, for a pull-door/legacy item (code already on main),
 // re-runs the item's OWN verify directly against the current tree. Every
 // failure path (conflict, red verify) parks the item at `blocked` with a
 // reason instead of leaving main mid-merge or the item silently in
@@ -36,8 +35,8 @@ import { resolveRoot, isResolvedStatus } from '../../state/frontier.mjs';
 import { driftStatus } from '../../state/drift-status.mjs';
 import {
   classifySource,
-  mergeRunnerItem,
-  withMergeSlot,
+  landRunnerItem,
+  acknowledgeLand,
   performCatchUp,
   buildOwnFileSet,
   isWorkingTreeClean as isMainTreeClean,
@@ -47,7 +46,6 @@ import {
   branchNameFor,
   branchExists,
   createBranchRef,
-  withMergeEphemeralWorktree,
   detectTrunk,
   isMainWorktree,
   currentHead,
@@ -56,8 +54,6 @@ import {
 } from '../../runner/worktree.mjs';
 import { ironLawForItem, ironLawRefusal } from '../../runner/iron-law-gate.mjs';
 import { readIronLawLevel, recordIronLawSkip, recordIronLawAcknowledge } from './iron-law-level.mjs';
-import { withLockRetry } from '../../runner/lock-wait.mjs';
-import { createLockScope } from '../../holder-lock/index.mjs';
 import { listSessions } from '../../runner/session.mjs';
 import { runGoalCheck } from '../../runner/goal-check.mjs';
 import { mergeGitHubPR } from '../../runner/github-adapter.mjs';
@@ -114,6 +110,16 @@ function moveDeliveredOrRecordFault(dir, id, phase, testForceLockTimeoutId, { me
   }
 }
 
+/** Once Work durably recorded the delivery, Land may release the candidate,
+ * pins and journal it kept for that acknowledgement (Git spec §9, M4). A
+ * retained candidate never negates the delivery; it is only reported. */
+function releaseDeliveredLand(repoRoot, id, landSettlement, event) {
+  if (!landSettlement) return;
+  for (const warning of acknowledgeLand(repoRoot, landSettlement.operationId, `work-delivered:${id}:${event.seq}`)) {
+    process.stderr.write(`fgos: warning: "${id}" is delivered; its Land candidate was retained (${warning}).\n`);
+  }
+}
+
 function moveBlockedOrConflict(dir, { id, reason, role = 'system' }) {
   try {
     moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason, role });
@@ -134,6 +140,33 @@ function moveBlockedOrConflict(dir, { id, reason, role = 'system' }) {
 }
 
 /**
+ * The Land operation id this approve publishes `id`'s branch under, into
+ * `destination`. A publication Land already recorded for this exact source
+ * and destination is settled under its original id; an attempt whose effect
+ * is unknown refuses before another operation is created. A fresh id is
+ * recorded as a decision before Land starts, so the publication identity
+ * outlives a lost acknowledgement (Git spec §9 step 6, M4).
+ */
+function landOperationFor(dir, repoRoot, view, id, destination) {
+  const source = resolveRefSha(repoRoot, branchNameFor(id));
+  const prior = [...view.decisions].reverse().find(decision => decision.id === id
+    && decision.landOperation?.source === source && decision.landOperation?.destination === destination);
+  if (prior) {
+    const operation = createGitRecovery(gitPortOptions(repoRoot, { mutation: true })).inspectOperation({ operationId: prior.landOperation.operationId });
+    if (operation.outcome?.kind === 'land') return prior.landOperation.operationId;
+    if (!operation.terminal && ['target-attempt', 'land-verified'].includes(operation.phase?.phase)) {
+      throw new StoreError('precondition', `approve: Land operation ${prior.landOperation.operationId} requires recovery before another publication.`);
+    }
+  }
+  const operationId = crypto.randomUUID();
+  addDecision(dir, { id, kind: 'engine',
+    text: `approve: prepare Land operation ${operationId}`,
+    rationale: 'retain the publication identity until Work acknowledges delivery',
+    landOperation: { operationId, source, destination } });
+  return operationId;
+}
+
+/**
  * @param {{dir: string, repoRoot: string}} ctx - `repoRoot` follows this
  *   verb's own `--trust-dir` policy, resolved by the adapter.
  * @param {{id: string, resolveTimeoutMs: () => number|undefined, resolveWaitFlags: () => {noWait: boolean, waitMs: number|undefined},
@@ -151,10 +184,9 @@ export async function approveUseCase(
   // refuses a malformed flag, exactly when it always did.
   const timeoutMs = resolveTimeoutMs();
   const { noWait, waitMs } = resolveWaitFlags();
-  // Every merge into the target runs under the target's merge slot, taken
-  // through `runMerge` (a single try under --no-wait, a wait otherwise).
-  const scope = createLockScope('approve');
-  const runMerge = (mergeFn) => (noWait ? mergeFn({}) : withLockRetry(mergeFn, { waitMs }));
+  // Land waits for the target's merge slot and the main checkout up to this
+  // budget (no wait under --no-wait, Land's default when no --wait is given).
+  const lockWait = noWait ? { lockWaitMs: 0 } : waitMs !== undefined ? { lockWaitMs: waitMs } : {};
 
   const view = listWork(dir);
   const item = view.work[id];
@@ -371,8 +403,8 @@ export async function approveUseCase(
     // tsk-kv3 (Q1): the main-checkout clean-tree gate USED to run here,
     // unconditionally, covering both the leaf->root and root->main
     // paths below. Removed for leaf->root specifically: that merge runs
-    // entirely inside a DETACHED ephemeral worktree
-    // (withMergeEphemeralWorktree, a few lines down) and never reads or
+    // entirely inside Land's own candidate worktree and publishes to a
+    // branch the main checkout does not hold, so it never reads or
     // writes repoRoot's own working tree at all — gating on its
     // cleanliness protected a resource that path never touches. The
     // gate is re-added below, scoped to the root->main branch only,
@@ -381,7 +413,7 @@ export async function approveUseCase(
 
     // Acceptance-evidence pre-flight (tsk-396 D1): covers both merge
     // paths below (leaf->root and root->main share this one branch
-    // point) — checked BEFORE mergeRunnerItem's real git merge, not
+    // point) — checked BEFORE landRunnerItem builds any candidate, not
     // caught after the fact inside moveWork's own `to === 'delivered'`
     // check (store.mjs). A merge that's about to be refused here never
     // touches the target branch.
@@ -425,60 +457,25 @@ export async function approveUseCase(
       if (!branchExists(repoRoot, rootBranch)) {
         createBranchRef(repoRoot, rootId);
       }
-      // Ephemeral worktree checked out on fgw/<rootId> (now guaranteed to
-      // exist, either from dispatch-side wiring or the fallback just
-      // above) — never the human's own main
-      // checkout, and never a literal checkout of fgw/<rootId> itself:
-      // withMergeEphemeralWorktree stands up a DETACHED checkout at the
-      // branch's current tip commit, merges there, then lands the
-      // result via a plain `git branch -f` ref update (worktree.mjs,
-      // docs/history/merge-worktree-reclaim-clobbers-kept-checkout/
-      // CONTEXT.md D1 — this replaces an earlier version of this
-      // comment that attributed the race below to createWorktree's
-      // branch-reuse path force-reclaiming any existing checkout of
-      // fgw/<rootId>; that mechanism no longer runs here). This still
-      // races a concurrent approval of a sibling leaf of the same
-      // root, or the runner's own dispatch of that root — D16's
-      // per-root merge-mutex lives in the runner's write-queue, not
-      // this human-driven CLI verb, so nothing here prevents two such
-      // merges from overlapping. What changed (tsk-46a, docs/history/
-      // merge-ephemeral-branch-force-race/CONTEXT.md):
-      // withMergeEphemeralWorktree's own CAS guard now catches the
-      // overlap at the ref-move step and makes the losing side fail
-      // loudly instead of silently overwriting the winner's commit —
-      // the race can still happen, but it is no longer a silent
-      // data-loss risk; the losing `approve` call just needs a retry
-      // against the new tip. A long-lived claim worktree checked out
-      // on fgw/<rootId> falling behind this same ref update is a
-      // separate, guarded concern — see resyncClaimWorktree
-      // (worktree.mjs), which runs when that worktree is next
-      // reattached to.
+      // The leaf lands on fgw/<rootId> through Land, the same publisher as
+      // root-into-main (Git spec §9): Land's session on the root branch's
+      // full-ref slot excludes a sibling leaf's approve or the runner's own
+      // merge into it, builds the candidate from the tip it pins there, and
+      // verifies before the ref moves. A root branch another checkout holds
+      // is refused by Land, never moved behind that checkout's index.
       //
-      // withMergeEphemeralWorktree's own finally (worktree.mjs) removes
-      // the checkout on every exit path below (conflict, verify-fail,
-      // merged) — per D4/D17 that never deletes the branch itself.
-      // mergeRunnerItem's own conflict/verify-fail outcomes already
-      // leave the ephemeral checkout clean via `git merge --abort`, so
-      // no cleanupMergedBranch call is needed on those paths.
-      // tsk-xyr (§E): the target's own slot is held OUTSIDE
-      // withMergeEphemeralWorktree — createDetachedMergeWorktree reads
-      // the target's tip BEFORE this callback runs, so the slot must
-      // already be held by the time that read happens, not acquired
-      // from inside it (that would leave the tip read unprotected).
-      // The wait budget goes to the slot's own acquire, the only call here
-      // that can throw lock-held for contention on this target.
-      return await runMerge(({ waitMs: slotWaitMs }) => withMergeSlot(scope, repoRoot, rootBranch, async () => {
-        // tsk-4ax (D3): catchup as a STANDARD step, not only a recovery
-        // from `blocked` — if the target isn't yet an ancestor of the
-        // branch, catch it up FIRST, still inside the slot (so the
-        // target provably cannot move between this check and the land
-        // below — the whole invariant D3 depends on). Once caught up,
-        // the branch itself is now an ancestor and carries a commit
-        // this call JUST verified green; `effectiveItem` threads that
-        // fresh tip into the land below in-memory only (never persisted
-        // via moveWork — awaiting-approval -> awaiting-approval is not
-        // a valid FSM edge, and there is nothing to persist: this same
-        // call is about to consume the proof immediately).
+      // tsk-4ax (D3): catchup as a STANDARD step, not only a recovery from
+      // `blocked` — if the target isn't yet an ancestor of the branch, catch
+      // it up FIRST, through Sync under the branch's own checkout custody,
+      // never under the target's slot: Land pins the target only at prepare
+      // and merges from that pin, so whatever lands on the root meanwhile is
+      // included, never overwritten. Once caught up, the branch carries a
+      // commit this call JUST verified green; `effectiveItem` threads that
+      // fresh tip into the land below in-memory only (never persisted via
+      // moveWork — awaiting-approval -> awaiting-approval is not a valid FSM
+      // edge, and there is nothing to persist: this same call is about to
+      // consume the proof immediately).
+      {
         let effectiveItem = item;
         let alreadyAncestor = false;
         try {
@@ -534,13 +531,8 @@ export async function approveUseCase(
           // 'merged' or 'already-caught-up'.
           effectiveItem = { ...item, branchHeadAtReturn: catchupResult.catchupHead };
         }
-        return await withMergeEphemeralWorktree(repoRoot, rootId, async (ephemeral) => {
-        // lockRoot pins the lock files to the real repo root — ephemeral.path
-        // stays the git-op cwd but is never the lock's own root, since it's
-        // a throwaway worktree with no writable .fgos/ (ADR0020). The merge
-        // runs in that detached worktree under the target's slot, which is
-        // already held in `scope`.
-        const result = await mergeRunnerItem(ephemeral.path, effectiveItem, { timeoutMs, lockRoot: repoRoot, scope, waitMs: slotWaitMs });
+        const operationId = landOperationFor(dir, repoRoot, view, id, `refs/heads/${rootBranch}`);
+        const result = await landRunnerItem(repoRoot, effectiveItem, { target: rootBranch, operationId, timeoutMs, ...lockWait });
 
         if (result.outcome === 'conflict') {
           const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-conflict', role: 'system' });
@@ -630,30 +622,24 @@ export async function approveUseCase(
           return { id, mode: 'merge', to: 'blocked', reason: mergeReason, target: rootBranch, timedOut: result.check.timedOut, exitStatus: result.check.status, output: result.check.output };
         }
 
+        if (result.outcome !== 'merged') {
+          throw new StoreError('precondition', `approve: merge returned ${result.outcome}; delivery was not recorded.`);
+        }
+
         // Merged: land the leaf's work on its root's branch. The
         // leaf's own branch (and any stray worktree checkout of it) is
         // NO LONGER torn down here (tsk-1p9, restore-to-decision, D1):
         // teardown is deferred to the `cleanup` verb, gated by D7's TTL
         // and D8's harness (which now resolves the correct root-aware
-        // git context for a leaf branch, tsk-1p9 D7/D8 — the exact
-        // constraint that used to force this call to run from the
-        // ephemeral worktree right here no longer applies, since the
-        // deferred call resolves its own correct ref).
+        // git context for a leaf branch, tsk-1p9 D7/D8).
         // tsk-480: the merge above is already real and permanent —
         // status recording is best-effort from here regardless of
         // outcome (previously: also gated cleanup on this write
         // succeeding; cleanup no longer happens on this path at all).
-        // tsk-5dk: read the ephemeral worktree's OWN HEAD, not
-        // rootBranch's ref on repoRoot — withMergeEphemeralWorktree
-        // (worktree.mjs) only force-moves the real branch AFTER this
-        // callback returns (`git branch -f branch endCommit`), so
-        // reading repoRoot's ref here would still see the PRE-merge
-        // sha. `ephemeral.path`'s HEAD is correct in both the fresh-
-        // merge case (it IS the just-created endCommit) and the
-        // idempotent-already-merged case (HEAD never advanced past
-        // rootBranch's existing tip, which is exactly right there too).
-        const mergedSha = currentHead(ephemeral.path);
-        const moveResult = moveDeliveredOrRecordFault(dir, id, 'leaf-into-root merge', testForceLockTimeoutId, { mergedSha, mergedInto: rootBranch });
+        // The receipt names the commit Land published; an already-merged
+        // re-approve published nothing, and the root branch's tip is it.
+        const mergedSha = result.receipt?.localEffect.publishedOid ?? resolveRefSha(repoRoot, rootBranch);
+        const moveResult = moveDeliveredOrRecordFault(dir, id, 'leaf-into-root merge', testForceLockTimeoutId, { mergedSha, mergedInto: rootBranch, landSettlement: result.landSettlement });
         if (!moveResult.event) {
           return {
             id,
@@ -668,6 +654,7 @@ export async function approveUseCase(
             postLand: result.postLand,
           };
         }
+        releaseDeliveredLand(repoRoot, id, result.landSettlement, moveResult.event);
         return {
           id,
           mode: 'merge',
@@ -678,8 +665,7 @@ export async function approveUseCase(
           output: result.check.output,
           postLand: result.postLand,
         };
-        });
-      }, { waitMs: slotWaitMs }));
+      }
     }
 
 
@@ -704,37 +690,11 @@ export async function approveUseCase(
       throw new StoreError('validation', `approve: working tree at "${repoRoot}" is not clean — commit or stash pending changes before approving "${id}".`);
     }
 
-    // Not wrapped in runMerge: the CAS merge takes the trunk's merge slot
-    // itself, the main checkout mutex only for its final land step, and waits
-    // on each (or fails fast under --no-wait) without redoing the verify run.
-    const { mergeRootIntoMainCas } = await import('../../runner/merge.mjs');
-    const sourceOid = resolveRefSha(repoRoot, branchNameFor(id));
-    const destination = `refs/heads/${detectTrunk(repoRoot)}`;
-    const prior = [...view.decisions].reverse().find(decision => decision.id === id
-      && decision.landOperation?.source === sourceOid && decision.landOperation?.destination === destination);
-    let operationId;
-    if (prior) {
-      // A previously published operation is settled under its original id.
-      // Unknown native effects refuse before another operation is created.
-      const operation = createGitRecovery(gitPortOptions(repoRoot, { mutation: true })).inspectOperation({ operationId: prior.landOperation.operationId });
-      if (operation.outcome?.kind === 'land') operationId = prior.landOperation.operationId;
-      else if (!operation.terminal && ['target-attempt', 'land-verified'].includes(operation.phase?.phase)) {
-        throw new StoreError('precondition', `approve: Land operation ${prior.landOperation.operationId} requires recovery before another publication.`);
-      }
-    }
-    if (!operationId) {
-      operationId = crypto.randomUUID();
-      addDecision(dir, { id, kind: 'engine',
-        text: `approve: prepare Land operation ${operationId}`,
-        rationale: 'retain the publication identity until Work acknowledges delivery',
-        landOperation: { operationId, source: sourceOid, destination } });
-    }
-    const result = await mergeRootIntoMainCas(repoRoot, item, branchNameFor(id), {
-      operationId,
-      timeoutMs,
-      ownFileSet,
-      ...(noWait ? { lockWaitMs: 0 } : waitMs !== undefined ? { lockWaitMs: waitMs } : {}),
-    });
+    // Land takes the trunk's merge slot itself, the main checkout only for
+    // publication, and waits on each (or fails fast under --no-wait) without
+    // redoing the verify run.
+    const operationId = landOperationFor(dir, repoRoot, view, id, `refs/heads/${detectTrunk(repoRoot)}`);
+    const result = await landRunnerItem(repoRoot, item, { operationId, timeoutMs, ownFileSet, ...lockWait });
 
     if (result.outcome === 'conflict') {
       const reason = hadChildren ? 'integration-drift' : 'merge-conflict';
@@ -870,11 +830,8 @@ export async function approveUseCase(
     // (already real and permanent) — now moot on this path, since
     // cleanup no longer happens here at all (tsk-1p9 D1: deferred to
     // the `cleanup` verb, gated by D7's TTL and D8's harness).
-    // tsk-5dk: same resolveRefSha-of-the-target-branch approach as the
-    // leaf-into-root path above, kept uniform even though this merge
-    // already ran directly on repoRoot (no ephemeral worktree here) —
-    // still correct, and still robust for an idempotent already-merged
-    // re-approve (see the leaf-into-root comment above for why).
+    // Same as the leaf-into-root path above: the receipt's published
+    // commit, or the trunk's tip for an already-merged re-approve.
     const mergedSha = result.receipt?.localEffect.publishedOid ?? resolveRefSha(repoRoot, detectTrunk(repoRoot));
     const moveResult = moveDeliveredOrRecordFault(dir, id, 'root-into-main merge', testForceLockTimeoutId, { mergedSha, mergedInto: 'main', landSettlement: result.landSettlement });
     if (!moveResult.event) {
@@ -892,6 +849,7 @@ export async function approveUseCase(
         postLand: result.postLand,
       };
     }
+    releaseDeliveredLand(repoRoot, id, result.landSettlement, moveResult.event);
     return {
       id,
       mode: 'merge',

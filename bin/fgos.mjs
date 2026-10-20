@@ -3722,7 +3722,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // fgw/<parentId> for a nested root — WITHOUT touching the root item's
     // own status/stage (CONTEXT.md's locked contract: this replaces the
     // ad-hoc `git merge` tsk-3bn's own origin incident required by hand).
-    // Reuses `mergeRunnerItem`'s exact lock/verify path (constraint #1,
+    // Reuses `landRunnerItem`'s exact Land/verify path (constraint #1,
     // fgos-coding-validating's gate) — never a second bespoke merge mechanism.
     // Unlike `approve`'s root-into-main path, this never deletes fgw/<id>
     // afterward: the root stays open for further leaf merges.
@@ -3802,11 +3802,9 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // the item's own linked worktree (e.g. a session that just hit
       // verify-fail-post-merge and is still sitting inside its own picked
       // worktree) always passes --dir at the stable main checkout —
-      // deriving repoRoot from it keeps withMergeEphemeralWorktree's own
-      // `git branch -f` (src/runner/worktree.mjs) targeting that stable
-      // root instead of the worktree currently checked out on the same
-      // branch it is about to force-update, which git refuses ("Cannot
-      // force update the current branch"). Byte-identical to today when
+      // deriving repoRoot from it keeps catchup's Sync and its trusted
+      // main resolution on that stable root instead of the worktree
+      // currently checked out on the item's own branch. Byte-identical to today when
       // --dir is omitted (dataDir() resolves dir from process.cwd() too
       // in that case). This verb has no `--trust-dir` gate, unlike
       // approve/sync-root/promote-to-component — a real per-verb

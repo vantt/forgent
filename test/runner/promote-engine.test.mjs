@@ -7,6 +7,8 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { resolveIntegrationBranch, retargetMember } from '../../src/runner/promote-engine.mjs';
 import { branchNameFor } from '../../src/runner/worktree.mjs';
+import { activateGitFixture } from './worktree-native-fixture.helper.mjs';
+import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 
 // Every test here creates its own disposable git repo (mirrors
 // merge.test.mjs's own initRepo) — never this repo's own checkout. Trunk is
@@ -21,6 +23,9 @@ function initRepo() {
   fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: repoRoot });
+  // The activation fence lives under `.fgos/locks/`, which a real checkout ignores.
+  fs.appendFileSync(path.join(repoRoot, '.git', 'info', 'exclude'), '.fgos/\n');
+  activateGitFixture(repoRoot);
   return repoRoot;
 }
 
@@ -142,23 +147,16 @@ test('retargetMember refuses to run from a linked worktree, mirroring sync-root\
   }
 });
 
-test('retargetMember retries on lock-held and succeeds once the lock clears (withLockRetry wrap)', async () => {
+test('retargetMember waits while another process holds the integration branch\'s merge slot and merges once it is gone', async () => {
   const repoRoot = initRepo();
-  const fgosDir = path.join(repoRoot, '.fgos');
-  fs.mkdirSync(fgosDir, { recursive: true });
   makeBranchWithCommit(repoRoot, 'fgw/member-a', 'member-a.txt', 'member a work\n');
   resolveIntegrationBranch(repoRoot, 'root-x');
 
-  const lockPath = path.join(fgosDir, 'main-checkout.lock');
-  fs.writeFileSync(lockPath, JSON.stringify({ pid: 'other-session', ts: Date.now() }));
-
-  setTimeout(() => {
-    if (fs.existsSync(lockPath)) {
-      fs.unlinkSync(lockPath);
-    }
-  }, 200);
+  const holder = await holdLockInChild('merge-slot', { fgosDir: path.join(repoRoot, '.fgos'), ref: encodeURIComponent('refs/heads/fgw/root-x') });
+  setTimeout(() => holder.child.kill('SIGKILL'), 300);
 
   const result = await retargetMember(repoRoot, makeItem('member-a'), 'root-x');
+  await holder.exited;
   assert.deepEqual(result, { id: 'member-a', outcome: 'merged' });
+  assert.equal(git(repoRoot, ['show', 'fgw/root-x:member-a.txt']), 'member a work\n');
 });
-

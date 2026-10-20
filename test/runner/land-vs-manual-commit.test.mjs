@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { mergeRootIntoMainCas } from '../../src/runner/merge.mjs';
+import { landRunnerItem } from '../../src/runner/merge.mjs';
 import { retargetMember, resolveIntegrationBranch } from '../../src/runner/promote-engine.mjs';
 import { withMainCheckout } from '../../src/runner/repo-locks.mjs';
 import { checkpointMainFgos } from '../../src/runner/main-fgos-checkpoint.mjs';
@@ -44,8 +44,8 @@ test('two lands into one target exclude each other under the slot, and the secon
   const verify = (id) => `node -e "const fs=require('fs');fs.appendFileSync('${log}','start ${id}\\n');setTimeout(()=>{fs.appendFileSync('${log}','end ${id}\\n')},600)"`;
 
   const [a, b] = await Promise.all([
-    mergeRootIntoMainCas(repoRoot, item('item-a', verify('a')), 'fgw/item-a', { timeoutMs: 60000, lockWaitMs: 30000 }),
-    mergeRootIntoMainCas(repoRoot, item('item-b', verify('b')), 'fgw/item-b', { timeoutMs: 60000, lockWaitMs: 30000 }),
+    landRunnerItem(repoRoot, item('item-a', verify('a')), { branch: 'fgw/item-a', timeoutMs: 60000, lockWaitMs: 30000 }),
+    landRunnerItem(repoRoot, item('item-b', verify('b')), { branch: 'fgw/item-b', timeoutMs: 60000, lockWaitMs: 30000 }),
   ]);
 
   assert.equal(a.outcome, 'merged', JSON.stringify(a));
@@ -61,7 +61,7 @@ test('two lands into one target exclude each other under the slot, and the secon
   assert.equal(probe('main-checkout', { fgosDir: path.join(repoRoot, '.fgos') }).result, 'free');
 });
 
-test('a checkpoint that holds main while a land waits for it finishes first; the land then reports the moved trunk and loses nothing', { skip }, async () => {
+test('a checkpoint that holds main while a land waits for it finishes first; the land then merges onto the moved trunk and loses nothing', { skip }, async () => {
   const repoRoot = initRepo();
   activateGitFixture(repoRoot);
   addBranch(repoRoot, 'fgw/item-a', 'a.txt', 'a\n');
@@ -77,16 +77,16 @@ test('a checkpoint that holds main while a land waits for it finishes first; the
   try {
     let land;
     await withMainCheckout(createLockScope('checkpointer'), 'checkpoint', async (mainHandle) => {
-      land = mergeRootIntoMainCas(repoRoot, item('item-a'), 'fgw/item-a', { timeoutMs: 60000, lockWaitMs: 30000 });
+      land = landRunnerItem(repoRoot, item('item-a'), { branch: 'fgw/item-a', timeoutMs: 60000, lockWaitMs: 30000 });
       // Long enough for the land to finish its merge and verify and start waiting for main.
       await sleep(1500);
       checkpointMainFgos(mainHandle, fgosDir, repoRoot);
     }, { fgosDir });
 
-    await assert.rejects(land, (err) => {
-      assert.equal(JSON.parse(err.message).cause, 'land-target-changed', `the trunk moved under the land: ${err.message}`);
-      return true;
-    });
+    const result = await land;
+    assert.equal(result.outcome, 'merged', JSON.stringify(result));
+    assert.equal(result.receipt.localEffect.publishedOid, mainTip(repoRoot), 'the land published onto the trunk the checkpoint moved');
+    assert.match(git(repoRoot, ['show', 'main:a.txt']), /^a$/m, 'the branch content landed');
     assert.match(git(repoRoot, ['log', '--format=%s', `${tipBefore}..main`]), /chore\(\.fgos\): fallback events checkpoint/);
     assert.equal(git(repoRoot, ['status', '--porcelain', '--untracked-files=no']).trim(), '', 'the index and tree are consistent, nothing half-applied');
     assert.equal(fs.existsSync(path.join(repoRoot, '.git', 'index.lock')), false);
@@ -121,7 +121,7 @@ exit 0
   fs.chmodSync(refHook, 0o755);
   const before = commitCount(repoRoot);
 
-  const result = await mergeRootIntoMainCas(repoRoot, item('item-a'), 'fgw/item-a', { timeoutMs: 60000, lockWaitMs: 30000, ownFileSet: new Set(['a.txt']) });
+  const result = await landRunnerItem(repoRoot, item('item-a'), { branch: 'fgw/item-a', timeoutMs: 60000, lockWaitMs: 30000, ownFileSet: new Set(['a.txt']) });
 
   assert.equal(result.outcome, 'merged', JSON.stringify(result));
   assert.equal(fs.existsSync(attemptLog), false, 'the land ran the reference-transaction hook');
@@ -148,7 +148,7 @@ test('without the hook (raw git outside fgOS), a manual commit that slips in bef
 
   let land;
   await withMainCheckout(createLockScope('holder'), 'hold', async () => {
-    land = mergeRootIntoMainCas(repoRoot, item('item-a'), 'fgw/item-a', { timeoutMs: 60000, lockWaitMs: 30000 });
+    land = landRunnerItem(repoRoot, item('item-a'), { branch: 'fgw/item-a', timeoutMs: 60000, lockWaitMs: 30000 });
     await sleep(1500);
     fs.writeFileSync(path.join(repoRoot, 'manual.txt'), 'manual\n');
     git(repoRoot, ['add', 'manual.txt']);
@@ -173,7 +173,7 @@ test('a file staged in main outside the item\'s own file set does not refuse the
   git(repoRoot, ['add', 'staged.txt']);
   const tipBefore = mainTip(repoRoot);
 
-  const result = await mergeRootIntoMainCas(repoRoot, item('item-a'), 'fgw/item-a', { timeoutMs: 60000, lockWaitMs: 30000, ownFileSet: new Set(['a.txt']) });
+  const result = await landRunnerItem(repoRoot, item('item-a'), { branch: 'fgw/item-a', timeoutMs: 60000, lockWaitMs: 30000, ownFileSet: new Set(['a.txt']) });
 
   assert.equal(result.outcome, 'merged', JSON.stringify(result));
   assert.equal(result.receipt.checkout, 'pending', 'checkout-lagging: the staged bytes are preserved, not synced over');
@@ -196,7 +196,7 @@ test('staged .fgos event files in main are fgOS\'s own: they survive the land co
   fs.writeFileSync(path.join(repoRoot, '.fgos', 'events', 'w1.jsonl'), '{"seq":3}\n');
   git(repoRoot, ['add', '-f', '.fgos/events.jsonl', '.fgos/events/w1.jsonl']);
 
-  const result = await mergeRootIntoMainCas(repoRoot, item('item-a'), 'fgw/item-a', { timeoutMs: 60000, lockWaitMs: 30000, ownFileSet: new Set(['a.txt']) });
+  const result = await landRunnerItem(repoRoot, item('item-a'), { branch: 'fgw/item-a', timeoutMs: 60000, lockWaitMs: 30000, ownFileSet: new Set(['a.txt']) });
 
   assert.equal(result.outcome, 'merged', JSON.stringify(result));
   assert.equal(fs.readFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), 'utf8'), '{"seq":1}\n{"seq":2}\n', 'the staged edit is not reset to HEAD');
@@ -212,7 +212,7 @@ test('an unstaged edit on an unrelated path survives the land untouched', { skip
   addBranch(repoRoot, 'fgw/item-a', 'a.txt', 'a\n');
   fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'edited by a person, not staged\n');
 
-  const result = await mergeRootIntoMainCas(repoRoot, item('item-a'), 'fgw/item-a', { timeoutMs: 60000, lockWaitMs: 30000, ownFileSet: new Set(['a.txt']) });
+  const result = await landRunnerItem(repoRoot, item('item-a'), { branch: 'fgw/item-a', timeoutMs: 60000, lockWaitMs: 30000, ownFileSet: new Set(['a.txt']) });
 
   assert.equal(result.outcome, 'merged', JSON.stringify(result));
   assert.equal(fs.readFileSync(path.join(repoRoot, 'seed.txt'), 'utf8'), 'edited by a person, not staged\n');
@@ -227,7 +227,7 @@ test('a file staged in main that is part of the item\'s own file set refuses the
   git(repoRoot, ['add', 'a.txt']);
   const tipBefore = mainTip(repoRoot);
 
-  const result = await mergeRootIntoMainCas(repoRoot, item('item-a'), 'fgw/item-a', { timeoutMs: 60000, lockWaitMs: 30000, ownFileSet: new Set(['a.txt']) });
+  const result = await landRunnerItem(repoRoot, item('item-a'), { branch: 'fgw/item-a', timeoutMs: 60000, lockWaitMs: 30000, ownFileSet: new Set(['a.txt']) });
 
   assert.equal(result.outcome, 'main-checkout-dirty-mid-merge', JSON.stringify(result));
   assert.equal(mainTip(repoRoot), tipBefore, 'update-ref never ran');
@@ -250,7 +250,7 @@ test('promoting a member does not hold the main mutex during verify: another wit
     assert.ok(Date.now() < deadline, 'verify never started');
     await sleep(20);
   }
-  assert.equal(probe('merge-slot', { fgosDir, ref: encodeURIComponent('fgw/root-x') }).result, 'held', 'the integration branch\'s slot is held');
+  assert.equal(probe('merge-slot', { fgosDir, ref: encodeURIComponent('refs/heads/fgw/root-x') }).result, 'held', 'the integration branch\'s slot is held');
   const entered = await withMainCheckout(createLockScope('concurrent'), 'concurrent', () => 'in', { fgosDir });
   assert.equal(entered, 'in');
   assert.deepEqual(await promoting, { id: 'member-a', outcome: 'merged' });

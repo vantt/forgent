@@ -286,7 +286,7 @@ async function typedOperationRows(root, state, index, loader, samples, observer 
   fs.writeFileSync(baselineFile, baseline.replace(/from '([^']+)'/g, (all, specifier) =>
     specifier.startsWith('.') ? `from '${pathToFileURL(path.resolve(CHECKOUT, path.dirname(baselinePath), specifier)).href}'` : all));
   const { commitUnitWork } = await import(pathToFileURL(baselineFile).href);
-  const { mergeRootIntoMainCas } = await import('../../src/runner/merge.mjs');
+  const { landRunnerItem } = await import('../../src/runner/merge.mjs');
   const make = label => {
     const repo = path.join(root, label); git(['init', '-q', '--initial-branch=main', repo]);
     git(['-C', repo, 'config', 'user.name', IDENTITY.name]); git(['-C', repo, 'config', 'user.email', IDENTITY.email]);
@@ -340,7 +340,7 @@ async function typedOperationRows(root, state, index, loader, samples, observer 
         // the same fixture disk through the ordinary OS temp-directory input.
         process.env.TMPDIR = root;
         observer.begin('land-legacy');
-        out = await mergeRootIntoMainCas(main,{id:`e3-${i}`,branchHeadAtReturn:source},'source',{ownFileSet:['payload']});
+        out = await landRunnerItem(main,{id:`e3-${i}`,branchHeadAtReturn:source},{branch:'source',ownFileSet:['payload']});
         observer.end('land-legacy');
       } finally {
         if (previousTmpdir === undefined) delete process.env.TMPDIR;

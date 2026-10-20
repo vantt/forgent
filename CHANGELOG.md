@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Leaf `approve`, `sync-root` and `promote-to-component` now land through Git Land like root-into-main `approve`: the target branch's merge slot is Land's (`lock fence merge-slot --param ref=` now takes the URL-encoded full ref, e.g. `refs%2Fheads%2Fmain`), the item's verify runs in Land's candidate, a root branch checked out in another worktree is refused instead of moved behind it, and `.fgos` event files due for a checkpoint are committed before the merge rather than inside it. After `approve` or `sync-root` records the result, Land's published candidate is removed.
+
 - Root-into-main `approve` through Land again refuses a branch that writes under `.fgos/`, self-resolves decision-id collisions on the decision index and `merge=union` `.fgos` conflicts, and runs the repo-invariant checks on the candidate before publishing.
 
 - `approve`/`merge` `--wait` now also bounds Land's wait for the main checkout at publication (previously a fixed 5 s), and a waiting Land no longer stalls its own process, so a release by another holder in the same process is seen.
