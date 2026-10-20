@@ -17,11 +17,13 @@
 // committed (per D2's durability policy) so it is reviewable like any other
 // source file, but that also means it carries the same trust level as code:
 // only apply it from a checkout you already trust.
-import { CHECKER_SEATS } from '../execution/seat-resolver.mjs';
+import { CHECKER_SEATS, SEAT_ROLES } from '../execution/seat-resolver.mjs';
+import { isSeatId } from '../../convention/seat-id.mjs';
+import { definitionFileName } from '../../convention/definition-names.mjs';
 import { RIGOR_VALUES } from '../rigor.mjs';
 import { canonicalizeWriteEntry } from './write-scope.mjs';
 import { RUN_TIMEOUT_MIN_MS, RUN_TIMEOUT_MAX_MS, runTimeoutProblem } from './run-timeout.mjs';
-import { parseTierCell, isExtendedTierCell } from './tier-cell.mjs';
+import { parseTierCell, isExtendedTierCell, REASONING_EFFORT_VALUES } from './tier-cell.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { mergeConfigDefaults } from '../../setup/config-merge.mjs';
@@ -279,6 +281,50 @@ export const SUPPORTED_EXECUTOR_TEMPLATES = { claude: DEFAULT_RUNNER_CONFIG.exec
 
 
 /**
+ * A copy of `value` with every `"$comment"` key removed at every depth. `$comment` is documentation
+ * (`fgos setup` writes the tier ladder as one); it never reaches validation, a resolver or the
+ * semantic config hash, because the loaders strip it from the merged runner before anything reads it.
+ */
+export function stripConfigComments(value) {
+  if (Array.isArray(value)) return value.map(stripConfigComments);
+  if (value === null || typeof value !== 'object') return value;
+  const out = {};
+  for (const [key, child] of Object.entries(value)) {
+    if (key !== '$comment') out[key] = stripConfigComments(child);
+  }
+  return out;
+}
+
+/** The capability entry keys that choose tier or taste per seat; they exist in the project config only. */
+const SEAT_BINDING_CAPABILITY_KEYS = Object.freeze(['tier', 'maxTier', 'roles', 'personas', 'seats']);
+
+/** The one value of `runner.patterns.seatBinding.schema` this release reads. */
+export const SEAT_BINDING_SCHEMA_VERSION = 1;
+
+/**
+ * Seat binding keys are the project config's: the global file is read by every fgOS release on the
+ * machine, and an older one refuses a capability key it does not know. A global file that carries one
+ * is an error naming the project config, not a value that silently fills a gap in every project.
+ */
+function refuseGlobalSeatBindingKeys(globalConfig) {
+  const runner = globalConfig?.runner;
+  if (!runner || typeof runner !== 'object') return;
+  const refuse = (keyPath) => {
+    throw new RunnerConfigError(
+      `~/.fgos/config.json runner.${keyPath} is a project setting: put it in the project's .fgos/config.json, never in the global config (older fgOS releases on this machine refuse it).`,
+    );
+  };
+  if (runner.defaults !== undefined) refuse('defaults');
+  if (runner.patterns?.seatBinding !== undefined) refuse('patterns.seatBinding');
+  for (const [name, entry] of Object.entries(runner.capabilities ?? {})) {
+    if (!entry || typeof entry !== 'object') continue;
+    for (const key of SEAT_BINDING_CAPABILITY_KEYS) {
+      if (entry[key] !== undefined) refuse(`capabilities.${name}.${key}`);
+    }
+  }
+}
+
+/**
  * `mergeWithGlobalConfig`'s `sanitizeGlobal` hook for this module's own
  * schema: drops any `runner.modelPolicies.<provider>` tier key not in
  * `MODEL_POLICY_TIERS`. A stale key here is not a project-level
@@ -290,7 +336,7 @@ export const SUPPORTED_EXECUTOR_TEMPLATES = { claude: DEFAULT_RUNNER_CONFIG.exec
  * `~/.fgos/config.json` itself, so a stale key already on disk stays there
  * (harmless once filtered) until something else cleans the file.
  *
- * It also drops a cell written as a list or as `model@pool`. The global config
+ * It also drops a cell written as a list, as `model@pool` or as a `{model, pool?, effort?}` object. The global config
  * is read by every fgOS release on the machine, and an older release fails
  * config load on a list and passes `model@pool` to the CLI as a model id, so
  * these forms belong in a project config until every release reads them. The
@@ -299,6 +345,7 @@ export const SUPPORTED_EXECUTOR_TEMPLATES = { claude: DEFAULT_RUNNER_CONFIG.exec
 const warnedGlobalExtendedCells = new Set();
 
 function sanitizeGlobalModelPolicies(globalConfig) {
+  refuseGlobalSeatBindingKeys(globalConfig);
   const modelPolicies = globalConfig?.runner?.modelPolicies;
   if (!modelPolicies || typeof modelPolicies !== 'object' || Array.isArray(modelPolicies)) {
     return globalConfig;
@@ -320,7 +367,7 @@ function sanitizeGlobalModelPolicies(globalConfig) {
         if (!warnedGlobalExtendedCells.has(cellName)) {
           warnedGlobalExtendedCells.add(cellName);
           process.stderr.write(
-            `fgos: ignoring ~/.fgos/config.json runner.${cellName}: a list or "model@pool" cell belongs in the project config (older fgOS releases on this machine cannot read it)\n`,
+            `fgos: ignoring ~/.fgos/config.json runner.${cellName}: a list, "model@pool" or {model, pool?, effort?} cell belongs in the project config (older fgOS releases on this machine cannot read it)\n`,
           );
         }
       } else {
@@ -358,7 +405,7 @@ export function loadRunnerConfigFromDir(dir) {
   }
   rejectProjectProviderAccountInventory(parsed, sharedPath);
   const withGlobal = mergeWithGlobalConfig(parsed, undefined, { sanitizeGlobal: sanitizeGlobalModelPolicies });
-  const runnerCfg = withGlobal.runner ?? {};
+  const runnerCfg = stripConfigComments(withGlobal.runner ?? {});
   validateRunnerConfigShape(runnerCfg, `${sharedPath}#runner`);
   normalizeConfigConfinement(runnerCfg);
   return runnerCfg;
@@ -414,7 +461,7 @@ export function ensureRunnerConfigForDir(dir) {
       );
     }
     const withGlobal = mergeWithGlobalConfig(projectShared, undefined, { sanitizeGlobal: sanitizeGlobalModelPolicies });
-    const runnerCfg = withGlobal.runner ?? {};
+    const runnerCfg = stripConfigComments(withGlobal.runner ?? {});
     validateRunnerConfigShape(runnerCfg, `${sharedPath}#runner`);
     normalizeConfigConfinement(runnerCfg);
     return runnerCfg;
@@ -517,7 +564,8 @@ export const EXECUTOR_CARRIES = Object.freeze(['user-text', 'repo-content']);
 // enforces at dispatch time, without a config.mjs -> assignment-policy.mjs
 // -> config.mjs import cycle. `assignment-policy.mjs` re-exports this name
 // unchanged for its own existing callers.
-export const REASONING_EFFORT_VALUES = Object.freeze(['low', 'medium', 'high', 'max']);
+// The vocabulary itself lives in tier-cell.mjs (a leaf), because a tier cell names an effort too.
+export { REASONING_EFFORT_VALUES };
 
 /**
  * The one validation every requested reasoningEffort goes through, whichever
@@ -1310,6 +1358,59 @@ export function validateCapabilityServesShape(serves, label) {
   }
 }
 
+function validateTierName(value, label) {
+  if (!MODEL_POLICY_TIERS.includes(value)) {
+    throw new RunnerConfigError(`runner config (${label}) must be one of ${MODEL_POLICY_TIERS.join('/')}, got: ${JSON.stringify(value)}.`);
+  }
+}
+
+/** A persona is named by the bare name inside its `agent.<name>.yaml`, under Convention's agent-name rule. */
+function personaNameProblem(name) {
+  try {
+    definitionFileName('agent-file', name);
+    return true;
+  } catch {
+    return 'a persona name (a lowercase letter, then lowercase letters, digits or "-")';
+  }
+}
+
+/**
+ * `roles`, `personas` and `seats` of a capability entry: a map from a key of the given kind to
+ * `{tier?, prefer?}`. `keyProblem` returns true for a good key, else a phrase saying what a good one is.
+ */
+function validateSeatTasteMap(map, label, kind, keyProblem) {
+  if (!map || typeof map !== 'object' || Array.isArray(map)) {
+    throw new RunnerConfigError(`runner config (${label}) must be an object mapping a ${kind} -> {tier?, prefer?} when present.`);
+  }
+  for (const [key, taste] of Object.entries(map)) {
+    const keyLabel = `${label}.${key}`;
+    const verdict = keyProblem(key);
+    if (verdict !== true) throw new RunnerConfigError(`runner config (${label}) key ${JSON.stringify(key)} must be ${verdict}.`);
+    if (!taste || typeof taste !== 'object' || Array.isArray(taste)) {
+      throw new RunnerConfigError(`runner config (${keyLabel}) must be an object {tier?, prefer?}.`);
+    }
+    for (const field of Object.keys(taste)) {
+      if (field !== 'tier' && field !== 'prefer') {
+        throw new RunnerConfigError(`runner config (${keyLabel}) contains unknown key "${field}". Allowed keys: tier, prefer.`);
+      }
+    }
+    if (taste.tier !== undefined) validateTierName(taste.tier, `${keyLabel} "tier"`);
+    if (taste.prefer !== undefined) normalizePreferCandidates(taste.prefer, `${keyLabel} "prefer"`);
+  }
+}
+
+/** Every `prefer` a capability entry carries, with the label that names where it sits. */
+function preferSitesOf(entry, label) {
+  const sites = [];
+  if (entry.prefer !== undefined) sites.push({ prefer: entry.prefer, label: `${label} "prefer"` });
+  for (const mapKey of ['roles', 'personas', 'seats']) {
+    for (const [key, taste] of Object.entries(entry[mapKey] ?? {})) {
+      if (taste?.prefer !== undefined) sites.push({ prefer: taste.prefer, label: `${label}.${mapKey}.${key} "prefer"` });
+    }
+  }
+  return sites;
+}
+
 function validateCapabilitiesShape(capabilities, label) {
   if (!capabilities || typeof capabilities !== 'object' || Array.isArray(capabilities)) {
     throw new RunnerConfigError(`runner config (${label}) must be an object mapping a capability name -> {description?, aliases?, prefer?, overrides?, confinement?, serves?} when present.`);
@@ -1362,7 +1463,12 @@ function validateCapabilitiesShape(capabilities, label) {
     if (entry.serves !== undefined) {
       validateCapabilityServesShape(entry.serves, `${entryLabel}.serves`);
     }
-    const ALLOWED_CAPABILITY_ENTRY_KEYS = ['description', 'aliases', 'prefer', 'rigor', 'confinement', 'serves', 'persona', 'minCheckers', 'verify'];
+    if (entry.tier !== undefined) validateTierName(entry.tier, `${entryLabel} "tier"`);
+    if (entry.maxTier !== undefined) validateTierName(entry.maxTier, `${entryLabel} "maxTier"`);
+    if (entry.roles !== undefined) validateSeatTasteMap(entry.roles, `${entryLabel}.roles`, 'role', (key) => SEAT_ROLES.includes(key) || `one of ${SEAT_ROLES.join('/')}`);
+    if (entry.personas !== undefined) validateSeatTasteMap(entry.personas, `${entryLabel}.personas`, 'persona', personaNameProblem);
+    if (entry.seats !== undefined) validateSeatTasteMap(entry.seats, `${entryLabel}.seats`, 'seat', (key) => isSeatId(key) || 'a seat id (a lowercase letter, then lowercase letters, digits or "-"; not a reserved name)');
+    const ALLOWED_CAPABILITY_ENTRY_KEYS = ['description', 'aliases', 'prefer', 'rigor', 'confinement', 'serves', 'persona', 'minCheckers', 'verify', ...SEAT_BINDING_CAPABILITY_KEYS];
     for (const key of Object.keys(entry)) {
       if (!ALLOWED_CAPABILITY_ENTRY_KEYS.includes(key)) {
         if (key === 'unconfined') {
@@ -1389,10 +1495,24 @@ export function validateRunnerPatternsShape(patterns, label) {
   if (!patterns || typeof patterns !== 'object' || Array.isArray(patterns)) {
     throw new RunnerConfigError(`runner config (${label}) must be an object when present.`);
   }
-  const ALLOWED_PATTERNS_KEYS = ['defaultRule', 'reviewed'];
+  const ALLOWED_PATTERNS_KEYS = ['defaultRule', 'reviewed', 'seatBinding'];
   for (const key of Object.keys(patterns)) {
     if (!ALLOWED_PATTERNS_KEYS.includes(key)) {
       throw new RunnerConfigError(`runner config (${label}) contains unknown key "${key}". Allowed keys: ${ALLOWED_PATTERNS_KEYS.join(', ')}.`);
+    }
+  }
+  // The schema marker: a release that does not know this key refuses the whole file (its patterns map is
+  // strict), which is what keeps an older release from binding seats against a config it cannot read.
+  if (patterns.seatBinding !== undefined) {
+    const marker = patterns.seatBinding;
+    if (!marker || typeof marker !== 'object' || Array.isArray(marker)) {
+      throw new RunnerConfigError(`runner config (${label}.seatBinding) must be an object {schema: ${SEAT_BINDING_SCHEMA_VERSION}}.`);
+    }
+    for (const key of Object.keys(marker)) {
+      if (key !== 'schema') throw new RunnerConfigError(`runner config (${label}.seatBinding) contains unknown key "${key}". Allowed keys: schema.`);
+    }
+    if (marker.schema !== SEAT_BINDING_SCHEMA_VERSION) {
+      throw new RunnerConfigError(`runner config (${label}.seatBinding.schema) must be ${SEAT_BINDING_SCHEMA_VERSION}, got: ${JSON.stringify(marker.schema)}.`);
     }
   }
   if (patterns.defaultRule !== undefined) {
@@ -1468,7 +1588,7 @@ export function validateRunnerPatternsShape(patterns, label) {
  * Shape-check `cfg.modelPolicies` (tsk-5tm-5 D9): an object mapping an
  * arbitrary provider name (`"claude"`, `"gemini"`, ...) to a tier map,
  * each tier map's keys drawn from `MODEL_POLICY_TIERS` and values tier
- * cells: a model, `model@pool`, or a non-empty list of those (`parseTierCell`). Partial coverage (a provider naming fewer
+ * cells: a model, `model@pool`, a `{model, pool?, effort?}` object, or a non-empty list of those (`parseTierCell`). Partial coverage (a provider naming fewer
  * than all 6 tiers) is valid at load time, same lenient-at-load/strict-
  * at-resolve philosophy (per `resolveTierModel`'s own doc comment) — a missing tier only throws once
  * something actually asks for it.
@@ -1491,7 +1611,7 @@ function validateModelPoliciesShape(modelPolicies, label) {
         parseTierCell(model, providerModel);
       } catch (err) {
         throw new RunnerConfigError(
-          `runner config (${label}.${providerModel}.${policyTier}) must be a model, "model@pool", or a non-empty list of those: ${err.message}.`,
+          `runner config (${label}.${providerModel}.${policyTier}) must be a model, "model@pool", a {model, pool?, effort?} object, or a non-empty list of those: ${err.message}.`,
         );
       }
     }
@@ -1527,6 +1647,17 @@ function validateTierFallbackShape(tierFallback, label) {
       seen.add(family);
     }
   }
+}
+
+/** `runner.defaults`: the system default a seat runs at when nothing else names a tier. */
+function validateRunnerDefaultsShape(defaults, label) {
+  if (!defaults || typeof defaults !== 'object' || Array.isArray(defaults)) {
+    throw new RunnerConfigError(`runner config (${label}) must be an object when present.`);
+  }
+  for (const key of Object.keys(defaults)) {
+    if (key !== 'tier') throw new RunnerConfigError(`runner config (${label}) contains unknown key "${key}". Allowed keys: tier.`);
+  }
+  if (defaults.tier !== undefined) validateTierName(defaults.tier, `${label}.tier`);
 }
 
 function validateRigorToTierShape(rigorToTier, label) {
@@ -1678,21 +1809,22 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
   // all.
   if (cfg.capabilities !== undefined) {
     for (const [name, entry] of Object.entries(cfg.capabilities)) {
-      if (entry.prefer === undefined) continue;
-      const preferCandidates = normalizePreferCandidates(entry.prefer, `${sourceLabel} capabilities.${name} "prefer"`);
-      for (const candidate of preferCandidates) {
-        const candidateExecutor = cfg.executors?.[candidate.executor];
-        if (!candidateExecutor) {
-          throw new RunnerConfigError(
-            `runner config (${sourceLabel} capabilities.${name}) "prefer" names "${candidate.executor}" but no such executor is registered.`,
-          );
-        }
-        if (candidate.invocation !== undefined) {
-          const invocations = Array.isArray(candidateExecutor.invocations) ? candidateExecutor.invocations : [];
-          if (!invocations.some((inv) => inv.id === candidate.invocation)) {
+      for (const site of preferSitesOf(entry, `${sourceLabel} capabilities.${name}`)) {
+        const siteName = site.label.slice(0, site.label.lastIndexOf(' "prefer"'));
+        for (const candidate of normalizePreferCandidates(site.prefer, site.label)) {
+          const candidateExecutor = cfg.executors?.[candidate.executor];
+          if (!candidateExecutor) {
             throw new RunnerConfigError(
-              `runner config (${sourceLabel} capabilities.${name}) "prefer" names invocation "${candidate.invocation}" on executor "${candidate.executor}" but no such invocation id is declared on it.`,
+              `runner config (${siteName}) "prefer" names "${candidate.executor}" but no such executor is registered.`,
             );
+          }
+          if (candidate.invocation !== undefined) {
+            const invocations = Array.isArray(candidateExecutor.invocations) ? candidateExecutor.invocations : [];
+            if (!invocations.some((inv) => inv.id === candidate.invocation)) {
+              throw new RunnerConfigError(
+                `runner config (${siteName}) "prefer" names invocation "${candidate.invocation}" on executor "${candidate.executor}" but no such invocation id is declared on it.`,
+              );
+            }
           }
         }
       }
@@ -1710,6 +1842,8 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
   }
   validateModelPoliciesShape(cfg.modelPolicies, `${sourceLabel} modelPolicies`);
   if (cfg.tierFallback !== undefined) validateTierFallbackShape(cfg.tierFallback, `${sourceLabel} tierFallback`);
+  if (cfg.maxTier !== undefined) validateTierName(cfg.maxTier, `${sourceLabel} maxTier`);
+  if (cfg.defaults !== undefined) validateRunnerDefaultsShape(cfg.defaults, `${sourceLabel} defaults`);
   if (!cfg.rigorToTier || typeof cfg.rigorToTier !== 'object' || Array.isArray(cfg.rigorToTier)) {
     throw new RunnerConfigError(
       `runner config (${sourceLabel}) must declare a "rigorToTier" object mapping rigor -> tier.`,

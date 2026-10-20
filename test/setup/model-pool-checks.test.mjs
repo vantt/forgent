@@ -124,13 +124,13 @@ test('llm-accounts-vs-legacy compares only once runner.llmAccounts exists, and w
   assert.match(differ.message, /^warning: .*only in runner\.providers: gemini\/tetcu72.*only in runner\.llmAccounts: gemini\/other/);
 });
 
-test('global-model-policies-portable fails on a list or model@pool cell in the global config', () => {
+test('global-model-policies-portable fails on a list, model@pool or object cell in the global config', () => {
   const plain = runCheck('global-model-policies-portable', {}, { modelPolicies: { claude: { advanced: 'opus' } } });
   assert.equal(plain.passed, true);
 
-  const extended = runCheck('global-model-policies-portable', {}, { modelPolicies: { claude: { advanced: ['opus@vertex', 'opus'] }, deepseek: { standard: 'deepseek-v4@openrouter' } } });
+  const extended = runCheck('global-model-policies-portable', {}, { modelPolicies: { claude: { advanced: ['opus@vertex', 'opus'] }, deepseek: { standard: 'deepseek-v4@openrouter' }, gemini: { flagship: { model: 'gemini-pro', effort: 'high' } } } });
   assert.equal(extended.passed, false);
-  assert.match(extended.message, /claude\.advanced, deepseek\.standard/);
+  assert.match(extended.message, /claude\.advanced, deepseek\.standard, gemini\.flagship/);
 });
 
 test('capability-rigor-ceiling names a capability whose rigor lifts it above runner.maxTier, with its model', () => {

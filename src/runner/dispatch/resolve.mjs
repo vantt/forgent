@@ -133,7 +133,7 @@ export function resolveCapabilityDetailsFromHints({
 
 /**
  * Every entry of the cell cfg.modelPolicies[provider][tier], in order, as
- * `{model, pool, explicitPool}` (see `parseTierCell`), whichever pool serves
+ * `{model, pool, explicitPool, effort?}` (see `parseTierCell`), whichever pool serves
  * them: each is a candidate of the seat's walk.
  * Valid tiers: nano | mini | standard | advanced | flagship | frontier.
  */

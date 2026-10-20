@@ -1,0 +1,1410 @@
+{
+  "runner": {
+    "executor": {
+      "command": "claude",
+      "args": [
+        "-p",
+        "{prompt}",
+        "--model",
+        "{model}",
+        "--permission-mode",
+        "acceptEdits",
+        "--allowedTools",
+        "Bash(cargo build:*),Bash(cargo check:*),Bash(cargo test:*),Bash(cargo clippy:*),Bash(cargo fmt:*),Bash(node --test:*),Bash(rtk cargo:*),Bash(rtk node:*),Bash(rtk proxy cargo:*),Bash(rtk proxy node:*),Skill"
+      ]
+    },
+    "capabilities": {
+      "impact-analysis": {
+        "description": "Code-graph blast radius",
+        "aliases": [
+          "impact_analysis",
+          "Impact Analysis"
+        ],
+        "prefer": "gitnexus"
+      },
+      "pane-labeling": {
+        "description": "Write a session/task id onto the current terminal pane's label, for a human watching a screen"
+      },
+      "advise": {
+        "description": "Async product-decision consult -- value comes from disagreement and never changes project state.",
+        "prefer": [
+          {
+            "executor": "claude",
+            "invocation": "claude-cli-bwrap"
+          }
+        ],
+        "confinement": {
+          "mode": "required",
+          "policy": "host-write-denied"
+        },
+        "serves": {
+          "outputKind": "decision",
+          "mutates": false
+        }
+      },
+      "execute": {
+        "description": "Compliance-driven work -- value comes from following the plan, changes files, and must pass verification.",
+        "prefer": [
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "deepseek"
+          },
+          {
+            "executor": "glm"
+          },
+          "claude"
+        ],
+        "serves": {
+          "outputKind": "change",
+          "mutates": true
+        }
+      },
+      "review": {
+        "description": "Independent read-only review of a non-code artifact (docs, design, spec, config) before merge/decision -- distinct from code:review (I19, core/skills/_shared/capability-catalog.md).",
+        "confinement": {
+          "mode": "required",
+          "policy": "host-write-denied"
+        },
+        "serves": {
+          "outputKind": "finding",
+          "mutates": false
+        }
+      },
+      "fgos-coding-implement": {
+        "description": "code-implement work for the coding domain executing stage -- preferred executor gemini through omp (omp-gemini-tetcu72), claude as fallback.",
+        "prefer": [
+          {
+            "executor": "gemini",
+            "invocation": "omp-herdr"
+          },
+          {
+            "executor": "deepseek"
+          },
+          {
+            "executor": "glm"
+          },
+          "claude"
+        ]
+      },
+      "code:implement": {
+        "description": "Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)",
+        "prefer": [
+          {
+            "executor": "gemini",
+            "invocation": "omp-herdr"
+          },
+          {
+            "executor": "deepseek"
+          },
+          {
+            "executor": "glm"
+          },
+          "claude"
+        ],
+        "serves": {
+          "outputKind": "change",
+          "domain": "code",
+          "mutates": true
+        }
+      },
+      "code:review": {
+        "description": "Canonical coding review capability -- independent read-only review of a coding implementation unit before merge (P2-runtime, docs/history/agent-coordination-foundation/plan.md).",
+        "prefer": [
+          {
+            "executor": "openai",
+            "invocation": "codex-cli-bwrap"
+          },
+          {
+            "executor": "claude",
+            "invocation": "claude-cli-bwrap"
+          }
+        ],
+        "confinement": {
+          "mode": "required",
+          "policy": "host-write-denied"
+        },
+        "serves": {
+          "outputKind": "finding",
+          "domain": "code",
+          "mutates": false
+        }
+      },
+      "code:test": {
+        "description": "Canonical coding test capability -- author or run tests for a coding implementation unit (P2-runtime, docs/history/agent-coordination-foundation/plan.md).",
+        "prefer": [
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "deepseek"
+          },
+          {
+            "executor": "glm"
+          },
+          "claude"
+        ],
+        "serves": {
+          "outputKind": "verification",
+          "domain": "code"
+        }
+      },
+      "code:debug": {
+        "description": "Canonical coding debug capability -- read-only root-cause investigation of a coding defect (P2-runtime, docs/history/agent-coordination-foundation/plan.md).",
+        "prefer": [
+          {
+            "executor": "openai",
+            "invocation": "codex-cli-bwrap"
+          },
+          {
+            "executor": "claude",
+            "invocation": "claude-cli-bwrap"
+          }
+        ],
+        "confinement": {
+          "mode": "required",
+          "policy": "host-write-denied"
+        },
+        "serves": {
+          "outputKind": "finding",
+          "domain": "code"
+        }
+      },
+      "code:refactor": {
+        "description": "Canonical coding refactor capability -- behavior-preserving structural change to existing code (P2-runtime, docs/history/agent-coordination-foundation/plan.md).",
+        "prefer": [
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "deepseek"
+          },
+          {
+            "executor": "glm"
+          },
+          "claude"
+        ],
+        "serves": {
+          "outputKind": "change",
+          "domain": "code",
+          "mutates": true,
+          "behaviorPreserving": true
+        }
+      },
+      "marketing:research": {
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap"
+          }
+        ]
+      },
+      "marketing:write": {
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap"
+          }
+        ]
+      },
+      "marketing:publish": {
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap"
+          }
+        ]
+      },
+      "architecture:frame": {
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
+        "prefer": [
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          },
+          {
+            "executor": "claude"
+          }
+        ],
+        "rigor": "high"
+      },
+      "architecture:shape": {
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
+        "prefer": [
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          }
+        ],
+        "rigor": "critical"
+      },
+      "architecture:critique": {
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
+        "prefer": [
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "claude"
+          }
+        ],
+        "rigor": "high"
+      },
+      "architecture:synthesize": {
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "deepseek"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "openai"
+          }
+        ],
+        "rigor": "critical"
+      },
+      "architecture:explain": {
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          }
+        ],
+        "rigor": "critical"
+      },
+      "business:frame": {
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap"
+          }
+        ]
+      },
+      "business:perspectives": {
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap"
+          }
+        ]
+      },
+      "business:critique": {
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap"
+          }
+        ]
+      },
+      "business:synthesize": {
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap"
+          }
+        ]
+      },
+      "business:plan": {
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap"
+          }
+        ]
+      },
+      "delphi:propose": {
+        "description": "Workflow unit capability \"delphi:propose\" -- declare a \"prefer\" pool to choose which executors serve it.",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap"
+          }
+        ]
+      },
+      "delphi:synthesize": {
+        "description": "Workflow unit capability \"delphi:synthesize\" -- declare a \"prefer\" pool to choose which executors serve it.",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap"
+          }
+        ]
+      },
+      "group-cognition:explore": {
+        "description": "Workflow unit capability \"group-cognition:explore\" -- declare a \"prefer\" pool to choose which executors serve it.",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap"
+          }
+        ]
+      },
+      "group-cognition:critique": {
+        "description": "Workflow unit capability \"group-cognition:critique\" -- declare a \"prefer\" pool to choose which executors serve it.",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap"
+          }
+        ]
+      },
+      "group-cognition:synthesize": {
+        "description": "Workflow unit capability \"group-cognition:synthesize\" -- declare a \"prefer\" pool to choose which executors serve it.",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap"
+          }
+        ]
+      },
+      "nominal-group:generate": {
+        "description": "Workflow unit capability \"nominal-group:generate\" -- declare a \"prefer\" pool to choose which executors serve it.",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap"
+          }
+        ]
+      },
+      "nominal-group:share": {
+        "description": "Workflow unit capability \"nominal-group:share\" -- declare a \"prefer\" pool to choose which executors serve it.",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap"
+          }
+        ]
+      },
+      "nominal-group:vote": {
+        "description": "Workflow unit capability \"nominal-group:vote\" -- declare a \"prefer\" pool to choose which executors serve it.",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap"
+          }
+        ]
+      },
+      "nominal-group:rank": {
+        "description": "Workflow unit capability \"nominal-group:rank\" -- declare a \"prefer\" pool to choose which executors serve it.",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap"
+          }
+        ]
+      },
+      "coding:discover": {
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap"
+          }
+        ],
+        "description": "Workflow unit capability \"coding:discover\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "coding:explore": {
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap"
+          }
+        ],
+        "description": "Workflow unit capability \"coding:explore\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "coding:plan": {
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap"
+          }
+        ]
+      },
+      "coding:validate": {
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap"
+          }
+        ],
+        "description": "Workflow unit capability \"coding:validate\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "coding:implement": {
+        "prefer": [
+          {
+            "executor": "gemini",
+            "invocation": "omp-herdr"
+          },
+          {
+            "executor": "deepseek"
+          },
+          {
+            "executor": "glm"
+          },
+          "claude"
+        ],
+        "description": "Workflow unit capability \"coding:implement\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "docs:write": {
+        "description": "Canonical documentation authoring capability -- write or update documents (README, specs, guides) in the working tree; declare a \"prefer\" pool to choose which executors serve it.",
+        "serves": {
+          "outputKind": "change",
+          "domain": "docs",
+          "mutates": true
+        }
+      }
+    },
+    "executors": {
+      "claude": {
+        "kind": "agent",
+        "providerModel": "claude",
+        "description": "Claude Code CLI, the one executor of the claude family: claude-cli and claude-cli-bwrap run headless, claude-herdr-bwrap runs a claude REPL in a herdr pane under the bwrap posture. bind() picks the pane invocation inside herdr and a cli one outside, so a capability gets claude in both places.",
+        "identity": {
+          "principalRef": "principal://claude",
+          "runtimeBackendRef": "backend://claude-cli",
+          "trustDomain": "local-operator",
+          "egressClass": "unrestricted"
+        },
+        "supports": {
+          "providerFamilies": [
+            "claude"
+          ],
+          "reasoningEffort": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "skills": [
+            "ak:cook"
+          ],
+          "systemPrompt": false,
+          "toolGating": "allowedTools"
+        },
+        "invocations": [
+          {
+            "id": "claude-cli",
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "claude",
+            "args": [
+              "-p",
+              "{prompt}",
+              "--model",
+              "{model}",
+              "--permission-mode",
+              "acceptEdits"
+            ]
+          },
+          {
+            "id": "claude-cli-bwrap",
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "claude",
+            "args": [
+              "-p",
+              "{prompt}",
+              "--model",
+              "{model}"
+            ],
+            "confinement": {
+              "backend": "bwrap"
+            }
+          },
+          {
+            "id": "claude-herdr-bwrap",
+            "via": "cli",
+            "adapter": "herdr-spawn",
+            "command": "claude",
+            "args": [
+              "--model",
+              "{model}"
+            ],
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "interactiveMode": {
+              "exitCommand": "/exit",
+              "kind": "claude",
+              "trustStore": {
+                "kind": "claude-json"
+              }
+            }
+          }
+        ]
+      },
+      "glm": {
+        "kind": "agent",
+        "description": "GLM 5.3 (z-ai/glm-5.3) through the pi CLI and OpenRouter, headless. Replaces the claude-CLI-through-gateway route.",
+        "allowCrossProvider": true,
+        "invocations": [
+          {
+            "id": "pi-cli-bwrap",
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "pi",
+            "args": [
+              "--model",
+              "{model}",
+              "--thinking",
+              "medium",
+              "--tools",
+              "read,write,edit,bash,grep,find,ls",
+              "--mode",
+              "json",
+              "--approve",
+              "-p",
+              "{prompt}"
+            ],
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "credentialStore": {
+              "use": "pi",
+              "homeEnv": "PI_CODING_AGENT_DIR",
+              "files": [
+                "auth.json",
+                "models-store.json",
+                "settings.json",
+                "trust.json",
+                "bin/fd",
+                "models.json"
+              ]
+            }
+          }
+        ],
+        "providerModel": "z-ai",
+        "supports": {
+          "skills": [
+            "ak:cook"
+          ]
+        }
+      },
+      "gitnexus": {
+        "kind": "tool",
+        "description": "Code-graph blast radius",
+        "for": [
+          "impact-analysis"
+        ],
+        "scanTarget": ".gitnexus",
+        "responsibility": "Verification",
+        "invocations": [
+          {
+            "via": "mcp",
+            "command": "mcp:gitnexus",
+            "tools": {
+              "impact-analysis": "mcp__gitnexus__impact"
+            }
+          }
+        ]
+      },
+      "herdr": {
+        "kind": "tool",
+        "for": [
+          "pane-labeling"
+        ],
+        "responsibility": "Chrome",
+        "description": "herdr pane label writer (herdr pane rename) for /fgOS:terminal",
+        "invocations": [
+          {
+            "via": "cli",
+            "command": "herdr",
+            "args": []
+          }
+        ]
+      },
+      "openai": {
+        "kind": "agent",
+        "description": "OpenAI provider, 2 bins merged into one executor (2026-09-17 provider-naming pass): codex CLI (native OpenAI Codex CLI) + pi CLI (multi-provider agent, --provider omitted -- each ~/.pi/accounts/<name> dir carries exactly one provider's credentials, confirmed via real invocation test). Invocation id = <bin>-<mode>-<account>, self-descriptive regardless of which bin actually runs. Both bins now use modelPolicies like every other executor.",
+        "providerModel": "openai",
+        "allowCrossProvider": true,
+        "invocations": [
+          {
+            "id": "codex-cli-bwrap",
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "codex",
+            "args": [
+              "exec",
+              "--skip-git-repo-check",
+              "-s",
+              "danger-full-access",
+              "--model",
+              "{model}",
+              "{prompt}"
+            ],
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "credentialStore": {
+              "use": "codex",
+              "homeEnv": "CODEX_HOME"
+            }
+          },
+          {
+            "id": "codex-herdr",
+            "via": "cli",
+            "adapter": "herdr-spawn",
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "command": "codex",
+            "args": [
+              "-s",
+              "danger-full-access",
+              "-a",
+              "never",
+              "--no-daemon",
+              "--model",
+              "{model}"
+            ],
+            "interactiveMode": {
+              "exitCommand": "/quit",
+              "kind": "codex",
+              "trustStore": {
+                "kind": "codex-toml"
+              }
+            },
+            "credentialStore": {
+              "use": "codex",
+              "homeEnv": "CODEX_HOME"
+            }
+          },
+          {
+            "id": "pi-cli-bwrap",
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "pi",
+            "args": [
+              "--model",
+              "{model}",
+              "--thinking",
+              "medium",
+              "--tools",
+              "read,write,edit,bash,grep,find,ls",
+              "--mode",
+              "json",
+              "--approve",
+              "-p",
+              "{prompt}"
+            ],
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "credentialStore": {
+              "use": "pi",
+              "homeEnv": "PI_CODING_AGENT_DIR",
+              "files": [
+                "auth.json",
+                "models-store.json",
+                "settings.json",
+                "trust.json",
+                "bin/fd"
+              ]
+            }
+          }
+        ],
+        "supports": {
+          "skills": [
+            "ak:cook"
+          ]
+        }
+      },
+      "gemini": {
+        "kind": "agent",
+        "description": "Gemini provider via omp (oh-my-pi) on the gemini-tetcu72 profile; Antigravity CLI (agy) invocations removed 2026-10-16 (agy not installed, owner chose omp). Invocations: omp-gemini-tetcu72 (herdr pane), omp-cli-bwrap-gemini-tetcu72 (headless). The confined account comes from runner.providers.gemini.accounts in the global config.",
+        "allowCrossProvider": true,
+        "providerModel": "gemini",
+        "invocations": [
+          {
+            "id": "omp-herdr",
+            "via": "cli",
+            "adapter": "herdr-spawn",
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "command": "omp",
+            "args": [
+              "--model",
+              "{model}",
+              "--thinking",
+              "medium",
+              "--tools",
+              "read,write,edit,bash,grep,glob",
+              "--auto-approve"
+            ],
+            "interactiveMode": {
+              "exitCommand": "/exit",
+              "kind": "omp"
+            },
+            "env": {
+              "PI_CONFIG_DIR": "../../tmp/fgos-omp-config"
+            },
+            "credentialStore": {
+              "use": "omp",
+              "homeEnv": "PI_CODING_AGENT_DIR",
+              "files": [
+                "agent.db",
+                "config.yml"
+              ]
+            }
+          },
+          {
+            "id": "omp-cli-bwrap",
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "omp",
+            "args": [
+              "--model",
+              "{model}",
+              "--thinking",
+              "medium",
+              "--tools",
+              "read,write,edit,bash,grep,glob",
+              "--mode",
+              "json",
+              "--auto-approve",
+              "-p",
+              "{prompt}"
+            ],
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "env": {
+              "PI_CONFIG_DIR": "../../tmp/fgos-omp-config"
+            },
+            "credentialStore": {
+              "use": "omp",
+              "homeEnv": "PI_CODING_AGENT_DIR",
+              "files": [
+                "agent.db",
+                "config.yml"
+              ]
+            }
+          }
+        ],
+        "supports": {
+          "skills": [
+            "ak:cook"
+          ]
+        }
+      },
+      "xai": {
+        "kind": "agent",
+        "description": "xai (Grok) provider via omp CLI (oh-my-pi, a pi fork) with the xai-vantt profile; replaces the pi grok-vantt login that kept needing re-OAuth. omp reads the profile through PI_CODING_AGENT_DIR like pi does. PI_CONFIG_DIR is a path relative to HOME that lands in /tmp, because omp writes a runtime directory under its config root and the confined home is read-only. omp uses glob instead of ls/find. The account files are declared in the user-level ~/.fgos/config.json (providers.xai).",
+        "allowCrossProvider": true,
+        "providerModel": "xai",
+        "invocations": [
+          {
+            "id": "omp-cli-bwrap",
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "omp",
+            "args": [
+              "--model",
+              "{model}",
+              "--thinking",
+              "medium",
+              "--tools",
+              "read,write,edit,bash,grep,glob",
+              "--mode",
+              "json",
+              "--auto-approve",
+              "-p",
+              "{prompt}"
+            ],
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "env": {
+              "PI_CONFIG_DIR": "../../tmp/fgos-omp-config"
+            },
+            "credentialStore": {
+              "use": "omp",
+              "homeEnv": "PI_CODING_AGENT_DIR",
+              "files": [
+                "agent.db",
+                "config.yml",
+                "models.db"
+              ]
+            }
+          },
+          {
+            "id": "omp-herdr",
+            "via": "cli",
+            "adapter": "herdr-spawn",
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "command": "omp",
+            "args": [
+              "--model",
+              "{model}",
+              "--thinking",
+              "medium",
+              "--tools",
+              "read,write,edit,bash,grep,glob",
+              "--auto-approve"
+            ],
+            "interactiveMode": {
+              "exitCommand": "/exit",
+              "kind": "omp"
+            },
+            "env": {
+              "PI_CONFIG_DIR": "../../tmp/fgos-omp-config"
+            },
+            "credentialStore": {
+              "use": "omp",
+              "homeEnv": "PI_CODING_AGENT_DIR",
+              "files": [
+                "agent.db",
+                "config.yml",
+                "models.db"
+              ]
+            }
+          }
+        ],
+        "supports": {
+          "skills": [
+            "ak:cook"
+          ]
+        }
+      },
+      "deepseek": {
+        "kind": "agent",
+        "description": "DeepSeek provider via pi CLI, OpenRouter gateway account. --provider omitted -- account dir has a single provider (openrouter). Same account dir also serves other OpenRouter-hosted models (e.g. glm-cli's z-ai route uses a different account/mechanism); --model alone selects deepseek/* here. pi-herdr-openrouter runs the same pi account in a confined herdr pane.",
+        "allowCrossProvider": true,
+        "providerModel": "deepseek",
+        "invocations": [
+          {
+            "id": "pi-cli-bwrap",
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "pi",
+            "args": [
+              "--model",
+              "{model}",
+              "--thinking",
+              "medium",
+              "--tools",
+              "read,write,edit,bash,grep,find,ls",
+              "--mode",
+              "json",
+              "--approve",
+              "-p",
+              "{prompt}"
+            ],
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "credentialStore": {
+              "use": "pi",
+              "homeEnv": "PI_CODING_AGENT_DIR",
+              "files": [
+                "auth.json",
+                "models-store.json",
+                "settings.json",
+                "trust.json",
+                "bin/fd",
+                "models.json"
+              ]
+            }
+          },
+          {
+            "id": "pi-herdr",
+            "via": "cli",
+            "adapter": "herdr-spawn",
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "command": "pi",
+            "args": [
+              "--model",
+              "{model}",
+              "--thinking",
+              "medium",
+              "--tools",
+              "read,write,edit,bash,grep,find,ls",
+              "--approve"
+            ],
+            "interactiveMode": {
+              "exitCommand": "/quit",
+              "kind": "pi"
+            },
+            "credentialStore": {
+              "use": "pi",
+              "homeEnv": "PI_CODING_AGENT_DIR",
+              "files": [
+                "auth.json",
+                "models-store.json",
+                "settings.json",
+                "trust.json",
+                "bin/fd",
+                "models.json"
+              ]
+            }
+          }
+        ],
+        "supports": {
+          "skills": [
+            "ak:cook"
+          ]
+        }
+      }
+    },
+    "timeoutMs": 2100000,
+    "parallel": {
+      "maxRoots": 4,
+      "maxLeavesPerRoot": 4
+    },
+    "modelPolicies": {
+      "claude": {
+        "nano": "haiku",
+        "standard": "sonnet",
+        "advanced": "sonnet",
+        "flagship": "opus",
+        "frontier": "fable"
+      },
+      "gemini": {
+        "nano": "gemini-3.8-flash-low",
+        "standard": "gemini-3.8-flash-medium",
+        "advanced": "gemini-3.8-flash-high",
+        "flagship": "gemini-4-argon-high",
+        "frontier": "gemini-4-argon-high"
+      },
+      "openai": {
+        "nano": "gpt-5.6-luna",
+        "standard": "gpt-5.6-terra",
+        "advanced": "gpt-5.6-sol",
+        "flagship": "gpt-6.1-sol",
+        "frontier": "gpt-6-astra"
+      },
+      "z-ai": {
+        "nano": [
+          "thehive/zai-org/glm-5.3-flash@thehive",
+          "z-ai/glm-5.3-flash@openrouter"
+        ],
+        "standard": [
+          "thehive/zai-org/glm-5.3-flash@thehive",
+          "z-ai/glm-5.3-flash@openrouter"
+        ],
+        "advanced": "z-ai/glm-5.3@openrouter",
+        "flagship": "z-ai/glm-5.3@openrouter",
+        "frontier": "z-ai/glm-5.3@openrouter"
+      },
+      "xai": {
+        "nano": "grok-4.3",
+        "standard": "grok-4.3",
+        "advanced": "grok-4.5",
+        "flagship": "grok-4.6",
+        "frontier": "grok-4.6"
+      },
+      "deepseek": {
+        "nano": [
+          "thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive",
+          "deepseek/deepseek-v4.1-flash@openrouter"
+        ],
+        "standard": [
+          "thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive",
+          "deepseek/deepseek-v4.1-flash@openrouter"
+        ],
+        "advanced": "deepseek/deepseek-v4-pro@openrouter",
+        "flagship": "deepseek/deepseek-v4-pro@openrouter",
+        "frontier": "deepseek/deepseek-v4-pro@openrouter"
+      }
+    },
+    "rigorToTier": {
+      "low": "nano",
+      "standard": "standard",
+      "high": "flagship",
+      "critical": "frontier"
+    },
+    "maxTier": "flagship",
+    "confinement": {
+      "strict": false
+    },
+    "coordination": {
+      "orgPolicy": {
+        "dischargeOn": [
+          "accepted"
+        ]
+      }
+    },
+    "patterns": {
+      "defaultRule": {
+        "mutatingMinRigor": "standard"
+      },
+      "reviewed": {
+        "maxRounds": 2,
+        "checkersByRigor": {
+          "standard": [
+            "reviewer"
+          ],
+          "high": [
+            "reviewer",
+            "red-team"
+          ],
+          "critical": [
+            "reviewer",
+            "red-team",
+            "tester"
+          ]
+        }
+      }
+    },
+    "generatedPaths": [
+      {
+        "from": "core/skills/**",
+        "also": [
+          ".agents/skills/**",
+          "plugins/fgOS/skills/**",
+          ".claude/skills/**"
+        ]
+      }
+    ],
+    "idleTimeoutMs": 5400000,
+    "tierFallback": {
+      "nano": [
+        "gemini",
+        "deepseek",
+        "z-ai",
+        "claude",
+        "openai"
+      ],
+      "standard": [
+        "gemini",
+        "deepseek",
+        "z-ai",
+        "claude",
+        "openai"
+      ],
+      "advanced": [
+        "gemini",
+        "deepseek",
+        "z-ai",
+        "claude",
+        "openai"
+      ],
+      "flagship": [
+        "claude",
+        "openai",
+        "gemini",
+        "xai"
+      ],
+      "frontier": [
+        "claude",
+        "openai",
+        "gemini",
+        "xai"
+      ]
+    }
+  }
+}

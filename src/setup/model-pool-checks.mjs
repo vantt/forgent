@@ -185,7 +185,7 @@ export function checkGlobalModelPoliciesPortable() {
   if (extended.length > 0) {
     return {
       passed: false,
-      message: `~/.fgos/config.json runner.modelPolicies has list or "model@pool" cells (${extended.join(', ')}); older fgOS releases on this machine fail on a list and run "model@pool" as a model id, and this release ignores them -- move them to the project config`,
+      message: `~/.fgos/config.json runner.modelPolicies has list, "model@pool" or object cells (${extended.join(', ')}); older fgOS releases on this machine fail on a list or an object and run "model@pool" as a model id, and this release ignores them -- move them to the project config`,
     };
   }
   return { passed: true, message: 'global modelPolicies cells are plain model names' };
