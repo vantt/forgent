@@ -146,7 +146,7 @@ test('invalid seat lists are refused with the reason', () => {
 });
 
 const persona = (name, text = `name: ${name}\ndescription: ${name} posture\n`) => ({
-  name, tier: 'workspace', source: `fgos/agents/${name}.yaml`, text, digest: `digest-of-${name}`,
+  name, tier: 'workspace', source: `fgos/agents/${name}.yaml`, identity: `workspace:fgos/agents/${name}`, text, digest: `digest-of-${name}`,
 });
 
 test('a named persona seat keeps its order, gets no lens task and is recorded with the pinned text', () => {
@@ -161,7 +161,7 @@ test('a named persona seat keeps its order, gets no lens task and is recorded wi
   assert.equal(panel.template.params.roleTasks['member-3'], seatTask('third angle'));
   assert.deepEqual(provenance.seats, ['first angle', '@finance-controller', 'third angle']);
   assert.deepEqual(provenance.personas, [{
-    seat: 'member-2', name: 'finance-controller', tier: 'workspace', source: 'fgos/agents/finance-controller.yaml',
+    seat: 'member-2', name: 'finance-controller', tier: 'workspace', source: 'fgos/agents/finance-controller.yaml', identity: 'workspace:fgos/agents/finance-controller',
     digest: 'digest-of-finance-controller', text: finance.text,
   }]);
   assert.ok(!JSON.stringify(workflow).includes('weigh {objective} literally'), 'persona text is never copied into the definition');
