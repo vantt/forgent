@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
-import {ensureHostBin, ensureGitAddon as buildAddon, gitAddonSourceDigest} from '../../scripts/run-tests.mjs';
+import {ensureHostBin, ensureGitAddon as buildAddon, gitAddonSourceDigest} from '../../scripts/lib/git-addon-stage.mjs';
 import {pathToFileURL} from 'node:url';
 import {ensureGitAddon, root} from '../helpers/git-addon.mjs';
 import {buildRustDistribution, nativeAddonLibraryName, nativeAddonComponent, computeArtifactDigest, gitCapabilitiesForHost} from '../../scripts/build-rust-distribution.mjs';

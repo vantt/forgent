@@ -280,7 +280,7 @@ function mirroredRepoRoot(prefix) {
   fs.copyFileSync(realLibPath, path.join(root, 'scripts', 'lib', 'is-main-module.mjs'));
   fs.copyFileSync(realQueueLibPath, path.join(root, 'scripts', 'lib', 'full-suite-queue.mjs'));
   // ...and the libraries run-tests.mjs and the distribution builder (its one-door census step) import.
-  for (const rel of ['lib/dev-host-manifest.mjs', 'lib/git-dir-layout.mjs', 'lib/js-source-lexer.mjs', 'lib/git-spawn-match.mjs', 'git-one-door-scan.mjs']) {
+  for (const rel of ['lib/dev-host-manifest.mjs', 'lib/git-addon-stage.mjs', 'lib/git-dir-layout.mjs', 'lib/js-source-lexer.mjs', 'lib/git-spawn-match.mjs', 'git-one-door-scan.mjs']) {
     fs.copyFileSync(fileURLToPath(new URL(`../../scripts/${rel}`, import.meta.url)), path.join(root, 'scripts', rel));
   }
   // run-tests.mjs builds the native addon record through the distribution builder's helpers.
@@ -904,4 +904,31 @@ test('runSelectedTests leaves the run green when the identity keys are untouched
   assert.equal(result.status, 0);
   assert.equal(result.gitIdentityDiff.leaked, false);
   fs.rmSync(base, { recursive: true, force: true });
+});
+
+// run-tests.mjs awaits `import('./test-proof-inventory.mjs')` at its top level to print the suite
+// report. A module of that graph that imports run-tests.mjs back waits for the launcher's own
+// evaluation, which waits for the report: the process then ends with exit 13 (unsettled top-level
+// await) before any suite line. No other test starts the launcher as the main module, so the graph is
+// what proves it.
+function staticImportClosure(entry) {
+  const seen = new Set();
+  const visit = (file) => {
+    if (seen.has(file)) return;
+    seen.add(file);
+    const source = fs.readFileSync(file, 'utf8');
+    for (const match of source.matchAll(/^\s*(?:import|export)\b[^'"\n;]*?from\s*['"](\.{1,2}\/[^'"]+)['"]|^\s*import\s*['"](\.{1,2}\/[^'"]+)['"]/gm)) {
+      visit(path.resolve(path.dirname(file), match[1] ?? match[2]));
+    }
+  };
+  visit(entry);
+  return seen;
+}
+
+test('the suite report module does not import the launcher back, or the launcher cannot print it', () => {
+  const launcher = path.join(REPO_ROOT, 'scripts', 'run-tests.mjs');
+  const report = staticImportClosure(path.join(REPO_ROOT, 'scripts', 'test-proof-inventory.mjs'));
+  assert.equal(report.has(launcher), false, 'test-proof-inventory.mjs reaches run-tests.mjs through static imports');
+  // The check sees a cycle when there is one: test-select.mjs imports the launcher directly.
+  assert.equal(staticImportClosure(path.join(REPO_ROOT, 'scripts', 'test-select.mjs')).has(launcher), true);
 });

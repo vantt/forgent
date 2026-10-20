@@ -12,7 +12,7 @@ import { fixture } from './phase07-fixture.mjs';
 import { trackedLegacy } from './phase08-fixture.mjs';
 import { migrateUseCase } from '../../src/verbs/events/migrate.mjs';
 import { checkStopped } from '../../src/holder-lock/fences.mjs';
-import { ensureHostBin } from '../../scripts/run-tests.mjs';
+import { ensureHostBin } from '../../scripts/lib/git-addon-stage.mjs';
 const hostBin = ensureHostBin();
 /**
  * Production quiesce scans the whole machine (a stop-everything cutover), so
