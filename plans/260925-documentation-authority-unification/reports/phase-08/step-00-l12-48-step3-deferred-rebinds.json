@@ -1,0 +1,18 @@
+{
+  "inputHEAD": "5fb9627d445fe4de8e06880d840ef523690509a1",
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "changedFiles": [
+    "docs/architecture-manifest.json",
+    "docs/backlog.md",
+    "docs/platform/git/spec.md"
+  ],
+  "canonicalRecordFilesScanned": 82,
+  "canonicalRecordsScanned": 741,
+  "records": [],
+  "changedFilesWithoutAuthoredRecord": [
+    "docs/architecture-manifest.json",
+    "docs/backlog.md",
+    "docs/platform/git/spec.md"
+  ],
+  "rule": "Inventory only; no Step 3 source record/diff rebind now. Revalidate changed target evidence when applying Step 4. Earlier L12-44 deferred obligations remain in force."
+}

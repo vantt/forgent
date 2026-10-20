@@ -1,0 +1,100 @@
+{
+  "inputHEAD": "5fb9627d445fe4de8e06880d840ef523690509a1",
+  "commands": [
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node scripts/check-legacy-docs-ratchet.mjs",
+      "exit": 0,
+      "stdout": "check-legacy-docs-ratchet: clean (996 legacy files checked; 26 accounted edit(s), 2 accounted new file(s)).\n",
+      "stderr": ""
+    },
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/check-legacy-docs-ratchet.test.mjs",
+      "exit": 0,
+      "stdout": "\u2714 deterministic generation: generating baseline twice yields byte-for-byte identical content (3.017825ms)\n\u2714 class/scope: properly classifies markdown authority, retained sources, and non-markdown evidence (0.200068ms)\n\u2714 new maintained file: unreviewed new file under legacy root is refused with unreviewed-new-file (1.557311ms)\n\u2714 accounted edit: file modified with valid reviewed exception passes (0.870832ms)\n\u2714 unaccounted edit: file modified without exception or with digest mismatch is refused (0.685129ms)\n\u2714 unexpected deletion: baselined file missing without exception is refused (0.518195ms)\n\u2714 malformed baseline: schema validator rejects invalid baseline structures (0.545036ms)\n\u2714 malformed exception: schema validator rejects invalid exception objects (1.037781ms)\n\u2714 canonicalizeExceptionPath: canonicalizes posix relative paths and rejects absolute/traversal paths (R2) (0.273763ms)\n\u2714 dotfiles: unreviewed dotfile under legacy root is detected and refused (3.972165ms)\n\u2714 non-regular entries: FIFOs and sockets under legacy roots are refused as forbidden-entry (R4) (4.935165ms)\n\u2714 symlink identity: replacing a symlink with regular file of identical bytes is refused (0.626196ms)\n\u2714 symlink target: retargeting a symlink to another file of equal bytes is refused (0.620536ms)\n\u2714 tree escape: symlink pointing outside repository root or directory symlink is refused (0.534097ms)\n\u2714 classification: includes curated generated projections alongside maintained authority (0.106454ms)\n\u2714 CLI: exits 0 on clean tree and exits 1 on finding (119.922386ms)\n\u2714 live self-check: repository baseline and ratchet verify cleanly (95.478976ms)\n\u2714 policy-aware: permits edited and new generated projections without exception (1.013595ms)\n\u2714 policy-aware: permits new and edited history-evidence payloads without exception (0.66503ms)\n\u2714 maintained controls: blocks unreviewed new maintained-authority and retained-source files (0.421228ms)\n\u2714 maintained controls: blocks unaccounted edits to maintained-authority and retained-source (0.490329ms)\n\u2714 safety: detects and refuses class spoofing attempts in baseline (0.379287ms)\n\u2714 messages: ensure messages do not call non-authority payloads maintained authority (0.329785ms)\n\u2714 expired exceptions: exceptions past expiry date are flagged with expired-exception (0.353091ms)\n\u2714 unused exceptions: exceptions with no matching on-disk edit or new file are flagged with unused-exception (0.354295ms)\n\u2714 root-aware and case-safe: blocks docs/specs/*.txt, *.yml, *.MD from bypassing ratchet (F1) (0.387355ms)\n\u2714 exact generated projection matching: docs/specs/platform-foundations.MD and PLATFORM-FOUNDATIONS.md classify as maintained-authority and are refused as unreviewed new files (F1 residual) (0.362311ms)\n\u2714 expiry boundary: explicitly tests active vs expired on expiry date (F4) (0.42669ms)\n\u2139 tests 28\n\u2139 suites 0\n\u2139 pass 28\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 307.655613\n",
+      "stderr": ""
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "script": "ownership.mjs",
+      "command": "env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--max-old-space-size=3072 node /tmp/fgos-work/l12-48/step10-round5-reproduction/ownership.mjs --output-dir /tmp/fgos-work/l12-48/step10-round5-reproduction",
+      "exit": 0,
+      "stdout": "{ all: 269, active: 207, sameSource: 205, drift: 0 }\n",
+      "stderr": ""
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "script": "audit-ownership.mjs",
+      "command": "env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--max-old-space-size=3072 node /tmp/fgos-work/l12-48/step10-round5-reproduction/audit-ownership.mjs --output-dir /tmp/fgos-work/l12-48/step10-round5-reproduction",
+      "exit": 0,
+      "stdout": "{\n  collisions: 269,\n  newGapGroups: 24,\n  newActivePairs: 0,\n  nativeDuplicates: 0,\n  drift: 0,\n  ok: true\n}\n",
+      "stderr": ""
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "script": "ownership.mjs",
+      "command": "env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--max-old-space-size=3072 node /tmp/fgos-work/l12-48/step10-sync4d-reproduction/ownership.mjs --output-dir /tmp/fgos-work/l12-48/step10-sync4d-reproduction",
+      "exit": 0,
+      "stdout": "{ all: 269, active: 207, sameSource: 205, drift: 0 }\n",
+      "stderr": ""
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "script": "audit-ownership.mjs",
+      "command": "env -u CLAUDE_CODE_SESSION_ID NODE_OPTIONS=--max-old-space-size=3072 node /tmp/fgos-work/l12-48/step10-sync4d-reproduction/audit-ownership.mjs --output-dir /tmp/fgos-work/l12-48/step10-sync4d-reproduction",
+      "exit": 0,
+      "stdout": "{\n  collisions: 269,\n  newGapGroups: 24,\n  newActivePairs: 0,\n  nativeDuplicates: 0,\n  drift: 0,\n  ok: true\n}\n",
+      "stderr": ""
+    }
+  ],
+  "protectedReproductionManifests": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "sha256": "926531d3700fb8388621a7a02268ad07ad4a1aed7855efff8d798545d30f51da"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "sha256": "55d0d4af0edba7cf7fbc29bc44090b2949a0bfe10855f21d93fd2443457cf88a"
+    }
+  ],
+  "accounting": {
+    "exceptionDataChanged": false,
+    "reason": "No changed path under ratchet legacy roots; initial ratchet already exit 0. Neither ownership recipe requires mainMergeAccounting rows for these paths. Per conditional authorization, preserve complete existing accounting byte-for-byte.",
+    "exceptionFileSha256": "0080f3b7f32d94f3912c984aab65345e25f113db8799ae7b663b156c8e9072b4"
+  },
+  "bindingProcedure": "Both unchanged manifest unitsOf agree on full historical/current passages for all three changed documentation files. Prior anchor AND full digest match three architecture file-block bindings; sole added use-case registration and otherwise identical JSON establish correspondence. Git spec/backlog have zero decision target bindings. Journal contains full rows/passages; all changed bindings pending independent review with source identities unchanged.",
+  "recipeReproduction": "Extract .scripts (round5) or .readOnlyScripts (sync4d) verbatim from each protected JSON into distinct /tmp/fgos-work subdirectories, retaining filenames; invoke ownership.mjs and audit-ownership.mjs with --output-dir that same directory, from repo cwd, CLAUDE_CODE_SESSION_ID unset. Run serially. No recipe or reproduction manifest edited.",
+  "finalStructuralVerification": {
+    "checkedBindings": 3,
+    "reboundRows": 3,
+    "parked": 0,
+    "semanticShardDiffsMatchJournal": true,
+    "sourceIdentitiesUnchanged": true,
+    "exceptionsByteIdenticalToInput": true,
+    "reproductionManifestsByteIdenticalToInput": true,
+    "canonicalStep3RecordsByteIdenticalToInput": true,
+    "step3CanonicalBatchFiles": 82,
+    "step3CanonicalRecords": 741,
+    "newDeferredSourceRebinds": 0,
+    "trackedWrites": [
+      "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/progress.md"
+    ],
+    "untrackedWrites": [
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-48-merge-rebindings.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-48-ratchet-tests.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-48-ratchet.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-48-step3-deferred-rebinds.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-48-verification.json"
+    ],
+    "writeScopeVerified": true,
+    "diffCheckExit": 0
+  },
+  "limits": [
+    "Author verification, no independent content acceptance.",
+    "No full npm suite or checks.mjs reproduction/batch-end acceptance; later committed-pair accounting needs actual runner commit.",
+    "No consumer edits or config/state/secrets access; no fgOS CLI or git write.",
+    "Markdown preview left to Lead; no service started."
+  ]
+}
