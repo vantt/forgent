@@ -1266,11 +1266,11 @@
         "frontier": "gpt-6-astra"
       },
       "z-ai": {
-        "nano": "z-ai/glm-5.3",
-        "standard": "z-ai/glm-5.3",
-        "advanced": "z-ai/glm-5.3",
-        "flagship": "z-ai/glm-5.3",
-        "frontier": "z-ai/glm-5.3"
+        "nano": "z-ai/glm-5.3-flash@openrouter",
+        "standard": "z-ai/glm-5.3-flash@openrouter",
+        "advanced": "z-ai/glm-5.3@openrouter",
+        "flagship": "z-ai/glm-5.3@openrouter",
+        "frontier": "z-ai/glm-5.3@openrouter"
       },
       "xai": {
         "nano": "grok-4.3",
@@ -1280,11 +1280,11 @@
         "frontier": "grok-4.6"
       },
       "deepseek": {
-        "nano": "deepseek/deepseek-v4.1-flash",
-        "standard": "deepseek/deepseek-v4.1-flash",
-        "advanced": "deepseek/deepseek-v4-pro",
-        "flagship": "deepseek/deepseek-v4-pro",
-        "frontier": "deepseek/deepseek-v4-pro"
+        "nano": "deepseek/deepseek-v4.1-flash@openrouter",
+        "standard": "deepseek/deepseek-v4.1-flash@openrouter",
+        "advanced": "deepseek/deepseek-v4-pro@openrouter",
+        "flagship": "deepseek/deepseek-v4-pro@openrouter",
+        "frontier": "deepseek/deepseek-v4-pro@openrouter"
       }
     },
     "rigorToTier": {
