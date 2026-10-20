@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 - New skill `fgos-cook`: delivers a plan written by `ak:plan` by opening a conductor case on the coding guide with an owner-approved frame, then dispatching one slice at a time through `fgos run` and `fgos workflow` naming the case, checking each result itself and handing the branch to the owner (it never merges). Slices run serially in one worktree until the Git land operation exists; the route table waits for Seat Binding.
+- A conductor Workflow case now moves past its entry milestones: when a Unit settles with `pass` (or `findings`), its activity's `produces` milestones are proposed as achieved with the digest of their subject (the Unit's reports, or for a delivery milestone the paths it wrote, backed by a verify receipt for that digest). Before, the settle recorded nothing, so `fgos run --case C --activity implement-item` stayed refused with `entry-milestone-unmet` after `validate-plan` passed.
+- A pi or omp seat in a herdr pane now gets its brief through the agent prompt door (one send that types and submits), as codex does. The raw typed brief took 7 to 25 s and sometimes lost its final Enter, and a seat stopped mid-typing could leave the rest of the brief in the pane's shell. The supervisor also re-reads its stop state before every send into the pane.
 
 - `npm test` now prepares the release fgos, fgctl and native addon it tests against (incremental), so the suite is green on a fresh machine, not only in CI.
 
