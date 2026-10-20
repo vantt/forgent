@@ -1,0 +1,92 @@
+[
+  {
+    "file": "domains/coding/compiled.json",
+    "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+    "digest": "462f9d0c675f3ed459bd46f97cfa2da136355d2355c5001eb151252f12c82c9b",
+    "bytes": 15766,
+    "lines": 597,
+    "legacyReferenceHits": [],
+    "disposition": "zero-edge coverage; L12-58(2); no census id invented",
+    "custody": "Step 5"
+  },
+  {
+    "file": "domains/coding/registry.yaml",
+    "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+    "digest": "0b0b1e96edbd9431e2ee6be1b1afcf28a5c29c059bf54c383254ee6456ebc075",
+    "bytes": 1925,
+    "lines": 98,
+    "legacyReferenceHits": [],
+    "disposition": "zero-edge coverage; L12-58(2); no census id invented",
+    "custody": "Step 5"
+  },
+  {
+    "file": "domains/coding/specs/.gitkeep",
+    "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+    "digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "lines": 0,
+    "legacyReferenceHits": [],
+    "disposition": "zero-edge coverage; L12-58(2); no census id invented",
+    "custody": "Step 4 zero-edge source"
+  },
+  {
+    "file": "domains/coding/workflows/feature.yaml",
+    "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+    "digest": "ed1ac667db48bba000fe870d02846d820955e942556acdb4da368787f586c0fa",
+    "bytes": 8110,
+    "lines": 176,
+    "legacyReferenceHits": [],
+    "disposition": "zero-edge coverage; L12-58(2); no census id invented",
+    "custody": "Step 5"
+  },
+  {
+    "file": "domains/marketing/specs/.gitkeep",
+    "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+    "digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "lines": 0,
+    "legacyReferenceHits": [],
+    "disposition": "zero-edge coverage; L12-58(2); no census id invented",
+    "custody": "Step 4 zero-edge source"
+  },
+  {
+    "file": "domains/marketing/templates/ideal-customer.md",
+    "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+    "digest": "72e3fd8d0ecacb2e2b6185d53ceebf0659c3c6c3391c3aa790e357ec68b620ff",
+    "bytes": 394,
+    "lines": 9,
+    "legacyReferenceHits": [],
+    "disposition": "zero-edge coverage; L12-58(2); no census id invented",
+    "custody": "Step 4 zero-edge source"
+  },
+  {
+    "file": "domains/marketing/templates/offer.md",
+    "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+    "digest": "c0381063d48827dc932668265c3aaf0edbf6b013be5d21228080c536a1636d10",
+    "bytes": 298,
+    "lines": 9,
+    "legacyReferenceHits": [],
+    "disposition": "zero-edge coverage; L12-58(2); no census id invented",
+    "custody": "Step 4 zero-edge source"
+  },
+  {
+    "file": "domains/marketing/templates/price-test-notes.md",
+    "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+    "digest": "284ea4f237186c5b2248dacd4436b56401a323ff9ded447b3a2cd59f038fccf9",
+    "bytes": 285,
+    "lines": 8,
+    "legacyReferenceHits": [],
+    "disposition": "zero-edge coverage; L12-58(2); no census id invented",
+    "custody": "Step 4 zero-edge source"
+  },
+  {
+    "file": "domains/marketing/workflows/content-publish.yaml",
+    "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+    "digest": "b522f4d99b496eef11f592f82bd529ca89e94e0dbd53f9ad3bd9cb8dacef1973",
+    "bytes": 2826,
+    "lines": 68,
+    "legacyReferenceHits": [],
+    "disposition": "zero-edge coverage; L12-58(2); no census id invented",
+    "custody": "Step 5"
+  }
+]

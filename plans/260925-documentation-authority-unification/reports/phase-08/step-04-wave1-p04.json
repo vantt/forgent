@@ -1,0 +1,942 @@
+{
+  "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+  "reviewerRule": "Never run checker/probes/resolver/author scripts. Read every assigned file through EOF and independently verify targets. One verdict per whole file, even when streamed.",
+  "set": "step04-004",
+  "files": [
+    "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P04.2-handoff-gaps-fix-report.md",
+    "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-recheck-report.md",
+    "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P01.1-mvp3-recheck-disposition-review-report.md",
+    "archive/plans/260904-2329-group-thinking-plan-loop/phase-02-chain-verb-and-pack-registration.md",
+    "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0730-p03-1-r5-live-proof-review-report.md",
+    "archive/plans/260905-architecture-advisory-panel/phase-05-comparative-proof-and-promotion.md"
+  ],
+  "joinedSlots": 8,
+  "items": [
+    {
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P04.2-handoff-gaps-fix-report.md",
+      "sourceDigest": "76545f27676b684d4d7390a2a37df469cf6e9590b2e9477b3fc1fe44e0f694cf",
+      "sourceContext": "# Fixer report — P04.2 handoff gaps (3 accepted findings)\n\nCell: P04.2. Track: step-09-mvp3-to-mvp5. Docs-only fix pass.\n\n## 1. HIGH (Red-Team Attack 2) — crash-bricked-coordinationId omission\n\n**File:** `docs/architect/agent-coordination/playbooks/mvp6-dogfood-handoff.md`, \"Still-open limitations\" section.\n\n**Before:** 4 bullets (driver handoff/multi-writer resume, corrupted-session coverage scope, concurrent-resume-same-writer scope, `aggregateBounds` field coverage, self-heal-branch gap — actually 5 listed).\n\n**After:** Added a 6th bullet naming the crash-bricked-`coordinationId` window: `openSession` (`store.mjs`) creates the session directory before writing `session.json`; a crash in that window leaves a directory with no manifest, unrecoverable (fails closed via `EEXIST`/\"already exists\", no recovery path). Cites `P00.1.md` Carried-Forward Gap #15 (12/40 real SIGKILLs reproduced in the predecessor track) and `P04.1.md`'s own Red-Team \"Broken/corrupted-session resume\" section (independently reproduced the same shape against the new resume door). States plainly it is not fixed or owned by any cell in this plan — directly relevant because §5 of the same handoff recommends a fixed `coordinationId` for resume.\n\n## 2. MEDIUM (Red-Team Attack 4) — false \"zero diff\" claim for `store.mjs` in P01.1\n\n**File:** `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.2.md`, \"Plan-Level Acceptance\" table, row \"Existing Step 08 and MVP1/MVP2 behavior remains compatible\".\n\n**Before:** \"Zero diff to `session-engine.mjs`/`store.mjs`/`replay.mjs`/`schema.mjs`/`group-cognition-framework.yaml` confirmed independently by Reviewer and/or Red-Team in P01.1, P02.1, P02.2, P03.1, and P04.1\" — factually wrong: P01.1 added `assertDispositionRefOwnedBySession` to `store.mjs` (+53/-1, confirmed by reading `P01.1.md`'s own \"## 6. Commands\" `git diff --stat -- src test`).\n\n**After:** Reworded to: zero diff to `session-engine.mjs`/`replay.mjs`/`schema.mjs`/`group-cognition-framework.yaml` across all cells; `store.mjs` carries P01.1's own additive `assertDispositionRefOwnedBySession` change (+53/-1, cited to `P01.1.md`), Reviewer-confirmed backward-compatible in that cell's own Review section; zero diff to `store.mjs` in every OTHER cell (P02.1, P02.2, P03.1, P04.1).\n\nThe underlying compatibility verdict (Step 08/MVP1/MVP2 remain compatible) still holds — the `store.mjs` change is additive, not a modification of existing dispatch/disposition semantics, and was independently Reviewer-confirmed in P01.1 as backward-compatible. Only the citation was corrected; the row's conclusion is preserved, matching the Red-Team's own recommended fix direction.\n\n## 3. MEDIUM (Reviewer) — \"nine\" miscount\n\n**File:** `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.2.md`, sentence immediately below the Plan-Level Acceptance table.\n\nVerified `plan.md:65-92`'s own Plan-Level Acceptance bullets directly: counted 10 (full test suite; MVP3 preserves RunResults; MVP3 disposition; MVP4 launcher; role execution policy; MVP5 live proof; MVP5 resume; MVP5 dogfood handoff; no Work/git mutation; Step 08/MVP1/MVP2 compatibility). The Doer's own table in `P04.2.md` already lists all 10 rows correctly — only the closing summary sentence undercounted.\n\n**Before:** \"All nine Plan-Level Acceptance bullets are satisfied, the last one by this cell's own deliverable.\"\n\n**After:** \"All ten Plan-Level Acceptance bullets are satisfied, the last one by this cell's own deliverable.\"\n\n## Verification\n\n```\ngit diff --check -- docs/architect/agent-coordination/playbooks/mvp6-dogfood-handoff.md docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.2.md\n# exit 0, no output\ngit status --porcelain -- src/ core/ test/\n# empty — docs-only scope held\n```\n\nStatus: DONE\nSummary: Fixed all 3 accepted findings (1 HIGH, 2 MEDIUM), all docs-only edits to the handoff playbook and P04.2.md's self-check table/sentence. `src/`/`core/`/`test/` untouched; both sanity checks pass.\n",
+      "record": {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P04.2-handoff-gaps-fix-report.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "76545f27676b684d4d7390a2a37df469cf6e9590b2e9477b3fc1fe44e0f694cf",
+        "digest": "76545f27676b684d4d7390a2a37df469cf6e9590b2e9477b3fc1fe44e0f694cf",
+        "inventoryEdgeIds": [
+          "evidence-048",
+          "evidence-048",
+          "evidence-048"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-048",
+            "slotKey": "{\"edgeId\":\"evidence-048\",\"file\":\"archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P04.2-handoff-gaps-fix-report.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-048\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":15}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-048",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 15
+              }
+            ],
+            "consumerFile": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P04.2-handoff-gaps-fix-report.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 15,
+                "columnStart": 12,
+                "columnEndExclusive": 59,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 15,
+                "columnStart": 12,
+                "columnEndExclusive": 59,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '**File:** `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.2.md`, \"Plan-Level Acceptance\" table, row \"Existing Step 08 and MVP1/MVP2 behavior remains compatible\".'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-048",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 15,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "**File:** `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.2.md`, \"Plan-Level Acceptance\" table, row \"Existing Step 08 and MVP1/MVP2 behavior remains compatible\"."
+              }
+            ]
+          },
+          {
+            "edgeId": "evidence-048",
+            "slotKey": "{\"edgeId\":\"evidence-048\",\"file\":\"archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P04.2-handoff-gaps-fix-report.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-048\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":25}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-048",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 25
+              }
+            ],
+            "consumerFile": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P04.2-handoff-gaps-fix-report.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 25,
+                "columnStart": 12,
+                "columnEndExclusive": 59,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 25,
+                "columnStart": 12,
+                "columnEndExclusive": 59,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '**File:** `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.2.md`, sentence immediately below the Plan-Level Acceptance table.'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-048",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 25,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "**File:** `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.2.md`, sentence immediately below the Plan-Level Acceptance table."
+              }
+            ]
+          },
+          {
+            "edgeId": "evidence-048",
+            "slotKey": "{\"edgeId\":\"evidence-048\",\"file\":\"archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P04.2-handoff-gaps-fix-report.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-048\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":36}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-048",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 36
+              }
+            ],
+            "consumerFile": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P04.2-handoff-gaps-fix-report.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 36,
+                "columnStart": 89,
+                "columnEndExclusive": 136,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 36,
+                "columnStart": 89,
+                "columnEndExclusive": 136,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: 'git diff --check -- docs/architect/agent-coordination/playbooks/mvp6-dogfood-handoff.md docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.2.md'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-048",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 36,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "git diff --check -- docs/architect/agent-coordination/playbooks/mvp6-dogfood-handoff.md docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.2.md"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-004",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P04.2-handoff-gaps-fix-report.md",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "76545f27676b684d4d7390a2a37df469cf6e9590b2e9477b3fc1fe44e0f694cf",
+          "bytes": 4040,
+          "lines": 43,
+          "headings": [
+            {
+              "line": 1,
+              "text": "# Fixer report — P04.2 handoff gaps (3 accepted findings)"
+            },
+            {
+              "line": 5,
+              "text": "## 1. HIGH (Red-Team Attack 2) — crash-bricked-coordinationId omission"
+            },
+            {
+              "line": 13,
+              "text": "## 2. MEDIUM (Red-Team Attack 4) — false \"zero diff\" claim for `store.mjs` in P01.1"
+            },
+            {
+              "line": 23,
+              "text": "## 3. MEDIUM (Reviewer) — \"nine\" miscount"
+            },
+            {
+              "line": 33,
+              "text": "## Verification"
+            },
+            {
+              "line": 37,
+              "text": "# exit 0, no output"
+            },
+            {
+              "line": 39,
+              "text": "# empty — docs-only scope held"
+            }
+          ],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-recheck-report.md",
+      "sourceDigest": "b7caafe7fb6b9fb134c282a5d2e6068eab6164f3e608ab9d6ca681d10db1fe0e",
+      "sourceContext": "# Reviewer recheck report — P00.1\n\nCell: P00.1. Recheck of the Fixer's report\n(`plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P00.1-review-redteam-findings-fix-report.md`)\nagainst live source, independent of trusting the Fixer's own claims.\n\n## Method\n\nFor each of the 8 accepted findings (2 MEDIUM + 6 LOW), re-derived the\ncorrect citation/quote/number directly from source and compared against\n`P00.1.md`'s current text — never accepted the Fixer's \"verified\" claim at\nface value.\n\n## Results — all 8 CONFIRMED-RESOLVED\n\n| # | Finding | Source checked | Result |\n|---|---|---|---|\n| 1 | MEDIUM (Reviewer) — misattributed quote, Entry Condition 1 | `standalone-master-coordination-loop.yaml:6-9` | Quote appears verbatim at cited lines; citation no longer points at `index.md:123-135` |\n| 2 | MEDIUM (Red-Team) — Entry Condition 5 overclaim | `index.md:150`, `index.md:174` | Both named exceptions (\"recorded as a Gap instead\"; \"correctly deferred as a forward gap, not fixed here\") confirmed verbatim; blanket-claim wording removed |\n| 3 | LOW (Reviewer) — activation block line citations | fixture lines 106-123 | `activation:`/`mode:` pairs confirmed at 110-111, 117-118, 121-122 |\n| 4 | LOW (Reviewer + Red-Team) — run.mjs citation | `run.mjs:189-190,242` | Line 189 is the `if` guard, 190 is `openStandaloneSession`, 242 is `openDeclaredProtocolSession`; citation `190,242` confirmed exact |\n| 5 | LOW (Reviewer + Red-Team) — dropped \"into\" | `flow-definition.md:103` | Live text reads \"...cannot materialize into an Assignment...\"; quote now matches verbatim |\n| 6 | LOW (Reviewer) — trial-count rounding | `index.md` P02.1 Red-Team section | \"10/11/7 double-consumptions out of 20/20/12 trials\" and \"0 ... in 46 ... trials\" both confirmed; revised text matches exactly, no batch dropped |\n\n## No new problem introduced\n\nRe-read `P00.1.md` §§1-6 end to end after the fixes. Internally consistent;\nthe Fixer's edits were surgical (citation/quote corrections + two MEDIUM\nrewrites), no collateral prose disruption.\n\n## No scope escape\n\n`git status --porcelain` on\n`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/`\nshows only this track's own three files (`P00.1.md`, `current-cell.md`,\n`index.md`); the predecessor track directory\n(`step-09-group-thinking-mvp1-mvp2/`) shows zero changes.\n\n## Verdict\n\n**APPROVE.** Recorded as a new `### Reviewer Recheck` subsection nested\nunder `## Review (Reviewer)` in `P00.1.md`.\n\nClaude-Session: https://claude.ai/code/session_01QYmrK5xhxo5T4n5R2ewpVQ\n",
+      "record": {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-recheck-report.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "b7caafe7fb6b9fb134c282a5d2e6068eab6164f3e608ab9d6ca681d10db1fe0e",
+        "digest": "b7caafe7fb6b9fb134c282a5d2e6068eab6164f3e608ab9d6ca681d10db1fe0e",
+        "inventoryEdgeIds": [
+          "evidence-059"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-059",
+            "slotKey": "{\"edgeId\":\"evidence-059\",\"file\":\"archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-recheck-report.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-059\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":34}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-059",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 34
+              }
+            ],
+            "consumerFile": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-recheck-report.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 34,
+                "columnStart": 2,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 34,
+                "columnStart": 2,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-059",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 34,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/`"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-004",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-recheck-report.md",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "b7caafe7fb6b9fb134c282a5d2e6068eab6164f3e608ab9d6ca681d10db1fe0e",
+          "bytes": 2550,
+          "lines": 44,
+          "headings": [
+            {
+              "line": 1,
+              "text": "# Reviewer recheck report — P00.1"
+            },
+            {
+              "line": 7,
+              "text": "## Method"
+            },
+            {
+              "line": 14,
+              "text": "## Results — all 8 CONFIRMED-RESOLVED"
+            },
+            {
+              "line": 25,
+              "text": "## No new problem introduced"
+            },
+            {
+              "line": 31,
+              "text": "## No scope escape"
+            },
+            {
+              "line": 39,
+              "text": "## Verdict"
+            }
+          ],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P01.1-mvp3-recheck-disposition-review-report.md",
+      "sourceDigest": "da1c7c163a6cef24d154b78a0ed13601a36fe3ceb4f4c6539bc1f9a0017e76cb",
+      "sourceContext": "# Reviewer Report — P01.1 (Phase 01, MVP3 recheck lineage and driver disposition)\n\nRole: Reviewer (independent of the Doer). Cell: P01.1. Branch:\nstep-09-mvp3-to-mvp5.\n\n## Method\n\nRead `current-cell.md`, the Doer's `P01.1.md`, then verified independently\nagainst the actual diff and repo state rather than trusting the Doer's\nnarrative:\n\n- `git diff`/`git status --porcelain` on the touched files (working-tree,\n  uncommitted).\n- Read `assertDispositionRefOwnedBySession` (`store.mjs`) side by side with\n  `session-engine.mjs`'s existing `assertRefsOwnedBySession` — confirmed\n  byte-for-byte matching segment-split logic and identical two-branch check\n  order.\n- Read `recordDriverDisposition`'s full body to confirm the new checks are\n  wired inside the lock, after identity/status checks, before idempotency —\n  correct ordering.\n- Read all 4 new store-level tests and both new door-level tests in full\n  (not just names) — confirmed each asserts a specific error-message pattern\n  plus an event-count/file-content post-condition, so none can pass\n  vacuously.\n- Re-derived the R2 deferral by reading `P03.1.md` lines 199-227 (MEDIUM-3)\n  directly — the ruling exists exactly as cited and is not overstated.\n- Re-derived the R8 \"terminal session, no door-level test possible\" claim by\n  reading `src/verbs/coordination/run.mjs` lines 166-401 directly — confirmed\n  session opens once, closes once after the steps loop, no step type\n  transitions to terminal mid-loop, and re-running an existing\n  `coordinationId` is refused before any step runs. Claim holds.\n- Independently re-ran the targeted test command synchronously in the\n  foreground: `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test\n  'test/runner/coordination*.test.mjs'` → **314/314 pass**, matching the\n  Doer's reported figure exactly.\n- Cross-checked every P03.1.md/P00.1.md/P03.2.md/coordination-session.md\n  citation in the Doer's Proof Matrix against the actual cited document\n  text — all matched.\n\n## Findings\n\n- **LOW-1**: Three line-number citations to pre-existing tests in\n  `test/verbs/coordination-run-driver-steps.test.mjs` (cited as 356, 466,\n  526) are stale — actual current lines are 357, 513, 573. The 466→513 and\n  526→573 gaps are both exactly 47 lines, matching the size of this cell's\n  own insertion earlier in that same file, indicating the citations were\n  computed pre-edit and never recomputed. All three cited tests genuinely\n  exist and cover exactly what's claimed — this is a documentation\n  navigability issue, not a false-evidence issue. No MEDIUM or HIGH\n  findings.\n\n## Verdict\n\n**APPROVE.** Findings appended as a `## Review (Reviewer)` section at the\nend of\n`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P01.1.md`.\nNo other section of that file, nor `current-cell.md`/`index.md`, was\nedited.\n\nStatus: DONE\nSummary: APPROVE, 1 LOW finding (stale line-number citations in a\npre-existing test file, cosmetic only), 0 MEDIUM, 0 HIGH. Code, tests, and\nevery cross-document citation independently re-verified against the actual\ndiff/source, not the Doer's paraphrase; targeted suite re-run synchronously\nconfirms 314/314 pass with no regression.\n",
+      "record": {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P01.1-mvp3-recheck-disposition-review-report.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "da1c7c163a6cef24d154b78a0ed13601a36fe3ceb4f4c6539bc1f9a0017e76cb",
+        "digest": "da1c7c163a6cef24d154b78a0ed13601a36fe3ceb4f4c6539bc1f9a0017e76cb",
+        "inventoryEdgeIds": [
+          "evidence-060"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-060",
+            "slotKey": "{\"edgeId\":\"evidence-060\",\"file\":\"archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P01.1-mvp3-recheck-disposition-review-report.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-060\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":56}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-060",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 56
+              }
+            ],
+            "consumerFile": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P01.1-mvp3-recheck-disposition-review-report.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 56,
+                "columnStart": 2,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 56,
+                "columnStart": 2,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P01.1.md`.'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-060",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 56,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P01.1.md`."
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-004",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P01.1-mvp3-recheck-disposition-review-report.md",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "da1c7c163a6cef24d154b78a0ed13601a36fe3ceb4f4c6539bc1f9a0017e76cb",
+          "bytes": 3191,
+          "lines": 65,
+          "headings": [
+            {
+              "line": 1,
+              "text": "# Reviewer Report — P01.1 (Phase 01, MVP3 recheck lineage and driver disposition)"
+            },
+            {
+              "line": 6,
+              "text": "## Method"
+            },
+            {
+              "line": 40,
+              "text": "## Findings"
+            },
+            {
+              "line": 52,
+              "text": "## Verdict"
+            }
+          ],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "archive/plans/260904-2329-group-thinking-plan-loop/phase-02-chain-verb-and-pack-registration.md",
+      "sourceDigest": "728a0335c327b848dd68dd34408b2e87251297c54b3289de68af407689c67cc9",
+      "sourceContext": "---\nstatus: completed\n---\n\n# Phase 02 — Chain Verb And Pack Registration\n\nDepends on: Entry Conditions only. Runs in parallel with Phase 01. Zero\nfile overlap with Phase 01 — verify this before dispatch by diffing this\nphase's own Files list against Phase 01's.\n\n## Objective\n\nGive the external Lead a real, read-only way to see \"what's done, what's\nnext\" across a whole chain of cell-sessions, reconstructed ENTIRELY from\nthe sessions' own event logs — never a new persisted plan/status object.\nRegister the existing `standalone-master-coordination-loop` fixture into\nthe group-thinking Protocol Pack so it can be launched through the same\ngate the three existing group-thinking-lite protocols already use.\n\n## Requirements\n\n- **R1**: `core/protocol-packs/group-thinking.json` gains a member entry\n  `{ id: \"core.coordination-protocol.standalone-master-coordination-loop\",\n  version: \"1.0.0\" }` (read the fixture's own real `metadata.id`/\n  `metadata.version` directly before writing this — do not assume from\n  memory). This is a pure data edit; the pack loader is already\n  data-driven (confirmed by `group-thinking-pack.mjs`'s own header\n  comment) — no code change required for this requirement alone.\n- **R2**: A new read-only verb, `fgos coordination chain <track>`,\n  accepts a track/prefix string, lists every session id under\n  `.fgos/coordination/sessions/` whose id starts with `<track>--`,\n  calls the existing `showCoordinationUseCase` (or the function it\n  wraps) per matching session id, and renders:\n  - a list of cells, each with: cell id (parsed from the session id\n    after the `--`), status, phase, last disposition (if any),\n    `pendingDriverAuthorizations`, and its Assignment ids;\n  - `activeCell`: the most-recently-created session whose status is\n    still `active` (or `null` if none);\n  - `nextAction`: a plain-text hint derived from the active cell's own\n    `pendingDriverAuthorizations`/quorum-missing data (reuse whatever\n    `show.mjs` already derives for one session — do not invent new\n    derivation logic).\n  Sort cells by creation order using `manifest.createdAt`\n  (`store.mjs`, confirmed present at ~line 238) — not filesystem\n  `birthtime`, which is unreliable across filesystems/copy operations and\n  was only a fallback guess in an earlier draft of this plan.\n- **R3**: `--json` flag on the new verb, matching `fgos coordination\n  show`'s own existing `--json` convention exactly (same envelope shape\n  where applicable).\n- **R4**: The verb touches NOTHING outside read paths — it must never\n  call any function that appends an event, creates a session, or\n  dispatches an Assignment. Prove this with a static/architecture-style\n  test if this repo already has a pattern for \"this module only imports\n  read-side functions\" (check `test/architecture.test.mjs` for a\n  precedent before inventing a new check style).\n- **R5**: Register the verb in whatever this repo's CLI dispatch table is\n  (`src/cli/command-registry.mjs` and/or `bin/fgos.mjs`'s own\n  `coordination` case — confirm the real registration point by reading\n  how `show`/`launch-master-loop` are already registered, mirror that\n  exact pattern, do not invent a new registration mechanism). `bin/fgos.mjs`\n  dispatches coordination subcommands via inline `if (sub === ...)`\n  branches (confirmed) — every place that ENUMERATES the legal subcommand\n  list as a string (the `command-registry.mjs` description string, and\n  `bin/fgos.mjs`'s own `requireField`-style usage/error message that lists\n  `<run|show|launch-master-loop>` or similar) must be updated to include\n  `chain` too — grep for every such enumeration, do not update only the\n  dispatch branch itself and miss the usage/help text.\n- **R6**: No new persistence anywhere. If implementing this verb tempts\n  writing a cache/index file under `.fgos/`, that is a requirements\n  violation — stop and re-derive from the event logs directly. Correctness\n  over speed for v1; note any real performance concern as a named Gap,\n  not a reason to add a cache.\n- **R7 (moved here from an earlier draft's Phase 01 — this is CLI-layer\n  work, exclusively this cell's own lease)**: `bin/fgos.mjs`'s\n  `coordination` case gains a `--cwd <path>` flag (the worker/session\n  working directory Phase 01's own engine-level mechanism needs — Phase\n  01 itself never touches this file), distinct from whatever flag already\n  names the repo root, mirroring the existing `dispatch execute`\n  command's own `--cwd`/`--repo-root` split (see AGENTS.md's Dispatch\n  section for the precedent this must match exactly). When `--cwd` is\n  omitted, behavior is byte-identical to today (cwd defaults to repo\n  root, exactly as now). Add the CLI-level assertion: `fgos coordination\n  run --cwd <a real worktree> --file <request naming a mutating step>`\n  actually reaches `runCoordinationUseCase` with `ctx.cwd` set to that\n  worktree — a real, end-to-end CLI test, not just that the flag parses.\n- **R8**: the stale \"no resume door\" comments in\n  `src/verbs/coordination/launch-master-loop.mjs` (confirmed present,\n  ~lines 22-24 and ~152-157 — re-locate before editing) are factually\n  wrong (resuming an existing `coordinationId` already works, proven by\n  this plan's own design investigation and by existing tests elsewhere\n  in this codebase) — correct them to describe the real, current\n  behavior. This is a comment-only correction; no behavior change.\n\n## Files\n\nMay touch:\n- `core/protocol-packs/group-thinking.json` (R1).\n- `src/verbs/coordination/chain.mjs` (new file, R2-R4).\n- `src/cli/command-registry.mjs` and `bin/fgos.mjs` — the `coordination`\n  verb's subcommand registration (the new `chain` subcommand, R5), the\n  new `--cwd` flag (R7), and every enumerated-subcommand string (R5) —\n  this cell owns ALL CLI-layer wiring for both this phase and Phase 01's\n  own mechanism; do not touch any unrelated case in this file.\n- `src/verbs/coordination/launch-master-loop.mjs` — comment-only\n  correction (R8).\n- `CHANGELOG.md` — one `## [Unreleased]` line for the new `chain`\n  subcommand and `--cwd` flag.\n- `test/verbs/coordination-chain.test.mjs` (new file) and/or\n  `test/verbs/coordination-group-thinking-pack-registration.test.mjs`\n  (existing file, extend for R1's new pack member) — real tests per\n  below.\n- `test/cli/coordination.test.mjs` — extend for the new `chain`\n  subcommand's own CLI-level test AND Phase 01's own `--cwd` flag's\n  CLI-level test (R7) — this file is exclusively this cell's own lease;\n  Phase 01 never touches it.\n- This cell's own report file under\n  `docs/architect/agent-coordination/verification/group-thinking-plan-loop/`.\n\nDo NOT touch:\n- Anything under `src/runner/coordination/**` or\n  `src/runner/dispatch/**` — this cell is read-only, verbs-layer only, no\n  kernel/dispatch-core file should appear in this cell's own diff at all.\n  If implementing R2 seems to require touching one of these, STOP —\n  that means `show.mjs`'s own existing read path doesn't expose what's\n  needed, and the correct fix is exposing it through the EXISTING\n  `show`-side function (a small, additive export), not by adding new\n  logic into the kernel proper. Report this rather than silently\n  expanding scope.\n- `core/coordination-protocols/standalone-master-coordination-loop.yaml`\n  itself (registering it into the pack does not require editing the\n  fixture).\n- `.agents/skills/fgos-plan-loop/**` (does not exist yet; Phase 03's own\n  lease).\n- Phase 01's own Files list (mutation-core files) — zero overlap\n  required.\n\n## Tests First\n\n1. A real chain of 3 sessions opened with ids `probe--cellA`,\n   `probe--cellB`, `probe--other-track--cellC` (deliberately similar but\n   NOT matching the `probe--` prefix cleanly — proves prefix matching is\n   exact, not a loose substring match) — `fgos coordination chain probe`\n   lists exactly `cellA` and `cellB`, never `other-track--cellC`.\n2. One of the three sessions stays open (a pending driver-authorized\n   step never dispatched) — `chain`'s own `activeCell` names it, and\n   `nextAction` names the real pending authorization, not a generic\n   placeholder.\n3. All sessions closed — `activeCell` is `null`, and every cell's own\n   final disposition/status renders correctly.\n4. `chain` on a track prefix with ZERO matching sessions returns an\n   empty, well-formed result (not an error, not a crash) — a plan that\n   hasn't started its first cell yet is a legitimate state.\n5. R1's pack registration: `loadProtocolPack()`'s own `members` array now\n   includes `standalone-master-coordination-loop`'s real id/version,\n   confirmed by reading the pack JSON directly, not by trusting a\n   narrated claim.\n6. A request naming `protocolId: 'core.coordination-protocol.standalone-master-coordination-loop'`\n   through `runGroupThinkingRequest` (the SAME gate the three\n   group-thinking-lite protocols already use) dispatches successfully —\n   proves the registration is real, not just a JSON edit that looks\n   right.\n7. `chain` never calls a write-side function — enforced by whatever\n   static check pattern R4 settled on, with a deliberately-broken PoC\n   (a throwaway variant that DOES call a write function) confirmed to\n   trip that check, proving the check itself has teeth.\n8. R7's `--cwd` flag: `fgos coordination run --cwd <real worktree> --file\n   <request>` actually dispatches with `ctx.cwd` set to that worktree —\n   confirmed by a real, direct assertion (e.g. the session lands under\n   the correct `.fgos/` per Phase 01's R8 fix), not just that the CLI\n   exits 0. Omitting `--cwd` behaves byte-identically to today.\n9. Every enumerated-subcommand string found during R5's own grep (help\n   text, error messages, the registry description) lists `chain`\n   correctly — paste the real grep output in the report.\n\n## Risks / Rollback\n\n- **Risk**: session creation order isn't reliably derivable from the\n  event log alone (if the log's own first line's timestamp is unreliable\n  or absent for some session shape). Mitigation: check this against a\n  REAL, already-existing multi-session fixture from this repo's own test\n  suite before deciding the ordering mechanism, not a hypothetical one.\n- **Risk**: R5's CLI registration touches a shared file\n  (`command-registry.mjs`) that Phase 01 might also incidentally need —\n  confirmed NOT the case by design (Phase 01 never touches CLI\n  registration), but the Coordinator should re-verify zero overlap right\n  before dispatching this cell, since file lists can drift between plan\n  authoring and execution.\n- **Rollback**: this cell adds files and one JSON array entry — reverting\n  is a clean `git revert`, no other cell's state is affected.\n\n## Acceptance\n\n- All 9 Tests First items pass, independently re-run by the Coordinator.\n- Zero regression in the existing group-thinking pack conformance suite\n  (the three existing protocols' own tests stay green, unchanged).\n- `chain`'s own implementation contains zero write-side function calls\n  (verified, not asserted).\n- Independent Reviewer + Red-Team both return APPROVE; this cell is\n  lower-risk than Phase 01 (read-only, verbs-layer, no kernel) but still\n  gets the same independent-review bar as every cell in this plan.\n",
+      "record": {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/phase-02-chain-verb-and-pack-registration.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "728a0335c327b848dd68dd34408b2e87251297c54b3289de68af407689c67cc9",
+        "digest": "728a0335c327b848dd68dd34408b2e87251297c54b3289de68af407689c67cc9",
+        "inventoryEdgeIds": [
+          "evidence-069"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-069",
+            "slotKey": "{\"edgeId\":\"evidence-069\",\"file\":\"archive/plans/260904-2329-group-thinking-plan-loop/phase-02-chain-verb-and-pack-registration.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-069\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":117}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-069",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 117
+              }
+            ],
+            "consumerFile": "archive/plans/260904-2329-group-thinking-plan-loop/phase-02-chain-verb-and-pack-registration.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 117,
+                "columnStart": 4,
+                "columnEndExclusive": 51,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 117,
+                "columnStart": 4,
+                "columnEndExclusive": 51,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '  `docs/architect/agent-coordination/verification/group-thinking-plan-loop/`.'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-069",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 117,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "  `docs/architect/agent-coordination/verification/group-thinking-plan-loop/`."
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-004",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "archive/plans/260904-2329-group-thinking-plan-loop/phase-02-chain-verb-and-pack-registration.md",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "728a0335c327b848dd68dd34408b2e87251297c54b3289de68af407689c67cc9",
+          "bytes": 11232,
+          "lines": 200,
+          "headings": [
+            {
+              "line": 5,
+              "text": "# Phase 02 — Chain Verb And Pack Registration"
+            },
+            {
+              "line": 11,
+              "text": "## Objective"
+            },
+            {
+              "line": 20,
+              "text": "## Requirements"
+            },
+            {
+              "line": 94,
+              "text": "## Files"
+            },
+            {
+              "line": 137,
+              "text": "## Tests First"
+            },
+            {
+              "line": 175,
+              "text": "## Risks / Rollback"
+            },
+            {
+              "line": 191,
+              "text": "## Acceptance"
+            }
+          ],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0730-p03-1-r5-live-proof-review-report.md",
+      "sourceDigest": "1e7437fd49ece4d23e35b756e8014cd1a112ebb3f5d0a198c0b7525759044bde",
+      "sourceContext": "# P03.1 R5 — Independent Review of the Live Proof\n\nVerdict: **APPROVE**. 0 HIGH, 0 MEDIUM, 1 LOW (informational only).\n\n## Scope\n\nIndependently re-verified the Lead's R5 live-proof report directly against\n`/home/vantt/projects/fgos-test-drive` (real host project) and forgentX\nsource — did not re-run the proof, did not trust the report's own\nnarration for any load-bearing claim. Full findings appended as a new\n\"## Review (R5 live proof)\" section in\n`docs/architect/agent-coordination/verification/group-thinking-plan-loop/P03.1.md`.\n\n## What was independently verified\n\n- **Commit ledger**: all 8 real commits (`674634c`, `69cb90d`, `7b06187`,\n  `dab9691`, `b7eac94`, `46a7b1e`, `ed5deb0`, plus `521b44f`) confirmed via\n  `git rev-list`/`git reflog` in the exact claimed order. One LOW false\n  alarm along the way: plain `git log --oneline master` (no options)\n  omits both merge commits due to a standard git default rev-walk\n  simplification quirk on this exact graph — resolved with\n  `--topo-order`/`--parents`/`--first-parent`, all of which show the full,\n  correct ledger. Not a defect in the report; documented in P03.1.md so a\n  future verifier doesn't re-chase it.\n- **Code + tests**: `src/text-utils.mjs` matches the report's quoted\n  post-fix bodies. `node --test test/*.test.js` → 14/14 pass. Manually\n  reproduced both originally-failing invariants and the post-fix values\n  exactly (`truncate('hi',1)==='h'`, `truncate('hello',3)==='hel'`,\n  `slugify('İ')==='i'`, `slugify('a+b=c$')==='a+b=c$'` unchanged).\n- **Work-state-untouched measurement**: current `sha256sum\n  .fgos/state.json .fgos/events.jsonl` matches the report's cited \"after\"\n  hashes exactly. `ed5deb0` (archival commit) touches only\n  `docs/history/r5-live-proof-evidence/**`, zero `.fgos/` files. Zero\n  Work-lifecycle verbs found in any archived request JSON.\n- **Real dispatch evidence**: spot-checked 4 `result.json` files —\n  `executorId`/`providerModel` fields (`codex-cli`/`codex`,\n  `claude-reviewer`/`claude`, `agy-cli`/`gemini`) all match the report's\n  claims exactly, including the `no-evidence` grading despite a valid\n  red-team claim (Gap 5) and the neg1 zero-diff evidence.\n- **Gap 1 (HIGH), re-derived independently from forgentX source**: `grep\n  -n \"mutation\" src/verbs/coordination/run.mjs` returns zero matches; the\n  real `dispatchDeclaredOperation` call in the operation-step branch never\n  includes a `mutation` field, while `schema.mjs` fully validates and\n  legalizes it on that step type. Confirms the central finding exactly.\n- **`tsk-371`**: confirmed real, `status: \"todo\"`, in forgentX's own work\n  list — not a dangling reference.\n- **R7's `runner.md` edit**: read the actual stop-gate paragraph; the\n  Coordinator's judgment call (R5 does NOT close the Work-attached\n  mutation stop gate, since R5 is Work-independent by design) is correct,\n  not an overclaim.\n- **Kill-and-resume evidence**: archived `child-b.log`/`child-a.log`\n  content is internally consistent with the report's quoted excerpts,\n  including a genuine, unrelated pre-fix failure log entry that reads as\n  real debugging noise, not fabrication.\n- **`fgos coordination chain ... --json`**: re-ran independently, output\n  matches the report's quoted JSON structurally and in full rationale\n  text.\n\n## Findings\n\nNone at HIGH or MEDIUM. One LOW (informational, git-log-display false\nalarm, not a report defect) — recorded in P03.1.md for future verifiers.\n\nStatus: DONE\nVerdict: APPROVE\nFindings: 0 HIGH, 0 MEDIUM, 1 LOW (informational)\nSummary: All load-bearing R5 claims (commit ledger, code/tests, Work-state-untouched hashes, dispatch evidence, Gap 1's run.mjs bug) independently reproduced against real source/state, zero discrepancies found.\nCoordinator's R7 judgment call on the stop-gate paragraph is also correct, not an overclaim.\n\nClaude-Session: https://claude.ai/code/session_01Q7qMX2hkJLtEdpk92M21AJ\n",
+      "record": {
+        "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0730-p03-1-r5-live-proof-review-report.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "1e7437fd49ece4d23e35b756e8014cd1a112ebb3f5d0a198c0b7525759044bde",
+        "digest": "1e7437fd49ece4d23e35b756e8014cd1a112ebb3f5d0a198c0b7525759044bde",
+        "inventoryEdgeIds": [
+          "evidence-083"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-083",
+            "slotKey": "{\"edgeId\":\"evidence-083\",\"file\":\"archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0730-p03-1-r5-live-proof-review-report.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-083\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":12}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-083",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 12
+              }
+            ],
+            "consumerFile": "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0730-p03-1-r5-live-proof-review-report.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 12,
+                "columnStart": 2,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 12,
+                "columnStart": 2,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '`docs/architect/agent-coordination/verification/group-thinking-plan-loop/P03.1.md`.'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-083",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 12,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "`docs/architect/agent-coordination/verification/group-thinking-plan-loop/P03.1.md`."
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-004",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0730-p03-1-r5-live-proof-review-report.md",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "1e7437fd49ece4d23e35b756e8014cd1a112ebb3f5d0a198c0b7525759044bde",
+          "bytes": 3911,
+          "lines": 70,
+          "headings": [
+            {
+              "line": 1,
+              "text": "# P03.1 R5 — Independent Review of the Live Proof"
+            },
+            {
+              "line": 5,
+              "text": "## Scope"
+            },
+            {
+              "line": 14,
+              "text": "## What was independently verified"
+            },
+            {
+              "line": 59,
+              "text": "## Findings"
+            }
+          ],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "archive/plans/260905-architecture-advisory-panel/phase-05-comparative-proof-and-promotion.md",
+      "sourceDigest": "c340805055ba7ef3860c55bd81eb20fb19ba0ba42b19340c202c88a9888a6f22",
+      "sourceContext": "---\nstatus: completed\n---\n\n# Phase 05 - Comparative Proof And Promotion\n\nDepends on: Phase 04 closed.\n\n## Objective\n\nProve that productization added safety and durability without making the panel\nless intelligent. Compare the manual playbook and production skill on real\narchitecture cases, close regressions, and promote only evidence-backed\nbehavior.\n\n## Cells\n\n### P05.1 - Hard conformance and recovery proof\n\nExercise the installed product path against immutable fixtures for every\nauthority, visibility, aggregation, routing, bound, and replay claim. Kill the\ndriver after meaningful durable progress and resume from a fresh process with\nonly the installed skill plus session id. Store requests, events, replay,\nRunResults, routing provenance, attacks, and outcomes under `proofs/P05.1/`.\n\n### P05.2 - Comparative live proof and promotion\n\nRun real clear and unclear cases with the Phase 01 rubric and a person's\nDecision Dialogue. Compare manual and product behavior row by row. Route soul\nregressions to P04 and hard gaps to P03 only with evidence. After independent\napproval, promote contracts/doctrine/docs, update proposal status and changelog,\nrun final checks, and close the track.\n\n## Requirements\n\n- Run the production panel on clear and unclear real-project questions\n  comparable to Phase 01's cases, including a real person in Decision Dialogue.\n- Evaluate both paths with the same qualitative rubric: improved understanding,\n  necessity and quality of questions, credibility of alternatives, use of\n  disconfirming evidence, willingness to revise, dissent preservation,\n  recommendation calibration, explanation quality, and decision usefulness.\n- Record where the hard shell improves safety/recovery and where it introduces\n  stiffness, ceremony, context loss, or degraded prose.\n- Treat a material qualitative regression as a failed proof even when all\n  schema and conformance tests pass. Fix soul/prose in Phase 04; change the hard\n  shell only when evidence proves it is the source of the regression.\n- Exercise controlled reveal, specialist pull-in, aggregation, recheck,\n  selective reopen, crash/fresh-process resume, human-decision provenance,\n  bounds, and Work isolation through the real product path.\n- Exercise heterogeneous dispatch in one real panel: at least two distinct\n  safe executor/provider bindings, explicit role-level tiers, fresh independent role\n  contexts, and RunResult provenance matching every selected binding.\n- Re-run the advisory shape with the available homogeneous fallback and report\n  the qualitative difference. Provider diversity is a controllable capability,\n  not an unmeasured claim of automatic superiority.\n- Independently review and red-team the final implementation. The red-team must\n  attack both legal bypasses and bad-advisor failure modes.\n- Promote settled hard behavior into canonical Coordination contracts and soft\n  behavior into the appropriate domain doctrine/skill documentation. Update\n  reading maps, Group Thinking docs, examples, changelog,\n  `docs/architect/agent-coordination/verification/README.md`, and the track\n  verification index without presenting prose judgment as a kernel guarantee.\n\n## Live Proof Boundary\n\nUse real projects outside `forgentX`. Record repository instructions,\nconfigured executors, exact fgOS version, baseline state, evidence sources, and\nthe person's evaluation. A scripted fake-human transcript cannot prove the\nDecision Dialogue. The panel must not mutate code, git, or Work state.\n\n## Final Verification\n\nRun the focused coordination/verbs/CLI/architecture suites, skill projection\nchecks, all protocol conformance cases, relative-link checks, and full\n`npm test`. Use `detect_changes()` against `main` before final commit.\n\nThe P05.2 report names commit hashes, binary/version, external project roots,\nrequested actor bindings, actual RunResult executor/provider/model/tier, human\ninteractions, dispositions, baseline/final test counts, remaining limitations,\nand the manual-vs-product qualitative matrix. Narration alone proves nothing.\n\n## Exit\n\nThe shipped panel is measurably at least as useful as its manual prompt, more\nauditable and resumable, and no less able to understand, reframe, disagree,\nexplain, and advise. Remaining limitations are named honestly as either hard\ncapability deferrals or soft-intelligence improvements.\n",
+      "record": {
+        "file": "archive/plans/260905-architecture-advisory-panel/phase-05-comparative-proof-and-promotion.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "c340805055ba7ef3860c55bd81eb20fb19ba0ba42b19340c202c88a9888a6f22",
+        "digest": "c340805055ba7ef3860c55bd81eb20fb19ba0ba42b19340c202c88a9888a6f22",
+        "inventoryEdgeIds": [
+          "evidence-085"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-085",
+            "slotKey": "{\"edgeId\":\"evidence-085\",\"file\":\"archive/plans/260905-architecture-advisory-panel/phase-05-comparative-proof-and-promotion.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-085\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":61}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-085",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 61
+              }
+            ],
+            "consumerFile": "archive/plans/260905-architecture-advisory-panel/phase-05-comparative-proof-and-promotion.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 61,
+                "columnStart": 4,
+                "columnEndExclusive": 51,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 61,
+                "columnStart": 4,
+                "columnEndExclusive": 51,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '  `docs/architect/agent-coordination/verification/README.md`, and the track'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-085",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 61,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "  `docs/architect/agent-coordination/verification/README.md`, and the track"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-004",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "archive/plans/260905-architecture-advisory-panel/phase-05-comparative-proof-and-promotion.md",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "c340805055ba7ef3860c55bd81eb20fb19ba0ba42b19340c202c88a9888a6f22",
+          "bytes": 4354,
+          "lines": 87,
+          "headings": [
+            {
+              "line": 5,
+              "text": "# Phase 05 - Comparative Proof And Promotion"
+            },
+            {
+              "line": 9,
+              "text": "## Objective"
+            },
+            {
+              "line": 16,
+              "text": "## Cells"
+            },
+            {
+              "line": 18,
+              "text": "### P05.1 - Hard conformance and recovery proof"
+            },
+            {
+              "line": 26,
+              "text": "### P05.2 - Comparative live proof and promotion"
+            },
+            {
+              "line": 34,
+              "text": "## Requirements"
+            },
+            {
+              "line": 64,
+              "text": "## Live Proof Boundary"
+            },
+            {
+              "line": 71,
+              "text": "## Final Verification"
+            },
+            {
+              "line": 82,
+              "text": "## Exit"
+            }
+          ],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    }
+  ]
+}

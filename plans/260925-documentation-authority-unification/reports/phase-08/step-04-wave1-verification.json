@@ -1,0 +1,317 @@
+{
+  "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+  "completedBatches": [
+    "step04-001",
+    "step04-002",
+    "step04-003",
+    "step04-004",
+    "step04-005",
+    "step04-006",
+    "step04-007",
+    "step04-008",
+    "step04-009",
+    "step04-010",
+    "step04-011",
+    "step04-012",
+    "step04-013",
+    "step04-014",
+    "step04-015",
+    "step04-016"
+  ],
+  "stopBoundary": "step04-016 complete; step04-017..033 not authored. Remaining turn context reserved for full replay, probes, frozen review packet and handoff; no partial next batch.",
+  "records": 174,
+  "consumerFiles": 203,
+  "slots": 542,
+  "dispositions": {
+    "preserve": 470,
+    "patch": 46,
+    "parked": 26
+  },
+  "checkerFailureCount": 0,
+  "openLeadRulingEdges": [],
+  "probes": {
+    "passed": 10,
+    "total": 10,
+    "allPassed": true
+  },
+  "sourceFilesWithDiff": 8,
+  "sourcePatchSlots": 30,
+  "renderPatchJoins": 16,
+  "A51": {
+    "patchedPopulation": 8,
+    "patchedSample": 6,
+    "unpatchedSample": 28,
+    "mandatorySources": 26,
+    "distinctSelectedSources": 58,
+    "perSet": "step-04-wave1-selection.json",
+    "independentReviewed": 0,
+    "reworkNumerator": null,
+    "reworkDenominator": null
+  },
+  "reviewParts": [
+    {
+      "part": 1,
+      "bytes": 178187,
+      "slots": 26,
+      "pass": true
+    },
+    {
+      "part": 2,
+      "bytes": 209850,
+      "slots": 31,
+      "pass": true
+    },
+    {
+      "part": 3,
+      "bytes": 102565,
+      "slots": 9,
+      "pass": true
+    },
+    {
+      "part": 4,
+      "bytes": 73480,
+      "slots": 8,
+      "pass": true
+    },
+    {
+      "part": 5,
+      "bytes": 92012,
+      "slots": 17,
+      "pass": true
+    },
+    {
+      "part": 6,
+      "bytes": 66176,
+      "slots": 5,
+      "pass": true
+    },
+    {
+      "part": 7,
+      "bytes": 298913,
+      "slots": 2,
+      "pass": true
+    },
+    {
+      "part": 8,
+      "bytes": 226258,
+      "slots": 31,
+      "pass": true
+    },
+    {
+      "part": 9,
+      "bytes": 233369,
+      "slots": 27,
+      "pass": true
+    },
+    {
+      "part": 10,
+      "bytes": 177390,
+      "slots": 24,
+      "pass": true
+    },
+    {
+      "part": 11,
+      "bytes": 224733,
+      "slots": 0,
+      "pass": true
+    },
+    {
+      "part": 12,
+      "bytes": 81162,
+      "slots": 0,
+      "pass": true
+    },
+    {
+      "part": 13,
+      "bytes": 154633,
+      "slots": 36,
+      "pass": true
+    },
+    {
+      "part": 14,
+      "bytes": 218216,
+      "slots": 15,
+      "pass": true
+    },
+    {
+      "part": 15,
+      "bytes": 222988,
+      "slots": 22,
+      "pass": true
+    },
+    {
+      "part": 16,
+      "bytes": 14742,
+      "slots": 2,
+      "pass": true
+    },
+    {
+      "part": 17,
+      "bytes": 10387,
+      "slots": 1,
+      "pass": true
+    },
+    {
+      "part": 18,
+      "bytes": 136002,
+      "slots": 11,
+      "pass": true
+    },
+    {
+      "part": 19,
+      "bytes": 60919,
+      "slots": 4,
+      "pass": true
+    },
+    {
+      "part": 20,
+      "bytes": 329663,
+      "slots": 43,
+      "pass": true
+    },
+    {
+      "part": 21,
+      "bytes": 17422,
+      "slots": 4,
+      "pass": true
+    }
+  ],
+  "commands": [
+    {
+      "name": "whitespace",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.009,
+      "stdout": "step-04-wave1-whitespace.stdout.log",
+      "stderr": "step-04-wave1-whitespace.stderr.log",
+      "CLAUDE_CODE_SESSION_ID": "unset",
+      "TMPDIR": "/tmp/fgos-work"
+    },
+    {
+      "name": "legacy-ratchet",
+      "argv": [
+        "node",
+        "scripts/check-legacy-docs-ratchet.mjs"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.063,
+      "stdout": "step-04-wave1-legacy-ratchet.stdout.log",
+      "stderr": "step-04-wave1-legacy-ratchet.stderr.log",
+      "CLAUDE_CODE_SESSION_ID": "unset",
+      "TMPDIR": "/tmp/fgos-work"
+    },
+    {
+      "name": "light-tests",
+      "argv": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "--test",
+        "test/scripts/doc-link-pass.test.mjs",
+        "test/scripts/check-doc-candidate-status.test.mjs",
+        "test/scripts/check-doc-constitution.test.mjs",
+        "test/scripts/generate-shipped-path-inventory.test.mjs",
+        "test/setup/instruction-registry.test.mjs",
+        "test/setup/instruction-composition.test.mjs",
+        "test/setup/instruction-projections.test.mjs"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 1.701,
+      "stdout": "step-04-wave1-light-tests.stdout.log",
+      "stderr": "step-04-wave1-light-tests.stderr.log",
+      "CLAUDE_CODE_SESSION_ID": "unset",
+      "TMPDIR": "/tmp/fgos-work"
+    }
+  ],
+  "writes": [
+    "plans/260925-documentation-authority-unification/reports/phase-08/__pycache__/step-04-check.cpython-310.pyc",
+    "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-check.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-probes.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-001.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-002.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-003.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-004.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-005.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-006.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-007.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-008.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-010.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-011.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-012.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-013.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-014.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-015.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-016.jsonl",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-author.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-check-result.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-finalize-records.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-initial-check-result.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-legacy-ratchet.stderr.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-legacy-ratchet.stdout.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-light-tests.stderr.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-light-tests.stdout.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-local-main-boundaries.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-manifest.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-p01.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-p02.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-p03.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-p04.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-p05.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-p06.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-p07.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-p08.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-p09.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-p10.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-p11.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-p12.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-p13.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-p14.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-p15.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-p16.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-p17.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-p18.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-p19.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-p20.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-p21.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-packet.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-probes-result.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-repair.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-review-accounting.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-review-index.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-review-request.md",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-ruling-corrections.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-selection.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-verify.py",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-whitespace.stderr.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-whitespace.stdout.log",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-whole-file-reads.json",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-04-wave1-zero-edge-coverage.json"
+  ],
+  "outOfScopeWrites": [],
+  "protectedBindingCount": 1672,
+  "protectedDrift": [],
+  "zeroEdgeCoverageFiles": 9,
+  "noConsumerEdits": true,
+  "generatorRuns": 0,
+  "gitMutations": 0,
+  "fgosCliInvocations": 0,
+  "reviewersStarted": 0,
+  "pairAccountingParts": 0,
+  "committedByteAcceptance": "Pending runner commit and ordinary L12-11 Lead accounting; no guessed commit or post-commit reproduction claim",
+  "knownLeadBaseline": "L12-58: one existing D6 citation failure on main in decision-citation-drift; this wave does not edit docs/backlog.md or claim that separate suite green.",
+  "preview": "Not started: MDView MCP unavailable, and CLI preview was omitted to honor the assignment’s strict write scope. Markdown is available directly.",
+  "reviewerBudget": {
+    "elapsedSeconds": 0,
+    "remainingSeconds": null,
+    "status": "Lead must allocate; no independent review started"
+  },
+  "verifiedAt": "2026-10-20T10:32:53.715160+00:00",
+  "pass": true
+}

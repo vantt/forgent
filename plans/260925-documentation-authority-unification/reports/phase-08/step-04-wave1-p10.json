@@ -1,0 +1,2589 @@
+{
+  "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+  "reviewerRule": "Never run checker/probes/resolver/author scripts. Read every assigned file through EOF and independently verify targets. One verdict per whole file, even when streamed.",
+  "set": "step04-009",
+  "files": [
+    "core/instructions/platform-laws.md"
+  ],
+  "joinedSlots": 24,
+  "items": [
+    {
+      "file": "core/instructions/platform-laws.md",
+      "sourceDigest": "4b834fa5ea7db1d9637a3126a7a96f7758be2f1650131411c4e69b3a91ac6f90",
+      "sourceContext": "---\nid: platform-operating-laws\nkind: law\nowner: core\nscope: repo\nmode: append\nappliesTo: [\"*\"]\nspecificity: 10\ntitle: Platform Operating Laws\ndescription: Core platform operating laws L1-L10 defining immutable platform invariants\n---\n\n# Platform Operating Laws\n\nPlatform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:\n\n- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)\n- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)\n- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)\n- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)\n- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)\n- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)\n- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)\n- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)\n- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)\n- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)\n\nAuthoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place.\n",
+      "record": {
+        "file": "core/instructions/platform-laws.md",
+        "inventoryInputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+        "inventoryInputs": [
+          {
+            "path": "step-02-census-instructions.json",
+            "commit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+            "sha256": "dceafd6fe7ff4d9ca6d045a2f92850a321fb6a23ec688ed112e08153250bc187",
+            "edges": 87
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "4b834fa5ea7db1d9637a3126a7a96f7758be2f1650131411c4e69b3a91ac6f90",
+        "digest": "4b834fa5ea7db1d9637a3126a7a96f7758be2f1650131411c4e69b3a91ac6f90",
+        "inventoryEdgeIds": [
+          "instructions-025",
+          "instructions-026",
+          "instructions-027",
+          "instructions-028",
+          "instructions-029",
+          "instructions-030",
+          "instructions-031",
+          "instructions-032",
+          "instructions-033",
+          "instructions-034",
+          "instructions-035",
+          "instructions-036",
+          "instructions-039",
+          "instructions-040",
+          "instructions-041",
+          "instructions-042",
+          "instructions-043",
+          "instructions-044",
+          "instructions-045",
+          "instructions-046",
+          "instructions-047",
+          "instructions-048",
+          "instructions-049",
+          "instructions-050"
+        ],
+        "diff": "--- a/core/instructions/platform-laws.md\n+++ b/core/instructions/platform-laws.md\n@@ -12,17 +12,17 @@\n \n # Platform Operating Laws\n \n-Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:\n+Platform laws L1-L10 are locked in `docs/platform/platform-foundations.md#luật-nền-platform-forgent-phase-0-compound-learning-stack` and define immutable platform invariants for fgOS:\n \n-- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)\n-- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)\n-- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)\n-- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)\n-- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)\n-- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)\n-- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)\n-- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)\n-- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)\n-- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)\n+- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform/platform-foundations.md#l1-hai-vật-lý-của-tri-thức-log-vs-state`)\n+- **L2 — Kiến trúc memory hai tầng** (`docs/platform/platform-foundations.md#l2-kiến-trúc-memory-hai-tầng`)\n+- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform/platform-foundations.md#l3-luật-store-truth-ở-jsonl-db-là-view`)\n+- **L4 — Routing model theo audience của từng interface** (`docs/platform/platform-foundations.md#l4-routing-model-theo-audience-của-từng-interface`)\n+- **L5 — Definition of done: sáu câu hỏi** (`docs/platform/platform-foundations.md#l5-definition-of-done-sáu-câu-hỏi`)\n+- **L6 — Maturity ladder F0–F5** (`docs/platform/platform-foundations.md#l6-maturity-ladder-f0f5`)\n+- **L7 — Durability ladder** (`docs/platform/platform-foundations.md#l7-durability-ladder`)\n+- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform/platform-foundations.md#l8-doctrine-placement-rule-always-loaded-layer`)\n+- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform/platform-foundations.md#l9-thang-hoàn-tất-của-một-việc-run-merge-durable`)\n+- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform/platform-foundations.md#l10-add-through-not-alongside-mở-rộng-qua-cửa-không-đắp-cạnh-cửa`)\n \n-Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place.\n+Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform/platform-foundations.md#luật-nền-platform-forgent-phase-0-compound-learning-stack`. Changing any locked law requires superseding its decision ID rather than editing in place.\n",
+        "edges": [
+          {
+            "edgeId": "instructions-025",
+            "slotKey": "{\"edgeId\":\"instructions-025\",\"file\":\"AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-025\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":339}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-025",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 339
+              }
+            ],
+            "consumerFile": "AGENTS.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 341,
+                "columnStart": 37,
+                "columnEndExclusive": 65,
+                "text": "docs/platform-foundations.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 341,
+                "columnStart": 37,
+                "columnEndExclusive": 65,
+                "text": "docs/platform-foundations.md"
+              }
+            ],
+            "matchedExpression": "docs/platform-foundations.md",
+            "logicalReference": "docs/platform-foundations.md",
+            "disposition": "patch",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source core/instructions/platform-laws.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: 'Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:' Source disposition: patch. A51, L12-7/30/31/32/58: Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": null,
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/platform-foundations.md",
+            "sourceSlotKey": "{\"edgeId\":\"instructions-039\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-039\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":15}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-025",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 339,
+                "matchedExpression": "docs/platform-foundations.md",
+                "originalLineText": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+              }
+            ]
+          },
+          {
+            "edgeId": "instructions-026",
+            "slotKey": "{\"edgeId\":\"instructions-026\",\"file\":\"AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-026\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":341}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-026",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 341
+              }
+            ],
+            "consumerFile": "AGENTS.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 343,
+                "columnStart": 52,
+                "columnEndExclusive": 117,
+                "text": "docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 343,
+                "columnStart": 52,
+                "columnEndExclusive": 117,
+                "text": "docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state"
+              }
+            ],
+            "matchedExpression": "docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state",
+            "logicalReference": "docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state",
+            "disposition": "patch",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source core/instructions/platform-laws.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: '- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)' Source disposition: patch. A51, L12-7/30/31/32/58: Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": null,
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/platform-foundations.md",
+            "sourceSlotKey": "{\"edgeId\":\"instructions-040\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-040\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":17}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-026",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 341,
+                "matchedExpression": "docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state",
+                "originalLineText": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+              }
+            ]
+          },
+          {
+            "edgeId": "instructions-027",
+            "slotKey": "{\"edgeId\":\"instructions-027\",\"file\":\"AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-027\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":342}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-027",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 342
+              }
+            ],
+            "consumerFile": "AGENTS.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 344,
+                "columnStart": 40,
+                "columnEndExclusive": 95,
+                "text": "docs/platform-foundations.md#l2--kin-trc-memory-hai-tng"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 344,
+                "columnStart": 40,
+                "columnEndExclusive": 95,
+                "text": "docs/platform-foundations.md#l2--kin-trc-memory-hai-tng"
+              }
+            ],
+            "matchedExpression": "docs/platform-foundations.md#l2--kin-trc-memory-hai-tng",
+            "logicalReference": "docs/platform-foundations.md#l2--kin-trc-memory-hai-tng",
+            "disposition": "patch",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source core/instructions/platform-laws.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: '- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)' Source disposition: patch. A51, L12-7/30/31/32/58: Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": null,
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/platform-foundations.md",
+            "sourceSlotKey": "{\"edgeId\":\"instructions-041\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-041\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":18}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-027",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 342,
+                "matchedExpression": "docs/platform-foundations.md#l2--kin-trc-memory-hai-tng",
+                "originalLineText": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+              }
+            ]
+          },
+          {
+            "edgeId": "instructions-028",
+            "slotKey": "{\"edgeId\":\"instructions-028\",\"file\":\"AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-028\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":343}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-028",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 343
+              }
+            ],
+            "consumerFile": "AGENTS.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 345,
+                "columnStart": 52,
+                "columnEndExclusive": 117,
+                "text": "docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 345,
+                "columnStart": 52,
+                "columnEndExclusive": 117,
+                "text": "docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view"
+              }
+            ],
+            "matchedExpression": "docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view",
+            "logicalReference": "docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view",
+            "disposition": "patch",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source core/instructions/platform-laws.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: '- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)' Source disposition: patch. A51, L12-7/30/31/32/58: Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": null,
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/platform-foundations.md",
+            "sourceSlotKey": "{\"edgeId\":\"instructions-042\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-042\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":19}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-028",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 343,
+                "matchedExpression": "docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view",
+                "originalLineText": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+              }
+            ]
+          },
+          {
+            "edgeId": "instructions-029",
+            "slotKey": "{\"edgeId\":\"instructions-029\",\"file\":\"AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-029\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":344}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-029",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 344
+              }
+            ],
+            "consumerFile": "AGENTS.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 346,
+                "columnStart": 61,
+                "columnEndExclusive": 138,
+                "text": "docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 346,
+                "columnStart": 61,
+                "columnEndExclusive": 138,
+                "text": "docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface"
+              }
+            ],
+            "matchedExpression": "docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface",
+            "logicalReference": "docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface",
+            "disposition": "patch",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source core/instructions/platform-laws.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: '- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)' Source disposition: patch. A51, L12-7/30/31/32/58: Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": null,
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/platform-foundations.md",
+            "sourceSlotKey": "{\"edgeId\":\"instructions-043\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-043\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":20}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-029",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 344,
+                "matchedExpression": "docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface",
+                "originalLineText": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+              }
+            ]
+          },
+          {
+            "edgeId": "instructions-030",
+            "slotKey": "{\"edgeId\":\"instructions-030\",\"file\":\"AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-030\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":345}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-030",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 345
+              }
+            ],
+            "consumerFile": "AGENTS.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 347,
+                "columnStart": 46,
+                "columnEndExclusive": 106,
+                "text": "docs/platform-foundations.md#l5--definition-of-done-su-cu-hi"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 347,
+                "columnStart": 46,
+                "columnEndExclusive": 106,
+                "text": "docs/platform-foundations.md#l5--definition-of-done-su-cu-hi"
+              }
+            ],
+            "matchedExpression": "docs/platform-foundations.md#l5--definition-of-done-su-cu-hi",
+            "logicalReference": "docs/platform-foundations.md#l5--definition-of-done-su-cu-hi",
+            "disposition": "patch",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source core/instructions/platform-laws.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: '- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)' Source disposition: patch. A51, L12-7/30/31/32/58: Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": null,
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/platform-foundations.md",
+            "sourceSlotKey": "{\"edgeId\":\"instructions-044\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-044\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":21}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-030",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 345,
+                "matchedExpression": "docs/platform-foundations.md#l5--definition-of-done-su-cu-hi",
+                "originalLineText": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+              }
+            ]
+          },
+          {
+            "edgeId": "instructions-031",
+            "slotKey": "{\"edgeId\":\"instructions-031\",\"file\":\"AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-031\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":346}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-031",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 346
+              }
+            ],
+            "consumerFile": "AGENTS.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 348,
+                "columnStart": 36,
+                "columnEndExclusive": 89,
+                "text": "docs/platform-foundations.md#l6--maturity-ladder-f0f5"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 348,
+                "columnStart": 36,
+                "columnEndExclusive": 89,
+                "text": "docs/platform-foundations.md#l6--maturity-ladder-f0f5"
+              }
+            ],
+            "matchedExpression": "docs/platform-foundations.md#l6--maturity-ladder-f0f5",
+            "logicalReference": "docs/platform-foundations.md#l6--maturity-ladder-f0f5",
+            "disposition": "patch",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source core/instructions/platform-laws.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: '- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)' Source disposition: patch. A51, L12-7/30/31/32/58: Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": null,
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/platform-foundations.md",
+            "sourceSlotKey": "{\"edgeId\":\"instructions-045\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-045\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":22}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-031",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 346,
+                "matchedExpression": "docs/platform-foundations.md#l6--maturity-ladder-f0f5",
+                "originalLineText": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+              }
+            ]
+          },
+          {
+            "edgeId": "instructions-032",
+            "slotKey": "{\"edgeId\":\"instructions-032\",\"file\":\"AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-032\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":347}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-032",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 347
+              }
+            ],
+            "consumerFile": "AGENTS.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 349,
+                "columnStart": 32,
+                "columnEndExclusive": 82,
+                "text": "docs/platform-foundations.md#l7--durability-ladder"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 349,
+                "columnStart": 32,
+                "columnEndExclusive": 82,
+                "text": "docs/platform-foundations.md#l7--durability-ladder"
+              }
+            ],
+            "matchedExpression": "docs/platform-foundations.md#l7--durability-ladder",
+            "logicalReference": "docs/platform-foundations.md#l7--durability-ladder",
+            "disposition": "patch",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source core/instructions/platform-laws.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: '- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)' Source disposition: patch. A51, L12-7/30/31/32/58: Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": null,
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/platform-foundations.md",
+            "sourceSlotKey": "{\"edgeId\":\"instructions-046\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-046\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":23}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-032",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 347,
+                "matchedExpression": "docs/platform-foundations.md#l7--durability-ladder",
+                "originalLineText": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+              }
+            ]
+          },
+          {
+            "edgeId": "instructions-033",
+            "slotKey": "{\"edgeId\":\"instructions-033\",\"file\":\"AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-033\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":348}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-033",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 348
+              }
+            ],
+            "consumerFile": "AGENTS.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 350,
+                "columnStart": 60,
+                "columnEndExclusive": 136,
+                "text": "docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 350,
+                "columnStart": 60,
+                "columnEndExclusive": 136,
+                "text": "docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer"
+              }
+            ],
+            "matchedExpression": "docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer",
+            "logicalReference": "docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer",
+            "disposition": "patch",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source core/instructions/platform-laws.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: '- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)' Source disposition: patch. A51, L12-7/30/31/32/58: Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": null,
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/platform-foundations.md",
+            "sourceSlotKey": "{\"edgeId\":\"instructions-047\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-047\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":24}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-033",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 348,
+                "matchedExpression": "docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer",
+                "originalLineText": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+              }
+            ]
+          },
+          {
+            "edgeId": "instructions-034",
+            "slotKey": "{\"edgeId\":\"instructions-034\",\"file\":\"AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-034\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":349}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-034",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 349
+              }
+            ],
+            "consumerFile": "AGENTS.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 351,
+                "columnStart": 65,
+                "columnEndExclusive": 140,
+                "text": "docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 351,
+                "columnStart": 65,
+                "columnEndExclusive": 140,
+                "text": "docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable"
+              }
+            ],
+            "matchedExpression": "docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable",
+            "logicalReference": "docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable",
+            "disposition": "patch",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source core/instructions/platform-laws.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: '- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)' Source disposition: patch. A51, L12-7/30/31/32/58: Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": null,
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/platform-foundations.md",
+            "sourceSlotKey": "{\"edgeId\":\"instructions-048\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-048\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":25}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-034",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 349,
+                "matchedExpression": "docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable",
+                "originalLineText": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+              }
+            ]
+          },
+          {
+            "edgeId": "instructions-035",
+            "slotKey": "{\"edgeId\":\"instructions-035\",\"file\":\"AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-035\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":350}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-035",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 350
+              }
+            ],
+            "consumerFile": "AGENTS.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 352,
+                "columnStart": 78,
+                "columnEndExclusive": 164,
+                "text": "docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 352,
+                "columnStart": 78,
+                "columnEndExclusive": 164,
+                "text": "docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca"
+              }
+            ],
+            "matchedExpression": "docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca",
+            "logicalReference": "docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca",
+            "disposition": "patch",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source core/instructions/platform-laws.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: '- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)' Source disposition: patch. A51, L12-7/30/31/32/58: Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": null,
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/platform-foundations.md",
+            "sourceSlotKey": "{\"edgeId\":\"instructions-049\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-049\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":26}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-035",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 350,
+                "matchedExpression": "docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca",
+                "originalLineText": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+              }
+            ]
+          },
+          {
+            "edgeId": "instructions-036",
+            "slotKey": "{\"edgeId\":\"instructions-036\",\"file\":\"AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-036\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":352}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-036",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 352
+              }
+            ],
+            "consumerFile": "AGENTS.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 354,
+                "columnStart": 107,
+                "columnEndExclusive": 135,
+                "text": "docs/platform-foundations.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 354,
+                "columnStart": 107,
+                "columnEndExclusive": 135,
+                "text": "docs/platform-foundations.md"
+              }
+            ],
+            "matchedExpression": "docs/platform-foundations.md",
+            "logicalReference": "docs/platform-foundations.md",
+            "disposition": "patch",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source core/instructions/platform-laws.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: 'Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place.' Source disposition: patch. A51, L12-7/30/31/32/58: Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": null,
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/platform-foundations.md",
+            "sourceSlotKey": "{\"edgeId\":\"instructions-039\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-039\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":15}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-036",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 352,
+                "matchedExpression": "docs/platform-foundations.md",
+                "originalLineText": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+              }
+            ]
+          },
+          {
+            "edgeId": "instructions-039",
+            "slotKey": "{\"edgeId\":\"instructions-039\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-039\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":15}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-039",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 15
+              }
+            ],
+            "consumerFile": "core/instructions/platform-laws.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 15,
+                "columnStart": 37,
+                "columnEndExclusive": 65,
+                "text": "docs/platform-foundations.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 15,
+                "columnStart": 37,
+                "columnEndExclusive": 65,
+                "text": "docs/platform-foundations.md"
+              }
+            ],
+            "matchedExpression": "docs/platform-foundations.md",
+            "logicalReference": "docs/platform-foundations.md",
+            "disposition": "patch",
+            "diffHunk": "@@ -12,17 +12,17 @@",
+            "reason": "A51, L12-7/30/31/32/58: Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/platform/platform-foundations.md",
+            "anchor": "luật-nền-platform-forgent-phase-0-compound-learning-stack",
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/platform-foundations.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-039",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 15,
+                "matchedExpression": "docs/platform-foundations.md",
+                "originalLineText": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+              }
+            ]
+          },
+          {
+            "edgeId": "instructions-040",
+            "slotKey": "{\"edgeId\":\"instructions-040\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-040\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":17}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-040",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 17
+              }
+            ],
+            "consumerFile": "core/instructions/platform-laws.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 17,
+                "columnStart": 52,
+                "columnEndExclusive": 117,
+                "text": "docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 17,
+                "columnStart": 52,
+                "columnEndExclusive": 117,
+                "text": "docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state"
+              }
+            ],
+            "matchedExpression": "docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state",
+            "logicalReference": "docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state",
+            "disposition": "patch",
+            "diffHunk": "@@ -12,17 +12,17 @@",
+            "reason": "A51, L12-7/30/31/32/58: Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/platform/platform-foundations.md",
+            "anchor": "l1-hai-vật-lý-của-tri-thức-log-vs-state",
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/platform-foundations.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-040",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 17,
+                "matchedExpression": "docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state",
+                "originalLineText": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+              }
+            ]
+          },
+          {
+            "edgeId": "instructions-041",
+            "slotKey": "{\"edgeId\":\"instructions-041\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-041\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":18}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-041",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 18
+              }
+            ],
+            "consumerFile": "core/instructions/platform-laws.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 18,
+                "columnStart": 40,
+                "columnEndExclusive": 95,
+                "text": "docs/platform-foundations.md#l2--kin-trc-memory-hai-tng"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 18,
+                "columnStart": 40,
+                "columnEndExclusive": 95,
+                "text": "docs/platform-foundations.md#l2--kin-trc-memory-hai-tng"
+              }
+            ],
+            "matchedExpression": "docs/platform-foundations.md#l2--kin-trc-memory-hai-tng",
+            "logicalReference": "docs/platform-foundations.md#l2--kin-trc-memory-hai-tng",
+            "disposition": "patch",
+            "diffHunk": "@@ -12,17 +12,17 @@",
+            "reason": "A51, L12-7/30/31/32/58: Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/platform/platform-foundations.md",
+            "anchor": "l2-kiến-trúc-memory-hai-tầng",
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/platform-foundations.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-041",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 18,
+                "matchedExpression": "docs/platform-foundations.md#l2--kin-trc-memory-hai-tng",
+                "originalLineText": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+              }
+            ]
+          },
+          {
+            "edgeId": "instructions-042",
+            "slotKey": "{\"edgeId\":\"instructions-042\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-042\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":19}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-042",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 19
+              }
+            ],
+            "consumerFile": "core/instructions/platform-laws.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 19,
+                "columnStart": 52,
+                "columnEndExclusive": 117,
+                "text": "docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 19,
+                "columnStart": 52,
+                "columnEndExclusive": 117,
+                "text": "docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view"
+              }
+            ],
+            "matchedExpression": "docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view",
+            "logicalReference": "docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view",
+            "disposition": "patch",
+            "diffHunk": "@@ -12,17 +12,17 @@",
+            "reason": "A51, L12-7/30/31/32/58: Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/platform/platform-foundations.md",
+            "anchor": "l3-luật-store-truth-ở-jsonl-db-là-view",
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/platform-foundations.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-042",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 19,
+                "matchedExpression": "docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view",
+                "originalLineText": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+              }
+            ]
+          },
+          {
+            "edgeId": "instructions-043",
+            "slotKey": "{\"edgeId\":\"instructions-043\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-043\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":20}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-043",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 20
+              }
+            ],
+            "consumerFile": "core/instructions/platform-laws.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 20,
+                "columnStart": 61,
+                "columnEndExclusive": 138,
+                "text": "docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 20,
+                "columnStart": 61,
+                "columnEndExclusive": 138,
+                "text": "docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface"
+              }
+            ],
+            "matchedExpression": "docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface",
+            "logicalReference": "docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface",
+            "disposition": "patch",
+            "diffHunk": "@@ -12,17 +12,17 @@",
+            "reason": "A51, L12-7/30/31/32/58: Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/platform/platform-foundations.md",
+            "anchor": "l4-routing-model-theo-audience-của-từng-interface",
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/platform-foundations.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-043",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 20,
+                "matchedExpression": "docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface",
+                "originalLineText": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+              }
+            ]
+          },
+          {
+            "edgeId": "instructions-044",
+            "slotKey": "{\"edgeId\":\"instructions-044\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-044\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":21}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-044",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 21
+              }
+            ],
+            "consumerFile": "core/instructions/platform-laws.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 21,
+                "columnStart": 46,
+                "columnEndExclusive": 106,
+                "text": "docs/platform-foundations.md#l5--definition-of-done-su-cu-hi"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 21,
+                "columnStart": 46,
+                "columnEndExclusive": 106,
+                "text": "docs/platform-foundations.md#l5--definition-of-done-su-cu-hi"
+              }
+            ],
+            "matchedExpression": "docs/platform-foundations.md#l5--definition-of-done-su-cu-hi",
+            "logicalReference": "docs/platform-foundations.md#l5--definition-of-done-su-cu-hi",
+            "disposition": "patch",
+            "diffHunk": "@@ -12,17 +12,17 @@",
+            "reason": "A51, L12-7/30/31/32/58: Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/platform/platform-foundations.md",
+            "anchor": "l5-definition-of-done-sáu-câu-hỏi",
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/platform-foundations.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-044",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 21,
+                "matchedExpression": "docs/platform-foundations.md#l5--definition-of-done-su-cu-hi",
+                "originalLineText": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+              }
+            ]
+          },
+          {
+            "edgeId": "instructions-045",
+            "slotKey": "{\"edgeId\":\"instructions-045\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-045\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":22}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-045",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 22
+              }
+            ],
+            "consumerFile": "core/instructions/platform-laws.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 22,
+                "columnStart": 36,
+                "columnEndExclusive": 89,
+                "text": "docs/platform-foundations.md#l6--maturity-ladder-f0f5"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 22,
+                "columnStart": 36,
+                "columnEndExclusive": 89,
+                "text": "docs/platform-foundations.md#l6--maturity-ladder-f0f5"
+              }
+            ],
+            "matchedExpression": "docs/platform-foundations.md#l6--maturity-ladder-f0f5",
+            "logicalReference": "docs/platform-foundations.md#l6--maturity-ladder-f0f5",
+            "disposition": "patch",
+            "diffHunk": "@@ -12,17 +12,17 @@",
+            "reason": "A51, L12-7/30/31/32/58: Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/platform/platform-foundations.md",
+            "anchor": "l6-maturity-ladder-f0f5",
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/platform-foundations.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-045",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 22,
+                "matchedExpression": "docs/platform-foundations.md#l6--maturity-ladder-f0f5",
+                "originalLineText": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+              }
+            ]
+          },
+          {
+            "edgeId": "instructions-046",
+            "slotKey": "{\"edgeId\":\"instructions-046\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-046\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":23}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-046",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 23
+              }
+            ],
+            "consumerFile": "core/instructions/platform-laws.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 23,
+                "columnStart": 32,
+                "columnEndExclusive": 82,
+                "text": "docs/platform-foundations.md#l7--durability-ladder"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 23,
+                "columnStart": 32,
+                "columnEndExclusive": 82,
+                "text": "docs/platform-foundations.md#l7--durability-ladder"
+              }
+            ],
+            "matchedExpression": "docs/platform-foundations.md#l7--durability-ladder",
+            "logicalReference": "docs/platform-foundations.md#l7--durability-ladder",
+            "disposition": "patch",
+            "diffHunk": "@@ -12,17 +12,17 @@",
+            "reason": "A51, L12-7/30/31/32/58: Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/platform/platform-foundations.md",
+            "anchor": "l7-durability-ladder",
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/platform-foundations.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-046",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 23,
+                "matchedExpression": "docs/platform-foundations.md#l7--durability-ladder",
+                "originalLineText": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+              }
+            ]
+          },
+          {
+            "edgeId": "instructions-047",
+            "slotKey": "{\"edgeId\":\"instructions-047\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-047\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":24}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-047",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 24
+              }
+            ],
+            "consumerFile": "core/instructions/platform-laws.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 24,
+                "columnStart": 60,
+                "columnEndExclusive": 136,
+                "text": "docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 24,
+                "columnStart": 60,
+                "columnEndExclusive": 136,
+                "text": "docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer"
+              }
+            ],
+            "matchedExpression": "docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer",
+            "logicalReference": "docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer",
+            "disposition": "patch",
+            "diffHunk": "@@ -12,17 +12,17 @@",
+            "reason": "A51, L12-7/30/31/32/58: Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/platform/platform-foundations.md",
+            "anchor": "l8-doctrine-placement-rule-always-loaded-layer",
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/platform-foundations.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-047",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 24,
+                "matchedExpression": "docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer",
+                "originalLineText": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+              }
+            ]
+          },
+          {
+            "edgeId": "instructions-048",
+            "slotKey": "{\"edgeId\":\"instructions-048\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-048\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":25}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-048",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 25
+              }
+            ],
+            "consumerFile": "core/instructions/platform-laws.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 25,
+                "columnStart": 65,
+                "columnEndExclusive": 140,
+                "text": "docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 25,
+                "columnStart": 65,
+                "columnEndExclusive": 140,
+                "text": "docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable"
+              }
+            ],
+            "matchedExpression": "docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable",
+            "logicalReference": "docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable",
+            "disposition": "patch",
+            "diffHunk": "@@ -12,17 +12,17 @@",
+            "reason": "A51, L12-7/30/31/32/58: Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/platform/platform-foundations.md",
+            "anchor": "l9-thang-hoàn-tất-của-một-việc-run-merge-durable",
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/platform-foundations.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-048",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 25,
+                "matchedExpression": "docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable",
+                "originalLineText": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)"
+              }
+            ]
+          },
+          {
+            "edgeId": "instructions-049",
+            "slotKey": "{\"edgeId\":\"instructions-049\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-049\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":26}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-049",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 26
+              }
+            ],
+            "consumerFile": "core/instructions/platform-laws.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 26,
+                "columnStart": 78,
+                "columnEndExclusive": 164,
+                "text": "docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 26,
+                "columnStart": 78,
+                "columnEndExclusive": 164,
+                "text": "docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca"
+              }
+            ],
+            "matchedExpression": "docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca",
+            "logicalReference": "docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca",
+            "disposition": "patch",
+            "diffHunk": "@@ -12,17 +12,17 @@",
+            "reason": "A51, L12-7/30/31/32/58: Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/platform/platform-foundations.md",
+            "anchor": "l10-add-through-not-alongside-mở-rộng-qua-cửa-không-đắp-cạnh-cửa",
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/platform-foundations.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-049",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 26,
+                "matchedExpression": "docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca",
+                "originalLineText": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)"
+              }
+            ]
+          },
+          {
+            "edgeId": "instructions-050",
+            "slotKey": "{\"edgeId\":\"instructions-050\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-050\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":28}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-050",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 28
+              }
+            ],
+            "consumerFile": "core/instructions/platform-laws.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 28,
+                "columnStart": 107,
+                "columnEndExclusive": 135,
+                "text": "docs/platform-foundations.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 28,
+                "columnStart": 107,
+                "columnEndExclusive": 135,
+                "text": "docs/platform-foundations.md"
+              }
+            ],
+            "matchedExpression": "docs/platform-foundations.md",
+            "logicalReference": "docs/platform-foundations.md",
+            "disposition": "patch",
+            "diffHunk": "@@ -12,17 +12,17 @@",
+            "reason": "A51, L12-7/30/31/32/58: Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/platform/platform-foundations.md",
+            "anchor": "luật-nền-platform-forgent-phase-0-compound-learning-stack",
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/platform-foundations.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-instructions.json",
+                "edgeId": "instructions-050",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 28,
+                "matchedExpression": "docs/platform-foundations.md",
+                "originalLineText": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {
+              "{\"edgeId\":\"instructions-039\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-039\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":15}]}": "read-only citation; no writer/default-root/schema/identity change",
+              "{\"edgeId\":\"instructions-040\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-040\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":17}]}": "read-only citation; no writer/default-root/schema/identity change",
+              "{\"edgeId\":\"instructions-041\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-041\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":18}]}": "read-only citation; no writer/default-root/schema/identity change",
+              "{\"edgeId\":\"instructions-042\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-042\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":19}]}": "read-only citation; no writer/default-root/schema/identity change",
+              "{\"edgeId\":\"instructions-043\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-043\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":20}]}": "read-only citation; no writer/default-root/schema/identity change",
+              "{\"edgeId\":\"instructions-044\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-044\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":21}]}": "read-only citation; no writer/default-root/schema/identity change",
+              "{\"edgeId\":\"instructions-045\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-045\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":22}]}": "read-only citation; no writer/default-root/schema/identity change",
+              "{\"edgeId\":\"instructions-046\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-046\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":23}]}": "read-only citation; no writer/default-root/schema/identity change",
+              "{\"edgeId\":\"instructions-047\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-047\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":24}]}": "read-only citation; no writer/default-root/schema/identity change",
+              "{\"edgeId\":\"instructions-048\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-048\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":25}]}": "read-only citation; no writer/default-root/schema/identity change",
+              "{\"edgeId\":\"instructions-049\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-049\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":26}]}": "read-only citation; no writer/default-root/schema/identity change",
+              "{\"edgeId\":\"instructions-050\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-050\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":28}]}": "read-only citation; no writer/default-root/schema/identity change"
+            },
+            "descriptionTruth": {
+              "{\"edgeId\":\"instructions-039\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-039\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":15}]}": {
+                "sourcePassage": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:",
+                "adjacentPassage": "Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:",
+                "target": "docs/platform/platform-foundations.md",
+                "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+                "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+                "targetEvidence": [
+                  {
+                    "line": 86,
+                    "text": "## Luật nền platform forgent (Phase 0 — compound-learning stack)"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  }
+                },
+                "assessment": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+              },
+              "{\"edgeId\":\"instructions-040\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-040\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":17}]}": {
+                "sourcePassage": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)",
+                "adjacentPassage": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)",
+                "target": "docs/platform/platform-foundations.md",
+                "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+                "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+                "targetEvidence": [
+                  {
+                    "line": 113,
+                    "text": "### L1 — Hai vật lý của tri thức: Log vs State"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  }
+                },
+                "assessment": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+              },
+              "{\"edgeId\":\"instructions-041\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-041\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":18}]}": {
+                "sourcePassage": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)",
+                "adjacentPassage": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)",
+                "target": "docs/platform/platform-foundations.md",
+                "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+                "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+                "targetEvidence": [
+                  {
+                    "line": 137,
+                    "text": "### L2 — Kiến trúc memory hai tầng"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  }
+                },
+                "assessment": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+              },
+              "{\"edgeId\":\"instructions-042\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-042\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":19}]}": {
+                "sourcePassage": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)",
+                "adjacentPassage": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)",
+                "target": "docs/platform/platform-foundations.md",
+                "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+                "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+                "targetEvidence": [
+                  {
+                    "line": 165,
+                    "text": "### L3 — Luật store: truth ở JSONL, db là view"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  }
+                },
+                "assessment": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+              },
+              "{\"edgeId\":\"instructions-043\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-043\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":20}]}": {
+                "sourcePassage": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)",
+                "adjacentPassage": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)",
+                "target": "docs/platform/platform-foundations.md",
+                "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+                "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+                "targetEvidence": [
+                  {
+                    "line": 195,
+                    "text": "### L4 — Routing model theo audience của từng interface"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  }
+                },
+                "assessment": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+              },
+              "{\"edgeId\":\"instructions-044\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-044\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":21}]}": {
+                "sourcePassage": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)",
+                "adjacentPassage": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)",
+                "target": "docs/platform/platform-foundations.md",
+                "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+                "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+                "targetEvidence": [
+                  {
+                    "line": 222,
+                    "text": "### L5 — Definition of done: sáu câu hỏi"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  }
+                },
+                "assessment": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+              },
+              "{\"edgeId\":\"instructions-045\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-045\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":22}]}": {
+                "sourcePassage": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)",
+                "adjacentPassage": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)",
+                "target": "docs/platform/platform-foundations.md",
+                "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+                "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+                "targetEvidence": [
+                  {
+                    "line": 239,
+                    "text": "### L6 — Maturity ladder F0–F5"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  }
+                },
+                "assessment": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+              },
+              "{\"edgeId\":\"instructions-046\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-046\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":23}]}": {
+                "sourcePassage": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)",
+                "adjacentPassage": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)",
+                "target": "docs/platform/platform-foundations.md",
+                "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+                "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+                "targetEvidence": [
+                  {
+                    "line": 267,
+                    "text": "### L7 — Durability ladder"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  }
+                },
+                "assessment": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+              },
+              "{\"edgeId\":\"instructions-047\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-047\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":24}]}": {
+                "sourcePassage": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)",
+                "adjacentPassage": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)",
+                "target": "docs/platform/platform-foundations.md",
+                "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+                "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+                "targetEvidence": [
+                  {
+                    "line": 285,
+                    "text": "### L8 — Doctrine placement rule (always-loaded layer)"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  }
+                },
+                "assessment": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+              },
+              "{\"edgeId\":\"instructions-048\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-048\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":25}]}": {
+                "sourcePassage": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)",
+                "adjacentPassage": "- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)",
+                "target": "docs/platform/platform-foundations.md",
+                "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+                "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+                "targetEvidence": [
+                  {
+                    "line": 309,
+                    "text": "### L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  }
+                },
+                "assessment": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+              },
+              "{\"edgeId\":\"instructions-049\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-049\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":26}]}": {
+                "sourcePassage": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)",
+                "adjacentPassage": "- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)",
+                "target": "docs/platform/platform-foundations.md",
+                "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+                "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+                "targetEvidence": [
+                  {
+                    "line": 339,
+                    "text": "### L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  }
+                },
+                "assessment": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+              },
+              "{\"edgeId\":\"instructions-050\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-050\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":28}]}": {
+                "sourcePassage": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place.",
+                "adjacentPassage": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place.",
+                "target": "docs/platform/platform-foundations.md",
+                "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+                "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+                "targetEvidence": [
+                  {
+                    "line": 86,
+                    "text": "## Luật nền platform forgent (Phase 0 — compound-learning stack)"
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+                  }
+                },
+                "assessment": "Candidate carries the full locked-law text. The specific law citation retains its own heading; the DoD entry selects L5; generic law ownership selects the complete law-body heading. L12-54(2) treats this law body as live."
+              }
+            },
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {
+            "{\"edgeId\":\"instructions-039\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-039\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":15}]}": {
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+              "passage": "## Luật nền platform forgent (Phase 0 — compound-learning stack)",
+              "targetEvidenceLine": 86,
+              "sourceLocatorTokens": [],
+              "targetLines": [
+                86
+              ],
+              "targetLineText": [
+                "## Luật nền platform forgent (Phase 0 — compound-learning stack)"
+              ]
+            },
+            "{\"edgeId\":\"instructions-040\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-040\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":17}]}": {
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+              "passage": "### L1 — Hai vật lý của tri thức: Log vs State",
+              "targetEvidenceLine": 113,
+              "sourceLocatorTokens": [],
+              "targetLines": [
+                113
+              ],
+              "targetLineText": [
+                "### L1 — Hai vật lý của tri thức: Log vs State"
+              ]
+            },
+            "{\"edgeId\":\"instructions-041\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-041\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":18}]}": {
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+              "passage": "### L2 — Kiến trúc memory hai tầng",
+              "targetEvidenceLine": 137,
+              "sourceLocatorTokens": [],
+              "targetLines": [
+                137
+              ],
+              "targetLineText": [
+                "### L2 — Kiến trúc memory hai tầng"
+              ]
+            },
+            "{\"edgeId\":\"instructions-042\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-042\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":19}]}": {
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+              "passage": "### L3 — Luật store: truth ở JSONL, db là view",
+              "targetEvidenceLine": 165,
+              "sourceLocatorTokens": [],
+              "targetLines": [
+                165
+              ],
+              "targetLineText": [
+                "### L3 — Luật store: truth ở JSONL, db là view"
+              ]
+            },
+            "{\"edgeId\":\"instructions-043\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-043\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":20}]}": {
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+              "passage": "### L4 — Routing model theo audience của từng interface",
+              "targetEvidenceLine": 195,
+              "sourceLocatorTokens": [],
+              "targetLines": [
+                195
+              ],
+              "targetLineText": [
+                "### L4 — Routing model theo audience của từng interface"
+              ]
+            },
+            "{\"edgeId\":\"instructions-044\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-044\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":21}]}": {
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+              "passage": "### L5 — Definition of done: sáu câu hỏi",
+              "targetEvidenceLine": 222,
+              "sourceLocatorTokens": [],
+              "targetLines": [
+                222
+              ],
+              "targetLineText": [
+                "### L5 — Definition of done: sáu câu hỏi"
+              ]
+            },
+            "{\"edgeId\":\"instructions-045\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-045\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":22}]}": {
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+              "passage": "### L6 — Maturity ladder F0–F5",
+              "targetEvidenceLine": 239,
+              "sourceLocatorTokens": [],
+              "targetLines": [
+                239
+              ],
+              "targetLineText": [
+                "### L6 — Maturity ladder F0–F5"
+              ]
+            },
+            "{\"edgeId\":\"instructions-046\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-046\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":23}]}": {
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+              "passage": "### L7 — Durability ladder",
+              "targetEvidenceLine": 267,
+              "sourceLocatorTokens": [],
+              "targetLines": [
+                267
+              ],
+              "targetLineText": [
+                "### L7 — Durability ladder"
+              ]
+            },
+            "{\"edgeId\":\"instructions-047\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-047\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":24}]}": {
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+              "passage": "### L8 — Doctrine placement rule (always-loaded layer)",
+              "targetEvidenceLine": 285,
+              "sourceLocatorTokens": [],
+              "targetLines": [
+                285
+              ],
+              "targetLineText": [
+                "### L8 — Doctrine placement rule (always-loaded layer)"
+              ]
+            },
+            "{\"edgeId\":\"instructions-048\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-048\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":25}]}": {
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+              "passage": "### L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable",
+              "targetEvidenceLine": 309,
+              "sourceLocatorTokens": [],
+              "targetLines": [
+                309
+              ],
+              "targetLineText": [
+                "### L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable"
+              ]
+            },
+            "{\"edgeId\":\"instructions-049\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-049\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":26}]}": {
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+              "passage": "### L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa",
+              "targetEvidenceLine": 339,
+              "sourceLocatorTokens": [],
+              "targetLines": [
+                339
+              ],
+              "targetLineText": [
+                "### L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa"
+              ]
+            },
+            "{\"edgeId\":\"instructions-050\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-050\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":28}]}": {
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+              "passage": "## Luật nền platform forgent (Phase 0 — compound-learning stack)",
+              "targetEvidenceLine": 86,
+              "sourceLocatorTokens": [],
+              "targetLines": [
+                86
+              ],
+              "targetLineText": [
+                "## Luật nền platform forgent (Phase 0 — compound-learning stack)"
+              ]
+            }
+          },
+          "relativeResolution": {
+            "{\"edgeId\":\"instructions-039\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-039\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":15}]}": {
+              "replacement": "docs/platform/platform-foundations.md#luật-nền-platform-forgent-phase-0-compound-learning-stack",
+              "resolvedTarget": "docs/platform/platform-foundations.md",
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "authorityStatus": "cutover-patch-only"
+            },
+            "{\"edgeId\":\"instructions-040\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-040\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":17}]}": {
+              "replacement": "docs/platform/platform-foundations.md#l1-hai-vật-lý-của-tri-thức-log-vs-state",
+              "resolvedTarget": "docs/platform/platform-foundations.md",
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "authorityStatus": "cutover-patch-only"
+            },
+            "{\"edgeId\":\"instructions-041\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-041\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":18}]}": {
+              "replacement": "docs/platform/platform-foundations.md#l2-kiến-trúc-memory-hai-tầng",
+              "resolvedTarget": "docs/platform/platform-foundations.md",
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "authorityStatus": "cutover-patch-only"
+            },
+            "{\"edgeId\":\"instructions-042\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-042\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":19}]}": {
+              "replacement": "docs/platform/platform-foundations.md#l3-luật-store-truth-ở-jsonl-db-là-view",
+              "resolvedTarget": "docs/platform/platform-foundations.md",
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "authorityStatus": "cutover-patch-only"
+            },
+            "{\"edgeId\":\"instructions-043\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-043\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":20}]}": {
+              "replacement": "docs/platform/platform-foundations.md#l4-routing-model-theo-audience-của-từng-interface",
+              "resolvedTarget": "docs/platform/platform-foundations.md",
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "authorityStatus": "cutover-patch-only"
+            },
+            "{\"edgeId\":\"instructions-044\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-044\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":21}]}": {
+              "replacement": "docs/platform/platform-foundations.md#l5-definition-of-done-sáu-câu-hỏi",
+              "resolvedTarget": "docs/platform/platform-foundations.md",
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "authorityStatus": "cutover-patch-only"
+            },
+            "{\"edgeId\":\"instructions-045\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-045\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":22}]}": {
+              "replacement": "docs/platform/platform-foundations.md#l6-maturity-ladder-f0f5",
+              "resolvedTarget": "docs/platform/platform-foundations.md",
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "authorityStatus": "cutover-patch-only"
+            },
+            "{\"edgeId\":\"instructions-046\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-046\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":23}]}": {
+              "replacement": "docs/platform/platform-foundations.md#l7-durability-ladder",
+              "resolvedTarget": "docs/platform/platform-foundations.md",
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "authorityStatus": "cutover-patch-only"
+            },
+            "{\"edgeId\":\"instructions-047\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-047\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":24}]}": {
+              "replacement": "docs/platform/platform-foundations.md#l8-doctrine-placement-rule-always-loaded-layer",
+              "resolvedTarget": "docs/platform/platform-foundations.md",
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "authorityStatus": "cutover-patch-only"
+            },
+            "{\"edgeId\":\"instructions-048\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-048\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":25}]}": {
+              "replacement": "docs/platform/platform-foundations.md#l9-thang-hoàn-tất-của-một-việc-run-merge-durable",
+              "resolvedTarget": "docs/platform/platform-foundations.md",
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "authorityStatus": "cutover-patch-only"
+            },
+            "{\"edgeId\":\"instructions-049\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-049\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":26}]}": {
+              "replacement": "docs/platform/platform-foundations.md#l10-add-through-not-alongside-mở-rộng-qua-cửa-không-đắp-cạnh-cửa",
+              "resolvedTarget": "docs/platform/platform-foundations.md",
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "authorityStatus": "cutover-patch-only"
+            },
+            "{\"edgeId\":\"instructions-050\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-050\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":28}]}": {
+              "replacement": "docs/platform/platform-foundations.md#luật-nền-platform-forgent-phase-0-compound-learning-stack",
+              "resolvedTarget": "docs/platform/platform-foundations.md",
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "authorityStatus": "cutover-patch-only"
+            }
+          },
+          "labelForm": {
+            "{\"edgeId\":\"instructions-039\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-039\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":15}]}": {
+              "source": "docs/platform-foundations.md",
+              "replacement": "docs/platform/platform-foundations.md#luật-nền-platform-forgent-phase-0-compound-learning-stack",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            },
+            "{\"edgeId\":\"instructions-040\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-040\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":17}]}": {
+              "source": "docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state",
+              "replacement": "docs/platform/platform-foundations.md#l1-hai-vật-lý-của-tri-thức-log-vs-state",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            },
+            "{\"edgeId\":\"instructions-041\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-041\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":18}]}": {
+              "source": "docs/platform-foundations.md#l2--kin-trc-memory-hai-tng",
+              "replacement": "docs/platform/platform-foundations.md#l2-kiến-trúc-memory-hai-tầng",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            },
+            "{\"edgeId\":\"instructions-042\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-042\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":19}]}": {
+              "source": "docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view",
+              "replacement": "docs/platform/platform-foundations.md#l3-luật-store-truth-ở-jsonl-db-là-view",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            },
+            "{\"edgeId\":\"instructions-043\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-043\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":20}]}": {
+              "source": "docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface",
+              "replacement": "docs/platform/platform-foundations.md#l4-routing-model-theo-audience-của-từng-interface",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            },
+            "{\"edgeId\":\"instructions-044\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-044\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":21}]}": {
+              "source": "docs/platform-foundations.md#l5--definition-of-done-su-cu-hi",
+              "replacement": "docs/platform/platform-foundations.md#l5-definition-of-done-sáu-câu-hỏi",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            },
+            "{\"edgeId\":\"instructions-045\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-045\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":22}]}": {
+              "source": "docs/platform-foundations.md#l6--maturity-ladder-f0f5",
+              "replacement": "docs/platform/platform-foundations.md#l6-maturity-ladder-f0f5",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            },
+            "{\"edgeId\":\"instructions-046\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-046\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":23}]}": {
+              "source": "docs/platform-foundations.md#l7--durability-ladder",
+              "replacement": "docs/platform/platform-foundations.md#l7-durability-ladder",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            },
+            "{\"edgeId\":\"instructions-047\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-047\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":24}]}": {
+              "source": "docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer",
+              "replacement": "docs/platform/platform-foundations.md#l8-doctrine-placement-rule-always-loaded-layer",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            },
+            "{\"edgeId\":\"instructions-048\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-048\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":25}]}": {
+              "source": "docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable",
+              "replacement": "docs/platform/platform-foundations.md#l9-thang-hoàn-tất-của-một-việc-run-merge-durable",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            },
+            "{\"edgeId\":\"instructions-049\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-049\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":26}]}": {
+              "source": "docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca",
+              "replacement": "docs/platform/platform-foundations.md#l10-add-through-not-alongside-mở-rộng-qua-cửa-không-đắp-cạnh-cửa",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            },
+            "{\"edgeId\":\"instructions-050\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-050\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":28}]}": {
+              "source": "docs/platform-foundations.md",
+              "replacement": "docs/platform/platform-foundations.md#luật-nền-platform-forgent-phase-0-compound-learning-stack",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            }
+          }
+        },
+        "reviewSet": "step04-009",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [
+          {
+            "sourcePath": "core/instructions/platform-laws.md",
+            "sourceDigest": "4b834fa5ea7db1d9637a3126a7a96f7758be2f1650131411c4e69b3a91ac6f90",
+            "renderFiles": [
+              {
+                "path": "AGENTS.md",
+                "digest": "898a34841eece4742d6441e704f2c0fef14cf800b4e6a62f879fef5dba2130e1",
+                "sourceDigest": "4b834fa5ea7db1d9637a3126a7a96f7758be2f1650131411c4e69b3a91ac6f90",
+                "generatedBlockRange": {
+                  "startLine": 317,
+                  "endLine": 396
+                },
+                "sourceHeaderWitnesses": [
+                  {
+                    "line": 337,
+                    "text": "- source: `core/instructions/platform-laws.md`"
+                  }
+                ],
+                "renderOnly": true,
+                "generationDoor": "existing instruction registry/composition/projection door; exact implementation invocation is Step5 responsibility",
+                "generationRun": null,
+                "existingEdgeJoins": [
+                  {
+                    "edgeId": "instructions-025",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-instructions.json",
+                        "edgeId": "instructions-025",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 339
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-line-correspondence",
+                      "oldLine": 339,
+                      "line": 341,
+                      "columnStart": 37,
+                      "columnEndExclusive": 65,
+                      "text": "docs/platform-foundations.md"
+                    }
+                  },
+                  {
+                    "edgeId": "instructions-026",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-instructions.json",
+                        "edgeId": "instructions-026",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 341
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-line-correspondence",
+                      "oldLine": 341,
+                      "line": 343,
+                      "columnStart": 52,
+                      "columnEndExclusive": 117,
+                      "text": "docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state"
+                    }
+                  },
+                  {
+                    "edgeId": "instructions-027",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-instructions.json",
+                        "edgeId": "instructions-027",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 342
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-line-correspondence",
+                      "oldLine": 342,
+                      "line": 344,
+                      "columnStart": 40,
+                      "columnEndExclusive": 95,
+                      "text": "docs/platform-foundations.md#l2--kin-trc-memory-hai-tng"
+                    }
+                  },
+                  {
+                    "edgeId": "instructions-028",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-instructions.json",
+                        "edgeId": "instructions-028",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 343
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-line-correspondence",
+                      "oldLine": 343,
+                      "line": 345,
+                      "columnStart": 52,
+                      "columnEndExclusive": 117,
+                      "text": "docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view"
+                    }
+                  },
+                  {
+                    "edgeId": "instructions-029",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-instructions.json",
+                        "edgeId": "instructions-029",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 344
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-line-correspondence",
+                      "oldLine": 344,
+                      "line": 346,
+                      "columnStart": 61,
+                      "columnEndExclusive": 138,
+                      "text": "docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface"
+                    }
+                  },
+                  {
+                    "edgeId": "instructions-030",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-instructions.json",
+                        "edgeId": "instructions-030",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 345
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-line-correspondence",
+                      "oldLine": 345,
+                      "line": 347,
+                      "columnStart": 46,
+                      "columnEndExclusive": 106,
+                      "text": "docs/platform-foundations.md#l5--definition-of-done-su-cu-hi"
+                    }
+                  },
+                  {
+                    "edgeId": "instructions-031",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-instructions.json",
+                        "edgeId": "instructions-031",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 346
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-line-correspondence",
+                      "oldLine": 346,
+                      "line": 348,
+                      "columnStart": 36,
+                      "columnEndExclusive": 89,
+                      "text": "docs/platform-foundations.md#l6--maturity-ladder-f0f5"
+                    }
+                  },
+                  {
+                    "edgeId": "instructions-032",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-instructions.json",
+                        "edgeId": "instructions-032",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 347
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-line-correspondence",
+                      "oldLine": 347,
+                      "line": 349,
+                      "columnStart": 32,
+                      "columnEndExclusive": 82,
+                      "text": "docs/platform-foundations.md#l7--durability-ladder"
+                    }
+                  },
+                  {
+                    "edgeId": "instructions-033",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-instructions.json",
+                        "edgeId": "instructions-033",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 348
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-line-correspondence",
+                      "oldLine": 348,
+                      "line": 350,
+                      "columnStart": 60,
+                      "columnEndExclusive": 136,
+                      "text": "docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer"
+                    }
+                  },
+                  {
+                    "edgeId": "instructions-034",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-instructions.json",
+                        "edgeId": "instructions-034",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 349
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-line-correspondence",
+                      "oldLine": 349,
+                      "line": 351,
+                      "columnStart": 65,
+                      "columnEndExclusive": 140,
+                      "text": "docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable"
+                    }
+                  },
+                  {
+                    "edgeId": "instructions-035",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-instructions.json",
+                        "edgeId": "instructions-035",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 350
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-line-correspondence",
+                      "oldLine": 350,
+                      "line": 352,
+                      "columnStart": 78,
+                      "columnEndExclusive": 164,
+                      "text": "docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca"
+                    }
+                  },
+                  {
+                    "edgeId": "instructions-036",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-instructions.json",
+                        "edgeId": "instructions-036",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 352
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-line-correspondence",
+                      "oldLine": 352,
+                      "line": 354,
+                      "columnStart": 107,
+                      "columnEndExclusive": 135,
+                      "text": "docs/platform-foundations.md"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "wholeFileRead": {
+          "file": "core/instructions/platform-laws.md",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "4b834fa5ea7db1d9637a3126a7a96f7758be2f1650131411c4e69b3a91ac6f90",
+          "bytes": 1888,
+          "lines": 28,
+          "headings": [
+            {
+              "line": 13,
+              "text": "# Platform Operating Laws"
+            }
+          ],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {
+        "docs/platform/platform-foundations.md": [
+          {
+            "edgeSlot": "{\"edgeId\":\"instructions-039\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-039\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":15}]}",
+            "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+            "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+            "passage": "## Luật nền platform forgent (Phase 0 — compound-learning stack)",
+            "targetEvidenceLine": 86,
+            "sourceLocatorTokens": [],
+            "targetLines": [
+              86
+            ],
+            "targetLineText": [
+              "## Luật nền platform forgent (Phase 0 — compound-learning stack)"
+            ]
+          },
+          {
+            "edgeSlot": "{\"edgeId\":\"instructions-040\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-040\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":17}]}",
+            "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+            "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+            "passage": "### L1 — Hai vật lý của tri thức: Log vs State",
+            "targetEvidenceLine": 113,
+            "sourceLocatorTokens": [],
+            "targetLines": [
+              113
+            ],
+            "targetLineText": [
+              "### L1 — Hai vật lý của tri thức: Log vs State"
+            ]
+          },
+          {
+            "edgeSlot": "{\"edgeId\":\"instructions-041\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-041\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":18}]}",
+            "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+            "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+            "passage": "### L2 — Kiến trúc memory hai tầng",
+            "targetEvidenceLine": 137,
+            "sourceLocatorTokens": [],
+            "targetLines": [
+              137
+            ],
+            "targetLineText": [
+              "### L2 — Kiến trúc memory hai tầng"
+            ]
+          },
+          {
+            "edgeSlot": "{\"edgeId\":\"instructions-042\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-042\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":19}]}",
+            "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+            "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+            "passage": "### L3 — Luật store: truth ở JSONL, db là view",
+            "targetEvidenceLine": 165,
+            "sourceLocatorTokens": [],
+            "targetLines": [
+              165
+            ],
+            "targetLineText": [
+              "### L3 — Luật store: truth ở JSONL, db là view"
+            ]
+          },
+          {
+            "edgeSlot": "{\"edgeId\":\"instructions-043\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-043\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":20}]}",
+            "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+            "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+            "passage": "### L4 — Routing model theo audience của từng interface",
+            "targetEvidenceLine": 195,
+            "sourceLocatorTokens": [],
+            "targetLines": [
+              195
+            ],
+            "targetLineText": [
+              "### L4 — Routing model theo audience của từng interface"
+            ]
+          },
+          {
+            "edgeSlot": "{\"edgeId\":\"instructions-044\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-044\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":21}]}",
+            "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+            "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+            "passage": "### L5 — Definition of done: sáu câu hỏi",
+            "targetEvidenceLine": 222,
+            "sourceLocatorTokens": [],
+            "targetLines": [
+              222
+            ],
+            "targetLineText": [
+              "### L5 — Definition of done: sáu câu hỏi"
+            ]
+          },
+          {
+            "edgeSlot": "{\"edgeId\":\"instructions-045\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-045\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":22}]}",
+            "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+            "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+            "passage": "### L6 — Maturity ladder F0–F5",
+            "targetEvidenceLine": 239,
+            "sourceLocatorTokens": [],
+            "targetLines": [
+              239
+            ],
+            "targetLineText": [
+              "### L6 — Maturity ladder F0–F5"
+            ]
+          },
+          {
+            "edgeSlot": "{\"edgeId\":\"instructions-046\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-046\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":23}]}",
+            "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+            "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+            "passage": "### L7 — Durability ladder",
+            "targetEvidenceLine": 267,
+            "sourceLocatorTokens": [],
+            "targetLines": [
+              267
+            ],
+            "targetLineText": [
+              "### L7 — Durability ladder"
+            ]
+          },
+          {
+            "edgeSlot": "{\"edgeId\":\"instructions-047\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-047\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":24}]}",
+            "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+            "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+            "passage": "### L8 — Doctrine placement rule (always-loaded layer)",
+            "targetEvidenceLine": 285,
+            "sourceLocatorTokens": [],
+            "targetLines": [
+              285
+            ],
+            "targetLineText": [
+              "### L8 — Doctrine placement rule (always-loaded layer)"
+            ]
+          },
+          {
+            "edgeSlot": "{\"edgeId\":\"instructions-048\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-048\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":25}]}",
+            "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+            "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+            "passage": "### L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable",
+            "targetEvidenceLine": 309,
+            "sourceLocatorTokens": [],
+            "targetLines": [
+              309
+            ],
+            "targetLineText": [
+              "### L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable"
+            ]
+          },
+          {
+            "edgeSlot": "{\"edgeId\":\"instructions-049\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-049\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":26}]}",
+            "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+            "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+            "passage": "### L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa",
+            "targetEvidenceLine": 339,
+            "sourceLocatorTokens": [],
+            "targetLines": [
+              339
+            ],
+            "targetLineText": [
+              "### L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa"
+            ]
+          },
+          {
+            "edgeSlot": "{\"edgeId\":\"instructions-050\",\"file\":\"core/instructions/platform-laws.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-050\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":28}]}",
+            "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+            "targetDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+            "passage": "## Luật nền platform forgent (Phase 0 — compound-learning stack)",
+            "targetEvidenceLine": 86,
+            "sourceLocatorTokens": [],
+            "targetLines": [
+              86
+            ],
+            "targetLineText": [
+              "## Luật nền platform forgent (Phase 0 — compound-learning stack)"
+            ]
+          }
+        ]
+      },
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    }
+  ]
+}

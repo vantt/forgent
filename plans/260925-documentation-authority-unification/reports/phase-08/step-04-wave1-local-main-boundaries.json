@@ -1,0 +1,146 @@
+[
+  {
+    "set": "step04-001",
+    "checkedAt": "2026-10-20T10:27:17.243350+00:00",
+    "localMain": "7c341fd55bb5e9d4ecc2126794d533f55d7aa7f7",
+    "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+    "consumerDiffVsMain": [],
+    "newMainConsumerCommits": [],
+    "method": "Post-authoring boundary replay against local main only; no pull/merge/rebinding. Authored bytes remain fixed at author input; later rebind at Step 7 under L12-58(1). Not a claim that earlier boundaries were checked contemporaneously."
+  },
+  {
+    "set": "step04-002",
+    "checkedAt": "2026-10-20T10:27:17.248195+00:00",
+    "localMain": "7c341fd55bb5e9d4ecc2126794d533f55d7aa7f7",
+    "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+    "consumerDiffVsMain": [],
+    "newMainConsumerCommits": [],
+    "method": "Post-authoring boundary replay against local main only; no pull/merge/rebinding. Authored bytes remain fixed at author input; later rebind at Step 7 under L12-58(1). Not a claim that earlier boundaries were checked contemporaneously."
+  },
+  {
+    "set": "step04-003",
+    "checkedAt": "2026-10-20T10:27:17.253513+00:00",
+    "localMain": "7c341fd55bb5e9d4ecc2126794d533f55d7aa7f7",
+    "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+    "consumerDiffVsMain": [],
+    "newMainConsumerCommits": [],
+    "method": "Post-authoring boundary replay against local main only; no pull/merge/rebinding. Authored bytes remain fixed at author input; later rebind at Step 7 under L12-58(1). Not a claim that earlier boundaries were checked contemporaneously."
+  },
+  {
+    "set": "step04-004",
+    "checkedAt": "2026-10-20T10:27:17.258715+00:00",
+    "localMain": "7c341fd55bb5e9d4ecc2126794d533f55d7aa7f7",
+    "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+    "consumerDiffVsMain": [],
+    "newMainConsumerCommits": [],
+    "method": "Post-authoring boundary replay against local main only; no pull/merge/rebinding. Authored bytes remain fixed at author input; later rebind at Step 7 under L12-58(1). Not a claim that earlier boundaries were checked contemporaneously."
+  },
+  {
+    "set": "step04-005",
+    "checkedAt": "2026-10-20T10:27:17.263395+00:00",
+    "localMain": "7c341fd55bb5e9d4ecc2126794d533f55d7aa7f7",
+    "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+    "consumerDiffVsMain": [],
+    "newMainConsumerCommits": [],
+    "method": "Post-authoring boundary replay against local main only; no pull/merge/rebinding. Authored bytes remain fixed at author input; later rebind at Step 7 under L12-58(1). Not a claim that earlier boundaries were checked contemporaneously."
+  },
+  {
+    "set": "step04-006",
+    "checkedAt": "2026-10-20T10:27:17.268260+00:00",
+    "localMain": "7c341fd55bb5e9d4ecc2126794d533f55d7aa7f7",
+    "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+    "consumerDiffVsMain": [],
+    "newMainConsumerCommits": [],
+    "method": "Post-authoring boundary replay against local main only; no pull/merge/rebinding. Authored bytes remain fixed at author input; later rebind at Step 7 under L12-58(1). Not a claim that earlier boundaries were checked contemporaneously."
+  },
+  {
+    "set": "step04-007",
+    "checkedAt": "2026-10-20T10:27:17.272993+00:00",
+    "localMain": "7c341fd55bb5e9d4ecc2126794d533f55d7aa7f7",
+    "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+    "consumerDiffVsMain": [],
+    "newMainConsumerCommits": [],
+    "method": "Post-authoring boundary replay against local main only; no pull/merge/rebinding. Authored bytes remain fixed at author input; later rebind at Step 7 under L12-58(1). Not a claim that earlier boundaries were checked contemporaneously."
+  },
+  {
+    "set": "step04-008",
+    "checkedAt": "2026-10-20T10:27:17.277639+00:00",
+    "localMain": "7c341fd55bb5e9d4ecc2126794d533f55d7aa7f7",
+    "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+    "consumerDiffVsMain": [],
+    "newMainConsumerCommits": [],
+    "method": "Post-authoring boundary replay against local main only; no pull/merge/rebinding. Authored bytes remain fixed at author input; later rebind at Step 7 under L12-58(1). Not a claim that earlier boundaries were checked contemporaneously."
+  },
+  {
+    "set": "step04-009",
+    "checkedAt": "2026-10-20T10:27:17.284584+00:00",
+    "localMain": "7c341fd55bb5e9d4ecc2126794d533f55d7aa7f7",
+    "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+    "consumerDiffVsMain": [],
+    "newMainConsumerCommits": [],
+    "method": "Post-authoring boundary replay against local main only; no pull/merge/rebinding. Authored bytes remain fixed at author input; later rebind at Step 7 under L12-58(1). Not a claim that earlier boundaries were checked contemporaneously."
+  },
+  {
+    "set": "step04-010",
+    "checkedAt": "2026-10-20T10:27:17.290360+00:00",
+    "localMain": "7c341fd55bb5e9d4ecc2126794d533f55d7aa7f7",
+    "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+    "consumerDiffVsMain": [],
+    "newMainConsumerCommits": [],
+    "method": "Post-authoring boundary replay against local main only; no pull/merge/rebinding. Authored bytes remain fixed at author input; later rebind at Step 7 under L12-58(1). Not a claim that earlier boundaries were checked contemporaneously."
+  },
+  {
+    "set": "step04-011",
+    "checkedAt": "2026-10-20T10:27:17.297592+00:00",
+    "localMain": "7c341fd55bb5e9d4ecc2126794d533f55d7aa7f7",
+    "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+    "consumerDiffVsMain": [],
+    "newMainConsumerCommits": [],
+    "method": "Post-authoring boundary replay against local main only; no pull/merge/rebinding. Authored bytes remain fixed at author input; later rebind at Step 7 under L12-58(1). Not a claim that earlier boundaries were checked contemporaneously."
+  },
+  {
+    "set": "step04-012",
+    "checkedAt": "2026-10-20T10:27:17.303769+00:00",
+    "localMain": "7c341fd55bb5e9d4ecc2126794d533f55d7aa7f7",
+    "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+    "consumerDiffVsMain": [],
+    "newMainConsumerCommits": [],
+    "method": "Post-authoring boundary replay against local main only; no pull/merge/rebinding. Authored bytes remain fixed at author input; later rebind at Step 7 under L12-58(1). Not a claim that earlier boundaries were checked contemporaneously."
+  },
+  {
+    "set": "step04-013",
+    "checkedAt": "2026-10-20T10:27:17.310508+00:00",
+    "localMain": "7c341fd55bb5e9d4ecc2126794d533f55d7aa7f7",
+    "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+    "consumerDiffVsMain": [],
+    "newMainConsumerCommits": [],
+    "method": "Post-authoring boundary replay against local main only; no pull/merge/rebinding. Authored bytes remain fixed at author input; later rebind at Step 7 under L12-58(1). Not a claim that earlier boundaries were checked contemporaneously."
+  },
+  {
+    "set": "step04-014",
+    "checkedAt": "2026-10-20T10:27:17.319072+00:00",
+    "localMain": "7c341fd55bb5e9d4ecc2126794d533f55d7aa7f7",
+    "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+    "consumerDiffVsMain": [],
+    "newMainConsumerCommits": [],
+    "method": "Post-authoring boundary replay against local main only; no pull/merge/rebinding. Authored bytes remain fixed at author input; later rebind at Step 7 under L12-58(1). Not a claim that earlier boundaries were checked contemporaneously."
+  },
+  {
+    "set": "step04-015",
+    "checkedAt": "2026-10-20T10:27:17.327204+00:00",
+    "localMain": "7c341fd55bb5e9d4ecc2126794d533f55d7aa7f7",
+    "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+    "consumerDiffVsMain": [],
+    "newMainConsumerCommits": [],
+    "method": "Post-authoring boundary replay against local main only; no pull/merge/rebinding. Authored bytes remain fixed at author input; later rebind at Step 7 under L12-58(1). Not a claim that earlier boundaries were checked contemporaneously."
+  },
+  {
+    "set": "step04-016",
+    "checkedAt": "2026-10-20T10:27:17.336007+00:00",
+    "localMain": "7c341fd55bb5e9d4ecc2126794d533f55d7aa7f7",
+    "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+    "consumerDiffVsMain": [],
+    "newMainConsumerCommits": [],
+    "method": "Post-authoring boundary replay against local main only; no pull/merge/rebinding. Authored bytes remain fixed at author input; later rebind at Step 7 under L12-58(1). Not a claim that earlier boundaries were checked contemporaneously."
+  }
+]

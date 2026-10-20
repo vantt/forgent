@@ -1,0 +1,1146 @@
+{
+  "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+  "reviewerRule": "Never run checker/probes/resolver/author scripts. Read every assigned file through EOF and independently verify targets. One verdict per whole file, even when streamed.",
+  "set": "step04-005",
+  "files": [
+    "archive/plans/260906-1831-dispatch-visibility-v0/plan.md",
+    "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md"
+  ],
+  "joinedSlots": 17,
+  "items": [
+    {
+      "file": "archive/plans/260906-1831-dispatch-visibility-v0/plan.md",
+      "sourceDigest": "588a5cf5916ec6eee72aacb457b977cf8fcc01c1f6efa6592b458610e828239b",
+      "sourceContext": "---\nstatus: completed\n---\n\n# Dispatch Visibility V0 — interactive agent, quan sát được, không cần contact\n\nStatus: DONE — all 7 phases complete; the V0 definition of done is met on all 8 items | Created: 2026-09-06 | Owner: maintainer\nExecution track: `dispatch-visibility-v0`\nDesign source: [Visibility và Interactive Contact](../../docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md) (§8b.1 mức V0, §11 recommendation, §12b–§12c evidence)\n\n## Read this first\n\nBản plan này thi hành **Family B** ở mức **V0**: Dispatch sở hữu lifecycle truth,\nherdr là transport cộng failure detector, receipt là file do chính worker ghi.\n**Không** có verb `contact` trong V0 — shape của nó được khoá trong tài liệu thiết kế\nđể V1 không phải làm lại, nhưng không code gì.\n\nBa nguyên tắc không được vi phạm ở bất kỳ phase nào:\n\n```txt\n1. Dispatch sở hữu lifecycle truth. Pane, pid, agent_session là binding, mất được, rebind được.\n2. Visibility và contact là capability riêng, mechanism không hỗ trợ thì refuse có type.\n3. Interactive vẫn đi qua cùng Assignment → Run → RunResult. Không có đường herdr riêng.\n```\n\nLuật đã re-scope làm nền cho track này: decision **\"RUL40 re-scope\"** (scope `runner`,\n`supersedes:d3dbe7f5`, 2026-09-06) — herdr không bao giờ là truth hay receipt, nhưng\nagent API của nó được dùng làm transport và failure detector.\n\n## Vì sao V0 tồn tại\n\n`herdrSpawnInteractiveAdapter` hôm nay không dùng được cho prompt thật: nó nhét prompt\nvào command line rồi để `herdr pane run` gõ như keystroke, nên mọi prompt nhiều dòng\nđều hỏng argv (F3). Nó cũng đọc `agent_status` làm tín hiệu hoàn thành duy nhất, thứ đã\nsai hai lần đo được: false idle lúc khởi động và dip giữa turn khoảng 25%. Vì vậy\n`capabilities.fgos-coding-implement.prefer` đã bị revert về `agy-cli` và interactive\ndispatch thực tế đang chết.\n\nP6 (2026-09-06, agent claude thật) đã chứng minh hình dạng thay thế chạy được end-to-end.\nV0 là đưa hình dạng đó vào sản phẩm.\n\n## Bằng chứng đã có trước khi mở track\n\n| Câu hỏi | Trả lời | Nguồn |\n|---|---|---|\n| `agent start` có hấp thụ boot race của shell không | Có. Tab tạo xong gọi ngay, lệnh vẫn chạy đúng, pid xác nhận | §12b |\n| Nó có trả lỗi có tên thay vì treo không | Có. `agent_not_ready` + `blocked` sau 3928 ms | §12b |\n| Trust dialog có chặn dispatch vào worktree mới không | Có, mọi lần. Pre-seed thì hết, `idle` + `interactive_ready` sau 3897 ms | §12c |\n| Worker có tự ghi được receipt không | Có. `ack-1.json` rồi `result-1.json`, đúng thứ tự, không cần biết fgOS | §12c |\n| Prompt nhiều dòng có sống qua `agent prompt` không | Có, với claude. 7 dòng nguyên vẹn cả hai marker | §12c |\n| Pane `--no-focus` nghỉ ở trạng thái nào | `done`, không phải `idle`. Ready gate phải nhận cả hai | §12c |\n| Có cô lập được socket herdr khỏi worker bằng env không | Không. `--env` bị herdr ghi đè, và không cần env vẫn chạm socket qua HOME | §12b |\n| `pane close` có giết hết con cháu không | Không. Foreground chết, `setsid` sống sót | §12b |\n\n## Phases\n\n| Phase | Mục tiêu | Vào được sau | Lease chính |\n|---|---|---|---|\n| 00 ✅ | Worker trong worktree không còn chạy hook hỏng của repo | Điều kiện vào track | `worker-hook-neutral` |\n| 01 ✅ | Mechanism khai capability; trust và HOME của worker đúng trước khi khởi động | 00 | `executor-profile` |\n| 02 ✅ | Adapter đổi sang `agent start` + brief-as-file + `agent prompt`; receipt là ack file | 01 | `herdr-adapter` |\n| 03 ✅ | Ladder poll thay `agent_status`-là-hoàn-thành; outcome có type; pane giữ lại làm forensics | 02 | `herdr-adapter` |\n| 04 ✅ | `VisibilitySession` bền; `run.json` phản ánh trạng thái thật; Run mồ côi được reconcile | 03 | `run-truth` |\n| 05 ✅ | Cửa quan sát chỉ-đọc; doctor; spec và docs cập nhật | 04 | `observe-surface` |\n| 06 ✅ | Proof sống: agy, gateway restart, thử vượt rào | 05 | `v0-proof` |\n\nMột cell mở tại một thời điểm. Phase 02 và 03 cùng chạm `transport.mjs` nên chia sẻ lease\nvà phải tuần tự.\n\n## Định nghĩa hoàn thành của V0\n\n**Đối chiếu 2026-09-07** (bằng chứng: `docs/architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md`):\n1 ✅ đo sống (claude, trust pre-seed, không dialog nào) · 2 ✅ brief mang nguyên văn prompt 7 dòng ·\n3 ✅ kết luận từ file worker ghi, `agent_status` không còn được đọc thành \"xong\" ở bất kỳ đâu ·\n4 ✅ `died` sau 1525 ms, pane giữ lại, lý do có tên · 5 ✅ `run.json` đóng sổ khi settle, reconcile ra settled/died/unknown ·\n6 ✅ process riêng chạy `fgos dispatch watch`, 15 lần đọc, không cần lease ·\n7 ✅ 5705 test, 5695 pass, 3 đỏ đều có sẵn trên main ·\n8 ✅ confinement đã nối vào adapter và **đo sống**: worker nhận socket của session riêng, HOME riêng, không với tới cockpit của operator (16 agent) — `proofs/2026-09-07-v0/confinement-result.json`. Khai confinement mà dựng không được thì dispatch bị **từ chối**, không âm thầm hạ cấp.\n\nV0 đóng được khi tất cả đúng cùng lúc:\n\n1. Một dispatch interactive vào worktree mới đi tới `agent-ready` mà không cần người trả lời dialog nào.\n2. Prompt thật nhiều dòng của `fgos-coding-implement` tới được worker nguyên vẹn.\n3. Hoàn thành được kết luận từ file worker ghi, không bao giờ từ `agent_status`.\n4. Một dispatch thất bại để lại pane mở kèm lý do có tên, không phải timeout chung chung.\n5. `run.json` không còn kẹt ở `running` sau khi Run kết thúc hay sau khi process dispatch chết.\n6. Một người xem được agent đang làm gì mà không cần quyền gửi input.\n7. `npm test` xanh; hành vi mới có test tương ứng.\n8. Không capability nào chỉ interactive hoặc chỉ headless mới với tới được mà không khai rõ (ADR-010 §3).\n\n## Ngoài phạm vi V0, ghi rõ để không trôi vào\n\n- Verb `contact` và mọi kind của nó ngoài `system` (pointer, exit). Shape đã khoá ở §8.3, không code.\n- Hook-based contact tại turn boundary (Family C). V2.\n- `checkpoint`. Mechanism khai `false`, refuse có type.\n- Interrupt như một effect có grant riêng. V0 chỉ có timeout và đóng pane.\n- Dashboard, UI, gateway route mới.\n- Sửa `herdr-plugin/src/*.rs`.\n- Đổi `capabilities.fgos-coding-implement.prefer` sang một executor herdr. Đó là quyết định vận hành sau khi Phase 06 xanh, không phải một phần của V0.\n\n## Rủi ro và cách chặn\n\n| Rủi ro | Chặn bằng |\n|---|---|\n| Sửa `transport.mjs` làm hỏng `cli-spawn` đang gánh production | `cli-spawn` không được đụng một dòng nào; test hiện có của nó phải xanh không sửa assertion |\n| Ghi vào `~/.claude.json` của người dùng làm hỏng config | Chỉ thêm entry cho path fgOS tự tạo từ root đã được tin; atomic tmp-rename; xoá khi teardown; fail loud khi field đổi tên |\n| Worker chạm socket herdr điều khiển pane của người | Phase 01 HOME riêng; nếu không đạt thì capability profile phải mang nhãn `unsafe` và executor bị giới hạn |\n| Hai phiên cùng sửa `transport.mjs` | Lease `herdr-adapter` giữ Phase 02 và 03 tuần tự |\n| Main checkout dùng chung bị phiên khác đổi nhánh giữa chừng | Mọi phase làm trong worktree riêng của track, không bao giờ trong main checkout |\n| Đo trên một agent rồi tưởng đúng cho mọi agent | Phase 06 bắt buộc chạy agy; kết quả agy không được sửa ngược kết luận claude, chỉ thêm nhãn capability |\n\n## Phase files\n\n- [Phase 00 — worker hook neutralization](phase-00-worker-hook-neutralization.md)\n- [Phase 01 — executor capability profile, trust, HOME](phase-01-executor-profile-trust-home.md)\n- [Phase 02 — adapter onto agent start and brief delivery](phase-02-adapter-agent-start-and-brief.md)\n- [Phase 03 — signal ladder, typed outcomes, forensics](phase-03-signal-ladder-and-outcomes.md)\n- [Phase 04 — VisibilitySession and Run truth](phase-04-visibility-session-and-run-truth.md)\n- [Phase 05 — observe surface, doctor, docs](phase-05-observe-surface-and-docs.md)\n- [Phase 06 — live proof matrix](phase-06-live-proof-matrix.md)\n\n## Câu hỏi chưa giải quyết\n\n1. ~~Pane herdr có sống qua `herdr server stop/start` không.~~ **ĐÃ ĐO 2026-09-07 (P3, session riêng `fgos-v0-proof2`)**: pane SỐNG qua restart — trước `[w1:p1, w1:p2]`, sau `[w1:p1, w1:p2]`, cùng id. Chốt `resume: reattach-or-relaunch`. Log: `proofs/2026-09-07-v0/failure-result.json`.\n2. agy tuân thủ hợp đồng ack/result ở mức nào dưới `accept-edits`. Đo ở Phase 06; dưới ngưỡng thì agy mất nhãn interactive, không phải thiết kế sai.\n3. Có tách được HOME cho worker mà agent CLI vẫn khởi động bình thường không. Phase 01 phải trả lời trước khi Phase 02 dựa vào nó.\n4. Hang detection. Upstream đã park sau khi đo CPU và output counter đều không phân biệt được. V0 chấp nhận chỉ có idle-timeout và ceiling, ghi rõ là khoảng trống chứ không giả vờ có.\n",
+      "record": {
+        "file": "archive/plans/260906-1831-dispatch-visibility-v0/plan.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "588a5cf5916ec6eee72aacb457b977cf8fcc01c1f6efa6592b458610e828239b",
+        "digest": "588a5cf5916ec6eee72aacb457b977cf8fcc01c1f6efa6592b458610e828239b",
+        "inventoryEdgeIds": [
+          "evidence-089"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-089",
+            "slotKey": "{\"edgeId\":\"evidence-089\",\"file\":\"archive/plans/260906-1831-dispatch-visibility-v0/plan.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-089\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":72}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-089",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 72
+              }
+            ],
+            "consumerFile": "archive/plans/260906-1831-dispatch-visibility-v0/plan.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 72,
+                "columnStart": 40,
+                "columnEndExclusive": 87,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 72,
+                "columnStart": 40,
+                "columnEndExclusive": 87,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '**Đối chiếu 2026-09-07** (bằng chứng: `docs/architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md`):'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-089",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 72,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "**Đối chiếu 2026-09-07** (bằng chứng: `docs/architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md`):"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-005",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "archive/plans/260906-1831-dispatch-visibility-v0/plan.md",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "588a5cf5916ec6eee72aacb457b977cf8fcc01c1f6efa6592b458610e828239b",
+          "bytes": 9729,
+          "lines": 127,
+          "headings": [
+            {
+              "line": 5,
+              "text": "# Dispatch Visibility V0 — interactive agent, quan sát được, không cần contact"
+            },
+            {
+              "line": 11,
+              "text": "## Read this first"
+            },
+            {
+              "line": 30,
+              "text": "## Vì sao V0 tồn tại"
+            },
+            {
+              "line": 42,
+              "text": "## Bằng chứng đã có trước khi mở track"
+            },
+            {
+              "line": 55,
+              "text": "## Phases"
+            },
+            {
+              "line": 70,
+              "text": "## Định nghĩa hoàn thành của V0"
+            },
+            {
+              "line": 91,
+              "text": "## Ngoài phạm vi V0, ghi rõ để không trôi vào"
+            },
+            {
+              "line": 101,
+              "text": "## Rủi ro và cách chặn"
+            },
+            {
+              "line": 112,
+              "text": "## Phase files"
+            },
+            {
+              "line": 122,
+              "text": "## Câu hỏi chưa giải quyết"
+            }
+          ],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md",
+      "sourceDigest": "d6b057701646c6f5da759e7225fa64e68ba8854ed6c262a7ec1b8d2d9b59743c",
+      "sourceContext": "# Track Closeout Report: Rust Host R1 Kernel\n\n- Track: `rust-host-r1-kernel`\n- Plan: [`plans/260910-1700-rust-host-r1-kernel/plan.md`](../plan.md)\n- Date: 2026-09-11\n- Reference Target: `x86_64-unknown-linux-gnu`\n- Status as of 2026-09-15: DONE for R1 preview installed/default proof.\n  Public GitHub prerelease tag proof and stable/default graduation remain\n  release-publication follow-ups.\n\n## 1. Overview and Delivered Scope\n\nThe `rust-host-r1-kernel` track implemented and delivered the full Rust `fgos` host, release packaging pipeline, tier-0 workspace resolver, and `fgctl` bootstrap lifecycle suite:\n\n1. **Rust CLI Host (`apps/fgos`)**: Recognizes all 73 public selectors from generated descriptor [`packages/host-runtime/contracts/command-routes.json`](../../../packages/host-runtime/contracts/command-routes.json). Routes `legacy-cli` selectors through the Node.js payload ([`bin/fgos.mjs`](../../../bin/fgos.mjs)) with byte-identical stdout/stderr/signal/exit behavior, verified by the P02 parity harness.\n2. **Native `version` Routing**: Pure `Router` and `InvocationService` kernel execution through built-in provider `distribution.build.show` without creating a Node child process, outputting byte-compatible `fgos.v1` envelope responses.\n3. **Release Tree Packaging (`scripts/build-rust-distribution.mjs`)**: Stages standalone release distributions (`bin/fgos`, `bin/fgos-runner`, `libexec/legacy-node/`, `manifest.json`), verified with canonical content digests and covered by four `fgos doctor` diagnostics.\n4. **Tier-0 Workspace Shim Resolver**: Transparent resolution of `.fgos/installation/bin/fgos` across Node (`resolveFgosBin`), shell integration ([`scripts/fgos-shell-integration.sh`](../../../scripts/fgos-shell-integration.sh)), and Herdr (`resolve_fgos`).\n5. **`fgctl` Binary & Lifecycle Management (`apps/fgctl`)**: Content-addressed machine release store under `${XDG_STATE_HOME:-$HOME/.local/state}/fgos/`, atomic activation (`.fgos/installation/activation.json`), upgrade, rollback repair, and quarantine on integrity violation.\n6. **Standalone Installer ([`install.sh`](../../../install.sh))**: Downloads and installs `fgctl` from GitHub releases with `SHA256SUMS` verification without cloning or requiring build toolchains.\n7. **CI Release Pipeline & External Consumer Proof**: Workflow [`.github/workflows/release.yml`](../../../.github/workflows/release.yml) and automated verification script [`scripts/ci-external-consumer.sh`](../../../scripts/ci-external-consumer.sh).\n\nThe 2026-09-15 packaging-distribution proof re-ran the external-consumer flow\nagainst release-shaped local assets and proved the preview installed/default\nruntime claim: external/default `fgos` enters the Rust host and reports the\nactivated manifest digest. Legacy Node fallback is now a deprecated explicit\nescape hatch for 30 calendar days after preview release publication.\n\n## 2. Cell Merge History\n\nSourced from `git log` and `fgos coordination chain rust-host-r1-kernel --json`:\n\n| Cell | Phase | Merge Commit | Review / Red-Team Verdict | Trace Document |\n|---|---|---|---|---|\n| P00 | [Phase 00](../phase-00-inventory-and-inputs-freeze.md) | `b3ea08d9` | Clean after 2 fix rounds (reviewer: 9+3 fixed; red-team: 2+1 fixed) | [p00.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p00.md) |\n| P04 | [Phase 04](../phase-04-cargo-workspace-skeleton.md) | `26c2b261` | Clean after 2 fix rounds across 3 sessions; reviewer: 6 LOW (3 fixed); red-team: 1 MEDIUM fixed | [p04.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p04.md) |\n| P01 | [Phase 01](../phase-01-command-route-descriptor.md) | `7dddcb4e` | Clean, 0 findings on final round, after 2 fix rounds across 4 sessions | [p01.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p01.md) |\n| P02 | [Phase 02](../phase-02-parity-harness.md) | `fb09ecb2` | Clean after 3 fix rounds across 4 sessions; reviewer/red-team found 1 HIGH + 2 corroborating HIGH, 4 MEDIUM, all fixed | [p02.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p02.md) |\n| P05 | [Phase 05](../phase-05-kernel-contracts-and-router.md) | `0121dbc3` | Clean after 3 fix rounds across 3 sessions; reviewer: 6 MEDIUM + 9 LOW; red-team: 1 HIGH documented/rejected then re-confirmed M2 | [p05.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p05.md) |\n| P03 | [Phase 03](../phase-03-envelope-vectors-and-corpus.md) | `afa3c7cf` | Clean (0 HIGH, 0 open MEDIUM) after 2 fix rounds across 2 sessions; reviewer/red-team found 1 HIGH + 3 MEDIUM, all fixed | [p03.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p03.md) |\n| P06 | [Phase 06](../phase-06-invocation-service-and-authority.md) | `4565b897` | Clean after 2 fix rounds across 2 sessions; 1 HIGH + lifecycle MEDIUMs + duplicate invocation ID collision fixed | [p06.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p06.md) |\n| P07 | [Phase 07](../phase-07-cli-adapter-legacy-exec.md) | `37d4c1b3` | Clean, full-suite gate green, after 2 Lead fix rounds across 4 sessions; 4 red-team findings (2 HIGH, 2 MEDIUM) + 3 reviewer MEDIUM fixed | [p07.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p07.md) |\n| P08 | [Phase 08](../phase-08-native-version.md) | `9fcf975d` | Clean after 1 Lead fix round across 5 sessions; reviewer found 1 HIGH (civil-date constants) + 2 MEDIUM, fixed | [p08.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p08.md) |\n| P09 | [Phase 09](../phase-09-release-tree-builder-and-doctor.md) | `330e5c85` | Clean, full-suite gate green, after 3 Lead fix rounds across 5 sessions; 5 total HIGH fixed (path traversal, confinement bypasses) | [p09.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p09.md) |\n| P10 | [Phase 10](../phase-10-tier-zero-resolver.md) | `db099242` | Clean after 2 Lead fix rounds + 1 clean red-team check across 4 sessions; 3 HIGH fixed (executable entry, symlink escape, cross-runtime parity) | [p10.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p10.md) |\n| P11 | [Phase 11](../phase-11-fgctl-crate-and-release-store.md) | `d226fc5b` | Clean after 2 Lead fix rounds + 1 clean red-team check across 6 sessions; reviewer 2 MEDIUM (test hook dropped), red-team 2 MEDIUM (archive traversal, drive letter) fixed | [p11.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p11.md) |\n| P12 | [Phase 12](../phase-12-fgctl-init-and-activation.md) | `42c5b1cb` | Clean after 3 Lead fix rounds across 6 sessions; 5 total HIGH fixed (activation lock, crash-orphaned lock reclamation, atomic hard_link creation) | [p12.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p12.md) |\n| P14 | [Phase 14](../phase-14-install-script.md) | `da99a000` | Clean after 3 Lead fix rounds across 4 sessions; fixed spawnSync deadlock, unbounded network timeouts, symlinked fgctl refusal | [p14.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p14.md) |\n| P13 | [Phase 13](../phase-13-fgctl-upgrade-repair-rollback.md) | `bafce71d` | Clean, full-suite gate green, after 2 Lead fix rounds across 4 sessions; red-team 1 HIGH (activation TOCTOU), crash-window self-heal verified | [p13.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p13.md) |\n| P15 | [Phase 15](../phase-15-ci-release-and-external-consumer.md) | `5694a746` | Clean, full-suite gate green, after 1 Lead fix round across 2 sessions; 1 HIGH / 1 MEDIUM fixed by two-gate sequential digest verification | [p15.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p15.md) |\n| P16 | [Phase 16](../phase-16-docs-changelog-closeout.md) | (current) | Docs, changelog, closeout report, full-suite gate verified | (this report) |\n\n## 3. Deferred Findings Across All Cells\n\nEvery deferred finding recorded in the phase verification traces and cell status table:\n\n1. **P00 (Phase 00)**:\n   - 1 class deferred to P10: active skill-doc prose (`domains/coding/skills/**` etc.) invoking `bin/fgos.mjs` directly, outside R3's named 9-site scope. Resolved in P10.\n2. **P04 (Phase 04)**:\n   - LOW-1/LOW-4: No-action (false alarm / pre-existing).\n   - LOW-6: Dev manifest fields, spawnSync vs real exec. Deferred to and addressed in P07.\n3. **P01 (Phase 01)**:\n   - None (0 findings on final round).\n4. **P02 (Phase 02)**:\n   - LOW nits only, all explicitly latent (no current call site triggers them) — exitCode-preservation edge case, process-spy environment filtering.\n5. **P05 (Phase 05)**:\n   - M1: The kernel cannot hold real `&'static dyn OperationProvider` values yet, because this phase is explicitly forbidden from declaring the trait body at all (R7) — a genuine contradiction inside the phase spec, resolved in R7's favor. Deferred to Phase 06+.\n   - M2: A `replacement`-declaring duplicate pair passes `build_snapshot`'s linking check but `select()` never resolves it, always refusing `AmbiguousBinding`. Deferred, but only as a source comment — no owner in the plan corpus.\n   - 4 LOW deferred: M2's plan-corpus ownership gap; `from_static` validation reach (public and unvalidated beyond the `CATALOG` test); a link-time catalog-membership check that could complement M3 without adding a second runtime enforcement point; `SNAPSHOT_FOR_TESTS`'s pub-field justification (same-crate, `pub(crate)` would serve it).\n6. **P03 (Phase 03)**:\n   - 1 MEDIUM: 2 of 8 R5 assertions test a mock. Real coverage exists in P02's `harness.test.mjs`.\n   - 5 LOW deferred: golden vector edge cases, strict key ordering assertions.\n7. **P06 (Phase 06)**:\n   - MEDIUM-1-residual-on-HIGH-1: Catalog-policy admission is tautological in the only composition this crate offers. Deferred to Phase 08 as a named composition-root obligation.\n   - 3 LOW deferred.\n8. **P07 (Phase 07)**:\n   - 1 MEDIUM accepted: Unknown-verb stderr text differs from Node's, same exit code `4`. Recorded in `CHANGELOG.md`.\n   - 1 LOW deferred to P09/P11: Fallback probe order.\n   - Recursion-guard: Inherent env-var-clearing limitation accepted per documented threat model.\n9. **P08 (Phase 08)**:\n   - LOW-1: `cli_projector.rs`/`main.rs` single-native-route shortcut. Deferred as debt for next native route.\n   - LOW-2/3/5: Accepted as documented plan-directed caveats (hardcoded tests on version bump, `include_str!` compile-time package.json, multi-strategy fallback).\n10. **P09 (Phase 09)**:\n    - MEDIUM-4: Manifest missing `releaseVersion`. Flagged for P11+.\n    - MEDIUM-6: Two P07-introduced env vars never registered with `fgos setup`. Flagged for P11+.\n    - Several LOW accepted as documented caveats.\n11. **P10 (Phase 10)**:\n    - MEDIUM: Worktree-topology limitation for `cli.mjs` tier-0 resolution. Ratified as Lead decision, deferred to cutover track.\n    - Pre-existing `cohort-planner` flake and minor LOW accepted as documented caveats.\n    - LOW (found in P16 closeout verification): the cell's `herdr::resolve_fgos` addition to `fgos.rs`/`main.rs` was never run through `cargo fmt`, since `herdr-plugin` is `[workspace].exclude`d from the track's own `cargo fmt --all -- --check` gate and no reviewer/red-team round caught it. 6 new unformatted hunks against an already-unformatted pre-existing baseline (see §5). Deferred — fixing it now would touch code outside this closeout cell's own docs-only lease.\n12. **P11 (Phase 11)**:\n    - M1: Stale-lock ownership after a crash. Flagged for P12/P13 lock format.\n    - L3–L8 and 2 new LOW (pax-global-header format; same-trust-domain archive-reopen TOCTOU) accepted as documented caveats.\n    - INFO: Phase 09's manifest builder does not yet emit `digestKind`, `releaseVersion`, `sourceRevision`, `createdAt`, `requires.git`, or `stateSchemas`; `fgos-distribution`'s `ReleaseManifest` accommodates these as optional fields so deserialization never hard-fails. Not a P11 defect — anticipated explicitly by this phase's own requirements.\n13. **P12 (Phase 12)**:\n    - MEDIUM F2: A 2-syscall reclaim-path race, injection-only, never spontaneous, identical to the residual window in reference `main-checkout-lock.mjs`. Deferred to a structurally different mechanism (flock or tombstone-rename).\n    - Several LOW accepted as documented caveats.\n14. **P14 (Phase 14)**:\n    - LOW/INFO accepted as documented caveats: static source-regex test limits; tar symlinked-dir/hardlink escape refusal is environment behavior; byte-drip server without coreutils `timeout`.\n15. **P13 (Phase 13)**:\n    - LOW: Missing dedicated regression test for init-door chain-past rule (twin upgrade-door has one).\n    - 2 INFO: Quarantined `previousArtifactDigest`; sub-ms same-digest lock-guard window.\n    - LOW/L2-L9 DRY/duplication notes carried from round 1.\n16. **P15 (Phase 15)**:\n    - 4 LOW carried: Gate 1 checksum recompute runs after `fgctl init` staged archive; phase file R1 prose describes pre-fix single-gate design; `gh release create` line continuations collapsed; `build-rust-distribution.mjs` distribution-output-dir exemption has no unit test.\n    - INFO: GitHub prerelease tag resolution on `/releases/latest`.\n\n## 4. Performance Measurements\n\nBoth performance budgets defined in `plan.md` §Decisions table and Phase 08 R9 were measured warm on the reference host architecture (`x86_64-unknown-linux-gnu`, 12th Gen Intel Core i7-12650H, 16 CPUs):\n\n### Exact Reproduction Command\n\n```sh\nnode scripts/run-rust-dev-host.mjs version && node scripts/measure-p08-performance.mjs\n```\n\n### Measured Numbers\n\nSourced from the committed\n[`plans/260910-1700-rust-host-r1-kernel/reports/p08-performance.json`](p08-performance.json)\nartifact. The reproduction command above rewrites that same file in place —\nrunning it re-measures live rather than reading a static number, and every\nlive re-run observed this cell (2.638 ms, 3.131 ms, across two separate runs\non this shared host) landed well inside budget but never reproduced the\ncommitted `0.263 ms` figure to the decimal; the committed artifact was\nrestored via `git checkout` after each verification run so this report cites\nonly it, not a live re-measurement:\n\n1. **Legacy Exec Overhead (`ready` selector)**:\n   - Definition: Wall time of `fgos <legacy selector>` through the Rust CLI minus direct `node <payload> <selector>`, both warm (51 samples, 5 warmup rounds).\n   - Rust CLI p50: `374.634 ms`\n   - Direct Node p50: `374.371 ms`\n   - **Overhead p50**: `0.263 ms`\n   - **Budget / Threshold**: `≤ 25 ms`\n   - **Status**: **PASS (within threshold)**\n\n2. **Native `version` Latency**:\n   - Definition: Wall time of `fgos version` through the native Rust route (51 samples, 5 warmup rounds).\n   - **Native Version p50**: `6.183 ms`\n   - **Budget / Threshold**: `≤ 10 ms`\n   - **Status**: **PASS (within threshold)**\n\n## 5. Full-Suite Verification Gates\n\n`plan.md`'s own `FULL_TEST` definition (line 323) is the whole-repo Node suite,\nnot just the rust-host subset:\n\n```sh\nFGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs' \\\n  && cargo fmt --all -- --check \\\n  && cargo clippy --workspace --all-targets -- -D warnings \\\n  && cargo test --workspace \\\n  && cargo test --manifest-path herdr-plugin/Cargo.toml\n```\n\n`plan.md` itself documents one pre-existing, non-regression red test in that\nNode suite (lines 336-338: `cohort-planner` \"buildCandidateInventory against\nthe real committed\", `check-decision-citation-drift`), so the chained command\nabove does not itself exit 0 — each piece was verified individually instead:\n\n| Command | Target / Scope | Result / Exit Code |\n|---|---|---|\n| `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs'` | Whole-repo Node suite | Exit code 1 — 6030/6038 passed, 7 skipped, 1 failed (`cohort-planner`'s `buildCandidateInventory` test, the plan.md-documented pre-existing red, reproduced identically on unmodified `main`, not a regression) |\n| `cargo fmt --all -- --check` | Rust formatting across the workspace only — `herdr-plugin` is `[workspace].exclude`d, so this command does not cover it (see below) | Passed (exit code 0) |\n| `cargo fmt --manifest-path herdr-plugin/Cargo.toml -- --check` | Rust formatting for `herdr-plugin` specifically | **Fails** — 276 diff hunks across 12 files. 270 of those hunks, in all 12 files, reproduce identically on unmodified `main` — pre-existing, unrelated to this track. The remaining 6 (`fgos.rs` 8→13, `main.rs` 52→53) are new, introduced by this track's own Phase 10 commits, since no tooling this track ran ever covers `herdr-plugin`'s formatting (it is `[workspace].exclude`d from every `cargo fmt --all` call, including this cell's own). Not part of `plan.md`'s own `FULL_TEST` definition, which only names the two commands above it, but recorded here for completeness since \"workspace and `herdr-plugin`\" is otherwise a misleading claim |\n| `cargo clippy --workspace --all-targets -- -D warnings` | Rust linting across all workspace crates and targets | Passed (exit code 0) |\n| `cargo test --workspace` | Rust unit and integration tests across workspace crates | Passed (exit code 0) |\n| `cargo test --manifest-path herdr-plugin/Cargo.toml` | Rust integration and unit tests for `herdr-plugin` | Passed (exit code 0, 225 tests passed) |\n| `scripts/ci-external-consumer.sh --assets dist` (a hand-built distribution directory, packaged per `.github/workflows/release.yml`'s own steps) | External consumer proof on clean environment | Passed (exit code 0) |\n| `source scripts/fgos-shell-integration.sh && fgos coordination chain rust-host-r1-kernel --json` | Coordination chain status read | Passed (exit code 0) |\n\nEvery command above was run individually and its real exit code recorded;\nnone were assumed. The two non-zero exits are the plan.md-documented\npre-existing `cohort-planner` red and the `herdr-plugin` formatting drift\nnoted above — neither is part of `plan.md`'s own `FULL_TEST` definition.\nThe `cohort-planner` red is entirely pre-existing; the `herdr-plugin`\ndrift is overwhelmingly pre-existing (270 of 276 hunks) with a small\naddition (6 hunks, 2 files) this track's own Phase 10 introduced — see\n§3.\n",
+      "record": {
+        "file": "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "d6b057701646c6f5da759e7225fa64e68ba8854ed6c262a7ec1b8d2d9b59743c",
+        "digest": "d6b057701646c6f5da759e7225fa64e68ba8854ed6c262a7ec1b8d2d9b59743c",
+        "inventoryEdgeIds": [
+          "evidence-094",
+          "evidence-094",
+          "evidence-094",
+          "evidence-094",
+          "evidence-094",
+          "evidence-094",
+          "evidence-094",
+          "evidence-094",
+          "evidence-094",
+          "evidence-094",
+          "evidence-094",
+          "evidence-094",
+          "evidence-094",
+          "evidence-094",
+          "evidence-094",
+          "evidence-094"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-094",
+            "slotKey": "{\"edgeId\":\"evidence-094\",\"file\":\"archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-094\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":35}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 35
+              }
+            ],
+            "consumerFile": "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 35,
+                "columnStart": 167,
+                "columnEndExclusive": 214,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 35,
+                "columnStart": 167,
+                "columnEndExclusive": 214,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '| P00 | [Phase 00](../phase-00-inventory-and-inputs-freeze.md) | `b3ea08d9` | Clean after 2 fix rounds (reviewer: 9+3 fixed; red-team: 2+1 fixed) | [p00.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p00.md) |'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 35,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "| P00 | [Phase 00](../phase-00-inventory-and-inputs-freeze.md) | `b3ea08d9` | Clean after 2 fix rounds (reviewer: 9+3 fixed; red-team: 2+1 fixed) | [p00.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p00.md) |"
+              }
+            ]
+          },
+          {
+            "edgeId": "evidence-094",
+            "slotKey": "{\"edgeId\":\"evidence-094\",\"file\":\"archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-094\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":36}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 36
+              }
+            ],
+            "consumerFile": "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 36,
+                "columnStart": 192,
+                "columnEndExclusive": 239,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 36,
+                "columnStart": 192,
+                "columnEndExclusive": 239,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '| P04 | [Phase 04](../phase-04-cargo-workspace-skeleton.md) | `26c2b261` | Clean after 2 fix rounds across 3 sessions; reviewer: 6 LOW (3 fixed); red-team: 1 MEDIUM fixed | [p04.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p04.md) |'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 36,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "| P04 | [Phase 04](../phase-04-cargo-workspace-skeleton.md) | `26c2b261` | Clean after 2 fix rounds across 3 sessions; reviewer: 6 LOW (3 fixed); red-team: 1 MEDIUM fixed | [p04.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p04.md) |"
+              }
+            ]
+          },
+          {
+            "edgeId": "evidence-094",
+            "slotKey": "{\"edgeId\":\"evidence-094\",\"file\":\"archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-094\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":37}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 37
+              }
+            ],
+            "consumerFile": "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 37,
+                "columnStart": 167,
+                "columnEndExclusive": 214,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 37,
+                "columnStart": 167,
+                "columnEndExclusive": 214,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '| P01 | [Phase 01](../phase-01-command-route-descriptor.md) | `7dddcb4e` | Clean, 0 findings on final round, after 2 fix rounds across 4 sessions | [p01.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p01.md) |'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 37,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "| P01 | [Phase 01](../phase-01-command-route-descriptor.md) | `7dddcb4e` | Clean, 0 findings on final round, after 2 fix rounds across 4 sessions | [p01.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p01.md) |"
+              }
+            ]
+          },
+          {
+            "edgeId": "evidence-094",
+            "slotKey": "{\"edgeId\":\"evidence-094\",\"file\":\"archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-094\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":38}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 38
+              }
+            ],
+            "consumerFile": "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 38,
+                "columnStart": 205,
+                "columnEndExclusive": 252,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 38,
+                "columnStart": 205,
+                "columnEndExclusive": 252,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '| P02 | [Phase 02](../phase-02-parity-harness.md) | `fb09ecb2` | Clean after 3 fix rounds across 4 sessions; reviewer/red-team found 1 HIGH + 2 corroborating HIGH, 4 MEDIUM, all fixed | [p02.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p02.md) |'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 38,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "| P02 | [Phase 02](../phase-02-parity-harness.md) | `fb09ecb2` | Clean after 3 fix rounds across 4 sessions; reviewer/red-team found 1 HIGH + 2 corroborating HIGH, 4 MEDIUM, all fixed | [p02.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p02.md) |"
+              }
+            ]
+          },
+          {
+            "edgeId": "evidence-094",
+            "slotKey": "{\"edgeId\":\"evidence-094\",\"file\":\"archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-094\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":39}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 39
+              }
+            ],
+            "consumerFile": "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 39,
+                "columnStart": 229,
+                "columnEndExclusive": 276,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 39,
+                "columnStart": 229,
+                "columnEndExclusive": 276,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '| P05 | [Phase 05](../phase-05-kernel-contracts-and-router.md) | `0121dbc3` | Clean after 3 fix rounds across 3 sessions; reviewer: 6 MEDIUM + 9 LOW; red-team: 1 HIGH documented/rejected then re-confirmed M2 | [p05.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p05.md) |'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 39,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "| P05 | [Phase 05](../phase-05-kernel-contracts-and-router.md) | `0121dbc3` | Clean after 3 fix rounds across 3 sessions; reviewer: 6 MEDIUM + 9 LOW; red-team: 1 HIGH documented/rejected then re-confirmed M2 | [p05.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p05.md) |"
+              }
+            ]
+          },
+          {
+            "edgeId": "evidence-094",
+            "slotKey": "{\"edgeId\":\"evidence-094\",\"file\":\"archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-094\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":40}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 40
+              }
+            ],
+            "consumerFile": "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 40,
+                "columnStart": 220,
+                "columnEndExclusive": 267,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 40,
+                "columnStart": 220,
+                "columnEndExclusive": 267,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '| P03 | [Phase 03](../phase-03-envelope-vectors-and-corpus.md) | `afa3c7cf` | Clean (0 HIGH, 0 open MEDIUM) after 2 fix rounds across 2 sessions; reviewer/red-team found 1 HIGH + 3 MEDIUM, all fixed | [p03.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p03.md) |'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 40,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "| P03 | [Phase 03](../phase-03-envelope-vectors-and-corpus.md) | `afa3c7cf` | Clean (0 HIGH, 0 open MEDIUM) after 2 fix rounds across 2 sessions; reviewer/red-team found 1 HIGH + 3 MEDIUM, all fixed | [p03.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p03.md) |"
+              }
+            ]
+          },
+          {
+            "edgeId": "evidence-094",
+            "slotKey": "{\"edgeId\":\"evidence-094\",\"file\":\"archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-094\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":41}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 41
+              }
+            ],
+            "consumerFile": "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 41,
+                "columnStart": 217,
+                "columnEndExclusive": 264,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 41,
+                "columnStart": 217,
+                "columnEndExclusive": 264,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '| P06 | [Phase 06](../phase-06-invocation-service-and-authority.md) | `4565b897` | Clean after 2 fix rounds across 2 sessions; 1 HIGH + lifecycle MEDIUMs + duplicate invocation ID collision fixed | [p06.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p06.md) |'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 41,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "| P06 | [Phase 06](../phase-06-invocation-service-and-authority.md) | `4565b897` | Clean after 2 fix rounds across 2 sessions; 1 HIGH + lifecycle MEDIUMs + duplicate invocation ID collision fixed | [p06.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p06.md) |"
+              }
+            ]
+          },
+          {
+            "edgeId": "evidence-094",
+            "slotKey": "{\"edgeId\":\"evidence-094\",\"file\":\"archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-094\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":42}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 42
+              }
+            ],
+            "consumerFile": "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 42,
+                "columnStart": 233,
+                "columnEndExclusive": 280,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 42,
+                "columnStart": 233,
+                "columnEndExclusive": 280,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '| P07 | [Phase 07](../phase-07-cli-adapter-legacy-exec.md) | `37d4c1b3` | Clean, full-suite gate green, after 2 Lead fix rounds across 4 sessions; 4 red-team findings (2 HIGH, 2 MEDIUM) + 3 reviewer MEDIUM fixed | [p07.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p07.md) |'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 42,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "| P07 | [Phase 07](../phase-07-cli-adapter-legacy-exec.md) | `37d4c1b3` | Clean, full-suite gate green, after 2 Lead fix rounds across 4 sessions; 4 red-team findings (2 HIGH, 2 MEDIUM) + 3 reviewer MEDIUM fixed | [p07.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p07.md) |"
+              }
+            ]
+          },
+          {
+            "edgeId": "evidence-094",
+            "slotKey": "{\"edgeId\":\"evidence-094\",\"file\":\"archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-094\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":43}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 43
+              }
+            ],
+            "consumerFile": "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 43,
+                "columnStart": 197,
+                "columnEndExclusive": 244,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 43,
+                "columnStart": 197,
+                "columnEndExclusive": 244,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '| P08 | [Phase 08](../phase-08-native-version.md) | `9fcf975d` | Clean after 1 Lead fix round across 5 sessions; reviewer found 1 HIGH (civil-date constants) + 2 MEDIUM, fixed | [p08.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p08.md) |'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 43,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "| P08 | [Phase 08](../phase-08-native-version.md) | `9fcf975d` | Clean after 1 Lead fix round across 5 sessions; reviewer found 1 HIGH (civil-date constants) + 2 MEDIUM, fixed | [p08.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p08.md) |"
+              }
+            ]
+          },
+          {
+            "edgeId": "evidence-094",
+            "slotKey": "{\"edgeId\":\"evidence-094\",\"file\":\"archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-094\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":44}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 44
+              }
+            ],
+            "consumerFile": "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 44,
+                "columnStart": 234,
+                "columnEndExclusive": 281,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 44,
+                "columnStart": 234,
+                "columnEndExclusive": 281,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '| P09 | [Phase 09](../phase-09-release-tree-builder-and-doctor.md) | `330e5c85` | Clean, full-suite gate green, after 3 Lead fix rounds across 5 sessions; 5 total HIGH fixed (path traversal, confinement bypasses) | [p09.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p09.md) |'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 44,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "| P09 | [Phase 09](../phase-09-release-tree-builder-and-doctor.md) | `330e5c85` | Clean, full-suite gate green, after 3 Lead fix rounds across 5 sessions; 5 total HIGH fixed (path traversal, confinement bypasses) | [p09.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p09.md) |"
+              }
+            ]
+          },
+          {
+            "edgeId": "evidence-094",
+            "slotKey": "{\"edgeId\":\"evidence-094\",\"file\":\"archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-094\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":45}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 45
+              }
+            ],
+            "consumerFile": "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 45,
+                "columnStart": 234,
+                "columnEndExclusive": 281,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 45,
+                "columnStart": 234,
+                "columnEndExclusive": 281,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '| P10 | [Phase 10](../phase-10-tier-zero-resolver.md) | `db099242` | Clean after 2 Lead fix rounds + 1 clean red-team check across 4 sessions; 3 HIGH fixed (executable entry, symlink escape, cross-runtime parity) | [p10.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p10.md) |'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 45,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "| P10 | [Phase 10](../phase-10-tier-zero-resolver.md) | `db099242` | Clean after 2 Lead fix rounds + 1 clean red-team check across 4 sessions; 3 HIGH fixed (executable entry, symlink escape, cross-runtime parity) | [p10.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p10.md) |"
+              }
+            ]
+          },
+          {
+            "edgeId": "evidence-094",
+            "slotKey": "{\"edgeId\":\"evidence-094\",\"file\":\"archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-094\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":46}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 46
+              }
+            ],
+            "consumerFile": "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 46,
+                "columnStart": 272,
+                "columnEndExclusive": 319,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 46,
+                "columnStart": 272,
+                "columnEndExclusive": 319,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '| P11 | [Phase 11](../phase-11-fgctl-crate-and-release-store.md) | `d226fc5b` | Clean after 2 Lead fix rounds + 1 clean red-team check across 6 sessions; reviewer 2 MEDIUM (test hook dropped), red-team 2 MEDIUM (archive traversal, drive letter) fixed | [p11.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p11.md) |'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 46,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "| P11 | [Phase 11](../phase-11-fgctl-crate-and-release-store.md) | `d226fc5b` | Clean after 2 Lead fix rounds + 1 clean red-team check across 6 sessions; reviewer 2 MEDIUM (test hook dropped), red-team 2 MEDIUM (archive traversal, drive letter) fixed | [p11.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p11.md) |"
+              }
+            ]
+          },
+          {
+            "edgeId": "evidence-094",
+            "slotKey": "{\"edgeId\":\"evidence-094\",\"file\":\"archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-094\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":47}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 47
+              }
+            ],
+            "consumerFile": "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 47,
+                "columnStart": 243,
+                "columnEndExclusive": 290,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 47,
+                "columnStart": 243,
+                "columnEndExclusive": 290,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '| P12 | [Phase 12](../phase-12-fgctl-init-and-activation.md) | `42c5b1cb` | Clean after 3 Lead fix rounds across 6 sessions; 5 total HIGH fixed (activation lock, crash-orphaned lock reclamation, atomic hard_link creation) | [p12.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p12.md) |'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 47,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "| P12 | [Phase 12](../phase-12-fgctl-init-and-activation.md) | `42c5b1cb` | Clean after 3 Lead fix rounds across 6 sessions; 5 total HIGH fixed (activation lock, crash-orphaned lock reclamation, atomic hard_link creation) | [p12.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p12.md) |"
+              }
+            ]
+          },
+          {
+            "edgeId": "evidence-094",
+            "slotKey": "{\"edgeId\":\"evidence-094\",\"file\":\"archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-094\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":48}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 48
+              }
+            ],
+            "consumerFile": "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 48,
+                "columnStart": 213,
+                "columnEndExclusive": 260,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 48,
+                "columnStart": 213,
+                "columnEndExclusive": 260,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '| P14 | [Phase 14](../phase-14-install-script.md) | `da99a000` | Clean after 3 Lead fix rounds across 4 sessions; fixed spawnSync deadlock, unbounded network timeouts, symlinked fgctl refusal | [p14.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p14.md) |'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 48,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "| P14 | [Phase 14](../phase-14-install-script.md) | `da99a000` | Clean after 3 Lead fix rounds across 4 sessions; fixed spawnSync deadlock, unbounded network timeouts, symlinked fgctl refusal | [p14.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p14.md) |"
+              }
+            ]
+          },
+          {
+            "edgeId": "evidence-094",
+            "slotKey": "{\"edgeId\":\"evidence-094\",\"file\":\"archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-094\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":49}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 49
+              }
+            ],
+            "consumerFile": "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 49,
+                "columnStart": 243,
+                "columnEndExclusive": 290,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 49,
+                "columnStart": 243,
+                "columnEndExclusive": 290,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '| P13 | [Phase 13](../phase-13-fgctl-upgrade-repair-rollback.md) | `bafce71d` | Clean, full-suite gate green, after 2 Lead fix rounds across 4 sessions; red-team 1 HIGH (activation TOCTOU), crash-window self-heal verified | [p13.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p13.md) |'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 49,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "| P13 | [Phase 13](../phase-13-fgctl-upgrade-repair-rollback.md) | `bafce71d` | Clean, full-suite gate green, after 2 Lead fix rounds across 4 sessions; red-team 1 HIGH (activation TOCTOU), crash-window self-heal verified | [p13.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p13.md) |"
+              }
+            ]
+          },
+          {
+            "edgeId": "evidence-094",
+            "slotKey": "{\"edgeId\":\"evidence-094\",\"file\":\"archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-094\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":50}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 50
+              }
+            ],
+            "consumerFile": "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 50,
+                "columnStart": 243,
+                "columnEndExclusive": 290,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 50,
+                "columnStart": 243,
+                "columnEndExclusive": 290,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '| P15 | [Phase 15](../phase-15-ci-release-and-external-consumer.md) | `5694a746` | Clean, full-suite gate green, after 1 Lead fix round across 2 sessions; 1 HIGH / 1 MEDIUM fixed by two-gate sequential digest verification | [p15.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p15.md) |'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-094",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 50,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "| P15 | [Phase 15](../phase-15-ci-release-and-external-consumer.md) | `5694a746` | Clean, full-suite gate green, after 1 Lead fix round across 2 sessions; 1 HIGH / 1 MEDIUM fixed by two-gate sequential digest verification | [p15.md](../../../docs/architect/agent-coordination/verification/rust-host-r1-kernel/p15.md) |"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-005",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "d6b057701646c6f5da759e7225fa64e68ba8854ed6c262a7ec1b8d2d9b59743c",
+          "bytes": 18279,
+          "lines": 180,
+          "headings": [
+            {
+              "line": 1,
+              "text": "# Track Closeout Report: Rust Host R1 Kernel"
+            },
+            {
+              "line": 11,
+              "text": "## 1. Overview and Delivered Scope"
+            },
+            {
+              "line": 29,
+              "text": "## 2. Cell Merge History"
+            },
+            {
+              "line": 53,
+              "text": "## 3. Deferred Findings Across All Cells"
+            },
+            {
+              "line": 108,
+              "text": "## 4. Performance Measurements"
+            },
+            {
+              "line": 112,
+              "text": "### Exact Reproduction Command"
+            },
+            {
+              "line": 118,
+              "text": "### Measured Numbers"
+            },
+            {
+              "line": 144,
+              "text": "## 5. Full-Suite Verification Gates"
+            }
+          ],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    }
+  ]
+}

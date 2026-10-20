@@ -1,0 +1,562 @@
+{
+  "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+  "reviewerRule": "Never run checker/probes/resolver/author scripts. Read every assigned file through EOF and independently verify targets. One verdict per whole file, even when streamed.",
+  "set": "step04-006",
+  "files": [
+    "archive/plans/260911-2305-runtime-recovery/reports/phase-00-baseline-report.md",
+    "archive/plans/260915-code-implementation-track-policy/reports/review-260915-0944-critical-design-review.md",
+    "archive/plans/260915-code-panel-multicell-facade/phase-05-live-proof-and-rollout.md"
+  ],
+  "joinedSlots": 5,
+  "items": [
+    {
+      "file": "archive/plans/260911-2305-runtime-recovery/reports/phase-00-baseline-report.md",
+      "sourceDigest": "4e7c0eaba7ef9a4ebce2cd41ed0c4871f00b947a724197fb6e2db724b81bf10a",
+      "sourceContext": "# Phase 00 — Baseline Report\n\n**Cell:** P00 (wave 0, read-only-baseline)\n**Plan:** [../plan.md](../plan.md)\n**Phase brief:** [../phase-00-freeze-existing-behavior.md](../phase-00-freeze-existing-behavior.md)\n**Date:** 2026-09-12\n**Mode:** observation only — no source changes in this cell (verified: `git status --short` shows no tracked-file diffs from this cell's work, only pre-existing untracked plan/design artifacts from the prior design session).\n\n## Focused suites run (all green, no source touched)\n\n| Suite | Tests | Pass | Fail | Skip |\n|---|---|---|---|---|\n| `test/runner/dispatch-liveness.test.mjs` | 20 | 20 | 0 | 0 |\n| `test/runner/main-checkout-lock.test.mjs` + `lock.test.mjs` + `lock-wait.test.mjs` | 86 | 86 | 0 | 0 |\n| `test/runner/coordination-replay.test.mjs` | 28 | 28 | 0 | 0 |\n| `test/runner/recovery.test.mjs` (Work-lifecycle `resolveAction`/`resolveStaleDoing`) | 33 | 33 | 0 | 0 |\n| `test/runner/herdr-agent.test.mjs` | 32 | 32 | 0 | 0 |\n| `test/runner/herdr-spawn-adapter.test.mjs` (fake client) | 36 | 35 | 0 | 1 |\n| `test/runner/coordination-recovery-and-quorum.test.mjs` | 31 | 31 | 0 | 0 |\n\n`test/runner/dispatch-recovery.test.mjs` does not exist yet — it is a P03 testLease file to be created by that cell, not an existing baseline suite. No other testLease file named in `code-panel-cells.json` for P01/P02L/P02H/P05/P05S exists yet either (`run-lock.mjs`, `cli-spawn-supervisor.mjs`, `read-evaluators.mjs`, `recovery-planner.mjs` all absent) — confirmed by direct `ls`, recorded here so later cells don't waste a round rediscovering it.\n\n## S0 scenario findings\n\n| ID | Scenario | Frozen observation |\n|---|---|---|\n| S0-1 | `blocked`/`paused-limit` mapping | Corrected owner: `src/runner/dispatch/herdr-round.mjs:55-61` (`ERROR_CLASS_FOR_OUTCOME`) is the actual mapping, not `liveness.mjs`/`result-ladder.mjs`. The 20/20 `dispatch-liveness.test.mjs` pass is still the frozen baseline for the ladder itself (`evaluateLadder`), but no test currently pins the `blocked`/`paused-limit` → `worker-timeout` mapping specifically. Not touched this cell. |\n| S0-2 | Herdr prompt timeout resend | Corrected gate: `herdr-round.mjs:527/548` — resend fires when there is no ack **file** yet (`ackSeen` is set only by `fs.existsSync(paths.ackPath)`, line 492) and `resends < maxResends` and the agent's polled state is a ready state (`isReadyState`, herdr-round.mjs:539); confirmed by `herdr-spawn-adapter.test.mjs`'s \"a herdr that stops answering does not turn a live round into an idle timeout\" (passes, 2.9s real wait). Dropping the earlier \"pre-`working`\" framing: a worker that goes `working` → `done` (a ready state) without ever producing an ack file IS re-briefed, because the gate keys on the ack file, not on ever having been `working`. Transport resend is not semantic duplicate delivery — preserved baseline, matches plan's non-goal. |\n| S0-3 | `run.mjs` close-after-steps | **Not deferred** (correction to the earlier \"out of lease\" framing): `closeSessionByQuorum` (`src/runner/coordination/session-engine.mjs:3579-3678`) evaluates quorum and either closes or throws a `CoordinationError` naming the refusal reason (e.g. incomplete actors not covered by `partialPolicy`, below-minimum completions) — it does not silently no-op. **Confirmed this cell**: `src/verbs/coordination/run.mjs:743-767` is exactly this caller — it invokes `closeSessionByQuorum` unconditionally after the step loop, including when the loop exits via the fan-out-failure `break` at line 726 falling through to it. `closeRefusalReason` is set at :745 (initialized `null`) and :751 (on a caught `CoordinationError`); a non-`CoordinationError` is rethrown at :753; `closeAttempted: true` is returned unconditionally at :766, with `closeRefusalReason` spread into the result only when non-null at :767. Covered behaviorally by the coordination-recovery-and-quorum suite (31/31 green). |\n| S0-4 | Lock reclaim, live vs dead PID | **Corrected — this was backwards.** `main-checkout-lock.mjs:276-292` freezes a **heartbeat-mitigated TTL takeover of live holders**, the opposite of a \"no TTL-only takeover\" guarantee: for a numeric-PID identity, `held = pidLive && withinTtl` — a live PID whose record has aged past `ttlMs` reads as **not held**, so a live holder can be taken over once its TTL lapses; for a string identity there is no PID to probe at all, so `held` is judged by TTL freshness alone (fail-closed to `AMBIGUOUS` only when `ttlMs` itself is missing). This is the **opposite** of traceability row X01 (\"live holder past TTL held\"). `main-checkout-lock.test.mjs` does prove same-identity self-recognition refresh and that `forceReclaimAmbiguousLock` never unlinks a record that still parses — a parseability guarantee, not a liveness one — but that is a narrower guarantee than X01 claims, not X01 itself. **P01 must NOT reuse `main-checkout-lock.mjs`'s held-ness rule for per-Run control** if X01's \"live holder past TTL still held\" property is actually required — it needs its own rule. |\n| S0-5 | Result link after retry declaration | **Not deferred** (correction to the earlier \"not independently fixtured\" framing): `retrySessionTask` (`session-engine.mjs:4384`) and result-link fencing — `assertValidRunIdForAssignment` (`session-engine.mjs:239`) plus the `dangling-ref` throw right after it (`:244`) — already exist and are tested (`coordination-recovery-and-quorum.test.mjs:625`, \"retrySessionTask dispatches a NEW Run for the SAME Assignment ... never deletes/rewrites the original evidence\"). The only genuinely missing piece is the schema-2 **exact-retry declaration** — there is no current schema-2 exact-retry code path to freeze, so that narrower gap alone is recorded as open, owned by P01. |\n| S0-6 | BL1 premature partial close | **Different track, same kernel mechanism**, tracked as **tsk-5qj**. BL1 (`session-engine.mjs`'s `partialPolicy`-declared auto-close-after-first-required-pass) is documented and reproduced in `docs/architect/agent-coordination/verification/architecture-advisory-panel/P02.1.md` (Table 1/Table 4). Corrected evidence sentence: `git log --all -S partialPolicy -- src/runner/coordination/session-engine.mjs` returns **two introduction commits** (`a9613222`, `35a266b7`), both predating the 2026-09-06 BL1 audit record — the earlier sentence wrongly implied this `git log` came back empty; the conclusion is unchanged, since neither commit is a post-audit fix: **BL1 remains open/unfixed** at the kernel level today. `coordination-recovery-and-quorum.test.mjs:463` (\"closeSessionByQuorum closes to 'partial' ... under an explicit partialPolicy naming the missing actor\") is the closest existing kernel fixture, though it exercises correct explicit-`partialPolicy` behavior rather than BL1's auto-close defect itself. **This runtime-recovery track is not exposed to it**: none of `fgos-plan-loop`'s own `open.json`/`fix-N.json`/`close.json` templates declare `partialPolicy` (confirmed by reading `.agents/skills/fgos-plan-loop/SKILL.md` section 1-4), and the architecture-advisory-panel's own `test/verbs/coordination-run-live-proof.test.mjs` proves a full produce→review→red-team→revise→recheck→close cycle works in ONE continuous session precisely when `partialPolicy` is omitted. The Lead accepts re-running the named suites above as sufficient S0 fixture evidence for every scenario in this table **except BL1**, which relies on the `:463` citation above instead. Recorded as a known, separately-owned kernel gap — out of this track's fix authority, tracked here only so no runtime-recovery cell rediscovers it as new. |\n| S0-7 | Herdr create/bind/locator crash windows | **Corrected — the earlier framing overstated the gap.** `herdr-round.mjs:654` mints the agent name as `normalizeAgentName(\\`fgos-${workId ?? 'run'}-${Date.now()...}\\`)` — timestamp-derived. `herdr-round.mjs:261` sets `runId: round.agentName`, but that is only `createWorkerHome`'s temp-dir label, not \"today's Run identity\" for Herdr — dropping that framing. A durable `runId` (`run_<assignmentId>_<attempt>`, minted at `assignment-runner.mjs:852`) already exists in `run.json`, and locators (`agentName`/`paneId`/`agentSession` in `visibility.json`, resolvable via `findAgentBinding` in `visibility-session.mjs:156`) are already persisted before each step. The real gap is narrower than previously stated: there is no production caller of `findAgentBinding` today, and the Herdr agent name is not derived from the durable `runId` — so a crash between `agentStart` and any locator read still has no recovery path keyed off the durable identity, which is the orphan-risk window P02H must close. |\n\n## Exit gate check (phase-00-freeze-existing-behavior.md)\n\n- [x] Baseline fixtures stored (this report + table above; scenario-level JSON fixtures were not separately emitted as files since every scenario is already reproducible by re-running the named suite/line reference — re-running is the fixture, per the existing suites' own determinism).\n- [x] Focused tests green — corrected totals: **265 pass / 1 skip / 266 total** across the 7 suites above (`recovery.test.mjs` is 33 tests, not 61 — the earlier count and the resulting 294/295 total were both wrong); the 1 skip in `herdr-spawn-adapter.test.mjs` is pre-existing, not caused by this cell.\n- [x] No `blocked`/`paused-limit` remapping shipped.\n- [x] No deterministic Herdr naming shipped (S0-7 only *observes* the current timestamp-derived name).\n- [x] No terminal-transfer behavior changed — the required \"replay post-terminal neutralization\" check is `src/runner/coordination/replay.mjs:87-151` (post-terminal `operation-authorized`/aggregation/contribution events are neutralized into `ignored*` lists, never silently dropped), exercised by `coordination-driver-authorization.test.mjs` (67/67 green).\n- [x] No lock reclaim policy changed.\n- [x] `git diff --check` — no source diff from this cell (see git status note above).\n\n## Known changes explicitly labeled (not shipped here, future slice)\n\n- S0-1 mapping: **preserved baseline**, owned by `herdr-round.mjs`'s `ERROR_CLASS_FOR_OUTCOME` (corrected owner), no change planned this cell.\n- S0-4 lock semantics: **preserved baseline for `main-checkout-lock.mjs` itself**, but P01's per-Run control must NOT copy this file's held-ness rule wholesale — it freezes a TTL-can-take-over-a-live-holder behavior, the opposite of X01's stated requirement, so P01 needs its own rule rather than reuse.\n- S0-7 Herdr naming: **named future slice**, P02H — corrected scope: wiring the already-durable `runId` into the agent name and giving `findAgentBinding` a production caller, not inventing a durable identity from scratch.\n- BL1 (tsk-5qj): **named future slice, but explicitly out of this track's cell scope** (owned by whichever track/backlog item fixes `session-engine.mjs`'s partial-close path; this track only needed to confirm it isn't triggered by its own templates).\n\n## Reconciliation with phase-00-baseline-260911.md\n\n`plans/260911-2305-runtime-recovery/reports/phase-00-baseline-260911.md` (dated 2026-09-11, a day earlier) exists in this same `reports/` directory and covers a different, narrower suite set (113 recovery/coordination/lock tests + 100 herdr/confinement/assignment tests, no `recovery.mjs`/`resolveAction` suite). This corrected report **supersedes** that file's S0-4-equivalent characterization (\"Existing lock tests include live-PID TTL reclaim behavior; this remains frozen legacy behavior\" — true as a description, but this report additionally makes explicit that it is the *opposite* of X01's stated requirement, which the 2026-09-11 file does not flag). This report **agrees with** that file's S0-7/S0-2 nuance: durable `runId` exists but is not yet threaded into Herdr launch identity, and terminal replay keeps neutralizing post-terminal records — both consistent with the corrected S0-7/exit-gate rows above.\n\n## Unresolved questions\n\n- (none)\n",
+      "record": {
+        "file": "archive/plans/260911-2305-runtime-recovery/reports/phase-00-baseline-report.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "4e7c0eaba7ef9a4ebce2cd41ed0c4871f00b947a724197fb6e2db724b81bf10a",
+        "digest": "4e7c0eaba7ef9a4ebce2cd41ed0c4871f00b947a724197fb6e2db724b81bf10a",
+        "inventoryEdgeIds": [
+          "evidence-097"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-097",
+            "slotKey": "{\"edgeId\":\"evidence-097\",\"file\":\"archive/plans/260911-2305-runtime-recovery/reports/phase-00-baseline-report.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-097\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":32}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-097",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 32
+              }
+            ],
+            "consumerFile": "archive/plans/260911-2305-runtime-recovery/reports/phase-00-baseline-report.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 32,
+                "columnStart": 232,
+                "columnEndExclusive": 279,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 32,
+                "columnStart": 232,
+                "columnEndExclusive": 279,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '| S0-6 | BL1 premature partial close | **Different track, same kernel mechanism**, tracked as **tsk-5qj**. BL1 (`session-engine.mjs`\\'s `partialPolicy`-declared auto-close-after-first-required-pass) is documented and reproduced in `docs/architect/agent-coordination/verification/architecture-advisory-panel/P02.1.md` (Table 1/Table 4). Corrected evidence sentence: `git log --all -S partialPolicy -- src/runner/coordination/session-engine.mjs` returns **two introduction commits** (`a9613222`, `35a266b7`), both predating the 2026-09-06 BL1 audit record — the earlier sentence wrongly implied this `git log` came back empty; the conclusion is unchanged, since neither commit is a post-audit fix: **BL1 remains open/unfixed** at the kernel level today. `coordination-recovery-and-quorum.test.mjs:463` (\"closeSessionByQuorum closes to \\'partial\\' ... under an explicit partialPolicy naming the missing actor\") is the closest existing kernel fixture, though it exercises correct explicit-`partialPolicy` behavior rather than BL1\\'s auto-close defect itself. **This runtime-recovery track is not exposed to it**: none of `fgos-plan-loop`\\'s own `open.json`/`fix-N.json`/`close.json` templates declare `partialPolicy` (confirmed by reading `.agents/skills/fgos-plan-loop/SKILL.md` section 1-4), and the architecture-advisory-panel\\'s own `test/verbs/coordination-run-live-proof.test.mjs` proves a full produce→review→red-team→revise→recheck→close cycle works in ONE continuous session precisely when `partialPolicy` is omitted. The Lead accepts re-running the named suites above as sufficient S0 fixture evidence for every scenario in this table **except BL1**, which relies on the `:463` citation above instead. Recorded as a known, separately-owned kernel gap — out of this track\\'s fix authority, tracked here only so no runtime-recovery cell rediscovers it as new. |'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-097",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 32,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "| S0-6 | BL1 premature partial close | **Different track, same kernel mechanism**, tracked as **tsk-5qj**. BL1 (`session-engine.mjs`'s `partialPolicy`-declared auto-close-after-first-required-pass) is documented and reproduced in `docs/architect/agent-coordination/verification/architecture-advisory-panel/P02.1.md` (Table 1/Table 4). Corrected evidence sentence: `git log --all -S partialPolicy -- src/runner/coordination/session-engine.mjs` returns **two introduction commits** (`a9613222`, `35a266b7`), both predating the 2026-09-06 BL1 audit record — the earlier sentence wrongly implied this `git log` came back empty; the conclusion is unchanged, since neither commit is a post-audit fix: **BL1 remains open/unfixed** at the kernel level today. `coordination-recovery-and-quorum.test.mjs:463` (\"closeSessionByQuorum closes to 'partial' ... under an explicit partialPolicy naming the missing actor\") is the closest existing kernel fixture, though it exercises correct explicit-`partialPolicy` behavior rather than BL1's auto-close defect itself. **This runtime-recovery track is not exposed to it**: none of `fgos-plan-loop`'s own `open.json`/`fix-N.json`/`close.json` templates declare `partialPolicy` (confirmed by reading `.agents/skills/fgos-plan-loop/SKILL.md` section 1-4), and the architecture-advisory-panel's own `test/verbs/coordination-run-live-proof.test.mjs` proves a full produce→review→red-team→revise→recheck→close cycle works in ONE continuous session precisely when `partialPolicy` is omitted. The Lead accepts re-running the named suites above as sufficient S0 fixture evidence for every scenario in this table **except BL1**, which relies on the `:463` citation above instead. Recorded as a known, separately-owned kernel gap — out of this track's fix authority, tracked here only so no runtime-recovery cell rediscovers it as new. |"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-006",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "archive/plans/260911-2305-runtime-recovery/reports/phase-00-baseline-report.md",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "4e7c0eaba7ef9a4ebce2cd41ed0c4871f00b947a724197fb6e2db724b81bf10a",
+          "bytes": 11991,
+          "lines": 58,
+          "headings": [
+            {
+              "line": 1,
+              "text": "# Phase 00 — Baseline Report"
+            },
+            {
+              "line": 9,
+              "text": "## Focused suites run (all green, no source touched)"
+            },
+            {
+              "line": 23,
+              "text": "## S0 scenario findings"
+            },
+            {
+              "line": 35,
+              "text": "## Exit gate check (phase-00-freeze-existing-behavior.md)"
+            },
+            {
+              "line": 45,
+              "text": "## Known changes explicitly labeled (not shipped here, future slice)"
+            },
+            {
+              "line": 52,
+              "text": "## Reconciliation with phase-00-baseline-260911.md"
+            },
+            {
+              "line": 56,
+              "text": "## Unresolved questions"
+            }
+          ],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "archive/plans/260915-code-implementation-track-policy/reports/review-260915-0944-critical-design-review.md",
+      "sourceDigest": "feb7797a2f6003110077cf596502f5c9b514ee053971880bf36ad1a70a1f68a0",
+      "sourceContext": "# Critical Design Review — Code Implementation Track Policy\n\n**Reviewed:** `plans/260915-code-implementation-track-policy/plan.md` (draft 2026-09-15)\n**Reviewer posture:** adversarial on boundaries; every claim below is checked\nagainst the live repo, not the plan's own description of it.\n**Verdict up front:** **NO-GO as written; GO for a much smaller cut** (see\n\"Recommended MVP scope\"). The plan solves a real symptom with the wrong\ndiagnosis and, in three of seven MVPs, rebuilds seams the repo already has.\n\n## 0. The diagnosis is wrong — and that changes everything downstream\n\nThe plan's \"Current Problem\" says test policy is \"loose prose such as *run the\ntarget project's real test command*\" and that agents therefore run the full\nsuite every cell. Evidence says otherwise:\n\n| Claim in plan | What the repo actually says |\n|---|---|\n| plan-loop encourages full suite per cell | `core/skills/fgos-plan-loop/SKILL.md:564-565` — \"run the phase's **focused** test in the worktree yourself\"; `:575-576` — \"Phases the plan marks as **full-suite gates** run the full suite before the merge\"; `:444` close = \"re-run the **phase's stated** test command\". Targeted-per-cell + full-at-gate is already the skill's contract. |\n| No checkpoint concept exists | `plans/260910-1700-rust-host-r1-kernel/plan.md:148-168` Product Gates marks P07/P09/P13/P15/P16 **\"Full-suite gate.\"** and cell traces under `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p07,p09,p13,p15.md` record it. This convention is dogfooded across a 17-cell track. |\n| Wording is the cause of full-suite-every-cell | `plans/260915-0455-test-suite-feedback-cost/phase-0[0-8]-*.md` — **all nine** phase files put `npm test` in their own `## Verification`, and `plan.md` Track-Wide Invariant #2 says \"each implementation cell runs the full suite once … before close\". The plan author chose it (high-risk track editing the proof harness itself). That is a plan decision, not a skill defect. |\n| \"run the target project's real test command\" is the generic wording | That string exists only in `domains/coding/skills/fgos-code-panel/SKILL.md:79,196,281,307` — a **single-change** skill where \"the real test command\" is the honest answer (one change, no track, no gates). |\n\nConsequence: MVP2's premise (\"stop the prompt templates from encouraging full\nsuite\") targets text that already says the opposite; MVP1 \"applied to the\nalready-running plan\" would silently reverse an explicit plan invariant (#2),\nwhich review rules forbid doing without surfacing it to the owner.\n\nThe real gaps, restated:\n\n1. **No authoring template** for Work-independent tracks tells a planner to\n   write a targeted Verification per phase and mark full-suite gates in Product\n   Gates. Agents default to `npm test` when nothing tells them otherwise.\n2. **Routing/naming drift**: the user says \"code panel\" for a multi-cell plan\n   (the test-suite plan's own status line reads `READY FOR CODE PANEL` while\n   its Execution Model says `fgos-plan-loop`). This is a description/routing\n   problem, not an orchestration-layer problem.\n3. **No baseline rule** in plan-loop. `master-coordinator.md:255-260` (TEST\n   BASELINE: full run once before cell 1, record known failures) did not\n   survive the distillation into `fgos-plan-loop`. Without it the plan's own\n   checkpoint triage (\"pre-existing vs patch-related\") has nothing to compare\n   against.\n\n## 1. Accepted decisions\n\n- **A1. Engine stays domain-neutral; no `npm test` in CoordinationSession or\n  plan-loop core.** Correct, and already law: `test/architecture.test.mjs:10`\n  (D12 domain-siloing — `core/`, `src/`, `bin/` cannot couple to a named\n  domain) and ADR-007 §1 (one pure seam per domain). Keep.\n- **A2. Targeted proof per cell, full proof at declared checkpoints and at\n  final close before any main merge.** Correct — it is the existing\n  master-coordinator/plan-loop/Product-Gates contract. Accept as a\n  *restatement*, not a new policy.\n- **A3. Reviewer/Red-Team evaluate proof sufficiency, not just correctness.**\n  Good, cheap, and expressible today in the `review-candidate` /\n  `red-team-candidate` objective text. Accept.\n- **A4. Convention-first, no runtime schema in the first cut.** Accept — but\n  the convention must be the *existing* one (Product Gates + per-phase\n  Verification + Execution Inputs), not a new YAML vocabulary (see R1).\n- **A5. Non-goals** (no test selection/caching/tiering here; do not make\n  test-suite track a prerequisite). Accept.\n- **A6. MVP4 manual prompt pack** — accept only as a *section* of the authoring\n  template, not a separate deliverable (RUL11: one shape, not five files).\n\n## 2. Rejected or risky decisions\n\n- **R1. REJECT the `trackKind` / `executionPolicy` YAML contract.**\n  It is a second, parallel machine-readable proof contract next to the Work\n  path's `verify` field (`core/skills/_shared/coding-worker-contract.md:84-86`,\n  the item's own `verify` command is the only thing that decides done) and next\n  to the already-used Product Gates convention. Nothing reads it (schema\n  `TOP_LEVEL_ALLOWED_KEYS` has no policy channel — `schema.mjs:509-512`), so it\n  is a convention wearing a schema's costume: it invites a validator (MVP5),\n  the validator invites a parser for `plan.md`, and plans become authority —\n  which `documentation-management.md` explicitly says they are not (\"Plans,\n  reports … are stateful records. They do not become evergreen product\n  authority\"). Use the prose surfaces that already exist:\n  - per-phase `## Verification` = `defaultCellProof: targeted`\n  - Product Gates `**Full-suite gate.**` marker = `checkpoints`\n  - plan.md Execution Inputs (track branch, cell branch convention, roster)\n    = `merge` / `sync` / roster\n- **R2. REJECT MVP6 as specified (\"plan-loop injects code policy when\n  `trackKind: code-implementation`\").** A `core/` skill branching on a\n  code-domain kind is exactly the coupling D12/ADR-007 forbid, just in prose\n  instead of an import. The generic, legal version: plan-loop's objective\n  composition always says *\"run exactly the Verification this cell's phase\n  file declares; run the track's full proof command only if plan.md marks\n  this phase a full-suite gate\"* — domain-neutral text, content owned by the\n  plan. That is a ~4-line edit, not an MVP.\n- **R3. REJECT MVP7 (code-panel as a two-mode facade).**\n  `fgos-code-panel`'s entire contract is \"self-contained … reading\n  `fgos-plan-loop` is not required\" (`SKILL.md:9-12,41-45`) and \"a change big\n  enough to need its own design discussion is a `fgos-plan-loop` track, not\n  this skill\" (`:62-65`). A facade that delegates to plan-loop's section-5\n  loop either duplicates that loop (two documents that drift — the R1-kernel\n  track already had to sync `claude` vs `claude-reviewer` roster wording\n  between the two skills) or becomes a thin pointer — and a thin pointer is a\n  one-paragraph routing fix, not a skill redesign. Naming answer to Q2:\n  **neither** a facade nor a new skill. Fix routing: add \"run / execute this\n  code implementation plan / track\" to `fgos-plan-loop`'s description; add an\n  explicit \"multi-cell plan → `fgos-plan-loop`\" line to code-panel's\n  description. The user keeps saying \"code panel\"; the router sends it to the\n  right place.\n- **R4. RISKY: `merge.trackToMain: finalOnly` as the default.** Real practice\n  is per-cell / per-pair landings on main (`git log --merges`: `bc989a66`\n  R2-P1+P2, `f6849be3`, `3cfa9a5d` P7, `13757075` …). Final-only merges\n  maximise integration debt and block sibling tracks from catching up.\n  Merge cadence must stay a per-plan choice in Execution Inputs; do not bake\n  a default the repo's own history contradicts.\n- **R5. RISKY: `sync.mainIntoTrack: atCheckpoints` + \"sync-induced\" triage.**\n  This adds a new git step with its own failure class to a plan that says it\n  is \"about orchestration design\". It is legitimate, but it is git policy,\n  not test policy, and plan-loop's Non-Goals put every merge outside the\n  session (`SKILL.md:64-70`). Move it to the authoring template as an\n  optional Execution Input, out of the \"verification policy\" story.\n- **R6. RISKY: MVP1 \"can be applied to an already-running plan\".** For the\n  test-suite track this reverses Invariant #2 and nine phase files' stated\n  Verification. Per review rules: present original decision / concern /\n  trade-off / options to the owner; do not apply an addendum over it. (For\n  that track specifically, full-per-cell is arguably *right*: it is editing\n  the harness that judges everything else.)\n- **R7. REJECT MVP5 in its stated form.** A validator that \"only verifies the\n  plan has a declared policy\" is a YAML-presence lint — agents will emit the\n  block and behaviour will not change. The failure mode you actually have is\n  a phase file whose Verification says `npm test`. That is caught by a\n  reviewer checklist line and the template, not by a script. Postpone until a\n  second real consumer shows a script earns its keep (ADR-007 §4's own bar).\n\n## 3. Missing design seams\n\n- **S1. Instruction fragments (`domains/<domain>/instructions/`).** The repo\n  already composes domain `law/boundary/procedure` fragments into host\n  projections (`src/setup/instruction-registry.mjs:4-13`;\n  `domains/coding/instructions/worktree-safety.md` is a live `kind: boundary`\n  example). A `kind: procedure` fragment \"coding verification discipline:\n  run the verification your unit declares; the full suite belongs to the\n  track's gates and the lifecycle's own verify/reverify, never to every\n  doer/fixer round\" is the canonical home for the rule. **Correction after\n  checking the live path:** delivery is not automatic today. Only the `repo`\n  target is ever rendered (`instruction-projections.mjs:240` `target ??\n  'repo'`), so a `domain`-scoped fragment composes into `domain-coding` but\n  nothing renders it; and this checkout has no materialized managed block in\n  `AGENTS.md` at all (`inspectInstructionProjection` → `materialized: false`,\n  effective set = `platform-operating-laws` only). So: put the rule in the\n  fragment as the single source, and have the plan-loop/code-panel objective\n  sentences (MVP-B) cite it — that is how it reaches workers until domain\n  projection rendering lands under packaging-distribution's own track.\n- **S2. Test baseline.** Master-coordinator's TEST BASELINE step\n  (`master-coordinator.md:255-260`) is absent from plan-loop and from this\n  plan. Checkpoint triage without a recorded baseline is guesswork. Add it as\n  the first Execution Input of the template and step 0 of plan-loop §5.\n- **S3. Blast-radius escalation rule (answers Open Question 4).** Reviewer /\n  Red-Team dispatches are `result.kind: advisory` and can never mutate or\n  expand their own step; only the Lead authors the next request. So: reviewer\n  / red-team **report** \"proof insufficient: targeted set does not cover\n  <contract>\" as a severity-tagged finding; if the Lead dispositions it\n  `accepted`, the cell becomes a full-suite gate before close, recorded in the\n  trace. Never \"force\". Add a *mechanical* trigger too: a cell whose diff\n  touches the paths master-coordinator already lists as isolation-breaking\n  (`:241-243` — dispatch/self-host hooks, session/replay/schema core, shared\n  invariants, migrations, **test harness foundations**) or `package.json`\n  scripts is a full-suite gate regardless of what Product Gates says.\n- **S4. Trace field for proof mode.** The cell trace\n  (`docs/architect/agent-coordination/verification/<track>/<cell>.md`) must\n  record `Proof: targeted | full-suite-gate | escalated-to-full` + exact\n  command + outcome. It is the only resumable record; MVP6's \"close-cell\n  wording\" is the wrong place (a request `rationale` is not where a fresh Lead\n  looks first).\n- **S5. Relationship to the Work path.** Work items already have per-item\n  `verify`, `fgos return` runs it, and `approve` does post-merge reverify\n  (`work-state.md:1984` verify-fail-post-merge edge). The plan should state\n  in one sentence that the Work-independent track mirrors that split\n  (cell verify = item verify; checkpoint/final full = lifecycle\n  verify/reverify) so the two proof models cannot diverge in vocabulary.\n\n## 4. Recommended MVP scope\n\nCut seven MVPs to **two**, both docs-only, both landable in one cell:\n\n**MVP-A — Authoring template + coding procedure fragment (replaces MVP1, MVP3,\nMVP4, MVP5)**\n\n- `docs/how-to/author-a-plan-loop-track.md` (or the location the docs nav\n  already reserves): required sections = Execution Inputs (track/cell\n  branch, roster, **baseline command + recorded baseline**, merge cadence,\n  optional main-sync), Product Gates table with `**Full-suite gate.**`\n  markers, per-phase `## Verification` that names targeted commands and\n  **never** the full suite unless the phase is a gate, cell-trace `Proof:`\n  field, and the five manual prompts from MVP4 as a \"Lead checklist\" section.\n- `domains/coding/instructions/verification-discipline.md`, `kind:\n  procedure`, projected to all coding workers (S1).\n- A \"living example\" = a **new** Execution-Inputs block for the test-suite\n  track presented to its owner as an *option*, not applied (R6).\n\n**MVP-B — Routing + generic wording (replaces MVP2, MVP6, MVP7)**\n\n- `core/skills/fgos-plan-loop/SKILL.md`: add baseline step to §5; put the\n  domain-neutral verification sentence into the `produce` / `revise`\n  objective templates and the proof-sufficiency sentence into `review` /\n  `red-team`; add \"run/execute this code implementation plan/track\" to the\n  description. No `trackKind`, no domain branch.\n- `domains/coding/skills/fgos-code-panel/SKILL.md`: description gains one\n  line \"a multi-cell plan is a `fgos-plan-loop` track — this skill is one\n  cell\"; body unchanged.\n- `npm run build:skills` + wrapper/projection tests.\n\nPostponed (not rejected forever): validator script, CLI conveniences,\npersisted checkpoint status, runtime refusal at close — each waits for a\nsecond real consumer.\n\n## 5. Concrete wording (answers Q7)\n\nDoer / Fixer objective (plan-loop §1 and §3 templates; domain-neutral):\n\n> Run exactly the Verification commands the phase file declares for this\n> cell and report each command's real outcome. Do not run the repository's\n> full proof command unless plan.md marks this phase a full-suite gate or the\n> Lead's objective for this round says so explicitly.\n\nReviewer / Red-Team objective (§1 and §3):\n\n> Judge proof sufficiency, not only correctness: if the declared targeted\n> verification does not exercise a contract this diff changes, report it as\n> a finding (HIGH if the gap is on a public or shared contract) and name the\n> missing test or the reason a full-suite gate is needed. You cannot run or\n> request the full suite yourself; the Lead decides on your finding.\n\nLead close rule (§4 / §5 step 5):\n\n> Close with `Proof: targeted` only when no accepted finding named a coverage\n> gap and the diff touches none of the isolation-breaking paths. Otherwise\n> the cell is a full-suite gate: run the track's full proof command in the\n> cell worktree, compare against the recorded baseline, triage every new\n> failure as patch-related / pre-existing / environmental, and record\n> `Proof: full-suite-gate` (or `escalated-to-full`) with the command and\n> outcome in the trace before `close.json`.\n\nCoding procedure fragment (one paragraph, S1):\n\n> Verification discipline: a coding worker runs the verification its unit\n> declares (a Work item's `verify`, a cell's phase Verification) and reports\n> the real outcome. The full test suite belongs to declared gates — full-suite\n> gate phases, track close, Work verify/reverify — never to every implement\n> or fix round. A reviewer or red-team who believes the declared verification\n> is insufficient reports a coverage finding; it never expands its own run.\n\n## 6. Answers to the eight questions, compressed\n\n1. Seam: the three-layer picture is fine as a *description*, but layer 3\n   (\"Code Implementation Policy\") already exists as (a) plan prose conventions\n   and (b) domain instruction fragments. Do not give it a new artefact.\n2. Facade: neither code-panel nor a new skill. Fix routing descriptions.\n3. SOLID: MVP6/MVP7 as written leak a code `trackKind` into `core/`; MVP-B's\n   generic sentence does not.\n4. Order: wrong because the list is wrong. Two docs-only MVPs, A then B.\n5. Convention-first is safe *because* the enforcement point is the Lead's\n   close + trace, and the reviewer checklist catches a phase file that says\n   `npm test`. Validator-first would validate the wrong thing.\n6. DoD: preserved only with S2 (baseline), S3 (mechanical + finding-driven\n   escalation) and S4 (trace field). Without those three, \"targeted per cell\"\n   is a proof hole, not a policy.\n7. Wording: §5 above.\n8. Reject R1, R2 (as specified), R3, R7; defer R4/R5 to per-plan Execution\n   Inputs; do not apply R6 to the running track without its owner's decision.\n\n## 7. Go / No-Go\n\n- **No-Go** on the plan as drafted (seven MVPs, YAML policy contract,\n  code-panel facade, plan-loop trackKind branch).\n- **Go** on MVP-A + MVP-B as one docs cell, with the three missing gates\n  (baseline, escalation rule, trace field) written in, and the test-suite\n  track's Invariant #2 left untouched pending its owner's call.\n\n## Unresolved questions (for the owner)\n\n1. Test-suite track: keep full-suite-per-cell (Invariant #2) as deliberately\n   chosen for a harness-editing track, or convert P03–P06 to targeted with\n   P02/P08 as gates? Options above; reviewer leans keep for P00–P02, targeted\n   for P03–P06, gate at P08.\n2. Where does the docs nav want the track-authoring how-to — `docs/how-to/`\n   or next to `master-coordinator.md` under `docs/architect/agent-coordination/playbooks/`?\n",
+      "record": {
+        "file": "archive/plans/260915-code-implementation-track-policy/reports/review-260915-0944-critical-design-review.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "feb7797a2f6003110077cf596502f5c9b514ee053971880bf36ad1a70a1f68a0",
+        "digest": "feb7797a2f6003110077cf596502f5c9b514ee053971880bf36ad1a70a1f68a0",
+        "inventoryEdgeIds": [
+          "evidence-100",
+          "evidence-100"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-100",
+            "slotKey": "{\"edgeId\":\"evidence-100\",\"file\":\"archive/plans/260915-code-implementation-track-policy/reports/review-260915-0944-critical-design-review.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-100\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":19}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-100",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 19
+              }
+            ],
+            "consumerFile": "archive/plans/260915-code-implementation-track-policy/reports/review-260915-0944-critical-design-review.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 19,
+                "columnStart": 176,
+                "columnEndExclusive": 223,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 19,
+                "columnStart": 176,
+                "columnEndExclusive": 223,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '| No checkpoint concept exists | `plans/260910-1700-rust-host-r1-kernel/plan.md:148-168` Product Gates marks P07/P09/P13/P15/P16 **\"Full-suite gate.\"** and cell traces under `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p07,p09,p13,p15.md` record it. This convention is dogfooded across a 17-cell track. |'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-100",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 19,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "| No checkpoint concept exists | `plans/260910-1700-rust-host-r1-kernel/plan.md:148-168` Product Gates marks P07/P09/P13/P15/P16 **\"Full-suite gate.\"** and cell traces under `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p07,p09,p13,p15.md` record it. This convention is dogfooded across a 17-cell track. |"
+              }
+            ]
+          },
+          {
+            "edgeId": "evidence-100",
+            "slotKey": "{\"edgeId\":\"evidence-100\",\"file\":\"archive/plans/260915-code-implementation-track-policy/reports/review-260915-0944-critical-design-review.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-100\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":163}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-100",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 163
+              }
+            ],
+            "consumerFile": "archive/plans/260915-code-implementation-track-policy/reports/review-260915-0944-critical-design-review.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 163,
+                "columnStart": 5,
+                "columnEndExclusive": 52,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 163,
+                "columnStart": 5,
+                "columnEndExclusive": 52,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '  (`docs/architect/agent-coordination/verification/<track>/<cell>.md`) must'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-100",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 163,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "  (`docs/architect/agent-coordination/verification/<track>/<cell>.md`) must"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-006",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "archive/plans/260915-code-implementation-track-policy/reports/review-260915-0944-critical-design-review.md",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "feb7797a2f6003110077cf596502f5c9b514ee053971880bf36ad1a70a1f68a0",
+          "bytes": 17805,
+          "lines": 280,
+          "headings": [
+            {
+              "line": 1,
+              "text": "# Critical Design Review — Code Implementation Track Policy"
+            },
+            {
+              "line": 10,
+              "text": "## 0. The diagnosis is wrong — and that changes everything downstream"
+            },
+            {
+              "line": 43,
+              "text": "## 1. Accepted decisions"
+            },
+            {
+              "line": 64,
+              "text": "## 2. Rejected or risky decisions"
+            },
+            {
+              "line": 128,
+              "text": "## 3. Missing design seams"
+            },
+            {
+              "line": 175,
+              "text": "## 4. Recommended MVP scope"
+            },
+            {
+              "line": 210,
+              "text": "## 5. Concrete wording (answers Q7)"
+            },
+            {
+              "line": 246,
+              "text": "## 6. Answers to the eight questions, compressed"
+            },
+            {
+              "line": 265,
+              "text": "## 7. Go / No-Go"
+            },
+            {
+              "line": 273,
+              "text": "## Unresolved questions (for the owner)"
+            }
+          ],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "archive/plans/260915-code-panel-multicell-facade/phase-05-live-proof-and-rollout.md",
+      "sourceDigest": "e8a72de2c5949849f6610b747d66e8d132fc3cee1012e084a82336b9d005f044",
+      "sourceContext": "---\nstatus: completed\n---\n\n# Phase 05 — Live proof và rollout\n\nLease: `facade-live-proof` | Vào được sau: P00-P03 và P04\n\n## Mục tiêu\n\nĐo end-to-end rằng facade vận hành được plan nhiều cell và thực sự giảm lãng phí test trước khi mở lại các kế hoạch đang chờ.\n\n## Requirements\n\nR1. Dùng track fixture ít nhất hai cell:\n\n- cell A thay đổi hẹp, chỉ focused/affected;\n- cell B chạm một full trigger và phải chạy full;\n- giữa hai cell phải dừng process rồi resume bằng fresh code-panel invocation.\n\nR2. Trace phải ghi role, command, duration, tree hash, environment fingerprint, result và reuse/escalation reason.\n\nR3. Reviewer và red-team độc lập thật; mutation chỉ ở role được phép; close dùng quorum engine.\n\nR4. Full suite chạy không quá một lần trên cùng final tree/environment. Final\nintegration bắt buộc sync latest `main` vào track trước, resolve tại track,\nchạy full proof tại đó, rồi mới merge track ra `main`. Nếu post-merge tree hash\nvà environment fingerprint không đổi, phải reuse proof; không chạy full lần\nhai chỉ vì commit SHA khác.\n\nR5. Chạy thêm một direct single-cell live smoke để chứng minh facade không làm đường ngắn đắt hơn.\n\nR6. Sau proof xanh, inventory P00 được cập nhật bằng lệnh resume cụ thể cho từng plan đang tạm dừng.\n\nR7. Nếu `main` tiến thêm hoặc merge/conflict resolution làm đổi tree/environment,\nkhông fix trực tiếp trên `main`. Sync lại vào track, resolve/fix, chạy proof cho\nstate mới rồi merge lại. Trace phải ghi lý do proof cũ stale.\n\n## Files\n\n- Add: `docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/p04/**`\n- Add/Edit: `docs/architect/agent-coordination/verification/code-panel-multicell-facade/{index.md,current-cell.md,p04.md}`\n- Add: `plans/260915-code-panel-multicell-facade/reports/track-closeout.md`\n- Edit: `plans/260915-code-panel-multicell-facade/plan.md` (status/evidence only)\n- Edit: `CHANGELOG.md` only if rollout evidence exposes a user-visible correction\n- Must not edit: source implementation except through a recorded accepted finding/fix round for P04's own scoped fixture\n\n## Steps\n\n1. Chạy fixture multi-cell qua `fgos-code-panel`, lưu hai cell traces.\n2. Kill/restart ở checkpoint đã chọn và resume không truyền chat context.\n3. Chạy direct single-cell smoke.\n4. Merge latest `main` vào track; resolve mọi conflict trong track worktree.\n5. Chạy `npm test` đúng một lần trên final integrated track tree và lưu\n   `testedSha`, tree hash, environment fingerprint.\n6. Merge track ra `main`; so sánh post-merge tree/environment với proof ở bước\n   5. Nếu giống, record proof reuse và không chạy test lại.\n7. Nếu khác, quay lại bước 4 với latest `main`; không vá hoặc chứng nhận trực\n   tiếp trên một untested main tree.\n8. So sánh baseline P00: số full runs, tổng thời gian test, duplicate commands và failures phát hiện.\n9. Viết closeout, regenerate projections/index cần thiết, cập nhật `CHANGELOG.md`.\n10. Với từng plan bị dừng, ghi `current cell`, `next command/action`, `coordination id`, và condition còn thiếu; chỉ sau đó tuyên bố sẵn sàng tiếp tục.\n\n## Validation\n\n- Hai traces tái lập được và dẫn tới terminal closed track.\n- Fresh resume không duplicate work.\n- Full-suite count đáp ứng R4.\n- Post-merge main tree hoặc reuse đúng proof của identical track tree, hoặc đã\n  quay lại vòng sync/test; không tồn tại main tree được chứng nhận bằng proof\n  của một tree khác.\n- `npm test` xanh.\n- Closeout trả lời rõ hiệu suất tốt hơn bao nhiêu, không chỉ nói “đã tối ưu”.\n- Một phiên mới đọc plan + closeout có thể tiếp tục plan thật mà không hỏi lại lịch sử buổi sáng.\n\n## Verification\n\n```sh\nnode --test test/setup/skill-wrappers.test.mjs test/skills/fgos-mirror.test.mjs test/architecture.test.mjs\nenv -u CLAUDE_CODE_ENTRYPOINT -u CLAUDECODE -u CLAUDE_CODE_SSE_PORT npm test\ntest \"$(git rev-parse \"${TESTED_SHA}^{tree}\")\" = \"$(git rev-parse \"${MAIN_INTEGRATED_SHA}^{tree}\")\"\n```\n\n## 2026-09-16 Direct hotfix execution note\n\nClaude quota was exhausted during the incident response, so P02/P03/P05 were\ncompleted by the lead session directly instead of through the broken\nplan-loop/code-panel dispatch path. The final integrated proof was still run on\nthe real track branch after syncing main hotfixes:\n\n```sh\ncargo build --release --workspace\nnode --test test/rust-host/*.test.mjs\nnode --test test/cli/fgos-intake-4.test.mjs\nenv -u CLAUDE_CODE_ENTRYPOINT -u CLAUDECODE -u CLAUDE_CODE_SSE_PORT npm test\n```\n\nFinal proof result on track branch `code-panel-multicell-facade`:\n\n- tested SHA: `069e93cffd6da26f9ce1702c9fec220216b5dddd`\n- tested tree: `094be49654b757d62dee26ffad0c94acd047dbb3`\n- environment: Node `v24.18.0`, npm `11.16.0`, Linux x86_64, `package-lock.json` sha256 `b097ecd850ca73e265a2dcbf94c63aa48c118069db53d42b00996fecd83fe2fc`\n- final `npm test`: 6593 tests, 6584 pass, 0 fail, 9 skipped, duration `395982.212118ms`\n\nThe earlier red full-suite attempt on the same tree reproduced the P00 baseline\nenvironment precondition (missing `target/release/fgos` and\n`target/release/fgctl`). After building Rust release binaries, `rust-host`\npassed 102/102 and the formerly failing intake regression passed 15/15 before\nthe final full-suite proof.\n\nPublication to `main` was completed at merge commit\n`4386a835e684d32837eff412c8e44457acc12dc6` (tree\n`c254e988199978b354b03386bf9e93a979c32297`). Because the post-proof evidence\ncommit changed docs, the final full suite was rerun on that exact main merge\ncommit:\n\n- `env -u CLAUDE_CODE_ENTRYPOINT -u CLAUDECODE -u CLAUDE_CODE_SSE_PORT npm test`\n- result: 6593 tests, 6584 pass, 0 fail, 9 skipped, duration `390376.330836ms`\n\n## Rollback\n\nNếu live proof fail, giữ các plan đang dừng và disable planned facade; direct code-panel cùng standalone plan-loop vẫn là fallback rõ ràng.\n",
+      "record": {
+        "file": "archive/plans/260915-code-panel-multicell-facade/phase-05-live-proof-and-rollout.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "e8a72de2c5949849f6610b747d66e8d132fc3cee1012e084a82336b9d005f044",
+        "digest": "e8a72de2c5949849f6610b747d66e8d132fc3cee1012e084a82336b9d005f044",
+        "inventoryEdgeIds": [
+          "evidence-105",
+          "evidence-105"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-105",
+            "slotKey": "{\"edgeId\":\"evidence-105\",\"file\":\"archive/plans/260915-code-panel-multicell-facade/phase-05-live-proof-and-rollout.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-105\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":41}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-105",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 41
+              }
+            ],
+            "consumerFile": "archive/plans/260915-code-panel-multicell-facade/phase-05-live-proof-and-rollout.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 41,
+                "columnStart": 9,
+                "columnEndExclusive": 56,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 41,
+                "columnStart": 9,
+                "columnEndExclusive": 56,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '- Add: `docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/p04/**`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-105",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 41,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "- Add: `docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/p04/**`"
+              }
+            ]
+          },
+          {
+            "edgeId": "evidence-105",
+            "slotKey": "{\"edgeId\":\"evidence-105\",\"file\":\"archive/plans/260915-code-panel-multicell-facade/phase-05-live-proof-and-rollout.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-105\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":42}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-105",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 42
+              }
+            ],
+            "consumerFile": "archive/plans/260915-code-panel-multicell-facade/phase-05-live-proof-and-rollout.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 42,
+                "columnStart": 14,
+                "columnEndExclusive": 61,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 42,
+                "columnStart": 14,
+                "columnEndExclusive": 61,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '- Add/Edit: `docs/architect/agent-coordination/verification/code-panel-multicell-facade/{index.md,current-cell.md,p04.md}`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-105",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 42,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "- Add/Edit: `docs/architect/agent-coordination/verification/code-panel-multicell-facade/{index.md,current-cell.md,p04.md}`"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-006",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "archive/plans/260915-code-panel-multicell-facade/phase-05-live-proof-and-rollout.md",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "e8a72de2c5949849f6610b747d66e8d132fc3cee1012e084a82336b9d005f044",
+          "bytes": 6197,
+          "lines": 122,
+          "headings": [
+            {
+              "line": 5,
+              "text": "# Phase 05 — Live proof và rollout"
+            },
+            {
+              "line": 9,
+              "text": "## Mục tiêu"
+            },
+            {
+              "line": 13,
+              "text": "## Requirements"
+            },
+            {
+              "line": 39,
+              "text": "## Files"
+            },
+            {
+              "line": 48,
+              "text": "## Steps"
+            },
+            {
+              "line": 64,
+              "text": "## Validation"
+            },
+            {
+              "line": 76,
+              "text": "## Verification"
+            },
+            {
+              "line": 84,
+              "text": "## 2026-09-16 Direct hotfix execution note"
+            },
+            {
+              "line": 120,
+              "text": "## Rollback"
+            }
+          ],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    }
+  ]
+}

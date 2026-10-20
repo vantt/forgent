@@ -1,0 +1,191 @@
+{
+  "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+  "reviewerRule": "Never run checker/probes/resolver/author scripts. Read every assigned file through EOF and independently verify targets. One verdict per whole file, even when streamed.",
+  "set": "step04-013",
+  "files": [
+    "src/config/shared-config-file.mjs"
+  ],
+  "joinedSlots": 2,
+  "items": [
+    {
+      "file": "src/config/shared-config-file.mjs",
+      "sourceDigest": "c2239950f9a6dcf64d140ca9208ea013104b81c82599b0754c268f760ee44d5c",
+      "sourceContext": "// shared-config-file.mjs -- the shared project config file (`.fgos/config.json`,\n// tsk-2ta D1 amended / tsk-5vf D1): one JSON file, one top-level section per\n// module (each module's own `registerConfigDefault` `key`, tsk-2cs D3/D6).\n// The legacy runner config file was retired (tsk-5hv D1) -- this is now\n// the sole config source, no fallback. `fgos setup` is what performs the real\n// write (D2); this module never writes on its own from a read (RUL9's\n// doctor-never-writes discipline, extended here to every read-only caller\n// of this module).\n//\n// `dir` is whatever project root the caller already resolved (repoRoot for\n// the runner path, cwd for doctor checks) -- no extra main-checkout\n// indirection. This file is NOT in `.gitignore`, so it is a normal\n// git-tracked file: every worktree checkout carries its own copy via\n// ordinary `git checkout`.\n\nimport fs from 'node:fs';\nimport path from 'node:path';\n\nexport function sharedConfigFilePath(dir) {\n  return path.join(dir, '.fgos', 'config.json');\n}\n\n/**\n * Read the shared config file at `dir`. Returns `{}` when it doesn't\n * exist. Invalid JSON throws, matching `loadGlobalConfig`'s existing\n * discipline.\n */\nexport function readSharedConfig(dir) {\n  const sharedPath = sharedConfigFilePath(dir);\n  if (fs.existsSync(sharedPath)) {\n    const raw = fs.readFileSync(sharedPath, 'utf8');\n    try {\n      return JSON.parse(raw);\n    } catch (err) {\n      throw new Error(`cannot parse shared config at \"${sharedPath}\": ${err.message}`);\n    }\n  }\n  return {};\n}\n\n// The repo-invariant check commands: deterministic, pure-read checks whose\n// pass/fail never depends on which item is being worked. They run alongside\n// an item's own `verify` at `return` and post-merge, so a repo-wide\n// invariant broken by item A cannot land on main unnoticed and stay red\n// across later merges (docs/history/tsk-516-approve-reverify-scope/\n// CONTEXT.md D2/D3/D4).\n//\n// Declared here, in the config layer, rather than hardcoded in the runner:\n// fgOS is a platform, and a project using it has its own invariant command,\n// not this repo's test layout (D6). This constant is only the default that\n// `fgos setup` writes -- the runner reads whatever the project's own config\n// actually says, and an absent section means no invariant check runs at all,\n// leaving behavior identical to before this existed.\n//\n// Lives in this domain-layer module (not next to its `registerConfigDefault`\n// call in the use-case layer) so both the use-case registration and the\n// infra-layer runner import it DOWNWARD -- an infra->use-case import would\n// break the one-way-down rule test/architecture.test.mjs enforces, which is\n// the very invariant this feature exists to protect.\nexport const DEFAULT_INVARIANT_CHECK_COMMANDS = ['node --test test/architecture.test.mjs'];\n\n/**\n * The invariant-check commands configured at `dir`, as a list of real\n * command strings. Returns `[]` for every shape that isn't a genuine list\n * of non-empty strings -- an absent section, a malformed one, or a list\n * with nothing runnable in it. Never falls back to\n * `DEFAULT_INVARIANT_CHECK_COMMANDS`: that default belongs to what `fgos\n * setup` WRITES, never to what a reader silently assumes -- otherwise a\n * project that deliberately configured no invariant checks would still get\n * this repo's own test command imposed on it.\n */\nexport function readInvariantCheckCommands(dir) {\n  const section = readSharedConfig(dir).invariantChecks;\n  if (!section || typeof section !== 'object' || Array.isArray(section)) return [];\n  if (!Array.isArray(section.commands)) return [];\n  return section.commands.filter((command) => typeof command === 'string' && command.trim() !== '');\n}\n\n// Project-specific commands every runner-created worktree runs after its\n// dependency install, before anything verifies in it -- e.g. building a\n// compiled binary the test suite needs, which a fresh checkout never has\n// (git only checks out tracked files). Empty by default: a project that\n// declares nothing keeps exactly today's behavior.\nexport const DEFAULT_WORKTREE_SETUP_COMMANDS = [];\n\n/**\n * The worktree setup commands configured at `dir` (`worktreeSetup.commands`),\n * as a list of non-empty command strings. `[]` for an absent or malformed\n * section -- same never-assume-a-default discipline as\n * `readInvariantCheckCommands`.\n */\nexport function readWorktreeSetupCommands(dir) {\n  const section = readSharedConfig(dir).worktreeSetup;\n  if (!section || typeof section !== 'object' || Array.isArray(section)) return [];\n  if (!Array.isArray(section.commands)) return [];\n  return section.commands.filter((command) => typeof command === 'string' && command.trim() !== '');\n}\n\n/**\n * Write `config` to the shared config file at `dir`, creating `.fgos/` if\n * needed. The only write path in this module -- callers decide WHEN to\n * write (`fgos setup`'s bootstrap, or the runner's own first-run default),\n * never triggered implicitly by a read.\n */\nexport function writeSharedConfig(dir, config) {\n  const sharedPath = sharedConfigFilePath(dir);\n  fs.mkdirSync(path.dirname(sharedPath), { recursive: true });\n  fs.writeFileSync(sharedPath, `${JSON.stringify(config, null, 2)}\\n`);\n}\n\n/**\n * `readSharedConfig` that degrades to `{}` instead of throwing on a file that\n * is present but not valid JSON.\n *\n * The shared config is explicitly an edit-the-file-by-hand surface, so a\n * half-typed edit is an ordinary state, not an exceptional one. A reader that\n * only wants one optional setting should behave the way it behaves when the\n * setting is absent — `readGateBypassLevel` has wrapped this call in exactly\n * this try/catch since it was written, for exactly this reason.\n *\n * Use this for an OPTIONAL setting whose absence is already meaningful. Do NOT\n * use it where the caller's whole job is to report on the file's health:\n * `fgos doctor`'s own checks must see the parse failure, not a tidy empty\n * object, or the one command that exists to name the problem would hide it.\n */\nexport function readSharedConfigOrEmpty(dir) {\n  try {\n    return readSharedConfig(dir);\n  } catch {\n    return {};\n  }\n}\n",
+      "record": {
+        "file": "src/config/shared-config-file.mjs",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "c2239950f9a6dcf64d140ca9208ea013104b81c82599b0754c268f760ee44d5c",
+        "digest": "c2239950f9a6dcf64d140ca9208ea013104b81c82599b0754c268f760ee44d5c",
+        "inventoryEdgeIds": [
+          "class6-l-000227",
+          "class6-l-000227"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000227",
+            "slotKey": "{\"edgeId\":\"class6-l-000227\",\"file\":\"src/config/shared-config-file.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000227\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":45}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000227",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 45
+              }
+            ],
+            "consumerFile": "src/config/shared-config-file.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 45,
+                "columnStart": 25,
+                "columnEndExclusive": 69,
+                "text": "docs/history/tsk-516-approve-reverify-scope/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 45,
+                "columnStart": 25,
+                "columnEndExclusive": 69,
+                "text": "docs/history/tsk-516-approve-reverify-scope/"
+              },
+              {
+                "line": 46,
+                "columnStart": 1,
+                "columnEndExclusive": 14,
+                "text": "// CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/tsk-516-approve-reverify-scope/\n// CONTEXT.md",
+            "logicalReference": "docs/history/tsk-516-approve-reverify-scope/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '// across later merges (docs/history/tsk-516-approve-reverify-scope/\\n// CONTEXT.md D2/D3/D4).'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/tsk-516-approve-reverify-scope/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000227",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 45,
+                "matchedExpression": "docs/history/tsk-516-approve-reverify-scope/\n// CONTEXT.md",
+                "originalLineText": "// across later merges (docs/history/tsk-516-approve-reverify-scope/"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000227",
+            "slotKey": "{\"edgeId\":\"class6-l-000227\",\"file\":\"src/config/shared-config-file.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000227\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":46}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000227",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 46
+              }
+            ],
+            "consumerFile": "src/config/shared-config-file.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 46,
+                "columnStart": 1,
+                "columnEndExclusive": 14,
+                "text": "// CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 45,
+                "columnStart": 25,
+                "columnEndExclusive": 69,
+                "text": "docs/history/tsk-516-approve-reverify-scope/"
+              },
+              {
+                "line": 46,
+                "columnStart": 1,
+                "columnEndExclusive": 14,
+                "text": "// CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/tsk-516-approve-reverify-scope/\n// CONTEXT.md",
+            "logicalReference": "docs/history/tsk-516-approve-reverify-scope/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '// across later merges (docs/history/tsk-516-approve-reverify-scope/\\n// CONTEXT.md D2/D3/D4).'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/tsk-516-approve-reverify-scope/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000227",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 46,
+                "matchedExpression": "docs/history/tsk-516-approve-reverify-scope/\n// CONTEXT.md",
+                "originalLineText": "// CONTEXT.md D2/D3/D4)."
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-013",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "src/config/shared-config-file.mjs",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "c2239950f9a6dcf64d140ca9208ea013104b81c82599b0754c268f760ee44d5c",
+          "bytes": 6143,
+          "lines": 132,
+          "headings": [],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    }
+  ]
+}

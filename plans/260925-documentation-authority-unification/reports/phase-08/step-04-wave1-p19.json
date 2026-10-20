@@ -1,0 +1,400 @@
+{
+  "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+  "reviewerRule": "Never run checker/probes/resolver/author scripts. Read every assigned file through EOF and independently verify targets. One verdict per whole file, even when streamed.",
+  "set": "step04-016",
+  "files": [
+    ".githooks/pre-commit",
+    ".github/workflows/ci.yml"
+  ],
+  "joinedSlots": 4,
+  "items": [
+    {
+      "file": ".githooks/pre-commit",
+      "sourceDigest": "ebcefc2815d02910532f1642afff4b7ee1b22ce20d9c5859e8ec44e1019f2943",
+      "sourceContext": "#!/usr/bin/env node\n// .githooks/pre-commit -- git-native hard block for the STR65 main-checkout\n// commit-activity beacon (D2/D3, str65-worktree-isolation-enforcement), plus a\n// staged-`.fgos/`-deletion guard (tsk-56u) that runs unconditionally. Fires\n// for ANY `git commit` against this checkout, regardless of actor (human\n// terminal, agent session, or CI) -- not only writes made through fgOS's\n// own CLI verbs, per D2. The STR65 lock/branch guards below only actually\n// APPLY when this hook is running \"at home\" -- see hookRunsAtHome below\n// (tsk-sir): a linked fgOS worktree (fgos pick's fgw/<id> branch) shares\n// this repo's single core.hooksPath setting with its main checkout, so\n// this exact file also fires for a commit made entirely inside that\n// OTHER, unrelated worktree -- one that writes to its own separate index\n// and branch and never touches this checkout's own lock hazard at all\n// (see docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md\n// D1/D2/D7). The staged-`.fgos/`-deletion guard (tsk-56u) is the opposite\n// case: it protects exactly that \"away from home\" worktree, so it is\n// never gated by hookRunsAtHome -- see stagedFgosDeletions below.\n//\n// Installed via `git config core.hooksPath .githooks` (wiring is cell -6's\n// job, out of scope here). Lives at <repoRoot>/.githooks/pre-commit and\n// imports its always-required dependencies with paths relative to ITS OWN\n// location, mirroring the production install layout. Convention checking\n// dynamically imports its client only when a scoped staged path exists; a\n// copied hook without that optional client warns and continues.\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport { fileURLToPath } from 'node:url';\nimport { execFileSync } from 'node:child_process';\nimport { resolveActiveHostBin } from '../src/util/host-bin-path.mjs';\nimport { probe, lockHolders, checkBorrowedDescription, resolveLock, LOCK_FD_ENV } from '../src/holder-lock/index.mjs';\nimport { readBeacon, judgeBeacon, writeBeacon, DEFAULT_BEACON_WINDOW_MS } from '../src/runner/main-checkout-activity.mjs';\nimport { resolveWriterIdentity } from '../src/util/session-identity.mjs';\n\nconst __dirname = path.dirname(fileURLToPath(import.meta.url));\n\nconst HOW_TO_DOC = 'docs/how-to-parallel-lanes.md (workshop root, one level up from repo/)';\n\n// One source of truth; land allowlist changes separately before using them.\nconst ROOT_FILE_ALLOWLIST = new Set([\n  '.gitattributes', '.gitignore', 'AGENTS.md', 'CHANGELOG.md', 'CLAUDE.md',\n  'Cargo.lock', 'Cargo.toml', 'LICENSE', 'README.md', 'clippy.toml',\n  'install.sh', 'package-lock.json', 'package.json', 'rustfmt.toml',\n]);\n\nfunction rootFileRefusal(committingToplevel) {\n  if (!fs.existsSync(path.join(committingToplevel, 'apps/fgos/Cargo.toml'))) return null;\n  const git = (args) => execFileSync('git', args, {\n    cwd: committingToplevel, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],\n  });\n  try {\n    const mergeHead = git(['rev-parse', '--git-path', 'MERGE_HEAD']).trim();\n    if (fs.existsSync(path.resolve(committingToplevel, mergeHead))) return null;\n    const roots = git(['diff', '--cached', '--name-only', '--diff-filter=ACR', '-z'])\n      .split('\\0').filter((name) => name && !name.includes('/'));\n    if (roots.length === 0) return null;\n\n    const hookPath = '.githooks/pre-commit';\n    if (git(['diff', '--cached', '--name-only', '--', hookPath]).trim()) {\n      // Locate authority only in HEAD, then inspect original diff ranges.\n      // Staged comments or decoy declarations cannot hide a changed block.\n      let headHook = '';\n      try {\n        headHook = git(['show', `HEAD:${hookPath}`]);\n      } catch (error) {\n        if (!(error.status === 128 && /does not exist|exists on disk, but not in/.test(error.stderr?.toString() ?? ''))) throw error;\n      }\n      const blocks = [...headHook.matchAll(/^const ROOT_FILE_ALLOWLIST = new Set\\(\\[\\n[\\s\\S]*?^\\]\\);/gm)];\n      const diff = git(['diff', '--cached', '--text', '--no-color', '--no-ext-diff', '--no-textconv', '--unified=0', '--', hookPath]);\n      let changed = blocks.length !== 1;\n      if (!changed) {\n        const block = blocks[0];\n        const first = headHook.slice(0, block.index).split('\\n').length;\n        const last = first + block[0].split('\\n').length - 1;\n        for (const hunk of diff.matchAll(/^@@ -(\\d+)(?:,(\\d+))? \\+\\d+(?:,\\d+)? @@/gm)) {\n          const start = Number(hunk[1]);\n          const count = hunk[2] === undefined ? 1 : Number(hunk[2]);\n          if (count === 0 ? start >= first && start < last : start <= last && start + count - 1 >= first) {\n            changed = true;\n            break;\n          }\n        }\n      }\n      // An added mutation/reference can change authority outside the block.\n      changed ||= diff.split('\\n').some((line) =>\n        line.startsWith('+') && !line.startsWith('+++') && line.includes('ROOT_FILE_ALLOWLIST'));\n      if (changed) {\n        return `commit refused: root allowlist changes cannot accompany new root files (${roots.join(', ')}). Land the allowlist change in a separate commit on main first, then retry the root addition.`;\n      }\n    }\n    const forbidden = roots.filter((name) => !ROOT_FILE_ALLOWLIST.has(name));\n    return forbidden.length > 0\n      ? `commit refused: new root files outside .githooks/pre-commit's allowlist (${forbidden.join(', ')}). Move scratch files to .fgos/runtime/tmp/ (or /tmp/fgos-work/); place durable files under their owning directory. Legitimate root additions require an allowlist change landed separately on main first.`\n      : null;\n  } catch (error) {\n    return `commit refused: could not safely inspect staged root files (${error.message}). Repair the index or hook inputs and retry.`;\n  }\n}\n\n// DEFAULT_BEACON_WINDOW_MS is the activity window this hook writes into its\n// beacon (overridable via FGOS_MAIN_CHECKOUT_LOCK_TTL_MS).\nfunction resolveTtlMs() {\n  const raw = process.env.FGOS_MAIN_CHECKOUT_LOCK_TTL_MS;\n  if (raw === undefined) return DEFAULT_BEACON_WINDOW_MS;\n  const parsed = Number(raw);\n  return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : DEFAULT_BEACON_WINDOW_MS;\n}\n\n// mainLockVerdict: what the main-checkout mutex says about this commit,\n// read once and never waiting (git already holds index.lock while this hook\n// runs, and a land takes the mutex before git's index.lock, so waiting here\n// could deadlock with it; this is an early check, not exclusion).\n//   - 'borrower': fgOS's own commit. git inherited the holder's description\n//     at slot 3 (FGOS_LOCK_FD names it) and the host confirms it is the very\n//     description holding the lock. A sibling that merely shares the env but\n//     opened the lock file itself is not a borrower.\n//   - 'held': another process holds the mutex: refuse.\n//   - 'free': nobody holds it: an ordinary commit.\n// Without a usable host binary no fgOS writer can hold the mutex either, so\n// the commit proceeds with a warning; any other failure refuses (fail-closed).\nfunction mainLockVerdict(fgosDir) {\n  const lockPath = resolveLock('main-checkout', { fgosDir }).v3Path;\n  if (process.env[LOCK_FD_ENV]) {\n    try {\n      if (checkBorrowedDescription(lockPath, { fgosDir }).result === 'borrower') return { kind: 'borrower' };\n    } catch {\n      // A stale variable (slot 3 not open) or an unusable host: not a borrower; the probe below decides.\n    }\n  }\n  try {\n    return { kind: probe('main-checkout', { fgosDir }).result };\n  } catch (err) {\n    if (err?.code === 'lock-driver-unavailable') {\n      // No host binary can answer, but the kernel still lists who holds the\n      // lock file: refuse when somebody does, continue only when nobody does.\n      const holders = lockHolders('main-checkout', { fgosDir });\n      if (holders.kind === 'list' && holders.pids.length > 0) return { kind: 'held' };\n      process.stderr.write(`warning: the main-checkout lock could not be checked (${err.message}); continuing.\\n`);\n      return { kind: 'free' };\n    }\n    return { kind: 'error', message: err?.message ?? String(err) };\n  }\n}\n\nfunction refuse(message) {\n  process.stderr.write(`${message}\\nSee ${HOW_TO_DOC} for how to work in an isolated worktree/session.\\n`);\n  process.exit(1);\n}\n\n// tsk-sir -- git always runs a hook subprocess with its cwd set to the\n// TOPLEVEL of whichever checkout is actually committing (confirmed\n// empirically: a probe hook printed its own cwd from both a main checkout\n// and a linked worktree sharing that main's hooksPath, and got each\n// checkout's own real toplevel back, never the hooksPath directory).\n// repoRoot (derived from `__dirname`, i.e. wherever this SCRIPT FILE\n// itself physically lives -- wherever core.hooksPath resolved to) is a\n// SEPARATE thing from that actual toplevel whenever hooksPath is shared\n// across a checkout family (D1/D7). When they match, this file is running\n// \"at home\" -- either the true main checkout, or a self-contained\n// worktree that was deliberately given its own independent hooksPath copy\n// (bee's --with-companion / fgOS's own \"session start\" shape, e2e-tested\n// separately from fgos pick's linked-worktree shape) -- and every STR65\n// guard below should apply, using repoRoot as it always did. When they\n// DIFFER, this file is running away from home: invoked for a DIFFERENT\n// checkout than the one whose `.fgos`/lock/branch state it would\n// otherwise act on -- exactly the fgos-pick shared-hooksPath case -- and\n// no STR65 guard below has anything real to protect there. The\n// staged-`.fgos/`-deletion guard is the one exception -- see\n// stagedFgosDeletions below.\nfunction normalizeFsPath(p) {\n  if (!p) return '';\n  try {\n    return (fs.realpathSync.native ? fs.realpathSync.native(p) : fs.realpathSync(p)).toLowerCase().replaceAll('\\\\', '/');\n  } catch {\n    return path.resolve(p).toLowerCase().replaceAll('\\\\', '/');\n  }\n}\n\nfunction hookRunsAtHome(repoRoot, actualToplevel) {\n  return normalizeFsPath(actualToplevel) === normalizeFsPath(repoRoot);\n}\n\n// STAGED-FGOS-DELETION (tsk-56u): refuses any commit that stages a\n// deletion under `.fgos/` -- the git-tracked runner state a linked\n// worktree never carries in its own working tree (ADR0020:\n// `src/runner/worktree.mjs`'s `createWorktree` always `fs.rmSync`'s the\n// checked-out `.fgos/` right after `git worktree add`, without ever\n// `git rm`-ing it from the index -- the working tree loses the files but\n// the index still has them). A bare `git add -A` inside that worktree\n// therefore stages every one of those files as deleted; committing that\n// silently destroys the live event log the moment the branch is later\n// merged/synced back, and the existing `fgos-write-rejected` check\n// (`src/runner/merge.mjs`) only catches this at merge time, not here at\n// the moment the destructive commit itself is made.\n//\n// Runs UNCONDITIONALLY in main() below, never gated by hookRunsAtHome --\n// the worktree \"away from home\" case is exactly where this hazard lives,\n// the opposite of the STR65 guards' own scope. Checks the diff against\n// `committingToplevel` (the checkout actually running this commit, per\n// tsk-sir), never `repoRoot` (wherever this script file itself lives) --\n// the two differ precisely in the case this guard exists to catch.\n//\n// Mirrors merge.mjs's own `fgos-write-rejected` staged-diff filter\n// (`git diff --name-only --cached`, `.fgos`/`.fgos/`-prefixed paths) but\n// scoped to deletions (`--diff-filter=D`): a worktree can only ever stage\n// a `.fgos` DELETION (it was rmSync'd, never re-created), never an\n// addition/modification, so narrowing to deletions loses no real coverage\n// for this hazard while leaving fgOS's own legitimate `.fgos` writes\n// (additions/modifications, made directly by the `fgos` CLI verbs against\n// the main checkout) untouched.\nfunction stagedFgosDeletions(committingToplevel) {\n  const output = execFileSync(\n    'git',\n    ['diff', '--cached', '--name-only', '--no-renames', '--diff-filter=D', '-z'],\n    { cwd: committingToplevel, encoding: 'utf8' },\n  );\n  return output\n    .split('\\0')\n    .filter((p) => p !== '')\n    .filter((p) => p === '.fgos' || p.startsWith('.fgos/'));\n}\n\n// tsk-5pb -- any staged path under .fgos/ (Added, Modified, Deleted) on a\n// worker's fgw/* branch is forbidden. Git manual merge materialization can stage\n// a .fgos/* blob as Modified; worker branches must never commit changes under .fgos/.\nfunction stagedFgosChangesOnWorkerBranch(committingToplevel) {\n  let branch;\n  try {\n    branch = execFileSync(\n      'git',\n      ['symbolic-ref', '--short', '-q', 'HEAD'],\n      { cwd: committingToplevel, encoding: 'utf8' },\n    ).trim();\n  } catch {\n    return [];\n  }\n  if (!/^fgw\\//.test(branch)) return [];\n\n  const output = execFileSync(\n    'git',\n    ['diff', '--cached', '--name-only'],\n    { cwd: committingToplevel, encoding: 'utf8' },\n  );\n  return output\n    .split('\\n')\n    .filter((p) => p !== '')\n    .filter((p) => p === '.fgos' || p.startsWith('.fgos/'));\n}\n\n// tsk-4hkd -- the main checkout must never sit on a fgw/<id> branch itself;\n// that branch belongs in the item's own linked worktree (fgos pick), never\n// checked out directly here. git-dir vs git-common-dir tells apart the main\n// checkout (both equal) from a linked worktree (its own git-dir nests under\n// <main>/.git/worktrees/<name>, so they differ) -- a linked worktree is\n// SUPPOSED to live on a fgw/* branch and must stay unaffected by this\n// guard. Only ever called once hookRunsAtHome(repoRoot) is true (see\n// main()) -- repoRoot here is always the checkout actually committing.\nfunction currentFgwBranchIfMainCheckout(repoRoot) {\n  const gitDir = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-dir'], { cwd: repoRoot, encoding: 'utf8' }).trim();\n  const gitCommonDir = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], { cwd: repoRoot, encoding: 'utf8' }).trim();\n  if (gitDir !== gitCommonDir) return null;\n\n  let branch;\n  try {\n    branch = execFileSync('git', ['symbolic-ref', '--short', '-q', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();\n  } catch {\n    return null; // detached HEAD -- no branch to match, nothing to refuse\n  }\n  return /^fgw\\//.test(branch) ? branch : null;\n}\n\nfunction countLines(str) {\n  let count = 0;\n  for (let i = 0; i < str.length; i++) {\n    if (str[i] === '\\n') count++;\n  }\n  return count;\n}\n\n// tsk-1i3 -- staged .fgos/* content-precedence guard on main/default branch.\n// Refuses any commit staging a modification (--diff-filter=M) of an append-only\n// .fgos/**/*.jsonl log whose staged line count is strictly lower than HEAD's own\n// line count for that same path (D1-D4).\nfunction stagedFgosModificationsRegressLineCount(committingToplevel) {\n  let branch;\n  try {\n    branch = execFileSync(\n      'git',\n      ['symbolic-ref', '--short', '-q', 'HEAD'],\n      { cwd: committingToplevel, encoding: 'utf8' },\n    ).trim();\n  } catch {\n    branch = '';\n  }\n  if (/^fgw\\//.test(branch)) return { regressedPaths: [] };\n\n  let output;\n  try {\n    output = execFileSync(\n      'git',\n      ['diff', '--cached', '--name-only', '--diff-filter=M'],\n      { cwd: committingToplevel, encoding: 'utf8' },\n    );\n  } catch (err) {\n    return { error: `commit refused: could not run \"git diff --cached\" to check staged modifications under \".fgos/\" (${err.message}) -- refusing to commit (fail-closed).` };\n  }\n\n  const modifiedFgosPaths = output\n    .split('\\n')\n    .filter((p) => p !== '')\n    // Only the append-only logs (events.jsonl and the like) are guarded: a stale worktree's older log\n    // must never replace main's newer one. A config or state file is edited on purpose, and a\n    // legitimate edit may remove lines from it.\n    .filter((p) => p.startsWith('.fgos/') && p.endsWith('.jsonl'));\n\n  if (modifiedFgosPaths.length === 0) return { regressedPaths: [] };\n\n  const regressedPaths = [];\n  for (const p of modifiedFgosPaths) {\n    let headContent, stagedContent;\n    try {\n      // maxBuffer (tsk-1i3 follow-up hotfix): execFileSync's default 1MB\n      // maxBuffer is smaller than .fgos/events.jsonl's real size (10MB+),\n      // throwing ENOBUFS on every commit that touches it and wrongly\n      // refusing the commit as \"could not read blob\" -- raised generously\n      // since this reads a whole git blob into memory once per commit.\n      const maxBuffer = 1024 * 1024 * 200;\n      headContent = execFileSync('git', ['show', `HEAD:${p}`], { cwd: committingToplevel, encoding: 'utf8', maxBuffer });\n      stagedContent = execFileSync('git', ['show', `:${p}`], { cwd: committingToplevel, encoding: 'utf8', maxBuffer });\n    } catch (err) {\n      return { error: `commit refused: could not read blob for \"${p}\" via \"git show\" -- refusing to commit against an unreadable ref/blob (fail-closed).` };\n    }\n\n    const headLines = countLines(headContent);\n    const stagedLines = countLines(stagedContent);\n    if (stagedLines < headLines) {\n      regressedPaths.push({ path: p, headLines, stagedLines });\n    }\n  }\n\n  return { regressedPaths };\n}\n\n// Retired event data cannot re-enter the checkout. Only the exact fence is allowed.\nfunction addedEventPathRefusal(cwd) {\n  // A directory is legacy Work; only the indexed/HEAD regular-file fence activates this rule.\n  const index = execFileSync('git', ['ls-files', '-s', '--', '.fgos/events'], { cwd, encoding: 'utf8' });\n  let head = '';\n  try { head = execFileSync('git', ['ls-tree', 'HEAD', '--', '.fgos/events'], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }); } catch {}\n  if (![index, head].some(text => text.split('\\n').some(line => /^100(?:644|755) /.test(line) && line.split('\\t')[1] === '.fgos/events'))) return null;\n  const added = execFileSync('git', ['diff', '--cached', '--name-only', '--no-renames', '--diff-filter=ACRT', '-z'], { cwd, encoding: 'utf8' }).split('\\0');\n  const forbidden = added.filter(p => p.startsWith('.fgos/events.jsonl') || p.startsWith('.fgos/events/'));\n  return forbidden.length ? `commit refused: retired event paths cannot be added: ${forbidden.join(', ')}` : null;\n}\n\n// STALE-WORKTREE-INDEX (tsk-1d7, docs/history/stale-worktree-index-guard/\n// CONTEXT.md D1/D2): a linked worktree checked out on a `fgw/*` branch can\n// go stale when an external process (e.g. `approve`'s leaf->root merge)\n// force-moves that branch's ref without ever touching THIS worktree's own\n// working tree/index. `HEAD` still reads the new commit correctly (a\n// symbolic ref that follows the branch), but files-on-disk + the index are\n// still the OLD tree -- a narrowly-staged commit from here would silently\n// carry the OLD content of every other tracked file along with it,\n// reverting them (this happened for real: commit 2cb6519e).\n//\n// Read-only, never mutates -- matches src/runner/worktree.mjs's own\n// `lastSyncedCommit`/`resyncClaimWorktree` pattern (reflog, not `rev-parse\n// HEAD`, which lies once an external `git branch -f` has moved the branch\n// ref out from under a symbolic HEAD). Runs UNCONDITIONALLY, same as\n// `stagedFgosDeletions` below where it exists -- scoped to `fgw/*`\n// branches internally (the \"away from home\" worktree case this guard\n// protects), never gated by `hookRunsAtHome` (the main checkout is\n// separately guarded against ever sitting on a `fgw/*` branch at all, by\n// `currentFgwBranchIfMainCheckout` below).\nfunction staleWorktreeIndexRefusal(committingToplevel) {\n  let branch;\n  try {\n    branch = execFileSync('git', ['symbolic-ref', '--short', '-q', 'HEAD'], { cwd: committingToplevel, encoding: 'utf8' }).trim();\n  } catch {\n    return null; // detached HEAD -- no branch this guard scopes to\n  }\n  if (!/^fgw\\//.test(branch)) return null;\n\n  let lastSynced;\n  try {\n    lastSynced = execFileSync('git', ['reflog', 'show', 'HEAD', '-n', '1', '--format=%H'], { cwd: committingToplevel, encoding: 'utf8' }).trim();\n  } catch {\n    lastSynced = '';\n  }\n  if (!lastSynced) {\n    return `commit refused: could not read this worktree's own HEAD reflog to determine what commit it was last synced to on \"${branch}\" -- refusing to commit against an unknown sync point (fail-closed). Inspect this worktree by hand.`;\n  }\n\n  let branchTip;\n  try {\n    branchTip = execFileSync('git', ['rev-parse', branch], { cwd: committingToplevel, encoding: 'utf8' }).trim();\n  } catch {\n    // tsk-2cl: the branch name itself was already read successfully via\n    // symbolic-ref above, so rev-parse failing right after implies a\n    // transient ref-read race or on-disk ref corruption -- fail closed,\n    // same as an unreadable reflog (above) or a diverged branch (below),\n    // rather than silently letting the commit through unguarded.\n    return `commit refused: could not read \"${branch}\"'s current tip via \"git rev-parse\" -- refusing to commit against an unreadable branch ref (fail-closed). Inspect this worktree by hand.`;\n  }\n  if (lastSynced === branchTip) return null; // in sync, no-op\n\n  let isAncestor = true;\n  try {\n    execFileSync('git', ['merge-base', '--is-ancestor', lastSynced, branchTip], { cwd: committingToplevel, encoding: 'utf8' });\n  } catch {\n    isAncestor = false;\n  }\n  if (!isAncestor) {\n    return `commit refused: this worktree's last-synced commit (${lastSynced}) is not an ancestor of \"${branch}\"'s current tip (${branchTip}) -- refusing to commit against a diverged index (fail-closed). Inspect this worktree by hand.`;\n  }\n\n  return `commit refused: \"${branch}\" has moved to ${branchTip} since this worktree was last synced (${lastSynced}) -- likely an external force-move (e.g. approve's merge landing a sibling child). This worktree's files/index are stale and a commit right now would silently carry the OLD content of every other tracked file, reverting them. Run \"fgos resync-worktree\" in this worktree to repair it, then retry the commit.`;\n}\n\nasync function warnOnConventionViolations(committingToplevel) {\n  if (!fs.existsSync(path.join(committingToplevel, 'apps/fgos/Cargo.toml'))) return;\n\n  let staged;\n  try {\n    staged = execFileSync(\n      'git',\n      ['diff', '--cached', '--name-only', '-z', '--diff-filter=ACR'],\n      { cwd: committingToplevel, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] },\n    );\n  } catch (error) {\n    process.stderr.write(`warning: convention check skipped (staged-path-read-error): ${error.message}\\n`);\n    return;\n  }\n  const paths = staged\n    .split('\\0')\n    .filter((candidate) => /^plans\\/(?:reports|journals)\\/[^/]+\\.md$/u.test(candidate));\n  if (paths.length === 0) return;\n\n  let conventionCheck;\n  try {\n    ({ conventionCheck } = await import('../src/convention/convention-client.mjs'));\n  } catch (error) {\n    process.stderr.write(`warning: convention check skipped (client-load-error): ${error.message}\\n`);\n    return;\n  }\n\n  try {\n    const result = conventionCheck(paths, { dir: committingToplevel });\n    for (const violation of result.violations ?? []) {\n      process.stderr.write(`warning: convention ${violation.path}: ${violation.code} ${violation.message}\\n`);\n    }\n  } catch (error) {\n    const category = error?.code ?? 'host-exec-error';\n    const detail = error?.timedOut ? 'host timed out' : (error?.message ?? 'unknown error');\n    process.stderr.write(`warning: convention check skipped (${category}): ${detail}\\n`);\n  }\n}\n\n// The config value only selects an operation. Rust proves the lock, WAL and index.\nfunction cutoverGrantAllows(committingToplevel) {\n  try {\n    const operation = execFileSync('git', ['config', '--get', 'fgos.operationId'], { cwd: committingToplevel, encoding: 'utf8' }).trim();\n    if (!operation) return false;\n    const { bin } = resolveActiveHostBin({ fgosDir: path.join(committingToplevel, '.fgos'), cwd: committingToplevel });\n    if (!bin) return false;\n    const verdict = JSON.parse(execFileSync(bin, ['internal', 'git-grant-check', '--protocol', '1', '--operation', operation], { cwd: committingToplevel, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe', 3] }));\n    return verdict.protocol === 1 && verdict.result === 'allowed';\n  } catch { return false; }\n}\n\nasync function main() {\n  const eventRefusal = addedEventPathRefusal(process.cwd());\n  if (eventRefusal) { console.error(eventRefusal); process.exitCode = 1; return; }\n\n  const repoRoot = path.resolve(__dirname, '..');\n  const committingToplevel = execFileSync('git', ['rev-parse', '--path-format=absolute', '--show-toplevel'], { encoding: 'utf8' }).trim();\n\n  const staleIndexRefusal = staleWorktreeIndexRefusal(committingToplevel);\n  if (staleIndexRefusal) {\n    refuse(staleIndexRefusal);\n    return;\n  }\n\n  const fgosDeletions = stagedFgosDeletions(committingToplevel);\n  if (fgosDeletions.length > 0 && !cutoverGrantAllows(committingToplevel)) {\n    refuse(`commit refused: this commit stages a deletion under \".fgos/\" (${fgosDeletions.join(', ')}) -- .fgos/ is fgOS's own runner state and must never be committed as deleted. A linked worktree never keeps a working-tree copy of .fgos/ by design (ADR0020); if you ran \"git add -A\" here, unstage these paths first (e.g. \"git restore --staged .fgos\").`);\n    return;\n  }\n\n  const fgosWorkerChanges = stagedFgosChangesOnWorkerBranch(committingToplevel);\n  if (fgosWorkerChanges.length > 0) {\n    refuse(`commit refused: this commit on a worker branch stages changes under \".fgos/\" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);\n    return;\n  }\n\n  const rootRefusal = rootFileRefusal(committingToplevel);\n  if (rootRefusal) {\n    refuse(rootRefusal);\n    return;\n  }\n\n  await warnOnConventionViolations(committingToplevel);\n\n  if (!hookRunsAtHome(repoRoot, committingToplevel)) {\n    // A different, unrelated checkout (sharing this repo's core.hooksPath)\n    // is committing -- nothing here concerns it, per the header comment.\n    process.exit(0);\n    return;\n  }\n\n  const fgwBranch = currentFgwBranchIfMainCheckout(repoRoot);\n  if (fgwBranch) {\n    refuse(`commit refused: main checkout is on branch ${fgwBranch} -- checkout back to the default branch and use \"fgos pick <id>\" for item work.`);\n    return;\n  }\n\n  const fgosRegressed = stagedFgosModificationsRegressLineCount(committingToplevel);\n  if (fgosRegressed.error) {\n    refuse(fgosRegressed.error);\n    return;\n  }\n  if (fgosRegressed.regressedPaths.length > 0) {\n    const paths = fgosRegressed.regressedPaths.map((r) => r.path).join(', ');\n    refuse(`commit refused: this commit stages a modification under \".fgos/\" (${paths}) whose line count is lower than HEAD -- .fgos/ files must not regress in content on main, main is left unchanged. See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);\n    return;\n  }\n\n  const fgosDir = path.join(repoRoot, '.fgos');\n  const lockVerdict = mainLockVerdict(fgosDir);\n  if (lockVerdict.kind === 'borrower') {\n    // fgOS's own commit under the mutex it holds: it neither checks nor\n    // writes the activity beacon.\n    process.exit(0);\n    return;\n  }\n  if (lockVerdict.kind === 'held') {\n    refuse('commit refused: fgOS is writing the main checkout right now (a claim, checkpoint or land) -- retry in a moment.');\n    return;\n  }\n  if (lockVerdict.kind === 'error') {\n    refuse(`commit refused: the main-checkout lock could not be checked (${lockVerdict.message}) -- refusing to commit, per fail-closed policy.`);\n    return;\n  }\n\n  // Commit-activity beacon (main-checkout-activity.mjs): a different\n  // session's commit inside its window is refused; the same session, an\n  // elapsed window or no beacon passes. A corrupt beacon is only a hint and\n  // fails open. This file never takes the main-checkout mutex, so a\n  // commit never blocks a claim, land or `fgctl init`.\n  let writer;\n  try {\n    writer = resolveWriterIdentity(fgosDir);\n  } catch (err) {\n    if (err?.name !== 'WriterIdentityError') throw err;\n    refuse(`commit refused: cannot resolve the writer identity (${err.code}): ${err.message}`);\n    return;\n  }\n  const now = Date.now();\n  const verdict = judgeBeacon(readBeacon(fgosDir), writer.id, now);\n  if (verdict.decision === 'refuse') {\n    refuse(`commit refused: another session committed in this checkout ${Math.round(verdict.ageMs / 1000)}s ago and appears to be actively working here (its activity window ends in ${Math.ceil(verdict.remainingMs / 1000)}s).`);\n    return;\n  }\n  if (verdict.reason === 'corrupt') {\n    process.stderr.write('warning: the main-checkout activity beacon could not be read; overwriting it.\\n');\n  }\n\n  // Written last, after every refusal above, so a refused commit never\n  // leaves a beacon behind. Git may still fail the commit after this hook;\n  // the beacon then stays lit for its window and only delays other writers.\n  try {\n    writeBeacon(fgosDir, { writer, windowMs: resolveTtlMs(), now });\n  } catch (error) {\n    process.stderr.write(`warning: could not write the main-checkout activity beacon (${error.message}).\\n`);\n  }\n\n  process.exit(0);\n}\n\nawait main();\n",
+      "record": {
+        "file": ".githooks/pre-commit",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "36d66f5db9d1015720dd751aee05c78b4e0054255d9a5edb9de415631b4c7ee2",
+        "digest": "ebcefc2815d02910532f1642afff4b7ee1b22ce20d9c5859e8ec44e1019f2943",
+        "inventoryEdgeIds": [
+          "class6-l-000008",
+          "class6-l-000009",
+          "class6-l-000009"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000008",
+            "slotKey": "{\"edgeId\":\"class6-l-000008\",\"file\":\".githooks/pre-commit\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000008\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":14}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000008",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 14
+              }
+            ],
+            "consumerFile": ".githooks/pre-commit",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 14,
+                "columnStart": 9,
+                "columnEndExclusive": 73,
+                "text": "docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 14,
+                "columnStart": 9,
+                "columnEndExclusive": 73,
+                "text": "docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md",
+            "logicalReference": "docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '// (see docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000008",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 14,
+                "matchedExpression": "docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md",
+                "originalLineText": "// (see docs/history/main-checkout-lock-worktree-commit-scope/CONTEXT.md"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000009",
+            "slotKey": "{\"edgeId\":\"class6-l-000009\",\"file\":\".githooks/pre-commit\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000009\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":342}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000009",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 342
+              }
+            ],
+            "consumerFile": ".githooks/pre-commit",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 355,
+                "columnStart": 35,
+                "columnEndExclusive": 75,
+                "text": "docs/history/stale-worktree-index-guard/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 355,
+                "columnStart": 35,
+                "columnEndExclusive": 75,
+                "text": "docs/history/stale-worktree-index-guard/"
+              },
+              {
+                "line": 356,
+                "columnStart": 1,
+                "columnEndExclusive": 14,
+                "text": "// CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/stale-worktree-index-guard/\n// CONTEXT.md",
+            "logicalReference": "docs/history/stale-worktree-index-guard/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '// STALE-WORKTREE-INDEX (tsk-1d7, docs/history/stale-worktree-index-guard/\\n// CONTEXT.md D1/D2): a linked worktree checked out on a `fgw/*` branch can'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/stale-worktree-index-guard/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000009",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 342,
+                "matchedExpression": "docs/history/stale-worktree-index-guard/\n// CONTEXT.md",
+                "originalLineText": "// STALE-WORKTREE-INDEX (tsk-1d7, docs/history/stale-worktree-index-guard/"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000009",
+            "slotKey": "{\"edgeId\":\"class6-l-000009\",\"file\":\".githooks/pre-commit\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000009\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":343}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000009",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 343
+              }
+            ],
+            "consumerFile": ".githooks/pre-commit",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 356,
+                "columnStart": 1,
+                "columnEndExclusive": 14,
+                "text": "// CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 355,
+                "columnStart": 35,
+                "columnEndExclusive": 75,
+                "text": "docs/history/stale-worktree-index-guard/"
+              },
+              {
+                "line": 356,
+                "columnStart": 1,
+                "columnEndExclusive": 14,
+                "text": "// CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/stale-worktree-index-guard/\n// CONTEXT.md",
+            "logicalReference": "docs/history/stale-worktree-index-guard/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '// STALE-WORKTREE-INDEX (tsk-1d7, docs/history/stale-worktree-index-guard/\\n// CONTEXT.md D1/D2): a linked worktree checked out on a `fgw/*` branch can'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/stale-worktree-index-guard/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000009",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 343,
+                "matchedExpression": "docs/history/stale-worktree-index-guard/\n// CONTEXT.md",
+                "originalLineText": "// CONTEXT.md D1/D2): a linked worktree checked out on a `fgw/*` branch can"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-016",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": ".githooks/pre-commit",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "ebcefc2815d02910532f1642afff4b7ee1b22ce20d9c5859e8ec44e1019f2943",
+          "bytes": 29032,
+          "lines": 579,
+          "headings": [],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": ".github/workflows/ci.yml",
+      "sourceDigest": "9c0a0e571f33944b4501618e5264842ce83da8eae23efda70662d127104a5eef",
+      "sourceContext": "name: CI\n\non:\n  push:\n    branches: [main]\n  pull_request:\n    branches: [main]\n\njobs:\n  test:\n    name: test (${{ matrix.os }})\n    strategy:\n      fail-fast: false\n      matrix:\n        # The full suite runs on Linux only: its runner, blind-unit confinement,\n        # panel and file-permission tests are written for Linux (bubblewrap, POSIX\n        # modes). Windows is proven by the focused tests in release-assets-check.yml\n        # (installer, launchers, release assets); macOS is not a supported target.\n        os: [ubuntu-latest]\n    # Backstop so a hung run fails in bounded time instead of GitHub's 6h job cap.\n    runs-on: ${{ matrix.os }}\n    timeout-minutes: 60\n    steps:\n      - uses: actions/checkout@v4\n        with:\n          # Default shallow (depth 1) clone: test/runner/coordination-p07-\n          # migration-and-adversarial.test.mjs does `git archive <old ancestor\n          # sha>` to materialize a real pre-schema-3 source tree, which needs\n          # that commit's object present locally -- a shallow clone only has\n          # the tip, so `git archive` failed \"not a tree object\" on all three\n          # OSes. Full history, matching selector-plan's own checkout below.\n          fetch-depth: 0\n\n      - name: Install Linux test tools\n        if: runner.os == 'Linux'\n        # Ubuntu 24.04 blocks unprivileged user namespaces via AppArmor, which\n        # leaves bwrap installed but unable to build a sandbox; lift it so the\n        # required-confinement tests really run here instead of skipping.\n        run: |\n          sudo apt-get update && sudo apt-get install -y bubblewrap zsh\n          if [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then\n            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0\n          fi\n          bwrap --ro-bind / / -- true && echo \"bwrap can build a sandbox\"\n\n      - name: Configure git identity for fixture repos\n        run: |\n          git config --global user.email \"ci@example.com\"\n          git config --global user.name \"CI\"\n          git config --global core.longpaths true\n\n      - uses: actions/setup-node@v4\n        with:\n          node-version: '24'\n          cache: npm\n\n      - name: Install dependencies\n        run: npm install\n\n      - name: Build Rust release binaries for npm tests\n        run: cargo build --locked --release --workspace\n\n      # Full suite (docs/distribution-vision.md tsk-49r D1): already\n      # includes test/install-packaging.test.mjs (the pack -> install -g ->\n      # fgos init proof) and test/setup/doctor-fresh-run.test.mjs (the\n      # fresh-runner fgos doctor proof, D4) on every OS in the matrix above.\n      #\n      # `mkdir -p test-results` runs first because `--test-reporter-destination`\n      # never creates its own output directory: node --test opens the file for\n      # writing at test-run start and crashes (ENOENT, exit 7, zero tests run)\n      # the instant that directory is missing. `shell: bash` keeps the same\n      # mkdir/test invocation on all three OSes in the matrix.\n      - name: npm test (includes install-packaging matrix proof)\n        id: run-tests\n        shell: bash\n        run: |\n          mkdir -p test-results\n          set +e\n          npm test -- --test-reporter=spec --test-reporter-destination=stdout --test-reporter=junit --test-reporter-destination=test-results/full.xml\n          code=$?\n          echo \"exit_code=$code\" >> \"$GITHUB_OUTPUT\"\n          exit $code\n        env:\n          FORCE_COLOR: 1\n\n      - name: Write test marker\n        if: always()\n        run: node scripts/write-test-marker.mjs --type full --xml test-results/full.xml --exit-code \"${{ steps.run-tests.outputs.exit_code }}\"\n        env:\n          JOB_STATUS: ${{ job.status }}\n\n      - name: Upload full results\n        if: always()\n        uses: actions/upload-artifact@v4\n        with:\n          name: full-results-${{ matrix.os }}\n          path: test-results/\n          retention-days: 14\n\n  # `npm test` (scripts/run-tests.mjs, a portable `node --test` wrapper over\n  # every discovered test/**/*.test.mjs) cannot see the Rust crate at all,\n  # so until this job existed herdr-plugin had no automated\n  # coverage anywhere — not locally, not here. It bit for real (tsk-1l9): a\n  # one-line stage fixture change in src/app.rs broke an assertion in\n  # src/ui.rs, and only a hand-typed `cargo test` caught it.\n  #\n  # One OS, not the matrix above: this crate is a local developer dashboard,\n  # not a shipped cross-platform artifact, so per-OS proof would buy nothing\n  # for the runtime cost. Widen it the day the crate is actually distributed.\n  #\n  # No toolchain action: ubuntu-latest ships a working Rust toolchain, so the\n  # job needs no third-party action beyond the checkout this repo already\n  # trusts. `rustup show` fails loudly if that ever stops being true, instead\n  # of letting a missing toolchain read as a passing job.\n  selector-plan:\n    name: selector-plan\n    runs-on: ubuntu-latest\n    timeout-minutes: 15\n    outputs:\n      decision: ${{ steps.plan.outputs.decision }}\n    steps:\n      - uses: actions/checkout@v4\n        with:\n          fetch-depth: 0\n\n      - uses: actions/setup-node@v4\n        with:\n          node-version: '24'\n          cache: npm\n      - run: npm install\n\n      - name: Generate plan\n        id: plan\n        run: |\n          npm run test:ownership:lint\n          npm run test:select:plan -- --base origin/main --plan-out selector-plan.json\n          DECISION=$(node -p \"require('./selector-plan.json').decision\")\n          echo \"decision=$DECISION\" >> $GITHUB_OUTPUT\n\n      - name: Upload plan\n        uses: actions/upload-artifact@v4\n        with:\n          name: selector-plan\n          path: selector-plan.json\n          retention-days: 14\n\n  related:\n    name: related\n    needs: selector-plan\n    if: needs.selector-plan.outputs.decision == 'related'\n    runs-on: ubuntu-latest\n    timeout-minutes: 45\n    steps:\n      - uses: actions/checkout@v4\n\n      - name: Download plan\n        uses: actions/download-artifact@v4\n        with:\n          name: selector-plan\n\n      - uses: actions/setup-node@v4\n        with:\n          node-version: '24'\n          cache: npm\n      - run: npm install\n\n      - name: Build Rust host binary for tests\n        run: cargo build --locked -p fgos\n\n      - name: Run related tests\n        id: run-tests\n        shell: bash\n        run: |\n          mkdir -p test-results\n          set +e\n          node scripts/test-select-run-plan.mjs --files-from selector-plan.json --test-reporter=spec --test-reporter-destination=stdout --test-reporter=junit --test-reporter-destination=test-results/related.xml\n          code=$?\n          echo \"exit_code=$code\" >> \"$GITHUB_OUTPUT\"\n          exit $code\n        env:\n          FORCE_COLOR: 1\n          NODE_V8_COVERAGE: coverage/related\n\n      - name: Write test marker\n        if: always()\n        run: node scripts/write-test-marker.mjs --type related --xml test-results/related.xml --plan selector-plan.json --exit-code \"${{ steps.run-tests.outputs.exit_code }}\"\n        env:\n          JOB_STATUS: ${{ job.status }}\n\n      - name: Upload related results\n        if: always()\n        uses: actions/upload-artifact@v4\n        with:\n          name: related-results\n          path: test-results/\n          retention-days: 14\n\n  compare:\n    name: compare\n    needs: [selector-plan, related, test]\n    if: always()\n    runs-on: ubuntu-latest\n    timeout-minutes: 15\n    permissions:\n      issues: write\n    steps:\n      - uses: actions/checkout@v4\n\n      - uses: actions/setup-node@v4\n        with:\n          node-version: '24'\n          cache: npm\n      - run: npm install\n\n      - name: Download artifacts\n        uses: actions/download-artifact@v4\n        with:\n          path: artifacts/\n\n      - name: Download base artifact\n        if: github.event_name == 'pull_request'\n        run: |\n          BASE_SHA=${{ github.event.pull_request.base.sha }}\n          RUN_ID=$(gh run list --commit $BASE_SHA --workflow CI --json databaseId --jq '.[0].databaseId' || true)\n          if [ -z \"$RUN_ID\" ] || [ \"$RUN_ID\" == \"null\" ]; then\n            RUN_ID=$(gh run list --branch ${{ github.event.pull_request.base.ref }} --workflow CI --status success --json databaseId --jq '.[0].databaseId' || true)\n          fi\n          if [ -n \"$RUN_ID\" ] && [ \"$RUN_ID\" != \"null\" ]; then\n            gh run download $RUN_ID --name full-results-ubuntu-latest --dir artifacts/base-results/test-results || echo \"Failed to download base artifact\"\n            if [ -f artifacts/base-results/test-results/full.xml ]; then\n              mv artifacts/base-results/test-results/full.xml artifacts/base-results/test-results/base.xml\n            fi\n          fi\n        env:\n          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n\n      - name: Run compare\n        run: npm run test:select:compare\n        env:\n          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n\n      # test:select:compare exits before writing ledger.json when the\n      # selector's own decision was 'full' (no comparison to make) -- the\n      # file only exists on a genuine 'related' run. Without this upload,\n      # every real compare ledger this repo ever produced was discarded the\n      # instant the job container tore down: promoteRules (test-select-\n      # promote.mjs) had no durable evidence to ever read, on any rule, ever.\n      - name: Upload compare ledger\n        if: always()\n        uses: actions/upload-artifact@v4\n        with:\n          name: compare-ledger-${{ github.run_id }}\n          path: ledger.json\n          if-no-files-found: ignore\n          retention-days: 90\n\n  herdr-plugin:\n    name: cargo test --locked (herdr-dashboard)\n    runs-on: ubuntu-latest\n    timeout-minutes: 30\n    steps:\n      - uses: actions/checkout@v4\n\n      - name: Show Rust toolchain\n        run: rustup show && cargo --version\n\n      - name: cargo test\n        run: cargo test --locked --manifest-path herdr-dashboard/Cargo.toml\n\n  # One OS, no toolchain action, same reasoning as the herdr-plugin job just\n  # above: x86_64-unknown-linux-gnu is the only target this track's Decisions\n  # table covers (plan.md), and ubuntu-latest's preinstalled toolchain is\n  # trusted the same way herdr-plugin's job already trusts it.\n  rust-workspace:\n    name: cargo (workspace)\n    runs-on: ubuntu-latest\n    timeout-minutes: 30\n    steps:\n      - uses: actions/checkout@v4\n\n      - name: Show Rust toolchain\n        run: rustup show && cargo --version\n\n      - name: cargo fmt\n        run: cargo fmt --all -- --check\n\n      - name: cargo clippy\n        run: cargo clippy --locked --workspace --all-targets -- -D warnings\n\n      - name: cargo test\n        run: cargo test --locked --workspace\n\n      - name: Install dependency auditor\n        run: cargo install cargo-deny --locked --version 0.20.2\n\n      - name: Audit locked dependencies\n        run: cargo deny --config .github/cargo-deny.toml check advisories bans sources\n\n  # Packages through the same script release.yml uses, so this proof and a release can\n  # never differ. Built on ubuntu-22.04 like the release asset (see release-assets.yml).\n  external-consumer:\n    name: external consumer proof\n    runs-on: ubuntu-22.04\n    timeout-minutes: 30\n    steps:\n      - uses: actions/checkout@v4\n\n      - name: Show Rust toolchain\n        run: rustup show && cargo --version\n\n      - uses: actions/setup-node@v4\n        with:\n          node-version: '24'\n          cache: npm\n\n      - name: Install dependencies\n        run: npm ci\n\n      - name: Build workspace (release)\n        run: cargo build --locked --release --workspace\n\n      - name: Check glibc ceiling of the shipped binaries\n        run: scripts/check-glibc-ceiling.sh target/release/fgos target/release/fgctl\n\n      - name: Build and package distribution assets\n        run: node scripts/package-release-assets.mjs --version \"v$(node -pe \"require('./package.json').version\")\" --out dist\n\n      - name: Run external consumer proof\n        run: scripts/ci-external-consumer.sh --assets dist\n\n  addon-reproducibility:\n    name: addon reproducibility\n    uses: ./.github/workflows/release-assets.yml\n",
+      "record": {
+        "file": ".github/workflows/ci.yml",
+        "inventoryInputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+        "inventoryInputs": [
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "9c0a0e571f33944b4501618e5264842ce83da8eae23efda70662d127104a5eef",
+        "digest": "9c0a0e571f33944b4501618e5264842ce83da8eae23efda70662d127104a5eef",
+        "inventoryEdgeIds": [
+          "class6-l-000012"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "class6-l-000012",
+            "slotKey": "{\"edgeId\":\"class6-l-000012\",\"file\":\".github/workflows/ci.yml\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000012\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":63}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000012",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 63
+              }
+            ],
+            "consumerFile": ".github/workflows/ci.yml",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 63,
+                "columnStart": 21,
+                "columnEndExclusive": 48,
+                "text": "docs/distribution-vision.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 63,
+                "columnStart": 21,
+                "columnEndExclusive": 48,
+                "text": "docs/distribution-vision.md"
+              }
+            ],
+            "matchedExpression": "docs/distribution-vision.md",
+            "logicalReference": "docs/distribution-vision.md",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58: Phase 9 carry: map the exact registered-session merge-into-main exemption/return progress distinction in this comment to a live post-merge holder, retaining the adjacent deliberately-unchanged behavior claim. A broad runner area pointer does not prove this claim.",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "Phase 9 carry: map the exact registered-session merge-into-main exemption/return progress distinction in this comment to a live post-merge holder, retaining the adjacent deliberately-unchanged behavior claim. A broad runner area pointer does not prove this claim.",
+            "dependency": "Phase 9 carry: map the exact registered-session merge-into-main exemption/return progress distinction in this comment to a live post-merge holder, retaining the adjacent deliberately-unchanged behavior claim. A broad runner area pointer does not prove this claim.",
+            "blockedCategory": "phase9-carry",
+            "dependencyCategory": "phase9-carry",
+            "legacyPath": "docs/distribution-vision.md",
+            "searchWitness": {
+              "pin": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/distribution-vision.md",
+              "passage": "      # Full suite (docs/distribution-vision.md tsk-49r D1): already",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/distribution-vision.md",
+                  "hitCount": 30,
+                  "liveHitCount": 20,
+                  "hitsSha256": "2e33d7fd3881c1e50fec3d578872fa823926ae13179499fdace719b5698c916f"
+                }
+              ],
+              "assessment": "Phase 9 carry: map the exact registered-session merge-into-main exemption/return progress distinction in this comment to a live post-merge holder, retaining the adjacent deliberately-unchanged behavior claim. A broad runner area pointer does not prove this claim.",
+              "hitGroups": [
+                {
+                  "query": "docs/distribution-vision.md",
+                  "carriageCount": 10,
+                  "liveCount": 20,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "Phase 9 carry: map the exact registered-session merge-into-main exemption/return progress distinction in this comment to a live post-merge holder, retaining the adjacent deliberately-unchanged behavior claim. A broad runner area pointer does not prove this claim.",
+                  "category": "citation-only"
+                }
+              ]
+            },
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000012",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 63,
+                "matchedExpression": "docs/distribution-vision.md",
+                "originalLineText": "      # Full suite (docs/distribution-vision.md tsk-49r D1): already"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-016",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": ".github/workflows/ci.yml",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "9c0a0e571f33944b4501618e5264842ce83da8eae23efda70662d127104a5eef",
+          "bytes": 12143,
+          "lines": 333,
+          "headings": [],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    }
+  ]
+}

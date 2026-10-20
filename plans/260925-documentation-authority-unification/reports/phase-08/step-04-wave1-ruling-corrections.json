@@ -1,0 +1,44 @@
+{
+  "sourceEditsApplied": false,
+  "corrections": [
+    {
+      "file": "bin/fgos.mjs",
+      "edgeId": "class6-l-000085",
+      "slotKey": "{\"edgeId\":\"class6-l-000085\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000085\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1056}]}",
+      "old": "preserve",
+      "new": "patch",
+      "target": "docs/knowledge/why-fgos-add-now-caps-a-work-item-s-id-at-30-characters/long-work-item-ids-max-length-guard.md",
+      "ruling": "L12-37(2) live renamed-alias navigation"
+    },
+    {
+      "file": "bin/fgos.mjs",
+      "edgeId": "class6-l-000085",
+      "slotKey": "{\"edgeId\":\"class6-l-000085\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000085\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1057}]}",
+      "old": "preserve",
+      "new": "patch",
+      "target": "docs/knowledge/why-fgos-add-now-caps-a-work-item-s-id-at-30-characters/long-work-item-ids-max-length-guard.md",
+      "ruling": "L12-37(2) live renamed-alias navigation"
+    },
+    {
+      "file": "src/intake/discovery.mjs",
+      "edgeId": "class6-l-000230",
+      "slotKey": "{\"edgeId\":\"class6-l-000230\",\"file\":\"src/intake/discovery.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000230\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":436}]}",
+      "old": "preserve",
+      "new": "patch",
+      "target": "docs/knowledge/why-judgediscovery-judgedecompose-run-a-second-independent-j/judge-verdict-second-pass-semantic-check.md",
+      "ruling": "L12-37(2) live renamed-alias navigation"
+    },
+    {
+      "file": "src/intake/verify-pattern-check.mjs",
+      "edgeId": "class6-l-000247",
+      "slotKey": "{\"edgeId\":\"class6-l-000247\",\"file\":\"src/intake/verify-pattern-check.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000247\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":21}]}",
+      "old": "preserve",
+      "new": "patch",
+      "target": "docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
+      "ruling": "L12-37(2) live renamed-alias navigation"
+    }
+  ],
+  "checkerRule": "L12-54(2) candidate law body is live; other carriage remains rejected",
+  "unitClarifications": "Per-edge source-bound distinct claims for mixed computed units; no disposition override",
+  "searchWitnesses": "Replayed after lawful target-carriage distinction"
+}

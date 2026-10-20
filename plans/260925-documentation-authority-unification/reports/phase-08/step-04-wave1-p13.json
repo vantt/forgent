@@ -1,0 +1,2594 @@
+{
+  "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+  "reviewerRule": "Never run checker/probes/resolver/author scripts. Read every assigned file through EOF and independently verify targets. One verdict per whole file, even when streamed.",
+  "set": "step04-010",
+  "files": [
+    "bin/fgos.mjs"
+  ],
+  "joinedSlots": 36,
+  "items": [
+    {
+      "file": "bin/fgos.mjs",
+      "sourceDigest": "64ace4da89dbc1222c6d3c0d634272c9b043d1c268a257ed2e2e09385a5eb198",
+      "record": {
+        "file": "bin/fgos.mjs",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-census-cli-help.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "0725cc3cd412e032c2c4ed4383a93194f79a59b413f8a56838050219caa3cb86",
+            "edges": 28
+          },
+          {
+            "path": "step-02l-census-class6.json",
+            "commit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+            "sha256": "2e3950a589524429f8c4d979d6be8d0a90baecb7d516fb9b00f004eaa084c24a",
+            "counts": {
+              "dynamicConstructions": 10980,
+              "dynamicFiles": 468,
+              "edgeFiles": 118,
+              "edges": 494,
+              "files": 490
+            }
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "b3d8603492b1d528b80422b3cc5adad2925fbea397963ebd75ed791ea1deb6c7",
+        "digest": "64ace4da89dbc1222c6d3c0d634272c9b043d1c268a257ed2e2e09385a5eb198",
+        "inventoryEdgeIds": [
+          "cli-001",
+          "cli-003",
+          "cli-005",
+          "cli-006",
+          "class6-l-000080",
+          "class6-l-000081",
+          "class6-l-000081",
+          "class6-l-000082",
+          "class6-l-000084",
+          "class6-l-000085",
+          "class6-l-000085",
+          "class6-l-000086",
+          "class6-l-000087",
+          "class6-l-000088",
+          "class6-l-000088",
+          "class6-l-000089",
+          "class6-l-000094",
+          "class6-l-000095",
+          "class6-l-000097",
+          "class6-l-000099",
+          "class6-l-000100",
+          "class6-l-000101",
+          "class6-l-000102",
+          "class6-l-000102",
+          "class6-l-000103",
+          "class6-l-000103",
+          "class6-l-000105",
+          "class6-l-000106",
+          "class6-l-000106",
+          "class6-l-000107",
+          "class6-l-000107",
+          "class6-l-000108",
+          "class6-l-000108",
+          "class6-l-000110",
+          "class6-l-000111",
+          "class6-l-000112"
+        ],
+        "diff": "--- a/bin/fgos.mjs\n+++ b/bin/fgos.mjs\n@@ -1054,8 +1054,8 @@\n       // (src/intake/classify.mjs) to derive a collision-free \"tsk-<hash>\"\n       // id from --title, instead of forcing the caller to invent one by\n       // hand. This closes the gap that let `add` accept an arbitrarily\n-      // long slugified-title id in the first place (docs/explanation/\n-      // long-work-item-ids-max-length-guard.md) — generateId is now the\n+      // long slugified-title id in the first place (docs/knowledge/\n+      // why-fgos-add-now-caps-a-work-item-s-id-at-30-characters/long-work-item-ids-max-length-guard.md#why-add-had-this-gap-and-submit-didnt) — generateId is now the\n       // path of least resistance, not a manually-typed guess.\n       const idFlag = optionalField(positional[0] ?? flags.id, 'add --id requires a non-empty value; omit --id entirely to auto-generate one from --title.');\n       if (flags.tier !== undefined) {\n",
+        "edges": [
+          {
+            "edgeId": "cli-001",
+            "slotKey": "{\"edgeId\":\"cli-001\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"cli-001\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-census-cli-help.json\",\"originalLine\":1733},{\"edgeId\":\"class6-l-000090\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1736}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-cli-help.json",
+                "edgeId": "cli-001",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 1733
+              },
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000090",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1736
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1737,
+                "columnStart": 12,
+                "columnEndExclusive": 57,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1737,
+                "columnStart": 12,
+                "columnEndExclusive": 57,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+            "logicalReference": "docs/architect/knowledge-registry-redesign.md",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58: Phase 9 carry: the exact attestation/doc-slot §7.4 or §8 rule cited by this maintained skill/comment needs a non-carriage successor passage and schema/reader parity. Preserve registry end-user pointers; do not guess a write destination from an alias.",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "Phase 9 carry: the exact attestation/doc-slot §7.4 or §8 rule cited by this maintained skill/comment needs a non-carriage successor passage and schema/reader parity. Preserve registry end-user pointers; do not guess a write destination from an alias.",
+            "dependency": "Phase 9 carry: the exact attestation/doc-slot §7.4 or §8 rule cited by this maintained skill/comment needs a non-carriage successor passage and schema/reader parity. Preserve registry end-user pointers; do not guess a write destination from an alias.",
+            "blockedCategory": "phase9-carry",
+            "dependencyCategory": "phase9-carry",
+            "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+            "searchWitness": {
+              "pin": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+              "passage": "        // docs/architect/knowledge-registry-redesign.md §7.4: an",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "hitCount": 2,
+                  "liveHitCount": 0,
+                  "hitsSha256": "56a6dad6e3ae8d6ead1d2f6fc1ca7ce6a213c3d4949cce22ebc2f902f3988320"
+                },
+                {
+                  "query": "§7.4: an",
+                  "hitCount": 0,
+                  "liveHitCount": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+                }
+              ],
+              "assessment": "Phase 9 carry: the exact attestation/doc-slot §7.4 or §8 rule cited by this maintained skill/comment needs a non-carriage successor passage and schema/reader parity. Preserve registry end-user pointers; do not guess a write destination from an alias.",
+              "hitGroups": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "carriageCount": 2,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "Phase 9 carry: the exact attestation/doc-slot §7.4 or §8 rule cited by this maintained skill/comment needs a non-carriage successor passage and schema/reader parity. Preserve registry end-user pointers; do not guess a write destination from an alias.",
+                  "category": "carriage"
+                },
+                {
+                  "query": "§7.4: an",
+                  "carriageCount": 0,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "Phase 9 carry: the exact attestation/doc-slot §7.4 or §8 rule cited by this maintained skill/comment needs a non-carriage successor passage and schema/reader parity. Preserve registry end-user pointers; do not guess a write destination from an alias.",
+                  "category": "dead"
+                }
+              ]
+            },
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-cli-help.json",
+                "edgeId": "cli-001",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 1733,
+                "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+                "originalLineText": "        // docs/architect/knowledge-registry-redesign.md §7.4: an"
+              },
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000090",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1736,
+                "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+                "originalLineText": "        // docs/architect/knowledge-registry-redesign.md §7.4: an"
+              }
+            ]
+          },
+          {
+            "edgeId": "cli-003",
+            "slotKey": "{\"edgeId\":\"cli-003\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"cli-003\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-census-cli-help.json\",\"originalLine\":1799},{\"edgeId\":\"class6-l-000093\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1802}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-cli-help.json",
+                "edgeId": "cli-003",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 1799
+              },
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000093",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1802
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1803,
+                "columnStart": 12,
+                "columnEndExclusive": 57,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1803,
+                "columnStart": 12,
+                "columnEndExclusive": 57,
+                "text": "docs/architect/knowledge-registry-redesign.md"
+              }
+            ],
+            "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+            "logicalReference": "docs/architect/knowledge-registry-redesign.md",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58: Phase 9 carry: the exact attestation/doc-slot §7.4 or §8 rule cited by this maintained skill/comment needs a non-carriage successor passage and schema/reader parity. Preserve registry end-user pointers; do not guess a write destination from an alias.",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "Phase 9 carry: the exact attestation/doc-slot §7.4 or §8 rule cited by this maintained skill/comment needs a non-carriage successor passage and schema/reader parity. Preserve registry end-user pointers; do not guess a write destination from an alias.",
+            "dependency": "Phase 9 carry: the exact attestation/doc-slot §7.4 or §8 rule cited by this maintained skill/comment needs a non-carriage successor passage and schema/reader parity. Preserve registry end-user pointers; do not guess a write destination from an alias.",
+            "blockedCategory": "phase9-carry",
+            "dependencyCategory": "phase9-carry",
+            "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+            "searchWitness": {
+              "pin": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/architect/knowledge-registry-redesign.md",
+              "passage": "        // docs/architect/knowledge-registry-redesign.md §8: \"The new",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "hitCount": 2,
+                  "liveHitCount": 0,
+                  "hitsSha256": "56a6dad6e3ae8d6ead1d2f6fc1ca7ce6a213c3d4949cce22ebc2f902f3988320"
+                },
+                {
+                  "query": "§8: \"The new",
+                  "hitCount": 0,
+                  "liveHitCount": 0,
+                  "hitsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+                }
+              ],
+              "assessment": "Phase 9 carry: the exact attestation/doc-slot §7.4 or §8 rule cited by this maintained skill/comment needs a non-carriage successor passage and schema/reader parity. Preserve registry end-user pointers; do not guess a write destination from an alias.",
+              "hitGroups": [
+                {
+                  "query": "docs/architect/knowledge-registry-redesign.md",
+                  "carriageCount": 2,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "Phase 9 carry: the exact attestation/doc-slot §7.4 or §8 rule cited by this maintained skill/comment needs a non-carriage successor passage and schema/reader parity. Preserve registry end-user pointers; do not guess a write destination from an alias.",
+                  "category": "carriage"
+                },
+                {
+                  "query": "§8: \"The new",
+                  "carriageCount": 0,
+                  "liveCount": 0,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "Phase 9 carry: the exact attestation/doc-slot §7.4 or §8 rule cited by this maintained skill/comment needs a non-carriage successor passage and schema/reader parity. Preserve registry end-user pointers; do not guess a write destination from an alias.",
+                  "category": "dead"
+                }
+              ]
+            },
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-cli-help.json",
+                "edgeId": "cli-003",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 1799,
+                "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+                "originalLineText": "        // docs/architect/knowledge-registry-redesign.md §8: \"The new"
+              },
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000093",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1802,
+                "matchedExpression": "docs/architect/knowledge-registry-redesign.md",
+                "originalLineText": "        // docs/architect/knowledge-registry-redesign.md §8: \"The new"
+              }
+            ]
+          },
+          {
+            "edgeId": "cli-005",
+            "slotKey": "{\"edgeId\":\"cli-005\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"cli-005\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-census-cli-help.json\",\"originalLine\":3515},{\"edgeId\":\"class6-l-000104\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":3516}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-cli-help.json",
+                "edgeId": "cli-005",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 3515
+              },
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000104",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 3516
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 3555,
+                "columnStart": 30,
+                "columnEndExclusive": 51,
+                "text": "docs/specs/runner.md:"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 3555,
+                "columnStart": 30,
+                "columnEndExclusive": 51,
+                "text": "docs/specs/runner.md:"
+              }
+            ],
+            "matchedExpression": "docs/specs/runner.md:",
+            "logicalReference": "docs/specs/runner.md:",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58: Phase 9 carry: map the exact registered-session merge-into-main exemption/return progress distinction in this comment to a live post-merge holder, retaining the adjacent deliberately-unchanged behavior claim. A broad runner area pointer does not prove this claim.",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "Phase 9 carry: map the exact registered-session merge-into-main exemption/return progress distinction in this comment to a live post-merge holder, retaining the adjacent deliberately-unchanged behavior claim. A broad runner area pointer does not prove this claim.",
+            "dependency": "Phase 9 carry: map the exact registered-session merge-into-main exemption/return progress distinction in this comment to a live post-merge holder, retaining the adjacent deliberately-unchanged behavior claim. A broad runner area pointer does not prove this claim.",
+            "blockedCategory": "phase9-carry",
+            "dependencyCategory": "phase9-carry",
+            "legacyPath": "docs/specs/runner.md",
+            "searchWitness": {
+              "pin": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/specs/runner.md",
+              "passage": "      // registered session (docs/specs/runner.md: \"a session worktree is",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/specs/runner.md",
+                  "hitCount": 473,
+                  "liveHitCount": 196,
+                  "hitsSha256": "5cbc2e5915ce4aeddf537a7e57a6375458174222b16c050c415323851015a5ab"
+                }
+              ],
+              "assessment": "Phase 9 carry: map the exact registered-session merge-into-main exemption/return progress distinction in this comment to a live post-merge holder, retaining the adjacent deliberately-unchanged behavior claim. A broad runner area pointer does not prove this claim.",
+              "hitGroups": [
+                {
+                  "query": "docs/specs/runner.md",
+                  "carriageCount": 277,
+                  "liveCount": 196,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "Phase 9 carry: map the exact registered-session merge-into-main exemption/return progress distinction in this comment to a live post-merge holder, retaining the adjacent deliberately-unchanged behavior claim. A broad runner area pointer does not prove this claim.",
+                  "category": "citation-only"
+                }
+              ]
+            },
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-cli-help.json",
+                "edgeId": "cli-005",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 3515,
+                "matchedExpression": "docs/specs/runner.md:",
+                "originalLineText": "      // registered session (docs/specs/runner.md: \"a session worktree is"
+              },
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000104",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 3516,
+                "matchedExpression": "docs/specs/runner.md",
+                "originalLineText": "      // registered session (docs/specs/runner.md: \"a session worktree is"
+              }
+            ]
+          },
+          {
+            "edgeId": "cli-006",
+            "slotKey": "{\"edgeId\":\"cli-006\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"cli-006\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-census-cli-help.json\",\"originalLine\":4150},{\"edgeId\":\"class6-l-000109\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":4166}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-cli-help.json",
+                "edgeId": "cli-006",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 4150
+              },
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000109",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 4166
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 4215,
+                "columnStart": 35,
+                "columnEndExclusive": 61,
+                "text": "docs/specs/distribution.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 4215,
+                "columnStart": 35,
+                "columnEndExclusive": 61,
+                "text": "docs/specs/distribution.md"
+              }
+            ],
+            "matchedExpression": "docs/specs/distribution.md",
+            "logicalReference": "docs/specs/distribution.md",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58: Phase 9 carry: source cites the RUL9/RUL11 diagnostic/fix contract. The candidate packaging spec retains that exact old row/rule under source-detail carriage; the live doctor contract differs from the stated reversal/gloss or lacks the exact token row. Carry or reconcile this precise claim into a live holder before changing its citation.",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "Phase 9 carry: source cites the RUL9/RUL11 diagnostic/fix contract. The candidate packaging spec retains that exact old row/rule under source-detail carriage; the live doctor contract differs from the stated reversal/gloss or lacks the exact token row. Carry or reconcile this precise claim into a live holder before changing its citation.",
+            "dependency": "Phase 9 carry: source cites the RUL9/RUL11 diagnostic/fix contract. The candidate packaging spec retains that exact old row/rule under source-detail carriage; the live doctor contract differs from the stated reversal/gloss or lacks the exact token row. Carry or reconcile this precise claim into a live holder before changing its citation.",
+            "blockedCategory": "phase9-carry",
+            "dependencyCategory": "phase9-carry",
+            "legacyPath": "docs/specs/distribution.md",
+            "searchWitness": {
+              "pin": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/specs/distribution.md",
+              "passage": "    // Diagnostic by default (D2, docs/specs/distribution.md RUL9): runs every",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "RUL9",
+                  "hitCount": 50,
+                  "liveHitCount": 49,
+                  "hitsSha256": "d10a27290c83627c29937dbf48514cdfe0b0ee0570a1c8dd74556ccb689ee5d3"
+                },
+                {
+                  "query": "docs/specs/distribution.md",
+                  "hitCount": 75,
+                  "liveHitCount": 44,
+                  "hitsSha256": "402f4c66fc2cc1db066e8d8e89c8728abc26b1c3158583d7db578c8b85750d71"
+                }
+              ],
+              "assessment": "Phase 9 carry: source cites the RUL9/RUL11 diagnostic/fix contract. The candidate packaging spec retains that exact old row/rule under source-detail carriage; the live doctor contract differs from the stated reversal/gloss or lacks the exact token row. Carry or reconcile this precise claim into a live holder before changing its citation.",
+              "hitGroups": [
+                {
+                  "query": "RUL9",
+                  "carriageCount": 1,
+                  "liveCount": 49,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "Phase 9 carry: source cites the RUL9/RUL11 diagnostic/fix contract. The candidate packaging spec retains that exact old row/rule under source-detail carriage; the live doctor contract differs from the stated reversal/gloss or lacks the exact token row. Carry or reconcile this precise claim into a live holder before changing its citation.",
+                  "category": "citation-only"
+                },
+                {
+                  "query": "docs/specs/distribution.md",
+                  "carriageCount": 31,
+                  "liveCount": 44,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "Phase 9 carry: source cites the RUL9/RUL11 diagnostic/fix contract. The candidate packaging spec retains that exact old row/rule under source-detail carriage; the live doctor contract differs from the stated reversal/gloss or lacks the exact token row. Carry or reconcile this precise claim into a live holder before changing its citation.",
+                  "category": "citation-only"
+                }
+              ]
+            },
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-cli-help.json",
+                "edgeId": "cli-006",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 4150,
+                "matchedExpression": "docs/specs/distribution.md",
+                "originalLineText": "    // Diagnostic by default (D2, docs/specs/distribution.md RUL9): runs every"
+              },
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000109",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 4166,
+                "matchedExpression": "docs/specs/distribution.md",
+                "originalLineText": "    // Diagnostic by default (D2, docs/specs/distribution.md RUL9): runs every"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000080",
+            "slotKey": "{\"edgeId\":\"class6-l-000080\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000080\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":210}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000080",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 210
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 211,
+                "columnStart": 27,
+                "columnEndExclusive": 65,
+                "text": "docs/history/<id>/iron-law-evidence.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 211,
+                "columnStart": 27,
+                "columnEndExclusive": 65,
+                "text": "docs/history/<id>/iron-law-evidence.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<id>/iron-law-evidence.md",
+            "logicalReference": "docs/history/<id>/iron-law-evidence.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: \"// tsk-4hl: an item's own docs/history/<id>/iron-law-evidence.md is a\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<id>/iron-law-evidence.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000080",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 210,
+                "matchedExpression": "docs/history/<id>/iron-law-evidence.md",
+                "originalLineText": "// tsk-4hl: an item's own docs/history/<id>/iron-law-evidence.md is a"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000081",
+            "slotKey": "{\"edgeId\":\"class6-l-000081\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000081\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":212}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000081",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 212
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 213,
+                "columnStart": 28,
+                "columnEndExclusive": 76,
+                "text": "docs/history/tsk-5t3-iron-law-evidence-contract/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 213,
+                "columnStart": 28,
+                "columnEndExclusive": 76,
+                "text": "docs/history/tsk-5t3-iron-law-evidence-contract/"
+              },
+              {
+                "line": 214,
+                "columnStart": 1,
+                "columnEndExclusive": 14,
+                "text": "// CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/tsk-5t3-iron-law-evidence-contract/\n// CONTEXT.md",
+            "logicalReference": "docs/history/tsk-5t3-iron-law-evidence-contract/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: \"// Iron-Law-required item (docs/history/tsk-5t3-iron-law-evidence-contract/\\n// CONTEXT.md) -- an item's declared footprint almost never lists it\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/tsk-5t3-iron-law-evidence-contract/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000081",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 212,
+                "matchedExpression": "docs/history/tsk-5t3-iron-law-evidence-contract/\n// CONTEXT.md",
+                "originalLineText": "// Iron-Law-required item (docs/history/tsk-5t3-iron-law-evidence-contract/"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000081",
+            "slotKey": "{\"edgeId\":\"class6-l-000081\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000081\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":213}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000081",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 213
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 214,
+                "columnStart": 1,
+                "columnEndExclusive": 14,
+                "text": "// CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 213,
+                "columnStart": 28,
+                "columnEndExclusive": 76,
+                "text": "docs/history/tsk-5t3-iron-law-evidence-contract/"
+              },
+              {
+                "line": 214,
+                "columnStart": 1,
+                "columnEndExclusive": 14,
+                "text": "// CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/tsk-5t3-iron-law-evidence-contract/\n// CONTEXT.md",
+            "logicalReference": "docs/history/tsk-5t3-iron-law-evidence-contract/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: \"// Iron-Law-required item (docs/history/tsk-5t3-iron-law-evidence-contract/\\n// CONTEXT.md) -- an item's declared footprint almost never lists it\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/tsk-5t3-iron-law-evidence-contract/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000081",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 213,
+                "matchedExpression": "docs/history/tsk-5t3-iron-law-evidence-contract/\n// CONTEXT.md",
+                "originalLineText": "// CONTEXT.md) -- an item's declared footprint almost never lists it"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000082",
+            "slotKey": "{\"edgeId\":\"class6-l-000082\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000082\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":218}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000082",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 218
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 219,
+                "columnStart": 54,
+                "columnEndExclusive": 72,
+                "text": "docs/history/<id>/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 219,
+                "columnStart": 54,
+                "columnEndExclusive": 72,
+                "text": "docs/history/<id>/"
+              }
+            ],
+            "matchedExpression": "docs/history/<id>/",
+            "logicalReference": "docs/history/<id>/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '// on purpose -- only this exact path, never a whole docs/history/<id>/'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<id>/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000082",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 218,
+                "matchedExpression": "docs/history/<id>/",
+                "originalLineText": "// on purpose -- only this exact path, never a whole docs/history/<id>/"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000084",
+            "slotKey": "{\"edgeId\":\"class6-l-000084\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000084\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":280}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000084",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 280
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 281,
+                "columnStart": 37,
+                "columnEndExclusive": 71,
+                "text": "docs/history/<feature>/RESEARCH.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 281,
+                "columnStart": 37,
+                "columnEndExclusive": 71,
+                "text": "docs/history/<feature>/RESEARCH.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/RESEARCH.md",
+            "logicalReference": "docs/history/<feature>/RESEARCH.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '// discovery/planning/validating to docs/history/<feature>/RESEARCH.md -- an'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<feature>/RESEARCH.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000084",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 280,
+                "matchedExpression": "docs/history/<feature>/RESEARCH.md",
+                "originalLineText": "// discovery/planning/validating to docs/history/<feature>/RESEARCH.md -- an"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000085",
+            "slotKey": "{\"edgeId\":\"class6-l-000085\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000085\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1056}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000085",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1056
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1057,
+                "columnStart": 54,
+                "columnEndExclusive": 71,
+                "text": "docs/explanation/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1057,
+                "columnStart": 54,
+                "columnEndExclusive": 71,
+                "text": "docs/explanation/"
+              },
+              {
+                "line": 1058,
+                "columnStart": 1,
+                "columnEndExclusive": 48,
+                "text": "      // long-work-item-ids-max-length-guard.md"
+              }
+            ],
+            "matchedExpression": "docs/explanation/\n      // long-work-item-ids-max-length-guard.md",
+            "logicalReference": "docs/explanation/long-work-item-ids-max-length-guard.md",
+            "disposition": "patch",
+            "diffHunk": "@@ -1054,8 +1054,8 @@",
+            "reason": "A51, L12-7/30/31/32/58: The exact pre-existing add/submit gap is explained under Why add had this gap and submit did not. The comment separately states the later generator change; it does not claim the target already documents the new default. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/knowledge/why-fgos-add-now-caps-a-work-item-s-id-at-30-characters/long-work-item-ids-max-length-guard.md",
+            "anchor": "why-add-had-this-gap-and-submit-didnt",
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/explanation/long-work-item-ids-max-length-guard.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000085",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1056,
+                "matchedExpression": "docs/explanation/\n      // long-work-item-ids-max-length-guard.md",
+                "originalLineText": "      // long slugified-title id in the first place (docs/explanation/"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000085",
+            "slotKey": "{\"edgeId\":\"class6-l-000085\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000085\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1057}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000085",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1057
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1058,
+                "columnStart": 1,
+                "columnEndExclusive": 48,
+                "text": "      // long-work-item-ids-max-length-guard.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1057,
+                "columnStart": 54,
+                "columnEndExclusive": 71,
+                "text": "docs/explanation/"
+              },
+              {
+                "line": 1058,
+                "columnStart": 1,
+                "columnEndExclusive": 48,
+                "text": "      // long-work-item-ids-max-length-guard.md"
+              }
+            ],
+            "matchedExpression": "docs/explanation/\n      // long-work-item-ids-max-length-guard.md",
+            "logicalReference": "docs/explanation/long-work-item-ids-max-length-guard.md",
+            "disposition": "patch",
+            "diffHunk": "@@ -1054,8 +1054,8 @@",
+            "reason": "A51, L12-7/30/31/32/58: The exact pre-existing add/submit gap is explained under Why add had this gap and submit did not. The comment separately states the later generator change; it does not claim the target already documents the new default. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/knowledge/why-fgos-add-now-caps-a-work-item-s-id-at-30-characters/long-work-item-ids-max-length-guard.md",
+            "anchor": "why-add-had-this-gap-and-submit-didnt",
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/explanation/long-work-item-ids-max-length-guard.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000085",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1057,
+                "matchedExpression": "docs/explanation/\n      // long-work-item-ids-max-length-guard.md",
+                "originalLineText": "      // long-work-item-ids-max-length-guard.md) — generateId is now the"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000086",
+            "slotKey": "{\"edgeId\":\"class6-l-000086\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000086\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1088}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000086",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1088
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1089,
+                "columnStart": 23,
+                "columnEndExclusive": 68,
+                "text": "docs/history/add-stage-default-gap/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1089,
+                "columnStart": 23,
+                "columnEndExclusive": 68,
+                "text": "docs/history/add-stage-default-gap/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/add-stage-default-gap/CONTEXT.md",
+            "logicalReference": "docs/history/add-stage-default-gap/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '        // Per D1/D2 (docs/history/add-stage-default-gap/CONTEXT.md): add now'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/add-stage-default-gap/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000086",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1088,
+                "matchedExpression": "docs/history/add-stage-default-gap/CONTEXT.md",
+                "originalLineText": "        // Per D1/D2 (docs/history/add-stage-default-gap/CONTEXT.md): add now"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000087",
+            "slotKey": "{\"edgeId\":\"class6-l-000087\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000087\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1126}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000087",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1126
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1127,
+                "columnStart": 21,
+                "columnEndExclusive": 44,
+                "text": "docs/history/<feature>/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1127,
+                "columnStart": 21,
+                "columnEndExclusive": 44,
+                "text": "docs/history/<feature>/"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/",
+            "logicalReference": "docs/history/<feature>/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: \"        // relative docs/history/<feature>/ path this item's own decision\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<feature>/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000087",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1126,
+                "matchedExpression": "docs/history/<feature>/",
+                "originalLineText": "        // relative docs/history/<feature>/ path this item's own decision"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000088",
+            "slotKey": "{\"edgeId\":\"class6-l-000088\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000088\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1160}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000088",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1160
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1161,
+                "columnStart": 41,
+                "columnEndExclusive": 78,
+                "text": "docs/history/phase-2-status-category-"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1161,
+                "columnStart": 41,
+                "columnEndExclusive": 78,
+                "text": "docs/history/phase-2-status-category-"
+              },
+              {
+                "line": 1162,
+                "columnStart": 1,
+                "columnEndExclusive": 32,
+                "text": "        // schema/DISCUSSION.md"
+              }
+            ],
+            "matchedExpression": "docs/history/phase-2-status-category-\n        // schema/DISCUSSION.md",
+            "logicalReference": "docs/history/phase-2-status-category-schema/DISCUSSION.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '        // Per decision record 0027 D6 (docs/history/phase-2-status-category-\\n        // schema/DISCUSSION.md §task-domain-fields): --domain-fields is an'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/phase-2-status-category-schema/DISCUSSION.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000088",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1160,
+                "matchedExpression": "docs/history/phase-2-status-category-\n        // schema/DISCUSSION.md",
+                "originalLineText": "        // Per decision record 0027 D6 (docs/history/phase-2-status-category-"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000088",
+            "slotKey": "{\"edgeId\":\"class6-l-000088\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000088\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1161}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000088",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1161
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1162,
+                "columnStart": 1,
+                "columnEndExclusive": 32,
+                "text": "        // schema/DISCUSSION.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1161,
+                "columnStart": 41,
+                "columnEndExclusive": 78,
+                "text": "docs/history/phase-2-status-category-"
+              },
+              {
+                "line": 1162,
+                "columnStart": 1,
+                "columnEndExclusive": 32,
+                "text": "        // schema/DISCUSSION.md"
+              }
+            ],
+            "matchedExpression": "docs/history/phase-2-status-category-\n        // schema/DISCUSSION.md",
+            "logicalReference": "docs/history/phase-2-status-category-schema/DISCUSSION.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '        // Per decision record 0027 D6 (docs/history/phase-2-status-category-\\n        // schema/DISCUSSION.md §task-domain-fields): --domain-fields is an'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/phase-2-status-category-schema/DISCUSSION.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000088",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1161,
+                "matchedExpression": "docs/history/phase-2-status-category-\n        // schema/DISCUSSION.md",
+                "originalLineText": "        // schema/DISCUSSION.md §task-domain-fields): --domain-fields is an"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000089",
+            "slotKey": "{\"edgeId\":\"class6-l-000089\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000089\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1706}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000089",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1706
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1707,
+                "columnStart": 12,
+                "columnEndExclusive": 58,
+                "text": "docs/history/compound-learn-artifact-registry/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1707,
+                "columnStart": 12,
+                "columnEndExclusive": 58,
+                "text": "docs/history/compound-learn-artifact-registry/"
+              }
+            ],
+            "matchedExpression": "docs/history/compound-learn-artifact-registry/",
+            "logicalReference": "docs/history/compound-learn-artifact-registry/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '        // docs/history/compound-learn-artifact-registry/ phase-06-attest-gate.md'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/compound-learn-artifact-registry/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000089",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1706,
+                "matchedExpression": "docs/history/compound-learn-artifact-registry/",
+                "originalLineText": "        // docs/history/compound-learn-artifact-registry/ phase-06-attest-gate.md"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000094",
+            "slotKey": "{\"edgeId\":\"class6-l-000094\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000094\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1956},{\"edgeId\":\"cli-004\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-census-cli-help.json\",\"originalLine\":1953}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000094",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1956
+              },
+              {
+                "inventory": "step-02-census-cli-help.json",
+                "edgeId": "cli-004",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 1953
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1957,
+                "columnStart": 29,
+                "columnEndExclusive": 49,
+                "text": "docs/specs/<area>.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1957,
+                "columnStart": 29,
+                "columnEndExclusive": 49,
+                "text": "docs/specs/<area>.md"
+              }
+            ],
+            "matchedExpression": "docs/specs/<area>.md",
+            "logicalReference": "docs/specs/<area>.md",
+            "disposition": "parked",
+            "diffHunk": null,
+            "reason": "A51, L12-30/31/32/58: Description needs rewrite: this complete narrative/index/writer contract assumes one docs/specs/<area>.md layout. Candidate ownership splits specs, decisions and subcomponents; preserve end-user pointers and trace the actual registry/index reader in Step 5 before specifying the whole authority statement.",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": "Description needs rewrite: this complete narrative/index/writer contract assumes one docs/specs/<area>.md layout. Candidate ownership splits specs, decisions and subcomponents; preserve end-user pointers and trace the actual registry/index reader in Step 5 before specifying the whole authority statement.",
+            "dependency": "Description needs rewrite: this complete narrative/index/writer contract assumes one docs/specs/<area>.md layout. Candidate ownership splits specs, decisions and subcomponents; preserve end-user pointers and trace the actual registry/index reader in Step 5 before specifying the whole authority statement.",
+            "blockedCategory": "description-rewrite",
+            "dependencyCategory": "description-rewrite",
+            "legacyPath": "docs/specs/<area>.md",
+            "searchWitness": {
+              "pin": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "roots": [
+                "docs/platform",
+                "docs/knowledge",
+                "docs/reference",
+                "docs/tutorials"
+              ],
+              "legacyPath": "docs/specs/<area>.md",
+              "passage": "      // area name matching docs/specs/<area>.md) so `fgos decision-index`",
+              "aliasLookups": [
+                {
+                  "source": "plans/260925-documentation-authority-unification/alias-table.json",
+                  "matches": []
+                },
+                {
+                  "source": "docs/doc-registry.json",
+                  "matches": []
+                }
+              ],
+              "queries": [
+                {
+                  "query": "docs/specs/<area>.md",
+                  "hitCount": 13,
+                  "liveHitCount": 13,
+                  "hitsSha256": "ad5f483a30d30de5d3f71b57472fc5eef4d9082c7de66ae462a5a322391d5bb7"
+                }
+              ],
+              "assessment": "Description needs rewrite: this complete narrative/index/writer contract assumes one docs/specs/<area>.md layout. Candidate ownership splits specs, decisions and subcomponents; preserve end-user pointers and trace the actual registry/index reader in Step 5 before specifying the whole authority statement.",
+              "hitGroups": [
+                {
+                  "query": "docs/specs/<area>.md",
+                  "carriageCount": 0,
+                  "liveCount": 13,
+                  "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+                  "liveAssessment": "Description needs rewrite: this complete narrative/index/writer contract assumes one docs/specs/<area>.md layout. Candidate ownership splits specs, decisions and subcomponents; preserve end-user pointers and trace the actual registry/index reader in Step 5 before specifying the whole authority statement.",
+                  "category": "citation-only"
+                }
+              ]
+            },
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000094",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1956,
+                "matchedExpression": "docs/specs/<area>.md",
+                "originalLineText": "      // area name matching docs/specs/<area>.md) so `fgos decision-index`"
+              },
+              {
+                "inventory": "step-02-census-cli-help.json",
+                "edgeId": "cli-004",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 1953,
+                "matchedExpression": "docs/specs/",
+                "originalLineText": "      // area name matching docs/specs/<area>.md) so `fgos decision-index`"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000095",
+            "slotKey": "{\"edgeId\":\"class6-l-000095\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000095\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1957}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000095",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1957
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 1958,
+                "columnStart": 30,
+                "columnEndExclusive": 53,
+                "text": "docs/decisions/index.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 1958,
+                "columnStart": 30,
+                "columnEndExclusive": 53,
+                "text": "docs/decisions/index.md"
+              }
+            ],
+            "matchedExpression": "docs/decisions/index.md",
+            "logicalReference": "docs/decisions/index.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-26/38: surviving native path, literal example, implementation provenance or captured contract reference; its runtime/reader behavior is outside this comment-only record and remains with Step 5. No authority-path rewrite is made. Exact passage: '      // can project it into docs/decisions/index.md. Purely optional and'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/decisions/index.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000095",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 1957,
+                "matchedExpression": "docs/decisions/index.md",
+                "originalLineText": "      // can project it into docs/decisions/index.md. Purely optional and"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000097",
+            "slotKey": "{\"edgeId\":\"class6-l-000097\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000097\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":2038}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000097",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 2038
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 2039,
+                "columnStart": 22,
+                "columnEndExclusive": 45,
+                "text": "docs/decisions/index.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 2039,
+                "columnStart": 22,
+                "columnEndExclusive": 45,
+                "text": "docs/decisions/index.md"
+              }
+            ],
+            "matchedExpression": "docs/decisions/index.md",
+            "logicalReference": "docs/decisions/index.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-26/38: surviving native path, literal example, implementation provenance or captured contract reference; its runtime/reader behavior is outside this comment-only record and remains with Step 5. No authority-path rewrite is made. Exact passage: '    // tsk-1lv-2 D4: docs/decisions/index.md is a projection of'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/decisions/index.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000097",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 2038,
+                "matchedExpression": "docs/decisions/index.md",
+                "originalLineText": "    // tsk-1lv-2 D4: docs/decisions/index.md is a projection of"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000099",
+            "slotKey": "{\"edgeId\":\"class6-l-000099\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000099\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":2203}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000099",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 2203
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 2204,
+                "columnStart": 9,
+                "columnEndExclusive": 56,
+                "text": "docs/history/fgos-show-scoped-detail/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 2204,
+                "columnStart": 9,
+                "columnEndExclusive": 56,
+                "text": "docs/history/fgos-show-scoped-detail/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/fgos-show-scoped-detail/CONTEXT.md",
+            "logicalReference": "docs/history/fgos-show-scoped-detail/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '    // (docs/history/fgos-show-scoped-detail/CONTEXT.md D1). Reuses'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/fgos-show-scoped-detail/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000099",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 2203,
+                "matchedExpression": "docs/history/fgos-show-scoped-detail/CONTEXT.md",
+                "originalLineText": "    // (docs/history/fgos-show-scoped-detail/CONTEXT.md D1). Reuses"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000100",
+            "slotKey": "{\"edgeId\":\"class6-l-000100\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000100\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":2232}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000100",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 2232
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 2233,
+                "columnStart": 27,
+                "columnEndExclusive": 75,
+                "text": "docs/history/execution-fanout/CONTEXT-tsk-4so.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 2233,
+                "columnStart": 27,
+                "columnEndExclusive": 75,
+                "text": "docs/history/execution-fanout/CONTEXT-tsk-4so.md"
+              }
+            ],
+            "matchedExpression": "docs/history/execution-fanout/CONTEXT-tsk-4so.md",
+            "logicalReference": "docs/history/execution-fanout/CONTEXT-tsk-4so.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '    // `--step` (tsk-4so, docs/history/execution-fanout/CONTEXT-tsk-4so.md):'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/execution-fanout/CONTEXT-tsk-4so.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000100",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 2232,
+                "matchedExpression": "docs/history/execution-fanout/CONTEXT-tsk-4so.md",
+                "originalLineText": "    // `--step` (tsk-4so, docs/history/execution-fanout/CONTEXT-tsk-4so.md):"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000101",
+            "slotKey": "{\"edgeId\":\"class6-l-000101\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000101\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":2263}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000101",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 2263
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 2264,
+                "columnStart": 42,
+                "columnEndExclusive": 77,
+                "text": "docs/history/gate-bypass/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 2264,
+                "columnStart": 42,
+                "columnEndExclusive": 77,
+                "text": "docs/history/gate-bypass/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/gate-bypass/CONTEXT.md",
+            "logicalReference": "docs/history/gate-bypass/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '    // the configured gate-bypass level (docs/history/gate-bypass/CONTEXT.md'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/gate-bypass/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000101",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 2263,
+                "matchedExpression": "docs/history/gate-bypass/CONTEXT.md",
+                "originalLineText": "    // the configured gate-bypass level (docs/history/gate-bypass/CONTEXT.md"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000102",
+            "slotKey": "{\"edgeId\":\"class6-l-000102\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000102\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":2279}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000102",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 2279
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 2280,
+                "columnStart": 27,
+                "columnEndExclusive": 75,
+                "text": "docs/history/tsk-65q-gate-bypass-global-install-"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 2280,
+                "columnStart": 27,
+                "columnEndExclusive": 75,
+                "text": "docs/history/tsk-65q-gate-bypass-global-install-"
+              },
+              {
+                "line": 2281,
+                "columnStart": 1,
+                "columnEndExclusive": 30,
+                "text": "    // resolution/RESEARCH.md"
+              }
+            ],
+            "matchedExpression": "docs/history/tsk-65q-gate-bypass-global-install-\n    // resolution/RESEARCH.md",
+            "logicalReference": "docs/history/tsk-65q-gate-bypass-global-install-resolution/RESEARCH.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '    // different project (docs/history/tsk-65q-gate-bypass-global-install-\\n    // resolution/RESEARCH.md).'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/tsk-65q-gate-bypass-global-install-resolution/RESEARCH.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000102",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 2279,
+                "matchedExpression": "docs/history/tsk-65q-gate-bypass-global-install-\n    // resolution/RESEARCH.md",
+                "originalLineText": "    // different project (docs/history/tsk-65q-gate-bypass-global-install-"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000102",
+            "slotKey": "{\"edgeId\":\"class6-l-000102\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000102\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":2280}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000102",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 2280
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 2281,
+                "columnStart": 1,
+                "columnEndExclusive": 30,
+                "text": "    // resolution/RESEARCH.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 2280,
+                "columnStart": 27,
+                "columnEndExclusive": 75,
+                "text": "docs/history/tsk-65q-gate-bypass-global-install-"
+              },
+              {
+                "line": 2281,
+                "columnStart": 1,
+                "columnEndExclusive": 30,
+                "text": "    // resolution/RESEARCH.md"
+              }
+            ],
+            "matchedExpression": "docs/history/tsk-65q-gate-bypass-global-install-\n    // resolution/RESEARCH.md",
+            "logicalReference": "docs/history/tsk-65q-gate-bypass-global-install-resolution/RESEARCH.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '    // different project (docs/history/tsk-65q-gate-bypass-global-install-\\n    // resolution/RESEARCH.md).'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/tsk-65q-gate-bypass-global-install-resolution/RESEARCH.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000102",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 2280,
+                "matchedExpression": "docs/history/tsk-65q-gate-bypass-global-install-\n    // resolution/RESEARCH.md",
+                "originalLineText": "    // resolution/RESEARCH.md)."
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000103",
+            "slotKey": "{\"edgeId\":\"class6-l-000103\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000103\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":2582}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000103",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 2582
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 2595,
+                "columnStart": 44,
+                "columnEndExclusive": 79,
+                "text": "docs/history/merge-standardization/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 2595,
+                "columnStart": 44,
+                "columnEndExclusive": 79,
+                "text": "docs/history/merge-standardization/"
+              },
+              {
+                "line": 2596,
+                "columnStart": 1,
+                "columnEndExclusive": 26,
+                "text": "    // CONTEXT.md/plan.md"
+              }
+            ],
+            "matchedExpression": "docs/history/merge-standardization/\n    // CONTEXT.md/plan.md",
+            "logicalReference": "docs/history/merge-standardization/CONTEXT.md/plan.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '    // pure read. Merge-readiness ranking (docs/history/merge-standardization/\\n    // CONTEXT.md/plan.md): \"list\" surfaces which `proposed` items are'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/merge-standardization/CONTEXT.md/plan.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000103",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 2582,
+                "matchedExpression": "docs/history/merge-standardization/\n    // CONTEXT.md/plan.md",
+                "originalLineText": "    // pure read. Merge-readiness ranking (docs/history/merge-standardization/"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000103",
+            "slotKey": "{\"edgeId\":\"class6-l-000103\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000103\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":2583}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000103",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 2583
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 2596,
+                "columnStart": 1,
+                "columnEndExclusive": 26,
+                "text": "    // CONTEXT.md/plan.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 2595,
+                "columnStart": 44,
+                "columnEndExclusive": 79,
+                "text": "docs/history/merge-standardization/"
+              },
+              {
+                "line": 2596,
+                "columnStart": 1,
+                "columnEndExclusive": 26,
+                "text": "    // CONTEXT.md/plan.md"
+              }
+            ],
+            "matchedExpression": "docs/history/merge-standardization/\n    // CONTEXT.md/plan.md",
+            "logicalReference": "docs/history/merge-standardization/CONTEXT.md/plan.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '    // pure read. Merge-readiness ranking (docs/history/merge-standardization/\\n    // CONTEXT.md/plan.md): \"list\" surfaces which `proposed` items are'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/merge-standardization/CONTEXT.md/plan.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000103",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 2583,
+                "matchedExpression": "docs/history/merge-standardization/\n    // CONTEXT.md/plan.md",
+                "originalLineText": "    // CONTEXT.md/plan.md): \"list\" surfaces which `proposed` items are"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000105",
+            "slotKey": "{\"edgeId\":\"class6-l-000105\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000105\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":3681}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000105",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 3681
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 3720,
+                "columnStart": 28,
+                "columnEndExclusive": 76,
+                "text": "docs/history/tsk-3bn-merge-conductor-harness-v2/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 3720,
+                "columnStart": 28,
+                "columnEndExclusive": 76,
+                "text": "docs/history/tsk-3bn-merge-conductor-harness-v2/"
+              }
+            ],
+            "matchedExpression": "docs/history/tsk-3bn-merge-conductor-harness-v2/",
+            "logicalReference": "docs/history/tsk-3bn-merge-conductor-harness-v2/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '    // sync-root (tsk-50i, docs/history/tsk-3bn-merge-conductor-harness-v2/):'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/tsk-3bn-merge-conductor-harness-v2/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000105",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 3681,
+                "matchedExpression": "docs/history/tsk-3bn-merge-conductor-harness-v2/",
+                "originalLineText": "    // sync-root (tsk-50i, docs/history/tsk-3bn-merge-conductor-harness-v2/):"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000106",
+            "slotKey": "{\"edgeId\":\"class6-l-000106\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000106\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":3909}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000106",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 3909
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 3958,
+                "columnStart": 37,
+                "columnEndExclusive": 64,
+                "text": "docs/distillery/deep-dives/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 3958,
+                "columnStart": 37,
+                "columnEndExclusive": 64,
+                "text": "docs/distillery/deep-dives/"
+              },
+              {
+                "line": 3959,
+                "columnStart": 1,
+                "columnEndExclusive": 24,
+                "text": "    // tool-registry.md"
+              }
+            ],
+            "matchedExpression": "docs/distillery/deep-dives/\n    // tool-registry.md",
+            "logicalReference": "docs/distillery/deep-dives/tool-registry.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-26/38: surviving native path, literal example, implementation provenance or captured contract reference; its runtime/reader behavior is outside this comment-only record and remains with Step 5. No authority-path rewrite is made. Exact passage: '    // tool-registry-capability per docs/distillery/deep-dives/\\n    // tool-registry.md; tsk-in1-1 D1: `register`/`remove` retired — a tool'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/distillery/deep-dives/tool-registry.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000106",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 3909,
+                "matchedExpression": "docs/distillery/deep-dives/\n    // tool-registry.md",
+                "originalLineText": "    // tool-registry-capability per docs/distillery/deep-dives/"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000106",
+            "slotKey": "{\"edgeId\":\"class6-l-000106\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000106\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":3910}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000106",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 3910
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 3959,
+                "columnStart": 1,
+                "columnEndExclusive": 24,
+                "text": "    // tool-registry.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 3958,
+                "columnStart": 37,
+                "columnEndExclusive": 64,
+                "text": "docs/distillery/deep-dives/"
+              },
+              {
+                "line": 3959,
+                "columnStart": 1,
+                "columnEndExclusive": 24,
+                "text": "    // tool-registry.md"
+              }
+            ],
+            "matchedExpression": "docs/distillery/deep-dives/\n    // tool-registry.md",
+            "logicalReference": "docs/distillery/deep-dives/tool-registry.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-26/38: surviving native path, literal example, implementation provenance or captured contract reference; its runtime/reader behavior is outside this comment-only record and remains with Step 5. No authority-path rewrite is made. Exact passage: '    // tool-registry-capability per docs/distillery/deep-dives/\\n    // tool-registry.md; tsk-in1-1 D1: `register`/`remove` retired — a tool'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/distillery/deep-dives/tool-registry.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000106",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 3910,
+                "matchedExpression": "docs/distillery/deep-dives/\n    // tool-registry.md",
+                "originalLineText": "    // tool-registry.md; tsk-in1-1 D1: `register`/`remove` retired — a tool"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000107",
+            "slotKey": "{\"edgeId\":\"class6-l-000107\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000107\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":4067}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000107",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 4067
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 4116,
+                "columnStart": 50,
+                "columnEndExclusive": 78,
+                "text": "docs/history/fgos-uninstall/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 4116,
+                "columnStart": 50,
+                "columnEndExclusive": 78,
+                "text": "docs/history/fgos-uninstall/"
+              },
+              {
+                "line": 4117,
+                "columnStart": 1,
+                "columnEndExclusive": 18,
+                "text": "    // CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/fgos-uninstall/\n    // CONTEXT.md",
+            "logicalReference": "docs/history/fgos-uninstall/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: \"    // Reverses `setup`'s own wiring (tsk-4iv-1, docs/history/fgos-uninstall/\\n    // CONTEXT.md D2-D4). Requires `--yes` (D3): with no flag, refuses before\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/fgos-uninstall/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000107",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 4067,
+                "matchedExpression": "docs/history/fgos-uninstall/\n    // CONTEXT.md",
+                "originalLineText": "    // Reverses `setup`'s own wiring (tsk-4iv-1, docs/history/fgos-uninstall/"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000107",
+            "slotKey": "{\"edgeId\":\"class6-l-000107\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000107\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":4068}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000107",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 4068
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 4117,
+                "columnStart": 1,
+                "columnEndExclusive": 18,
+                "text": "    // CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 4116,
+                "columnStart": 50,
+                "columnEndExclusive": 78,
+                "text": "docs/history/fgos-uninstall/"
+              },
+              {
+                "line": 4117,
+                "columnStart": 1,
+                "columnEndExclusive": 18,
+                "text": "    // CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/fgos-uninstall/\n    // CONTEXT.md",
+            "logicalReference": "docs/history/fgos-uninstall/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: \"    // Reverses `setup`'s own wiring (tsk-4iv-1, docs/history/fgos-uninstall/\\n    // CONTEXT.md D2-D4). Requires `--yes` (D3): with no flag, refuses before\"",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/fgos-uninstall/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000107",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 4068,
+                "matchedExpression": "docs/history/fgos-uninstall/\n    // CONTEXT.md",
+                "originalLineText": "    // CONTEXT.md D2-D4). Requires `--yes` (D3): with no flag, refuses before"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000108",
+            "slotKey": "{\"edgeId\":\"class6-l-000108\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000108\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":4080}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000108",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 4080
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 4129,
+                "columnStart": 46,
+                "columnEndExclusive": 59,
+                "text": "docs/history/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 4129,
+                "columnStart": 46,
+                "columnEndExclusive": 59,
+                "text": "docs/history/"
+              },
+              {
+                "line": 4130,
+                "columnStart": 1,
+                "columnEndExclusive": 49,
+                "text": "    //     shell-rc-dead-source-lines/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/\n    //     shell-rc-dead-source-lines/CONTEXT.md",
+            "logicalReference": "docs/history/shell-rc-dead-source-lines/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '    //     the caller can remove it by hand (docs/history/\\n    //     shell-rc-dead-source-lines/CONTEXT.md D1: \"deletion stays a human'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/shell-rc-dead-source-lines/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000108",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 4080,
+                "matchedExpression": "docs/history/\n    //     shell-rc-dead-source-lines/CONTEXT.md",
+                "originalLineText": "    //     the caller can remove it by hand (docs/history/"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000108",
+            "slotKey": "{\"edgeId\":\"class6-l-000108\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000108\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":4081}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000108",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 4081
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 4130,
+                "columnStart": 1,
+                "columnEndExclusive": 49,
+                "text": "    //     shell-rc-dead-source-lines/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 4129,
+                "columnStart": 46,
+                "columnEndExclusive": 59,
+                "text": "docs/history/"
+              },
+              {
+                "line": 4130,
+                "columnStart": 1,
+                "columnEndExclusive": 49,
+                "text": "    //     shell-rc-dead-source-lines/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/\n    //     shell-rc-dead-source-lines/CONTEXT.md",
+            "logicalReference": "docs/history/shell-rc-dead-source-lines/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '    //     the caller can remove it by hand (docs/history/\\n    //     shell-rc-dead-source-lines/CONTEXT.md D1: \"deletion stays a human'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/shell-rc-dead-source-lines/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000108",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 4081,
+                "matchedExpression": "docs/history/\n    //     shell-rc-dead-source-lines/CONTEXT.md",
+                "originalLineText": "    //     shell-rc-dead-source-lines/CONTEXT.md D1: \"deletion stays a human"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000110",
+            "slotKey": "{\"edgeId\":\"class6-l-000110\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000110\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":4170}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000110",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 4170
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 4219,
+                "columnStart": 17,
+                "columnEndExclusive": 63,
+                "text": "docs/history/doctor-fix-gate-bypass/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 4219,
+                "columnStart": 17,
+                "columnEndExclusive": 63,
+                "text": "docs/history/doctor-fix-gate-bypass/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/doctor-fix-gate-bypass/CONTEXT.md",
+            "logicalReference": "docs/history/doctor-fix-gate-bypass/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '    // `--fix` (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2, deliberate'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/doctor-fix-gate-bypass/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000110",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 4170,
+                "matchedExpression": "docs/history/doctor-fix-gate-bypass/CONTEXT.md",
+                "originalLineText": "    // `--fix` (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2, deliberate"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000111",
+            "slotKey": "{\"edgeId\":\"class6-l-000111\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000111\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":4348}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000111",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 4348
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 4397,
+                "columnStart": 17,
+                "columnEndExclusive": 67,
+                "text": "docs/history/stale-worktree-index-guard/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 4397,
+                "columnStart": 17,
+                "columnEndExclusive": 67,
+                "text": "docs/history/stale-worktree-index-guard/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/stale-worktree-index-guard/CONTEXT.md",
+            "logicalReference": "docs/history/stale-worktree-index-guard/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '    // tsk-1d7 (docs/history/stale-worktree-index-guard/CONTEXT.md D3): the'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/stale-worktree-index-guard/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000111",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 4348,
+                "matchedExpression": "docs/history/stale-worktree-index-guard/CONTEXT.md",
+                "originalLineText": "    // tsk-1d7 (docs/history/stale-worktree-index-guard/CONTEXT.md D3): the"
+              }
+            ]
+          },
+          {
+            "edgeId": "class6-l-000112",
+            "slotKey": "{\"edgeId\":\"class6-l-000112\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000112\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":4744}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000112",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 4744
+              }
+            ],
+            "consumerFile": "bin/fgos.mjs",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 4793,
+                "columnStart": 41,
+                "columnEndExclusive": 83,
+                "text": "docs/history/agent-coordination-state-root"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 4793,
+                "columnStart": 41,
+                "columnEndExclusive": 83,
+                "text": "docs/history/agent-coordination-state-root"
+              }
+            ],
+            "matchedExpression": "docs/history/agent-coordination-state-root",
+            "logicalReference": "docs/history/agent-coordination-state-root",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '// State/root-resolution investigation (docs/history/agent-coordination-state-root):'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/agent-coordination-state-root",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02l-census-class6.json",
+                "edgeId": "class6-l-000112",
+                "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+                "originalLine": 4744,
+                "matchedExpression": "docs/history/agent-coordination-state-root",
+                "originalLineText": "// State/root-resolution investigation (docs/history/agent-coordination-state-root):"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {
+              "{\"edgeId\":\"class6-l-000085\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000085\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1056}]}": "read-only citation; no writer/default-root/schema/identity change",
+              "{\"edgeId\":\"class6-l-000085\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000085\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1057}]}": "read-only citation; no writer/default-root/schema/identity change"
+            },
+            "descriptionTruth": {
+              "{\"edgeId\":\"class6-l-000085\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000085\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1056}]}": {
+                "sourcePassage": "      // long slugified-title id in the first place (docs/explanation/\n      // long-work-item-ids-max-length-guard.md) — generateId is now the",
+                "adjacentPassage": "    case 'add': {\n      // --id is optional (was required): an explicit id is still honored\n      // as-is (e.g. a deliberately chosen or parent-lineage child id like\n      // \"tsk-4vo-1\"), but omitting it now reuses `submit`'s own generateId\n      // (src/intake/classify.mjs) to derive a collision-free \"tsk-<hash>\"\n      // id from --title, instead of forcing the caller to invent one by\n      // hand. This closes the gap that let `add` accept an arbitrarily\n      // long slugified-title id in the first place (docs/explanation/\n      // long-work-item-ids-max-length-guard.md) — generateId is now the\n      // path of least resistance, not a manually-typed guess.\n      const idFlag = optionalField(positional[0] ?? flags.id, 'add --id requires a non-empty value; omit --id entirely to auto-generate one from --title.');\n      if (flags.tier !== undefined) {\n        throw new StoreError('validation', '--tier is retired; use --size (light|standard|heavy) or --rigor (low|standard|high|critical) instead.');\n      }\n      const id = idFlag ?? generateId(\n        requireField(flags.title, 'add requires --title (used to derive the id when --id is omitted, and always required as the item\\'s own title regardless)'),\n        Object.keys(listWork(dir).work),\n      );\n      const work = {\n        id,\n        title: flags.title,\n        kind: flags.kind,\n        status: 'todo',\n        deps: parseListFlag(flags.deps),\n        risk: flags.risk,\n        refs: parseListFlag(flags.refs),\n        verify: flags.verify,\n        description: requireField(flags.description, 'add requires --description (the item\\'s own full-text intake description)'),\n        learn: typeof flags.learn === 'string' ? flags.learn : undefined,\n        size: optionalField(flags.size, 'add --size requires a size value (e.g. light/standard/heavy); omit --size entirely to use the default.'),\n        rigor: optionalField(flags.rigor, 'add --rigor requires a rigor value (e.g. low/standard/high/critical); omit --rigor entirely to leave unset.'),\n        // Per base-workflow-model D1-D4/S2: --domain is optional, same\n        // omitted-leaves-undefined shape as --tier just above; omitting it\n        // leaves work.domain undefined so store.mjs's addWork/validateWorkShape\n        // apply DEFAULT_DOMAIN's lazy default. An out-of-registry value passes\n        // through unrejected here — work.mjs's validateWorkShape is the single\n        // source for the DOMAINS registry and rejects it as validation, so\n        // that rule is never duplicated here (same discipline as --tier/TIERS).\n        domain: optionalField(flags.domain, 'add --domain requires a domain name (e.g. coding/synthetic); omit --domain entirely to use the default.'),\n        // Per D1/D2 (docs/history/add-stage-default-gap/CONTEXT.md): add now\n        // stamps an entry stage the same way submit always has (line ~822\n        // above) instead of leaving stage undefined -- explicit --stage\n        // overrides; omitting it defaults to the domain's Clarify-mapped\n        // stage, which for coding (tsk-qod D1/D2: Clarify retired entirely)\n        // falls straight through to `.stages[0]` — 'discovery'. Same\n        // silenced onUnrecognized as submit's own call: an\n        // out-of-registry --domain is about to be rejected by addWork's\n        // validateWork below anyway, so this must not fire a spurious\n        // \"folding to coding\" warning first. An out-of-enum --stage value\n        // is rejected downstream by store.mjs's validateWorkShape (the\n        // single source for the STAGES domain), same \"don't duplicate the\n        // validation source\" discipline --domain/--tier already follow.\n        workflowStep: optionalField(flags.step, 'add --step requires a step value (e.g. discovery/planning/executing); omit --step entirely to use the default.')\n          ?? entryStepFor(flags.domain, flags.kind),\n        // Per work-graph-intelligence S2b (producer A): --discovered-from is\n        // an explicit, optional scalar provenance flag — same omitted-leaves-\n        // undefined shape as --domain/--tier above. work.mjs's\n        // validateWorkShape (mirroring its `parent` block) is the single\n        // source for the non-empty/non-self-referencing rule; existence of\n        // the referenced id is deliberately never enforced here (work-graph-\n        // intelligence-6, mirrors `parent`'s norm).\n        discoveredFrom: optionalField(flags['discovered-from'], 'add --discovered-from requires a non-empty id; omit it to leave unset.'),\n        // parent-flag-cli D1/D2: --parent is an optional scalar lineage flag,\n        // same omitted-leaves-undefined shape as --discovered-from above\n        // (whose own comment already calls out mirroring `parent`'s norm).\n        // Existence of the referenced id is deliberately never enforced here\n        // — work.mjs's shape validation (non-empty, non-self-referencing) is\n        // the only guard, same as discoveredFrom.\n        parent: optionalField(flags.parent, 'add --parent requires a non-empty id; omit --parent entirely to leave unset.'),\n        // Per work-graph-intelligence S9: --footprint is an optional list of\n        // the file paths this item is expected to touch (feeds the\n        // footprint-intersection advisory). Set ONLY when the flag is present\n        // so an omitted flag leaves footprint ABSENT (present-or-absent\n        // optional additive), unlike deps/refs which default to []. An empty\n        // `--footprint ''` parses to [] explicitly.\n        footprint: flags.footprint === undefined ? undefined : parseListFlag(flags.footprint),\n        // Per p50-workflow-induct D7: --docs-ref is an optional pointer to the\n        // relative docs/history/<feature>/ path this item's own decision\n        // artifacts (CONTEXT.md/plan.md) live at. Same omitted-leaves-undefined\n        // shape as --discovered-from/--domain/--tier above; work.mjs's\n        // validateWorkShape is the single source for the non-empty-string\n        // shape check, mirroring `description`'s rule.\n        docsRef: optionalField(flags['docs-ref'], 'add --docs-ref requires a non-empty path; omit it to leave unset.'),\n        // Per str73-done-flip-cos-check D2: --acceptance is an optional\n        // JSON-encoded array of {text, evidence} clauses — same omitted-\n        // leaves-undefined shape as --footprint/--docs-ref above. work.mjs's\n        // validateWorkShape is the single source for the {text, evidence}\n        // shape rule; a malformed JSON value is rejected here, before that.\n        acceptance: parseAcceptanceFlag(flags.acceptance, 'add --acceptance requires a JSON-encoded array of {text, evidence} clauses.'),\n        // Per str67-goal-directed-planning D1: --goal-tier is optional, same\n        // omitted-leaves-undefined shape as --tier/--domain/--discovered-from\n        // above. A goal item is always created fresh with goalTier set at\n        // add time (never retrofitted via edit). An out-of-domain value\n        // (not mvp/milestone) passes through unrejected here — work.mjs's\n        // validateWorkShape is the single source for the GOAL_TIERS domain\n        // and rejects it as validation, so that rule is never duplicated\n        // here (same discipline as --tier/TIERS and --domain/DOMAINS).\n        goalTier: optionalField(flags['goal-tier'], \"add --goal-tier requires a value ('mvp' or 'milestone'); omit --goal-tier entirely to leave unset.\"),\n        // Per str67-goal-directed-planning D2: --targets is an optional list\n        // of ids (existing or not-yet-created) this goal item considers\n        // \"part of\" it. Same present-or-absent shape as --footprint above,\n        // NOT the default-to-[] shape --deps/--refs use: set ONLY when the\n        // flag is present so an omitted flag leaves targets ABSENT. An\n        // empty `--targets ''` (or a bare `--targets` with no value)\n        // parses to [] explicitly, same as --footprint.\n        targets: flags.targets === undefined ? undefined : parseListFlag(flags.targets),\n        // Per work-item-priority-matrix D2: --urgent is optional, human-\n        // entered, same omitted-leaves-undefined shape as --tier/--domain\n        // above. work.mjs's validateWorkShape is the single source for the\n        // URGENCY_LEVELS domain and rejects an out-of-domain value.\n        urgent: optionalField(flags.urgent, \"add --urgent requires a value ('low'/'medium'/'high'/'critical'); omit --urgent entirely to leave unset.\"),\n        // Per decision record 0027 D6 (docs/history/phase-2-status-category-\n        // schema/DISCUSSION.md §task-domain-fields): --domain-fields is an\n        // optional JSON-encoded object ({ [domainName]: {...} }) — same\n        // omitted-leaves-undefined shape as --acceptance above, reusing\n        // parseAcceptanceFlag's generic \"parse JSON or reject\" behavior\n        // (it never actually assumed an array — only the caller's own\n        // message text names one). work.mjs's validateWorkShape/\n        // validateDomainFields are the single source for the shape/\n        // fieldSchema rules; a malformed JSON value is rejected here first.\n        domainFields: parseAcceptanceFlag(flags['domain-fields'], 'add --domain-fields requires a JSON-encoded object ({ [domainName]: {...} }).'),\n      };\n      const { event } = addWork(dir, work);\n      return { id: event.payload.id, seq: event.seq };\n    }",
+                "target": "docs/knowledge/why-fgos-add-now-caps-a-work-item-s-id-at-30-characters/long-work-item-ids-max-length-guard.md",
+                "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+                "targetDigest": "153f79c35730cc341649af06790de86d14186a9d0d1f50f2e72934fd12f0b5e5",
+                "targetEvidence": [
+                  {
+                    "line": 22,
+                    "text": ""
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "The exact pre-existing add/submit gap is explained under Why add had this gap and submit did not. The comment separately states the later generator change; it does not claim the target already documents the new default."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "The exact pre-existing add/submit gap is explained under Why add had this gap and submit did not. The comment separately states the later generator change; it does not claim the target already documents the new default."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "The exact pre-existing add/submit gap is explained under Why add had this gap and submit did not. The comment separately states the later generator change; it does not claim the target already documents the new default."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "The exact pre-existing add/submit gap is explained under Why add had this gap and submit did not. The comment separately states the later generator change; it does not claim the target already documents the new default."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "The exact pre-existing add/submit gap is explained under Why add had this gap and submit did not. The comment separately states the later generator change; it does not claim the target already documents the new default."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "The exact pre-existing add/submit gap is explained under Why add had this gap and submit did not. The comment separately states the later generator change; it does not claim the target already documents the new default."
+                  }
+                },
+                "assessment": "The exact pre-existing add/submit gap is explained under Why add had this gap and submit did not. The comment separately states the later generator change; it does not claim the target already documents the new default."
+              },
+              "{\"edgeId\":\"class6-l-000085\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000085\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1057}]}": {
+                "sourcePassage": "      // long slugified-title id in the first place (docs/explanation/\n      // long-work-item-ids-max-length-guard.md) — generateId is now the",
+                "adjacentPassage": "    case 'add': {\n      // --id is optional (was required): an explicit id is still honored\n      // as-is (e.g. a deliberately chosen or parent-lineage child id like\n      // \"tsk-4vo-1\"), but omitting it now reuses `submit`'s own generateId\n      // (src/intake/classify.mjs) to derive a collision-free \"tsk-<hash>\"\n      // id from --title, instead of forcing the caller to invent one by\n      // hand. This closes the gap that let `add` accept an arbitrarily\n      // long slugified-title id in the first place (docs/explanation/\n      // long-work-item-ids-max-length-guard.md) — generateId is now the\n      // path of least resistance, not a manually-typed guess.\n      const idFlag = optionalField(positional[0] ?? flags.id, 'add --id requires a non-empty value; omit --id entirely to auto-generate one from --title.');\n      if (flags.tier !== undefined) {\n        throw new StoreError('validation', '--tier is retired; use --size (light|standard|heavy) or --rigor (low|standard|high|critical) instead.');\n      }\n      const id = idFlag ?? generateId(\n        requireField(flags.title, 'add requires --title (used to derive the id when --id is omitted, and always required as the item\\'s own title regardless)'),\n        Object.keys(listWork(dir).work),\n      );\n      const work = {\n        id,\n        title: flags.title,\n        kind: flags.kind,\n        status: 'todo',\n        deps: parseListFlag(flags.deps),\n        risk: flags.risk,\n        refs: parseListFlag(flags.refs),\n        verify: flags.verify,\n        description: requireField(flags.description, 'add requires --description (the item\\'s own full-text intake description)'),\n        learn: typeof flags.learn === 'string' ? flags.learn : undefined,\n        size: optionalField(flags.size, 'add --size requires a size value (e.g. light/standard/heavy); omit --size entirely to use the default.'),\n        rigor: optionalField(flags.rigor, 'add --rigor requires a rigor value (e.g. low/standard/high/critical); omit --rigor entirely to leave unset.'),\n        // Per base-workflow-model D1-D4/S2: --domain is optional, same\n        // omitted-leaves-undefined shape as --tier just above; omitting it\n        // leaves work.domain undefined so store.mjs's addWork/validateWorkShape\n        // apply DEFAULT_DOMAIN's lazy default. An out-of-registry value passes\n        // through unrejected here — work.mjs's validateWorkShape is the single\n        // source for the DOMAINS registry and rejects it as validation, so\n        // that rule is never duplicated here (same discipline as --tier/TIERS).\n        domain: optionalField(flags.domain, 'add --domain requires a domain name (e.g. coding/synthetic); omit --domain entirely to use the default.'),\n        // Per D1/D2 (docs/history/add-stage-default-gap/CONTEXT.md): add now\n        // stamps an entry stage the same way submit always has (line ~822\n        // above) instead of leaving stage undefined -- explicit --stage\n        // overrides; omitting it defaults to the domain's Clarify-mapped\n        // stage, which for coding (tsk-qod D1/D2: Clarify retired entirely)\n        // falls straight through to `.stages[0]` — 'discovery'. Same\n        // silenced onUnrecognized as submit's own call: an\n        // out-of-registry --domain is about to be rejected by addWork's\n        // validateWork below anyway, so this must not fire a spurious\n        // \"folding to coding\" warning first. An out-of-enum --stage value\n        // is rejected downstream by store.mjs's validateWorkShape (the\n        // single source for the STAGES domain), same \"don't duplicate the\n        // validation source\" discipline --domain/--tier already follow.\n        workflowStep: optionalField(flags.step, 'add --step requires a step value (e.g. discovery/planning/executing); omit --step entirely to use the default.')\n          ?? entryStepFor(flags.domain, flags.kind),\n        // Per work-graph-intelligence S2b (producer A): --discovered-from is\n        // an explicit, optional scalar provenance flag — same omitted-leaves-\n        // undefined shape as --domain/--tier above. work.mjs's\n        // validateWorkShape (mirroring its `parent` block) is the single\n        // source for the non-empty/non-self-referencing rule; existence of\n        // the referenced id is deliberately never enforced here (work-graph-\n        // intelligence-6, mirrors `parent`'s norm).\n        discoveredFrom: optionalField(flags['discovered-from'], 'add --discovered-from requires a non-empty id; omit it to leave unset.'),\n        // parent-flag-cli D1/D2: --parent is an optional scalar lineage flag,\n        // same omitted-leaves-undefined shape as --discovered-from above\n        // (whose own comment already calls out mirroring `parent`'s norm).\n        // Existence of the referenced id is deliberately never enforced here\n        // — work.mjs's shape validation (non-empty, non-self-referencing) is\n        // the only guard, same as discoveredFrom.\n        parent: optionalField(flags.parent, 'add --parent requires a non-empty id; omit --parent entirely to leave unset.'),\n        // Per work-graph-intelligence S9: --footprint is an optional list of\n        // the file paths this item is expected to touch (feeds the\n        // footprint-intersection advisory). Set ONLY when the flag is present\n        // so an omitted flag leaves footprint ABSENT (present-or-absent\n        // optional additive), unlike deps/refs which default to []. An empty\n        // `--footprint ''` parses to [] explicitly.\n        footprint: flags.footprint === undefined ? undefined : parseListFlag(flags.footprint),\n        // Per p50-workflow-induct D7: --docs-ref is an optional pointer to the\n        // relative docs/history/<feature>/ path this item's own decision\n        // artifacts (CONTEXT.md/plan.md) live at. Same omitted-leaves-undefined\n        // shape as --discovered-from/--domain/--tier above; work.mjs's\n        // validateWorkShape is the single source for the non-empty-string\n        // shape check, mirroring `description`'s rule.\n        docsRef: optionalField(flags['docs-ref'], 'add --docs-ref requires a non-empty path; omit it to leave unset.'),\n        // Per str73-done-flip-cos-check D2: --acceptance is an optional\n        // JSON-encoded array of {text, evidence} clauses — same omitted-\n        // leaves-undefined shape as --footprint/--docs-ref above. work.mjs's\n        // validateWorkShape is the single source for the {text, evidence}\n        // shape rule; a malformed JSON value is rejected here, before that.\n        acceptance: parseAcceptanceFlag(flags.acceptance, 'add --acceptance requires a JSON-encoded array of {text, evidence} clauses.'),\n        // Per str67-goal-directed-planning D1: --goal-tier is optional, same\n        // omitted-leaves-undefined shape as --tier/--domain/--discovered-from\n        // above. A goal item is always created fresh with goalTier set at\n        // add time (never retrofitted via edit). An out-of-domain value\n        // (not mvp/milestone) passes through unrejected here — work.mjs's\n        // validateWorkShape is the single source for the GOAL_TIERS domain\n        // and rejects it as validation, so that rule is never duplicated\n        // here (same discipline as --tier/TIERS and --domain/DOMAINS).\n        goalTier: optionalField(flags['goal-tier'], \"add --goal-tier requires a value ('mvp' or 'milestone'); omit --goal-tier entirely to leave unset.\"),\n        // Per str67-goal-directed-planning D2: --targets is an optional list\n        // of ids (existing or not-yet-created) this goal item considers\n        // \"part of\" it. Same present-or-absent shape as --footprint above,\n        // NOT the default-to-[] shape --deps/--refs use: set ONLY when the\n        // flag is present so an omitted flag leaves targets ABSENT. An\n        // empty `--targets ''` (or a bare `--targets` with no value)\n        // parses to [] explicitly, same as --footprint.\n        targets: flags.targets === undefined ? undefined : parseListFlag(flags.targets),\n        // Per work-item-priority-matrix D2: --urgent is optional, human-\n        // entered, same omitted-leaves-undefined shape as --tier/--domain\n        // above. work.mjs's validateWorkShape is the single source for the\n        // URGENCY_LEVELS domain and rejects an out-of-domain value.\n        urgent: optionalField(flags.urgent, \"add --urgent requires a value ('low'/'medium'/'high'/'critical'); omit --urgent entirely to leave unset.\"),\n        // Per decision record 0027 D6 (docs/history/phase-2-status-category-\n        // schema/DISCUSSION.md §task-domain-fields): --domain-fields is an\n        // optional JSON-encoded object ({ [domainName]: {...} }) — same\n        // omitted-leaves-undefined shape as --acceptance above, reusing\n        // parseAcceptanceFlag's generic \"parse JSON or reject\" behavior\n        // (it never actually assumed an array — only the caller's own\n        // message text names one). work.mjs's validateWorkShape/\n        // validateDomainFields are the single source for the shape/\n        // fieldSchema rules; a malformed JSON value is rejected here first.\n        domainFields: parseAcceptanceFlag(flags['domain-fields'], 'add --domain-fields requires a JSON-encoded object ({ [domainName]: {...} }).'),\n      };\n      const { event } = addWork(dir, work);\n      return { id: event.payload.id, seq: event.seq };\n    }",
+                "target": "docs/knowledge/why-fgos-add-now-caps-a-work-item-s-id-at-30-characters/long-work-item-ids-max-length-guard.md",
+                "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+                "targetDigest": "153f79c35730cc341649af06790de86d14186a9d0d1f50f2e72934fd12f0b5e5",
+                "targetEvidence": [
+                  {
+                    "line": 22,
+                    "text": ""
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "The exact pre-existing add/submit gap is explained under Why add had this gap and submit did not. The comment separately states the later generator change; it does not claim the target already documents the new default."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "The exact pre-existing add/submit gap is explained under Why add had this gap and submit did not. The comment separately states the later generator change; it does not claim the target already documents the new default."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "The exact pre-existing add/submit gap is explained under Why add had this gap and submit did not. The comment separately states the later generator change; it does not claim the target already documents the new default."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "The exact pre-existing add/submit gap is explained under Why add had this gap and submit did not. The comment separately states the later generator change; it does not claim the target already documents the new default."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "The exact pre-existing add/submit gap is explained under Why add had this gap and submit did not. The comment separately states the later generator change; it does not claim the target already documents the new default."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "The exact pre-existing add/submit gap is explained under Why add had this gap and submit did not. The comment separately states the later generator change; it does not claim the target already documents the new default."
+                  }
+                },
+                "assessment": "The exact pre-existing add/submit gap is explained under Why add had this gap and submit did not. The comment separately states the later generator change; it does not claim the target already documents the new default."
+              }
+            },
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {
+            "{\"edgeId\":\"class6-l-000085\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000085\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1056}]}": {
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "targetDigest": "153f79c35730cc341649af06790de86d14186a9d0d1f50f2e72934fd12f0b5e5",
+              "passage": "",
+              "targetEvidenceLine": 22,
+              "targetLines": [
+                22
+              ],
+              "targetLineText": [
+                ""
+              ],
+              "sourceLocatorTokens": []
+            },
+            "{\"edgeId\":\"class6-l-000085\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000085\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1057}]}": {
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "targetDigest": "153f79c35730cc341649af06790de86d14186a9d0d1f50f2e72934fd12f0b5e5",
+              "passage": "",
+              "targetEvidenceLine": 22,
+              "targetLines": [
+                22
+              ],
+              "targetLineText": [
+                ""
+              ],
+              "sourceLocatorTokens": []
+            }
+          },
+          "relativeResolution": {
+            "{\"edgeId\":\"class6-l-000085\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000085\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1056}]}": {
+              "replacement": "docs/knowledge/why-fgos-add-now-caps-a-work-item-s-id-at-30-characters/long-work-item-ids-max-length-guard.md#why-add-had-this-gap-and-submit-didnt",
+              "resolvedTarget": "docs/knowledge/why-fgos-add-now-caps-a-work-item-s-id-at-30-characters/long-work-item-ids-max-length-guard.md",
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "authorityStatus": "cutover-patch-only"
+            },
+            "{\"edgeId\":\"class6-l-000085\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000085\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1057}]}": {
+              "replacement": "docs/knowledge/why-fgos-add-now-caps-a-work-item-s-id-at-30-characters/long-work-item-ids-max-length-guard.md#why-add-had-this-gap-and-submit-didnt",
+              "resolvedTarget": "docs/knowledge/why-fgos-add-now-caps-a-work-item-s-id-at-30-characters/long-work-item-ids-max-length-guard.md",
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "authorityStatus": "cutover-patch-only"
+            }
+          },
+          "labelForm": {
+            "{\"edgeId\":\"class6-l-000085\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000085\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1056}]}": {
+              "source": "docs/explanation/long-work-item-ids-max-length-guard.md",
+              "replacement": "docs/knowledge/why-fgos-add-now-caps-a-work-item-s-id-at-30-characters/long-work-item-ids-max-length-guard.md#why-add-had-this-gap-and-submit-didnt",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            },
+            "{\"edgeId\":\"class6-l-000085\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000085\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1057}]}": {
+              "source": "docs/explanation/long-work-item-ids-max-length-guard.md",
+              "replacement": "docs/knowledge/why-fgos-add-now-caps-a-work-item-s-id-at-30-characters/long-work-item-ids-max-length-guard.md#why-add-had-this-gap-and-submit-didnt",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            }
+          }
+        },
+        "reviewSet": "step04-010",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "bin/fgos.mjs",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "64ace4da89dbc1222c6d3c0d634272c9b043d1c268a257ed2e2e09385a5eb198",
+          "bytes": 298883,
+          "lines": 5236,
+          "headings": [],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {
+        "docs/knowledge/why-fgos-add-now-caps-a-work-item-s-id-at-30-characters/long-work-item-ids-max-length-guard.md": [
+          {
+            "edgeSlot": "{\"edgeId\":\"class6-l-000085\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000085\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1056}]}",
+            "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+            "targetDigest": "153f79c35730cc341649af06790de86d14186a9d0d1f50f2e72934fd12f0b5e5",
+            "passage": "",
+            "targetEvidenceLine": 22,
+            "targetLines": [
+              22
+            ],
+            "targetLineText": [
+              ""
+            ],
+            "sourceLocatorTokens": []
+          },
+          {
+            "edgeSlot": "{\"edgeId\":\"class6-l-000085\",\"file\":\"bin/fgos.mjs\",\"inventoryRefs\":[{\"edgeId\":\"class6-l-000085\",\"inputCommit\":\"42edba2b08d26ab8dcabe4859a301e1589fa8e6b\",\"inventory\":\"step-02l-census-class6.json\",\"originalLine\":1057}]}",
+            "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+            "targetDigest": "153f79c35730cc341649af06790de86d14186a9d0d1f50f2e72934fd12f0b5e5",
+            "passage": "",
+            "targetEvidenceLine": 22,
+            "targetLines": [
+              22
+            ],
+            "targetLineText": [
+              ""
+            ],
+            "sourceLocatorTokens": []
+          }
+        ]
+      },
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    }
+  ]
+}

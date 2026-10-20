@@ -1,0 +1,1122 @@
+{
+  "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+  "reviewerRule": "Never run checker/probes/resolver/author scripts. Read every assigned file through EOF and independently verify targets. One verdict per whole file, even when streamed.",
+  "set": "step04-003",
+  "files": [
+    "archive/plans/260901-1542-step08-standalone-coordination/plan.md",
+    "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-2050-GH-08-P01.1-coordination-store-report.md",
+    "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P00.1-contract-promotion-report.md",
+    "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P00.1-redteam-findings-fix-report.md",
+    "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P01.1-test-coverage-fix-report.md",
+    "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-contract-promotion-review-report.md",
+    "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P01.1-mvp3-recheck-disposition-report.md"
+  ],
+  "joinedSlots": 9,
+  "items": [
+    {
+      "file": "archive/plans/260901-1542-step08-standalone-coordination/plan.md",
+      "sourceDigest": "84a360c159f3616100895e67a8d9a4d9380da3996f6f30e60dc28c9c91667633",
+      "sourceContext": "---\nstatus: completed\n---\n\n# Step 08 - Standalone Coordination And Reusable Group Cognition\n\nStatus: done | Created: 2026-09-01 | Completed: 2026-09-02 | Owner: maintainer\n\nAll 8 phases closed. Full execution trace, review history (including\nevery real bug found and fixed, and both proof-rigor gaps found and\nclosed in the plan's own final cell), and the closing Deferral Audit\nlive under `docs/architect/agent-coordination/verification/step-08-standalone-coordination/`\n(`index.md` is the entry point; `deferral-audit.md` is the final\nAC-I001-I009 closure record).\nExecution track: `step-08-standalone-coordination`\n\nAuthority entering the plan:\n\n- [Agent Coordination Vision](../../docs/architect/agent-coordination/vision.md)\n- [ADR-006](../../docs/architect/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md)\n- [ADR-007](../../docs/architect/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md)\n- [Intent Preservation Ledger](../../docs/architect/agent-coordination/intent-preservation-ledger.md)\n- human-approved decisions in the [Step 08 checkpoint](../../docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#discussion-checkpoint-step-08-recommended-decisions-and-plan-2026-09-01)\n- reconciled [pre-plan architecture review](../reports/reviewer-260901-1403-GH-07-step08-pre-plan-architecture-review.md)\n\nPhase 00 extracts the approved checkpoint into accepted ADRs, contracts,\narchitecture, vocabulary, and the runner area spec before feature code relies on\nit. The proposal remains rationale and discussion history, never runtime\nauthority.\n\n## Goal\n\nDeliver one domain-neutral coordination foundation that can run:\n\n1. agent-led standalone coordination with no predeclared protocol;\n2. declared reusable coordination through a typed `CoordinationProtocol`;\n3. deterministic heterogeneous cohorts across provider/model/tier policy;\n4. one real Group Cognition framework using divergent, critical, evidence, and\n   convergent activities;\n5. interactive and headless operation over the same semantic engine.\n\nEvery execution-triggering activity must converge on the existing\n`Assignment -> DispatchPlan -> Run -> RunResult -> evidence` core. Work,\nWorkflow, Mission, and a declared protocol remain optional. Work remains the\nonly delivery lifecycle authority when present.\n\n## Locked Product Decisions\n\n- `CoordinationSession` is the V1 executable/recovery root. Future `Mission`\n  may reference N sessions but is `deferred-preserved`; V1 has no mandatory or\n  dead `missionId`.\n- `FlowDefinition` is the shared versioned graph/operation/policy IR. Typed\n  profiles preserve different semantics: `Workflow` uses Stage;\n  `CoordinationProtocol` uses Phase. Existing Workflow behavior is projected\n  additively; it is not migrated onto a new runtime in this step.\n- Schema uses `role` and `actors`. Role, seat, and responsibility position are\n  one concept. `SessionActor` is an addressable instance filling a Role.\n  `Persona` is behavioral identity; `Stance` is a temporary viewpoint and is\n  not a V1 schema field.\n- Definitions/domain packages own Role responsibilities and legal actor slots.\n  A trusted run request may bind a SessionActor slot to Persona and execution\n  policy, or populate declared multiplicity, but cannot silently change that\n  slot's Role or an operation's responsibility. Agent-led sessions may propose\n  new actors/roles only through the same foundation validator and bounds.\n- Declared protocol is optional. Agent-led sessions may create bounded inline\n  Assignments dynamically without `protocolId`, Work, Stage, or TaskSpec.\n- Portable definitions express WHAT through role, capabilities, evidence,\n  mutation, context, tier floors, topology, and hard cohort constraints. They\n  do not pin concrete executors or literal models.\n- Trusted operator/session policy may express global or per-actor execution\n  preferences. Governance remains final. A hard CLI executor selection means\n  \"highest-priority human preference subject to validation/governance\", not a\n  bypass.\n- `purpose` routing, executor fitness scoring, autonomous provider routing,\n  organization overlays, first-class AgentMessage, general AdhocTask storage,\n  unrestricted peer chat, and a framework marketplace are out of V1.\n- `.fgos/coordination/` is gitignored local runtime/recovery state. Verification\n  exports selected evidence deliberately.\n- Mission-lite is replaced directly. There is no migration reader, detector,\n  reporter, compatibility writer, or stored-data migration. Assignment\n  construction also drops its prototype `missionId` input; a future Mission\n  groups completed session ids from above instead of entering Assignment.\n- Interactive ships first for explicit observation. Headless later invokes the\n  same session/protocol/dispatch/evidence/recovery engine. Visibility and\n  operator presence are the intended differences; telemetry is deferred.\n- Standalone proofs are read-only. Work-attached mutation is a stop gate until\n  a coding-domain proof demonstrates domain-owned worktree/resource isolation,\n  merge ownership, recovery, and Work transition authority.\n\n## Phases\n\n| # | Phase | Depends on | Exit |\n|---|---|---|---|\n| 00 | [Canonical contracts and dispatch prerequisites](phase-00-canonical-contracts-and-dispatch-prerequisites.md) | Step 07 complete | Accepted design surface; executor/provider/tier resolution is truthful and CLI-reachable |\n| 01 | [CoordinationSession ledger and agent-led proof](phase-01-coordination-session-and-agent-led-proof.md) | 00 | Persistent standalone session resumes without duplicate Assignments and dynamically consults one actor |\n| 02 | [Shared FlowDefinition kernel and typed profiles](phase-02-shared-flow-definition-kernel.md) | 01 | Existing Workflow and protocol fixtures normalize through one additive IR with profile isolation |\n| 03 | [Declared consult protocol](phase-03-declared-consult-protocol.md) | 02 | Declared and agent-led consult use one governed engine with equivalent evidence semantics |\n| 04 | [Research fan-out/fan-in and Cohort Planner](phase-04-research-cohort-planner.md) | 03 | Explainable heterogeneous allocation, isolated branches, verified fan-in, loud unsatisfied constraints |\n| 05 | [First Group Cognition framework](phase-05-group-cognition-framework.md) | 04 | Real external-project comparison records quality gain or honest null result with dissent preserved |\n| 06 | [Recovery, partial completion, and budget hardening](phase-06-recovery-partial-completion-and-budgets.md) | 05 | Crash, retry, quorum, bounds, leakage, and evidence-laundering attacks are negatively proven |\n| 07 | [Headless parity, CLI stabilization, and adoption](phase-07-headless-parity-cli-and-adoption.md) | 06 | Public CLI/API stable; interactive/headless semantic parity proven; final intent audit closed |\n\nPhases execute strictly in this order. Do not combine Phase 00 dispatch work\nwith coordination runtime, and do not extract the shared kernel before the\nagent-led session proves the minimal runtime shape.\n\n## Plan-Level Acceptance\n\n- Full `npm test` passes relative to the exact baseline recorded before P00.1;\n  no baseline failure may grow or be reclassified without evidence.\n- Accepted ADRs/contracts and `docs/specs/runner.md` describe the implemented\n  public behavior; the Step 08 proposal points to them and remains non-normative.\n- A standalone session succeeds with `workId: null`, no Workflow, no Stage, no\n  TaskSpec, and no protocol id.\n- Existing coding Workflow behavior and golden tests remain unchanged while a\n  `CoordinationProtocol` uses the same neutral IR.\n- No coordinator, protocol, profile, role, actor, Skill, or Cohort Planner\n  spawns an executor directly or creates a private dispatch/evidence path.\n- Assignment/Run/RunResult remain canonical records. Session state stores\n  references and field-level policy provenance, not copied truth.\n- Actual executor id, provider family, model, tier, policy sources, and\n  governance result are persisted for every live actor run.\n- At least two configured provider families support every policy tier used by\n  the Phase 05 framework. Missing support stops the live proof; it is never\n  faked or silently weakened.\n- Independent branches cannot read sibling outputs before fan-in. Synthesis\n  cannot upgrade `reported`, failed, stale, or foreign evidence to `verified`.\n- Missing required actors block completion unless an explicit partial policy\n  is satisfied; every omission and dissenting result remains visible.\n- Interactive and headless doors invoke the same engine and produce\n  semantically equivalent persisted records for the same deterministic fixture.\n- No Step 08 proof mutates a consuming repository or advances/merges Work.\n- The final Deferral Audit covers AC-I001 through AC-I009 and includes an\n  executable must-not-preclude proof for every entry touched by the plan.\n\n## Intent Traceability\n\n| Intent | Implemented or advanced here | Executable must-not-preclude proof |\n|---|---|---|\n| AC-I001 | Persistent standalone CoordinationSession | Run with null Work and no lifecycle fields; reject any universal Work/Stage requirement |\n| AC-I002 | Dynamic primary-to-specialist consult | Run session with no protocol id; prove declared definitions remain optional |\n| AC-I003 | Consult, research, Group Cognition protocols | Static/runtime test that all protocol execution reaches `executeAssignment` and no direct spawn exists |\n| AC-I004 | Heterogeneous cohort and cognitive activities | Two-provider required-tier allocation plus dissent/evidence-aware synthesis tests |\n| AC-I005 | Shared kernel and project/domain discovery seams | Normalize packaged and project-owned fixtures through one loader; no foundation fork |\n| AC-I006 | Corrected dispatch provenance and one core | Unknown executor/provider-tier fail closed; all runs persist resolver provenance; no private dispatch core |\n| AC-I007 | Mission remains optional future grouping | Session manifest schema rejects `missionId`; a pure future-grouping fixture can reference N session ids without rewriting them |\n| AC-I008 | Interactive first, then headless capability parity | Same deterministic request through both doors yields equivalent semantic records after visibility fields are normalized |\n| AC-I009 | Domain isolation boundary preserved | Concurrent mutating actors sharing one workspace are refused; no merge/Work-transition API exists in coordination engine |\n\nEach phase closes with the ledger's Deferral Audit template. A status changes to\n`implemented` only when its accepted contract and named proof both exist.\n\n## Out Of Scope / Do Not Build\n\n- Mission identity, persistence, aggregation, or migration compatibility.\n- Mutating standalone coordination and Work-attached mutating live execution.\n- Work lifecycle transitions, branch creation, merge, approval, or worktree\n  allocation inside `src/runner/coordination/**`.\n- A second execution core, direct `spawn`, private provider SDK, or protocol-\n  specific executor adapter.\n- General task-category/`purpose` routing, weighted scoring, learned routing,\n  cost optimization, or automatic credential probing.\n- Literal executor/model pins in portable `CoordinationProtocol` files.\n- Full provider-by-tier matrix; only tiers a chosen framework requires matter.\n- First-class AgentMessage, free peer chat, recursive/unbounded task creation,\n  framework marketplace, organization overlay SDK, UI/dashboard, telemetry\n  backend, or herdr-spawn proof.\n- Consumer migration for the current Workflow runtime. The adapter is additive.\n\n## Autonomous Execution Contract\n\nUse the [Master Multi-Agent Implementation Coordinator](../../docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md).\nThis plan contains no open product decision. Routine implementation choices are\ndelegated to the master using repository precedent and the smallest compatible\nchange. The master must not ask for confirmation between cells.\n\nStop only when one of these objective gates occurs:\n\n1. an accepted source above contradicts a requirement and no additive\n   interpretation exists;\n2. full or focused tests cannot run because required local infrastructure is\n   unavailable after one documented recovery attempt;\n3. a required independent Reviewer or Red-Team cannot be launched;\n4. a required live CLI executor/provider is absent, unconfigured, lacks the\n   exact required tier, or fails authentication after one bounded retry;\n5. the external consuming-project case cannot be selected before observing\n   candidate outputs;\n6. Work-attached mutation becomes necessary to satisfy a requirement;\n7. GitNexus reports HIGH/CRITICAL impact and the active cell did not already\n   name that blast radius and mitigation;\n8. concurrent/user changes overlap an active cell such that preservation is\n   impossible without choosing whose behavior wins.\n\nDo not stop for naming, file placement, test-fixture shape, error wording,\ninternal helper boundaries, or other reversible choices already constrained by\nthe phase. Infer those from adjacent code and record them in the cell trace.\n\n## Execution Inputs\n\n```text\nREPO_ROOT: /home/vantt/projects/forgentX\nPLAN_DIR: /home/vantt/projects/forgentX/plans/260901-1542-step08-standalone-coordination\nTRACK: step-08-standalone-coordination\nSCOPE_DOCS:\n  - docs/architect/agent-coordination/vision.md\n  - docs/architect/agent-coordination/intent-preservation-ledger.md\n  - docs/architect/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md\n  - docs/architect/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md\n  - docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md\nBRANCH: step-08-standalone-coordination\nBASE_REF: infer once when branch is created and persist it\nMAX_CELLS_THIS_RUN: unlimited\n```\n\nBefore P00.1, the master records `git status`, preserves all unrelated changes,\nruns the full baseline, and audits current code rather than trusting research\nline numbers. Every symbol edit requires the repository's GitNexus upstream\nimpact analysis; HIGH/CRITICAL results are surfaced before editing. Before each\ncell commit, run GitNexus `detect_changes` against `BASE_REF` and `git diff\n--check`.\n\nFull test command:\n\n```bash\nFGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs'\n```\n\nEvery cell touching `src/runner/dispatch/**` also runs:\n\n```bash\nnode src/runner/dispatch.mjs decide --for smoke --needs-soul --has-live-task-access\n```\n\nIt must print a `mechanism` field before the cell can close. Only one Doer may\ntouch dispatch files at a time.\n\n## Suggested Cell Schedule\n\n| Cell | Requirements | Close boundary |\n|---|---|---|\n| P00.1 | Phase 00 R1, R2, R3, R4 | Accepted canonical design/spec and corrected stale pointers |\n| P00.2 | Phase 00 R5, R6, R7, R8 | Truthful provider/tier/executor resolution with negative tests |\n| P00.3 | Phase 00 R9, R10, R11 | CLI override, fallback posture, config baseline/live two-executor proof |\n| P01.1 | Phase 01 R1, R2, R3, R4 | Atomic store/manifest/events and direct mission-lite cutover |\n| P01.2 | Phase 01 R5, R6, R7, R8 | Shared engine, dynamic consult, recovery and live agent-led proof |\n| P02.1 | Phase 02 R1, R2, R3, R4 | Pure IR/schema/profile validators |\n| P02.2 | Phase 02 R5, R6, R7, R8 | Additive Workflow projection, protocol discovery, fixtures/doctor |\n| P03.1 | Phase 03 R1, R2, R3, R4 | Consult materialization/topology/policy provenance |\n| P03.2 | Phase 03 R5, R6, R7, R8 | Equivalent agent-led/declared proofs and bypass negatives |\n| P04.1 | Phase 04 R1, R2, R3, R4 | Pure deterministic Cohort Planner and unsatisfied explanations |\n| P04.2 | Phase 04 R5, R6, R7, R8, R9 | Concurrent isolated research, verified fan-in, two-provider live proof |\n| P05.1 | Phase 05 R1, R2, R3, R4 | Framework definition and phase/activity semantics |\n| P05.2 | Phase 05 R5, R6, R7, R8 | Locked external case, baseline, heterogeneous proof and quality report |\n| P06.1 | Phase 06 R1, R2, R3, R4 | Quorum/partial/retry/recovery hardening |\n| P06.2 | Phase 06 R5, R6, R7, R8 | Hard budgets, adversarial suite, Work isolation negatives |\n| P07.1 | Phase 07 R1, R2, R3, R4 | Public CLI/registry/examples and shared headless adapter |\n| P07.2 | Phase 07 R5, R6, R7, R8 | Parity proof, external adoption, canonical closure and final audit |\n\nThe master may split a suggested cell further for the playbook trace limits but\nmust not merge across the listed close boundaries or assign one requirement to\nmultiple cells.\n\n## Rollback Strategy\n\n- One commit per closed cell; no cross-cell squashing.\n- Phase 00 dispatch changes are independently revertible from coordination\n  runtime.\n- New coordination modules are additive until Phase 01's direct mission-lite\n  cutover; rollback restores the prior module from Git, not a compatibility\n  reader.\n- Workflow projection remains additive throughout, so reverting protocol\n  phases does not alter Work lifecycle behavior.\n- Local `.fgos/coordination/` state is disposable runtime data. Rollback never\n  rewrites committed Work events or Assignment/Run/RunResult evidence.\n",
+      "record": {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/plan.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "84a360c159f3616100895e67a8d9a4d9380da3996f6f30e60dc28c9c91667633",
+        "digest": "84a360c159f3616100895e67a8d9a4d9380da3996f6f30e60dc28c9c91667633",
+        "inventoryEdgeIds": [
+          "evidence-004"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-004",
+            "slotKey": "{\"edgeId\":\"evidence-004\",\"file\":\"archive/plans/260901-1542-step08-standalone-coordination/plan.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-004\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":12}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-004",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 12
+              }
+            ],
+            "consumerFile": "archive/plans/260901-1542-step08-standalone-coordination/plan.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 12,
+                "columnStart": 13,
+                "columnEndExclusive": 60,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 12,
+                "columnStart": 13,
+                "columnEndExclusive": 60,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: 'live under `docs/architect/agent-coordination/verification/step-08-standalone-coordination/`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-004",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 12,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "live under `docs/architect/agent-coordination/verification/step-08-standalone-coordination/`"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-003",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "archive/plans/260901-1542-step08-standalone-coordination/plan.md",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "84a360c159f3616100895e67a8d9a4d9380da3996f6f30e60dc28c9c91667633",
+          "bytes": 17242,
+          "lines": 274,
+          "headings": [
+            {
+              "line": 5,
+              "text": "# Step 08 - Standalone Coordination And Reusable Group Cognition"
+            },
+            {
+              "line": 31,
+              "text": "## Goal"
+            },
+            {
+              "line": 47,
+              "text": "## Locked Product Decisions"
+            },
+            {
+              "line": 90,
+              "text": "## Phases"
+            },
+            {
+              "line": 107,
+              "text": "## Plan-Level Acceptance"
+            },
+            {
+              "line": 136,
+              "text": "## Intent Traceability"
+            },
+            {
+              "line": 153,
+              "text": "## Out Of Scope / Do Not Build"
+            },
+            {
+              "line": 170,
+              "text": "## Autonomous Execution Contract"
+            },
+            {
+              "line": 198,
+              "text": "## Execution Inputs"
+            },
+            {
+              "line": 237,
+              "text": "## Suggested Cell Schedule"
+            },
+            {
+              "line": 263,
+              "text": "## Rollback Strategy"
+            }
+          ],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-2050-GH-08-P01.1-coordination-store-report.md",
+      "sourceDigest": "d84e7b9720fe1c9508c444b624cb85fd30e788dbfa5461f4bb6971bf3ae8d3c2",
+      "sourceContext": "# Doer Report — P01.1: CoordinationSession store, schema, events, direct cutover\n\nTrack: `step-08-standalone-coordination` · Phase 01 R1-R4 · Branch:\n`step-08-standalone-coordination`\n\n## Summary\n\nImplemented `src/runner/coordination/{schema,store,replay}.mjs` — a\nversioned, fail-closed CoordinationSession manifest/event store exactly\nmatching `docs/architect/agent-coordination/contracts/coordination-session.md`\n— and directly cut over `mission-lite.mjs` to it. Store/schema/events/\ncutover only; no session engine, dynamic consult, or live proof (P01.2's\nscope). 750-test focused suite green; full suite (4720 tests) shows only a\nstrict subset of the pre-existing 11-item baseline failure list, no new\nfailure.\n\n## Files Created\n\n- `src/runner/coordination/schema.mjs` — pure validator for the manifest\n  and event-log shape (`validateManifest`, `validateEventPayload`,\n  `applyAggregateBoundDefaults`, `assertAssignmentIsSessionBlind`,\n  `assertNoForbiddenFieldsDeep`, `CoordinationError`). No fs, no imports\n  beyond nothing (zero-dep pure module).\n- `src/runner/coordination/store.mjs` — `openSession`, `bindActor`,\n  `createSessionAssignment`, `linkResult`, `transitionSessionStatus`,\n  `readManifest`, `readSessionEvents`. Reuses `state/events.mjs`'s\n  `withEventsLock`/`appendEventLocked`/`readEvents` for every write and as\n  the critical section that makes the atomic-ref rule atomic; reuses\n  `dispatch/assignment.mjs`'s `buildAssignment()`/`claimAssignmentId()` for\n  every Assignment created — no parallel Assignment-construction path.\n- `src/runner/coordination/replay.mjs` — `replaySession`: reconstructs a\n  session's state from `events.jsonl` + `session.json`, fails closed\n  (`CoordinationError` with a named category) on schemaVersion mismatch,\n  corrupt log line (bubbles `EventLogError('corrupt-log')` from\n  `state/events.mjs` unchanged), duplicate `assignment-created`, dangling\n  ref in either direction, foreign ref, out-of-order `result-linked`, and a\n  tampered Assignment carrying a forbidden session/coordination field.\n- `test/runner/coordination-schema.test.mjs` (34 tests)\n- `test/runner/coordination-store.test.mjs` (18 tests, incl. two real\n  `worker_threads`-based concurrent races)\n- `test/runner/coordination-replay.test.mjs` (11 tests, one per corruption\n  category)\n- `test/runner/coordination-static.test.mjs` (2 tests: import-graph static\n  negative)\n\n## Files Modified\n\n- `src/runner/dispatch/assignment.mjs` — removed `missionId` parameter from\n  `createAssignmentId` and `buildDeclaredAssignment`; removed the\n  `assignment.missionId` stamp and the `renderAssignmentPrompt` \"Mission:\"\n  line; updated doc comments (ADR-008 Decision 5).\n- `src/runner/dispatch/assignment-runner.mjs` — renamed `opts.isMissionLite`\n  → `opts.isReadOnlyMode` in `validateAssignmentLegality`/`executeAssignment`\n  (mechanism unchanged: `isReadOnlyAssignment(asgn)` check is byte-identical,\n  only the flag name and its doc comments changed).\n- `src/runner/dispatch/cli.mjs` — both call sites renamed to\n  `isReadOnlyMode`; the `--assignment` door's flag simplified from\n  `Boolean(asgnObj.missionId) || asgnObj.provenance?.kind === 'inline'` to\n  `asgnObj.provenance?.kind === 'inline'` (the `missionId` half is dead code\n  once the field is retired from Assignment entirely).\n- `src/runner/dispatch.mjs` — removed the `mission-lite.mjs` re-export block\n  (`createMission`/`getMission`/`listMissions`/`appendThreadMessage`/\n  `readThreadMessages`/`createMissionAssignment`/`runMissionAssignment`/\n  `synthesizeMission`).\n- `test/runner/assignment-dispatch.test.mjs` — replaced the\n  `createMission`/`createMissionAssignment` import with\n  `openSession`/`createSessionAssignment` from the new store; deleted the\n  now-structurally-unreachable \"missionId-bearing declared assignment\"\n  refusal test (see P01.1.md's Doer Judgment Calls for why); rewrote the\n  companion inline-shape refusal test against the coordination store.\n- `test/runner/assignment-provenance.test.mjs` — removed `missionId` from\n  the one test that passed it to `buildAssignment`, asserting\n  `assignment.missionId === undefined` instead.\n- `test/runner/assignment-runresult.test.mjs` — removed `missionId` from a\n  `buildAssignment` call; renamed `isMissionLite: true` → `isReadOnlyMode: true`.\n- `.gitignore` — added `.fgos/coordination/` beside `.fgos/assignments/`.\n- `CHANGELOG.md` — added an `## [Unreleased]` entry (judged user-visible:\n  Assignment JSON shape and `executeAssignment`'s flag name both changed).\n- `docs/specs/reading-map.md` / `docs/specs/runner.md` — added a code\n  pointer to the new module now that real runtime exists (was\n  design-only from P00.1).\n- `docs/architecture-manifest.json` — removed `mission-lite.mjs`'s row,\n  added `schema.mjs` (infra), `store.mjs`/`replay.mjs` (use-case). Required\n  to keep `test/architecture.test.mjs` green (file↔manifest parity + layer\n  direction checks) — confirmed by running the suite before/after this edit.\n- `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md`\n  — Proof Matrix, Commands, and Doer Judgment Calls sections filled in with\n  real evidence (per instructions, no other section of this file touched).\n\n## Files Deleted\n\n- `src/runner/dispatch/mission-lite.mjs`\n- `test/runner/mission-lite.test.mjs`\n\n## Test Evidence\n\n```\nFGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test \\\n  'test/runner/coordination-*.test.mjs' \\\n  test/runner/assignment-provenance.test.mjs \\\n  test/runner/assignment-runresult.test.mjs\n```\n→ 114 pass, 0 fail.\n\nWidened (assignment-dispatch, assignment-policy, dispatch, operation-choice,\nsetup/registrations, architecture, assignment, assignment-normalizer):\n→ 750 pass, 0 fail.\n\n`node --test test/runner/mission-lite.test.mjs` → \"Could not find\" (confirms\ndeletion, no dangling reference).\n\nFull suite `node --test 'test/**/*.test.mjs'` → 4720 tests, 4705 pass, 10\nfail, 5 skipped. All 10 failures are a strict subset of `index.md`'s 11-item\npre-existing baseline (items #1-#7 and #10 reproduced verbatim; #8 codex-cli\nLIVE, #9 herdr-spawn interactiveMode, #11 lock-wait did not reproduce this\nrun — environment-dependent live-executor/timing tests). No new failure.\n\nSmoke: `node src/runner/dispatch.mjs decide --for smoke --needs-soul\n--has-live-task-access` → prints `{\"mechanism\":\"in-process\",\"configured\":false}`.\n\n`git status --porcelain -- src/runner/dispatch/` shows only the 4 expected\nminimal-surface edits. `git diff --check` clean.\n\nGitNexus `impact` (upstream) run before editing on every modified function\n(`createAssignmentId`, `buildAssignment`, `buildDeclaredAssignment`,\n`validateAssignmentLegality`): all LOW risk except\n`validateAssignmentLegality` (HIGH, because `loop.mjs`'s\n`dispatchClaimedItem` transitively calls it) — investigated and confirmed\n`loop.mjs` never sets the renamed flag under either name, so the rename is\nbehavior-preserving for that caller. `detect_changes({scope:'all'})` after\nall edits: `risk_level: \"medium\"`, blast radius limited to exactly the\nfunctions this cell intentionally touched.\n\n## Judgment Calls (full detail in P01.1.md)\n\n1. `isMissionLite` renamed to `isReadOnlyMode` (mechanism unchanged).\n2. `cli.mjs`'s `Boolean(asgnObj.missionId) ||` clause simplified away per\n   instruction; the one test that existed solely to cover that dead clause\n   was deleted (its coverage intent is preserved by the sibling inline-shape\n   test).\n3. `createSessionAssignment`'s `taskKey` idempotency is scoped to\n   within-process races only (real concurrent-caller dedup proven by a\n   `worker_threads` test) — full crash-then-restart idempotency is R7's\n   scope (P01.2), documented as such in code and in P01.1.md's Gaps.\n4. No doctor check added for `.fgos/coordination/` — no precedent exists\n   for its direct sibling `.fgos/assignments/` either (verified by grep).\n\n## Unresolved Questions\n\nNone — all Doer-prompt constraints were satisfied without needing a\nmaintainer decision.\n",
+      "record": {
+        "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-2050-GH-08-P01.1-coordination-store-report.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "d84e7b9720fe1c9508c444b624cb85fd30e788dbfa5461f4bb6971bf3ae8d3c2",
+        "digest": "d84e7b9720fe1c9508c444b624cb85fd30e788dbfa5461f4bb6971bf3ae8d3c2",
+        "inventoryEdgeIds": [
+          "evidence-008"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-008",
+            "slotKey": "{\"edgeId\":\"evidence-008\",\"file\":\"archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-2050-GH-08-P01.1-coordination-store-report.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-008\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":86}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-008",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 86
+              }
+            ],
+            "consumerFile": "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-2050-GH-08-P01.1-coordination-store-report.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 86,
+                "columnStart": 4,
+                "columnEndExclusive": 51,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 86,
+                "columnStart": 4,
+                "columnEndExclusive": 51,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '- `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-008",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 86,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "- `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md`"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-003",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-2050-GH-08-P01.1-coordination-store-report.md",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "d84e7b9720fe1c9508c444b624cb85fd30e788dbfa5461f4bb6971bf3ae8d3c2",
+          "bytes": 8031,
+          "lines": 151,
+          "headings": [
+            {
+              "line": 1,
+              "text": "# Doer Report — P01.1: CoordinationSession store, schema, events, direct cutover"
+            },
+            {
+              "line": 6,
+              "text": "## Summary"
+            },
+            {
+              "line": 17,
+              "text": "## Files Created"
+            },
+            {
+              "line": 46,
+              "text": "## Files Modified"
+            },
+            {
+              "line": 90,
+              "text": "## Files Deleted"
+            },
+            {
+              "line": 95,
+              "text": "## Test Evidence"
+            },
+            {
+              "line": 134,
+              "text": "## Judgment Calls (full detail in P01.1.md)"
+            },
+            {
+              "line": 148,
+              "text": "## Unresolved Questions"
+            }
+          ],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P00.1-contract-promotion-report.md",
+      "sourceDigest": "b78a928bc9eed5af604a13806c356583557699f71d852d55841caa8c888efa3f",
+      "sourceContext": "# Doer Report — P00.1 Contract Promotion (Phase 00, Step 09 MVP1/MVP2)\n\n## Scope\n\nPromoted the MVP1/MVP2 slice of the Discussion-status\n`docs/architect/proposals/step-09-group-thinking-substrate.md` (sections 6-9)\ninto two Accepted contracts, plus one confirmatory cross-reference edit and\none confirmation-only check. Docs-only; no `src/`, `test/`, or `core/` file\ntouched.\n\n## Changes\n\n### 1. `docs/architect/agent-coordination/contracts/coordination-session.md`\n\n- Added two rows to the existing Event Log table (same format as existing\n  rows): `operation-authorized` and `driver-disposition-recorded`, each with\n  its required-fields list, linking forward to the new detail section.\n- Added a new top-level section, **\"Driver-Authorized Optional Operations And\n  Recheck (MVP1/MVP2, Step 09)\"**, inserted between the Event Log's\n  retry-supersession paragraph and \"## Recovery Rule\". It:\n  - opens with an explicit MVP1/MVP2 scope statement and an explicit\n    disclaimer that deliberation memory, visibility windows, richer\n    aggregation, and `addSessionEdge` (Step 09 MVP3+/MVP6-9) remain\n    deferred/discussion;\n  - defines `operation-authorized` (fields: `authorizationId`, `operationId`,\n    `nodeId`, `targetActorId`, `invocationKey`, `authorizedBy`, `reason`,\n    `grantedContextRefs`, `targetArtifactRef?`, `ts`) and the accompanying\n    `assignment-created` provenance fields (`operationId`, `nodeId`,\n    `authorizationId`, `invocationKey`, `contextGrant`);\n  - defines `driver-disposition-recorded` (fields: `targetRef`,\n    `disposition`, `rationale`, `evidenceRefs`, `authorizedBy`, `ts`);\n  - states `invocationKey` idempotency: consumed exactly once per logical\n    optional-operation invocation; crash/resume replay must not\n    double-dispatch;\n  - states context-grant enforcement: a dispatched worker for a\n    driver-authorized operation may read only `grantedContextRefs` plus its\n    own always-legal base session context; hidden sibling outputs remain\n    illegal, on the same footing as the existing\n    `contextVisibility: isolated-until-fan-in` rule;\n  - states recheck-vs-retry: retry (unchanged, existing Run-supersession\n    language, explicitly not restated/duplicated — just cross-referenced as\n    \"above\") vs. recheck (NEW concept: a new Assignment against a new\n    artifact/evidence revision; the old RunResult/verdict is never\n    superseded, rewritten, or deleted).\n- Added 5 new bullets to \"Required Negative Tests\": unauthorized optional\n  operation dispatch, reused `invocationKey` (incl. crash/resume),\n  authorization after terminal session, context outside `grantedContextRefs`,\n  and recheck-without-disturbing-original-RunResult.\n- Updated the `Implementation:` metadata line: appended \"Phase 00 (Step 09):\n  driver-authorized optional operations, disposition, recheck-vs-retry\n  contract text accepted — implementation in Phases 01-03.\" (implementation\n  status stays otherwise unchanged — still \"Implemented\" for the Step 08\n  surface).\n- Bumped `Last reviewed:` to 2026-09-03.\n\n### 2. `docs/architect/agent-coordination/contracts/flow-definition.md`\n\n- Added `activation:` to the Graph YAML example\n  (`graph.nodes[].operations[].activation: {mode, maxInvocations}`).\n- Added a new \"### Activation (Phase 00, Step 09 MVP1/MVP2)\" subsection right\n  after the existing Graph bullet list. It:\n  - opens with the same MVP1/MVP2 scope statement and MVP3+ deferral\n    disclaimer as the coordination-session.md addition;\n  - states explicitly that `activation` is scoped to the node-operation\n    BINDING, never to the reusable `spec.operations[]` template, and that the\n    same operation id may be `required` at one graph position and\n    `driver-authorized` at another;\n  - states `mode: driver-authorized` means the binding cannot materialize\n    without a matching `operation-authorized` session event, cross-linking to\n    the new coordination-session.md section by its exact anchor;\n  - states the never-widens-aggregate-cap rule: binding-level\n    `maxInvocations` only narrows usage at that binding; it can never widen\n    `aggregateBounds.maxAssignments`/`maxRounds`/`maxConcurrency`, and\n    aggregate caps always win when stricter;\n  - states an unknown `activation.mode` value is rejected.\n- Added 2 new bullets to \"Required Negative Tests\": unknown `activation.mode`\n  rejected; `activation` declared on an operation template (not a binding)\n  rejected.\n- Updated the `Implementation:` metadata line with the same Phase 00 (Step\n  09) sentence used in coordination-session.md.\n- Bumped `Last reviewed:` to 2026-09-03.\n\n### 3. `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md`\n\n- Added exactly one sentence after the \"Deliberately Not Promoted\" section's\n  closing paragraph: \"The Master Multi-Agent Implementation Coordinator\n  playbook remains a manual-only implementation aid per its own Runtime\n  Boundary section, and is never loaded as runtime authority.\" (linked to\n  `../playbooks/prompts/master-coordinator.md`). Verified before writing this\n  that it does not restate `master-coordinator.md`'s own Runtime Boundary\n  text (read `master-coordinator.md:9-13`, which says: \"This is an\n  engineering bootstrap and manual fallback prompt. It is not loaded by\n  agent-coordination runtime. Production coordination prose belongs in\n  runtime Skills, TaskSpecs, and workflow/protocol configuration.\") — the new\n  sentence names/cross-references that section instead of copying it.\n- Bumped `Last reviewed:` to 2026-09-03.\n\n### 4. `docs/architect/proposals/component-authority-boundary-map.md`\n\n**Confirmed, no edit needed.** Read §6 \"Authority Ownership\" and §15 finding\nB. The map already places:\n\n- FlowDefinition validation/projection under \"Domain Registry And Definition\n  Loader\" (§6 row: \"General runtime definition registry and config loader\n  for domains, workflows, workflow/stage/operation declarations, task-spec/\n  skill references, roles, and FlowDefinition validation/projection.\");\n- CoordinationSession manifest/events + Assignment membership under \"Agent\n  Coordination Engine\" (§6 row: \"CoordinationSession manifest/events,\n  Assignment membership, actor/topology/bounds, session recovery, session\n  synthesis boundary...\");\n- Assignment-to-DispatchPlan resolution/Run creation under \"Dispatch And\n  Execution Engine\", and RunResult normalization/confidence under \"Run\n  Result Evaluator\" (both §6 rows);\n- Work/git/worktree/merge/coding-domain mutation under \"Coding Domain\n  Component\" (§6 row), and explicitly listed as something \"Agent Coordination\n  Engine\" \"Must not own\": \"Work stage/status/claim/return, declared Work\n  operation selection, dispatch mechanism, provider/model choice, coding\n  worktree/merge authority.\"\n\nNo placement error or gap found relative to the acceptance criterion. No\nedit made to this file.\n\n## Verification (R4 — protected files at zero diff)\n\n```bash\n$ git diff --check -- \\\n  docs/architect/agent-coordination/contracts/flow-definition.md \\\n  docs/architect/agent-coordination/contracts/coordination-session.md \\\n  docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md \\\n  docs/architect/proposals/component-authority-boundary-map.md\n# no output, exit 0 — clean\n\n$ git diff --stat -- core/coordination-protocols/group-cognition-framework.yaml docs/architect/agent-coordination/contracts/assignment-run-runresult.md\n# no output — zero diff on both protected files\n\n$ git diff --stat\n .../coordination-foundation-baseline.md            |   6 +-\n .../contracts/coordination-session.md              | 104 ++++++++++++++++++++-\n .../contracts/flow-definition.md                   |  37 +++++++-\n 3 files changed, 142 insertions(+), 5 deletions(-)\n```\n\nAlso confirmed `docs/architect/proposals/step-09-group-thinking-substrate.md`\nand `docs/architect/architecture-intent.md` are both at zero diff\n(`git diff --stat` on both produced no output), and no `src/`, `test/`, or\n`core/` file appears in `git status --porcelain`.\n\nAll new cross-reference links/anchors were checked to resolve: target files\nexist, and the new/linked section headers\n(`## Driver-Authorized Optional Operations And Recheck (MVP1/MVP2, Step 09)`\nin coordination-session.md, `## Graph` in flow-definition.md, `## 7. MVP2 -\nDriver Authorization Primitive` in the proposal) are present at the expected\nanchors.\n\n## Gaps / Unresolved Questions\n\nNone. All four Proof Matrix requirements (R1 x2, R2, R3, R4) are\ndoer-complete with evidence recorded in\n`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md`.\n\nStatus: DONE\nSummary: Promoted MVP1/MVP2 driver-authorization/recheck-vs-retry semantics into coordination-session.md and the `activation` binding field into flow-definition.md, added one cross-reference sentence to coordination-foundation-baseline.md, and confirmed component-authority-boundary-map.md already places all four authorities correctly (no edit needed); both protected files remain at zero diff.\nConcerns/Blockers: none\n",
+      "record": {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P00.1-contract-promotion-report.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "b78a928bc9eed5af604a13806c356583557699f71d852d55841caa8c888efa3f",
+        "digest": "b78a928bc9eed5af604a13806c356583557699f71d852d55841caa8c888efa3f",
+        "inventoryEdgeIds": [
+          "evidence-021"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-021",
+            "slotKey": "{\"edgeId\":\"evidence-021\",\"file\":\"archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P00.1-contract-promotion-report.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-021\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":159}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-021",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 159
+              }
+            ],
+            "consumerFile": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P00.1-contract-promotion-report.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 159,
+                "columnStart": 2,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 159,
+                "columnStart": 2,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md`.'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-021",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 159,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md`."
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-003",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P00.1-contract-promotion-report.md",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "b78a928bc9eed5af604a13806c356583557699f71d852d55841caa8c888efa3f",
+          "bytes": 9046,
+          "lines": 163,
+          "headings": [
+            {
+              "line": 1,
+              "text": "# Doer Report — P00.1 Contract Promotion (Phase 00, Step 09 MVP1/MVP2)"
+            },
+            {
+              "line": 3,
+              "text": "## Scope"
+            },
+            {
+              "line": 11,
+              "text": "## Changes"
+            },
+            {
+              "line": 13,
+              "text": "### 1. `docs/architect/agent-coordination/contracts/coordination-session.md`"
+            },
+            {
+              "line": 56,
+              "text": "### 2. `docs/architect/agent-coordination/contracts/flow-definition.md`"
+            },
+            {
+              "line": 83,
+              "text": "### 3. `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md`"
+            },
+            {
+              "line": 98,
+              "text": "### 4. `docs/architect/proposals/component-authority-boundary-map.md`"
+            },
+            {
+              "line": 123,
+              "text": "## Verification (R4 — protected files at zero diff)"
+            },
+            {
+              "line": 131,
+              "text": "# no output, exit 0 — clean"
+            },
+            {
+              "line": 134,
+              "text": "# no output — zero diff on both protected files"
+            },
+            {
+              "line": 155,
+              "text": "## Gaps / Unresolved Questions"
+            }
+          ],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P00.1-redteam-findings-fix-report.md",
+      "sourceDigest": "3427e947691228f3926b4349d26c731465c858ef37b2f0d397127817d4010805",
+      "sourceContext": "# Fixer report — P00.1 Red-Team findings (Round 2)\n\n## Scope\n\nFixed all 6 accepted Red-Team findings from\n`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md`\n(`## Red-Team` section, `### Coordinator Disposition (Red-Team Round 1)` —\nall 6 accepted). Docs-only additive prose; no shape/schema change.\n\n## Files changed\n\n- `docs/architect/agent-coordination/contracts/coordination-session.md`\n- `docs/architect/agent-coordination/contracts/flow-definition.md`\n\nNo other file touched. `coordination-foundation-baseline.md` remains at its\nFix-Round-1 state (untouched this round); `group-cognition-framework.yaml`\nand `assignment-run-runresult.md` untouched, per the constraint.\n\n## Fixes applied\n\n1. HIGH — Recheck/taskKey collision: added a clause to \"Recheck Is Not\n   Retry\" (`coordination-session.md`) requiring a recheck's `taskKey` to\n   incorporate the new artifact/evidence revision or the authorizing\n   `invocationKey`/`authorizationId`, explicitly naming the\n   `nodeId`+`operationId`+`actorId`-only derivation as the forbidden case.\n2. MEDIUM — `invocationKey` scope: added a sentence to the\n   \"`invocationKey` Idempotency\" subsection stating scope is the\n   CoordinationSession (checked against that session's own\n   `events.jsonl`); cross-session reuse is out of scope.\n3. MEDIUM — atomicity for `operation-authorized` vs terminal transition:\n   added point 5 to the Recovery Rule requiring the active-status check and\n   `operation-authorized` append to share the same atomic/serialized write\n   path as `assignment-created` (point 2), plus a replay-side fail-closed\n   rule for any `operation-authorized` event found after a terminal event.\n4. MEDIUM — `maxInvocations` resume-counting: added a clause to\n   `flow-definition.md`'s Activation table `maxInvocations` row requiring\n   the consumed-invocation count to be counted fresh from on-disk\n   `operation-authorized` events (never in-memory), mirroring\n   `aggregateBounds`'s existing freshness guarantee.\n5. LOW — `grantedContextRefs` cross-session scope: added a clause to\n   \"Context-Grant Enforcement\" (`coordination-session.md`) requiring every\n   `grantedContextRefs` entry to resolve to a ref owned by the same\n   `coordinationId`; cross-session grant authority stated as out of scope.\n6. LOW — `mode` default: clarified in `flow-definition.md`'s Activation\n   table `mode` row that `required` is the default whenever `mode` itself\n   is absent, regardless of whether the parent `activation` object is\n   present (e.g. `activation: {maxInvocations: 3}` with no `mode` key also\n   defaults to `required`).\n\n## Verification\n\n```bash\n$ git diff --check -- \\\n  docs/architect/agent-coordination/contracts/coordination-session.md \\\n  docs/architect/agent-coordination/contracts/flow-definition.md\n# (no output — clean, exit 0)\n\n$ git diff --stat\n .../coordination-foundation-baseline.md            |   5 +-\n .../contracts/coordination-session.md              | 133 ++++++++++++++++++++-\n .../contracts/flow-definition.md                   |  39 +++++-\n 3 files changed, 172 insertions(+), 5 deletions(-)\n```\n\nOnly the two permitted files carry new changes this round;\n`coordination-foundation-baseline.md`'s diff stat is unchanged from before\nthis round's work (Fix Round 1's edit, not re-touched).\n\nAppended a \"## Fix Round 2 (Red-Team findings)\" section to `P00.1.md`\ndocumenting all 6 before/after quotes, same style as the existing\n\"Fix Round 1\" section. Did not touch `current-cell.md`, `index.md`, or the\nReview/Red-Team/Coordinator Disposition sections of `P00.1.md`. No commit\nmade.\n\nStatus: DONE\nSummary: All 6 accepted Red-Team findings fixed in coordination-session.md and flow-definition.md as additive, docs-only clauses; git diff --check clean; only the two permitted files changed; Fix Round 2 section appended to P00.1.md; report written; nothing committed.\nConcerns/Blockers: None.\n",
+      "record": {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P00.1-redteam-findings-fix-report.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "3427e947691228f3926b4349d26c731465c858ef37b2f0d397127817d4010805",
+        "digest": "3427e947691228f3926b4349d26c731465c858ef37b2f0d397127817d4010805",
+        "inventoryEdgeIds": [
+          "evidence-026"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-026",
+            "slotKey": "{\"edgeId\":\"evidence-026\",\"file\":\"archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P00.1-redteam-findings-fix-report.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-026\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":6}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-026",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 6
+              }
+            ],
+            "consumerFile": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P00.1-redteam-findings-fix-report.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 6,
+                "columnStart": 2,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 6,
+                "columnStart": 2,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-026",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 6,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md`"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-003",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P00.1-redteam-findings-fix-report.md",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "3427e947691228f3926b4349d26c731465c858ef37b2f0d397127817d4010805",
+          "bytes": 3926,
+          "lines": 77,
+          "headings": [
+            {
+              "line": 1,
+              "text": "# Fixer report — P00.1 Red-Team findings (Round 2)"
+            },
+            {
+              "line": 3,
+              "text": "## Scope"
+            },
+            {
+              "line": 10,
+              "text": "## Files changed"
+            },
+            {
+              "line": 19,
+              "text": "## Fixes applied"
+            },
+            {
+              "line": 50,
+              "text": "## Verification"
+            },
+            {
+              "line": 56,
+              "text": "# (no output — clean, exit 0)"
+            }
+          ],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P01.1-test-coverage-fix-report.md",
+      "sourceDigest": "07be8eff528e5887d9a42b0b77383c8660fd148cb6fff1562893ab9e9f597e60",
+      "sourceContext": "# Fixer report — P01.1 test-coverage fix (MEDIUM-1, LOW-1)\n\n## Scope\n\nFixed exactly the 2 Red-Team findings the Coordinator routed to a Fixer round\nin `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P01.1.md`\n(\"### Coordinator Disposition\"): MEDIUM-1 (no test asserts `actor` field of\nnode-operation bindings) and LOW-1 (no test asserts `graph.entry`/node\ncount/node-id set). HIGH-1 (`cohort-planner.mjs` resolver landmine) was\nexplicitly dispositioned \"document, don't fix in this cell\" and was left\nuntouched.\n\n## File changed\n\n`test/runner/flow-definition-standalone-master-coordination-loop.test.mjs` —\nonly file edited. Both fixes added inside the existing test\n`\"...declares the required first-pass and declared revision/recheck\noperations\"` (lines ~50-83 after the edit):\n\n1. Built a second map, `actorByOp` (`Map<operationId, actorId>`), from the\n   same `node.operations` loop that already built `nodesByOp`, then asserted\n   the expected actor per operation: `produce-candidate` -> `doer`,\n   `review-candidate` -> `reviewer`, `red-team-candidate` -> `red-team`,\n   `revise-candidate` -> `fixer`, `reviewer-recheck` -> `reviewer`,\n   `red-team-recheck` -> `red-team`.\n2. Added `assert.equal(def.spec.graph.entry, 'phase-produce')` and\n   `assert.deepEqual(def.spec.graph.nodes.map(n => n.id).sort(), [...])`\n   against the sorted expected node-id set\n   `['phase-first-pass', 'phase-produce', 'phase-recheck', 'phase-revision']`.\n\nNo existing assertion was removed, weakened, or reordered — both additions\nare purely additive to the same test body.\n\n## Files NOT touched (per instructions)\n\n- Fixture: `core/coordination-protocols/standalone-master-coordination-loop.yaml`\n- `src/runner/definitions/schema.mjs`\n- `src/runner/definitions/protocol-loader.mjs`\n- `src/runner/coordination/cohort-planner.mjs` (HIGH-1 subject — explicitly\n  out of scope, left alone entirely)\n- `current-cell.md`, `index.md` (not edited by this Fixer round)\n- The Review/Red-Team/Gaps/Coordinator-Disposition sections of `P01.1.md`\n  (only a new `## Fix Round 1` section was appended at the end)\n\n## Verification\n\n```\n$ FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/runner/flow-definition*.test.mjs'\n...\nℹ tests 49\nℹ pass 49\nℹ fail 0\n```\n\n49/49 pass — same count as before the fix (both new assertions landed inside\nthe existing test, no new `test(...)` block was added).\n\n```\n$ git status --short test/runner/flow-definition-standalone-master-coordination-loop.test.mjs\n?? test/runner/flow-definition-standalone-master-coordination-loop.test.mjs\n```\n\nThe file was already untracked before this Fixer round (it was created\nearlier in this cell), so it does not appear in `git diff --stat`. Confirmed\nno other file under `test/runner/` changed by this round, and no changes made\nto the fixture or any `src/` file (both were already true before this round\nand remain true).\n\n## Documentation\n\nAppended a `## Fix Round 1` section to the end of\n`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P01.1.md`\nwith before/after code for both fixes and the verification output.\n\nStatus: DONE\nSummary: Extended the single existing test with actor-binding and graph-shape assertions closing MEDIUM-1 and LOW-1; 49/49 tests pass; only the one test file was edited; HIGH-1 and all other files left untouched.\nConcerns/Blockers: none\n",
+      "record": {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P01.1-test-coverage-fix-report.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "07be8eff528e5887d9a42b0b77383c8660fd148cb6fff1562893ab9e9f597e60",
+        "digest": "07be8eff528e5887d9a42b0b77383c8660fd148cb6fff1562893ab9e9f597e60",
+        "inventoryEdgeIds": [
+          "evidence-027",
+          "evidence-027"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-027",
+            "slotKey": "{\"edgeId\":\"evidence-027\",\"file\":\"archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P01.1-test-coverage-fix-report.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-027\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":6}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-027",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 6
+              }
+            ],
+            "consumerFile": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P01.1-test-coverage-fix-report.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 6,
+                "columnStart": 5,
+                "columnEndExclusive": 52,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 6,
+                "columnStart": 5,
+                "columnEndExclusive": 52,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: 'in `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P01.1.md`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-027",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 6,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "in `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P01.1.md`"
+              }
+            ]
+          },
+          {
+            "edgeId": "evidence-027",
+            "slotKey": "{\"edgeId\":\"evidence-027\",\"file\":\"archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P01.1-test-coverage-fix-report.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-027\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":72}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-027",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 72
+              }
+            ],
+            "consumerFile": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P01.1-test-coverage-fix-report.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 72,
+                "columnStart": 2,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 72,
+                "columnStart": 2,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P01.1.md`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-027",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 72,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P01.1.md`"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-003",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P01.1-test-coverage-fix-report.md",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "07be8eff528e5887d9a42b0b77383c8660fd148cb6fff1562893ab9e9f597e60",
+          "bytes": 3395,
+          "lines": 77,
+          "headings": [
+            {
+              "line": 1,
+              "text": "# Fixer report — P01.1 test-coverage fix (MEDIUM-1, LOW-1)"
+            },
+            {
+              "line": 3,
+              "text": "## Scope"
+            },
+            {
+              "line": 13,
+              "text": "## File changed"
+            },
+            {
+              "line": 34,
+              "text": "## Files NOT touched (per instructions)"
+            },
+            {
+              "line": 45,
+              "text": "## Verification"
+            },
+            {
+              "line": 69,
+              "text": "## Documentation"
+            }
+          ],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-contract-promotion-review-report.md",
+      "sourceDigest": "edaaaeaf4c433d6872a3fb313177bc74e7e8707a2d343908237c3ef69bc9a1b8",
+      "sourceContext": "# Reviewer Report — Cell P00.1 (Contract Promotion)\n\nTrack: step-09-group-thinking-mvp1-mvp2\nCell: P00.1\nReviewer: independent (no access to Doer's own reasoning; diff/contracts/proposal read directly)\n\n## Verdict\n\n1 MEDIUM, 2 LOW findings. No HIGH findings.\n\nFull findings recorded in\n`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md`\nunder `## Review`.\n\n## Summary\n\n- Independently reconfirmed (not trusting the Doer's Commands section):\n  `git diff --check` clean on all 4 named files; zero diff on\n  `group-cognition-framework.yaml` and `assignment-run-runresult.md`; zero\n  diff on `step-09-group-thinking-substrate.md`, `architecture-intent.md`,\n  and `component-authority-boundary-map.md`; `git status --porcelain` shows\n  only the 3 intended doc files modified, no `src/`/`test/`/`core/` touched.\n- Content faithfulness against substrate §6-9: `operation-authorized`,\n  `driver-disposition-recorded`, `invocationKey` idempotency, context-grant\n  enforcement, and recheck-vs-retry semantics all match the substrate's\n  concrete shapes (JSON examples in §7, Bounds rule, gap table in §9). No\n  MVP6-9 concepts (deliberation memory, visibility windows, richer\n  aggregation, `addSessionEdge`) leaked into accepted text — confirmed\n  absent from the diff.\n- Component authority claim (R3, \"no edit needed\") independently\n  re-verified against `component-authority-boundary-map.md` §6 lines\n  171-184 directly, not just the Doer's cited line numbers — confirmed\n  correct as-is.\n- All 7 required negative-test scenarios present in both contracts'\n  Required Negative Tests sections.\n- Anchors: hand-computed the GitHub slug for the new\n  `## Driver-Authorized Optional Operations And Recheck (MVP1/MVP2, Step 09)`\n  heading and confirmed `flow-definition.md`'s cross-reference to it\n  resolves exactly; all other new/changed relative links resolve to real\n  files.\n\n## Findings\n\n1. **MEDIUM** — The scope disclaimer repeated in both contracts (\"This\n   section does NOT accept ... (Step 09 MVP3+/MVP6-9) — those stay\n   deferred/discussion\") literally excludes \"MVP3+\", but the substrate's\n   own MVP Plan table (§8) labels \"Recheck and disposition\" as MVP3 — and\n   that is exactly the content the same section promotes as accepted. The\n   ambiguity traces back to the cell brief's own bundling of recheck/\n   disposition under \"MVP1/MVP2,\" so it's not a Doer invention, but the\n   promoted text had the opportunity to resolve the resulting\n   contradiction and didn't. Smallest fix: narrow the parenthetical to\n   `(Step 09 MVP6-9)` or add one disambiguating clause, in both files.\n\n2. **LOW** — `targetArtifactRef` (used in the promoted contract) vs.\n   `artifactRevision` (used in substrate §8/§9's gap-table prose) is an\n   inconsistency in the source material itself; the Doer picked the name\n   matching substrate §7's concrete JSON example, which is a reasonable\n   call, but did so silently with no cross-reference note.\n\n3. **LOW** — The added cross-reference sentence in\n   `coordination-foundation-baseline.md` paraphrases the substance of\n   `master-coordinator.md`'s Runtime Boundary section (\"manual-only,\"\n   \"never loaded as runtime authority\") rather than being a bare pointer,\n   which is accurate today but has no sync mechanism if the source wording\n   changes later.\n\nTwo claims were checked and explicitly rejected as non-issues (see the\n\"Verified and rejected as non-issues\" subsection in `P00.1.md`'s Review):\nthe `authorizedBy` field added to `driver-disposition-recorded` (justified\nby substrate §9's Driver authority row), and the three-aggregate-bound\nphrasing of the binding-cap-never-widens rule (justified by substrate §7's\nfull Bounds rule paragraph, not just its summary sentence).\n\nStatus: DONE\nSummary: Reviewed cell P00.1's contract promotion diff independently against the substrate proposal, component-authority map, and protected-file zero-diff requirements; found 1 MEDIUM (self-contradictory MVP3+ scope disclaimer vs. substrate's own MVP numbering for the promoted recheck/disposition content) and 2 LOW (silent field-naming divergence; cross-reference sentence paraphrases rather than purely points) findings, no HIGH findings, and no invariant/scope-leakage/protected-file violations.\nConcerns/Blockers: None blocking — all findings are documentation-clarity issues, not content or invariant defects.\n",
+      "record": {
+        "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-contract-promotion-review-report.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "edaaaeaf4c433d6872a3fb313177bc74e7e8707a2d343908237c3ef69bc9a1b8",
+        "digest": "edaaaeaf4c433d6872a3fb313177bc74e7e8707a2d343908237c3ef69bc9a1b8",
+        "inventoryEdgeIds": [
+          "evidence-032"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-032",
+            "slotKey": "{\"edgeId\":\"evidence-032\",\"file\":\"archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-contract-promotion-review-report.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-032\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":12}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-032",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 12
+              }
+            ],
+            "consumerFile": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-contract-promotion-review-report.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 12,
+                "columnStart": 2,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 12,
+                "columnStart": 2,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-032",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 12,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "`docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md`"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-003",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-contract-promotion-review-report.md",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "edaaaeaf4c433d6872a3fb313177bc74e7e8707a2d343908237c3ef69bc9a1b8",
+          "bytes": 4418,
+          "lines": 77,
+          "headings": [
+            {
+              "line": 1,
+              "text": "# Reviewer Report — Cell P00.1 (Contract Promotion)"
+            },
+            {
+              "line": 7,
+              "text": "## Verdict"
+            },
+            {
+              "line": 15,
+              "text": "## Summary"
+            },
+            {
+              "line": 42,
+              "text": "## Findings"
+            }
+          ],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P01.1-mvp3-recheck-disposition-report.md",
+      "sourceDigest": "8fd65aac473db692824d388407589059e3d2702fc76e0acd5045d4e56ece8239",
+      "sourceContext": "# Doer Report — P01.1 (Phase 01, MVP3 recheck lineage and driver disposition)\n\nRole: Doer. Cell: P01.1. Branch: step-09-mvp3-to-mvp5.\n\n## Outcome\n\nR1-R8 fully dispositioned, one at a time, in\n`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P01.1.md`.\nNo `run-retried`/retry code touched. No Work/git/coding-domain path touched.\nNo accepted contract file edited.\n\n### Accepted unchanged (cited to P03.1.md, no source touched)\n\nR3, R5, R7, R2's artifact-revision-link half, R6's mechanism, and 3 of R8's\n5 named negative-semantics cases (missing authorization, reused invocation\nkey — already covered at both engine and door level per P03.2's own\ntabulation; terminal session — covered at engine level).\n\n### Gap closed\n\n- **R4 / R8's \"disposition target must reference a real...target\" bullet**:\n  `recordDriverDisposition` (`store.mjs`) had zero check that `targetRef`/\n  `evidenceRefs` resolve to a ref owned by this session — P00.1.md's\n  Carried-Forward Gap #9. Added `assertDispositionRefOwnedBySession`\n  (`src/runner/coordination/store.mjs:1012`), mirroring\n  `session-engine.mjs`'s existing `assertRefsOwnedBySession` semantics\n  exactly (reject a ref naming a different session or a real-but-foreign\n  Assignment; leave an unresolvable-looking string alone — matching\n  precedent, not a stronger guarantee). 4 new tests in\n  `test/runner/coordination-recheck-disposition.test.mjs`, mutation-verified\n  (reverting the check fails exactly those 3 refusal tests, nothing else).\n- **R8 cases #1 (unknown target) and #2 (stale/nonexistent artifact ref)**:\n  proven at the engine level already, but had no door-level (CLI/request)\n  test — the phase's own Bug Taxonomy names exactly this trap. 2 new tests\n  in `test/verbs/coordination-run-driver-steps.test.mjs`. No source change\n  needed (the door has no error-swallowing around the engine calls); this\n  closed a proof gap, not a behavior gap.\n\n### Deferred (not fixed, with reasoning)\n\n- **R2's prior-finding/verdict link** stays artifact-revision-scoped/\n  best-effort. Already ruled on by P03.1's own Coordinator (MEDIUM-3) with\n  the same evidence available today — not re-litigated. A hard predecessor\n  edge would be a new contract-schema decision, out of this cell's\n  authority.\n- **R8 case #4 (terminal session), door-level proof only.** Structurally not\n  constructible today: `run.mjs` opens a session once and closes it once,\n  after the whole steps loop — no step type transitions to terminal\n  mid-loop, and a second call naming the same `coordinationId` is refused\n  before any step runs. Reaching this shape needs a resume door\n  (`P00.1.md` Gap #17, tagged Phase 04/MVP5) — out of scope here. Engine\n  level is fully proven and lock-held-atomic.\n\n## Scope note for Review\n\nTouched `test/verbs/coordination-run-driver-steps.test.mjs`, outside the\nphase file's literal Files list (`test/runner/coordination*.test.mjs` only),\nto close the two door-level R8 gaps. This mirrors where P03.2 itself put\nevery door-level test for this exact surface. Flagged explicitly in\nP01.1.md §7 for Review to confirm.\n\n## Test Results\n\n```\nFGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/runner/coordination*.test.mjs'\n-> tests 314 / pass 314 / fail 0\n\nFGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test \\\n  'test/runner/flow-definition*.test.mjs' 'test/runner/coordination*.test.mjs' \\\n  'test/verbs/coordination*.test.mjs' 'test/cli/coordination*.test.mjs'\n-> tests 431 / pass 431 / fail 0\n\nFGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs'\n-> tests 5165 / pass 5158 / fail 1 / skipped 6\n   The 1 failure is exactly the known-unrelated baseline:\n   test/cli/fgos-intake-4.test.mjs:318. No other failure, no new failure.\n   Baseline was 5159/5152/1; delta (+6 tests) is exactly this cell's new tests.\n```\n\n## Files Touched\n\n- `src/runner/coordination/store.mjs` (new helper +\n  `recordDriverDisposition` wiring)\n- `test/runner/coordination-recheck-disposition.test.mjs` (+4 tests)\n- `test/verbs/coordination-run-driver-steps.test.mjs` (+2 tests, +1 import)\n- `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P01.1.md`\n  (new)\n\nStatus: DONE\nSummary: All of R1-R8 dispositioned with citations; one genuine gap closed\n(disposition ref-ownership check, source + tests) and two proof-only door-level\ngaps closed (tests only); full suite green except the one pre-existing,\nunrelated baseline failure.\n",
+      "record": {
+        "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P01.1-mvp3-recheck-disposition-report.md",
+        "inventoryInputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+        "inventoryInputs": [
+          {
+            "path": "step-02-evidence-consumers.json",
+            "commit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+            "sha256": "9c5fb5dda3f222b7c82fede623a80f41dfff48f4d688364a579255e46d7a8200",
+            "fileRows": 212
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "8fd65aac473db692824d388407589059e3d2702fc76e0acd5045d4e56ece8239",
+        "digest": "8fd65aac473db692824d388407589059e3d2702fc76e0acd5045d4e56ece8239",
+        "inventoryEdgeIds": [
+          "evidence-040",
+          "evidence-040"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "evidence-040",
+            "slotKey": "{\"edgeId\":\"evidence-040\",\"file\":\"archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P01.1-mvp3-recheck-disposition-report.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-040\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":8}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-040",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 8
+              }
+            ],
+            "consumerFile": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P01.1-mvp3-recheck-disposition-report.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 8,
+                "columnStart": 2,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 8,
+                "columnStart": 2,
+                "columnEndExclusive": 49,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P01.1.md`.'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-040",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 8,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "`docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P01.1.md`."
+              }
+            ]
+          },
+          {
+            "edgeId": "evidence-040",
+            "slotKey": "{\"edgeId\":\"evidence-040\",\"file\":\"archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P01.1-mvp3-recheck-disposition-report.md\",\"inventoryRefs\":[{\"edgeId\":\"evidence-040\",\"inputCommit\":\"587c2a791a06cdd091c6437d46a5f367e9bf9e0a\",\"inventory\":\"step-02-evidence-consumers.json\",\"originalLine\":86}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-040",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 86
+              }
+            ],
+            "consumerFile": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P01.1-mvp3-recheck-disposition-report.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 86,
+                "columnStart": 4,
+                "columnEndExclusive": 51,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 86,
+                "columnStart": 4,
+                "columnEndExclusive": 51,
+                "text": "docs/architect/agent-coordination/verification/"
+              }
+            ],
+            "matchedExpression": "docs/architect/agent-coordination/verification/",
+            "logicalReference": "docs/architect/agent-coordination/verification/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, Archived plan/report records the original evidence destination or captured verification result. Preserve history/provenance exactly (L12-38/40/46), including original line locators and relative link labels; tree retires at Phase 9 where the cited path is under specs/architect. No current authority or post-cutover link acceptance is asserted. Exact passage: '- `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P01.1.md`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/architect/agent-coordination/verification/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-evidence-consumers.json",
+                "edgeId": "evidence-040",
+                "inputCommit": "587c2a791a06cdd091c6437d46a5f367e9bf9e0a",
+                "originalLine": 86,
+                "matchedExpression": [
+                  "docs/architect/agent-coordination/verification/"
+                ],
+                "originalLineText": "- `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P01.1.md`"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-003",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [],
+        "wholeFileRead": {
+          "file": "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P01.1-mvp3-recheck-disposition-report.md",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "8fd65aac473db692824d388407589059e3d2702fc76e0acd5045d4e56ece8239",
+          "bytes": 4431,
+          "lines": 93,
+          "headings": [
+            {
+              "line": 1,
+              "text": "# Doer Report — P01.1 (Phase 01, MVP3 recheck lineage and driver disposition)"
+            },
+            {
+              "line": 5,
+              "text": "## Outcome"
+            },
+            {
+              "line": 12,
+              "text": "### Accepted unchanged (cited to P03.1.md, no source touched)"
+            },
+            {
+              "line": 19,
+              "text": "### Gap closed"
+            },
+            {
+              "line": 39,
+              "text": "### Deferred (not fixed, with reasoning)"
+            },
+            {
+              "line": 54,
+              "text": "## Scope note for Review"
+            },
+            {
+              "line": 62,
+              "text": "## Test Results"
+            },
+            {
+              "line": 80,
+              "text": "## Files Touched"
+            }
+          ],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    }
+  ]
+}

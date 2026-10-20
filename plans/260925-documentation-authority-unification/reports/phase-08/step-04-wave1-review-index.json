@@ -1,0 +1,380 @@
+[
+  {
+    "part": 1,
+    "set": "step04-001",
+    "files": [
+      "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+      "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+      "domains/coding/skills/fgos-coding-implement/SKILL.md"
+    ],
+    "edges": 26,
+    "bytes": 178187,
+    "payload": "step-04-wave1-p01.json",
+    "payloadSha256": "cabecdf2f4a99465b8e90032fa842133db2fd1df99a9af470ec5e457d449a9d4",
+    "expectedReviewerOutput": "review-a38-step-04-wave1-p01.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 2,
+    "set": "step04-002",
+    "files": [
+      "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+      "domains/coding/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+      "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md"
+    ],
+    "edges": 31,
+    "bytes": 209850,
+    "payload": "step-04-wave1-p02.json",
+    "payloadSha256": "db0e12f86bfa762ee7c984b31846b0573522b3e33817c3934269785b4e5904e8",
+    "expectedReviewerOutput": "review-a38-step-04-wave1-p02.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 3,
+    "set": "step04-003",
+    "files": [
+      "archive/plans/260901-1542-step08-standalone-coordination/plan.md",
+      "archive/plans/260901-1542-step08-standalone-coordination/reports/doer-260901-2050-GH-08-P01.1-coordination-store-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/doer-260903-P00.1-contract-promotion-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P00.1-redteam-findings-fix-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/fixer-260903-P01.1-test-coverage-fix-report.md",
+      "archive/plans/260903-0004-step09-group-thinking-mvp1-mvp2/reports/reviewer-260903-P00.1-contract-promotion-review-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/doer-260903-P01.1-mvp3-recheck-disposition-report.md"
+    ],
+    "edges": 9,
+    "bytes": 102565,
+    "payload": "step-04-wave1-p03.json",
+    "payloadSha256": "a7e5f85b0c130b20be660ae5322af784834793acdcd6a04a2e1bf4247f0088f4",
+    "expectedReviewerOutput": "review-a38-step-04-wave1-p03.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 4,
+    "set": "step04-004",
+    "files": [
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/fixer-260903-P04.2-handoff-gaps-fix-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P00.1-recheck-report.md",
+      "archive/plans/260903-1049-step09-mvp3-to-mvp5/reports/reviewer-260903-P01.1-mvp3-recheck-disposition-review-report.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/phase-02-chain-verb-and-pack-registration.md",
+      "archive/plans/260904-2329-group-thinking-plan-loop/reports/reviewer-260905-0730-p03-1-r5-live-proof-review-report.md",
+      "archive/plans/260905-architecture-advisory-panel/phase-05-comparative-proof-and-promotion.md"
+    ],
+    "edges": 8,
+    "bytes": 73480,
+    "payload": "step-04-wave1-p04.json",
+    "payloadSha256": "5b89bd699dbe9034665b58065f7c00226115f25bc9248126828271b1822f2e0b",
+    "expectedReviewerOutput": "review-a38-step-04-wave1-p04.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 5,
+    "set": "step04-005",
+    "files": [
+      "archive/plans/260906-1831-dispatch-visibility-v0/plan.md",
+      "archive/plans/260910-1700-rust-host-r1-kernel/reports/track-closeout.md"
+    ],
+    "edges": 17,
+    "bytes": 92012,
+    "payload": "step-04-wave1-p05.json",
+    "payloadSha256": "f01f08e76dad413eabae15e1200fb8545d47f91e5ec76922ce0ed4ff0f0adbb5",
+    "expectedReviewerOutput": "review-a38-step-04-wave1-p05.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 6,
+    "set": "step04-006",
+    "files": [
+      "archive/plans/260911-2305-runtime-recovery/reports/phase-00-baseline-report.md",
+      "archive/plans/260915-code-implementation-track-policy/reports/review-260915-0944-critical-design-review.md",
+      "archive/plans/260915-code-panel-multicell-facade/phase-05-live-proof-and-rollout.md"
+    ],
+    "edges": 5,
+    "bytes": 66176,
+    "payload": "step-04-wave1-p06.json",
+    "payloadSha256": "26c11629297f5d994a5cf3839a6415f20e5c2de65a36af02fefa2ad468388da4",
+    "expectedReviewerOutput": "review-a38-step-04-wave1-p06.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 7,
+    "set": "step04-007",
+    "files": [
+      "archive/plans/260919-coordination-skill-harness-simplification/plan.md",
+      "archive/plans/260919-coordination-skill-harness-simplification/reports/unit-I27-panel-depth-experiment-real-comparison-report.md"
+    ],
+    "edges": 2,
+    "bytes": 298913,
+    "payload": "step-04-wave1-p07.json",
+    "payloadSha256": "1fb4d1866de84b92621754d5be5aaccfd9da7cc9e341a91f60378a3eb80640a5",
+    "expectedReviewerOutput": "review-a38-step-04-wave1-p07.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 8,
+    "set": "step04-008",
+    "files": [
+      "plugins/fgOS/skills/approve/SKILL.md",
+      "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+      "plugins/fgOS/skills/cleanup-next/SKILL.md",
+      "plugins/fgOS/skills/coding-shape-distill/SKILL.md",
+      "plugins/fgOS/skills/coding-shape/SKILL.md",
+      "plugins/fgOS/skills/deliver/SKILL.md",
+      "plugins/fgOS/skills/discover-next/SKILL.md",
+      "plugins/fgOS/skills/discover/SKILL.md",
+      "plugins/fgOS/skills/merge-loop/SKILL.md",
+      "plugins/fgOS/skills/merge-next/SKILL.md",
+      "plugins/fgOS/skills/plan/SKILL.md",
+      "plugins/fgOS/skills/retro-loop/SKILL.md",
+      "plugins/fgOS/skills/retro-next/SKILL.md",
+      "plugins/fgOS/skills/terminal-close/SKILL.md",
+      "plugins/fgOS/skills/terminal/SKILL.md"
+    ],
+    "edges": 31,
+    "bytes": 226258,
+    "payload": "step-04-wave1-p08.json",
+    "payloadSha256": "616c73272667c42759c66ef61c3e74160697fd1163b4e6a04cafd0764d3feef1",
+    "expectedReviewerOutput": "review-a38-step-04-wave1-p08.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 9,
+    "set": "step04-009",
+    "files": [
+      "AGENTS.md",
+      "CLAUDE.md",
+      "core/instructions/design-principles.md"
+    ],
+    "edges": 27,
+    "bytes": 233369,
+    "payload": "step-04-wave1-p09.json",
+    "payloadSha256": "5abb721d45b3af774ec468a304c0a7c923289f3402a087a76aae08767b896815",
+    "expectedReviewerOutput": "review-a38-step-04-wave1-p09.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 10,
+    "set": "step04-009",
+    "files": [
+      "core/instructions/platform-laws.md"
+    ],
+    "edges": 24,
+    "bytes": 177390,
+    "payload": "step-04-wave1-p10.json",
+    "payloadSha256": "1156dd9115336d563ea1471f7058f47ab13b5ee62b75ec38a5cd88c4e3526c05",
+    "expectedReviewerOutput": "review-a38-step-04-wave1-p10.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 11,
+    "set": "step04-010",
+    "files": [
+      "bin/fgos.mjs"
+    ],
+    "edges": 0,
+    "bytes": 224733,
+    "payload": "step-04-wave1-p11.json",
+    "payloadSha256": "0ebaff17b3dd273ba6bf3db4efb462faa8c166a8b68f00abba36f53c17ec456a",
+    "expectedReviewerOutput": "review-a38-step-04-wave1-p11.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 12,
+    "set": "step04-010",
+    "files": [
+      "bin/fgos.mjs"
+    ],
+    "edges": 0,
+    "bytes": 81162,
+    "payload": "step-04-wave1-p12.json",
+    "payloadSha256": "58c57375ef8440b73d1d95f888bd0b8432ca0febf60281abc7b969f65e07468e",
+    "expectedReviewerOutput": "review-a38-step-04-wave1-p12.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 13,
+    "set": "step04-010",
+    "files": [
+      "bin/fgos.mjs"
+    ],
+    "edges": 36,
+    "bytes": 154633,
+    "payload": "step-04-wave1-p13.json",
+    "payloadSha256": "6d5b35c1a539ee9dec4feb4ff43c332a3b2b02fa64e28869402af7e1dddfe2e2",
+    "expectedReviewerOutput": "review-a38-step-04-wave1-p13.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 14,
+    "set": "step04-011",
+    "files": [
+      "src/cli/command-registry.mjs"
+    ],
+    "edges": 15,
+    "bytes": 218216,
+    "payload": "step-04-wave1-p14.json",
+    "payloadSha256": "da247288b381f5aa4829f7a87296992cc01013c1f3cadd08de9d89f7fdbe17e8",
+    "expectedReviewerOutput": "review-a38-step-04-wave1-p14.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 15,
+    "set": "step04-012",
+    "files": [
+      "apps/fgos-gateway/src/cf_access.rs",
+      "apps/fgos-gateway/src/gateway.rs",
+      "apps/fgos-gateway/web/src/api/errors.ts",
+      "apps/fgos-gateway/web/src/api/poll.ts"
+    ],
+    "edges": 22,
+    "bytes": 222988,
+    "payload": "step-04-wave1-p15.json",
+    "payloadSha256": "7ed17dba5cb43cb978b0483b14b99c16e18097b0bffaa3302926e74d0e4fbd72",
+    "expectedReviewerOutput": "review-a38-step-04-wave1-p15.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 16,
+    "set": "step04-013",
+    "files": [
+      "src/config/shared-config-file.mjs"
+    ],
+    "edges": 2,
+    "bytes": 14742,
+    "payload": "step-04-wave1-p16.json",
+    "payloadSha256": "49866272dddb4b7782c70e9ae10c38770f1f1752f8f49d6455d4a26231843e76",
+    "expectedReviewerOutput": "review-a38-step-04-wave1-p16.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 17,
+    "set": "step04-014",
+    "files": [
+      "src/install/coexist.mjs"
+    ],
+    "edges": 1,
+    "bytes": 10387,
+    "payload": "step-04-wave1-p17.json",
+    "payloadSha256": "a97f1284920a75261d4deaabe7f56b254c8f437f70f802335cebddaeb26dc069",
+    "expectedReviewerOutput": "review-a38-step-04-wave1-p17.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 18,
+    "set": "step04-015",
+    "files": [
+      "src/intake/discovery.mjs",
+      "src/intake/plan.mjs"
+    ],
+    "edges": 11,
+    "bytes": 136002,
+    "payload": "step-04-wave1-p18.json",
+    "payloadSha256": "5e5ccaa713da02a985defe05df435e561fa0393a990c1306dd81613d03b9529d",
+    "expectedReviewerOutput": "review-a38-step-04-wave1-p18.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 19,
+    "set": "step04-016",
+    "files": [
+      ".githooks/pre-commit",
+      ".github/workflows/ci.yml"
+    ],
+    "edges": 4,
+    "bytes": 60919,
+    "payload": "step-04-wave1-p19.json",
+    "payloadSha256": "267562adb0974c1018cf7ab58f24c2fce7e6fdb2ff9c937cd76db9f991c5b6ea",
+    "expectedReviewerOutput": "review-a38-step-04-wave1-p19.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 20,
+    "set": "L12-10-mandatory-controls",
+    "files": [
+      ".agents/skills/_shared/capability-catalog.md",
+      ".agents/skills/_shared/executor-dispatch-fallback.md",
+      ".agents/skills/_shared/planning-capability-awareness.md",
+      ".agents/skills/fgos-coding-planning/SKILL.md",
+      ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      ".agents/skills/fgos-coding-validating/SKILL.md",
+      ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "core/skills/_shared/capability-catalog.md",
+      "core/skills/_shared/executor-dispatch-fallback.md",
+      "core/skills/_shared/planning-capability-awareness.md",
+      "domains/coding/skills/fgos-coding-planning/SKILL.md",
+      "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "domains/coding/skills/fgos-coding-validating/SKILL.md",
+      "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+      "domains/coding/task-specs/shape-plan.md",
+      "plugins/fgOS/skills/_shared/capability-catalog.md",
+      "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+      "plugins/fgOS/skills/_shared/planning-capability-awareness.md",
+      "plugins/fgOS/skills/fgos-coding-planning/SKILL.md",
+      "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+      "plugins/fgOS/skills/fgos-coding-validating/SKILL.md",
+      "plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md"
+    ],
+    "edges": 43,
+    "bytes": 329663,
+    "payload": "step-04-wave1-p20.json",
+    "payloadSha256": "01b15c0a57c125e9d09f9ed24322404b9129cf103c881ddb8c3377ee9a6dca01",
+    "expectedReviewerOutput": "review-a38-step-04-wave1-p20.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  },
+  {
+    "part": 21,
+    "set": "L12-58-Step5-source-witnesses",
+    "files": [
+      "plugins/fgOS/skills/terminal-close/close.sh",
+      "plugins/fgOS/skills/terminal/rename.sh"
+    ],
+    "edges": 4,
+    "bytes": 17422,
+    "payload": "step-04-wave1-p21.json",
+    "payloadSha256": "55a0c76161ee05a62580208ee836b9214d02859aecaa5d0d7a4a6434945441cd",
+    "expectedReviewerOutput": "review-a38-step-04-wave1-p21.md",
+    "reviewStatus": "pending",
+    "elapsedReviewerSeconds": 0,
+    "remainingReviewerBudgetSeconds": null
+  }
+]

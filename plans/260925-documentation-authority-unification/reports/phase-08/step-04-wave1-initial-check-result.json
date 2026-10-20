@@ -1,0 +1,165 @@
+{
+  "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+  "checkedBatches": [
+    "step04-001",
+    "step04-002",
+    "step04-003",
+    "step04-004",
+    "step04-005",
+    "step04-006",
+    "step04-007",
+    "step04-008",
+    "step04-009",
+    "step04-010",
+    "step04-011",
+    "step04-012",
+    "step04-013",
+    "step04-014",
+    "step04-015",
+    "step04-016"
+  ],
+  "files": 174,
+  "consumerFiles": 203,
+  "edges": 542,
+  "dispositions": {
+    "preserve": 474,
+    "patch": 42,
+    "parked": 26
+  },
+  "failureCount": 26,
+  "failures": [
+    {
+      "file": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    },
+    {
+      "file": "AGENTS.md",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    },
+    {
+      "file": "AGENTS.md",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    },
+    {
+      "file": "AGENTS.md",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    },
+    {
+      "file": "AGENTS.md",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    },
+    {
+      "file": "AGENTS.md",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    },
+    {
+      "file": "AGENTS.md",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    },
+    {
+      "file": "AGENTS.md",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    },
+    {
+      "file": "AGENTS.md",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    },
+    {
+      "file": "AGENTS.md",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    },
+    {
+      "file": "AGENTS.md",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    },
+    {
+      "file": "AGENTS.md",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    },
+    {
+      "file": "core/instructions/platform-laws.md",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    },
+    {
+      "file": "core/instructions/platform-laws.md",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    },
+    {
+      "file": "core/instructions/platform-laws.md",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    },
+    {
+      "file": "core/instructions/platform-laws.md",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    },
+    {
+      "file": "core/instructions/platform-laws.md",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    },
+    {
+      "file": "core/instructions/platform-laws.md",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    },
+    {
+      "file": "core/instructions/platform-laws.md",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    },
+    {
+      "file": "core/instructions/platform-laws.md",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    },
+    {
+      "file": "core/instructions/platform-laws.md",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    },
+    {
+      "file": "core/instructions/platform-laws.md",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    },
+    {
+      "file": "core/instructions/platform-laws.md",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    },
+    {
+      "file": "core/instructions/platform-laws.md",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    },
+    {
+      "file": "apps/fgos-gateway/web/src/api/errors.ts",
+      "check": "anchor-from-evidence",
+      "detail": "missing line evidence / whole-file justification"
+    }
+  ],
+  "openLeadRulingEdges": [],
+  "checkerSha256": "cc14768591b776534a356be35e84e379df455d9e4e0a48f0c8065d16370b5e58",
+  "reusedStep3Sha256": "20bbeca2b0b104df357de506e479062b589e6faa31164a80761deddc31578b2b"
+}

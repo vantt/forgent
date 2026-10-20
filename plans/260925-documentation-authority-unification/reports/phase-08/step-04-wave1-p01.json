@@ -1,0 +1,2295 @@
+{
+  "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+  "reviewerRule": "Never run checker/probes/resolver/author scripts. Read every assigned file through EOF and independently verify targets. One verdict per whole file, even when streamed.",
+  "set": "step04-001",
+  "files": [
+    "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+    "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+    "domains/coding/skills/fgos-coding-implement/SKILL.md"
+  ],
+  "joinedSlots": 26,
+  "items": [
+    {
+      "file": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+      "sourceDigest": "d4a473140d8dd360e446e288101fca3052a2e7aca6809fe1981b95947c7a7516",
+      "sourceContext": "---\nname: fgos-coding-discovering\nuser-invocable: false\ndescription: >-\n  Own the machine-only stage `discovery`: soi ambiguity còn lại từ những gì\n  đã clarify, gọi helper `fgos-researching` bao nhiêu lần tuỳ nhu cầu, rồi\n  tự phán clear/unclear và tự gọi engine verb để kết thúc stage. Use when\n  a claimed item's stage is `discovery` and needs the machine-alone pass\n  before either skipping straight to `planning` or falling to `exploring`\n  for a person. Examples: \"item vừa qua clarify, còn gì mơ hồ không\", \"chạy\n  pha discovery cho item này\", \"tự phán rồi tự chuyển stage, không cần hỏi\n  người ở bước này\".\n---\n\n# fgos-coding-discovering\n\nSkill chủ (stage owner, D7) cho stage `discovery` — pha **máy một mình**\n(D6): dispatch headless được, không cần người ngồi cạnh. Đọc thông tin đã\nclarify, soi chỗ còn ambiguous, gọi helper `fgos-researching` (tool, không\nphải stage — D4) bao nhiêu lần tuỳ nhu cầu để thu bằng chứng, rồi tự phán\n`clear`/`unclear` từ chính bằng chứng đó và tự gọi engine verb\n`fgos discover --verdict ...` để kết thúc stage. Verdict quyết định\n**cạnh đi**, không chỉ đi-hay-dừng: `clear` bỏ qua `exploring`, nhảy thẳng\nsang `planning`; `unclear` sang `exploring` để một người cùng làm rõ (D2).\n\nĐịnh nghĩa \"skill chủ\" (D7): mở file skill ra, có lệnh gọi `fgos <verb>`\nđể tự chuyển stage/status của chính item không — có thì là chủ, không thì\nchỉ là helper trả verdict/finding về cho caller. `fgos-coding-discovering`\nlà chủ; `fgos-researching` vẫn là helper, không đổi vai trò sau khi skill\nnày tồn tại.\n\nSkill này cũng là nơi phán `size`/`rigor`/`kind`/`risk` (Phase 3): trên bằng\nchứng đã research xong ở bước 3, không phải suy đoán từ text submit —\nđọc vựng qua `classificationVocabulary(domain, field)`\n(`src/state/domain-registry.mjs`), không hardcode mảng giá trị. Xem\nbước 4/5.\n\nHợp đồng đầu việc: `domains/coding/task-specs/judge-ambiguity.md` (D6/D9)\n— input/output/gate/verify-template và bảng `## Collaboration` mà bước 3\ndưới đây thực thi. Đọc file đó trước khi sửa prose ở bước 3, để không\nlệch khỏi hợp đồng đã khoá (tsk-2t9c D16 — task-spec này đã tồn tại từ\n`taskSpecMap` nhưng chưa từng được trích dẫn ở đây).\n\n## Hard rules\n\n- Mọi lệnh `fgos <verb>` skill này gọi (`decision`, `discover`) đều\n  `requiresExistingStore: true` — resolve main checkout root giống mọi\n  skill chủ khác (`git rev-parse --path-format=absolute --git-common-dir\n  | xargs dirname`) và truyền `--dir \"$root\"` trên từng lệnh. Session này\n  có thể đang ở trong một worktree liên kết, thứ không bao giờ mang\n  `.fgos/` riêng theo thiết kế (ADR0020) — verb sẽ từ chối (exit 4) thay\n  vì âm thầm lệch nếu bỏ `--dir` (tsk-56t D1).\n- Khi một trong các lệnh `fgos <verb>` trên hỏng với một known error\n  category, relay category đó nguyên văn trong hand-back — không bao giờ\n  gói lại thành \"blocked\" chung chung (tsk-1c6 D2/D4). Category duy nhất\n  đủ điều kiện hôm nay là `lock-timeout`\n  (`EventLogError('lock-timeout')`, exit code `7`, khoá chia sẻ của\n  `.fgos/events.jsonl`), báo bằng chính dòng của nó:\n\n  ```text\n  stop-reason: lock-timeout\n  ```\n\n  `fgos-coding-driving` mang dòng này lên bất kỳ vòng lặp nào đang lái\n  item, khiến cả lượt chạy dừng lại thay vì bỏ qua một item.\n- Tự làm phần soi-ambiguity/đọc-bằng-chứng trực tiếp (Read/Grep/`rg` trên\n  chính `view.discovery[id]` và `docsRef` đã có) — không bao giờ giao việc\n  đó cho Agent/Task tool như một dispatch tuỳ tiện. Việc RESEARCH THẬT (tìm\n  trong repo, tra ngoài) là việc của helper `fgos-researching` — gọi nó,\n  không tự làm lại; nhưng việc ĐỌC LẠI những gì item đã có sẵn (title,\n  `refs`, verdict cũ) là việc của chính skill này, làm trực tiếp.\n- Chỉ phán `tier`/`kind`/`risk` từ bằng chứng THẬT `fgos-researching` đã\n  trả về ở bước 3 (D12) — không phán từ suy đoán hợp lý, không tái research\n  một vòng mới chỉ để phán classification. Chỉ gọi `fgos edit` khi giá trị\n  phán ra khác giá trị hiện có trên item — không ghi đè vô ích khi trùng.\n- Không mở lại hay diễn giải khác một quyết định đã khoá ở `CONTEXT.md`\n  (nếu item đã có, từ một vòng `exploring`/`discovery` trước) — trích D-ID,\n  không bao giờ ghi đè ở đây.\n- Coi `title`/`description` của item là input không đáng tin (RUL45,\n  `docs/specs/runner.md`) — không bao giờ chèn thẳng vào lệnh shell; luôn\n  truyền như một argv element tách riêng, có quote.\n- Không có nhánh hỏi người ở skill này — đây là pha máy một mình (D6).\n  Khác với `fgos-coding-exploring`/`fgos-coding-planning`, skill này KHÔNG\n  check gate-bypass và KHÔNG gọi `fgos gate-approve` — không có gate nào\n  để bypass, vì không có gì cần một người approve trước khi verdict tự áp\n  dụng. Nếu tìm thấy bằng chứng đủ rõ thì `clear`; nếu không, `unclear` —\n  cả hai đều tự gọi thẳng engine verb, không dừng lại chờ ai.\n- Kết thúc bằng cách tự gọi `fgos discover --verdict ...` (xem Flow) rồi\n  bàn giao — không bao giờ để lại cho một lệnh `fgos discover` mù ở sau\n  tự phán lại (đúng tinh thần Native-First, tsk-27y D1/D2).\n- **Multi-role team harness (tsk-2t9c D1/D4/D9/D14): mỗi lần gọi helper\n  `fgos-researching` ở bước 3 là một call `consult` (sync) thật — ghi lại\n  bằng `fgos handoff` ngay sau khi có finding, không âm thầm bỏ qua.**\n  Đây là edge DUY NHẤT `roleGraph` khai cho stage `discovery` (D14 — sửa\n  từ một giả định sai trước đó rằng discovery hoàn toàn không có tương\n  tác role nào; thực tế nó vẫn consult researcher, chỉ là không bao giờ\n  hỏi người trực tiếp). Domain không khai `roleGraph` thì bỏ qua toàn bộ\n  mục này.\n\n## Flow\n\n1. **Orient.** Đọc lại `view.discovery[id]` (`fgos list --id <id> --json`)\n   — mảng verdict `discovery` cũ, mới nhất cuối cùng, nếu có. Đọc title,\n   `refs`, và `docsRef` (nếu item đã có `docs/history/<feature>/` từ một\n   vòng `clarify`/Init trước) — không suy đoán lại những gì item đã biết\n   sẵn.\n\n   **Nhận lại quả bóng nếu không phải của mình (tsk-2t9c D14/D16).** Đọc\n   `data.work[id].holder` từ chính lời gọi `fgos list` trên. Nếu có giá\n   trị và khác `implementer`, gọi `handoff-return`, lặp lại (đọc `holder`\n   lại sau mỗi lần) cho tới khi `holder` là `implementer` hoặc lời gọi từ\n   chối vì \"không còn call nào đang mở\" (kết cục bình thường, không phải\n   lỗi):\n\n    ```bash\n    fgos handoff-return \"<item-id>\" --note \"reclaiming at Orient — holder was <role>\"\n    ```\n\n   Bỏ qua bước này khi domain của item không khai `roleGraph`.\n\n2. **Soi ambiguity.** Từ thông tin đã clarify (title/description/refs),\n   liệt kê cụ thể những gì còn mơ hồ — một khái niệm chưa rõ, một pattern\n   chưa biết có tồn tại trong repo không, một quyết định phạm vi chưa\n   chốt. Không liệt kê một câu hỏi mà chính repo đã trả lời sẵn (tránh\n   đúng lỗi đã từng xảy ra ở vòng chạy hỏng ghi trong\n   `docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md`\n   §5 vòng 1-3 — hỏi người một câu scout đã trả lời sẵn).\n\n3. **Gọi helper `fgos-researching`.** Với mỗi điểm mơ hồ ở bước 2, gọi\n   skill `fgos-researching` (bao nhiêu lần tuỳ nhu cầu — độc lập, không\n   dồn hết vào một lời gọi nếu các điểm không phụ thuộc nhau) với goal cụ\n   thể + mọi thứ item đã biết. Helper đó tự ghi\n   `docs/history/<feature>/RESEARCH.md` (tích luỹ, không đè) và trả về\n   `{clear, verify?, question?}` cho TỪNG điểm — never tự đi research trực\n   tiếp thay cho nó.\n\n   Ngay sau MỖI lần gọi trả về (dù `clear:true` hay ra `question`, không\n   gộp chờ hết mọi điểm mới ghi một lần), log call `consult` (tsk-2t9c\n   D9/D14/D16 — cùng một mốc \"ngay khi lời gọi helper trả về\", thống nhất\n   với `fgos-coding-exploring`/`fgos-coding-validating`):\n\n    ```bash\n    fgos handoff \"<item-id>\" --to researcher --reason consult --outcome \"<finding, một dòng>\"\n    ```\n\n   Sync — không đổi `holder`, chỉ ghi `call-summary`. Bỏ qua bước này khi\n   domain của item không khai `roleGraph`.\n\n4. **Tự phán.** Từ TOÀN BỘ finding thật vừa thu (không phải từ suy đoán\n   hợp lý), quyết:\n   - **`clear`** — mọi điểm mơ hồ đã có bằng chứng giải quyết. Verify: lấy\n     `verify` thật do `fgos-researching` đề xuất nếu có và item chưa có\n     verify thật của riêng nó (`hasRealVerify`, cùng khuôn engine đã dùng\n     ở `resolveDiscovery`) — không tự chế một verify mới đè lên verify đã\n     thật.\n   - **`unclear`** — còn ít nhất một điểm chưa có bằng chứng giải quyết,\n     hoặc bằng chứng mâu thuẫn nhau. Question: nêu đúng điểm còn mở, trích\n     dẫn lại bằng chứng đã có (để người ở `exploring` không phải scout lại\n     từ đầu) — không hỏi chung chung. Định dạng `--question` theo self-contained\n     citations (`../_shared/citation-format.md`) và mẫu câu hỏi quyết định\n     (`../_shared/decision-question.md`; ở stage này chỉ cần Chuyện gì đang\n     xảy ra, Nguyên nhân, Phạm vi của câu trả lời).\n\n   **Chỉ khi `clear`: phán luôn `size`/`rigor`/`kind`/`risk`** (Phase 3) —\n   trên CÙNG bằng chứng vừa thu ở bước 3, không research thêm vòng mới.\n   Tiêu chí phán `rigor`: độ nghiêm là hậu quả khi làm sai (blast radius,\n   contract công khai, bảo mật, dữ liệu), **không phải** độ lớn việc.\n   `size` là độ lớn, công sức (ước lượng, chia việc).\n   Đọc vựng `kind`/`risk` qua `classificationVocabulary(domain, 'kind')` /\n   `classificationVocabulary(domain, 'risk')`\n   (`src/state/domain-registry.mjs`, không hardcode mảng giá trị);\n   `size` so với `SIZES` toàn cục của `work.mjs` (`light`/`standard`/`heavy`);\n   `rigor` so với `RIGOR_VALUES` toàn cục (`low`/`standard`/`high`/`critical`). Một\n   verdict `unclear` không phán classification — chưa đủ bằng chứng.\n\n5. **Tự gọi engine verb.** Ngay sau bước 4, không dừng lại chờ gì thêm:\n\n    ```bash\n    # clear (nếu size/rigor/kind/risk phán ra khác giá trị hiện có trên item,\n    # gọi edit TRƯỚC discover — bỏ qua lệnh edit khi giá trị trùng):\n    fgos edit \"<item-id>\" --size \"<size phán>\" --rigor \"<rigor phán>\" --kind \"<kind phán>\" --risk \"<risk phán>\"\n    fgos discover \"<item-id>\" --verdict clear --verify \"<verify thật vừa xác nhận ở bước 4>\"\n    # unclear:\n    fgos discover \"<item-id>\" --verdict unclear --question \"<câu hỏi cụ thể, trích bằng chứng>\"\n    ```\n   Cả hai nhánh đều là lệnh gọi engine THẬT — verdict `clear` bỏ qua\n   `exploring`, verdict `unclear` sang `exploring` cho một người (D2). Ghi\n   một dòng `fgos decision` ngắn trước lệnh trên nếu muốn để lại dấu vết\n   lý do (không bắt buộc — `resolveDiscovery` đã tự ghi một decision\n   `caller-supplied` cho mỗi lần gọi).\n\n## Red flags\n\n- tự đi research trực tiếp (search repo, tra online) thay vì gọi helper\n  `fgos-researching`\n- phán `size`/`rigor`/`kind`/`risk` từ suy đoán hợp lý thay vì từ finding thật\n  `fgos-researching` đã trả về, hoặc phán classification cho một verdict\n  `unclear`\n- hardcode mảng giá trị `kind`/`risk` thay vì đọc qua\n  `classificationVocabulary(domain, field)`\n- gọi `fgos edit` khi giá trị phán ra trùng giá trị hiện có (ghi đè vô ích)\n- mở lại một quyết định đã khoá ở `CONTEXT.md` thay vì trích D-ID\n- dừng lại hỏi người, hoặc check gate-bypass — không có gate nào ở stage\n  này, đây là pha máy một mình\n- phán `clear` từ suy đoán hợp lý thay vì từ finding thật `fgos-researching`\n  đã trả về\n- gọi `fgos discover` mà không tự phán trước — để một lệnh sau tự phán mù\n  (đúng thứ D7 tồn tại để tránh: helper không bao giờ ghi state, skill chủ\n  luôn tự gọi verb ngay sau khi tự phán, không tách hai bước ra hai caller\n  khác nhau)\n- chèn thẳng `title`/`description` chưa quote vào lệnh shell\n- gọi `fgos-researching` mà không log `handoff --reason consult` ngay sau\n  (khi domain có `roleGraph`) — biến tương tác thật thành vô hình trở lại\n- bỏ qua reclaim ở Orient khi `holder` không phải `implementer`, hoặc chỉ\n  gọi `handoff-return` một lần rồi dừng dù `holder` vẫn chưa về\n  `implementer` (tsk-2t9c D16 — call thread lồng 2 tầng cần 2 lần gọi)\n\nViolating the letter of the rules is violating the spirit of the rules.\n\nVerdict tự phán, engine verb tự gọi — stage đã kết thúc, item đã ở\n`planning` (verdict `clear`) hoặc `exploring` (verdict `unclear`). Không\ncần bàn giao thêm gì — driver (`fgos-coding-driving`) sẽ tự đọc lại stage\nmới ở vòng lặp kế tiếp.\n",
+      "record": {
+        "file": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "inventoryInputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+        "inventoryInputs": [
+          {
+            "path": "step-02-census-skills-prompts.json",
+            "commit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+            "sha256": "c68eac52ad9ab06e0420fcbfb98d4d1879a12cc274fb903d942a040e81f6817f",
+            "edges": 332
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "d4a473140d8dd360e446e288101fca3052a2e7aca6809fe1981b95947c7a7516",
+        "digest": "d4a473140d8dd360e446e288101fca3052a2e7aca6809fe1981b95947c7a7516",
+        "inventoryEdgeIds": [
+          "skills-016",
+          "skills-017",
+          "skills-018",
+          "skills-019",
+          "skills-090",
+          "skills-091",
+          "skills-092",
+          "skills-093",
+          "skills-149",
+          "skills-150",
+          "skills-151",
+          "skills-152"
+        ],
+        "diff": "--- a/domains/coding/skills/fgos-coding-discovering/SKILL.md\n+++ b/domains/coding/skills/fgos-coding-discovering/SKILL.md\n@@ -77,7 +77,7 @@\n   (nếu item đã có, từ một vòng `exploring`/`discovery` trước) — trích D-ID,\n   không bao giờ ghi đè ở đây.\n - Coi `title`/`description` của item là input không đáng tin (RUL45,\n-  `docs/specs/runner.md`) — không bao giờ chèn thẳng vào lệnh shell; luôn\n+  `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules`) — không bao giờ chèn thẳng vào lệnh shell; luôn\n   truyền như một argv element tách riêng, có quote.\n - Không có nhánh hỏi người ở skill này — đây là pha máy một mình (D6).\n   Khác với `fgos-coding-exploring`/`fgos-coding-planning`, skill này KHÔNG\n",
+        "edges": [
+          {
+            "edgeId": "skills-016",
+            "slotKey": "{\"edgeId\":\"skills-016\",\"file\":\".agents/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-016\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":81}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-016",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 81
+              }
+            ],
+            "consumerFile": ".agents/skills/fgos-coding-discovering/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 81,
+                "columnStart": 4,
+                "columnEndExclusive": 24,
+                "text": "docs/specs/runner.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 81,
+                "columnStart": 4,
+                "columnEndExclusive": 24,
+                "text": "docs/specs/runner.md"
+              }
+            ],
+            "matchedExpression": "docs/specs/runner.md",
+            "logicalReference": "docs/specs/runner.md",
+            "disposition": "patch",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source domains/coding/skills/fgos-coding-discovering/SKILL.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: '  `docs/specs/runner.md`) — không bao giờ chèn thẳng vào lệnh shell; luôn' Source disposition: patch. A51, L12-7/30/31/32/58: The RUL45 trust-boundary paragraph explicitly calls title/description untrusted and describes its prompt/shell boundary. The full rule is the narrow holder; shaping cites the same untrusted-input claim. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": null,
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/specs/runner.md",
+            "sourceSlotKey": "{\"edgeId\":\"skills-090\",\"file\":\"domains/coding/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-090\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":80}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-016",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 81,
+                "matchedExpression": "docs/specs/runner.md",
+                "originalLineText": "  `docs/specs/runner.md`) — không bao giờ chèn thẳng vào lệnh shell; luôn"
+              }
+            ]
+          },
+          {
+            "edgeId": "skills-017",
+            "slotKey": "{\"edgeId\":\"skills-017\",\"file\":\".agents/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-017\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":105}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-017",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 105
+              }
+            ],
+            "consumerFile": ".agents/skills/fgos-coding-discovering/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 105,
+                "columnStart": 42,
+                "columnEndExclusive": 65,
+                "text": "docs/history/<feature>/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 105,
+                "columnStart": 42,
+                "columnEndExclusive": 65,
+                "text": "docs/history/<feature>/"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/",
+            "logicalReference": "docs/history/<feature>/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source domains/coding/skills/fgos-coding-discovering/SKILL.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: '   `refs`, và `docsRef` (nếu item đã có `docs/history/<feature>/` từ một' Source disposition: preserve. A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '   `refs`, và `docsRef` (nếu item đã có `docs/history/<feature>/` từ một'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<feature>/",
+            "sourceSlotKey": "{\"edgeId\":\"skills-091\",\"file\":\"domains/coding/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-091\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":104}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-017",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 105,
+                "matchedExpression": "docs/history/<feature>/",
+                "originalLineText": "   `refs`, và `docsRef` (nếu item đã có `docs/history/<feature>/` từ một"
+              }
+            ]
+          },
+          {
+            "edgeId": "skills-018",
+            "slotKey": "{\"edgeId\":\"skills-018\",\"file\":\".agents/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-018\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":127}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-018",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 127
+              }
+            ],
+            "consumerFile": ".agents/skills/fgos-coding-discovering/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 127,
+                "columnStart": 5,
+                "columnEndExclusive": 71,
+                "text": "docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 127,
+                "columnStart": 5,
+                "columnEndExclusive": 71,
+                "text": "docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md"
+              }
+            ],
+            "matchedExpression": "docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md",
+            "logicalReference": "docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source domains/coding/skills/fgos-coding-discovering/SKILL.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: '   `docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md`' Source disposition: preserve. A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '   `docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md",
+            "sourceSlotKey": "{\"edgeId\":\"skills-092\",\"file\":\"domains/coding/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-092\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":126}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-018",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 127,
+                "matchedExpression": "docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md",
+                "originalLineText": "   `docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md`"
+              }
+            ]
+          },
+          {
+            "edgeId": "skills-019",
+            "slotKey": "{\"edgeId\":\"skills-019\",\"file\":\".agents/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-019\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":134}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-019",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 134
+              }
+            ],
+            "consumerFile": ".agents/skills/fgos-coding-discovering/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 134,
+                "columnStart": 5,
+                "columnEndExclusive": 39,
+                "text": "docs/history/<feature>/RESEARCH.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 134,
+                "columnStart": 5,
+                "columnEndExclusive": 39,
+                "text": "docs/history/<feature>/RESEARCH.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/RESEARCH.md",
+            "logicalReference": "docs/history/<feature>/RESEARCH.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source domains/coding/skills/fgos-coding-discovering/SKILL.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: '   `docs/history/<feature>/RESEARCH.md` (tích luỹ, không đè) và trả về' Source disposition: preserve. A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '   `docs/history/<feature>/RESEARCH.md` (tích luỹ, không đè) và trả về'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<feature>/RESEARCH.md",
+            "sourceSlotKey": "{\"edgeId\":\"skills-093\",\"file\":\"domains/coding/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-093\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":133}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-019",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 134,
+                "matchedExpression": "docs/history/<feature>/RESEARCH.md",
+                "originalLineText": "   `docs/history/<feature>/RESEARCH.md` (tích luỹ, không đè) và trả về"
+              }
+            ]
+          },
+          {
+            "edgeId": "skills-090",
+            "slotKey": "{\"edgeId\":\"skills-090\",\"file\":\"domains/coding/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-090\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":80}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-090",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 80
+              }
+            ],
+            "consumerFile": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 80,
+                "columnStart": 4,
+                "columnEndExclusive": 24,
+                "text": "docs/specs/runner.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 80,
+                "columnStart": 4,
+                "columnEndExclusive": 24,
+                "text": "docs/specs/runner.md"
+              }
+            ],
+            "matchedExpression": "docs/specs/runner.md",
+            "logicalReference": "docs/specs/runner.md",
+            "disposition": "patch",
+            "diffHunk": "@@ -77,7 +77,7 @@",
+            "reason": "A51, L12-7/30/31/32/58: The RUL45 trust-boundary paragraph explicitly calls title/description untrusted and describes its prompt/shell boundary. The full rule is the narrow holder; shaping cites the same untrusted-input claim. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+            "anchor": "business-rules",
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/specs/runner.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-090",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 80,
+                "matchedExpression": "docs/specs/runner.md",
+                "originalLineText": "  `docs/specs/runner.md`) — không bao giờ chèn thẳng vào lệnh shell; luôn"
+              }
+            ]
+          },
+          {
+            "edgeId": "skills-091",
+            "slotKey": "{\"edgeId\":\"skills-091\",\"file\":\"domains/coding/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-091\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":104}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-091",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 104
+              }
+            ],
+            "consumerFile": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 104,
+                "columnStart": 42,
+                "columnEndExclusive": 65,
+                "text": "docs/history/<feature>/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 104,
+                "columnStart": 42,
+                "columnEndExclusive": 65,
+                "text": "docs/history/<feature>/"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/",
+            "logicalReference": "docs/history/<feature>/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '   `refs`, và `docsRef` (nếu item đã có `docs/history/<feature>/` từ một'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<feature>/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-091",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 104,
+                "matchedExpression": "docs/history/<feature>/",
+                "originalLineText": "   `refs`, và `docsRef` (nếu item đã có `docs/history/<feature>/` từ một"
+              }
+            ]
+          },
+          {
+            "edgeId": "skills-092",
+            "slotKey": "{\"edgeId\":\"skills-092\",\"file\":\"domains/coding/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-092\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":126}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-092",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 126
+              }
+            ],
+            "consumerFile": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 126,
+                "columnStart": 5,
+                "columnEndExclusive": 71,
+                "text": "docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 126,
+                "columnStart": 5,
+                "columnEndExclusive": 71,
+                "text": "docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md"
+              }
+            ],
+            "matchedExpression": "docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md",
+            "logicalReference": "docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '   `docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-092",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 126,
+                "matchedExpression": "docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md",
+                "originalLineText": "   `docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md`"
+              }
+            ]
+          },
+          {
+            "edgeId": "skills-093",
+            "slotKey": "{\"edgeId\":\"skills-093\",\"file\":\"domains/coding/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-093\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":133}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-093",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 133
+              }
+            ],
+            "consumerFile": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 133,
+                "columnStart": 5,
+                "columnEndExclusive": 39,
+                "text": "docs/history/<feature>/RESEARCH.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 133,
+                "columnStart": 5,
+                "columnEndExclusive": 39,
+                "text": "docs/history/<feature>/RESEARCH.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/RESEARCH.md",
+            "logicalReference": "docs/history/<feature>/RESEARCH.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '   `docs/history/<feature>/RESEARCH.md` (tích luỹ, không đè) và trả về'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<feature>/RESEARCH.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-093",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 133,
+                "matchedExpression": "docs/history/<feature>/RESEARCH.md",
+                "originalLineText": "   `docs/history/<feature>/RESEARCH.md` (tích luỹ, không đè) và trả về"
+              }
+            ]
+          },
+          {
+            "edgeId": "skills-149",
+            "slotKey": "{\"edgeId\":\"skills-149\",\"file\":\"plugins/fgOS/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-149\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":81}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-149",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 81
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 81,
+                "columnStart": 4,
+                "columnEndExclusive": 24,
+                "text": "docs/specs/runner.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 81,
+                "columnStart": 4,
+                "columnEndExclusive": 24,
+                "text": "docs/specs/runner.md"
+              }
+            ],
+            "matchedExpression": "docs/specs/runner.md",
+            "logicalReference": "docs/specs/runner.md",
+            "disposition": "patch",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source domains/coding/skills/fgos-coding-discovering/SKILL.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: '  `docs/specs/runner.md`) — không bao giờ chèn thẳng vào lệnh shell; luôn' Source disposition: patch. A51, L12-7/30/31/32/58: The RUL45 trust-boundary paragraph explicitly calls title/description untrusted and describes its prompt/shell boundary. The full rule is the narrow holder; shaping cites the same untrusted-input claim. Phase 9 exact patch specification; current operative route remains unchanged until cutover.",
+            "target": null,
+            "anchor": null,
+            "timing": "Phase 9",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/specs/runner.md",
+            "sourceSlotKey": "{\"edgeId\":\"skills-090\",\"file\":\"domains/coding/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-090\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":80}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-149",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 81,
+                "matchedExpression": "docs/specs/runner.md",
+                "originalLineText": "  `docs/specs/runner.md`) — không bao giờ chèn thẳng vào lệnh shell; luôn"
+              }
+            ]
+          },
+          {
+            "edgeId": "skills-150",
+            "slotKey": "{\"edgeId\":\"skills-150\",\"file\":\"plugins/fgOS/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-150\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":105}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-150",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 105
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 105,
+                "columnStart": 42,
+                "columnEndExclusive": 65,
+                "text": "docs/history/<feature>/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 105,
+                "columnStart": 42,
+                "columnEndExclusive": 65,
+                "text": "docs/history/<feature>/"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/",
+            "logicalReference": "docs/history/<feature>/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source domains/coding/skills/fgos-coding-discovering/SKILL.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: '   `refs`, và `docsRef` (nếu item đã có `docs/history/<feature>/` từ một' Source disposition: preserve. A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '   `refs`, và `docsRef` (nếu item đã có `docs/history/<feature>/` từ một'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<feature>/",
+            "sourceSlotKey": "{\"edgeId\":\"skills-091\",\"file\":\"domains/coding/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-091\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":104}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-150",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 105,
+                "matchedExpression": "docs/history/<feature>/",
+                "originalLineText": "   `refs`, và `docsRef` (nếu item đã có `docs/history/<feature>/` từ một"
+              }
+            ]
+          },
+          {
+            "edgeId": "skills-151",
+            "slotKey": "{\"edgeId\":\"skills-151\",\"file\":\"plugins/fgOS/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-151\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":127}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-151",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 127
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 127,
+                "columnStart": 5,
+                "columnEndExclusive": 71,
+                "text": "docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 127,
+                "columnStart": 5,
+                "columnEndExclusive": 71,
+                "text": "docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md"
+              }
+            ],
+            "matchedExpression": "docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md",
+            "logicalReference": "docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source domains/coding/skills/fgos-coding-discovering/SKILL.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: '   `docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md`' Source disposition: preserve. A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '   `docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md`'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md",
+            "sourceSlotKey": "{\"edgeId\":\"skills-092\",\"file\":\"domains/coding/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-092\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":126}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-151",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 127,
+                "matchedExpression": "docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md",
+                "originalLineText": "   `docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md`"
+              }
+            ]
+          },
+          {
+            "edgeId": "skills-152",
+            "slotKey": "{\"edgeId\":\"skills-152\",\"file\":\"plugins/fgOS/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-152\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":134}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-152",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 134
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 134,
+                "columnStart": 5,
+                "columnEndExclusive": 39,
+                "text": "docs/history/<feature>/RESEARCH.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 134,
+                "columnStart": 5,
+                "columnEndExclusive": 39,
+                "text": "docs/history/<feature>/RESEARCH.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/RESEARCH.md",
+            "logicalReference": "docs/history/<feature>/RESEARCH.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source domains/coding/skills/fgos-coding-discovering/SKILL.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: '   `docs/history/<feature>/RESEARCH.md` (tích luỹ, không đè) và trả về' Source disposition: preserve. A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '   `docs/history/<feature>/RESEARCH.md` (tích luỹ, không đè) và trả về'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<feature>/RESEARCH.md",
+            "sourceSlotKey": "{\"edgeId\":\"skills-093\",\"file\":\"domains/coding/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-093\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":133}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-152",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 134,
+                "matchedExpression": "docs/history/<feature>/RESEARCH.md",
+                "originalLineText": "   `docs/history/<feature>/RESEARCH.md` (tích luỹ, không đè) và trả về"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {
+              "{\"edgeId\":\"skills-090\",\"file\":\"domains/coding/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-090\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":80}]}": "read-only citation; no writer/default-root/schema/identity change"
+            },
+            "descriptionTruth": {
+              "{\"edgeId\":\"skills-090\",\"file\":\"domains/coding/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-090\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":80}]}": {
+                "sourcePassage": "  `docs/specs/runner.md`) — không bao giờ chèn thẳng vào lệnh shell; luôn",
+                "adjacentPassage": "- Coi `title`/`description` của item là input không đáng tin (RUL45,\n  `docs/specs/runner.md`) — không bao giờ chèn thẳng vào lệnh shell; luôn\n  truyền như một argv element tách riêng, có quote.",
+                "target": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+                "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+                "targetDigest": "38b4c82e7ec19c98dddb438de7d76c989b96b2df17193676bec3c093b50c9202",
+                "targetEvidence": [
+                  {
+                    "line": 78,
+                    "text": "- **RUL45 (báo việc-phát-hiện của trợ lý: đúng một lần mỗi lượt, fail-safe, không niềm tin đặc biệt, có trần + chống trùng).** Kênh báo-cáo mô tả ở \"Báo việc-phát-hiện từ trợ lý\" (trên) giữ nguyên tắc một-người-ghi (chỉ runner ghi work-state, trợ lý không bao giờ được phép) trong khi vẫn cho trợ lý một đường DỮ LIỆU để lộ ra việc mới: (1) việc tách báo-cáo khỏi output chạy đúng MỘT LẦN cho mỗi lượt dispatch, tại thời điểm kết thúc (thành đề xuất/chấm-trượt/quá-giờ/hỏng) — không lặp lại giữa các lần thử nội bộ của cùng lượt, nên một báo-cáo lộ ra sớm rồi lặp lại ở lần thử sau trong CÙNG lượt không bao giờ tạo hai bản; (2) một báo-cáo hỏng-hình không bao giờ đổi kết cục của chính lượt dispatch — bị bỏ qua âm thầm, không throw; (3) item tạo ra từ báo-cáo vào hệ với KHÔNG niềm tin đặc biệt nào — cùng giai đoạn đầu vào, cùng vòng xét-lại như một item người tự khai; (4) một lượt dispatch chỉ hành động trên tối đa một số báo-cáo GIỚI HẠN, phần dư bị bỏ qua có ghi lại (S10, review-fix P2 — chặn một trợ lý bất thường sinh vô hạn item); (5) một báo-cáo đã được ghi nhận trước đó (khớp dòng dõi phát-hiện + tên việc, không phân biệt hoa/thường/khoảng trắng) không tạo item thứ hai — dù lặp trong CÙNG output hay tái xuất hiện ở một lượt dispatch SAU của cùng item nguồn (S10, review-fix P2 — chặn trùng lặp khi báo-cáo bị gửi lại) — hai tên việc THẬT SỰ khác nhau vẫn cả hai được tạo (per work-graph-intelligence S2b / 8cf7effe, S10 / 7bbe6315). **Bảo đảm giao-nhận (S11, review-fix P3).** Kênh là cố-gắng-tối-đa, TỐI-ĐA-MỘT-LẦN — không phải ít-nhất-một-lần: một báo-cáo mất giữa lúc phân tích và lúc ghi xong (vd runner chết đột ngột) không được phục hồi, không có đối-soát-lại nào đọc lại output đã lưu để dựng lại báo-cáo đã mất — chấp nhận CÓ CHỦ Ý cho một kênh tư vấn phi-chặn, không phải một hàng đợi đáng tin cậy. **Ranh giới tin cậy (S11, review-fix P3).** Tên/mô tả trong một báo-cáo là văn bản KHÔNG ĐÁNG TIN do trợ lý tự soạn; item tạo ra nạp thẳng văn bản đó vào prompt của worker nghiên-cứu ở stage `discovery` — mặt tiếp xúc thứ hai (sau chính trợ lý) nơi văn bản không đáng tin chạm một model sẽ sinh lệnh chạy được. Giảm nhẹ hiện có: `verify` KHÔNG BAO GIỜ do trợ lý đặt trực tiếp (luôn qua placeholder rồi được gán lại ở vòng nghiên-cứu/làm-rõ, và một đề xuất verify còn phải qua một vòng kiểm cú pháp độc lập trước khi được ghi) nên văn bản đó không thể tự nó thành một lệnh shell; item không mang niềm tin đặc biệt, đi qua đúng vòng xét-lại như mọi item khác. Một cửa xét-duyệt-người bắt buộc trước dispatch tự động của item runner-tự-tạo được cân nhắc nhưng CHƯA XÂY (đổi thiết kế lớn hơn phạm vi vá P3) — xem decision ADR0013 (kênh báo-cáo-không-ghi cho discovered-from — worker phát khối rào fgos-discovered, runner đọc và tự ghi). **Kỷ luật ghi log (S11, review-fix P3).** Tên việc trong một báo-cáo — văn bản KHÔNG ĐÁNG TIN — được CHUẨN HOÁ (gộp khoảng trắng/xuống dòng, cắt độ dài) trước khi đưa vào bất kỳ dòng log nào của kênh này; một tên việc mang ký tự xuống dòng không thể giả-mạo thêm dòng log. Việc chuẩn hoá này CHỈ áp dụng cho bản ghi log — tên việc ĐẦY ĐỦ, nguyên văn vẫn được lưu trên item tạo ra, không bị cắt hay đổi."
+                  }
+                ],
+                "comparisons": {
+                  "counts": {
+                    "verdict": "not-asserted",
+                    "note": "The RUL45 trust-boundary paragraph explicitly calls title/description untrusted and describes its prompt/shell boundary. The full rule is the narrow holder; shaping cites the same untrusted-input claim."
+                  },
+                  "ports": {
+                    "verdict": "not-asserted",
+                    "note": "The RUL45 trust-boundary paragraph explicitly calls title/description untrusted and describes its prompt/shell boundary. The full rule is the narrow holder; shaping cites the same untrusted-input claim."
+                  },
+                  "defaults": {
+                    "verdict": "not-asserted",
+                    "note": "The RUL45 trust-boundary paragraph explicitly calls title/description untrusted and describes its prompt/shell boundary. The full rule is the narrow holder; shaping cites the same untrusted-input claim."
+                  },
+                  "verbFileLists": {
+                    "verdict": "not-asserted",
+                    "note": "The RUL45 trust-boundary paragraph explicitly calls title/description untrusted and describes its prompt/shell boundary. The full rule is the narrow holder; shaping cites the same untrusted-input claim."
+                  },
+                  "versions": {
+                    "verdict": "not-asserted",
+                    "note": "The RUL45 trust-boundary paragraph explicitly calls title/description untrusted and describes its prompt/shell boundary. The full rule is the narrow holder; shaping cites the same untrusted-input claim."
+                  },
+                  "shippedStatus": {
+                    "verdict": "not-asserted",
+                    "note": "The RUL45 trust-boundary paragraph explicitly calls title/description untrusted and describes its prompt/shell boundary. The full rule is the narrow holder; shaping cites the same untrusted-input claim."
+                  }
+                },
+                "assessment": "The RUL45 trust-boundary paragraph explicitly calls title/description untrusted and describes its prompt/shell boundary. The full rule is the narrow holder; shaping cites the same untrusted-input claim."
+              }
+            },
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {
+            "{\"edgeId\":\"skills-090\",\"file\":\"domains/coding/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-090\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":80}]}": {
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "targetDigest": "38b4c82e7ec19c98dddb438de7d76c989b96b2df17193676bec3c093b50c9202",
+              "passage": "- **RUL45 (báo việc-phát-hiện của trợ lý: đúng một lần mỗi lượt, fail-safe, không niềm tin đặc biệt, có trần + chống trùng).** Kênh báo-cáo mô tả ở \"Báo việc-phát-hiện từ trợ lý\" (trên) giữ nguyên tắc một-người-ghi (chỉ runner ghi work-state, trợ lý không bao giờ được phép) trong khi vẫn cho trợ lý một đường DỮ LIỆU để lộ ra việc mới: (1) việc tách báo-cáo khỏi output chạy đúng MỘT LẦN cho mỗi lượt dispatch, tại thời điểm kết thúc (thành đề xuất/chấm-trượt/quá-giờ/hỏng) — không lặp lại giữa các lần thử nội bộ của cùng lượt, nên một báo-cáo lộ ra sớm rồi lặp lại ở lần thử sau trong CÙNG lượt không bao giờ tạo hai bản; (2) một báo-cáo hỏng-hình không bao giờ đổi kết cục của chính lượt dispatch — bị bỏ qua âm thầm, không throw; (3) item tạo ra từ báo-cáo vào hệ với KHÔNG niềm tin đặc biệt nào — cùng giai đoạn đầu vào, cùng vòng xét-lại như một item người tự khai; (4) một lượt dispatch chỉ hành động trên tối đa một số báo-cáo GIỚI HẠN, phần dư bị bỏ qua có ghi lại (S10, review-fix P2 — chặn một trợ lý bất thường sinh vô hạn item); (5) một báo-cáo đã được ghi nhận trước đó (khớp dòng dõi phát-hiện + tên việc, không phân biệt hoa/thường/khoảng trắng) không tạo item thứ hai — dù lặp trong CÙNG output hay tái xuất hiện ở một lượt dispatch SAU của cùng item nguồn (S10, review-fix P2 — chặn trùng lặp khi báo-cáo bị gửi lại) — hai tên việc THẬT SỰ khác nhau vẫn cả hai được tạo (per work-graph-intelligence S2b / 8cf7effe, S10 / 7bbe6315). **Bảo đảm giao-nhận (S11, review-fix P3).** Kênh là cố-gắng-tối-đa, TỐI-ĐA-MỘT-LẦN — không phải ít-nhất-một-lần: một báo-cáo mất giữa lúc phân tích và lúc ghi xong (vd runner chết đột ngột) không được phục hồi, không có đối-soát-lại nào đọc lại output đã lưu để dựng lại báo-cáo đã mất — chấp nhận CÓ CHỦ Ý cho một kênh tư vấn phi-chặn, không phải một hàng đợi đáng tin cậy. **Ranh giới tin cậy (S11, review-fix P3).** Tên/mô tả trong một báo-cáo là văn bản KHÔNG ĐÁNG TIN do trợ lý tự soạn; item tạo ra nạp thẳng văn bản đó vào prompt của worker nghiên-cứu ở stage `discovery` — mặt tiếp xúc thứ hai (sau chính trợ lý) nơi văn bản không đáng tin chạm một model sẽ sinh lệnh chạy được. Giảm nhẹ hiện có: `verify` KHÔNG BAO GIỜ do trợ lý đặt trực tiếp (luôn qua placeholder rồi được gán lại ở vòng nghiên-cứu/làm-rõ, và một đề xuất verify còn phải qua một vòng kiểm cú pháp độc lập trước khi được ghi) nên văn bản đó không thể tự nó thành một lệnh shell; item không mang niềm tin đặc biệt, đi qua đúng vòng xét-lại như mọi item khác. Một cửa xét-duyệt-người bắt buộc trước dispatch tự động của item runner-tự-tạo được cân nhắc nhưng CHƯA XÂY (đổi thiết kế lớn hơn phạm vi vá P3) — xem decision ADR0013 (kênh báo-cáo-không-ghi cho discovered-from — worker phát khối rào fgos-discovered, runner đọc và tự ghi). **Kỷ luật ghi log (S11, review-fix P3).** Tên việc trong một báo-cáo — văn bản KHÔNG ĐÁNG TIN — được CHUẨN HOÁ (gộp khoảng trắng/xuống dòng, cắt độ dài) trước khi đưa vào bất kỳ dòng log nào của kênh này; một tên việc mang ký tự xuống dòng không thể giả-mạo thêm dòng log. Việc chuẩn hoá này CHỈ áp dụng cho bản ghi log — tên việc ĐẦY ĐỦ, nguyên văn vẫn được lưu trên item tạo ra, không bị cắt hay đổi.",
+              "targetEvidenceLine": 78,
+              "sourceLocatorTokens": [],
+              "targetLines": [
+                78
+              ],
+              "targetLineText": [
+                "- **RUL45 (báo việc-phát-hiện của trợ lý: đúng một lần mỗi lượt, fail-safe, không niềm tin đặc biệt, có trần + chống trùng).** Kênh báo-cáo mô tả ở \"Báo việc-phát-hiện từ trợ lý\" (trên) giữ nguyên tắc một-người-ghi (chỉ runner ghi work-state, trợ lý không bao giờ được phép) trong khi vẫn cho trợ lý một đường DỮ LIỆU để lộ ra việc mới: (1) việc tách báo-cáo khỏi output chạy đúng MỘT LẦN cho mỗi lượt dispatch, tại thời điểm kết thúc (thành đề xuất/chấm-trượt/quá-giờ/hỏng) — không lặp lại giữa các lần thử nội bộ của cùng lượt, nên một báo-cáo lộ ra sớm rồi lặp lại ở lần thử sau trong CÙNG lượt không bao giờ tạo hai bản; (2) một báo-cáo hỏng-hình không bao giờ đổi kết cục của chính lượt dispatch — bị bỏ qua âm thầm, không throw; (3) item tạo ra từ báo-cáo vào hệ với KHÔNG niềm tin đặc biệt nào — cùng giai đoạn đầu vào, cùng vòng xét-lại như một item người tự khai; (4) một lượt dispatch chỉ hành động trên tối đa một số báo-cáo GIỚI HẠN, phần dư bị bỏ qua có ghi lại (S10, review-fix P2 — chặn một trợ lý bất thường sinh vô hạn item); (5) một báo-cáo đã được ghi nhận trước đó (khớp dòng dõi phát-hiện + tên việc, không phân biệt hoa/thường/khoảng trắng) không tạo item thứ hai — dù lặp trong CÙNG output hay tái xuất hiện ở một lượt dispatch SAU của cùng item nguồn (S10, review-fix P2 — chặn trùng lặp khi báo-cáo bị gửi lại) — hai tên việc THẬT SỰ khác nhau vẫn cả hai được tạo (per work-graph-intelligence S2b / 8cf7effe, S10 / 7bbe6315). **Bảo đảm giao-nhận (S11, review-fix P3).** Kênh là cố-gắng-tối-đa, TỐI-ĐA-MỘT-LẦN — không phải ít-nhất-một-lần: một báo-cáo mất giữa lúc phân tích và lúc ghi xong (vd runner chết đột ngột) không được phục hồi, không có đối-soát-lại nào đọc lại output đã lưu để dựng lại báo-cáo đã mất — chấp nhận CÓ CHỦ Ý cho một kênh tư vấn phi-chặn, không phải một hàng đợi đáng tin cậy. **Ranh giới tin cậy (S11, review-fix P3).** Tên/mô tả trong một báo-cáo là văn bản KHÔNG ĐÁNG TIN do trợ lý tự soạn; item tạo ra nạp thẳng văn bản đó vào prompt của worker nghiên-cứu ở stage `discovery` — mặt tiếp xúc thứ hai (sau chính trợ lý) nơi văn bản không đáng tin chạm một model sẽ sinh lệnh chạy được. Giảm nhẹ hiện có: `verify` KHÔNG BAO GIỜ do trợ lý đặt trực tiếp (luôn qua placeholder rồi được gán lại ở vòng nghiên-cứu/làm-rõ, và một đề xuất verify còn phải qua một vòng kiểm cú pháp độc lập trước khi được ghi) nên văn bản đó không thể tự nó thành một lệnh shell; item không mang niềm tin đặc biệt, đi qua đúng vòng xét-lại như mọi item khác. Một cửa xét-duyệt-người bắt buộc trước dispatch tự động của item runner-tự-tạo được cân nhắc nhưng CHƯA XÂY (đổi thiết kế lớn hơn phạm vi vá P3) — xem decision ADR0013 (kênh báo-cáo-không-ghi cho discovered-from — worker phát khối rào fgos-discovered, runner đọc và tự ghi). **Kỷ luật ghi log (S11, review-fix P3).** Tên việc trong một báo-cáo — văn bản KHÔNG ĐÁNG TIN — được CHUẨN HOÁ (gộp khoảng trắng/xuống dòng, cắt độ dài) trước khi đưa vào bất kỳ dòng log nào của kênh này; một tên việc mang ký tự xuống dòng không thể giả-mạo thêm dòng log. Việc chuẩn hoá này CHỈ áp dụng cho bản ghi log — tên việc ĐẦY ĐỦ, nguyên văn vẫn được lưu trên item tạo ra, không bị cắt hay đổi."
+              ]
+            }
+          },
+          "relativeResolution": {
+            "{\"edgeId\":\"skills-090\",\"file\":\"domains/coding/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-090\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":80}]}": {
+              "replacement": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules",
+              "resolvedTarget": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+              "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+              "authorityStatus": "cutover-patch-only"
+            }
+          },
+          "labelForm": {
+            "{\"edgeId\":\"skills-090\",\"file\":\"domains/coding/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-090\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":80}]}": {
+              "source": "docs/specs/runner.md",
+              "replacement": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules",
+              "method": "Step 3 form(); preserves path/relative/image/link-label form"
+            }
+          }
+        },
+        "reviewSet": "step04-001",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [
+          {
+            "sourcePath": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+            "sourceDigest": "d4a473140d8dd360e446e288101fca3052a2e7aca6809fe1981b95947c7a7516",
+            "renderFiles": [
+              {
+                "path": ".agents/skills/fgos-coding-discovering/SKILL.md",
+                "digest": "1ca9a909f183948bb4e38e094d49814bb74152414b44f265346417e31ad28b7d",
+                "sourceDigest": "d4a473140d8dd360e446e288101fca3052a2e7aca6809fe1981b95947c7a7516",
+                "headerWitnesses": [
+                  {
+                    "line": 14,
+                    "text": "<!-- Generated by fgOS skill assembly from domains/coding/skills/fgos-coding-discovering/SKILL.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->"
+                  }
+                ],
+                "censusSourcePath": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+                "existingEdgeJoins": [
+                  {
+                    "edgeId": "skills-016",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-016",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 81
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-unchanged-source",
+                      "oldLine": 81,
+                      "line": 81,
+                      "columnStart": 4,
+                      "columnEndExclusive": 24,
+                      "text": "docs/specs/runner.md"
+                    }
+                  },
+                  {
+                    "edgeId": "skills-017",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-017",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 105
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-unchanged-source",
+                      "oldLine": 105,
+                      "line": 105,
+                      "columnStart": 42,
+                      "columnEndExclusive": 65,
+                      "text": "docs/history/<feature>/"
+                    }
+                  },
+                  {
+                    "edgeId": "skills-018",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-018",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 127
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-unchanged-source",
+                      "oldLine": 127,
+                      "line": 127,
+                      "columnStart": 5,
+                      "columnEndExclusive": 71,
+                      "text": "docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md"
+                    }
+                  },
+                  {
+                    "edgeId": "skills-019",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-019",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 134
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-unchanged-source",
+                      "oldLine": 134,
+                      "line": 134,
+                      "columnStart": 5,
+                      "columnEndExclusive": 39,
+                      "text": "docs/history/<feature>/RESEARCH.md"
+                    }
+                  }
+                ],
+                "renderOnly": true,
+                "generationDoor": "npm run build:skills",
+                "generationRun": null
+              },
+              {
+                "path": ".claude/skills/fgos-coding-discovering/SKILL.md",
+                "digest": "3b3bbd1ab5090d8cda8addba0f0cf142e96451cce43b599ff0b34703a1de071a",
+                "sourceDigest": "d4a473140d8dd360e446e288101fca3052a2e7aca6809fe1981b95947c7a7516",
+                "headerWitnesses": [],
+                "censusSourcePath": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+                "existingEdgeJoins": [],
+                "renderOnly": true,
+                "generationDoor": "npm run build:skills",
+                "generationRun": null
+              },
+              {
+                "path": "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
+                "digest": "1ca9a909f183948bb4e38e094d49814bb74152414b44f265346417e31ad28b7d",
+                "sourceDigest": "d4a473140d8dd360e446e288101fca3052a2e7aca6809fe1981b95947c7a7516",
+                "headerWitnesses": [
+                  {
+                    "line": 14,
+                    "text": "<!-- Generated by fgOS skill assembly from domains/coding/skills/fgos-coding-discovering/SKILL.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->"
+                  }
+                ],
+                "censusSourcePath": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+                "existingEdgeJoins": [
+                  {
+                    "edgeId": "skills-149",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-149",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 81
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-unchanged-source",
+                      "oldLine": 81,
+                      "line": 81,
+                      "columnStart": 4,
+                      "columnEndExclusive": 24,
+                      "text": "docs/specs/runner.md"
+                    }
+                  },
+                  {
+                    "edgeId": "skills-150",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-150",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 105
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-unchanged-source",
+                      "oldLine": 105,
+                      "line": 105,
+                      "columnStart": 42,
+                      "columnEndExclusive": 65,
+                      "text": "docs/history/<feature>/"
+                    }
+                  },
+                  {
+                    "edgeId": "skills-151",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-151",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 127
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-unchanged-source",
+                      "oldLine": 127,
+                      "line": 127,
+                      "columnStart": 5,
+                      "columnEndExclusive": 71,
+                      "text": "docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md"
+                    }
+                  },
+                  {
+                    "edgeId": "skills-152",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-152",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 134
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-unchanged-source",
+                      "oldLine": 134,
+                      "line": 134,
+                      "columnStart": 5,
+                      "columnEndExclusive": 39,
+                      "text": "docs/history/<feature>/RESEARCH.md"
+                    }
+                  }
+                ],
+                "renderOnly": true,
+                "generationDoor": "npm run build:skills",
+                "generationRun": null
+              }
+            ]
+          }
+        ],
+        "wholeFileRead": {
+          "file": "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "d4a473140d8dd360e446e288101fca3052a2e7aca6809fe1981b95947c7a7516",
+          "bytes": 14088,
+          "lines": 223,
+          "headings": [
+            {
+              "line": 15,
+              "text": "# fgos-coding-discovering"
+            },
+            {
+              "line": 44,
+              "text": "## Hard rules"
+            },
+            {
+              "line": 100,
+              "text": "## Flow"
+            },
+            {
+              "line": 192,
+              "text": "## Red flags"
+            }
+          ],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {
+        "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md": [
+          {
+            "edgeSlot": "{\"edgeId\":\"skills-090\",\"file\":\"domains/coding/skills/fgos-coding-discovering/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-090\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":80}]}",
+            "targetCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+            "targetDigest": "38b4c82e7ec19c98dddb438de7d76c989b96b2df17193676bec3c093b50c9202",
+            "passage": "- **RUL45 (báo việc-phát-hiện của trợ lý: đúng một lần mỗi lượt, fail-safe, không niềm tin đặc biệt, có trần + chống trùng).** Kênh báo-cáo mô tả ở \"Báo việc-phát-hiện từ trợ lý\" (trên) giữ nguyên tắc một-người-ghi (chỉ runner ghi work-state, trợ lý không bao giờ được phép) trong khi vẫn cho trợ lý một đường DỮ LIỆU để lộ ra việc mới: (1) việc tách báo-cáo khỏi output chạy đúng MỘT LẦN cho mỗi lượt dispatch, tại thời điểm kết thúc (thành đề xuất/chấm-trượt/quá-giờ/hỏng) — không lặp lại giữa các lần thử nội bộ của cùng lượt, nên một báo-cáo lộ ra sớm rồi lặp lại ở lần thử sau trong CÙNG lượt không bao giờ tạo hai bản; (2) một báo-cáo hỏng-hình không bao giờ đổi kết cục của chính lượt dispatch — bị bỏ qua âm thầm, không throw; (3) item tạo ra từ báo-cáo vào hệ với KHÔNG niềm tin đặc biệt nào — cùng giai đoạn đầu vào, cùng vòng xét-lại như một item người tự khai; (4) một lượt dispatch chỉ hành động trên tối đa một số báo-cáo GIỚI HẠN, phần dư bị bỏ qua có ghi lại (S10, review-fix P2 — chặn một trợ lý bất thường sinh vô hạn item); (5) một báo-cáo đã được ghi nhận trước đó (khớp dòng dõi phát-hiện + tên việc, không phân biệt hoa/thường/khoảng trắng) không tạo item thứ hai — dù lặp trong CÙNG output hay tái xuất hiện ở một lượt dispatch SAU của cùng item nguồn (S10, review-fix P2 — chặn trùng lặp khi báo-cáo bị gửi lại) — hai tên việc THẬT SỰ khác nhau vẫn cả hai được tạo (per work-graph-intelligence S2b / 8cf7effe, S10 / 7bbe6315). **Bảo đảm giao-nhận (S11, review-fix P3).** Kênh là cố-gắng-tối-đa, TỐI-ĐA-MỘT-LẦN — không phải ít-nhất-một-lần: một báo-cáo mất giữa lúc phân tích và lúc ghi xong (vd runner chết đột ngột) không được phục hồi, không có đối-soát-lại nào đọc lại output đã lưu để dựng lại báo-cáo đã mất — chấp nhận CÓ CHỦ Ý cho một kênh tư vấn phi-chặn, không phải một hàng đợi đáng tin cậy. **Ranh giới tin cậy (S11, review-fix P3).** Tên/mô tả trong một báo-cáo là văn bản KHÔNG ĐÁNG TIN do trợ lý tự soạn; item tạo ra nạp thẳng văn bản đó vào prompt của worker nghiên-cứu ở stage `discovery` — mặt tiếp xúc thứ hai (sau chính trợ lý) nơi văn bản không đáng tin chạm một model sẽ sinh lệnh chạy được. Giảm nhẹ hiện có: `verify` KHÔNG BAO GIỜ do trợ lý đặt trực tiếp (luôn qua placeholder rồi được gán lại ở vòng nghiên-cứu/làm-rõ, và một đề xuất verify còn phải qua một vòng kiểm cú pháp độc lập trước khi được ghi) nên văn bản đó không thể tự nó thành một lệnh shell; item không mang niềm tin đặc biệt, đi qua đúng vòng xét-lại như mọi item khác. Một cửa xét-duyệt-người bắt buộc trước dispatch tự động của item runner-tự-tạo được cân nhắc nhưng CHƯA XÂY (đổi thiết kế lớn hơn phạm vi vá P3) — xem decision ADR0013 (kênh báo-cáo-không-ghi cho discovered-from — worker phát khối rào fgos-discovered, runner đọc và tự ghi). **Kỷ luật ghi log (S11, review-fix P3).** Tên việc trong một báo-cáo — văn bản KHÔNG ĐÁNG TIN — được CHUẨN HOÁ (gộp khoảng trắng/xuống dòng, cắt độ dài) trước khi đưa vào bất kỳ dòng log nào của kênh này; một tên việc mang ký tự xuống dòng không thể giả-mạo thêm dòng log. Việc chuẩn hoá này CHỈ áp dụng cho bản ghi log — tên việc ĐẦY ĐỦ, nguyên văn vẫn được lưu trên item tạo ra, không bị cắt hay đổi.",
+            "targetEvidenceLine": 78,
+            "sourceLocatorTokens": [],
+            "targetLines": [
+              78
+            ],
+            "targetLineText": [
+              "- **RUL45 (báo việc-phát-hiện của trợ lý: đúng một lần mỗi lượt, fail-safe, không niềm tin đặc biệt, có trần + chống trùng).** Kênh báo-cáo mô tả ở \"Báo việc-phát-hiện từ trợ lý\" (trên) giữ nguyên tắc một-người-ghi (chỉ runner ghi work-state, trợ lý không bao giờ được phép) trong khi vẫn cho trợ lý một đường DỮ LIỆU để lộ ra việc mới: (1) việc tách báo-cáo khỏi output chạy đúng MỘT LẦN cho mỗi lượt dispatch, tại thời điểm kết thúc (thành đề xuất/chấm-trượt/quá-giờ/hỏng) — không lặp lại giữa các lần thử nội bộ của cùng lượt, nên một báo-cáo lộ ra sớm rồi lặp lại ở lần thử sau trong CÙNG lượt không bao giờ tạo hai bản; (2) một báo-cáo hỏng-hình không bao giờ đổi kết cục của chính lượt dispatch — bị bỏ qua âm thầm, không throw; (3) item tạo ra từ báo-cáo vào hệ với KHÔNG niềm tin đặc biệt nào — cùng giai đoạn đầu vào, cùng vòng xét-lại như một item người tự khai; (4) một lượt dispatch chỉ hành động trên tối đa một số báo-cáo GIỚI HẠN, phần dư bị bỏ qua có ghi lại (S10, review-fix P2 — chặn một trợ lý bất thường sinh vô hạn item); (5) một báo-cáo đã được ghi nhận trước đó (khớp dòng dõi phát-hiện + tên việc, không phân biệt hoa/thường/khoảng trắng) không tạo item thứ hai — dù lặp trong CÙNG output hay tái xuất hiện ở một lượt dispatch SAU của cùng item nguồn (S10, review-fix P2 — chặn trùng lặp khi báo-cáo bị gửi lại) — hai tên việc THẬT SỰ khác nhau vẫn cả hai được tạo (per work-graph-intelligence S2b / 8cf7effe, S10 / 7bbe6315). **Bảo đảm giao-nhận (S11, review-fix P3).** Kênh là cố-gắng-tối-đa, TỐI-ĐA-MỘT-LẦN — không phải ít-nhất-một-lần: một báo-cáo mất giữa lúc phân tích và lúc ghi xong (vd runner chết đột ngột) không được phục hồi, không có đối-soát-lại nào đọc lại output đã lưu để dựng lại báo-cáo đã mất — chấp nhận CÓ CHỦ Ý cho một kênh tư vấn phi-chặn, không phải một hàng đợi đáng tin cậy. **Ranh giới tin cậy (S11, review-fix P3).** Tên/mô tả trong một báo-cáo là văn bản KHÔNG ĐÁNG TIN do trợ lý tự soạn; item tạo ra nạp thẳng văn bản đó vào prompt của worker nghiên-cứu ở stage `discovery` — mặt tiếp xúc thứ hai (sau chính trợ lý) nơi văn bản không đáng tin chạm một model sẽ sinh lệnh chạy được. Giảm nhẹ hiện có: `verify` KHÔNG BAO GIỜ do trợ lý đặt trực tiếp (luôn qua placeholder rồi được gán lại ở vòng nghiên-cứu/làm-rõ, và một đề xuất verify còn phải qua một vòng kiểm cú pháp độc lập trước khi được ghi) nên văn bản đó không thể tự nó thành một lệnh shell; item không mang niềm tin đặc biệt, đi qua đúng vòng xét-lại như mọi item khác. Một cửa xét-duyệt-người bắt buộc trước dispatch tự động của item runner-tự-tạo được cân nhắc nhưng CHƯA XÂY (đổi thiết kế lớn hơn phạm vi vá P3) — xem decision ADR0013 (kênh báo-cáo-không-ghi cho discovered-from — worker phát khối rào fgos-discovered, runner đọc và tự ghi). **Kỷ luật ghi log (S11, review-fix P3).** Tên việc trong một báo-cáo — văn bản KHÔNG ĐÁNG TIN — được CHUẨN HOÁ (gộp khoảng trắng/xuống dòng, cắt độ dài) trước khi đưa vào bất kỳ dòng log nào của kênh này; một tên việc mang ký tự xuống dòng không thể giả-mạo thêm dòng log. Việc chuẩn hoá này CHỈ áp dụng cho bản ghi log — tên việc ĐẦY ĐỦ, nguyên văn vẫn được lưu trên item tạo ra, không bị cắt hay đổi."
+            ]
+          }
+        ]
+      },
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+      "sourceDigest": "8dc34fb566efe56f5adb0b460baa7c5d4cabee9bfd3bb5c491cc2f0ed6285218",
+      "sourceContext": "# Lock decisions and write CONTEXT.md — full mechanics\n\nThe full detail behind SKILL.md's Step 2 (Lock decisions Socratically)\nand Step 3 (Write the decision doc).\n\n## Batching and the three checks\n\nAsk the fewest rounds the dependencies allow: batch every question whose\nanswer does not change another pending question into one round; ask a\nquestion whose wording depends on a prior answer only after that answer\nlands. Every question passes three checks before it is asked:\n\n- **material** — the answer changes scope, behavior, data shape, or\n  acceptance criteria;\n- **grounded** — it cites scout evidence or a concrete uncertainty, never\n  a generic preference;\n- **answerable** — the person can pick an option, approve a default, or\n  point at a reference.\n\nA question that fails any check is never asked — pin it as a labeled\nassumption instead, or hand it to `fgos-coding-planning` if only the\nimplementer cares.\n\n**Ask as open conversational prose, not via a structured-choice tool.**\nThese questions exist to discover product decisions the session does not\nyet know — a tool that forces the answer into a short pre-set option list\ncan only ever surface what the session already imagined, defeating that\npurpose (a person who wants to answer with a framing the session never\nproposed has no box to put it in). \"answerable\" above does not mean\n\"multiple-choice\" — \"point at a reference\" is explicitly an open answer\nshape. Reach for a structured-choice tool only when scout evidence has\nalready narrowed the question to a short list of concretely-named real\nalternatives (never options invented just to make the question fit the\ntool) — the Gate section's own yes/no confirmation is exactly that case,\nsince by then the decision is already locked and the only remaining\nquestion is a closed approve/reject.\n\n## Logging each decision\n\nAfter each answer, confirm the decision back and assign it a stable,\nincrementing per-item id in the item's own local `D<n>` numbering,\nstarting at 1 and counting up by one for each new locked decision. Then\nrun:\n\n```bash\nfgos decision --text \"<D-ID>: <one-line summary>\" --rationale \"see CONTEXT.md for the full scout evidence and reasoning\" --relation none\n```\n\n(or `--relation supersedes:<old-D-ID>` when this D-ID explicitly revises\nan earlier one already locked in this same CONTEXT.md — every `fgos\ndecision` write declares its relation, no default). This additionally\nlands the decision in the item's append-only decision log, surfaced\nthrough `view.decisions`/`fgos list` for machine readers — `--rationale`\nis required — this call is additive alongside writing CONTEXT.md in Step\n3, never a replacement for it: CONTEXT.md stays the source of truth for\nthe full decision, this just makes its existence visible outside the\nprose doc. When an answer settles what a fuzzy term means, pin the term\nthe same way. If one answer contains several decisions, lock the one the\nquestion asked about and surface the rest as separate candidate\ndecisions, one at a time. Scope creep — a new feature, adjacent work not\nactually asked for — gets one line marking it deferred, then the current\nquestion continues.\n\n## The `ask`/`answer` park round trip\n\nUse the item's `ask`/`answer` round trip for any question that cannot be\nsettled without a person and the item cannot simply wait in conversation\nfor: `fgos ask <id> --text \"...\"` parks the item and records the\nquestion; `fgos answer <id> --text \"...\"` records the answer and resumes\nit. This is the same path whether the answer comes back immediately or\nlater — there is no separate synchronous shortcut, and an item is only\nlegitimately blocked on a person while it actually sits in that parked\nstate.\n\nThis is the real `advise` interaction — call `handoff` first, then `ask`:\n\n```bash\nfgos handoff \"<id>\" --to advisor --reason advise --dir \"$root\"\n```\n\n```bash\nfgos ask \"<id>\" --text \"...\" --dir \"$root\"\n```\n\n**When the answer comes back immediately** (same session, `fgos answer`\ncalled right after `fgos ask` with no real gap between them), reclaim\nbefore doing anything else: `holder` is `advisor` the moment the\n`handoff` call above lands, and nothing else in this step closes it.\nContinuing straight to a second Socratic round (multiple rounds are\nexplicitly allowed) with `holder` still `advisor` means that\nround's own `consult`/`advise` attempt gets refused — `advisor` has\nzero outgoing edges at stage `exploring`:\n\n```bash\nfgos handoff-return \"<id>\" --note \"reclaiming after an immediately-answered ask, same session\" --dir \"$root\"\n```\n\nWhen the answer does NOT come back immediately — the item genuinely parks\nacross sessions — this reclaim is not this session's job to run; it\nhappens automatically the next time any stage-skill is entered (either\nthis skill's own Step 1, or `fgos-coding-driving`'s per-iteration\nreclaim).\n\nThe live conversational questions this step asks the rest of the time\n(the common case) get no `handoff` call at all — nothing parks, there is\nnothing to track.\n\n## Writing CONTEXT.md\n\nWrite `docs/history/<feature>/CONTEXT.md` covering: the feature boundary,\nthe locked decisions table with D-IDs, pinned terms, the scout paths and\nevidence cited, canonical references, and any outstanding questions\ndeferred to planning. Concrete language only — no placeholders, no TODOs,\nno vague preferences.\n\nPut a heading with this exact text (nothing appended on that line, and\nnot translated) directly above the decisions table:\n\n```markdown\n## Locked decisions\n```\n\n**Never hand-type the table itself** — every row already exists in\n`state.decisions` from the `fgos decision --id` calls above. Leave the\nsection under the heading empty (or whatever it already holds from an\nearlier render), then run, once, after the last decision for this pass\nhas been logged:\n\n```bash\nfgos context-render \"<item-id>\" --dir \"$root\"\n```\n\nThis replaces whatever sits under the heading with a fresh render from\nthe log — CONTEXT.md's table becomes a VIEW, never a second, hand-typed\ncopy that can drift from what `fgos decision` actually recorded. It\nrefuses if the file does not exist yet, so write the rest of the doc\n(this heading included, even with nothing under it yet) before the first\ncall. Re-run it again any time a later round adds more decisions —\nidempotent, a no-op re-run reports `changed: false`.\n\nThe engine slices this same section with a literal-text match on the\nexact heading above, both to write it and to read a child's cited D-IDs\nand extract footprint paths later. Any other wording — a translated\nheading, a numbered variant — makes both sides miss the section entirely:\nthe write refuses (no heading to splice under), and the read silently\ncomes back empty, disabling the check instead of erroring.\n\nEnd the doc with a section using this exact heading (nothing appended on\nthat line), body `None` when every candidate question was locked or\ndeferred, or a real list of what is still open for `fgos-coding-planning`\notherwise:\n\n```markdown\n## Outstanding questions\n\nNone\n```\n\nThis is the section the gate-bypass check reads to decide whether this\nskill's own Gate can auto-approve instead of asking a person — a missing\nor misworded heading, or a body that doesn't start `None`, fails that\ncheck closed and forces the question every time, even when nothing is\nactually outstanding.\n\n## Pointing the item at its doc\n\nPoint the claimed item at this doc the same way any item points at its\nown decision record: if the item does not yet carry a `docsRef`, record\none at creation time —\n\n```bash\nfgos add --title \"<title>\" --kind <kind> --risk <risk> --verify \"<real, runnable command>\" --description \"<full-text description>\" --docs-ref \"docs/history/<feature>/\"\n```\n\n(no positional argument — `fgos add`'s positional/`--id` is the item's\nown id, not its title; omitting `--id` entirely auto-generates a\ncollision-free one from `--title`.)\n\n`--docs-ref` is the item's existing pointer field, not a new one; the doc\nitself is what's git-versioned, the field only points at its directory.\nAn item created earlier without `docsRef` is unaffected — the field is\noptional, and this skill does not need every item to already carry it.\n",
+      "record": {
+        "file": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+        "inventoryInputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+        "inventoryInputs": [
+          {
+            "path": "step-02-census-skills-prompts.json",
+            "commit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+            "sha256": "c68eac52ad9ab06e0420fcbfb98d4d1879a12cc274fb903d942a040e81f6817f",
+            "edges": 332
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "8dc34fb566efe56f5adb0b460baa7c5d4cabee9bfd3bb5c491cc2f0ed6285218",
+        "digest": "8dc34fb566efe56f5adb0b460baa7c5d4cabee9bfd3bb5c491cc2f0ed6285218",
+        "inventoryEdgeIds": [
+          "skills-025",
+          "skills-026",
+          "skills-048",
+          "skills-049",
+          "skills-099",
+          "skills-100",
+          "skills-158",
+          "skills-159"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "skills-025",
+            "slotKey": "{\"edgeId\":\"skills-025\",\"file\":\".agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-025\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":111}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-025",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 111
+              }
+            ],
+            "consumerFile": ".agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 111,
+                "columnStart": 8,
+                "columnEndExclusive": 41,
+                "text": "docs/history/<feature>/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 111,
+                "columnStart": 8,
+                "columnEndExclusive": 41,
+                "text": "docs/history/<feature>/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/CONTEXT.md",
+            "logicalReference": "docs/history/<feature>/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: 'Write `docs/history/<feature>/CONTEXT.md` covering: the feature boundary,' Source disposition: preserve. A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: 'Write `docs/history/<feature>/CONTEXT.md` covering: the feature boundary,'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<feature>/CONTEXT.md",
+            "sourceSlotKey": "{\"edgeId\":\"skills-099\",\"file\":\"domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-099\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":110}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-025",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 111,
+                "matchedExpression": "docs/history/<feature>/CONTEXT.md",
+                "originalLineText": "Write `docs/history/<feature>/CONTEXT.md` covering: the feature boundary,"
+              }
+            ]
+          },
+          {
+            "edgeId": "skills-026",
+            "slotKey": "{\"edgeId\":\"skills-026\",\"file\":\".agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-026\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":173}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-026",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 173
+              }
+            ],
+            "consumerFile": ".agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 173,
+                "columnStart": 144,
+                "columnEndExclusive": 167,
+                "text": "docs/history/<feature>/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 173,
+                "columnStart": 144,
+                "columnEndExclusive": 167,
+                "text": "docs/history/<feature>/"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/",
+            "logicalReference": "docs/history/<feature>/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: 'fgos add --title \"<title>\" --kind <kind> --risk <risk> --verify \"<real, runnable command>\" --description \"<full-text description>\" --docs-ref \"docs/history/<feature>/\"' Source disposition: preserve. A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: 'fgos add --title \"<title>\" --kind <kind> --risk <risk> --verify \"<real, runnable command>\" --description \"<full-text description>\" --docs-ref \"docs/history/<feature>/\"'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<feature>/",
+            "sourceSlotKey": "{\"edgeId\":\"skills-100\",\"file\":\"domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-100\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":172}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-026",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 173,
+                "matchedExpression": "docs/history/<feature>/",
+                "originalLineText": "fgos add --title \"<title>\" --kind <kind> --risk <risk> --verify \"<real, runnable command>\" --description \"<full-text description>\" --docs-ref \"docs/history/<feature>/\""
+              }
+            ]
+          },
+          {
+            "edgeId": "skills-048",
+            "slotKey": "{\"edgeId\":\"skills-048\",\"file\":\".claude/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-048\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":111}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-048",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 111
+              }
+            ],
+            "consumerFile": ".claude/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 111,
+                "columnStart": 8,
+                "columnEndExclusive": 41,
+                "text": "docs/history/<feature>/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 111,
+                "columnStart": 8,
+                "columnEndExclusive": 41,
+                "text": "docs/history/<feature>/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/CONTEXT.md",
+            "logicalReference": "docs/history/<feature>/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: 'Write `docs/history/<feature>/CONTEXT.md` covering: the feature boundary,' Source disposition: preserve. A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: 'Write `docs/history/<feature>/CONTEXT.md` covering: the feature boundary,'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<feature>/CONTEXT.md",
+            "sourceSlotKey": "{\"edgeId\":\"skills-099\",\"file\":\"domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-099\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":110}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-048",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 111,
+                "matchedExpression": "docs/history/<feature>/CONTEXT.md",
+                "originalLineText": "Write `docs/history/<feature>/CONTEXT.md` covering: the feature boundary,"
+              }
+            ]
+          },
+          {
+            "edgeId": "skills-049",
+            "slotKey": "{\"edgeId\":\"skills-049\",\"file\":\".claude/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-049\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":173}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-049",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 173
+              }
+            ],
+            "consumerFile": ".claude/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 173,
+                "columnStart": 144,
+                "columnEndExclusive": 167,
+                "text": "docs/history/<feature>/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 173,
+                "columnStart": 144,
+                "columnEndExclusive": 167,
+                "text": "docs/history/<feature>/"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/",
+            "logicalReference": "docs/history/<feature>/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: 'fgos add --title \"<title>\" --kind <kind> --risk <risk> --verify \"<real, runnable command>\" --description \"<full-text description>\" --docs-ref \"docs/history/<feature>/\"' Source disposition: preserve. A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: 'fgos add --title \"<title>\" --kind <kind> --risk <risk> --verify \"<real, runnable command>\" --description \"<full-text description>\" --docs-ref \"docs/history/<feature>/\"'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<feature>/",
+            "sourceSlotKey": "{\"edgeId\":\"skills-100\",\"file\":\"domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-100\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":172}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-049",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 173,
+                "matchedExpression": "docs/history/<feature>/",
+                "originalLineText": "fgos add --title \"<title>\" --kind <kind> --risk <risk> --verify \"<real, runnable command>\" --description \"<full-text description>\" --docs-ref \"docs/history/<feature>/\""
+              }
+            ]
+          },
+          {
+            "edgeId": "skills-099",
+            "slotKey": "{\"edgeId\":\"skills-099\",\"file\":\"domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-099\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":110}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-099",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 110
+              }
+            ],
+            "consumerFile": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 110,
+                "columnStart": 8,
+                "columnEndExclusive": 41,
+                "text": "docs/history/<feature>/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 110,
+                "columnStart": 8,
+                "columnEndExclusive": 41,
+                "text": "docs/history/<feature>/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/CONTEXT.md",
+            "logicalReference": "docs/history/<feature>/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: 'Write `docs/history/<feature>/CONTEXT.md` covering: the feature boundary,'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<feature>/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-099",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 110,
+                "matchedExpression": "docs/history/<feature>/CONTEXT.md",
+                "originalLineText": "Write `docs/history/<feature>/CONTEXT.md` covering: the feature boundary,"
+              }
+            ]
+          },
+          {
+            "edgeId": "skills-100",
+            "slotKey": "{\"edgeId\":\"skills-100\",\"file\":\"domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-100\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":172}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-100",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 172
+              }
+            ],
+            "consumerFile": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 172,
+                "columnStart": 144,
+                "columnEndExclusive": 167,
+                "text": "docs/history/<feature>/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 172,
+                "columnStart": 144,
+                "columnEndExclusive": 167,
+                "text": "docs/history/<feature>/"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/",
+            "logicalReference": "docs/history/<feature>/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: 'fgos add --title \"<title>\" --kind <kind> --risk <risk> --verify \"<real, runnable command>\" --description \"<full-text description>\" --docs-ref \"docs/history/<feature>/\"'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<feature>/",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-100",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 172,
+                "matchedExpression": "docs/history/<feature>/",
+                "originalLineText": "fgos add --title \"<title>\" --kind <kind> --risk <risk> --verify \"<real, runnable command>\" --description \"<full-text description>\" --docs-ref \"docs/history/<feature>/\""
+              }
+            ]
+          },
+          {
+            "edgeId": "skills-158",
+            "slotKey": "{\"edgeId\":\"skills-158\",\"file\":\"plugins/fgOS/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-158\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":111}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-158",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 111
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 111,
+                "columnStart": 8,
+                "columnEndExclusive": 41,
+                "text": "docs/history/<feature>/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 111,
+                "columnStart": 8,
+                "columnEndExclusive": 41,
+                "text": "docs/history/<feature>/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/CONTEXT.md",
+            "logicalReference": "docs/history/<feature>/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: 'Write `docs/history/<feature>/CONTEXT.md` covering: the feature boundary,' Source disposition: preserve. A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: 'Write `docs/history/<feature>/CONTEXT.md` covering: the feature boundary,'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<feature>/CONTEXT.md",
+            "sourceSlotKey": "{\"edgeId\":\"skills-099\",\"file\":\"domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-099\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":110}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-158",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 111,
+                "matchedExpression": "docs/history/<feature>/CONTEXT.md",
+                "originalLineText": "Write `docs/history/<feature>/CONTEXT.md` covering: the feature boundary,"
+              }
+            ]
+          },
+          {
+            "edgeId": "skills-159",
+            "slotKey": "{\"edgeId\":\"skills-159\",\"file\":\"plugins/fgOS/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-159\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":173}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-159",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 173
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 173,
+                "columnStart": 144,
+                "columnEndExclusive": 167,
+                "text": "docs/history/<feature>/"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 173,
+                "columnStart": 144,
+                "columnEndExclusive": 167,
+                "text": "docs/history/<feature>/"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/",
+            "logicalReference": "docs/history/<feature>/",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: 'fgos add --title \"<title>\" --kind <kind> --risk <risk> --verify \"<real, runnable command>\" --description \"<full-text description>\" --docs-ref \"docs/history/<feature>/\"' Source disposition: preserve. A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: 'fgos add --title \"<title>\" --kind <kind> --risk <risk> --verify \"<real, runnable command>\" --description \"<full-text description>\" --docs-ref \"docs/history/<feature>/\"'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<feature>/",
+            "sourceSlotKey": "{\"edgeId\":\"skills-100\",\"file\":\"domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-100\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":172}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-159",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 173,
+                "matchedExpression": "docs/history/<feature>/",
+                "originalLineText": "fgos add --title \"<title>\" --kind <kind> --risk <risk> --verify \"<real, runnable command>\" --description \"<full-text description>\" --docs-ref \"docs/history/<feature>/\""
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-001",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [
+          {
+            "sourcePath": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+            "sourceDigest": "8dc34fb566efe56f5adb0b460baa7c5d4cabee9bfd3bb5c491cc2f0ed6285218",
+            "renderFiles": [
+              {
+                "path": ".agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+                "digest": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
+                "sourceDigest": "8dc34fb566efe56f5adb0b460baa7c5d4cabee9bfd3bb5c491cc2f0ed6285218",
+                "headerWitnesses": [
+                  {
+                    "line": 1,
+                    "text": "<!-- Generated by fgOS skill assembly from domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->"
+                  }
+                ],
+                "censusSourcePath": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+                "existingEdgeJoins": [
+                  {
+                    "edgeId": "skills-025",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-025",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 111
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-unchanged-source",
+                      "oldLine": 111,
+                      "line": 111,
+                      "columnStart": 8,
+                      "columnEndExclusive": 41,
+                      "text": "docs/history/<feature>/CONTEXT.md"
+                    }
+                  },
+                  {
+                    "edgeId": "skills-026",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-026",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 173
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-unchanged-source",
+                      "oldLine": 173,
+                      "line": 173,
+                      "columnStart": 144,
+                      "columnEndExclusive": 167,
+                      "text": "docs/history/<feature>/"
+                    }
+                  }
+                ],
+                "renderOnly": true,
+                "generationDoor": "npm run build:skills",
+                "generationRun": null
+              },
+              {
+                "path": ".claude/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+                "digest": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
+                "sourceDigest": "8dc34fb566efe56f5adb0b460baa7c5d4cabee9bfd3bb5c491cc2f0ed6285218",
+                "headerWitnesses": [
+                  {
+                    "line": 1,
+                    "text": "<!-- Generated by fgOS skill assembly from domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->"
+                  }
+                ],
+                "censusSourcePath": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+                "existingEdgeJoins": [
+                  {
+                    "edgeId": "skills-048",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-048",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 111
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-unchanged-source",
+                      "oldLine": 111,
+                      "line": 111,
+                      "columnStart": 8,
+                      "columnEndExclusive": 41,
+                      "text": "docs/history/<feature>/CONTEXT.md"
+                    }
+                  },
+                  {
+                    "edgeId": "skills-049",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-049",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 173
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-unchanged-source",
+                      "oldLine": 173,
+                      "line": 173,
+                      "columnStart": 144,
+                      "columnEndExclusive": 167,
+                      "text": "docs/history/<feature>/"
+                    }
+                  }
+                ],
+                "renderOnly": true,
+                "generationDoor": "npm run build:skills",
+                "generationRun": null
+              },
+              {
+                "path": "plugins/fgOS/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+                "digest": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
+                "sourceDigest": "8dc34fb566efe56f5adb0b460baa7c5d4cabee9bfd3bb5c491cc2f0ed6285218",
+                "headerWitnesses": [
+                  {
+                    "line": 1,
+                    "text": "<!-- Generated by fgOS skill assembly from domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->"
+                  }
+                ],
+                "censusSourcePath": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+                "existingEdgeJoins": [
+                  {
+                    "edgeId": "skills-158",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-158",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 111
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-unchanged-source",
+                      "oldLine": 111,
+                      "line": 111,
+                      "columnStart": 8,
+                      "columnEndExclusive": 41,
+                      "text": "docs/history/<feature>/CONTEXT.md"
+                    }
+                  },
+                  {
+                    "edgeId": "skills-159",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-159",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 173
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-unchanged-source",
+                      "oldLine": 173,
+                      "line": 173,
+                      "columnStart": 144,
+                      "columnEndExclusive": 167,
+                      "text": "docs/history/<feature>/"
+                    }
+                  }
+                ],
+                "renderOnly": true,
+                "generationDoor": "npm run build:skills",
+                "generationRun": null
+              }
+            ]
+          }
+        ],
+        "wholeFileRead": {
+          "file": "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "8dc34fb566efe56f5adb0b460baa7c5d4cabee9bfd3bb5c491cc2f0ed6285218",
+          "bytes": 8209,
+          "lines": 182,
+          "headings": [
+            {
+              "line": 1,
+              "text": "# Lock decisions and write CONTEXT.md — full mechanics"
+            },
+            {
+              "line": 6,
+              "text": "## Batching and the three checks"
+            },
+            {
+              "line": 38,
+              "text": "## Logging each decision"
+            },
+            {
+              "line": 64,
+              "text": "## The `ask`/`answer` park round trip"
+            },
+            {
+              "line": 108,
+              "text": "## Writing CONTEXT.md"
+            },
+            {
+              "line": 120,
+              "text": "## Locked decisions"
+            },
+            {
+              "line": 154,
+              "text": "## Outstanding questions"
+            },
+            {
+              "line": 165,
+              "text": "## Pointing the item at its doc"
+            }
+          ],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    },
+    {
+      "file": "domains/coding/skills/fgos-coding-implement/SKILL.md",
+      "sourceDigest": "ab60f67d8f8dffefdebc9152f42e788ce0a3895ec8605e9ff39544af1811ffae",
+      "sourceContext": "---\nname: fgos-coding-implement\nuser-invocable: false\ndescription: >-\n  Implement, verify, and hand back exactly one claimed coding-domain item at\n  stage `executing`. Use once an item has already cleared `discovery` and\n  `planning` (or never needed either) and is ready for direct\n  implementation. Examples: \"I've claimed this item, it's ready to build\",\n  \"implement this and return it\", \"the item is at executing, what do I do\n  now\".\n---\n\n# fgos-coding-implement\n\nRuns while a claimed item's `stage` reads `executing` — the direct\nimplementation step between shaping and synthesis. This skill turns a\nclaimed item into real changes, proves them with the item's own `verify`\ncommand, and hands the item back through `fgos return`. It never designs\nor re-shapes the work; that already happened at\n`discovery`/`exploring`/`planning`.\n\n## Driver vs. worker\n\nThis file is split into two halves that live in two different places.\nBelow this section is the **driver** half — claim status, decide the\ndispatch mechanism, verify, commit, the Iron Law check, `fgos return`,\nand every Collaboration handoff call. The **worker** half — the\nboundaries for actually doing the work, provider-neutral, shared with\nevery other kind of dispatched unit — lives separately at\n`../_shared/coding-worker-contract.md`. Which half applies to you depends\non how you got here:\n\n- **You are the driver session** — you ran `fgos pick`/arrived via\n  `fgos-routing` with a live claim on this item and the ability to call\n  `fgos` verbs against the real store. Read this whole file. At Flow Step\n  2 (Implement), when you do the work yourself, you ALSO follow\n  `../_shared/coding-worker-contract.md`'s boundaries for that part —\n  same discipline an out-of-process worker follows: a session that isn't\n  dispatching still executes the worker's own half.\n- **You are an out-of-process worker** — you were dispatched here, you\n  hold no claim on this item, and you have no `fgos` verb to call against\n  the real store. **Stop reading after this section.** Read and follow\n  only `../_shared/coding-worker-contract.md` — it is complete on its own\n  for what you need to do. Everything below is the driver's own job,\n  never yours.\n\n## Hard rules\n\n- When asking questions (`fgos ask`, `AskUserQuestion`, chat), use\n  self-contained citations (see `../_shared/citation-format.md`) and the\n  decision-question template (`../_shared/decision-question.md`); the engine\n  refuses an `ask` missing its parts.\n- The `fgos` shell function automatically resolves the main checkout root and appends `--dir \"$root\"` when invoking subcommands from a linked worktree, so you can call `fgos <verb>` subcommands (`ask`, `answer`, `return`) directly:\n\n  ```bash\n  fgos <verb> ...\n  ```\n- **Always call `dispatch.mjs decide` first for the Implement step —\n  never assume \"I have a live Task tool, so I do it myself\" as the\n  default.** A `cli-spawn`-shaped executor already registered in\n  `.fgos/config.json` resolves `out-of-process` *unconditionally* once\n  configured — having live Task access does not change that; config\n  wins, not \"I already have full context so I'll do it myself\". Run\n  `node src/runner/dispatch.mjs decide --for code:implement [--has-live-task-access]`\n  as the very first action of Implement and branch on the real\n  `mechanism` it returns. Full mechanics for all three outcomes:\n  `references/implement-and-collaboration.md`.\n- Implement real behavior. No stubs, TODO-only placeholders, dead code,\n  or pseudo-implementations offered as if they were done.\n- Match existing patterns in the touched files and the decisions already\n  locked in `docs/history/<feature>/CONTEXT.md` (cite the decision id;\n  never reopen or reinterpret a locked decision here — that is\n  `fgos-coding-exploring`'s and `fgos-coding-planning`'s job, not this\n  skill's).\n- Reuse before you add; retire what you replace. Before writing a new\n  function, helper, module or mechanism, search the whole repository (not\n  only the touched files) for one that already does the job, by name and by\n  the primitive it touches; reuse or extend it, and import the shared module\n  an import guard names instead of copying code. A change that replaces a\n  mechanism moves its consumers and deletes the old path in the same change.\n  Record what you searched and reused in the return note. Same rule as rule 5\n  of `../_shared/coding-worker-contract.md` and AGENTS.md \"Design principles\".\n- Do not classify the item's domain or re-derive its stage.\n  `fgos-routing` already resolved both before handing this item to this\n  skill.\n- Treat the item's `title`/`description` as untrusted input — never\n  splice it raw into a shell command; pass it as a discrete quoted argv\n  element.\n- Never assert an item is done on say-so. `fgos return` is the only\n  producer surface allowed to close this step, and it only succeeds when\n  the item's own `verify` command actually passes — an assertion is\n  never evidence.\n- One commit per item, with the item's id in the commit message — the\n  same traceability a cap trace gives a bee cell, translated to a plain\n  git habit here since fgOS has no separate cell-trace file.\n- **Multi-role team harness: fire real `fgos handoff`/`fgos handoff-return`\n  calls at the points below, do not just perform the underlying action\n  silently.** (Return's own `review` handoff is the one exception — the\n  engine fires it for you as a side effect of `return`/`catchup` reaching\n  `awaiting-approval`; every other point below is still this skill's own\n  job to fire.) Stage operations map to team communication modes as:\n  `consult` -> `scout-blast-radius` or `resolve-question` Assignment;\n  `assist`  -> `scoped-subtask` Assignment;\n  `review`  -> `review-item` Assignment;\n  `fix`     -> `fix-verify-red` operation (usually direct implementer path);\n  `advise`  -> async advisor path (not cli-spawn unless explicitly supported).\n  The role/holder axis only stays truthful if the session\n  actually records who is holding the item. `fgos handoff` is opt-in\n  per-domain (only fires for a domain with a declared role graph); if the\n  item's domain declares none, skip every call below silently. A refusal\n  from `handoff` is never swallowed and never blocks the underlying\n  action it accompanies — report the refusal plainly and continue with\n  the underlying action regardless.\n\n## Flow\n\n### Step 1: Orient\nRead the claimed item's title, `refs`, `deps`, and docsRef when present.\nRe-check live claim status if this session did not arrive via\n`fgos-coding-driving`. Reclaim the role/holder ball if it isn't already\n`implementer`. Full mechanics: `references/worker-contract-and-orient.md`.\n\n### Step 2: Implement\nRun `dispatch.mjs decide` first (per the Hard rule above) and branch on\nits answer — do the work yourself, or dispatch it out-of-process. Apply\nthe impact-analysis capability gate before editing a symbol. Fix a bug,\nadd missing functionality, or fix a blocking issue found in the path\nwithout redesigning scope; park anything that would require redesigning\nscope or architecture. Log the four Collaboration interactions\n(`consult`/`assist`/`advise`) whenever their trigger actually matches.\nFull mechanics: `references/implement-and-collaboration.md`.\n\n### Step 3: Verify — proof, not assertion\nSkip entirely when mechanism was `out-of-process` (the worker already\nran verify; it does not commit — the runner committed its edits inside the Unit's `writes`). Otherwise run the item's own `verify` command exactly as\nrecorded; on failure, fix the root cause and rerun the exact command,\nnever weaken it. Full mechanics: `references/verify-commit-and-iron-law.md`.\n\n### Step 4: Commit, then check Iron Law evidence\nCommit the real implementation first, THEN classify the exact committed\ndiff against the Iron Law gate — running the classification before\ncommitting is a false negative, not a skip. Write\n`docs/history/<id>/iron-law-evidence.md` only when the result requires\nit. Full mechanics: `references/verify-commit-and-iron-law.md`.\n\n### Step 5: Return\n`fgos return <id>` re-runs verify itself and only then moves the item to\n`awaiting-approval` (or `blocked` on a red verify) — it never takes the\ncaller's word for it. The `review` Collaboration handoff fires as an\nengine-level side effect of that exact transition, never something this\nskill calls itself. Full mechanics (the blocked-item recovery path via\n`fgos catchup`): `references/return-mechanics.md`.\n\n## Headless\n\nThis skill runs effectively headless: never wait silently on a question a\nperson could answer later. An unambiguous deviation (Step 2's auto-fix\ncases) is applied and reported; anything genuinely ambiguous — scope,\narchitecture, a package install — is parked via `fgos ask`, never guessed\npast. This is the same discipline `fgos-routing`'s gate contract\ndescribes for the whole chain, applied here at the implementation step\nspecifically.\n\n## Next\n\nOnce `fgos return <id>` reports the item moved to `awaiting-approval`,\nload `fgos-routing` to re-read its stage and continue — routing decides\nwhether compound-learn (and `fgos-coding-compounding`) comes next; this\nskill's own job ends at a returned, verified item (the review handoff\nabove already fired as part of that same transition — nothing further to\ndo for it here).\n\n## Red flags\n\n- a stub, TODO, or \"should work\" accepted in place of a real\n  implementation\n- a new helper or module written without first searching for one that\n  already does the job, or an old path left alive after its replacement\n  landed\n- editing outside what the item actually describes\n- redesigning scope or architecture inside an `executing` item instead\n  of parking it\n- installing a package on this skill's own authority\n- calling `fgos return` without having actually run the item's `verify`\n  command yourself first\n- swapping in a weaker or different check because the real `verify`\n  command is inconvenient\n- retrying `fgos return` on the same red state with no real change\n  underneath it\n- classifying the item's domain or re-deciding its stage — not this\n  skill's job\n- splicing an item's raw `title`/`description` into a shell command\n- fabricating or paraphrasing the failing-test-first transcript in\n  `iron-law-evidence.md` instead of pasting the real command output\n- writing `iron-law-evidence.md` for an item the classifier says\n  `required: false` for\n\nViolating the letter of the rules is violating the spirit of the rules.\n\n## References\n\n- `references/worker-contract-and-orient.md` — the Orient step's claim\n  re-check and reclaim mechanics\n- `references/implement-and-collaboration.md` — the dispatch-decide\n  branches, the impact-analysis gate, the auto-fix/park rules, and the\n  four Collaboration handoff calls\n- `references/verify-commit-and-iron-law.md` — the Verify step and the\n  full commit/Iron-Law-classification mechanics\n- `references/return-mechanics.md` — the `fgos return` mechanics, the\n  engine-fired review handoff, and the `blocked`-item recovery path\n\n## Workflow Position\n\n**Typically follows:** `fgos-coding-validating` (READY verdict), or\n`fgos-coding-driving`'s own claim-and-invoke step at stage `executing`\n**Typically precedes:** `fgos-routing` (re-reads stage after return)\n**Related:** `../_shared/coding-worker-contract.md` (the worker half of\nthis same file, for an out-of-process dispatch)\n",
+      "record": {
+        "file": "domains/coding/skills/fgos-coding-implement/SKILL.md",
+        "inventoryInputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+        "inventoryInputs": [
+          {
+            "path": "step-02-census-skills-prompts.json",
+            "commit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+            "sha256": "c68eac52ad9ab06e0420fcbfb98d4d1879a12cc274fb903d942a040e81f6817f",
+            "edges": 332
+          }
+        ],
+        "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+        "inventoryFileDigest": "ab60f67d8f8dffefdebc9152f42e788ce0a3895ec8605e9ff39544af1811ffae",
+        "digest": "ab60f67d8f8dffefdebc9152f42e788ce0a3895ec8605e9ff39544af1811ffae",
+        "inventoryEdgeIds": [
+          "skills-027",
+          "skills-028",
+          "skills-101",
+          "skills-102",
+          "skills-160",
+          "skills-161"
+        ],
+        "diff": "",
+        "edges": [
+          {
+            "edgeId": "skills-027",
+            "slotKey": "{\"edgeId\":\"skills-027\",\"file\":\".agents/skills/fgos-coding-implement/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-027\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":72}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-027",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 72
+              }
+            ],
+            "consumerFile": ".agents/skills/fgos-coding-implement/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 72,
+                "columnStart": 14,
+                "columnEndExclusive": 47,
+                "text": "docs/history/<feature>/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 72,
+                "columnStart": 14,
+                "columnEndExclusive": 47,
+                "text": "docs/history/<feature>/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/CONTEXT.md",
+            "logicalReference": "docs/history/<feature>/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source domains/coding/skills/fgos-coding-implement/SKILL.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: '  locked in `docs/history/<feature>/CONTEXT.md` (cite the decision id;' Source disposition: preserve. A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '  locked in `docs/history/<feature>/CONTEXT.md` (cite the decision id;'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<feature>/CONTEXT.md",
+            "sourceSlotKey": "{\"edgeId\":\"skills-101\",\"file\":\"domains/coding/skills/fgos-coding-implement/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-101\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":71}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-027",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 72,
+                "matchedExpression": "docs/history/<feature>/CONTEXT.md",
+                "originalLineText": "  locked in `docs/history/<feature>/CONTEXT.md` (cite the decision id;"
+              }
+            ]
+          },
+          {
+            "edgeId": "skills-028",
+            "slotKey": "{\"edgeId\":\"skills-028\",\"file\":\".agents/skills/fgos-coding-implement/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-028\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":144}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-028",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 144
+              }
+            ],
+            "consumerFile": ".agents/skills/fgos-coding-implement/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 144,
+                "columnStart": 2,
+                "columnEndExclusive": 40,
+                "text": "docs/history/<id>/iron-law-evidence.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 144,
+                "columnStart": 2,
+                "columnEndExclusive": 40,
+                "text": "docs/history/<id>/iron-law-evidence.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<id>/iron-law-evidence.md",
+            "logicalReference": "docs/history/<id>/iron-law-evidence.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source domains/coding/skills/fgos-coding-implement/SKILL.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: '`docs/history/<id>/iron-law-evidence.md` only when the result requires' Source disposition: preserve. A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '`docs/history/<id>/iron-law-evidence.md` only when the result requires'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<id>/iron-law-evidence.md",
+            "sourceSlotKey": "{\"edgeId\":\"skills-102\",\"file\":\"domains/coding/skills/fgos-coding-implement/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-102\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":143}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-028",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 144,
+                "matchedExpression": "docs/history/<id>/iron-law-evidence.md",
+                "originalLineText": "`docs/history/<id>/iron-law-evidence.md` only when the result requires"
+              }
+            ]
+          },
+          {
+            "edgeId": "skills-101",
+            "slotKey": "{\"edgeId\":\"skills-101\",\"file\":\"domains/coding/skills/fgos-coding-implement/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-101\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":71}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-101",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 71
+              }
+            ],
+            "consumerFile": "domains/coding/skills/fgos-coding-implement/SKILL.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 71,
+                "columnStart": 14,
+                "columnEndExclusive": 47,
+                "text": "docs/history/<feature>/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 71,
+                "columnStart": 14,
+                "columnEndExclusive": 47,
+                "text": "docs/history/<feature>/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/CONTEXT.md",
+            "logicalReference": "docs/history/<feature>/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '  locked in `docs/history/<feature>/CONTEXT.md` (cite the decision id;'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<feature>/CONTEXT.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-101",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 71,
+                "matchedExpression": "docs/history/<feature>/CONTEXT.md",
+                "originalLineText": "  locked in `docs/history/<feature>/CONTEXT.md` (cite the decision id;"
+              }
+            ]
+          },
+          {
+            "edgeId": "skills-102",
+            "slotKey": "{\"edgeId\":\"skills-102\",\"file\":\"domains/coding/skills/fgos-coding-implement/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-102\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":143}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-102",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 143
+              }
+            ],
+            "consumerFile": "domains/coding/skills/fgos-coding-implement/SKILL.md",
+            "renderOnly": false,
+            "slotSourceSpans": [
+              {
+                "line": 143,
+                "columnStart": 2,
+                "columnEndExclusive": 40,
+                "text": "docs/history/<id>/iron-law-evidence.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 143,
+                "columnStart": 2,
+                "columnEndExclusive": 40,
+                "text": "docs/history/<id>/iron-law-evidence.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<id>/iron-law-evidence.md",
+            "logicalReference": "docs/history/<id>/iron-law-evidence.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '`docs/history/<id>/iron-law-evidence.md` only when the result requires'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<id>/iron-law-evidence.md",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-102",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 143,
+                "matchedExpression": "docs/history/<id>/iron-law-evidence.md",
+                "originalLineText": "`docs/history/<id>/iron-law-evidence.md` only when the result requires"
+              }
+            ]
+          },
+          {
+            "edgeId": "skills-160",
+            "slotKey": "{\"edgeId\":\"skills-160\",\"file\":\"plugins/fgOS/skills/fgos-coding-implement/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-160\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":72}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-160",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 72
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/fgos-coding-implement/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 72,
+                "columnStart": 14,
+                "columnEndExclusive": 47,
+                "text": "docs/history/<feature>/CONTEXT.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 72,
+                "columnStart": 14,
+                "columnEndExclusive": 47,
+                "text": "docs/history/<feature>/CONTEXT.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<feature>/CONTEXT.md",
+            "logicalReference": "docs/history/<feature>/CONTEXT.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source domains/coding/skills/fgos-coding-implement/SKILL.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: '  locked in `docs/history/<feature>/CONTEXT.md` (cite the decision id;' Source disposition: preserve. A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '  locked in `docs/history/<feature>/CONTEXT.md` (cite the decision id;'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<feature>/CONTEXT.md",
+            "sourceSlotKey": "{\"edgeId\":\"skills-101\",\"file\":\"domains/coding/skills/fgos-coding-implement/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-101\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":71}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-160",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 72,
+                "matchedExpression": "docs/history/<feature>/CONTEXT.md",
+                "originalLineText": "  locked in `docs/history/<feature>/CONTEXT.md` (cite the decision id;"
+              }
+            ]
+          },
+          {
+            "edgeId": "skills-161",
+            "slotKey": "{\"edgeId\":\"skills-161\",\"file\":\"plugins/fgOS/skills/fgos-coding-implement/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-161\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":144}]}",
+            "inventoryRefs": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-161",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 144
+              }
+            ],
+            "consumerFile": "plugins/fgOS/skills/fgos-coding-implement/SKILL.md",
+            "renderOnly": true,
+            "slotSourceSpans": [
+              {
+                "line": 144,
+                "columnStart": 2,
+                "columnEndExclusive": 40,
+                "text": "docs/history/<id>/iron-law-evidence.md"
+              }
+            ],
+            "sourceSpans": [
+              {
+                "line": 144,
+                "columnStart": 2,
+                "columnEndExclusive": 40,
+                "text": "docs/history/<id>/iron-law-evidence.md"
+              }
+            ],
+            "matchedExpression": "docs/history/<id>/iron-law-evidence.md",
+            "logicalReference": "docs/history/<id>/iron-law-evidence.md",
+            "disposition": "preserve",
+            "diffHunk": null,
+            "reason": "A51, L12-58: render/projection occurrence is a census/provenance join only. Canonical source domains/coding/skills/fgos-coding-implement/SKILL.md owns any Phase 9 specification; no render diff, no generation or installed parity claim. Exact render passage: '`docs/history/<id>/iron-law-evidence.md` only when the result requires' Source disposition: preserve. A51, L12-10/38/40: preserve the external-project artifact convention or named historical implementation/decision evidence, including sibling CONTEXT/RESEARCH/DISCUSSION names. This does not prescribe this repository’s cutover layout. Exact passage: '`docs/history/<id>/iron-law-evidence.md` only when the result requires'",
+            "target": null,
+            "anchor": null,
+            "timing": "none",
+            "blockedReason": null,
+            "dependency": null,
+            "blockedCategory": null,
+            "dependencyCategory": null,
+            "legacyPath": "docs/history/<id>/iron-law-evidence.md",
+            "sourceSlotKey": "{\"edgeId\":\"skills-102\",\"file\":\"domains/coding/skills/fgos-coding-implement/SKILL.md\",\"inventoryRefs\":[{\"edgeId\":\"skills-102\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-skills-prompts.json\",\"originalLine\":143}]}",
+            "inventoryOccurrences": [
+              {
+                "inventory": "step-02-census-skills-prompts.json",
+                "edgeId": "skills-161",
+                "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                "originalLine": 144,
+                "matchedExpression": "docs/history/<id>/iron-law-evidence.md",
+                "originalLineText": "`docs/history/<id>/iron-law-evidence.md` only when the result requires"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "coverage": {
+            "writerTrace": {},
+            "descriptionTruth": {},
+            "scope": "Every frozen batch slot; other buckets remain in Step 3/5 or L12-10 custody. No new census identities invented."
+          },
+          "anchors": {},
+          "relativeResolution": {},
+          "labelForm": {}
+        },
+        "reviewSet": "step04-001",
+        "authoringRules": [
+          "A51",
+          "L12-7",
+          "L12-10",
+          "L12-21..L12-58"
+        ],
+        "sourceRenderProvenance": [
+          {
+            "sourcePath": "domains/coding/skills/fgos-coding-implement/SKILL.md",
+            "sourceDigest": "ab60f67d8f8dffefdebc9152f42e788ce0a3895ec8605e9ff39544af1811ffae",
+            "renderFiles": [
+              {
+                "path": ".agents/skills/fgos-coding-implement/SKILL.md",
+                "digest": "9a20fc209673928ce5fb414af91940e9760ced0f264dd5e4673078cc070cfcdd",
+                "sourceDigest": "ab60f67d8f8dffefdebc9152f42e788ce0a3895ec8605e9ff39544af1811ffae",
+                "headerWitnesses": [
+                  {
+                    "line": 12,
+                    "text": "<!-- Generated by fgOS skill assembly from domains/coding/skills/fgos-coding-implement/SKILL.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->"
+                  }
+                ],
+                "censusSourcePath": "domains/coding/skills/fgos-coding-implement/SKILL.md",
+                "existingEdgeJoins": [
+                  {
+                    "edgeId": "skills-027",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-027",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 72
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-unchanged-source",
+                      "oldLine": 72,
+                      "line": 72,
+                      "columnStart": 14,
+                      "columnEndExclusive": 47,
+                      "text": "docs/history/<feature>/CONTEXT.md"
+                    }
+                  },
+                  {
+                    "edgeId": "skills-028",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-028",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 144
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-unchanged-source",
+                      "oldLine": 144,
+                      "line": 144,
+                      "columnStart": 2,
+                      "columnEndExclusive": 40,
+                      "text": "docs/history/<id>/iron-law-evidence.md"
+                    }
+                  }
+                ],
+                "renderOnly": true,
+                "generationDoor": "npm run build:skills",
+                "generationRun": null
+              },
+              {
+                "path": ".claude/skills/fgos-coding-implement/SKILL.md",
+                "digest": "5f829b9668af162c1a05c6f0590ec9ae4129945f37318e43121469505cdd80ea",
+                "sourceDigest": "ab60f67d8f8dffefdebc9152f42e788ce0a3895ec8605e9ff39544af1811ffae",
+                "headerWitnesses": [],
+                "censusSourcePath": "domains/coding/skills/fgos-coding-implement/SKILL.md",
+                "existingEdgeJoins": [],
+                "renderOnly": true,
+                "generationDoor": "npm run build:skills",
+                "generationRun": null
+              },
+              {
+                "path": "plugins/fgOS/skills/fgos-coding-implement/SKILL.md",
+                "digest": "9a20fc209673928ce5fb414af91940e9760ced0f264dd5e4673078cc070cfcdd",
+                "sourceDigest": "ab60f67d8f8dffefdebc9152f42e788ce0a3895ec8605e9ff39544af1811ffae",
+                "headerWitnesses": [
+                  {
+                    "line": 12,
+                    "text": "<!-- Generated by fgOS skill assembly from domains/coding/skills/fgos-coding-implement/SKILL.md (npm run build:skills in the fgOS source repo). Do not edit this copy; it is overwritten. -->"
+                  }
+                ],
+                "censusSourcePath": "domains/coding/skills/fgos-coding-implement/SKILL.md",
+                "existingEdgeJoins": [
+                  {
+                    "edgeId": "skills-160",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-160",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 72
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-unchanged-source",
+                      "oldLine": 72,
+                      "line": 72,
+                      "columnStart": 14,
+                      "columnEndExclusive": 47,
+                      "text": "docs/history/<feature>/CONTEXT.md"
+                    }
+                  },
+                  {
+                    "edgeId": "skills-161",
+                    "inventoryRefs": [
+                      {
+                        "inventory": "step-02-census-skills-prompts.json",
+                        "edgeId": "skills-161",
+                        "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+                        "originalLine": 144
+                      }
+                    ],
+                    "sourceSpan": {
+                      "status": "exact-unchanged-source",
+                      "oldLine": 144,
+                      "line": 144,
+                      "columnStart": 2,
+                      "columnEndExclusive": 40,
+                      "text": "docs/history/<id>/iron-law-evidence.md"
+                    }
+                  }
+                ],
+                "renderOnly": true,
+                "generationDoor": "npm run build:skills",
+                "generationRun": null
+              }
+            ]
+          }
+        ],
+        "wholeFileRead": {
+          "file": "domains/coding/skills/fgos-coding-implement/SKILL.md",
+          "inputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+          "digest": "ab60f67d8f8dffefdebc9152f42e788ce0a3895ec8605e9ff39544af1811ffae",
+          "bytes": 11407,
+          "lines": 218,
+          "headings": [
+            {
+              "line": 13,
+              "text": "# fgos-coding-implement"
+            },
+            {
+              "line": 22,
+              "text": "## Driver vs. worker"
+            },
+            {
+              "line": 47,
+              "text": "## Hard rules"
+            },
+            {
+              "line": 115,
+              "text": "## Flow"
+            },
+            {
+              "line": 117,
+              "text": "### Step 1: Orient"
+            },
+            {
+              "line": 123,
+              "text": "### Step 2: Implement"
+            },
+            {
+              "line": 133,
+              "text": "### Step 3: Verify — proof, not assertion"
+            },
+            {
+              "line": 139,
+              "text": "### Step 4: Commit, then check Iron Law evidence"
+            },
+            {
+              "line": 146,
+              "text": "### Step 5: Return"
+            },
+            {
+              "line": 154,
+              "text": "## Headless"
+            },
+            {
+              "line": 164,
+              "text": "## Next"
+            },
+            {
+              "line": 173,
+              "text": "## Red flags"
+            },
+            {
+              "line": 200,
+              "text": "## References"
+            },
+            {
+              "line": 212,
+              "text": "## Workflow Position"
+            }
+          ],
+          "method": "Entire pinned blob read and decoded; every line traversed, every slot rebound; full context in review payload. Independent semantic review pending."
+        }
+      },
+      "targetEvidence": {},
+      "mandatory": "Read source→render header/slot correspondence in record; generation/parity is not claimed."
+    }
+  ]
+}

@@ -1,0 +1,218 @@
+{
+  "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+  "reviewerRule": "Never run checker/probes/resolver/author scripts. Read every assigned file through EOF and independently verify targets. One verdict per whole file, even when streamed.",
+  "set": "L12-58-Step5-source-witnesses",
+  "files": [
+    "plugins/fgOS/skills/terminal-close/close.sh",
+    "plugins/fgOS/skills/terminal/rename.sh"
+  ],
+  "joinedSlots": 4,
+  "items": [
+    {
+      "file": "plugins/fgOS/skills/terminal-close/close.sh",
+      "sourceContext": "#!/usr/bin/env bash\n# fgOS terminal close -- best-effort close of the caller's own herdr pane,\n# through the terminal-control port. Chrome-only\n# (docs/history/fgos-terminal-close-autoclose/CONTEXT.md D2, mirrors\n# terminal/rename.sh's own guard chain): never touches .fgos/ state, never\n# blocks the caller. Any missing precondition is a silent no-op, exit 0.\n#\n# Usage: close.sh\nset -u\n\n# Not in a herdr-managed pane, or herdr unavailable: no-op.\n[ \"${HERDR_ENV:-}\" = \"1\" ] || exit 0\ncommand -v herdr >/dev/null 2>&1 || exit 0\ncommand -v fgos >/dev/null 2>&1 || exit 0\n[ -n \"${HERDR_PANE_ID:-}\" ] || exit 0\n# Same ownership guard as terminal/rename.sh: never close a dead or foreign\n# pane named by an inherited HERDR_PANE_ID.\n. \"$(dirname \"$0\")/../terminal/pane-owned.sh\"\n. \"$(dirname \"$0\")/../terminal/terminal-port.sh\"\nfgos_pane_owned \"$HERDR_PANE_ID\" || exit 0\n\n# The pane is attached under this session's key (idempotent when /fgOS:terminal\n# already did it). Naming it as the caller's own pane is what lets the port\n# close an attached pane: the one case where it does.\nkey=$(fgos_terminal_key \"${CLAUDE_PROJECT_DIR:-}\")\nfgos_terminal_attach \"$key\" \"$HERDR_PANE_ID\" || exit 0\nfgos_terminal_call release \"{\\\"key\\\":$(fgos_json_str \"$key\"),\\\"disposition\\\":\\\"close\\\",\\\"callerPane\\\":$(fgos_json_str \"$HERDR_PANE_ID\")}\" >/dev/null || true\nexit 0\n",
+      "digest": "0ddfcc36dfad61392248ce67bb903f26ff2ae34f9a8a169cc343ef87be067e50",
+      "preparedWitness": {
+        "file": "plugins/fgOS/skills/terminal-close/close.sh",
+        "lines": "1-12",
+        "header": [
+          "#!/usr/bin/env bash",
+          "# fgOS terminal close -- best-effort close of the caller's own herdr pane,",
+          "# through the terminal-control port. Chrome-only",
+          "# (docs/history/fgos-terminal-close-autoclose/CONTEXT.md D2, mirrors",
+          "# terminal/rename.sh's own guard chain): never touches .fgos/ state, never",
+          "# blocks the caller. Any missing precondition is a silent no-op, exit 0.",
+          "#",
+          "# Usage: close.sh",
+          "set -u",
+          "",
+          "# Not in a herdr-managed pane, or herdr unavailable: no-op.",
+          "[ \"${HERDR_ENV:-}\" = \"1\" ] || exit 0"
+        ],
+        "censusSourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "reason": "Headerless host/plugin source per Step2, not a proved generated join. Preserve historical/external conventions; resolve canonical authoring owner before any non-preserve edit."
+      },
+      "sourceOwner": "plugins/fgOS/skills/terminal-close/close.sh",
+      "custody": "Executable source; Step 5 only; no Step 4 diff and no generated status inferred",
+      "joins": [
+        {
+          "file": "plugins/fgOS/skills/terminal-close/close.sh",
+          "sourceOwner": "UNRESOLVED-RENDER-SOURCE:plugins/fgOS/skills/terminal-close/close.sh",
+          "sourcePath": "plugins/fgOS/skills/terminal-close/close.sh",
+          "surface": "render-joins",
+          "renderOnly": true,
+          "bucket": "step5",
+          "advisoryClass": null,
+          "rule": "Behavioral owner: preserve active reads/writes/defaults and require Step 5 parity; comments in the same generator/setup/tool seam stay with that owner.",
+          "edgeId": "skills-191",
+          "inventoryRefs": [
+            {
+              "inventory": "step-02-census-skills-prompts.json",
+              "edgeId": "skills-191",
+              "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+              "originalLine": 4
+            },
+            {
+              "inventory": "step-02l-census-class4.json",
+              "edgeId": "class4-l-002102",
+              "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+              "originalLine": 4
+            }
+          ],
+          "matchedExpression": "docs/history/fgos-terminal-close-autoclose/CONTEXT.md",
+          "kind": "historical-provenance",
+          "binding": {
+            "status": "exact-unchanged-source",
+            "oldLine": 4,
+            "line": 4,
+            "columnStart": 4,
+            "columnEndExclusive": 57,
+            "text": "docs/history/fgos-terminal-close-autoclose/CONTEXT.md"
+          },
+          "currentFileDigest": "0ddfcc36dfad61392248ce67bb903f26ff2ae34f9a8a169cc343ef87be067e50",
+          "ownerSurface": "render-joins"
+        }
+      ]
+    },
+    {
+      "file": "plugins/fgOS/skills/terminal/rename.sh",
+      "sourceContext": "#!/usr/bin/env bash\n# fgOS terminal rename -- best-effort herdr pane label, through the\n# terminal-control port (attach, then label). Chrome-only (D2,\n# docs/history/fgos-terminal-pane-rename/CONTEXT.md): never touches .fgos/\n# state, never blocks the caller. Any missing precondition -- including the\n# pane-labeling capability not being registered at all -- is a silent no-op,\n# exit 0.\n#\n# Usage: rename.sh <task-id> <project-root>\n#   <task-id>      the claimed fgOS item id (first label segment)\n#   <project-root> absolute path to this repo's checkout, so the fgOS\n#                  session-id fallback (fg.ssid) can be resolved even when\n#                  this script itself runs from an installed plugin cache\n#                  copy that doesn't carry src/ alongside it.\nset -u\n\ntask_id=\"${1:-}\"\nproject_root=\"${2:-}\"\n\n[ -n \"$task_id\" ] || exit 0\n\n# Capability gate (D5, docs/history/orchestrator-worker-slots/DISCUSSION.md\n# §6 \"Nhãn: session tự đặt qua helper skill có gate\"). Pane labeling is an\n# adapter-swappable capability declared through the tool registry:\n#\n#   fgos tool register --name herdr --kind cli --capability pane-labeling \\\n#     --command herdr\n#\n# Zero registered providers means this environment has no pane-label concept\n# at all, so labeling is skipped silently -- the same shape this script\n# already had outside a herdr pane, never a failure (\"absent capability =\n# clean skip\", src/state/tool-registry.mjs's own header). Swapping herdr for\n# tmux/cmux later means registering a different provider here, not editing\n# every caller: this query is the hexagon seam, and it sits ahead of the\n# herdr-specific guards below precisely so those guards read as one\n# adapter's implementation detail rather than as the gate itself.\n#\n# Gated on REGISTERED, not on `--status present`: `present` only becomes true\n# once someone has run `fgos tool check` on this machine (bin/fgos.mjs's\n# `tool query`, resolvedStatus), so gating on it would switch labeling off on\n# every fresh clone with no signal. The registry answers \"does this\n# environment have the concept\"; the adapter guards below answer \"and is it\n# usable right now\", which for herdr is a strictly sharper question than a\n# PATH probe -- herdr being installed says nothing about this session running\n# inside one of its panes.\n#\n# Any failure to answer the question at all -- no <project-root>, no\n# .fgos/installation/bin/fgos or bin/fgos.mjs there, node missing, CLI error --\n# falls through to the same no-op. Fail-closed is the right direction for\n# decoration: a helper that cannot confirm the capability must not guess\n# that it is present.\n[ -n \"$project_root\" ] || exit 0\nif [ -x \"$project_root/.fgos/installation/bin/fgos\" ]; then\n  \"$project_root/.fgos/installation/bin/fgos\" tool query --capability pane-labeling --dir \"$project_root\" 2>/dev/null \\\n    | grep -q '\"capability\" *: *\"pane-labeling\"' || exit 0\nelif [ -f \"$project_root/bin/fgos.mjs\" ]; then\n  node \"$project_root/bin/fgos.mjs\" tool query --capability pane-labeling --dir \"$project_root\" 2>/dev/null \\\n    | grep -q '\"capability\" *: *\"pane-labeling\"' || exit 0\nelse\n  exit 0\nfi\n\n# herdr adapter -- today's only pane-labeling provider. Not in a\n# herdr-managed pane, or herdr unavailable: no-op.\n[ \"${HERDR_ENV:-}\" = \"1\" ] || exit 0\ncommand -v herdr >/dev/null 2>&1 || exit 0\ncommand -v fgos >/dev/null 2>&1 || exit 0\n[ -n \"${HERDR_PANE_ID:-}\" ] || exit 0\n# HERDR_PANE_ID can be inherited from a shared agent daemon and name a dead\n# pane or another session's pane: act only on this caller's own live pane.\n. \"$(dirname \"$0\")/pane-owned.sh\"\n. \"$(dirname \"$0\")/terminal-port.sh\"\nfgos_pane_owned \"$HERDR_PANE_ID\" || exit 0\n\n# fg.ssid (D1): fgOS's own session id. FGOS_SESSION_ID first, else\n# resolveWriterIdentity()'s own env/registry/pid fallback chain\n# (src/util/session-identity.mjs) -- dropped entirely if neither resolves.\nfg_ssid=\"${FGOS_SESSION_ID:-}\"\nif [ -z \"$fg_ssid\" ] && [ -n \"$project_root\" ] && [ -f \"$project_root/src/util/session-identity.mjs\" ]; then\n  fg_ssid=$(node -e \"\n    import(process.argv[1]).then(({ resolveWriterIdentity }) => {\n      process.stdout.write(String(resolveWriterIdentity().id));\n    }).catch(() => {});\n  \" -- \"$project_root/src/util/session-identity.mjs\" 2>/dev/null || true)\nfi\n\n# a.ssid (D1): the coding agent tool's own native session id. Claude Code\n# exposes CLAUDE_CODE_SESSION_ID; other agent tools are not detected today\n# (docs/history/fgos-terminal-pane-rename/CONTEXT.md, outstanding questions)\n# and simply drop this segment (D4).\na_ssid=\"${CLAUDE_CODE_SESSION_ID:-}\"\n\n# resolveWriterIdentity()'s own fallback chain reads CLAUDE_CODE_SESSION_ID\n# too when FGOS_SESSION_ID is unset, so fg_ssid can come back equal to\n# a_ssid -- collapsing the two genuinely-distinct identities D1 requires.\n# Drop the duplicate rather than show the same value twice.\nif [ -n \"$fg_ssid\" ] && [ \"$fg_ssid\" = \"$a_ssid\" ]; then\n  fg_ssid=\"\"\nfi\n\n# D4: taskid | fg.ssid:<v> | a.ssid:<v>, unresolved segments dropped.\nlabel=\"$task_id\"\n[ -n \"$fg_ssid\" ] && label=\"$label | fg.ssid:$fg_ssid\"\n[ -n \"$a_ssid\" ] && label=\"$label | a.ssid:$a_ssid\"\n\n# The terminal-control port takes the pane (attach, keyed by this session's\n# writer id; idempotent) and then writes the label. Either step failing is\n# the same silent no-op as every guard above.\nkey=$(fgos_terminal_key \"$project_root\")\nfgos_terminal_attach \"$key\" \"$HERDR_PANE_ID\" || exit 0\nfgos_terminal_call label \"{\\\"key\\\":$(fgos_json_str \"$key\"),\\\"display\\\":{\\\"label\\\":$(fgos_json_str \"$label\")}}\" >/dev/null || true\nexit 0\n",
+      "digest": "f5dc67dab59851a891667bb474670d48bc83b2f6292adae6051be78dd976dd15",
+      "preparedWitness": {
+        "file": "plugins/fgOS/skills/terminal/rename.sh",
+        "lines": "1-12",
+        "header": [
+          "#!/usr/bin/env bash",
+          "# fgOS terminal rename -- best-effort herdr pane label, through the",
+          "# terminal-control port (attach, then label). Chrome-only (D2,",
+          "# docs/history/fgos-terminal-pane-rename/CONTEXT.md): never touches .fgos/",
+          "# state, never blocks the caller. Any missing precondition -- including the",
+          "# pane-labeling capability not being registered at all -- is a silent no-op,",
+          "# exit 0.",
+          "#",
+          "# Usage: rename.sh <task-id> <project-root>",
+          "#   <task-id>      the claimed fgOS item id (first label segment)",
+          "#   <project-root> absolute path to this repo's checkout, so the fgOS",
+          "#                  session-id fallback (fg.ssid) can be resolved even when"
+        ],
+        "censusSourceVsRender": "source (including hand-authored host/plugin skills without canonical header; do not infer generated status from directory)",
+        "reason": "Headerless host/plugin source per Step2, not a proved generated join. Preserve historical/external conventions; resolve canonical authoring owner before any non-preserve edit."
+      },
+      "sourceOwner": "plugins/fgOS/skills/terminal/rename.sh",
+      "custody": "Executable source; Step 5 only; no Step 4 diff and no generated status inferred",
+      "joins": [
+        {
+          "file": "plugins/fgOS/skills/terminal/rename.sh",
+          "sourceOwner": "UNRESOLVED-RENDER-SOURCE:plugins/fgOS/skills/terminal/rename.sh",
+          "sourcePath": "plugins/fgOS/skills/terminal/rename.sh",
+          "surface": "render-joins",
+          "renderOnly": true,
+          "bucket": "step5",
+          "advisoryClass": null,
+          "rule": "Behavioral owner: preserve active reads/writes/defaults and require Step 5 parity; comments in the same generator/setup/tool seam stay with that owner.",
+          "edgeId": "skills-195",
+          "inventoryRefs": [
+            {
+              "inventory": "step-02-census-skills-prompts.json",
+              "edgeId": "skills-195",
+              "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+              "originalLine": 4
+            },
+            {
+              "inventory": "step-02l-census-class4.json",
+              "edgeId": "class4-l-002106",
+              "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+              "originalLine": 4
+            }
+          ],
+          "matchedExpression": "docs/history/fgos-terminal-pane-rename/CONTEXT.md",
+          "kind": "historical-provenance",
+          "binding": {
+            "status": "exact-unchanged-source",
+            "oldLine": 4,
+            "line": 4,
+            "columnStart": 3,
+            "columnEndExclusive": 52,
+            "text": "docs/history/fgos-terminal-pane-rename/CONTEXT.md"
+          },
+          "currentFileDigest": "f5dc67dab59851a891667bb474670d48bc83b2f6292adae6051be78dd976dd15",
+          "ownerSurface": "render-joins"
+        },
+        {
+          "file": "plugins/fgOS/skills/terminal/rename.sh",
+          "sourceOwner": "UNRESOLVED-RENDER-SOURCE:plugins/fgOS/skills/terminal/rename.sh",
+          "sourcePath": "plugins/fgOS/skills/terminal/rename.sh",
+          "surface": "render-joins",
+          "renderOnly": true,
+          "bucket": "step5",
+          "advisoryClass": null,
+          "rule": "Behavioral owner: preserve active reads/writes/defaults and require Step 5 parity; comments in the same generator/setup/tool seam stay with that owner.",
+          "edgeId": "skills-196",
+          "inventoryRefs": [
+            {
+              "inventory": "step-02-census-skills-prompts.json",
+              "edgeId": "skills-196",
+              "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+              "originalLine": 22
+            },
+            {
+              "inventory": "step-02l-census-class4.json",
+              "edgeId": "class4-l-002107",
+              "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+              "originalLine": 22
+            }
+          ],
+          "matchedExpression": "docs/history/orchestrator-worker-slots/DISCUSSION.md",
+          "kind": "historical-provenance",
+          "binding": {
+            "status": "exact-unchanged-source",
+            "oldLine": 22,
+            "line": 22,
+            "columnStart": 24,
+            "columnEndExclusive": 76,
+            "text": "docs/history/orchestrator-worker-slots/DISCUSSION.md"
+          },
+          "currentFileDigest": "f5dc67dab59851a891667bb474670d48bc83b2f6292adae6051be78dd976dd15",
+          "ownerSurface": "render-joins"
+        },
+        {
+          "file": "plugins/fgOS/skills/terminal/rename.sh",
+          "sourceOwner": "UNRESOLVED-RENDER-SOURCE:plugins/fgOS/skills/terminal/rename.sh",
+          "sourcePath": "plugins/fgOS/skills/terminal/rename.sh",
+          "surface": "render-joins",
+          "renderOnly": true,
+          "bucket": "step5",
+          "advisoryClass": null,
+          "rule": "Behavioral owner: preserve active reads/writes/defaults and require Step 5 parity; comments in the same generator/setup/tool seam stay with that owner.",
+          "edgeId": "skills-197",
+          "inventoryRefs": [
+            {
+              "inventory": "step-02-census-skills-prompts.json",
+              "edgeId": "skills-197",
+              "inputCommit": "0689b862e8468014f0a08c8b5749ab5aabfc3421",
+              "originalLine": 89
+            },
+            {
+              "inventory": "step-02l-census-class4.json",
+              "edgeId": "class4-l-002108",
+              "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+              "originalLine": 89
+            }
+          ],
+          "matchedExpression": "docs/history/fgos-terminal-pane-rename/CONTEXT.md",
+          "kind": "historical-provenance",
+          "binding": {
+            "status": "exact-unchanged-source",
+            "oldLine": 89,
+            "line": 89,
+            "columnStart": 4,
+            "columnEndExclusive": 53,
+            "text": "docs/history/fgos-terminal-pane-rename/CONTEXT.md"
+          },
+          "currentFileDigest": "f5dc67dab59851a891667bb474670d48bc83b2f6292adae6051be78dd976dd15",
+          "ownerSurface": "render-joins"
+        }
+      ]
+    }
+  ]
+}

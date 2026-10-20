@@ -1,0 +1,97 @@
+{
+  "authorInputCommit": "ef62747ddb0952d3cf1a3558f5ea650e77fcbe7e",
+  "positiveFiles": 174,
+  "positiveSlots": 542,
+  "positiveFailureCount": 0,
+  "probes": [
+    {
+      "probe": "render-path diff rejected",
+      "expectedCheck": "render-path-diff-rejected",
+      "observedChecks": [
+        "exact-whole-file-diff",
+        "git-apply-check",
+        "render-path-diff-rejected"
+      ],
+      "rejected": true,
+      "pass": true
+    },
+    {
+      "probe": "missing census id rejected",
+      "expectedCheck": "multi-census-id",
+      "observedChecks": [
+        "multi-census-id",
+        "qualified-original-occurrences",
+        "slot-join"
+      ],
+      "rejected": true,
+      "pass": true
+    },
+    {
+      "probe": "provenance mismatch rejected",
+      "expectedCheck": "source-render-provenance",
+      "observedChecks": [
+        "source-render-provenance"
+      ],
+      "rejected": true,
+      "pass": true
+    },
+    {
+      "probe": "missing original census alias rejected",
+      "expectedCheck": "slot-join",
+      "observedChecks": [
+        "qualified-original-occurrences",
+        "slot-join"
+      ],
+      "rejected": true,
+      "pass": true
+    },
+    {
+      "probe": "current digest mismatch rejected",
+      "expectedCheck": "author-pin-digest",
+      "observedChecks": [
+        "author-pin-digest"
+      ],
+      "rejected": true,
+      "pass": true
+    },
+    {
+      "probe": "render occurrence hunk rejected",
+      "expectedCheck": "render-path-diff-rejected",
+      "observedChecks": [
+        "render-path-diff-rejected"
+      ],
+      "rejected": true,
+      "pass": true
+    },
+    {
+      "probe": "Phase 8 apply-now rejected",
+      "expectedCheck": "zero-apply-now",
+      "observedChecks": [
+        "zero-apply-now"
+      ],
+      "rejected": true,
+      "pass": true
+    },
+    {
+      "probe": "bad span rejected",
+      "expectedCheck": "source-spans",
+      "observedChecks": [
+        "source-spans"
+      ],
+      "rejected": true,
+      "pass": true
+    },
+    {
+      "probe": "L12-54(2) candidate law body is live",
+      "pass": true
+    },
+    {
+      "probe": "other retained source detail remains carriage",
+      "pass": true
+    }
+  ],
+  "passed": 10,
+  "total": 10,
+  "allPassed": true,
+  "checkerSha256": "741f41e31bf9506b09d13c7986816f68fde31bd575c9b1cc99ae92590b0ed5fb"
+}
