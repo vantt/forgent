@@ -65,6 +65,17 @@ export function pruneRunDirs(runtimeBase, { now = Date.now(), staleMs = STALE_RU
   }
 }
 
+/** Environment of the staged dev host. FGOS_HOST_BIN names the staged host itself, so a Node client
+ * under `npm run fgos:dev` resolves the working-tree host and never the activated one. */
+export function devHostEnv(baseEnv, { fgosBin, checkoutRoot, manifestPath }) {
+  return {
+    ...baseEnv,
+    FGOS_HOST_BIN: fgosBin,
+    FGOS_ACTIVE_RELEASE_PATH: checkoutRoot,
+    FGOS_ACTIVE_MANIFEST_PATH: manifestPath,
+  };
+}
+
 function forwardResult(result, description) {
   if (result.error) {
     throw new Error(`${description}: ${result.error.message}`);
@@ -146,11 +157,7 @@ function main() {
     child = spawnSync(fgosBin, process.argv.slice(2), {
       cwd: process.env.INIT_CWD ?? process.cwd(),
       stdio: 'inherit',
-      env: {
-        ...process.env,
-        FGOS_ACTIVE_RELEASE_PATH: checkoutRoot,
-        FGOS_ACTIVE_MANIFEST_PATH: manifestPath,
-      },
+      env: devHostEnv(process.env, { fgosBin, checkoutRoot, manifestPath }),
     });
   } finally {
     // Remove only this invocation's artifacts, never another run or user file, and not while a
