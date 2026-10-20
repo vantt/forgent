@@ -1,0 +1,14 @@
+{
+  "merge": "0b55288b06432804be46c1aaebd768f28f15f1ac",
+  "priorMerge": "080e7ccad88dbbfa472be335759efc991b150ce1",
+  "extractorsAgree": true,
+  "extractors": [],
+  "changedPaths": [],
+  "changedCandidateFiles": [],
+  "directChecked": 0,
+  "groupMembersChecked": 0,
+  "changedBindingsPendingReview": 0,
+  "postApplicationDirectChecks": [],
+  "remainingDrift": 0,
+  "deferredStep3Records": 0
+}

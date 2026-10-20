@@ -1,0 +1,164 @@
+{
+  "inputHEAD": "0b55288b06432804be46c1aaebd768f28f15f1ac",
+  "prior": "6813aac5ebb7e1a55d3f8cb8f4238d00119a89cf",
+  "merge": "0b55288b06432804be46c1aaebd768f28f15f1ac",
+  "main": "f03c2ee5b77552da534f1c277025764115526e74",
+  "base": "e4ee4235900299ee412d45e523628d159fe3ca0b",
+  "accountedMerges": [
+    {
+      "merge": "0b55288b06432804be46c1aaebd768f28f15f1ac",
+      "main": "f03c2ee5b77552da534f1c277025764115526e74",
+      "base": "e4ee4235900299ee412d45e523628d159fe3ca0b",
+      "mainCommits": 8,
+      "changedPaths": [
+        ".agents/skills/fgos-cook/SKILL.md",
+        ".agents/skills/fgos-cook/references/case-and-doors.md",
+        ".agents/skills/fgos-cook/references/reading-ak-plans.md",
+        ".agents/skills/fgos-cook/references/route-table-pending.md",
+        ".agents/skills/fgos-run/SKILL.md",
+        ".claude/skills/fgos-cook/SKILL.md",
+        ".claude/skills/fgos-cook/references/case-and-doors.md",
+        ".claude/skills/fgos-cook/references/reading-ak-plans.md",
+        ".claude/skills/fgos-cook/references/route-table-pending.md",
+        "CHANGELOG.md",
+        "core/skills/fgos-cook/SKILL.md",
+        "core/skills/fgos-cook/references/case-and-doors.md",
+        "core/skills/fgos-cook/references/reading-ak-plans.md",
+        "core/skills/fgos-cook/references/route-table-pending.md",
+        "core/skills/fgos-run/SKILL.md",
+        "plans/261017-1313-fgos-platform-program-board/plan.md",
+        "plans/261020-2014-cook-p5-fgos-cook-coordination-loop/plan.md",
+        "plans/reports/phase-lead-261020-2014-cook-p5-coordination-loop.md",
+        "plugins/fgOS/skills/fgos-cook/SKILL.md",
+        "plugins/fgOS/skills/fgos-cook/references/case-and-doors.md",
+        "plugins/fgOS/skills/fgos-cook/references/reading-ak-plans.md",
+        "plugins/fgOS/skills/fgos-cook/references/route-table-pending.md",
+        "plugins/fgOS/skills/fgos-run/SKILL.md"
+      ],
+      "changedDocs": [],
+      "changedCandidateFiles": []
+    }
+  ],
+  "mainCommits": 8,
+  "changedPaths": [
+    ".agents/skills/fgos-cook/SKILL.md",
+    ".agents/skills/fgos-cook/references/case-and-doors.md",
+    ".agents/skills/fgos-cook/references/reading-ak-plans.md",
+    ".agents/skills/fgos-cook/references/route-table-pending.md",
+    ".agents/skills/fgos-run/SKILL.md",
+    ".claude/skills/fgos-cook/SKILL.md",
+    ".claude/skills/fgos-cook/references/case-and-doors.md",
+    ".claude/skills/fgos-cook/references/reading-ak-plans.md",
+    ".claude/skills/fgos-cook/references/route-table-pending.md",
+    "CHANGELOG.md",
+    "core/skills/fgos-cook/SKILL.md",
+    "core/skills/fgos-cook/references/case-and-doors.md",
+    "core/skills/fgos-cook/references/reading-ak-plans.md",
+    "core/skills/fgos-cook/references/route-table-pending.md",
+    "core/skills/fgos-run/SKILL.md",
+    "plans/261017-1313-fgos-platform-program-board/plan.md",
+    "plans/261020-2014-cook-p5-fgos-cook-coordination-loop/plan.md",
+    "plans/reports/phase-lead-261020-2014-cook-p5-coordination-loop.md",
+    "plugins/fgOS/skills/fgos-cook/SKILL.md",
+    "plugins/fgOS/skills/fgos-cook/references/case-and-doors.md",
+    "plugins/fgOS/skills/fgos-cook/references/reading-ak-plans.md",
+    "plugins/fgOS/skills/fgos-cook/references/route-table-pending.md",
+    "plugins/fgOS/skills/fgos-run/SKILL.md"
+  ],
+  "changedCandidateFiles": [],
+  "changedDocs": [],
+  "mainPathCommits": {
+    ".agents/skills/fgos-cook/SKILL.md": [
+      "c1a3b7b59 feat(skills): add fgos-cook, the coordinator that delivers an ak plan through a conductor case"
+    ],
+    ".agents/skills/fgos-cook/references/case-and-doors.md": [
+      "c1a3b7b59 feat(skills): add fgos-cook, the coordinator that delivers an ak plan through a conductor case"
+    ],
+    ".agents/skills/fgos-cook/references/reading-ak-plans.md": [
+      "fc65b1289 fix(skills): drop local decision ids from the fgos-cook plan reading guide",
+      "c1a3b7b59 feat(skills): add fgos-cook, the coordinator that delivers an ak plan through a conductor case"
+    ],
+    ".agents/skills/fgos-cook/references/route-table-pending.md": [
+      "c1a3b7b59 feat(skills): add fgos-cook, the coordinator that delivers an ak plan through a conductor case"
+    ],
+    ".agents/skills/fgos-run/SKILL.md": [
+      "c1a3b7b59 feat(skills): add fgos-cook, the coordinator that delivers an ak plan through a conductor case"
+    ],
+    ".claude/skills/fgos-cook/SKILL.md": [
+      "c1a3b7b59 feat(skills): add fgos-cook, the coordinator that delivers an ak plan through a conductor case"
+    ],
+    ".claude/skills/fgos-cook/references/case-and-doors.md": [
+      "c1a3b7b59 feat(skills): add fgos-cook, the coordinator that delivers an ak plan through a conductor case"
+    ],
+    ".claude/skills/fgos-cook/references/reading-ak-plans.md": [
+      "fc65b1289 fix(skills): drop local decision ids from the fgos-cook plan reading guide",
+      "c1a3b7b59 feat(skills): add fgos-cook, the coordinator that delivers an ak plan through a conductor case"
+    ],
+    ".claude/skills/fgos-cook/references/route-table-pending.md": [
+      "c1a3b7b59 feat(skills): add fgos-cook, the coordinator that delivers an ak plan through a conductor case"
+    ],
+    "CHANGELOG.md": [
+      "c93f2ea93 Merge branch 'worktree-agent-a49edb90659389932'",
+      "905b95ef8 Merge branch 'main' into worktree-agent-a49edb90659389932",
+      "c1a3b7b59 feat(skills): add fgos-cook, the coordinator that delivers an ak plan through a conductor case"
+    ],
+    "core/skills/fgos-cook/SKILL.md": [
+      "c1a3b7b59 feat(skills): add fgos-cook, the coordinator that delivers an ak plan through a conductor case"
+    ],
+    "core/skills/fgos-cook/references/case-and-doors.md": [
+      "c1a3b7b59 feat(skills): add fgos-cook, the coordinator that delivers an ak plan through a conductor case"
+    ],
+    "core/skills/fgos-cook/references/reading-ak-plans.md": [
+      "fc65b1289 fix(skills): drop local decision ids from the fgos-cook plan reading guide",
+      "c1a3b7b59 feat(skills): add fgos-cook, the coordinator that delivers an ak plan through a conductor case"
+    ],
+    "core/skills/fgos-cook/references/route-table-pending.md": [
+      "c1a3b7b59 feat(skills): add fgos-cook, the coordinator that delivers an ak plan through a conductor case"
+    ],
+    "core/skills/fgos-run/SKILL.md": [
+      "c1a3b7b59 feat(skills): add fgos-cook, the coordinator that delivers an ak plan through a conductor case"
+    ],
+    "plans/261017-1313-fgos-platform-program-board/plan.md": [
+      "f03c2ee5b docs(board): record the cook skill merge and the seat identity verify result",
+      "68ded3a0a docs(board): record the Git 07-08 host gate result and the fix unit"
+    ],
+    "plans/261020-2014-cook-p5-fgos-cook-coordination-loop/plan.md": [
+      "c1a3b7b59 feat(skills): add fgos-cook, the coordinator that delivers an ak plan through a conductor case",
+      "2b4d408a6 docs(plan): plan the fgos-cook coordination loop skill"
+    ],
+    "plans/reports/phase-lead-261020-2014-cook-p5-coordination-loop.md": [
+      "52b287653 docs(report): record the fgos-cook coordination loop lane"
+    ],
+    "plugins/fgOS/skills/fgos-cook/SKILL.md": [
+      "c1a3b7b59 feat(skills): add fgos-cook, the coordinator that delivers an ak plan through a conductor case"
+    ],
+    "plugins/fgOS/skills/fgos-cook/references/case-and-doors.md": [
+      "c1a3b7b59 feat(skills): add fgos-cook, the coordinator that delivers an ak plan through a conductor case"
+    ],
+    "plugins/fgOS/skills/fgos-cook/references/reading-ak-plans.md": [
+      "fc65b1289 fix(skills): drop local decision ids from the fgos-cook plan reading guide",
+      "c1a3b7b59 feat(skills): add fgos-cook, the coordinator that delivers an ak plan through a conductor case"
+    ],
+    "plugins/fgOS/skills/fgos-cook/references/route-table-pending.md": [
+      "c1a3b7b59 feat(skills): add fgos-cook, the coordinator that delivers an ak plan through a conductor case"
+    ],
+    "plugins/fgOS/skills/fgos-run/SKILL.md": [
+      "c1a3b7b59 feat(skills): add fgos-cook, the coordinator that delivers an ak plan through a conductor case"
+    ]
+  },
+  "extractorsAgree": true,
+  "checkedBindings": [],
+  "successorGroupMemberChecks": [],
+  "entries": [],
+  "parked": [],
+  "needsWrites": [],
+  "counts": {
+    "directChecked": 0,
+    "groupMembersChecked": 0,
+    "proposedRebindings": 0,
+    "appliedRebindings": 0,
+    "remainingDrift": 0
+  },
+  "phase9ConservationUnionAdditions": [],
+  "acceptance": "Author binding verification only; independent changed-binding review and real runner commit L12-11 accounting remain owed."
+}

@@ -1,0 +1,48 @@
+{
+  "ruling": "L12-73",
+  "merges": [
+    "0b55288b06432804be46c1aaebd768f28f15f1ac"
+  ],
+  "step3Overlaps": [],
+  "step4Overlaps": [
+    {
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-017.jsonl",
+      "line": 1,
+      "file": "CHANGELOG.md",
+      "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+      "recordSha256": "8c218697e50bd71903d5837180c4a1db2eabeb0d8c1c4cb39bb83ea8dc3a000a",
+      "pinnedDigest": "062f9fdd3601883b474bc5f0980b444366e8b10fafb6dc490ac8bd5fee00e8e9",
+      "headDigest": "177b3feb838b90313647e1285ac12e935c6187f413be6f78fb77330943f811ee",
+      "action": "Deferred once to Step 7 final atomic assembly under L12-58(1); no Step 4 record edited in Phase 8."
+    },
+    {
+      "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-030.jsonl",
+      "line": 9,
+      "file": "core/skills/fgos-run/SKILL.md",
+      "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+      "recordSha256": "bfdb78cb5cf2d9c4aa0bc9a9bb85970c6550db4b9c1d6df49053915f013d5cf7",
+      "pinnedDigest": "1e1ebada1abc36f8d1313f78d28cbe6fd9cbfb160ae7f1f2aa2031bb349c2afc",
+      "headDigest": "b33a70eb0dbd2a0470053ab033b6eaadf5d70ff03bf3a7eca454e171eb32b1ba",
+      "action": "Deferred once to Step 7 final atomic assembly under L12-58(1); no Step 4 record edited in Phase 8."
+    }
+  ],
+  "step5Status": {
+    "authoredRecords": {
+      "totalRecords": 291,
+      "primaryConsumerFileOverlaps": 0,
+      "movedCurrentPassageAtPin": 0,
+      "note": "All 291 authored Step 5 records in step-05-records/*.jsonl match disk bytes and sourceSha256 at their author pins; none of their primary consumer files changed between pin and HEAD, so zero currentPassage moved at the pin."
+    },
+    "authoredCoCutDependencies": {
+      "file": "CHANGELOG.md",
+      "affectedRecordsCount": 11,
+      "recordFiles": [
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl"
+      ],
+      "note": "CHANGELOG.md changed in main (headDigest 177b3feb838b90313647e1285ac12e935c6187f413be6f78fb77330943f811ee); listed in coCutPaths across 11 authored records. Deferred to Step 7 / Phase 9 co-cut assembly."
+    },
+    "unpilotedQueueConsumerFiles": []
+  }
+}

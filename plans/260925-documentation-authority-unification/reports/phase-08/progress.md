@@ -1063,3 +1063,14 @@ Full checker: **291 records / 2,419 original references / 5,654 original tuples 
 `step-05-seam4-rereview-list.json` lists **195 physical source files**, including all original p12–p29 files (60 source locators); 70 changed generated outputs are listed separately for per-file review. Original transient light payload partition was reproduced from the unchanged Lead packer and committed input records in scratch, stopping before output. Lead repacks and reviews; no independent acceptance or cutover claimed.
 
 Verification: `step-05-seam4-rulings-verification.json`. Records only; no CLI, build, services, cargo/npm suite, consumer/gate/baseline edits, or git writes. Markdown preview stays with Lead. `needsWrites: []`.
+
+
+## Local main merge 0b55288b0 accounting — completed author handback (2026-10-21)
+
+Input `0b55288b06432804be46c1aaebd768f28f15f1ac`; local main `f03c2ee5b77552da534f1c277025764115526e74`, base `e4ee4235900299ee412d45e523628d159fe3ca0b`, **8 main commits / 23 changed paths** (fgos-cook skill sources and references, board/report docs, CHANGELOG, fgos-run skill references). **Zero changed documentation or candidate files** under `docs/**`, `AGENTS.md` or `CLAUDE.md`.
+
+Ratchet clean: **997 legacy files checked / 28 accounted edits / 3 accounted new files**, exit 0; ratchet test suite passes **28/28**. Exceptions unchanged. Citation drift reports no findings.
+Step 0 binding check: 0 candidate files changed, 0 direct bindings checked, 0 group members checked, 0 drifted bindings, 0 rebindings applied, 0 remaining target drift. Receipt: `step-00-l12-73-binding-check.json`.
+Consumer overlaps: Step 3 has 0 overlaps (`step-00-l12-73-step3-deferred-rebinds.json` is empty). Step 4 has 2 overlaps (`CHANGELOG.md` in `step04-017.jsonl:1`, `core/skills/fgos-run/SKILL.md` in `step04-030.jsonl:9`), deferred once to Step 7 final assembly under L12-58(1). Step 5 has 0 primary consumer overlaps across all 291 authored records; `CHANGELOG.md` is in `coCutPaths` of 11 authored records (deferred to Step 7 / Phase 9 co-cut assembly). Receipt: `step-00-l12-73-consumer-overlaps.json`.
+
+Runner supplies the real commit; Lead owes ordinary L12-11 actual-commit accounting and independent Step 0 review. No git write, fgOS CLI, docs/code/consumer edit, live state/secrets read, authority flip, generator/build, full npm/cargo or installed parity is claimed. `needsWrites: []`.
