@@ -116,6 +116,9 @@ pub struct SyncIntent {
     pub head: String,
     pub target: String,
     pub message: String,
+    /// Consumer-declared literal bytes applied after the merge (prepare only).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub files: Vec<crate::LandFile>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -440,6 +443,7 @@ impl Intent {
                 target,
                 message,
                 reference,
+                files,
             } = payload.as_ref();
             if !Path::new(worktree).is_absolute()
                 || !checkout_resource_valid(&self.resource_set, worktree)
@@ -448,6 +452,7 @@ impl Intent {
                 || reference
                     .as_ref()
                     .is_some_and(|r| RefName::parse(r).is_err())
+                || crate::land::validate_declared_files(files, "sync").is_err()
             {
                 return Err(corrupt("sync binding"));
             }

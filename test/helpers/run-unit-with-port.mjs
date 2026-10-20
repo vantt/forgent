@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { runUnit as coreRunUnit, resolveGitRoots } from '../../src/runner/execution/run.mjs';
 import { createCaseAdmissionPort } from '../../src/workflow/case-admission-port.mjs';
+import { activateGitFixture } from './git-fixture.mjs';
 
 function mainRootOf(options) {
   if (options.repoRoot) return options.repoRoot;
@@ -22,10 +23,8 @@ function mainRootOf(options) {
 // This is fixture setup; production's activation fence remains mandatory.
 export function prepareActivatedGitFixture(repoRoot) {
   if (!repoRoot || !fs.existsSync(path.join(repoRoot, '.git'))) return;
-  const fence = path.join(repoRoot, '.fgos/locks/activation.lock');
-  if (fs.existsSync(fence)) return;
-  fs.mkdirSync(fence, {recursive:true});
-  fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({lock:'activation',by:'fgos git',at:'fixture'}));
+  if (fs.existsSync(path.join(repoRoot, '.fgos/locks/activation.lock'))) return;
+  activateGitFixture(repoRoot);
 }
 
 export function runUnitWithPort(options = {}) {

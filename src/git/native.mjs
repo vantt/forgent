@@ -7,6 +7,11 @@ import { createRequire } from 'node:module';
 import { OWN_PAYLOAD_ROOT, releasePayloadManifest } from '../run-supervisor/payload-root.mjs';
 const require = createRequire(import.meta.url);
 let handover;
+/** A native port error as its typed fields (`cause`, `stderr` bytes, ...);
+ * an error that is not one keeps its message as the cause. */
+export function nativeError(error) {
+  try { return JSON.parse(error.message); } catch { return { cause: error.message ?? error.code, stderr: [] }; }
+}
 export function withNativeLocks(addon, handles, call) {
   if (!handover) handover = registerGitHandover(addon);
   return handover(handles, call);

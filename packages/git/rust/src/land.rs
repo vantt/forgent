@@ -32,6 +32,49 @@ pub struct LandFile {
     pub path: String,
     pub bytes: Option<Vec<u8>>,
 }
+/// Consumer-declared paths are literal, relative and outside `.git`; `kind`
+/// names the refusal (`invalid-land-file`, `invalid-sync-file`).
+pub(crate) fn validate_declared_files(files: &[LandFile], kind: &str) -> Result<()> {
+    for file in files {
+        let path = std::path::Path::new(&file.path);
+        if path.is_absolute()
+            || file.path.is_empty()
+            || path
+                .components()
+                .any(|c| !matches!(c, std::path::Component::Normal(_)))
+            || file.path.split('/').any(|s| s == ".git")
+        {
+            return Err(failure(format!("invalid-{kind}-file")));
+        }
+    }
+    Ok(())
+}
+/// Write one declared file's literal bytes under `root`, or remove it when it
+/// declares an absence. Git never interprets them. Symlink ancestors and
+/// targets are refused rather than written through.
+pub(crate) fn write_declared_file(root: &std::path::Path, file: &LandFile, kind: &str) -> Result<()> {
+    let path = std::path::Path::new(&file.path);
+    let full = root.join(path);
+    let mut at = root.to_path_buf();
+    for part in path.components() {
+        at.push(part);
+        if std::fs::symlink_metadata(&at).is_ok_and(|m| m.file_type().is_symlink()) {
+            return Err(failure(format!("{kind}-file-symlink")));
+        }
+    }
+    if let Some(bytes) = &file.bytes {
+        if let Some(p) = full.parent() {
+            std::fs::create_dir_all(p).map_err(failure)?;
+        }
+        std::fs::write(full, bytes).map_err(failure)
+    } else {
+        match std::fs::remove_file(full) {
+            Ok(()) => Ok(()),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
+            Err(e) => Err(failure(e)),
+        }
+    }
+}
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct LandEvidence {
@@ -332,18 +375,7 @@ impl GitDriver {
         if let Some(p) = &req.footprint {
             fgos_write_scope::canonicalize_all(p).map_err(failure)?;
         }
-        for file in &req.files {
-            let path = std::path::Path::new(&file.path);
-            if path.is_absolute()
-                || file.path.is_empty()
-                || path
-                    .components()
-                    .any(|c| !matches!(c, std::path::Component::Normal(_)))
-                || file.path.split('/').any(|s| s == ".git")
-            {
-                return Err(failure("invalid-land-file"));
-            }
-        }
+        validate_declared_files(&req.files, "land")?;
         let slot = LockScope::seeded(vec![]).map_err(failure)?;
         let mut p = params(repo);
         p.insert("ref".into(), slot_key(&req.destination));
@@ -563,28 +595,7 @@ impl GitDriver {
             }
             // Consumer transformations are literal bytes; no business-state interpretation.
             for file in &req.files {
-                let path = std::path::Path::new(&file.path);
-                let full = worktree.path.join(path);
-                // Refuse symlink ancestors/targets rather than writing outside the candidate.
-                let mut at = worktree.path.clone();
-                for part in path.components() {
-                    at.push(part);
-                    if std::fs::symlink_metadata(&at).is_ok_and(|m| m.file_type().is_symlink()) {
-                        return Err(failure("land-file-symlink"));
-                    }
-                }
-                if let Some(bytes) = &file.bytes {
-                    if let Some(p) = full.parent() {
-                        std::fs::create_dir_all(p).map_err(failure)?;
-                    }
-                    std::fs::write(full, bytes).map_err(failure)?;
-                } else {
-                    match std::fs::remove_file(full) {
-                        Ok(()) => (),
-                        Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
-                        Err(e) => return Err(failure(e)),
-                    }
-                }
+                write_declared_file(&worktree.path, file, "land")?;
                 let input = format!("{}\0", file.path);
                 self.land_text(
                     &candidate_repo,

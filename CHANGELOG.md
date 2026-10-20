@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `catchup` (and the inline catchup in leaf `approve` and `sync-root`) keeps the target's `.fgos` bytes the way Land does: a branch that deleted an event shard the target grew no longer fails as `merge-refused`, a leaf whose root branch was never created approves instead of parking `fgos-write-rejected`, a conflict is reported without leaving a catch-up checkout behind, and a refused merge reports Git's own message. `cleanup` deletes the merged branch only at the tip it verified.
+
 - Leaf `approve`, `sync-root` and `promote-to-component` now land through Git Land like root-into-main `approve`: the target branch's merge slot is Land's (`lock fence merge-slot --param ref=` now takes the URL-encoded full ref, e.g. `refs%2Fheads%2Fmain`), the item's verify runs in Land's candidate, a root branch checked out in another worktree is refused instead of moved behind it, and `.fgos` event files due for a checkpoint are committed before the merge rather than inside it. After `approve` or `sync-root` records the result, Land's published candidate is removed.
 
 - Root-into-main `approve` through Land again refuses a branch that writes under `.fgos/`, self-resolves decision-id collisions on the decision index and `merge=union` `.fgos` conflicts, and runs the repo-invariant checks on the candidate before publishing.

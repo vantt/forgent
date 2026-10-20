@@ -51,20 +51,24 @@ impl GitDriver {
         writer: &str,
         id: &str,
     ) -> Result<SyncResult> {
-        self.start_sync_inner(repo, held, target, message, writer, id, false)
+        self.start_sync_inner(repo, held, target, message, &[], writer, id, false)
     }
     /// Prepare the same Sync operation, leaving its owned merge open so the
     /// consumer can verify before committing under continuous custody.
+    /// `files` are the consumer's literal resolution bytes, applied and
+    /// staged after the merge exactly as Land applies its declarations.
+    #[allow(clippy::too_many_arguments)]
     pub fn prepare_sync(
         &self,
         repo: &RepoHandle,
         held: Vec<BorrowedHandle<'_>>,
         target: &Oid,
         message: &str,
+        files: &[LandFile],
         writer: &str,
         id: &str,
     ) -> Result<SyncResult> {
-        self.start_sync_inner(repo, held, target, message, writer, id, true)
+        self.start_sync_inner(repo, held, target, message, files, writer, id, true)
     }
     #[allow(clippy::too_many_arguments)]
     fn start_sync_inner(
@@ -73,6 +77,7 @@ impl GitDriver {
         held: Vec<BorrowedHandle<'_>>,
         target: &Oid,
         message: &str,
+        files: &[LandFile],
         writer: &str,
         id: &str,
         prepare_only: bool,
@@ -80,6 +85,7 @@ impl GitDriver {
         if root(repo)? == repo.trusted_main_root() {
             return Err(failure("sync-linked-worktree-required"));
         }
+        crate::land::validate_declared_files(files, "sync")?;
         if message.is_empty() || message.contains('\0') || message.len() > 1024 * 1024 {
             return Err(failure("invalid-commit-message"));
         }
@@ -94,6 +100,7 @@ impl GitDriver {
                 head: compact.expected.clone(),
                 target: target.as_str().into(),
                 message: message.into(),
+                files: files.to_vec(),
             }));
             if compact.request != wal::canonical_digest(&(&kind, writer)).map_err(failure)? {
                 return Err(failure("operation-id-reused"));
@@ -104,7 +111,9 @@ impl GitDriver {
             let previous = wal.inspect(id).map_err(failure)?;
             match &previous.intent().kind {
                 OperationKind::Sync(payload)
-                    if payload.target == target.as_str() && payload.message == message => {}
+                    if payload.target == target.as_str()
+                        && payload.message == message
+                        && payload.files == files => {}
                 _ => return Err(failure("operation-id-reused")),
             }
             return self.continue_sync_scoped(repo, &scope, &wal, writer, id, false);
@@ -156,6 +165,7 @@ impl GitDriver {
             head: head.clone(),
             target: target.as_str().into(),
             message: message.into(),
+            files: files.to_vec(),
         }));
         let intent = Intent {
             request_digest: wal::canonical_digest(&(&kind, writer)).map_err(failure)?,
@@ -224,6 +234,17 @@ impl GitDriver {
                 }
             }
         }
+        // Declared paths the checkout keeps absent before the merge stay absent.
+        let mut absent = std::collections::BTreeSet::new();
+        for file in files {
+            match fs::symlink_metadata(root(repo)?.join(&file.path)) {
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+                    absent.insert(file.path.clone());
+                }
+                Err(e) => return Err(failure(e)),
+                Ok(_) => (),
+            }
+        }
         let out = self.checkout_call(
             repo,
             &scope,
@@ -258,9 +279,11 @@ impl GitDriver {
         touched.extend(self.unmerged(repo, &scope)?);
         touched.sort();
         touched.dedup();
+        // A consumer declaration replaces that restore for its own paths.
         let store: Vec<_> = touched
             .into_iter()
             .filter(|p| p == ".fgos" || p.starts_with(".fgos/"))
+            .filter(|p| !files.iter().any(|f| f.path == *p))
             .collect();
         if !store.is_empty() {
             self.stage_paths(
@@ -270,6 +293,7 @@ impl GitDriver {
                 &store,
             )?;
         }
+        self.apply_declared_files(repo, &scope, files, &absent)?;
         let conflicts = self.unmerged(repo, &scope)?;
         for p in &conflicts {
             if fgos_scope_literal(p).is_err()
@@ -312,6 +336,59 @@ impl GitDriver {
         receipt.staged = staged;
         receipt.warnings.extend(admission_warnings);
         Ok(receipt)
+    }
+    /// Apply consumer declarations after the merge. A skip-worktree path (as
+    /// Worktree creation leaves `.fgos`) changes in the index only, and when
+    /// it was absent before the merge it is absent again afterwards; any other
+    /// path is written and staged as Land does, an absence by index removal.
+    fn apply_declared_files(
+        &self,
+        repo: &RepoHandle,
+        scope: &LockScope<'_>,
+        files: &[LandFile],
+        absent: &std::collections::BTreeSet<String>,
+    ) -> Result<()> {
+        for file in files {
+            let entry = self.checkout_bytes(repo, scope, &["--literal-pathspecs", "ls-files", "-v", "-z", "--", &file.path])?;
+            let skipped = matches!(entry.first(), Some(b'S' | b's'));
+            let path = std::slice::from_ref(&file.path);
+            let index = |flag: &str| -> Result<()> {
+                let input = format!("{}\0", file.path);
+                let out = self.checkout_call(repo, scope, &["update-index", flag, "-z", "--stdin"], input.as_bytes(), false)?;
+                if out.success { Ok(()) } else { Err(out.error("sync-file-staging-failed")) }
+            };
+            match (&file.bytes, skipped) {
+                (Some(bytes), true) => {
+                    let blob = self.checkout_call(repo, scope, &["hash-object", "-w", "--stdin"], bytes, false)?;
+                    if !blob.success {
+                        return Err(blob.error("sync-file-staging-failed"));
+                    }
+                    let oid = String::from_utf8(blob.stdout).map_err(failure)?;
+                    let info = format!("100644 {}\t{}\0", oid.trim(), file.path);
+                    let out = self.checkout_call(repo, scope, &["update-index", "-z", "--index-info"], info.as_bytes(), false)?;
+                    if !out.success {
+                        return Err(out.error("sync-file-staging-failed"));
+                    }
+                    index("--skip-worktree")?;
+                    if absent.contains(&file.path) {
+                        match fs::remove_file(root(repo)?.join(&file.path)) {
+                            Err(e) if e.kind() != std::io::ErrorKind::NotFound => return Err(failure(e)),
+                            _ => (),
+                        }
+                    }
+                }
+                (None, true) => index("--force-remove")?,
+                (Some(_), false) => {
+                    crate::land::write_declared_file(root(repo)?, file, "sync")?;
+                    self.stage_paths(repo, scope, &["add", "-f", "-A"], path)?;
+                }
+                (None, false) => {
+                    crate::land::write_declared_file(root(repo)?, file, "sync")?;
+                    self.stage_paths(repo, scope, &["rm", "-q", "--cached", "--ignore-unmatch"], path)?;
+                }
+            }
+        }
+        Ok(())
     }
     fn sync_index_digest(
         &self,
@@ -520,6 +597,7 @@ impl GitDriver {
                     head: compact.expected.clone(),
                     target: compact.next.clone(),
                     message: String::new(),
+                    files: vec![],
                 })),
                 request_digest: compact.request.clone(),
                 repo_identity: wal.repository_identity().into(),

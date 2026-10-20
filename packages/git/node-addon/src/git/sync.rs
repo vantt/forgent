@@ -60,6 +60,7 @@ impl GitSync {
                 held,
                 &Oid::parse(text(&args, "target")?, self.repo.object_format()).map_err(error)?,
                 text(&args, "message")?,
+                &serde_json::from_value::<Vec<LandFile>>(args.get("files").cloned().unwrap_or_else(|| json!([]))).map_err(error)?,
                 &self.writer,
                 id
             ),

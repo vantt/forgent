@@ -1969,38 +1969,30 @@ test('landRunnerItem attaches no postLand report when the merge did not land', a
   assert.equal(result.postLand, undefined);
 });
 
-test('performCatchUp pre-merge-refusal fixture returns merge-refused outcome without conflictedFiles', { skip: process.platform === 'win32' ? 'POSIX git shim test' : false }, async () => {
+// Native Sync runs fgOS's own validated Git with an empty hooks path, so the
+// refusal comes from state Git itself honours: an untracked file in the
+// branch's own checkout at a path the merge would create (spec G-067).
+test('performCatchUp pre-merge-refusal fixture returns merge-refused outcome without conflictedFiles', async () => {
   const repoRoot = initRepo();
   makeBranchWithCommit(repoRoot, 'fgw/tsk-5et', 'f.txt', 'branch\n');
   git(repoRoot, ['checkout', 'main']);
-  fs.writeFileSync(path.join(repoRoot, 'f.txt'), 'main\n');
-  git(repoRoot, ['add', 'f.txt']);
-  git(repoRoot, ['commit', '-m', 'main edit']);
+  fs.writeFileSync(path.join(repoRoot, 'incoming.txt'), 'main\n');
+  git(repoRoot, ['add', 'incoming.txt']);
+  git(repoRoot, ['commit', '-m', 'main adds incoming.txt']);
+  const checkout = fs.mkdtempSync(path.join(os.tmpdir(), 'catchup-refusal-'));
+  fs.rmSync(checkout, { recursive: true });
+  git(repoRoot, ['worktree', 'add', '-q', checkout, 'fgw/tsk-5et']);
+  fs.writeFileSync(path.join(checkout, 'incoming.txt'), 'local untracked\n');
+  const tipBefore = git(repoRoot, ['rev-parse', 'fgw/tsk-5et']).trim();
 
-  const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'bin-shim-'));
-  const realGit = execFileSync('which', ['git'], { encoding: 'utf8' }).trim();
-  const shimScript = `#!/bin/sh
-if [ "$1" = "merge" ] && [ "$2" = "--no-commit" ]; then
-  echo "error: Entry 'f.txt' not uptodate. Cannot merge." >&2
-  exit 1
-fi
-exec ${realGit} "$@"
-`;
-  fs.writeFileSync(path.join(binDir, 'git'), shimScript, { mode: 0o755 });
-
-  const origPath = process.env.PATH;
-  process.env.PATH = `${binDir}:${origPath}`;
-
-  try {
-    activateGitFixture(repoRoot);
+  activateGitFixture(repoRoot);
   const result = await performCatchUp(repoRoot, 'tsk-5et', makeItem(), 'main', 5000);
-    assert.equal(result.outcome, 'merge-refused');
-    assert.equal(result.reason, "error: Entry 'f.txt' not uptodate. Cannot merge.");
-    assert.equal('conflictedFiles' in result, false);
-  } finally {
-    process.env.PATH = origPath;
-    fs.rmSync(binDir, { recursive: true, force: true });
-  }
+  assert.equal(result.outcome, 'merge-refused');
+  assert.equal(result.reason.split('\n')[0], 'error: The following untracked working tree files would be overwritten by merge:');
+  assert.equal('conflictedFiles' in result, false);
+  assert.equal(git(repoRoot, ['rev-parse', 'fgw/tsk-5et']).trim(), tipBefore);
+  assert.throws(() => git(checkout, ['rev-parse', '--verify', '-q', 'MERGE_HEAD']));
+  assert.equal(fs.readFileSync(path.join(checkout, 'incoming.txt'), 'utf8'), 'local untracked\n');
 });
 
 test('performCatchUp genuine conflict returns conflict outcome with non-empty conflictedFiles', async () => {

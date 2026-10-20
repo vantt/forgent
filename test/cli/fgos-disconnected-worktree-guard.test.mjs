@@ -31,6 +31,7 @@ import {
   createSession,
   endSession,
 } from './helpers/fgos-cli-harness.mjs';
+import { activateGitFixture } from '../helpers/git-fixture.mjs';
 
 // A real main checkout whose `.fgos/` is committed into HEAD -- mirrors this
 // product repo's own convention (`.fgos/events.jsonl` and friends are
@@ -42,10 +43,11 @@ function initGitCwdMainWithCommittedFgos() {
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
-  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/cache/\n.fgos/runtime/\n.fgos/logs/\n.fgos/*.lock\n.fgos/sessions.json\n');
+  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/cache/\n.fgos/runtime/\n.fgos/logs/\n.fgos/locks/\n.fgos/*.lock\n.fgos/sessions.json\n');
   fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', '-A'], { cwd });
   execFileSync('git', ['commit', '-q', '-m', 'seed with committed .fgos'], { cwd });
+  activateGitFixture(cwd);
   return cwd;
 }
 

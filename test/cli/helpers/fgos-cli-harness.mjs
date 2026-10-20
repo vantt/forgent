@@ -23,7 +23,7 @@ import { createSession, endSession } from '../../../src/runner/session.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../../src/state/fgos-file-registry.mjs';
 import { writeCoexistenceManifest } from '../../../src/install/coexist.mjs';
 import { invokeHost } from '../../../src/util/host-bin.mjs';
-import { prepareActivatedGitFixture } from '../../helpers/run-unit-with-port.mjs';
+import { initFixtureRepo, activateGitFixture } from '../../helpers/git-fixture.mjs';
 
 // The CLI under test, resolved by absolute path so it works regardless of
 // the spawned process's cwd (which every test below points at a fresh
@@ -269,26 +269,12 @@ function addOk(cwd, id, extra = {}) {
 // means the real files AND the log entries `take`/`add` already appended.
 function initGitCwd() {
   const cwd = tmpCwd();
-  execFileSync('git', ['init', '-q'], { cwd });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
-  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/cache/\n.fgos/runtime/\n');
-  fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
-  execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd });
-  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });
-  return cwd;
+  return initFixtureRepo(cwd);
 }
 
 function initGitCwdFast() {
   const cwd = tmpCwdFast();
-  execFileSync('git', ['init', '-q'], { cwd });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
-  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/cache/\n.fgos/runtime/\n');
-  fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
-  execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd });
-  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });
-  return cwd;
+  return initFixtureRepo(cwd);
 }
 
 function gitHead(cwd) {
@@ -319,13 +305,7 @@ function initHeadlessGitCwdFast() {
 // so a test can plant a dirty file OUTSIDE cwd's own subtree.
 function initGitCwdInSubdir(subdirName = 'workspace') {
   const topLevel = tmpCwd();
-  execFileSync('git', ['init', '-q'], { cwd: topLevel });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: topLevel });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: topLevel });
-  fs.writeFileSync(path.join(topLevel, '.gitignore'), '.fgos/cache/\n.fgos/runtime/\n');
-  fs.writeFileSync(path.join(topLevel, 'seed.txt'), 'seed\n');
-  execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd: topLevel });
-  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: topLevel });
+  initFixtureRepo(topLevel);
   const cwd = path.join(topLevel, subdirName);
   fs.mkdirSync(cwd, { recursive: true });
   return { cwd, topLevel };
@@ -351,6 +331,8 @@ function tmpLinkedWorktree() {
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: main });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: main });
   commitFile(main, 'seed.txt');
+  // After the seed commit: its `git add -A` must not commit the fence.
+  activateGitFixture(main);
   const wt = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-wt-')));
   fs.rmdirSync(wt);
   execFileSync('git', ['worktree', 'add', '-b', 'tsk-56t-dir-flag-test', wt], { cwd: main });
@@ -592,32 +574,12 @@ function writeHangScript(cwd, ms) {
 
 function initGitCwdMain() {
   const cwd = tmpCwd();
-  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
-  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/cache/\n.fgos/runtime/\n.fgos/locks/\n');
-  fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
-  execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd });
-  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });
-  // Runner-source approve lands through native Git Land, which requires
-  // an activated checkout; this is fixture setup, the fence stays mandatory.
-  prepareActivatedGitFixture(cwd);
-  return cwd;
+  return initFixtureRepo(cwd, { branch: 'main' });
 }
 
 function initGitCwdMainFast() {
   const cwd = tmpCwdFast();
-  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
-  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/cache/\n.fgos/runtime/\n.fgos/locks/\n');
-  fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
-  execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd });
-  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });
-  // Runner-source approve lands through native Git Land, which requires
-  // an activated checkout; this is fixture setup, the fence stays mandatory.
-  prepareActivatedGitFixture(cwd);
-  return cwd;
+  return initFixtureRepo(cwd, { branch: 'main' });
 }
 
 function gitAtCwd(cwd, args) {
@@ -1106,15 +1068,7 @@ function commitInWorktree(worktreePath, filename, content = 'inside-session\n') 
 // store still lives on disk and is symlinked into each session worktree, and
 // isMainTreeClean already excludes `.fgos/`, so approve is unaffected.
 function initSessionSafeCwd() {
-  const cwd = tmpCwd();
-  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
-  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/\n');
-  fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
-  execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd });
-  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });
-  return cwd;
+  return initFixtureRepo(tmpCwd(), { branch: 'main', ignore: '.fgos/\n' });
 }
 
 // Builds a runner-classified proposed item (a live fgw/<id> branch with a real

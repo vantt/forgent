@@ -41,7 +41,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { branchNameFor, branchExists, reclaimOrphanedCheckout, detectTrunk, inspectGit, resolveRefSha, checkoutPathForBranch, provisionDependencies, runWorktreeSetupCommands, createVerifyCheckout, removeWorktree } from './worktree.mjs';
+import { branchNameFor, branchExists, reclaimOrphanedCheckout, detectTrunk, inspectGit, resolveRefSha, checkoutPathForBranch, provisionDependencies, runWorktreeSetupCommands, createVerifyCheckout, removeWorktree, deleteBranchRef, gitWorktrees, realpathOrSelf } from './worktree.mjs';
 import { runGoalCheck, runInvariantChecks, invariantFailureAsCheck } from './goal-check.mjs';
 import { readInvariantCheckCommands } from '../config/shared-config-file.mjs';
 import { normalizePath } from '../util/normalize-path.mjs';
@@ -57,6 +57,7 @@ import { createGitLand } from '../git/land.mjs';
 import { createGitRecovery } from '../git/recovery.mjs';
 import { gitPortOptions } from '../git/inspect.mjs';
 import { createGitSync } from '../git/sync.mjs';
+import { nativeError } from '../git/native.mjs';
 import { createGitWorktree } from '../git/worktree.mjs';
 
 /** Raised only for a genuinely unexpected failure (a held lock, a target
@@ -771,12 +772,16 @@ function branchContentMismatch(repoRoot, branch, ref) {
     return [];
   }
   const firstMerge = mergeCommits[0];
+  const port = inspectGit(repoRoot);
+  let mainline;
   let base;
   try {
-    base = git(repoRoot, ['merge-base', branch, `${firstMerge}^1`]).trim();
+    mainline = port.resolveCommit({ name: `${firstMerge}^1` });
+    base = mainline && port.compareCommits({ left: resolveRefSha(repoRoot, branch), right: mainline }).mergeBase;
   } catch {
-    return []; // no shared history to diff against — fail open, nothing to compare
+    base = null;
   }
+  if (!base) return []; // no shared history to diff against — fail open, nothing to compare
   // tsk-52p: exclude .fgos/ paths outright, never just gated by a
   // `merge=union` attribute like declareLandFiles' own exemption below —
   // ADR0020 guarantees a worker branch can NEVER
@@ -801,30 +806,21 @@ function branchContentMismatch(repoRoot, branch, ref) {
   // discard signature is narrower: the merge commit itself made no change to
   // that path relative to its own first parent, even though branch's diff
   // touched it.
-  const changedByMerge = new Set(
-    nulPaths(git(repoRoot, ['--literal-pathspecs', 'diff', '--name-only', '--no-relative', '-z', `${firstMerge}^1`, firstMerge, '--', ...introducedPaths], { maxBuffer: GIT_LIST_MAX_BUFFER })),
-  );
+  // Without rename folding a renamed path names both of its ends, so either
+  // end counts as changed by the merge.
+  const changedByMerge = new Set();
+  let cursor;
+  do {
+    const page = port.diff({ before: mainline, after: firstMerge, maxEntries: 4096, cursor });
+    for (const entry of page.entries) changedByMerge.add(Buffer.from(entry.path).toString('utf8'));
+    cursor = page.nextCursor;
+  } while (cursor);
   return introducedPaths.filter((p) => !changedByMerge.has(p));
 }
 
-// tsk-2j9 D1/D2: a genuine `git merge --no-commit --no-ff branch` no-op
-// (branch already an ancestor of HEAD by the time this call runs -- the
-// TOCTOU window between `isAlreadyMerged`'s pre-check above and this call,
-// e.g. a main-checkout writer that bypasses the main checkout mutex)
-// exits 0 with "Already up to date." and creates no `MERGE_HEAD`. Every
-// abort call below used to run unconditionally on that path and crash with
-// "fatal: There is no merge to abort (MERGE_HEAD missing)" instead of
-// returning the outcome the code was already about to return. Guarding on
-// `MERGE_HEAD`'s existence closes that gap without changing any call
-// site's own error message or returned outcome on every already-covered
-// case -- this only ever changes behavior when there was nothing to abort.
+/** Whether the main checkout has a merge in progress (its `MERGE_HEAD`). */
 function mergeHeadExists(repoRoot) {
-  try {
-    git(repoRoot, ['rev-parse', '--verify', 'MERGE_HEAD']);
-    return true;
-  } catch {
-    return false;
-  }
+  return inspectGit(repoRoot).resolveCommit({ name: 'MERGE_HEAD' }) !== null;
 }
 
 export function formatFgosWriteRejectedDetail(branch, paths, targetLabel) {
@@ -843,7 +839,7 @@ export function formatFgosWriteRejectedDetail(branch, paths, targetLabel) {
  * cleanup failure must never mask the merge/done result that already
  * happened; failures are returned as warnings for the caller to surface.
  *
- * FORCE DELETE (tsk-1p9 D8): `git branch -D`, not `-d`. By the time this
+ * FORCE DELETE (tsk-1p9 D8): an exact-old Refs delete, never `-d`'s merge check. By the time this
  * runs, D8's harness has ALREADY independently verified the branch's
  * commit resolves against the correct target (the root's branch for a
  * leaf, `HEAD` for a root/standalone item) — `-d`'s own local safety net
@@ -854,13 +850,21 @@ export function formatFgosWriteRejectedDetail(branch, paths, targetLabel) {
  */
 export function cleanupMergedBranch(repoRoot, branch) {
   const warnings = [];
+  // The tip the harness verified is the only one this deletes: a branch that
+  // moves meanwhile is left in place by the exact-old delete.
+  let tip;
+  try {
+    tip = resolveRefSha(repoRoot, branch);
+  } catch (err) {
+    return { warnings: [`branch delete failed for "${branch}" (left in place, harmless): ${err.message}`] };
+  }
   try {
     reclaimOrphanedCheckout(repoRoot, branch);
   } catch (err) {
     warnings.push(`worktree cleanup failed for "${branch}": ${err.message}`);
   }
   try {
-    git(repoRoot, ['branch', '-D', branch]);
+    deleteBranchRef(repoRoot, branch, tip);
   } catch (err) {
     warnings.push(`branch delete failed for "${branch}" (left in place, harmless): ${err.message}`);
   }
@@ -894,8 +898,9 @@ export function cleanupMergedBranch(repoRoot, branch) {
  *     merge (or the already-caught-up tree) staged cleanly but the item's
  *     own verify came back red; any merge started is aborted, the item's
  *     branch is left exactly as it was.
- *   - `{ outcome: 'conflict', conflictedFiles }` — a real textual conflict;
- *     aborted cleanly, branch untouched.
+ *   - `{ outcome: 'conflict', conflictedFiles }` — a real textual conflict
+ *     outside `.fgos`, read from the read-only merge before any checkout or
+ *     Sync exists; branch untouched.
  *   - `{ outcome: 'merge-refused', reason }` — git refused the merge attempt
  *     up front before staging anything (no MERGE_HEAD); aborted cleanly (nothing
  *     staged to abort), branch untouched.
@@ -906,6 +911,27 @@ export function cleanupMergedBranch(repoRoot, branch) {
  */
 export async function performCatchUp(repoRoot, id, item, target, timeoutMs) {
   const ownBranch = branchNameFor(id);
+  // The store rule Land applies, bound to the target pinned for this Sync:
+  // `.fgos` keeps the target's bytes, so a stale branch neither conflicts on
+  // nor carries forward store state it never owned (ADR0020). Sync on its
+  // own keeps the source's `.fgos`, which would make this merge commit read
+  // as the branch reverting the target's store changes; so every `.fgos`
+  // path the merge result changes against the source is declared with the
+  // merge's bytes. A branch's own store write is left to Land to refuse.
+  const pinned = resolveRefSha(repoRoot, target);
+  const source = resolveRefSha(repoRoot, ownBranch);
+  const files = new Map();
+  if (inspectGit(repoRoot).ancestry({ ancestor: pinned, descendant: source }).answer !== 'yes') {
+    const { tree, conflictedPaths } = readMergeTree(repoRoot, pinned, source);
+    // A real conflict is known from the read-only merge: report it before
+    // any checkout or Sync exists, so no merge bytes are left to preserve.
+    const conflictedFiles = conflictedPaths.filter((p) => !isFgosPath(p));
+    if (conflictedFiles.length > 0) return { outcome: 'conflict', conflictedFiles };
+    declareStoreFiles(repoRoot, item, { target: pinned, source, tree, conflictedPaths }, files);
+    const merged = changedStorePaths(repoRoot, source, tree).filter((p) => !files.has(p) && !conflictedPaths.includes(p));
+    const mergedBytes = readPathsAt(repoRoot, tree, merged);
+    for (const p of merged) files.set(p, { path: p, bytes: mergedBytes.get(p) === null ? null : [...mergedBytes.get(p)] });
+  }
   const options = gitPortOptions(repoRoot, { mutation: true });
   const worktrees = createGitWorktree(options);
   let checkout = checkoutPathForBranch(repoRoot, ownBranch);
@@ -929,7 +955,7 @@ export async function performCatchUp(repoRoot, id, item, target, timeoutMs) {
   try {
     // No destination slot is held here. Sync alone owns the source index/ref
     // under its verified checkout custody, and pins the observed target OID.
-    prepared = sync.prepare({ operationId, target: resolveRefSha(repoRoot, target), message: `catch-up: merge ${target} into ${ownBranch}` }, held);
+    prepared = sync.prepare({ operationId, target: pinned, message: `catch-up: merge ${target} into ${ownBranch}`, files: [...files.values()] }, held);
     if (prepared.state === 'conflicted-open') {
       const conflictedFiles = prepared.resolverGrant;
       sync.abort({ operationId }, held);
@@ -957,7 +983,10 @@ export async function performCatchUp(repoRoot, id, item, target, timeoutMs) {
       try { sync.abort({ operationId }, held); }
       catch (abortError) { err.abortError = abortError; throw err; }
     }
-    return { outcome: 'merge-refused', reason: String(err.message) };
+    // The reason is Git's own refusal text when Git refused (G-067).
+    const native = nativeError(err);
+    const stderr = Buffer.from(native.stderr ?? []).toString('utf8').trim();
+    return { outcome: 'merge-refused', reason: stderr || String(native.cause ?? err.message) };
   } finally {
     if (created) {
       try {
@@ -992,17 +1021,9 @@ function readPathsAt(repoRoot, revision, paths) {
   return found;
 }
 
-/**
- * The trusted-side resolutions a Land candidate of `source` onto `target`
- * needs, as declared candidate files, read from a read-only
- * `git merge-tree` of the two exact OIDs: a decision-id collision on the
- * decision index is renumbered and unioned, a conflict confined to
- * `merge=union` `.fgos` paths and every `.fgos` path the branch did not
- * really write keep the target's bytes (ADR0020). Anything else returns the
- * outcome the merge verbs already report: `conflict`, or
- * `fgos-write-rejected` with the paths a branch tried to write under `.fgos`.
- */
-export function declareLandFiles(repoRoot, item, target, source) {
+/** The read-only `git merge-tree` of `source` onto `target` (two exact
+ * OIDs): the merged tree and the paths it left conflicted. */
+function readMergeTree(repoRoot, target, source) {
   let out;
   let conflicted = false;
   try {
@@ -1013,10 +1034,70 @@ export function declareLandFiles(repoRoot, item, target, source) {
     conflicted = true;
   }
   const [tree, ...rest] = String(out).split('\0');
-  const conflictedPaths = conflicted ? [...new Set(rest.filter(Boolean))] : [];
+  return { tree, conflictedPaths: conflicted ? [...new Set(rest.filter(Boolean))] : [] };
+}
+
+/** The `.fgos` paths whose bytes differ between two trees (or commits). */
+const changedStorePaths = (repoRoot, before, after) => nulPaths(git(repoRoot, ['diff-tree', '-r', '--name-only', '--no-renames', '-z', before, after, '--', '.fgos'], { maxBuffer: GIT_LIST_MAX_BUFFER }));
+
+const isUnionAt = (repoRoot, target, relPath) => git(repoRoot, ['check-attr', `--source=${target}`, 'merge', '--', relPath]).trim().endsWith(': union');
+
+/**
+ * The one fgOS store rule for a merge of `source` onto `target` (ADR0020: a
+ * worker branch never owns `.fgos`), shared by Land candidates and Sync
+ * catchup. Every conflicted `merge=union` `.fgos` path in `conflictedPaths`,
+ * and every `.fgos` path the merged `tree` changes against `target` that the
+ * branch did not write since its take point (or that is `merge=union`),
+ * keeps the target's bytes (or its absence), declared into `files`. Returns
+ * the conflicted `.fgos` paths it could not resolve and the changed ones the
+ * branch really wrote; the caller decides what those mean.
+ */
+function declareStoreFiles(repoRoot, item, { target, source, tree, conflictedPaths }, files) {
+  const declare = (relPath, bytes) => files.set(relPath, { path: relPath, bytes: bytes === null ? null : [...bytes] });
+  const unresolved = conflictedPaths.filter((p) => !isFgosPath(p) || !isUnionAt(repoRoot, target, p));
+  const resolvable = conflictedPaths.filter((p) => !unresolved.includes(p));
+  const kept = readPathsAt(repoRoot, target, resolvable);
+  for (const p of resolvable) declare(p, kept.get(p));
+  const takenAt = item.lastAttempt?.branchHeadAtTake ?? item.branchHeadAtTake;
+  const changed = changedStorePaths(repoRoot, target, tree).filter((p) => !files.has(p) && !conflictedPaths.includes(p));
+  const keptBytes = readPathsAt(repoRoot, target, changed);
+  // A path the branch did not change since its take point is inherited
+  // staleness, never the worker's own write: same bytes (or absence) at both.
+  let atTake = null;
+  let atSource = null;
+  if (takenAt && changed.length > 0) {
+    try {
+      atTake = readPathsAt(repoRoot, takenAt, changed);
+      atSource = readPathsAt(repoRoot, source, changed);
+    } catch {
+      atTake = null; // an unreadable take point proves nothing unchanged
+    }
+  }
+  const sameBytes = (a, b) => (a === null || b === null ? a === b : a.equals(b));
+  const written = [];
+  for (const p of changed) {
+    const unchangedOnBranch = atTake !== null && sameBytes(atTake.get(p), atSource.get(p));
+    const kept = keptBytes.get(p);
+    if (kept !== null && (unchangedOnBranch || isUnionAt(repoRoot, target, p))) declare(p, kept);
+    else if (kept === null && unchangedOnBranch) declare(p, null);
+    else written.push(p);
+  }
+  return { unresolved, written };
+}
+
+/**
+ * The trusted-side resolutions a Land candidate of `source` onto `target`
+ * needs, as declared candidate files, read from a read-only
+ * `git merge-tree` of the two exact OIDs: a decision-id collision on the
+ * decision index is renumbered and unioned, and the store rule
+ * (`declareStoreFiles`) keeps the target's `.fgos` bytes. Anything else
+ * returns the outcome the merge verbs already report: `conflict`, or
+ * `fgos-write-rejected` with the paths a branch tried to write under `.fgos`.
+ */
+export function declareLandFiles(repoRoot, item, target, source) {
+  const { tree, conflictedPaths } = readMergeTree(repoRoot, target, source);
   const files = new Map();
   const declare = (relPath, bytes) => files.set(relPath, { path: relPath, bytes: bytes === null ? null : [...bytes] });
-  const isUnion = (relPath) => git(repoRoot, ['check-attr', `--source=${target}`, 'merge', '--', relPath]).trim().endsWith(': union');
   let selfResolved = false;
   if (conflictedPaths.length === 1 && conflictedPaths[0] === DECISION_INDEX_PATH) {
     const classification = classifyDecisionIndexText(readPathsAt(repoRoot, tree, [DECISION_INDEX_PATH]).get(DECISION_INDEX_PATH)?.toString('utf8') ?? '');
@@ -1036,36 +1117,11 @@ export function declareLandFiles(repoRoot, item, target, source) {
     }
     declare(DECISION_INDEX_PATH, Buffer.from(rebuildDecisionIndex(classification, idRenames)));
     selfResolved = true;
-  } else if (conflictedPaths.length > 0) {
-    if (!conflictedPaths.every((p) => isFgosPath(p) && isUnion(p))) return { outcome: 'conflict' };
-    const kept = readPathsAt(repoRoot, target, conflictedPaths);
-    for (const p of conflictedPaths) declare(p, kept.get(p));
   }
-  const takenAt = item.lastAttempt?.branchHeadAtTake ?? item.branchHeadAtTake;
-  const changed = nulPaths(git(repoRoot, ['diff-tree', '-r', '--name-only', '--no-renames', '-z', target, tree, '--', '.fgos'], { maxBuffer: GIT_LIST_MAX_BUFFER }))
-    .filter((p) => !files.has(p));
-  const keptBytes = readPathsAt(repoRoot, target, changed);
-  // A path the branch did not change since its take point is inherited
-  // staleness, never the worker's own write: same bytes (or absence) at both.
-  let atTake = null;
-  let atSource = null;
-  if (takenAt && changed.length > 0) {
-    try {
-      atTake = readPathsAt(repoRoot, takenAt, changed);
-      atSource = readPathsAt(repoRoot, source, changed);
-    } catch {
-      atTake = null; // an unreadable take point proves nothing unchanged
-    }
-  }
-  const sameBytes = (a, b) => (a === null || b === null ? a === b : a.equals(b));
-  const rejected = [];
-  for (const p of changed) {
-    const unchangedOnBranch = atTake !== null && sameBytes(atTake.get(p), atSource.get(p));
-    const kept = keptBytes.get(p);
-    if (kept !== null && (unchangedOnBranch || isUnion(p))) declare(p, kept);
-    else if (kept === null && unchangedOnBranch) declare(p, null);
-    else rejected.push(p);
-  }
+  const { unresolved, written: rejected } = declareStoreFiles(repoRoot, item, {
+    target, source, tree, conflictedPaths: selfResolved ? [] : conflictedPaths,
+  }, files);
+  if (unresolved.length > 0) return { outcome: 'conflict' };
   if (rejected.length > 0) return { outcome: 'fgos-write-rejected', paths: rejected, ...(selfResolved && { selfResolved }) };
   return { files: [...files.values()], selfResolved };
 }
@@ -1250,11 +1306,8 @@ export function acknowledgeLand(repoRoot, operationId, acknowledgement) {
 
 /** The ref the main checkout has checked out, or null when it is detached. */
 function checkedOutRef(repoRoot) {
-  try {
-    return git(repoRoot, ['symbolic-ref', '-q', 'HEAD']).trim();
-  } catch {
-    return null;
-  }
+  const main = realpathOrSelf(repoRoot);
+  return gitWorktrees(repoRoot).find((row) => realpathOrSelf(Buffer.from(row.path).toString('utf8')) === main)?.branch ?? null;
 }
 
 /**

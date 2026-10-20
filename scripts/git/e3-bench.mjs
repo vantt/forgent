@@ -33,6 +33,8 @@ function stats(ms) {
   return { n: ms.length, p50: round(percentile(ms, 0.5)), p95: round(percentile(ms, 0.95)), p99: round(percentile(ms, 0.99)), max: round(Math.max(...ms)), mean: round(ms.reduce((a, b) => a + b, 0) / ms.length) };
 }
 function time(fn) { const t = performance.now(); const value = fn(); return [performance.now() - t, value]; }
+// Land's prepare and publish wait on the event loop, so they are timed to settlement.
+async function timeAsync(fn) { const t = performance.now(); const value = await fn(); return [performance.now() - t, value]; }
 function options(argv) {
   const out = {};
   for (let i = 0; i < argv.length; i++) if (argv[i].startsWith('--')) out[argv[i].slice(2)] = argv[i + 1]?.startsWith('--') || argv[i + 1] === undefined ? true : argv[++i];
@@ -352,13 +354,13 @@ async function typedOperationRows(root, state, index, loader, samples, observer 
       const port = index.createGitLand({stateRoot:state,repoPath:main,trustedMain:main,writer:WRITER},loader);
       try {
         observer.begin('land-prepare');
-        const [prepareMs,prepared] = time(() => port.prepare({operationId:`land-${i}`,request:{source,target,destination:'refs/heads/main',message:'E3 merge',squash:false,footprint:['payload'],subtree:null,files:[]}}));
+        const [prepareMs,prepared] = await timeAsync(() => port.prepare({operationId:`land-${i}`,request:{source,target,destination:'refs/heads/main',message:'E3 merge',squash:false,footprint:['payload'],subtree:null,files:[]}}));
         observer.end('land-prepare');
         const candidate = prepared.candidate;
         if (!candidate) throw new Error("Land preparation returned no candidate");
         const evidence = {source:candidate.source,target:candidate.target,candidate:candidate.candidate,treeDigest:candidate.treeDigest,evidenceDigest:'e3-verified-fixture'};
         observer.begin('land-publish');
-        const [publishMs] = time(() => port.publish(evidence));
+        const [publishMs] = await timeAsync(() => port.publish(evidence));
         observer.end('land-publish');
         prepare.push(prepareMs); publish.push(publishMs);
         elapsed = prepareMs + publishMs;

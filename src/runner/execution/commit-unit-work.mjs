@@ -4,6 +4,7 @@ import path from 'node:path';
 import { createGitScopedCommit } from '../../git/scoped-commit.mjs';
 import { createGitSync } from '../../git/sync.mjs';
 import { createGitInspect } from '../../git/inspect.mjs';
+import { nativeError } from '../../git/native.mjs';
 import { resolveStateRoot } from '../../holder-lock/index.mjs';
 import { resolveWriterIdentity } from '../../util/session-identity.mjs';
 import { partitionPaths } from '../dispatch/write-scope.mjs';
@@ -29,9 +30,6 @@ export const stagedPaths = ctx => state(ctx).staged;
 export const changedPaths = ctx => [...new Set([...state(ctx).changed, ...stagedPaths(ctx)])];
 export function foreignIndexDetail(paths) {
   return `the index has staged changes this run did not make: ${paths.join(', ')}; unstage or commit them, then run again`;
-}
-function nativeError(error) {
-  try { return JSON.parse(error.message); } catch { return { cause: error.message ?? error.code, stderr: [] }; }
 }
 function refusal(error) {
   const e = nativeError(error);

@@ -206,6 +206,94 @@ fn sync_clean_and_conflict_resolution_have_exact_parents() {
     }
 }
 #[test]
+fn sync_prepare_applies_declared_bytes_for_a_store_path_the_producer_deleted() {
+    for finish in [true, false] {
+        let f = Fixture::new();
+        let shard = ".fgos/events/s.jsonl";
+        fs::create_dir_all(f.main.join(".fgos/events")).unwrap();
+        fs::write(f.main.join(shard), "1\n").unwrap();
+        git(&f.main, &["add", shard]);
+        git(&f.main, &["commit", "-qm", "shard"]);
+        git(&f.tree, &["merge", "-q", "--ff-only", "trunk"]);
+        git(&f.tree, &["rm", "-q", shard]);
+        git(&f.tree, &["commit", "-qm", "producer strips the store"]);
+        fs::write(f.main.join(shard), "1\n2\n").unwrap();
+        git(&f.main, &["commit", "-qam", "target grows the shard"]);
+        let head = git(&f.tree, &["rev-parse", "HEAD"]);
+        let oid = Oid::parse(&git(&f.main, &["rev-parse", "HEAD"]), ObjectFormat::Sha1).unwrap();
+        let files = vec![LandFile { path: shard.into(), bytes: Some(b"1\n2\n".to_vec()) }];
+        let prepared = f
+            .driver
+            .prepare_sync(&f.repo, f.held(), &oid, "catch-up", &files, "fixture", "declared")
+            .unwrap();
+        assert_eq!(prepared.state, "prepared");
+        assert!(prepared.resolver_grant.is_empty());
+        assert!(prepared.staged.contains(&shard.to_string()));
+        assert_eq!(git(&f.tree, &["show", &format!(":{shard}")]), "1\n2");
+        let other = vec![LandFile { path: shard.into(), bytes: None }];
+        assert_eq!(
+            f.driver
+                .prepare_sync(&f.repo, f.held(), &oid, "catch-up", &other, "fixture", "declared")
+                .unwrap_err()
+                .cause,
+            "operation-id-reused"
+        );
+        if finish {
+            let done = f.driver.continue_sync(&f.repo, f.held(), "fixture", "declared").unwrap();
+            assert_eq!(done.state, "done");
+            assert_eq!(git(&f.tree, &["show", &format!("HEAD:{shard}")]), "1\n2");
+            assert_eq!(
+                git(&f.tree, &["show", "-s", "--format=%P"]),
+                format!("{head} {}", oid.as_str())
+            );
+        } else {
+            let aborted = f.driver.abort_sync(&f.repo, f.held(), "fixture", "declared").unwrap();
+            assert_eq!(aborted.state, "conflict-aborted");
+            assert!(!f.tree.join(shard).exists());
+            assert_eq!(git(&f.tree, &["rev-parse", "HEAD"]), head);
+            assert_eq!(git(&f.tree, &["status", "--porcelain"]), "");
+        }
+    }
+}
+#[test]
+fn sync_prepare_applies_declarations_to_skip_worktree_store_paths_in_the_index_only() {
+    let f = Fixture::new();
+    let (kept, gone) = (".fgos/events/kept.jsonl", ".fgos/events/gone.jsonl");
+    fs::create_dir_all(f.main.join(".fgos/events")).unwrap();
+    fs::write(f.main.join(kept), "1\n").unwrap();
+    fs::write(f.main.join(gone), "1\n").unwrap();
+    git(&f.main, &["add", kept, gone]);
+    git(&f.main, &["commit", "-qm", "store"]);
+    git(&f.tree, &["merge", "-q", "--ff-only", "trunk"]);
+    // The shape Worktree creation leaves: tracked store paths absent on disk.
+    git(&f.tree, &["update-index", "--skip-worktree", kept, gone]);
+    fs::remove_dir_all(f.tree.join(".fgos")).unwrap();
+    fs::write(f.tree.join("own"), "producer\n").unwrap();
+    git(&f.tree, &["add", "own"]);
+    git(&f.tree, &["commit", "-qm", "producer"]);
+    fs::write(f.main.join(kept), "1\n2\n").unwrap();
+    git(&f.main, &["rm", "-q", gone]);
+    git(&f.main, &["commit", "-qam", "target store moves on"]);
+    let oid = Oid::parse(&git(&f.main, &["rev-parse", "HEAD"]), ObjectFormat::Sha1).unwrap();
+    let files = vec![
+        LandFile { path: kept.into(), bytes: Some(b"1\n2\n".to_vec()) },
+        LandFile { path: gone.into(), bytes: None },
+    ];
+    let prepared = f
+        .driver
+        .prepare_sync(&f.repo, f.held(), &oid, "catch-up", &files, "fixture", "sparse")
+        .unwrap();
+    assert_eq!(prepared.state, "prepared");
+    assert!(!f.tree.join(kept).exists() && !f.tree.join(gone).exists());
+    let done = f.driver.continue_sync(&f.repo, f.held(), "fixture", "sparse").unwrap();
+    assert_eq!(done.state, "done");
+    assert_eq!(git(&f.tree, &["show", &format!("HEAD:{kept}")]), "1\n2");
+    assert_eq!(git(&f.tree, &["ls-tree", "--name-only", "HEAD", "--", gone]), "");
+    assert!(git(&f.tree, &["ls-files", "-v", "--", kept]).starts_with("S "));
+    assert!(!f.tree.join(kept).exists() && !f.tree.join(gone).exists());
+    assert_eq!(git(&f.tree, &["status", "--porcelain"]), "");
+}
+#[test]
 fn markers_include_tabs_and_diff3_but_skip_binary() {
     for m in [b"<<<<<<<\tleft".as_slice(), b"|||||||| base", b">>>>>>>"] {
         assert!(has_conflict_markers(m));
@@ -375,6 +463,7 @@ fn interrupted_resources(f: &Fixture, id: &str, phase: u8, sync: bool, legacy: b
             head: baseline.head.clone(),
             target: baseline.head.clone(),
             message: "interrupted".into(),
+            files: vec![],
         }))
     } else {
         OperationKind::ScopedCommit(Box::new(ScopedCommitIntent {
@@ -1149,6 +1238,7 @@ fn sync_terminal_replay_ignores_live_branch_and_detached_head() {
                 head: old.expected.clone(),
                 target: target.as_str().into(),
                 message: "sync".into(),
+                files: vec![],
             }));
             old.v = 2;
             old.reference = None;

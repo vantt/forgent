@@ -21,6 +21,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { addWork } from '../../src/state/store.mjs';
+import { initFixtureRepo } from '../helpers/git-fixture.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -38,15 +39,7 @@ function tmpCwd() {
 // `take` operates on the real host repo directly (never a worktree) — same
 // reason fgos.test.mjs's own `initGitCwd` exists.
 function initGitCwd() {
-  const cwd = tmpCwd();
-  execFileSync('git', ['init', '-q'], { cwd });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
-  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/cache/\n');
-  fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
-  execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd });
-  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });
-  return cwd;
+  return initFixtureRepo(tmpCwd());
 }
 
 function stateView(cwd) {
