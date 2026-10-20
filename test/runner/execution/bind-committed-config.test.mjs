@@ -106,7 +106,7 @@ test('a Workflow capability with no prefer pool is refused with a structured rea
 test('a capability gets the same family and model inside herdr and headless; only the transport differs', () => {
   // claude used to be split into a cli executor and a pane-only one, so a pool that named the
   // pane one ran claude inside herdr and fell to the next family headless.
-  for (const capability of ['architecture:explain', 'business:frame', 'execute']) {
+  for (const capability of ['architecture:explain', 'business:frame', 'architecture:synthesize']) {
     for (const rigor of ['low', 'standard', 'high', 'critical']) {
       const unitAsk = { unit: { id: 'u', capability, writes: [], rigor }, role: 'reviewer' };
       const pane = bind(unitAsk, { runnerConfig, session: { herdrPresent: true } });

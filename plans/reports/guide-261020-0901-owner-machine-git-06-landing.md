@@ -18,7 +18,7 @@ Still stop-everything: no old-release controller may run beside a new one.
 
 ## Steps (in each of mdview, mcp-skill-hub, forgentX unless noted)
 
-0. **Clean /tmp** while no suite is running: `find /tmp -maxdepth 1 -name 'fgos-*' -mmin +120 -exec rm -rf {} +`.
+0. **Clean /tmp** while no suite is running, keeping every directory that is a Git checkout (workflow runs keep registered worktrees under `/tmp/fgos-wf-wt-*`; the 2026-10-20 owner landing lost three to the earlier command): `find /tmp -maxdepth 1 -name 'fgos-*' -mmin +120 -type d -exec sh -c 'git -C "$1" rev-parse --is-inside-work-tree >/dev/null 2>&1 || rm -rf "$1"' _ {} \;` then `git worktree list` in each project must show no newly `prunable` entry.
 1. **Git identity:** `git -C ~/projects/forgentX config --show-origin --get-all user.email` must show only `file:/home/<user>/.gitconfig`. If `file:.git/config` appears, run `git config --local --unset-all user.email` and `git config --local --unset-all user.name`. For a linked worktree with `extensions.worktreeConfig`, also run `--worktree --unset-all`. Confirm with `git var GIT_COMMITTER_IDENT`. Do the same check in mdview and mcp-skill-hub. `git --version` must be 2.53 or later.
 2. **Stop everything.**
    - `ps -eo pid,args | grep -E '(^| |/)(fgos|fgctl)( |$)|bin/fgos\.mjs|fgos-gateway|internal (supervise|gate)'` must list nothing.
