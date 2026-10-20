@@ -1,0 +1,97 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "completedBatches": [
+    "126",
+    "127",
+    "128",
+    "129",
+    "130"
+  ],
+  "files": 12,
+  "inventoryEdges": 1990,
+  "addedEdges": 20,
+  "edges": 2010,
+  "patchedFiles": 3,
+  "dispositions": {
+    "preserve": 103,
+    "parked": 1832,
+    "patch": 10,
+    "phase9-row-flip": 65
+  },
+  "parks": {
+    "phase9-carry": 2,
+    "description-rewrite": 2,
+    "GAP-02": 4,
+    "step5-parity": 1824
+  },
+  "perSet": {
+    "batch-126": {
+      "files": 4,
+      "edges": 78,
+      "patchedFiles": 1,
+      "dispositions": {
+        "preserve": 71,
+        "parked": 5,
+        "patch": 2
+      },
+      "parks": {
+        "phase9-carry": 1,
+        "description-rewrite": 2,
+        "GAP-02": 2
+      },
+      "openLeadRulingEdges": []
+    },
+    "batch-127": {
+      "files": 1,
+      "edges": 825,
+      "patchedFiles": 0,
+      "dispositions": {
+        "parked": 825
+      },
+      "parks": {
+        "step5-parity": 825
+      },
+      "openLeadRulingEdges": []
+    },
+    "batch-128": {
+      "files": 1,
+      "edges": 493,
+      "patchedFiles": 0,
+      "dispositions": {
+        "parked": 493
+      },
+      "parks": {
+        "step5-parity": 493
+      },
+      "openLeadRulingEdges": []
+    },
+    "batch-129": {
+      "files": 1,
+      "edges": 506,
+      "patchedFiles": 0,
+      "dispositions": {
+        "parked": 506
+      },
+      "parks": {
+        "step5-parity": 506
+      },
+      "openLeadRulingEdges": []
+    },
+    "batch-130": {
+      "files": 5,
+      "edges": 108,
+      "patchedFiles": 2,
+      "dispositions": {
+        "preserve": 32,
+        "parked": 3,
+        "patch": 8,
+        "phase9-row-flip": 65
+      },
+      "parks": {
+        "GAP-02": 2,
+        "phase9-carry": 1
+      },
+      "openLeadRulingEdges": []
+    }
+  }
+}
