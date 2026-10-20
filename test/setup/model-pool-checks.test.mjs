@@ -62,6 +62,21 @@ test('executor-skills-installed passes when the declared skill is installed and 
 
   const none = runCheck('executor-skills-installed', { executors: { claude: agent('claude') } });
   assert.equal(none.passed, true);
+
+  // The directory follows each invocation's CLI: every invocation of the executor must have the skill.
+  const twoClis = { multi: { ...agent('openai', 'codex'), supports: { skills: ['ak:cook'] }, invocations: [
+    { id: 'codex-cli', via: 'cli', adapter: 'cli-spawn', command: 'codex', args: ['{prompt}'] },
+    { id: 'omp-cli', via: 'cli', adapter: 'cli-spawn', command: 'omp', args: ['{prompt}'] },
+    { id: 'odd-cli', via: 'cli', adapter: 'cli-spawn', command: 'odd', args: ['{prompt}'] },
+  ] } };
+  const install = (...dirs) => (dir) => { for (const d of dirs) { fs.mkdirSync(path.join(dir, d, 'ak-cook'), { recursive: true }); fs.writeFileSync(path.join(dir, d, 'ak-cook', 'SKILL.md'), '# ak:cook\n'); } };
+  const partial = runCheck('executor-skills-installed', { executors: twoClis }, undefined, install('.agents/skills'));
+  assert.equal(partial.passed, false);
+  assert.match(partial.message, /\.omp\/skills\/ak-cook\/SKILL\.md is missing/);
+  assert.doesNotMatch(partial.message, /\.agents\/skills/);
+  const both = runCheck('executor-skills-installed', { executors: twoClis }, undefined, install('.agents/skills', '.omp/skills'));
+  assert.equal(both.passed, true, both.message);
+  assert.match(both.message, /not checked, no known skill directory: multi \(cli odd\)/);
 });
 
 test('model-policy-pools is quiet without a named pool and warns about a pool runner.llmAccounts lacks', () => {

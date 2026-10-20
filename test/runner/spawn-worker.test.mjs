@@ -363,7 +363,7 @@ test('spawnWorker passes an executor\'s own resolved env to the worker, never in
     const fx = fixture({
       executors: {
         glm: {
-          kind: 'agent', command: process.execPath, args: [envEcho], allowCrossProvider: true, env,
+          kind: 'agent', command: process.execPath, args: [envEcho], providerModel: 'node', allowCrossProvider: true, env,
           invocations: [{ id: 'cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: process.execPath, args: [envEcho], env }],
         },
       },

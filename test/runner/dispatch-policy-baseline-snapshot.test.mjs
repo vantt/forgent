@@ -939,11 +939,11 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     workTier: 'light',
     bindingSource: 'executor-id',
     provider: 'z-ai',
-    model: 'z-ai/glm-5.3-flash',
+    model: 'thehive/zai-org/glm-5.3-flash',
     command: 'pi',
     args: [
       '--model',
-      'z-ai/glm-5.3-flash',
+      'thehive/zai-org/glm-5.3-flash',
       '--thinking',
       'medium',
       '--tools',
@@ -963,7 +963,8 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
         'models-store.json',
         'settings.json',
         'trust.json',
-        'bin/fd'
+        'bin/fd',
+        'models.json'
       ]
     },
     adapter: 'cli-spawn',
@@ -976,11 +977,11 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     workTier: 'standard',
     bindingSource: 'executor-id',
     provider: 'z-ai',
-    model: 'z-ai/glm-5.3-flash',
+    model: 'thehive/zai-org/glm-5.3-flash',
     command: 'pi',
     args: [
       '--model',
-      'z-ai/glm-5.3-flash',
+      'thehive/zai-org/glm-5.3-flash',
       '--thinking',
       'medium',
       '--tools',
@@ -1000,7 +1001,8 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
         'models-store.json',
         'settings.json',
         'trust.json',
-        'bin/fd'
+        'bin/fd',
+        'models.json'
       ]
     },
     adapter: 'cli-spawn',
@@ -1037,7 +1039,8 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
         'models-store.json',
         'settings.json',
         'trust.json',
-        'bin/fd'
+        'bin/fd',
+        'models.json'
       ]
     },
     adapter: 'cli-spawn',

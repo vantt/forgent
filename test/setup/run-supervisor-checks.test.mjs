@@ -35,7 +35,9 @@ let scratch;
 const children = new Set();
 before(() => {
   assert.ok(HOST_BIN && fs.existsSync(HOST_BIN), `set FGOS_HOST_BIN to a host built from this checkout (npm test does): ${HOST_BIN}`);
-  scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-run-supervisor-checks-'));
+  // Short: the runtime-socket-dir cases build `<scratch>/xdg-*/fgos/<hash>.sock`, which must fit
+  // SOCKET_PATH_MAX_BYTES under the runner's run directory and the process temp root.
+  scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-rsc-'));
 });
 after(() => {
   for (const child of children) child.kill('SIGKILL');
