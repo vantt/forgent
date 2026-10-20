@@ -113,6 +113,7 @@ import { formatLockDurationMs } from '../src/util/format-lock-duration.mjs';
 import { clearBeaconIfOwn, readBeacon } from '../src/runner/main-checkout-activity.mjs';
 import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
 import { createWorktreeUseCase } from '../src/verbs/worktree/create.mjs';
+import { removeWorktreeUseCase } from '../src/verbs/worktree/remove.mjs';
 import { resolveStateRoot as worktreeStateRoot } from '../src/holder-lock/state-root.mjs';
 import { createSession, endSession, listSessions, reclaimOrphanedSessions, isSessionWorktree, SessionError } from '../src/runner/session.mjs';
 import { startGateway, stopGateway, gatewayStatus, GatewayControlError } from '../src/runner/gateway-control.mjs';
@@ -3822,7 +3823,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
 
     case 'worktree': {
-      const sub = requireField(positional[0], 'worktree requires create <path>');
+      const sub = requireField(positional[0], 'worktree requires a sub-verb: create <path> | remove <path> --delivered-to <ref>');
       if (sub === 'create') {
         if (positional.length !== 2) throw new Error('usage: fgos worktree create <path> [--branch <name> | --detach] [--base <ref>] [--json]');
         const cwd = process.cwd();
@@ -3832,6 +3833,16 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         return createWorktreeUseCase({ cwd, repoRoot, stateRoot, writer }, {
           path: positional[1], branch: optionalField(flags.branch, 'worktree create --branch requires a name'),
           detach: Boolean(flags.detach), base: optionalField(flags.base, 'worktree create --base requires a ref'),
+        });
+      }
+      if (sub === 'remove') {
+        if (positional.length !== 2) throw new Error('usage: fgos worktree remove <path> --delivered-to <ref> [--json]');
+        const cwd = process.cwd();
+        const repoRoot = resolveMainCheckoutRoot(cwd) ?? cwd;
+        const stateRoot = worktreeStateRoot({ fgosDir: path.join(repoRoot, '.fgos') }).stateRoot;
+        const writer = String(resolveWriterIdentity(path.join(repoRoot, '.fgos')).id);
+        return removeWorktreeUseCase({ cwd, repoRoot, stateRoot, writer }, {
+          path: positional[1], deliveredTo: requireField(flags['delivered-to'], 'worktree remove requires --delivered-to <ref>'),
         });
       }
       throw new Error(`unknown worktree sub-verb: ${sub}`);
