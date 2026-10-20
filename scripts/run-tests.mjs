@@ -48,12 +48,18 @@ export function gitAddonSourceDigest(cwd = REPO_ROOT) {
   for (const file of files.sort()) hash.update(file).update('\0').update(fs.readFileSync(path.join(cwd, file)));
   return hash.digest('hex');
 }
+export function gitAddonDirectory(cwd = REPO_ROOT) {
+  // Linked checkouts can share .fgos, but their source payloads and manifests cannot.
+  const checkout = createHash('sha256').update(fs.realpathSync(cwd)).digest('hex').slice(0, 16);
+  return path.join(cwd, '.fgos/runtime/git-addon', checkout);
+}
+
 export function ensureGitAddon(env = process.env, cwd = REPO_ROOT, locked = true) {
   const dir = path.resolve(cwd, env.CARGO_TARGET_DIR || 'target');
   const cargoEnv = { ...env, CARGO_TARGET_DIR: dir };
   execFileSync('cargo', ['build', ...(locked ? ['--locked'] : []), '-p', 'fgos-node-addon'], { cwd, env: cargoEnv, stdio: 'inherit' });
   const library = nativeAddonLibraryName();
-  const addonDir = path.join(cwd, '.fgos/runtime/git-addon');
+  const addonDir = gitAddonDirectory(cwd);
   fs.mkdirSync(addonDir, { recursive: true });
   const addon = path.join(addonDir, 'fgos.node');
   const temporaryAddon = `${addon}.${process.pid}.tmp`;
@@ -63,15 +69,25 @@ export function ensureGitAddon(env = process.env, cwd = REPO_ROOT, locked = true
     fs.renameSync(temporaryAddon, addon);
   }
   const record = nativeAddonComponent(addon, path.relative(cwd, addon), cwd);
-  const manifestDir = path.join(cwd, '.fgos/runtime/git-addon');
+  const sourceHost = env.FGOS_HOST_BIN || ensureHostBin(env, cwd);
+  const hostBin = path.join(addonDir, process.platform === 'win32' ? 'fgos.exe' : 'fgos');
+  const hostBytes = fs.readFileSync(sourceHost);
+  if (!fs.existsSync(hostBin) || !fs.readFileSync(hostBin).equals(hostBytes)) {
+    const temporaryHost = `${hostBin}.${process.pid}.tmp`;
+    fs.writeFileSync(temporaryHost, hostBytes, { mode: 0o755 });
+    fs.renameSync(temporaryHost, hostBin);
+  }
+  const manifestDir = addonDir;
   fs.mkdirSync(manifestDir, { recursive: true });
   const manifest = path.join(manifestDir, 'native-addon.json');
-  const manifestBytes = JSON.stringify({ entries: { fgos: env.FGOS_HOST_BIN ? path.relative(cwd, env.FGOS_HOST_BIN) : '' }, components: { legacyNode: { root: '.' }, nativeAddon: record }, sourceDigest: gitAddonSourceDigest(cwd) });
+  const manifestBytes = JSON.stringify({ entries: { fgos: path.relative(cwd, hostBin) }, components: { legacyNode: { root: '.' }, nativeAddon: record }, sourceDigest: gitAddonSourceDigest(cwd) });
   if (!fs.existsSync(manifest) || fs.readFileSync(manifest, 'utf8') !== manifestBytes) {
     fs.writeFileSync(`${manifest}.${process.pid}.tmp`, manifestBytes);
     fs.renameSync(`${manifest}.${process.pid}.tmp`, manifest);
   }
-  return { addon, manifest, cargoEnv };
+  env.FGOS_HOST_BIN = hostBin;
+  env.FGOS_ACTIVE_MANIFEST_PATH = manifest;
+  return { addon, manifest, hostBin, cargoEnv };
 }
 
 const TEST_FILE_SUFFIX = '.test.mjs';

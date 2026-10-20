@@ -2,16 +2,21 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { ensureGitAddon as buildGitAddon, gitAddonSourceDigest, REPO_ROOT } from '../../scripts/run-tests.mjs';
+import { ensureGitAddon as buildGitAddon, gitAddonSourceDigest, gitAddonDirectory, REPO_ROOT } from '../../scripts/run-tests.mjs';
 export { REPO_ROOT as root } from '../../scripts/run-tests.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 export function ensureGitAddon(env = process.env, cwd = REPO_ROOT, locked = true) {
-  const manifest = path.join(cwd, '.fgos/runtime/git-addon/native-addon.json');
+  const manifest = path.join(gitAddonDirectory(cwd), 'native-addon.json');
   try {
     const value = JSON.parse(fs.readFileSync(manifest, 'utf8'));
     if (value.sourceDigest === gitAddonSourceDigest(cwd)) {
       loadNativeAddon({ descriptor: { manifest: value, releaseRoot: cwd } });
-      return { manifest, addon: path.join(cwd, value.components.nativeAddon.path) };
+      const hostBin = path.join(cwd, value.entries.fgos);
+      if (!fs.existsSync(hostBin)) throw new Error('staged host missing');
+      if (env.FGOS_HOST_BIN && !fs.readFileSync(env.FGOS_HOST_BIN).equals(fs.readFileSync(hostBin))) throw new Error('staged host changed');
+      env.FGOS_HOST_BIN = hostBin;
+      env.FGOS_ACTIVE_MANIFEST_PATH = manifest;
+      return { manifest, hostBin, addon: path.join(cwd, value.components.nativeAddon.path) };
     }
   } catch {}
   return buildGitAddon(env, cwd, locked);

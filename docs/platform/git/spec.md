@@ -255,6 +255,8 @@ The common order remains 20→40→50→60. Operations take only needed locks. V
 
 **Rank-30 versus rank-20 legality (R30; owner-decided structure; M2 held in the model abstraction, §19).** Rank 30 is the `dispatch-cwd` lease (holder-lock §7), taken by a dispatch on its worktree in the runner's per-dispatch LockScope above `runner` 10 and, once it exists, `attempt` 15. Under Q2 it is held from producer start through the runner commit and handoff; under Q1 the Rust scope inherits the caller's held ranks, so the Holder-lock rule "acquire only above every held rank" binds Git exactly as it binds the Node scope. Every rank below is an existing registry row; the table invents none.
 
+Execution rejects a mutating Unit that resolves to the main checkout before opening a native Git port or acquiring/borrowing custody; this policy refusal takes precedence over Git lock-admission errors. Resume reports a live cwd holder through the same coded `dispatch-in-flight` refusal as dispatch. A controller crash after native commit return leaves the real persisted ScopedCommit intent pending; resume recovers that intent and settles the original receipt without launching the producer or committing again. Runner regressions: `test/runner/execution/run.test.mjs` and `run-resume-order.test.mjs`.
+
 | Operation | Locks Git acquires (in order) | May already be held by the caller | Illegal combination and how the protocol avoids it |
 |---|---|---|---|
 | ScopedCommit in a linked worktree (runner commit) | none; Git's own `index.lock` 55 inside the git child | 10, 15, 30 (required: verified `dispatch-cwd` lease on that worktree, borrowed into the git children) | Missing or stale 30 fails closed. Git never acquires 20 or 40 here, so holding 30 is never an inversion. |

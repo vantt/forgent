@@ -79,6 +79,7 @@ fs.copyFileSync(process.env.ADDON_TEST_BYTES,path.join(output,${JSON.stringify(n
     for (const custom of [false, true]) {
       const record = path.join(temp, `env-${custom}.json`);
       const env = {...process.env, PATH: `${temp}${path.delimiter}${process.env.PATH}`, CARGO_ENV_RECORD: record, ADDON_TEST_BYTES: built.addon};
+      env.FGOS_HOST_BIN = built.hostBin;
       delete env.CARGO_TARGET_DIR;
       delete env.CARGO_HOME;
       if (custom) {
@@ -93,6 +94,21 @@ fs.copyFileSync(process.env.ADDON_TEST_BYTES,path.join(output,${JSON.stringify(n
       assert.equal(observed.home, env.CARGO_HOME);
       assert.equal(result.cargoEnv.CARGO_HOME, env.CARGO_HOME);
       assert.ok(result.addon.startsWith(`${repo}${path.sep}`), 'external Cargo outputs are copied into the confined dev payload');
+      const manifest = JSON.parse(fs.readFileSync(result.manifest));
+      assert.ok(!manifest.entries.fgos.split(/[\\/]/).includes('..'));
+      assert.equal(path.join(repo, manifest.entries.fgos), result.hostBin);
+      assert.deepEqual(fs.readFileSync(result.hostBin), fs.readFileSync(built.hostBin));
+      assert.equal(env.FGOS_HOST_BIN, result.hostBin);
+      assert.equal(env.FGOS_ACTIVE_MANIFEST_PATH, result.manifest);
+      const original = fs.readFileSync(result.manifest);
+      const sibling = path.join(temp, `sibling-${custom}`);
+      fs.mkdirSync(sibling);
+      for (const file of ['Cargo.toml', 'Cargo.lock']) fs.copyFileSync(path.join(repo, file), path.join(sibling, file));
+      fs.symlinkSync(path.join(root, 'packages'), path.join(sibling, 'packages'), 'dir');
+      fs.symlinkSync(path.join(repo, '.fgos'), path.join(sibling, '.fgos'), 'dir');
+      const siblingResult = buildAddon({ ...env }, sibling);
+      assert.notEqual(fs.realpathSync(siblingResult.manifest), fs.realpathSync(result.manifest), 'shared .fgos keeps distinct checkout manifests');
+      assert.deepEqual(fs.readFileSync(result.manifest), original, 'a parallel checkout does not overwrite this manifest');
       if (custom) assert.deepEqual(fs.readdirSync(env.CARGO_HOME), ['sentinel']);
     }
   } finally { fs.rmSync(temp, {recursive: true, force: true}); }

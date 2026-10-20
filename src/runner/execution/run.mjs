@@ -24,6 +24,7 @@ import { resolvePattern } from './patterns/presets.mjs';
 import { verifyCommandOf } from './patterns/reviewed.mjs';
 import { runCommand } from '../goal-check.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
+import { resolveMutatingCwdPosture } from '../dispatch/execution-contract.mjs';
 import { declaredOperationFields } from '../dispatch/assignment.mjs';
 import { createCredentialProbe } from '../dispatch/provider-credential-probe.mjs';
 import { ensureRunnerConfigForDir, RunnerConfigError, assertRunTimeoutMs } from '../dispatch/config.mjs';
@@ -31,7 +32,7 @@ import { commitOnBranch, commitUnitWork, foreignIndexDetail, preflightUnitWorktr
 import { assertSyncResumable, commitRoundWithSync, effectiveWriteScope, runPendingSync, seedSync, syncBrief, syncSummary } from './unit-sync.mjs';
 import { AgentNotFoundError, resolveAgentDefinition } from '../agent-definitions.mjs';
 import { parseYaml } from '../../util/yaml.mjs';
-import { dispatchCwdHolder, admitSuccessor, recordCustodyHandoff } from '../dispatch/cwd-lock.mjs';
+import { dispatchCwdHolder, dispatchInFlightError, admitSuccessor, recordCustodyHandoff } from '../dispatch/cwd-lock.mjs';
 import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName, isSeatInput } from './handoff-refs.mjs';
 import { outcomeOfRunResult, readUnitRunHistory } from './unit-run-history.mjs';
 import { writeUnitSummary } from './unit-summary.mjs';
@@ -524,8 +525,7 @@ async function runUnitBody(options, scope) {
     // into the same worktree.
     const cwdHolder = dispatchCwdHolder(path.join(mainRoot, '.fgos'), worktreePath);
     if (cwdHolder) {
-      const who = cwdHolder.pid ? `another process (PID ${cwdHolder.pid})` : 'another process';
-      throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": ${who} holds lock at "${cwdHolder.lockPath}"`);
+      throw dispatchInFlightError(worktreePath, cwdHolder);
     }
     assertNoStrayCommit(unitRunId, unitRecord, mainRoot);
 
@@ -561,6 +561,10 @@ async function runUnitBody(options, scope) {
     }
 
     unit = validateUnit(options.stanceOptions === undefined ? raw : { ...raw, stanceOptions: options.stanceOptions });
+    // Policy wins before seedSync or preflight can touch a native Git port or borrow custody.
+    if (unit.writes.length > 0 && resolveMutatingCwdPosture(worktreePath).reason === 'main-checkout') {
+      throw new RunnerConfigError(`runUnit refused -- cwd "${worktreePath}" resolves to the main checkout ("${mainRoot}"); a mutating dispatch must run in a linked git worktree, never the main checkout`);
+    }
     // Checked before the unit directory exists: an operation the step does not allow leaves nothing
     // behind. The pattern checked is the one the run will use (see patternName below).
     if (options.declared !== undefined) {
