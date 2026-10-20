@@ -49,6 +49,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The quiesce scan takes `--dir` for each linked worktree.
 
 - Commands that make many Git reads reuse the repository's checked config and storage format across them within one process, re-reading only when a config file changes: `approve --no-wait` refusing a held merge slot went from about 0.7 s to 0.4 s (79 to 21 Git processes) and `doctor --json` from about 3.8 s to 2.4 s (332 to 62).
+- A conductor Workflow case now moves past its entry milestones: when a Unit settles with `pass` (or `findings`), its activity's `produces` milestones are proposed as achieved with the digest of their subject (the Unit's reports, or for a delivery milestone the paths it wrote, backed by a verify receipt for that digest). Before, the settle recorded nothing, so `fgos run --case C --activity implement-item` stayed refused with `entry-milestone-unmet` after `validate-plan` passed.
+
+- `npm run fgos:dev` now makes Node clients (identity, repository access, run supervisor, terminal control) use the working-tree host it staged, not the activated release's host. Resuming a unit run whose `unit.json` carries a `seatSchema` from a newer release is refused with `record-from-newer-release`; reading such a record still works.
 
 - A pi or omp seat in a herdr pane now gets its brief through the agent prompt door (one send that types and submits), as codex does. The raw typed brief took 7 to 25 s and sometimes lost its final Enter, and a seat stopped mid-typing could leave the rest of the brief in the pane's shell. The supervisor also re-reads its stop state before every send into the pane.
 

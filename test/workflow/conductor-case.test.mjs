@@ -160,3 +160,42 @@ test('a nested start under a case that does not exist is invalid', async () => {
     (err) => err.code === 'authority-context-invalid',
   );
 });
+
+test('a conductor case moves past its entry milestone on what its own settle records, with no achieved written by hand', async () => {
+  const tmp = setupRepo();
+  const run = openCase({ repoRoot: tmp });
+  const port = createCaseAdmissionPort({ repoRoot: tmp, env: {} });
+  const wt = worktreeOf(tmp, 'build');
+  const build = (unitRunId) => port.admit({ unitRunId, caseRef: asRef(run, 'build-a'), activity: 'build-a', writes: ['src/a/**'], worktree: wt, readOnly: false, pattern: 'solo', seatLaunches: 1 });
+
+  assert.equal(build('unit-run-early').refused?.code, 'entry-milestone-unmet', 'plan-ready is not reached before the plan activity settles');
+
+  const planned = await runUnit({ unitData: { ...unitOf([]), objective: 'Plan the work' }, caseAdmission: port, caseRef: asRef(run, 'plan'), repoRoot: tmp, cwd: tmp, worktree: tmp });
+  assert.equal(planned.outcome, 'pass');
+  const milestone = projectionOf(run).milestones['plan-ready'];
+  assert.equal(milestone.state, 'achieved');
+  assert.match(milestone.digest, /^sha256:[0-9a-f]{64}$/);
+  assert.equal(build('unit-run-late').admitted, true, 'the activity that needed plan-ready is admitted now');
+});
+
+test('a delivery milestone is achieved only with a verify receipt for the paths the Unit wrote', () => {
+  const tmp = setupRepo();
+  const run = planned({ repoRoot: tmp });
+  const wt = worktreeOf(tmp, 'deliver');
+  fs.mkdirSync(path.join(wt, 'src', 'a'), { recursive: true });
+  fs.writeFileSync(path.join(wt, 'src', 'a', 'x.txt'), 'built\n');
+  const port = createCaseAdmissionPort({ repoRoot: tmp, env: {} });
+  const attempt = (unitRunId, results) => {
+    const admitted = port.admit({ unitRunId, caseRef: asRef(run, 'build-a'), activity: 'build-a', writes: ['src/a/**'], worktree: wt, readOnly: false, pattern: 'solo', seatLaunches: 1 });
+    assert.equal(admitted.admitted, true, JSON.stringify(admitted));
+    port.settle(admitted.reservationId, { caseId: run.caseId, outcome: 'pass', unitRunId, results, seatLaunchesUsed: 1 });
+    return projectionOf(run);
+  };
+
+  const unproven = attempt('unit-run-claim', [{ role: 'implementer', outcome: 'pass', runResult: {} }]);
+  assert.equal(unproven.milestones['child-built'].state, 'unreached');
+  assert.deepEqual(unproven.refusedAchievements.map((r) => [r.milestone, r.reason]), [['child-built', 'receipt-missing']]);
+
+  const proven = attempt('unit-run-proof', [{ role: 'implementer', outcome: 'pass', runResult: {} }, { role: 'verifier', outcome: 'pass' }]);
+  assert.equal(proven.milestones['child-built'].state, 'achieved');
+});
