@@ -13,6 +13,12 @@ import { loadNativeAddon } from '../../src/git/native.mjs';
 
 const STORE_MJS = pathToFileURL(path.resolve(fileURLToPath(import.meta.url), '../../../src/state/store.mjs')).href;
 
+// Event timestamps have millisecond resolution and a claim counts an event of its own item that shares
+// its acquisition millisecond as one it caused (settleClaim's same-writer drift check). With no Git
+// child to start, an item can now be added and claimed inside one millisecond; a test that needs the
+// item to predate its claim waits one clock tick between the two.
+const clockTick = () => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 5);
+
 function makeTmpDir() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-claim-test-'));
   initStore(dir);
@@ -117,6 +123,7 @@ test('settleClaim settles directly (no durable intermediate doing) and releases 
 test('settleClaim CAS validation failure', () => {
   const dir = makeTmpDir();
   addWork(dir, { id: 'tsk-1', title: 'Task 3', kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'standard', verify: 'npm test', domain: 'coding' });
+  clockTick();
 
   const claim = acquireClaim(dir, {
     id: 'tsk-1',
@@ -531,6 +538,7 @@ test('settleClaim with an invalid finalStatus writes NOTHING durably -- no parti
 test('settleClaim on a CAS/revision conflict leaves the claim untouched -- a failed settle must never destroy still-legitimate coordination state', () => {
   const dir = makeTmpDir();
   addWork(dir, { id: 'tsk-1', title: 'Task 13', kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'standard', verify: 'npm test', domain: 'coding' });
+  clockTick();
   const claim = acquireClaim(dir, { id: 'tsk-1', actor: 'session', preClaimStatus: 'todo', preClaimRevision: 'a-revision-that-will-never-match' });
 
   assert.throws(

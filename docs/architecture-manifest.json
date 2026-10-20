@@ -246,6 +246,7 @@
     "src/run-supervisor/gate-kill-grace.mjs": "infra",
     "src/run-supervisor/legacy-sweep.mjs": "infra",
     "src/run-supervisor/payload-root.mjs": "infra",
+    "src/run-supervisor/protocol.mjs": "infra",
     "src/run-supervisor/runtime-dir.mjs": "infra",
     "src/run-supervisor/step-support.mjs": "infra",
     "src/run-supervisor/steps/cleanup-trust.mjs": "infra",
