@@ -7,7 +7,7 @@ import { parseYaml } from '../util/yaml.mjs';
 
 import { validateWorkflowChecked as validateWorkflow } from './checked.mjs';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
-import { definitionNameOf } from '../convention/seat-id.mjs';
+import { definitionNameOf } from '../convention/definition-names.mjs';
 
 function resolvePackageRoot(cwd = process.cwd()) {
   // Find package root from cwd or fallback to nearest directory containing package.json or core/workflows

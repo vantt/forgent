@@ -18,7 +18,7 @@ import { fileURLToPath } from 'node:url';
 
 import { describeYamlError, parseYaml } from '../util/yaml.mjs';
 import { RunnerConfigError } from './dispatch/config.mjs';
-import { definitionFileName } from '../convention/seat-id.mjs';
+import { definitionFileName } from '../convention/definition-names.mjs';
 
 export const AGENT_NAME_PATTERN = /^[a-z][a-z0-9-]{0,63}$/;
 // A definition is a short persona sketch; the cap bounds what a pinned copy adds to a run record.

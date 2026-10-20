@@ -6,7 +6,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-import { definitionNameOf, definitionFileName } from '../../src/convention/seat-id.mjs';
+import { definitionNameOf, definitionFileName } from '../../src/convention/definition-names.mjs';
 
 const golden = JSON.parse(fs.readFileSync(new URL('../../packages/convention/contracts/convention.golden.v1.json', import.meta.url), 'utf8'));
 
