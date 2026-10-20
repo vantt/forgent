@@ -10,9 +10,9 @@ import { spawnSync, execFileSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import { releaseBinaryPath } from '../../src/util/release-binary-path.mjs';
 import { releaseTargetForHost } from '../../src/util/release-targets.mjs';
-import { REPO_ROOT, buildRustDistribution } from '../../scripts/build-rust-distribution.mjs';
+import { REPO_ROOT, buildRustDistribution, releaseOutputDir } from '../../scripts/build-rust-distribution.mjs';
 
-export const FGCTL_BIN = releaseBinaryPath(path.resolve(REPO_ROOT, 'target', 'release'), 'fgctl');
+export const FGCTL_BIN = releaseBinaryPath(releaseOutputDir(), 'fgctl');
 
 export const releaseDirName = (digest) => (process.platform === 'win32' ? digest.replace(':', '-') : digest);
 

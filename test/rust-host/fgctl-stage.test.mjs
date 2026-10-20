@@ -14,12 +14,13 @@ import {
   buildRustDistribution,
   canonicalJson,
   computeArtifactDigest,
+  releaseOutputDir,
 } from '../../scripts/build-rust-distribution.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const FGCTL_BIN = releaseBinaryPath(path.resolve(REPO_ROOT, 'target', 'release'), 'fgctl');
+const FGCTL_BIN = releaseBinaryPath(releaseOutputDir(), 'fgctl');
 
 const releaseDirName = (digest) => (process.platform === 'win32' ? digest.replace(':', '-') : digest);
 

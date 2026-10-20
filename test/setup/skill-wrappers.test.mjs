@@ -762,6 +762,9 @@ test('isGeneratedAdapterTarget chooses the nearest adapter marker across mixed m
 test('projection tests for Codex/OpenAI and Claude surfaces verify adapter projection invariants', () => {
   const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
   const canonicalSkills = discoverCanonicalSkills(repoRoot);
+  // .claude/skills is a gitignored setup output; project it from the tracked .agents/skills here.
+  const claudeSkillsRoot = path.join(mkTempDir('claude-wrapper-projection-'), '.claude', 'skills');
+  generateAllSkillWrappers(path.join(repoRoot, '.agents', 'skills'), claudeSkillsRoot);
 
   for (const skill of canonicalSkills) {
     const agentsPath = path.join(repoRoot, '.agents', 'skills', skill.name, 'SKILL.md');
@@ -772,7 +775,7 @@ test('projection tests for Codex/OpenAI and Claude surfaces verify adapter proje
       `portable Codex projection ${skill.name} must carry full skill instructions`,
     );
 
-    const claudePath = path.join(repoRoot, '.claude', 'skills', skill.name, 'SKILL.md');
+    const claudePath = path.join(claudeSkillsRoot, skill.name, 'SKILL.md');
     assert.ok(fs.existsSync(claudePath), `Claude wrapper projection must exist at ${claudePath}`);
     const claudeContent = fs.readFileSync(claudePath, 'utf8');
     assert.ok(

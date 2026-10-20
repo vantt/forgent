@@ -5,7 +5,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync, spawn, execFileSync } from 'node:child_process';
-import { REPO_ROOT } from '../../scripts/build-rust-distribution.mjs';
+import { REPO_ROOT, releaseOutputDir } from '../../scripts/build-rust-distribution.mjs';
+import { releaseBinaryPath } from '../../src/util/release-binary-path.mjs';
 import { holdLock } from './fgctl-lock-holder.mjs';
 import { useReleaseFixture, FGCTL_BIN, fixture, runFgctl, runShim, waitForProcess } from './fgctl-init-fixture.mjs';
 
@@ -271,7 +272,7 @@ test('R1 & R11: Non-git directory refuses init with clear error and no .fgos/ins
 });
 
 test('R10: version --runtime-json outside activated workspace reports host: "dev-source" and null fields', () => {
-  const fgosBin = path.resolve(REPO_ROOT, 'target', 'release', 'fgos');
+  const fgosBin = releaseBinaryPath(releaseOutputDir(), 'fgos');
   const tempEmptyDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-devsource-'));
 
   try {

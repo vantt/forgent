@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Commands that make many Git reads reuse the repository's checked config and storage format across them within one process, re-reading only when a config file changes: `approve --no-wait` refusing a held merge slot went from about 0.7 s to 0.4 s (79 to 21 Git processes) and `doctor --json` from about 3.8 s to 2.4 s (332 to 62).
 
+- `npm test` now prepares the release fgos, fgctl and native addon it tests against (incremental), so the suite is green on a fresh machine, not only in CI.
+
 - `npm test` ends with a `suite:` line: test files, `test()` calls and wall time against the committed `test/suite-baseline.json`. It fails when a test body is copied byte for byte into a second file and the baseline does not list that clone, and warns on titles shared across files and on new unmarked `fgos init` or network calls in tests. `node scripts/test-proof-inventory.mjs --duplicates` lists the clones and shared titles; `--write-baseline [--wall-seconds <s>]` refreshes the baseline.
 
 - `fgos worktree remove` no longer refuses every worktree `fgos worktree create` made. Create records what provisioning placed (each copied file with its content digest, and the installed `node_modules` declared regenerable) under the state root. Remove sets exactly those bytes aside before the Git port's clean check, puts them back if the port refuses, and deletes them once the checkout is gone. A copied file a worker edited, or any other ignored byte, still makes the port refuse with `worktree-ignored-bytes-preserved`. A worktree made before this change has no record and still needs its provisioned bytes cleaned by hand once.
