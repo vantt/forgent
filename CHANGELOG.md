@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Work settlement recognizes plain CLI writers through Event Store attribution; addon-less npm init refuses before project state writes with complete-release guidance. Event Store reuses byte-verified frames and stamp-validated Git config, avoids empty-cleanup fsyncs, and reports latency stages and syscall counts in the acceptance benchmark.
+
 - Added explicit Event Store host proof modes for settle-write faults and ext4 store-increment/zero-spawn/lock-convoy acceptance, with machine-readable verdicts.
 
 - Work transactions read their staged claim/file changes before acknowledgement; malformed shared project config no longer blocks claims through optional Event Store settings.

@@ -9,7 +9,7 @@ import { resolveActiveHostBin } from '../../src/util/host-bin-path.mjs';
 import { root } from '../helpers/git-addon.mjs';
 import { hostBin } from '../helpers/work-store-release.mjs';
 
-test('public Work mutations, same-writer drift and settle use the real facade and one batch', t => {
+for (const session of [undefined, 'claimant-session']) test(`public Work mutations reconcile same-writer drift (${session ?? 'plain CLI'}) with the real store`, t => {
   const f = fixture(t);
   const bin = hostBin;
   const storeUrl = new URL('../../src/state/store.mjs', import.meta.url).href;
@@ -55,8 +55,11 @@ test('public Work mutations, same-writer drift and settle use the real facade an
     assert.throws(() => checkDispatchAttestation(dir, process.argv[1], 'one', 'branch'), {code:'event-store-incomplete-history'});
     console.log(JSON.stringify({seq:topic.event.seq,origin:topic.event.origin}));
   `;
+  const env = { ...process.env, FGOS_HOST_BIN: bin, FGOS_STATE_ROOT: f.stateRoot };
+  for (const key of ['FGOS_SESSION_ID', 'CODEX_THREAD_ID', 'CLAUDE_CODE_SESSION_ID']) delete env[key];
+  if (session) env.FGOS_SESSION_ID = session;
   const output = execFileSync(process.execPath, ['--input-type=module', '-e', source, f.repo], {
-    env: { ...process.env, FGOS_HOST_BIN: bin, FGOS_STATE_ROOT: f.stateRoot }, encoding: 'utf8', timeout: 30000,
+    env, encoding: 'utf8', timeout: 30000,
   });
   assert.ok(JSON.parse(output).seq >= 5);
 });

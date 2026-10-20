@@ -964,10 +964,9 @@ const SIDE_LOG_ONLY_EVENT_TYPES = new Set([
  * concurrent conflict. This reconciles exactly that case: every
  * `view.work[id]`-mutating event (per `SIDE_LOG_ONLY_EVENT_TYPES` above)
  * since the claim's own `acquiredAt` must be positively attributed
- * (`payload.writer.id`) to `claim.writerId` — an event with no writer
- * stamp at all (e.g. `recordClaimAttempt`'s reclaim record,
- * src/runner/claim-port.mjs's stale-claim-reclaim path) or one stamped
- * with a different writer fails this closed, keeping the original refuse.
+ * (v4 store `src`, legacy `payload.writer.id`) to `claim.writerId`.
+ * Missing legacy attribution or a different writer fails closed. A v4
+ * payload need not duplicate its envelope's writer attribution.
  * `claim.writerId` absent (a claim written before that field existed) is
  * never reconciled either — no positive evidence exists to reconcile
  * against, the same "never a false positive on old data" floor the
@@ -997,7 +996,11 @@ function revisionDriftIsSelfCaused(events, id, claim) {
     // event from BEFORE the claim (e.g. the item's own `work.add`), which
     // never shares that millisecond in practice.
     if (!Number.isFinite(eventTsMs) || !(eventTsMs >= acquiredAtMs)) continue;
-    if (event.payload?.writer?.id !== claim.writerId) return false;
+    // v4 src is the store-recorded writer; legacy stamps may use numeric PIDs.
+    const writerId = event.v === 4 ? event.src : event.payload?.writer?.id;
+    if (!(typeof writerId === 'string' && writerId.length > 0)
+      && !(Number.isInteger(writerId) && writerId > 0)) return false;
+    if (String(writerId) !== claim.writerId) return false;
     sawSelfCausedEvent = true;
   }
   return sawSelfCausedEvent;

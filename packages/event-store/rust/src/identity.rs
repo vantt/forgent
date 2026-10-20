@@ -94,6 +94,7 @@ impl StoreIdentity {
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(()),
             Err(e) => return Err(io(e)),
         };
+        let mut removed = false;
         for entry in entries {
             let entry = entry.map_err(io)?;
             let name = entry.file_name();
@@ -115,11 +116,15 @@ impl StoreIdentity {
                 .is_some_and(valid_store_id)
             {
                 fs::remove_file(entry.path()).map_err(io)?;
+                removed = true;
             }
         }
-        File::open(&layout.root)
-            .and_then(|f| f.sync_all())
-            .map_err(io)
+        if removed {
+            File::open(&layout.root)
+                .and_then(|f| f.sync_all())
+                .map_err(io)?;
+        }
+        Ok(())
     }
 
     pub fn open(layout: &Layout, machine: &str) -> Result<Self, Error> {

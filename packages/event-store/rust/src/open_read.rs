@@ -12,15 +12,60 @@ use std::{
     path::{Path, PathBuf},
 };
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Framed {
     pub events: Vec<Envelope>,
     pub committed_len: usize,
+}
+// One verified frame per thread, keyed by exact bytes and decoding authority.
+// Every read still reads the file. Neither metadata nor a hash establishes
+// integrity; a changed byte (including a torn suffix) runs the verifier again.
+struct VerifiedFrame {
+    bytes: Vec<u8>,
+    origin: String,
+    stream: String,
+    strict: bool,
+    frame: Framed,
+}
+thread_local! {
+    static VERIFIED: std::cell::RefCell<Option<VerifiedFrame>> = const { std::cell::RefCell::new(None) };
 }
 /// An active suffix is speculative, including complete event lines and
 /// an incomplete line. A complete marker after a failure proves corruption.
 /// Immutable segments instead require complete, valid framing through EOF.
 pub fn decode(
+    bytes: &[u8],
+    origin: &str,
+    stream: &StreamId,
+    strict: bool,
+) -> Result<Framed, Error> {
+    if let Some(frame) = VERIFIED.with(|slot| {
+        slot.borrow()
+            .as_ref()
+            .filter(|cached| {
+                cached.origin == origin
+                    && cached.stream == stream.as_str()
+                    && cached.strict == strict
+                    && cached.bytes == bytes
+            })
+            .map(|cached| cached.frame.clone())
+    }) {
+        return Ok(frame);
+    }
+    let frame = decode_verified(bytes, origin, stream, strict)?;
+    // Bound retained memory; large immutable histories are never retained.
+    VERIFIED.with(|slot| {
+        *slot.borrow_mut() = (bytes.len() <= 4 * 1024 * 1024).then(|| VerifiedFrame {
+            bytes: bytes.to_vec(),
+            origin: origin.into(),
+            stream: stream.as_str().into(),
+            strict,
+            frame: frame.clone(),
+        })
+    });
+    Ok(frame)
+}
+fn decode_verified(
     bytes: &[u8],
     origin: &str,
     stream: &StreamId,

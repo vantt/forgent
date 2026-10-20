@@ -25,7 +25,7 @@ export function loadNativeAddon({ hostBin = process.env.FGOS_HOST_BIN, descripto
   if (!found) {
     try { found = { manifest: JSON.parse(fs.readFileSync(path.join(OWN_PAYLOAD_ROOT, 'native-addon.json'), 'utf8')), releaseRoot: OWN_PAYLOAD_ROOT }; packageDescriptor = true; } catch (err) { if (err.code !== 'ENOENT') throw unavailable(`invalid descriptor: ${err.message}`); }
   }
-  if (!found || (!descriptor && !packageDescriptor && !found.manifest.components?.nativeAddon)) throw Object.assign(unavailable('addon not shipped on this channel until M10'), { code: 'git-addon-not-shipped' });
+  if (!found || (!descriptor && !packageDescriptor && !found.manifest.components?.nativeAddon)) throw Object.assign(unavailable('this npm/legacy Node channel does not ship the required Event Store native addon; fgos init cannot initialize this channel. Install and activate a complete fgctl release containing components.nativeAddon, then run fgos init again'), { code: 'git-addon-not-shipped' });
   const entry = found?.manifest?.components?.nativeAddon;
   if (!entry || typeof entry.path !== 'string' || path.isAbsolute(entry.path) || entry.path.split(/[\\/]/).some(p => p === '..' || p === '')) throw unavailable('missing or unsafe addon path');
   if (entry.target !== `${process.platform}-${process.arch}` || entry.napiVersion !== 8 || Number(process.versions.napi) < 8) throw unavailable('target or Node-API mismatch');

@@ -731,12 +731,10 @@ test('settleClaim still refuses a revision drift caused by a GENUINELY DIFFERENT
   }
 });
 
-// recordClaimAttempt's own reclaim record (src/runner/claim-port.mjs) never
-// stamps `payload.writer` at all -- the reconcile must fail CLOSED on a
-// missing writer stamp (never treat "no evidence" as "same writer"), or a
-// genuinely different actor's stale-claim-reclaim could slip through
-// unnoticed.
-test('settleClaim treats an event with no writer stamp at all as NOT self-caused (fails closed, keeps refusing)', () => {
+// v4 always has a store-recorded writer even when a payload has no stamp.
+// A reclaim from another writer must still refuse; the owner's own event can
+// reconcile from src alone.
+for (const eventWriter of ['session-A', 'session-B']) test(`settleClaim uses store writer ${eventWriter} when the event payload has no writer stamp`, () => {
   const dir = makeTmpDir();
   addWork(dir, { id: 'tsk-1', title: 'Task 19', kind: 'bug', status: 'todo', deps: [], refs: [], risk: 'heavy', verify: 'npm test', domain: 'coding' });
 
@@ -748,15 +746,16 @@ test('settleClaim treats an event with no writer stamp at all as NOT self-caused
 
     editWork(dir, { id: 'tsk-1', patch: { size: 'standard' } });
 
-    // Simulate an unstamped event touching this id landing in the log
-    // directly (the shape recordClaimAttempt writes -- no payload.writer).
+    process.env.FGOS_SESSION_ID = eventWriter;
     appendWorkEvent(dir, { type: 'work.attempt', payload: { id: 'tsk-1', phase: 'claim', result: 'reclaimed' } });
+    const written = readRawEvents(dir).findLast(event => event.type === 'work.attempt');
+    assert.equal(written.payload.writer, undefined);
+    assert.equal(written.src, eventWriter);
+    process.env.FGOS_SESSION_ID = 'session-A';
+    const settle = () => settleClaim(dir, { id: 'tsk-1', claimId: claim.claimId, finalStatus: 'awaiting-approval' });
+    if (eventWriter === 'session-A') assert.equal(settle().view.work['tsk-1'].status, 'awaiting-approval');
+    else assert.throws(settle, err => err instanceof StoreError && err.category === 'conflict');
 
-    assert.throws(
-      () => settleClaim(dir, { id: 'tsk-1', claimId: claim.claimId, finalStatus: 'awaiting-approval' }),
-      (err) => err instanceof StoreError && err.category === 'conflict',
-      'an unstamped event in the drift window must fail the reconcile closed',
-    );
   } finally {
     if (originalSessionId === undefined) delete process.env.FGOS_SESSION_ID;
     else process.env.FGOS_SESSION_ID = originalSessionId;

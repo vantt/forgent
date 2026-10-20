@@ -108,7 +108,7 @@ async function storeIncrementBenchmark({root,out,sessions,filesystem,checkout,st
       for(let i=0;i<concurrency;i++){
         const log=path.join(repo,`trace-${i}`);
         const count=Math.floor(200/concurrency)+(i<200%concurrency?1:0);
-        const child=spawn('strace',['-f','-e','trace=process,write','-s','256','-o',log,
+        const child=spawn('strace',['-f','-e','trace=process,write,fsync,fdatasync','-s','256','-o',log,
           process.execPath,path.join(checkout,'scripts/event-store/store-increment-worker.mjs'),
           repo,stateRoot,built.manifest,checkout,String(i),String(count),barrier,'yes'],{env});
         children.push(child);
@@ -130,21 +130,32 @@ async function storeIncrementBenchmark({root,out,sessions,filesystem,checkout,st
       let completed;try{completed=await Promise.all(pending);}finally{clearTimeout(timer);}
       const elapsedMs=performance.now()-start;
       const observations=completed.flatMap(c=>c.measurements.observations);
-      let spawns=0,windows=0;
+      let spawns=0,windows=0,gitExecsBetweenGates=0;
+      const appendFsyncs=[];
       for(const c of completed){
-        const lines=fs.readFileSync(c.log,'utf8').split('\n');let inside=false;
+        const lines=fs.readFileSync(c.log,'utf8').split('\n');let inside=false,appending=false,fsyncs=0,seenGate=false;
         for(const line of lines){
-          if(line.includes('ES_GATE_BEGIN:')){if(inside)throw Error('nested trace marker');inside=true;windows++;continue;}
+          if(line.includes('ES_APPEND_BEGIN:')){if(appending)throw Error('nested append marker');appending=true;fsyncs=0;continue;}
+          if(line.includes('ES_APPEND_END:')){if(!appending)throw Error('unmatched append end');appending=false;appendFsyncs.push(fsyncs);continue;}
+          if(appending && /\b(?:fsync|fdatasync)\(/.test(line))fsyncs++;
+          if(!inside && seenGate && /\bexecve\("[^"]*\/git",/.test(line) && /= 0$/.test(line))gitExecsBetweenGates++;
+          if(line.includes('ES_GATE_BEGIN:')){if(inside)throw Error('nested trace marker');inside=true;seenGate=true;windows++;continue;}
           if(line.includes('ES_GATE_END:')){if(!inside)throw Error('unmatched trace end');inside=false;continue;}
           if(inside && /\b(?:clone|clone3|fork|vfork|execve|execveat)\(/.test(line))spawns++;
         }
-        if(inside)throw Error('incomplete gate trace');
+        if(inside || appending)throw Error('incomplete gate/append trace');
       }
-      const increments=observations.map(o=>o.incrementUpperBoundMs), waits=observations.map(o=>o.waitMs);
+      const increments=observations.map(o=>o.storeIncrementMs), upperBounds=observations.map(o=>o.incrementUpperBoundMs), waits=observations.map(o=>o.waitMs);
       const row={sessions:concurrency,mutations:observations.length,elapsedMs,windows,spawns,
-        incrementUpperBoundP95Ms:percentile(increments,.95),
+        incrementUpperBoundP95Ms:percentile(upperBounds,.95),
+        storeIncrementP50Ms:percentile(increments,.5),storeIncrementP95Ms:percentile(increments,.95),
+        stages:Object.fromEntries(['readInGate','append','fold','prepareEvents','cacheWrite'].map(stage=>[stage,{
+          p50Ms:percentile(observations.map(o=>o.stages[stage]),.5),p95Ms:percentile(observations.map(o=>o.stages[stage]),.95),
+        }])),
+        appendFsyncs:{min:Math.min(...appendFsyncs),max:Math.max(...appendFsyncs),observations:appendFsyncs},
+        gitExecsBetweenGates,gitExecsPerSteadyMutation:gitExecsBetweenGates/Math.max(1,windows-concurrency),
         convoy:{waitP50Ms:percentile(waits,.5),waitP95Ms:percentile(waits,.95),waitMaxMs:Math.max(...waits),observations},
-        verdict:observations.length===200&&windows===200&&spawns===0&&elapsedMs<=60000&&(concurrency!==20||percentile(increments,.95)<=50)?'PASS':'FAIL'};
+        verdict:observations.length===200&&windows===200&&appendFsyncs.length===200&&spawns===0&&elapsedMs<=60000&&(concurrency!==20||percentile(increments,.95)<=50)?'PASS':'FAIL'};
       result.rows.push(row);console.log(JSON.stringify({...row,convoy:{...row.convoy,observations:undefined}}));
     } finally {for(const c of children)if(c.exitCode===null)c.kill('SIGKILL');}
   }

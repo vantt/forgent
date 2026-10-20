@@ -1,5 +1,6 @@
 // Shared read-check-append gate; consumers own folding, paths and preconditions.
 import path from 'node:path';
+import { performance } from 'node:perf_hooks';
 import { readEventStoreConfig } from '../event-store/index.mjs';
 import { withStateTx, hotLockDepth, HotLockError } from './hot-lock.mjs';
 const refusal = code => Object.assign(new Error(code), { code });
@@ -17,7 +18,12 @@ function advance(cursor, events) {
  * An already-prepared store is also accepted (the same native facade, useful
  * to callers that already resolved repository authority).
  */
-export function withConsumerState(dir, mainFgosDir, writer, fn, { store, config, rebuild = false, beforeGate, heldRanks = [], readRoots = [], policy } = {}) {
+export function withConsumerState(dir, mainFgosDir, writer, fn, { store, config, rebuild = false, beforeGate, heldRanks = [], readRoots = [], policy, onTiming } = {}) {
+  const measure = (stage, run) => {
+    if (!onTiming) return run();
+    const start = performance.now();
+    try { return run(); } finally { onTiming(stage, performance.now() - start); }
+  };
   const { stream, resource, readState, fold, persist, prepareEvents, lifecycle } = policy;
   if (hotLockDepth() > 0) throw new HotLockError('hot-lock-reentry', 'Work cannot open a nested state transaction');
   if (!store) throw new TypeError('a prepared consumer store is required');
@@ -32,7 +38,7 @@ export function withConsumerState(dir, mainFgosDir, writer, fn, { store, config,
     try {
       const result = withStateTx(mainFgosDir, tx => {
         const origin = store.ownOrigin;
-        const tail = store.readInGate(origin, stream, candidate.cursor.cover[`${origin}:${stream}`] ?? 0).events;
+        const tail = measure('readInGate', () => store.readInGate(origin, stream, candidate.cursor.cover[`${origin}:${stream}`] ?? 0)).events;
         if (rebuild && tail.length) throw refusal('event-store-rebuild-raced');
         // A gated own-stream extension is the proven incremental case (§12).
         // Foreign/deferred changes are handled by the full read next time.
@@ -41,7 +47,7 @@ export function withConsumerState(dir, mainFgosDir, writer, fn, { store, config,
           || Object.entries(candidate.cursor.cover).some(([key, seq]) => key !== `${origin}:${stream}` && (event.seen[key] ?? 0) < seq))) {
           throw refusal('catch-up-required');
         }
-        tx.view = fold(tail, candidate.view);
+        tx.view = measure('fold', () => fold(tail, candidate.view));
         tx.cursor = advance(candidate.cursor, tail);
         tx.evidence = evidence;
         tx.tail = tail;
@@ -50,14 +56,14 @@ export function withConsumerState(dir, mainFgosDir, writer, fn, { store, config,
         mainFgosDir, writer, extraRoots, readRoots, eventStore: store, stageEffects: true,
         commitEvents(tx, events) {
           if (!events.length) return;
-          prepareEvents?.(tx, events);
-          const appended = store.append(stream, events.map(event => ({ eventType: event.type, schemaVersion: 1, payload: event.payload, ts: event.ts })), tx.cursor.cover, String(writer), [...heldRanks, 60]);
+          measure('prepareEvents', () => prepareEvents?.(tx, events));
+          const appended = measure('append', () => store.append(stream, events.map(event => ({ eventType: event.type, schemaVersion: 1, payload: event.payload, ts: event.ts })), tx.cursor.cover, String(writer), [...heldRanks, 60]));
           for (let i = 0; i < events.length; i += 1) Object.assign(events[i], appended.events[i]);
-          tx.view = fold(appended.events, tx.view);
+          tx.view = measure('fold', () => fold(appended.events, tx.view));
           tx.cursor = advance(tx.cursor, appended.events);
           sealedType = events.some(event => lifecycle.has(event.type));
         },
-        afterApply: tx => persist(tx),
+        afterApply: tx => measure('cacheWrite', () => persist(tx)),
       } });
       // Opportunistic failures do not turn an acknowledged mutation into a
       // refusal. Explicit seal/doctor retain the diagnostic failure surface.

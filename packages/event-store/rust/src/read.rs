@@ -180,7 +180,8 @@ fn read_legacy(
     streams: &[StreamId],
 ) -> Result<Vec<LegacyEvent>, Error> {
     let authority = crate::fence::authority(port, repo)?;
-    let pin = crate::fence::pinned_legacy(port, &authority).map_err(|error| {
+    let head = port.resolve_head(&authority).map_err(git_error)?;
+    let pin = crate::fence::pinned_at_head(port, &authority, &head).map_err(|error| {
         if refs.is_empty() && error.code == ErrorCode::EventStoreIo {
             Error::new(
                 ErrorCode::EventStoreRefspecMissing,
@@ -201,7 +202,7 @@ fn read_legacy(
         legacy_files(port, repo, &oid, streams)
     } else {
         if matches!(
-            port.resolve_head(&authority).map_err(git_error)?,
+            head,
             HeadFact::Unborn { .. }
         ) {
             return Ok(Vec::new());

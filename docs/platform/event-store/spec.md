@@ -532,7 +532,7 @@ One traced `take` made 983 process clones. A later trace attributed them to proc
 | (a) Event Store increment inside the Work gate | the store's share of the gate: in-gate read (section 11), append with recovery and `fsync`, fold of the new events | p95 at most 50 ms at 20 concurrent sessions on ext4; 0 process spawns inside the gate; no exhaustion at 20 sessions by 200 mutations in 60 s |
 | (b) End to end | CLI p95 of claim, move and settle | not worse than the V-SPAWN-01 baseline, rerun on ext4 on a main commit that contains a4b1278ae, before the Event Store cutover; the tmpfs table above is history, not the baseline of record |
 
-Phase 09 proof entry: `node scripts/event-store/v-spawn-bench.mjs --root .fgos/runtime/tmp/v-spawn-ext4 --sessions 1,10,15,20 --store-increment --strace --out .fgos/runtime/tmp/v-spawn-ext4/cutover.json`. The root must be fresh and its parent must already exist on ext4. This mode runs 200 real Work additions per concurrency, through the consumer gate, native append/fsync, reducer and cache. It measures a conservative upper bound from in-gate read through cache persistence/unlock, excluding the lock wait and opportunistic sealing; a passing upper bound proves the narrower part (a) budget. Trace markers enclose that same interval. JSON includes the verdict, all observations, completed gate windows, process-creation count, elapsed time and lock-wait distributions (including 15/20 sessions). Missing ext4, strace/ptrace, incomplete windows, worker failure or exhaustion fails explicitly. This harness is an acceptance procedure, not a recorded host measurement; it makes no part (b) claim.
+Phase 09 proof entry: `node scripts/event-store/v-spawn-bench.mjs --root .fgos/runtime/tmp/v-spawn-ext4 --sessions 1,10,15,20 --store-increment --strace --out .fgos/runtime/tmp/v-spawn-ext4/cutover.json`. The root must be fresh and its parent must already exist on ext4. This mode runs 200 real Work additions per concurrency, through the consumer gate, native append/fsync, reducer and cache. It retains the conservative upper bound from in-gate read through cache persistence/unlock, excluding lock wait and opportunistic sealing. Part (a) is measured separately by the consumer's timers: in-gate read, append including recovery/fsync, and folds (including the precondition preview). Cache persistence stays inside the gate but outside the part (a) sum, exactly as the budget table defines. Trace markers still enclose the upper-bound interval; nested append markers count actual fsync/fdatasync calls. JSON includes both p50/p95 metrics, per-stage timings, per-append fsync counts, steady Git execs outside the gate, the verdict, all observations, completed gate windows, process-creation count, elapsed time and lock-wait distributions (including 15/20 sessions). Missing ext4, strace/ptrace, incomplete windows, worker failure or exhaustion fails explicitly. This harness is an acceptance procedure, not a recorded host measurement; it makes no part (b) claim.
 
 No daemon is dedicated to Event Store.
 
@@ -1073,3 +1073,24 @@ separate workflow/coordination/Observe journals, the requirement-7 porting
 consumer, and the explicit requirement-9 repair/compaction/truncation/checkpoint/
 Land-restore mechanisms awaiting their removal unit. This cutover does not
 claim those later mechanism deletions are complete.
+
+
+### Phase 09 host follow-up: latency, attribution and channel admission
+
+Active-frame verification can reuse one bounded thread-local verified frame only
+when freshly read bytes, origin, stream and strictness match exactly. Changed
+bytes always reverify; receipt, sequence recovery and all append durability
+barriers remain mandatory. Temporary-file cleanup syncs its directory after a
+removal, rather than syncing an untouched directory on every append.
+
+Work same-writer drift uses the v4 envelope's `src` (the resolved writer passed
+to append). Legacy payload attribution remains supported with numeric PID ids
+normalized to the claim's string representation. An absent payload writer is
+not absent attribution in v4; a foreign `src` still refuses settlement.
+
+M10's release/activation requirement does not make an addon-less npm package a
+supported ES-09 writer. Its init refuses by channel name with an actionable
+complete-release/`components.nativeAddon` instruction before project state is
+created. The packed-install test proves neither `.fgos` nor `.git/fgos` appears.
+
+Evidence: `plans/reports/phase-lead-261020-1106-es-p09-u8-latency-writer-channel.md`.

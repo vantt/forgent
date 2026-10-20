@@ -57,6 +57,13 @@ test('store-increment workers exercise the real concurrent consumer and delimit 
   for(const child of children){
     const result=JSON.parse(child.output);assert.equal(result.observations.length,2);
     assert.ok(result.observations.every(o=>Number.isFinite(o.incrementUpperBoundMs)&&o.incrementUpperBoundMs>=0&&o.waitMs>=0));
+    for (const observation of result.observations) {
+      assert.ok(observation.storeIncrementMs >= 0);
+      for (const stage of ['readInGate','append','fold','prepareEvents','cacheWrite']) assert.ok(observation.stages[stage] >= 0, stage);
+      assert.equal(observation.storeIncrementMs, observation.stages.readInGate + observation.stages.append + observation.stages.fold + observation.stages.prepareEvents);
+      assert.ok(observation.incrementUpperBoundMs >= observation.storeIncrementMs);
+    }
+    assert.equal(child.errors.match(/ES_APPEND_BEGIN:/g)?.length,2);assert.equal(child.errors.match(/ES_APPEND_END:/g)?.length,2);
     assert.equal(child.errors.match(/ES_GATE_BEGIN:/g)?.length,2);assert.equal(child.errors.match(/ES_GATE_END:/g)?.length,2);
   }
   // This is correctness smoke only; host latency acceptance remains explicit.
