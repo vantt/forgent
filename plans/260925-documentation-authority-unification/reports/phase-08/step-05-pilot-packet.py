@@ -1,0 +1,128 @@
+"""Assemble per-seam receipts and bounded review slices. Records only."""
+import sys
+sys.dont_write_bytecode=True
+import pathlib,json,hashlib,subprocess,os,copy,math,datetime,difflib
+P=pathlib.Path(__file__).resolve().parent;ROOT=P.parents[3]
+sha=lambda b:hashlib.sha256(b.encode() if isinstance(b,str) else b).hexdigest()
+def save(n,v):(P/n).write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+def read(n):return json.loads((P/n).read_text())
+SEAMS=['gateway-contract','cli-help-messages','setup-doctor-roots'];PIN=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+rs=[json.loads(l) for s in SEAMS for l in (P/'step-05-records'/(s+'.jsonl')).read_text().splitlines()]
+tpl=read('step-05-parity-receipt-template.json')
+def info(f):
+ b=(ROOT/f).read_bytes();mode=subprocess.check_output(['git','ls-files','-s','--',f],text=True).split()[0]
+ return {'path':f,'sha256':sha(b),'bytes':len(b),'mode':mode,'provenance':PIN+':'+f}
+def proof(command,behavior,status='not-run',log=None,exit=None):
+ return {'command':command,'owningBehavior':behavior,'status':status,'exit':exit,'logPath':str(P.relative_to(ROOT)/log) if log else None,'logSha256':sha((P/log).read_bytes()) if log else None}
+receipts=[];patches=[]
+for seam in SEAMS:
+ group=[r for r in rs if seam in r['seamIds']]
+ x=copy.deepcopy(tpl['receipt']);x.update(id=seam+'-pilot',seam=seam,inputCommit=PIN,currentInputs=[info(r['file']) for r in group],candidateInputs=[{'path':r['file'],'sha256':r['expectedAfterSha256'],'mode':r['sourceMode'],'bytes':None,'provenance':'Full current-file diff in canonical file record; unapplied Phase 9 specification'} for r in group],readiness='pending independent review and listed missing cutover proof')
+ x['comparison'].update(normalization='none; source/byte hashes retained; no semantic/payload/path delta normalized away',comparedFields=tpl['seamTemplates'][seam]['requiredComparisons'],intentionalDeltas=[],unexpectedDeltas=[])
+ x['comparison']['currentOutputSet']=[];x['comparison']['candidateOutputSet']=[]
+ x['proofs']=[];x['blockedBy']=[]
+ for r in group:
+  changes=[]
+  for e in r['references']:
+   if e['disposition']=='patch':
+    text=(ROOT/r['file']).read_text();ls=text.splitlines();s=e['sourceSpans'][0];old=ls[s['line']-1];new=old[:s['columnStart']-1]+e['proposedReplacement']+old[s['columnEndExclusive']-1:]
+    delta={'file':r['file'],'referenceId':e['referenceId'],'edgeId':e['edgeId'],'line':s['line'],'currentExpression':old,'candidateExpression':new,'oldPointer':e['matchedExpression'],'newPointer':e['proposedReplacement'],'intent':'Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.','evidence':e['resolverWitness']}
+    changes.append(delta);x['comparison']['intentionalDeltas'].append(delta)
+  if r['diff']:
+   patches.append({'inputCommit':PIN,'file':r['file'],'sourceSha256':r['sourceSha256'],'mode':r['sourceMode'],'symbolOrPassage':[e['passage'] for e in r['references'] if e['disposition']=='patch'],'oldText':[d['currentExpression'] for d in changes],'newText':[d['candidateExpression'] for d in changes],'sourceSpans':[s for e in r['references'] if e['disposition']=='patch' for s in e['sourceSpans']],'diff':r['diff'],'expectedAfterSha256':r['expectedAfterSha256'],'targetOwner':sorted({e['target'] for e in r['references'] if e['disposition']=='patch'}),'claimAnchorProof':[e['resolverWitness'] for e in r['references'] if e['disposition']=='patch'],'receiptId':x['id'],'coCutPaths':r['coCutPaths'],'expectedOutputSets':changes,'testTargets':['missing: exact emitted/refusal-message migration parity for '+r['file']],'intentionalBehaviorDeltas':changes,'prerequisites':['Lead-started independent semantic review','Missing exact-output proof','User-visible CHANGELOG.md Unreleased co-edit in separately authorized Phase 9 packet','Same-package Step 0 rebind if the final patch touches a bound target'],'order':'Phase 9 atomic consumer cutover; no apply-now action','rollbackDiff':r['rollbackDiff'],'timing':'phase9','readiness':'pending / cutover-patch-only; never execution-ready'})
+ if seam=='gateway-contract':
+  x['currentInputs'] += [info('docs/contracts/fgos-gateway-api-v1.yaml')];x['candidateInputs'] += [info('docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml')]
+  x['comparison']['fileParityReceipt']={'path':str(P.relative_to(ROOT)/'step-05-gateway-file-parity.json'),'sha256':sha((P/'step-05-gateway-file-parity.json').read_bytes()),'recheck':read('step-05-pilot-gateway-file-parity.log')}
+  x['comparison']['currentOutputSet']=[{'http':{'status':200,'contentType':'application/yaml','bodySha256':'9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f'},'failure':{'status':500,'contentType':'application/json','category':'unexpected','exitCode':None,'messageTemplate':'could not read the OpenAPI contract at {root}/docs/contracts/fgos-gateway-api-v1.yaml: {err}'},'sourceEvidence':'gateway.rs get_contract, GatewayError::unexpected, into_response_with_status; static contract, not executed HTTP evidence'}]
+  x['comparison']['candidateOutputSet']=copy.deepcopy(x['comparison']['currentOutputSet'])
+  x['comparison']['pathDecision']='preserve both HTTP and MCP active reads at retained docs/contracts root (L12-26). The candidate file is equal, not authority to move the read.'
+  x['comparison']['conditionalMovedReadDelta']={'status':'not selected; requires later retained-root decision','coCut':['apps/fgos-gateway/src/gateway.rs','apps/fgos-gateway/src/mcp.rs','their owning inline fixtures'],'httpMissingReadErrorOld':'could not read the OpenAPI contract at {root}/docs/contracts/fgos-gateway-api-v1.yaml: {err}','httpMissingReadErrorNew':'could not read the OpenAPI contract at {root}/docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml: {err}','mcpParseErrorOld':'could not parse {root}/docs/contracts/fgos-gateway-api-v1.yaml as YAML: {err}','mcpParseErrorNew':'could not parse {root}/docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml as YAML: {err}','normalization':'same root/error fixture; only explicit path substitution allowed, error text still compared exactly'}
+  x['proofs']=[proof('env -u CLAUDE_CODE_SESSION_ID node plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-gateway-compare.mjs','Raw body files and complete parsed OpenAPI equality; 21 operations and 7 schemas','pass','step-05-pilot-gateway-file-parity.log',0),proof('env -u CLAUDE_CODE_SESSION_ID cargo test -p fgos-gateway contract_route_is_reachable_without_a_token','Only 200 and no-token reachability, gateway.rs lines 1737–1758'),proof('env -u CLAUDE_CODE_SESSION_ID cargo test -p fgos-gateway search_','mcp.rs search_with_no_query_returns_every_operation; search_with_a_query_matching_nothing_returns_an_empty_result_not_an_error; search_query_matches_case_insensitively_on_path_and_summary'),proof('missing','HTTP body bytes/content-type/fresh read; missing/unreadable/invalid UTF-8 500 JSON fields; MCP missing/read/YAML-parse-error parity','missing')]
+  x['blockedBy']=['HTTP body/content-type/fresh-read/error parity missing; no HTTP runtime pass claimed.','MCP error parity missing.','A45 legacy architecture-map registry co-edit remains Phase 9 only; no contract renumbering.']
+ elif seam=='cli-help-messages':
+  x['comparison']['unchangedContract']=['selector names and HELP_SELECTORS','JSON help schema, parameter names/types/required arrays','validation categories and exit codes','all non-pointer output text, interpolated values and branch logic','retained historical citations and external-project docs/history examples']
+  x['comparison']['currentOutputSet']=[{'file':r['file'],'sourceSha256':r['sourceSha256'],'emittedExpressions':[{'id':e['referenceId'],'passage':e['passage']} for e in r['references'] if e['admission']=='ADMIT']} for r in group]
+  x['comparison']['candidateOutputSet']=[{'file':r['file'],'sourceSha256':r['expectedAfterSha256'],'diffSha256':sha(r['diff'] or ''),'parked':r['parked']} for r in group]
+  x['proofs']=[proof('env -u CLAUDE_CODE_SESSION_ID node --test test/cli/command-registry.test.mjs test/cli/fgos-manifest.test.mjs test/cli/fgos-verb-help-json.test.mjs','Current registry/help wiring; does not prove all recovery strings'),proof('env -u CLAUDE_CODE_SESSION_ID node --test test/rust-host/help-routes.test.mjs','Host help selector wiring; later authorized host proof'),proof('missing','Every intentional message delta, including hook refusals, class6-l-000113 and class6-l-000245, compared on identical input/error fixture with unchanged category/exit','missing')]
+  x['blockedBy']=['Generic scope/quadrant help and examples need runtime/generator co-cut; exact parked ids in records.','Unknown-target/alias write refusals remain enforced.','Exact emitted/error/refusal parity missing; Unreleased changelog co-edit is a Phase 9 prerequisite.']
+ else:
+  manifest=json.loads((ROOT/'docs/architecture-manifest.json').read_text());filepaths=sorted(manifest['files']);owners=sorted({'core','platform'}|set(manifest.get('components',[]))|set(manifest.get('domains',[])))
+  tracked=subprocess.check_output(['git','ls-files','-z'],cwd=ROOT).decode().split('\0');docpaths=sorted(f for f in tracked if f.startswith('docs/') and f.endswith('.md'))
+  rootpaths=['core/instructions']+['components/'+c+'/instructions' for c in manifest.get('components',[])]+['domains/'+d+'/instructions' for d in manifest.get('domains',[])]
+  scanned=sorted(f for f in tracked if f.endswith('.md') and any(f.startswith(d+'/') for d in rootpaths))
+  x['comparison']['manifestParsedSets']={'current':{'owners':owners,'components':manifest.get('components',[]),'domains':manifest.get('domains',[]),'files':manifest['files'],'map':manifest.get('map')},'candidate':'same parsed owner/path sets; retained manifest path; no manifest payload change specified','fileCount':len(filepaths),'pathsSha256':sha(json.dumps(filepaths,separators=(',',':'))),'manifest':info('docs/architecture-manifest.json')}
+  x['comparison']['scanRootDeltas']={'added':[],'removed':[],'instructionRootsCurrent':rootpaths,'instructionRootsCandidate':rootpaths,'trackedInstructionFiles':scanned,'doctorNearDuplicateRootCurrent':'docs/','doctorNearDuplicateRootCandidate':'docs/','trackedCurrentDocsMarkdownFiles':docpaths,'scopeLimit':'Tracked checkout sets only; not the live filesystem/export or symlink proof. Final Phase 9 retirement/output set not yet supplied.','retirementSensitivity':{'removedIfBothLegacyRootsDeleted':[f for f in docpaths if f.startswith(('docs/specs/','docs/architect/'))],'candidateFinalScannedFiles':None,'blocker':'Need final reviewed deletion/carry set and bounded registry/outcome/sourceCaptureIds/inventory export. Cannot infer no finding loss merely from unchanged root.'}}
+  x['comparison']['stateComparisons']=['doc-alias-broken: same alias ownership and collision sets','doc-current-path-missing: every live currentPath at HEAD','doc-source-unreachable: every path-shaped sourceCaptureId resolves to same doc via current/alias path; work-item capture ids excluded','doc-source-conservation: all outcomes reachable, inventory oldPath unique, live sourceCaptureIds nonempty, every inventory oldPath on disk or resolvable','doc-near-duplicate: recursive docs Markdown candidates incl source frontmatter and findDuplicateAuthoritativeClaims tuples','decision-index-stale and instruction readDecisionIds: exact state-derived index equality, no empty-state overwrite','instruction discovery: missing/empty roots, unknown owners, duplicate IDs, symlink containment and lowercase .md recognition']
+  x['comparison']['currentOutputSet']=[{'staticRoots':rootpaths,'manifestOwners':owners,'sourceStateExport':None}];x['comparison']['candidateOutputSet']=[{'staticRoots':rootpaths,'manifestOwners':owners,'sourceStateExport':None,'finalScanSets':None}]
+  x['proofs']=[proof('env -u CLAUDE_CODE_SESSION_ID node --test test/setup/instruction-registry.test.mjs test/setup/registrations.test.mjs test/setup/checks.test.mjs test/setup/knowledge-doctor.test.mjs','Existing owning checks/discovery modules; not executed as a cutover proof'),proof('env -u CLAUDE_CODE_SESSION_ID node --test test/docs/rul11-anchor-phrase.test.mjs test/docs/decisions-corpus-retired.test.mjs test/setup/instruction-registry.test.mjs test/scripts/check-decision-citation-drift.test.mjs','84 current-root tests including real instruction discovery / missing roots / containment / lowercase extension','pass','step-05-pilot-light-tests.log',0),proof('missing','Same bounded state/inventory export current/candidate findings/severity/fix intent; recursive post-retirement file-set conservation','missing')]
+  x['blockedBy']=['State-backed aliases/currentPath/sourceCaptureIds/outcomes/inventory population export missing.','Skill/output provenance and instruction materialization join generators seam; no generated diff.','Final recursive post-retirement scan-set/finding parity missing.']
+ x['blockedBy'] += sorted({e['blockedReason'] for r in group for e in r['references'] if e['blockedReason']})
+ receipts.append(x)
+save('step-05-pilot-parity-receipts.json',{'inputCommit':PIN,'receipts':receipts})
+save('step-05-pilot-cutover-specs.json',{'inputCommit':PIN,'status':'unapplied Phase 9 specifications, pending review/proof','patches':patches})
+# The full review material is streamed without copying a canonical record into
+# multiple new records. Every file has one canonical JSONL record and verdict.
+items=[]
+for r in rs:
+ base={'file':r['file'],'recordPath':str(P.relative_to(ROOT)/'step-05-records'/(r['seamIds'][0]+'.jsonl')),'sourceSha256':r['sourceSha256'],'seam':r['seamIds'][0]}
+ # Preserve full contexts (including rejected/nonbehavioral files); no sample.
+ ls=(ROOT/r['file']).read_text().splitlines(True)
+ for start in range(0,len(ls),250):items.append({**base,'kind':'source-context','startLine':start+1,'endLine':min(start+250,len(ls)),'text':''.join(ls[start:start+250])})
+ meta={k:v for k,v in r.items() if k not in ['references','dynamicTraces','priorRecordRefs']};items.append({**base,'kind':'record-metadata','value':meta})
+ for k in ['references','dynamicTraces','priorRecordRefs']:
+  for i,e in enumerate(r[k]):items.append({**base,'kind':k,'index':i,'value':e})
+for receipt in receipts:
+ # One receipt may include all docs paths. It still fits one bounded item.
+ items.append({'kind':'receipt','seam':receipt['seam'],'value':receipt})
+expanded=[]
+for ordinal,item in enumerate(items):
+ raw=json.dumps(item,ensure_ascii=False,indent=2)
+ if len(raw.encode())>300000:
+  chunks=[raw[i:i+50000] for i in range(0,len(raw),50000)]
+  for i,chunk in enumerate(chunks):expanded.append({'kind':'item-fragment','fragmentOf':ordinal,'fragment':i,'fragments':len(chunks),'completeItemSha256':sha(raw),'file':item.get('file'),'seam':item.get('seam'),'text':chunk})
+ else:expanded.append(item)
+items=expanded
+parts=[];packet=[]
+for item in items:
+ trial={'inputCommit':PIN,'items':packet+[item]};size=len((json.dumps(trial,ensure_ascii=False,indent=2)+'\n').encode())
+ assert len((json.dumps({'items':[item]},ensure_ascii=False,indent=2)+'\n').encode())<390000,'single review item needs further bounded slicing'
+ if packet and (size>390000 or len({x.get('file') for x in packet+[item] if x.get('file')})>60):parts.append(packet);packet=[]
+ packet.append(item)
+if packet:parts.append(packet)
+index=[]
+for i,part in enumerate(parts,1):
+ name=f'step-05-pilot-p{i:02}.json';payload={'inputCommit':PIN,'part':i,'items':part};save(name,payload)
+ b=(P/name).read_bytes();fs=sorted({x['file'] for x in part if x.get('file')});index.append({'part':i,'payload':name,'payloadSha256':sha(b),'bytes':len(b),'files':fs,'fileRecords':len(fs),'items':len(part),'report':f'review-a38-step-05-pilot-p{i:02}.md','reviewStatus':'pending'})
+metrics=read('step-05-pilot-measurements.json');ms=metrics['measurements'];rate=sum(x['behavioralFileRecords'] for x in ms)/sum(x['files'] for x in ms)
+base=read('step-05-population-summary.json');remaining=[f for f in map(json.loads,(P/'step-05-population-files.jsonl').read_text().splitlines()) if f['seam'] not in SEAMS]
+byseam={}
+for s in ['generators-projections','real-file-tests-goldens','ui-spec-compiler','citation-ratchet-roots','runtime-defaults-dynamic']:
+ pop=[f for f in remaining if f['seam']==s];n=len(pop);byseam[s]={'primaryFiles':n,'projectedAdmittedFileRecords':math.ceil(n*rate),'projection':'Pooled pilot file admission rate; behavioral mix differs and generators/tests may survive at a higher rate. Promoted message-only memberships do not close runtime constructions.'}
+projected=sum(x['projectedAdmittedFileRecords'] for x in byseam.values());contextbytes=sum(x['bytes'] for x in index);admitted=sum(x['behavioralFileRecords'] for x in ms)
+projection={'measuredAdmittedFileRate':rate,'measuredLiteralAdmissionRate':sum(x['literalAdmitted'] for x in ms)/sum(x['literalReferences'] for x in ms),'remainingPrimaryQueue':len(remaining),'remainingBySeam':byseam,'projectedAdmittedFileRecords':projected,'countOnlyMinimumReviewParts':math.ceil(projected/60),'pilotContextualBytes':contextbytes,'pilotReviewParts':len(index),'projectedReviewPartsByObservedContext':math.ceil(projected*(contextbytes/admitted)/390000),'contextProjectionLimit':'Pilot includes all rejected file contexts and conservative unresolved generator parks. This is a sizing estimate, not a review budget or approved review time. Context mix, generator outputs and test goldens can expand it.','reviewHoursSensitivityAt5To15MinutesPerAdmittedFile':[round(projected*5/60,1),round(projected*15/60,1)],'reviewTimeStatus':'No measured independent reviewer time; 5–15 minutes is sensitivity only, not measured reviewer speed.','machineAuthoringPassSeconds':{x['seam']:x['authoringPassSeconds'] for x in ms},'authoringTimeLimit':'These are exact timed admission/record-construction passes after shared source investigation, not end-to-end per-seam semantic labor. Shared investigation/receipt/check/packet time is not silently projected as review speed.'}
+allrefs=list(map(json.loads,(P/'step-05-population-references.jsonl').read_text().splitlines()))
+alltuples=list(map(json.loads,(P/'step-05-population-dynamic.jsonl').read_text().splitlines()))
+pilotrefids={e['referenceId'] for r in rs for e in r['references']}
+pilottupleids={e['id'] for r in rs for e in r['dynamicTraces']}
+literalrate=projection['measuredLiteralAdmissionRate'];dynamicrate=sum(m['dynamicAdmitted'] for m in ms)/sum(m['dynamicTuples'] for m in ms)
+for s,d in projection['remainingBySeam'].items():
+ d['literalReferences']=sum(x['seam']==s and x['id'] not in pilotrefids for x in allrefs)
+ d['dynamicTuples']=sum(x['seam']==s and x['id'] not in pilottupleids for x in alltuples)
+ d['projectedAdmittedLiteralReferences']=math.ceil(d['literalReferences']*literalrate)
+ d['projectedAdmittedDynamicTuples']=math.ceil(d['dynamicTuples']*dynamicrate)
+projection['measuredDynamicAdmissionRate']=dynamicrate
+projection['projectedAdmittedLiteralReferences']=sum(d['projectedAdmittedLiteralReferences'] for d in projection['remainingBySeam'].values())
+projection['projectedAdmittedDynamicTuples']=sum(d['projectedAdmittedDynamicTuples'] for d in projection['remainingBySeam'].values())
+projection['remainingLiteralReferences']=sum(d['literalReferences'] for d in projection['remainingBySeam'].values())
+projection['remainingDynamicTuples']=sum(d['dynamicTuples'] for d in projection['remainingBySeam'].values())
+save('step-05-pilot-review-index.json',{'inputCommit':PIN,'limits':{'fileRecords':60,'bytes':400000},'selection':'100% files, references, dynamic tuples, preserves and parks; no sampling','parts':index,'projection':projection})
+text='''# Step 5 admission pilot — independent review request\n\nStatus: author handback, pending Lead-started independent review. No consumer edit or cutover authorization. Reviewers **never run checker, probes, tests, generators or gateway**; read the pinned payload and source evidence only.\n\nInput: `'''+PIN+'''`. Canonical records are the three `step-05-records/*.jsonl` files. Each physical file has one record and one final semantic verdict; large source/record context streams across linked parts. No repeated slice creates a second record. `step-05-pilot-review-index.json` binds every payload hash/byte count, file membership and required report name. All material is reviewed, including rejected comments, unrelated operations, fixtures, preserve judgments and unresolved parks. A51 sampling never waives behavioral review.\n\nReview every reference against its original id/pin, current content relocation and own passage. Verify each rejection names an actual non-document use or prior comment/history custody. Read every dynamic call in full-file context; challenge any incorrect non-document judgment, invented bounded construction, insufficient fixture provenance or missing co-cut. All conservative unresolved constructions remain parks, never ready patches. Review emitted class6-l-000113/000245 and hook refusals deeply. The command registry keeps the generated decision-index output at its real generator path; the knowledge rename copy is historical.\n\nFor each Phase 9 diff, verify it applies to the entire pinned current file, changes only selected admitted passages, names the exact current/candidate output delta and inverse rollback, and never edits a generated output. Alias lookup is evidence for pointers only, never a writer destination. The Unreleased changelog co-edit is a later prerequisite. Review the three parity receipts: file-level equality is not HTTP proof; missing body/content-type/fresh-read/error tests remain missing. Setup manifest/roots stay retained; state/sourceCaptureIds/inventory and final scan-set parity remain parked pending bounded exports.\n\nReport every defect with file/reference/tuple, exact evidence and corrected outcome. Use one report per part named below; for a file streamed across parts, cross-reference all related parts and give its final verdict only after all its slices are read. Any rework in this 100% mandatory set receives final-state correction and one bounded re-review; unresolved issues return to Lead. No reviewer is dispatched by this author.\n\n## Parts\n\n| Part | Payload | UTF-8 bytes | Distinct file records | Required report |\n|---|---|---:|---:|---|\n'''
+for x in index:text+=f"| {x['part']:02} | [{x['payload']}]({x['payload']}) | {x['bytes']:,} | {x['fileRecords']} | `{x['report']}` |\n"
+text+='\n## Measurements and projection\n\n| Seam | Files | Literal refs | Admitted | Rejected | Behavioral file records | Parked files | Timed machine admission pass (s) |\n|---|---:|---:|---:|---:|---:|---:|---:|\n'
+for x in ms:text+=f"| {x['seam']} | {x['files']} | {x['literalReferences']} | {x['literalAdmitted']} | {x['literalRejected']} | {x['behavioralFileRecords']} | {x['parkedFileRecords']} | {x['authoringPassSeconds']:.3f} |\n"
+text+=f"\nDynamic supersets are separate: "+'; '.join(f"{m['seam']} {m['dynamicTuples']} tuples / {m['dynamicAdmitted']} admitted / {m['dynamicRejected']} rejected / {m['parkedDynamicTuples']} parked" for m in ms)+'.\n'
+text+=f"\nMeasured file-admission rate {admitted}/{sum(m['files'] for m in ms)} = {rate:.1%}; literal admission {projection['measuredLiteralAdmissionRate']:.1%}. These are author judgments pending review. Remaining five-seam queue {len(remaining):,} primary files/locators projects {projected:,} admitted file records under this pooled rate, minimum {projection['countOnlyMinimumReviewParts']} parts by count and approximately {projection['projectedReviewPartsByObservedContext']} by observed contextual bytes. Pilot actual {len(index)} parts / {contextbytes:,} UTF-8 bytes. No review budget or independent reviewer speed is inferred. 5–15 minutes per admitted file gives only a sensitivity of {projection['reviewHoursSensitivityAt5To15MinutesPerAdmittedFile'][0]}–{projection['reviewHoursSensitivityAt5To15MinutesPerAdmittedFile'][1]} reviewer hours.\n\n"
+text+=f"\nProjected literal admission: {projection['projectedAdmittedLiteralReferences']:,} / {projection['remainingLiteralReferences']:,} remaining references at {literalrate:.1%}; dynamic admission: {projection['projectedAdmittedDynamicTuples']:,} / {projection['remainingDynamicTuples']:,} remaining tuples at {dynamicrate:.1%}. These are separate units and must not be added to file counts.\n\n"
+text+='Machine timings measure only the timed authoring pass after shared investigation; shared research and packet/check work are not per-seam labor measurements. They cannot support a semantic labor forecast. The remaining volume forecast uses the measured admission fraction, and review-part sizing uses measured bytes. Lead must size review time after independent pilot review. Generator/test seams differ from this pilot, so the queue itself remains the conservative upper bound. Runtime keeps non-message references and all untraced construction memberships even when its emitted message was promoted.\n\nPer-seam projection and limits are machine-readable in `step-05-pilot-review-index.json`. Ordinary L12-11 runner-commit accounting, Step 7 overlap/rebind review, A45/A47 and existing Phase 9 blockers remain owed. Markdown preview stays with Lead’s authorized environment; no state registration or process start.\n'
+(P/'step-05-pilot-review-request.md').write_text(text)
+print(json.dumps({'parts':len(index),'maxBytes':max(x['bytes'] for x in index),'projection':projection},ensure_ascii=False))

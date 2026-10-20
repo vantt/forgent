@@ -1,0 +1,43 @@
+{
+  "kind": "Step 5 pilot full mechanical checker; semantic independent review pending",
+  "rules": {
+    "coverage": "Every selected file, literal, original origin and dynamic tuple is admitted or rejected exactly once.",
+    "source-pins": "Whole-file bytes/mode/current pin are real; prior record hashes and protected pins stay equal.",
+    "source-spans": "Current reference spans/passage and dynamic context match full source; unresolved relocation parks.",
+    "rejections": "Rejection names its exact own passage/non-document operation and cannot carry an active patch.",
+    "parks": "Every parked reference/tuple has its own blocker and dependency; no execution-ready park.",
+    "patches": "One complete deterministic applicable diff per current file; exact after hash and inverse rollback.",
+    "targets": "Pointer targets are current exact claim holders, not aliases or frozen generated-index rename copies.",
+    "fixture-provenance": "Every admitted synthetic fixture pins its constructor/owning test and proves its temporary target is not an alias.",
+    "generated": "Generated output bytes cannot receive authored diffs; owning source/generator must be joined.",
+    "receipts": "All required comparison fields/current/candidate/proofs/deltas/readiness and per-file joins exist.",
+    "missing-proof": "Missing/not-run proof cannot claim passing parity; passed proof has real log/hash and exit 0.",
+    "gateway": "Reuse pinned complete file equality; HTTP missing/error/content-type/fresh read is never inferred.",
+    "setup": "Parsed owner/path sets, scan-root deltas, sourceCaptureIds and inventory/export gaps explicit.",
+    "message-deltas": "Every admitted patch has exact current/candidate emitted expression and changelog prerequisite.",
+    "review": "Every file/reference/tuple/source byte appears in hash-bound parts <=60 records / 400000 bytes; no sample."
+  },
+  "checks": {
+    "coverage": 2169,
+    "source-pins": 37,
+    "receipts": 478,
+    "source-spans": 2166,
+    "rejections": 1728,
+    "fixture-provenance": 14,
+    "patches": 37,
+    "generated": 37,
+    "targets": 13,
+    "parks": 267,
+    "missing-proof": 10,
+    "gateway": 1,
+    "message-deltas": 13,
+    "setup": 1,
+    "review": 2419
+  },
+  "files": 37,
+  "literalReferences": 149,
+  "dynamicTuples": 2017,
+  "failures": [],
+  "failureCount": 0,
+  "reviewStatus": "pending; checker success is not semantic acceptance or cutover readiness"
+}

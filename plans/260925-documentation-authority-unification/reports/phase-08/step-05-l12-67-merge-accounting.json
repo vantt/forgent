@@ -1,0 +1,151 @@
+{
+  "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+  "changedPaths": [
+    "CHANGELOG.md",
+    "docs/platform/agent-protocol/spec.md",
+    "packages/agent-protocol/contracts/fixtures/terminal/omp/vectors.json",
+    "packages/agent-protocol/contracts/fixtures/terminal/pi/vectors.json",
+    "packages/agent-protocol/rust/src/terminal/omp.rs",
+    "packages/agent-protocol/rust/src/terminal/pi.rs",
+    "packages/agent-protocol/rust/tests/terminal_vectors.rs",
+    "packages/run-supervisor/rust/src/supervise/terminal.rs",
+    "plans/261017-1313-fgos-platform-program-board/plan.md",
+    "plans/261020-2132-seat-binding-component/phase-00-facts-and-prior-art.md",
+    "plans/261020-2132-seat-binding-component/phase-01-seat-binding-crate.md",
+    "plans/261020-2132-seat-binding-component/phase-02-seat-identity-and-patterns.md",
+    "plans/261020-2132-seat-binding-component/phase-03-persona-scope.md",
+    "plans/261020-2132-seat-binding-component/phase-04-host-route-facade-exec-budget.md",
+    "plans/261020-2132-seat-binding-component/phase-05-config-schema-and-conversion.md",
+    "plans/261020-2132-seat-binding-component/phase-06-policy-cutover-tier-composition.md",
+    "plans/261020-2132-seat-binding-component/phase-07-ranking-cutover-cells-effort.md",
+    "plans/261020-2132-seat-binding-component/phase-08-lease-receipt-single-walker.md",
+    "plans/261020-2132-seat-binding-component/phase-09-setup-conversion-drain-fence.md",
+    "plans/261020-2132-seat-binding-component/phase-10-doctor-dry-bind.md",
+    "plans/261020-2132-seat-binding-component/phase-11-docs-and-boundary.md",
+    "plans/261020-2132-seat-binding-component/phase-12-landing-and-live-proof.md",
+    "plans/261020-2132-seat-binding-component/phase-pre-wave-host-resolution-and-record-fence.md",
+    "plans/261020-2132-seat-binding-component/plan.md",
+    "plans/261020-2132-seat-binding-component/red-team-adjudication.md",
+    "plans/reports/phase-lead-261020-2027-herdr-brief-prompt-door.md"
+  ],
+  "main": "f91dc5dbe4f7d8d5ca3e9e32aa27c5e9de37ea66",
+  "overlaps": [
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-090.jsonl",
+      "file": "docs/platform/agent-protocol/spec.md",
+      "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "sourceSha256": "236da5383cf15476b84f06f106d7a941b00d9abc7ef8f32190a6606f4a95bfb7",
+      "custody": "Step 7 deferred once; no prior approval carried across changed digest",
+      "recordFileSha256": "f0c88d09b6722f295c5e91b9844263d7714cb7426f26277e82c02f40db00d636",
+      "currentConsumerSha256": "cea88d449291b8ca29094fedb0bd9df1e0f06bd07bfed4a6bbb1163a39a226b6",
+      "previousConsumerSha256": "236da5383cf15476b84f06f106d7a941b00d9abc7ef8f32190a6606f4a95bfb7"
+    },
+    {
+      "record": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-017.jsonl",
+      "file": "CHANGELOG.md",
+      "authorInputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+      "sourceSha256": "062f9fdd3601883b474bc5f0980b444366e8b10fafb6dc490ac8bd5fee00e8e9",
+      "custody": "Step 7 deferred once; no prior approval carried across changed digest",
+      "recordFileSha256": "84d8f846a251aa63173e13ec71ed33800a0bacb509deec9aabc3f55f8388c7f2",
+      "currentConsumerSha256": "fc9ed43a4408a6f5c21c779b15f34fe2545ba3ec74387e2446962ef17de44c53",
+      "previousConsumerSha256": "062f9fdd3601883b474bc5f0980b444366e8b10fafb6dc490ac8bd5fee00e8e9"
+    }
+  ],
+  "populationDelta": [
+    {
+      "file": "packages/agent-protocol/contracts/fixtures/terminal/omp/vectors.json",
+      "beforeSha256": "7a2e2e10ab4aafa001e497982f530341926fe091a288c645c36665ee2d680356",
+      "afterSha256": "5ce6546726d70ee36a2a561cdc483ee2b808e3769d5dad78acad4d30d7092bc1",
+      "beforeBytes": 10840,
+      "afterBytes": 11589,
+      "existingPopulationRecords": [],
+      "diff": "diff --git a/packages/agent-protocol/contracts/fixtures/terminal/omp/vectors.json b/packages/agent-protocol/contracts/fixtures/terminal/omp/vectors.json\nindex 03fac4c28..ec1a40918 100644\n--- a/packages/agent-protocol/contracts/fixtures/terminal/omp/vectors.json\n+++ b/packages/agent-protocol/contracts/fixtures/terminal/omp/vectors.json\n@@ -145,7 +145,7 @@\n       \"expect\": {\n         \"outcome\": \"delivered\",\n         \"sentTexts\": 1,\n-        \"minEnters\": 2\n+        \"minEnters\": 1\n       },\n       \"message\": \"Reply with the single word ok. Do not use any tools.\",\n       \"source\": \"real omp composer with its attachment chip\"\n@@ -194,8 +194,8 @@\n       \"expect\": {\n         \"outcome\": \"delivery-unknown\",\n         \"sentTexts\": 1,\n-        \"minEnters\": 2,\n-        \"maxEnters\": 7\n+        \"minEnters\": 1,\n+        \"maxEnters\": 6\n       },\n       \"message\": \"Reply with the single word ok. Do not use any tools.\",\n       \"source\": \"real screen after a turn that finished before the first look; with no composer rule the short echoed brief sits in the bottom lines and reads as an unsent draft, so Enter is offered a bounded number of times and the outcome stays unknown\"\n@@ -438,6 +438,34 @@\n       },\n       \"message\": \"Reply with the single word ok. Do not use any tools.\",\n       \"source\": \"real working screen recorded 2026-10-18 from omp on herdr; herdr's detector has no rule for omp and says idle, the `⎋ Working…` footer is what shows work\"\n+    },\n+    {\n+      \"name\": \"brief-goes-in-one-prompt-door-send-that-submits-itself\",\n+      \"step\": \"deliver-brief\",\n+      \"script\": {\n+        \"frames\": [\n+          {\n+            \"at\": 0,\n+            \"file\": \"ready\"\n+          },\n+          {\n+            \"at\": 100,\n+            \"inspection\": {\n+              \"state\": \"working\",\n+              \"visibleWorking\": true,\n+              \"promptText\": \"\"\n+            }\n+          }\n+        ]\n+      },\n+      \"expect\": {\n+        \"outcome\": \"delivered\",\n+        \"sentTexts\": 1,\n+        \"submitSends\": 1,\n+        \"maxEnters\": 0\n+      },\n+      \"message\": \"Read the brief file and do the task.\",\n+      \"source\": \"the typed path takes 7 to 25 s for a 4 KB brief and can lose its final Enter; the prompt door does not\"\n     }\n   ]\n }\n"
+    },
+    {
+      "file": "packages/agent-protocol/contracts/fixtures/terminal/pi/vectors.json",
+      "beforeSha256": "0299ac85882fd3b6ad7fbd5fe3236f4e5f512e6e83b3f972b5f7a4addeb14401",
+      "afterSha256": "e1d459c4d6b182581803ce5ba92e4fa39968384ca7ea619ae0500f7ee19b81e0",
+      "beforeBytes": 12161,
+      "afterBytes": 12910,
+      "existingPopulationRecords": [],
+      "diff": "diff --git a/packages/agent-protocol/contracts/fixtures/terminal/pi/vectors.json b/packages/agent-protocol/contracts/fixtures/terminal/pi/vectors.json\nindex 585a1040e..6a5d8528f 100644\n--- a/packages/agent-protocol/contracts/fixtures/terminal/pi/vectors.json\n+++ b/packages/agent-protocol/contracts/fixtures/terminal/pi/vectors.json\n@@ -153,7 +153,7 @@\n       \"expect\": {\n         \"outcome\": \"delivered\",\n         \"sentTexts\": 1,\n-        \"minEnters\": 2\n+        \"minEnters\": 1\n       },\n       \"message\": \"# Brief 1\\n\\n## Your task\\nline 0\\nline 1\\nline 2\\nline 3\\nline 4\\nline 5\\nline 6\\nline 7\\nline 8\\nline 9\\nline 10\\nline 11\\nline 12\\nline 13\\nline 14\\nline 15\\nline 16\\nline 17\\nline 18\\nline 19\\nline 20\\nline 21\\nline 22\\nline 23\\nline 24\\nline 25\\nline 26\\nline 27\\nline 28\\nline 29\\nline 30\\nline 31\\nline 32\\nline 33\\nline 34\\nline 35\\nline 36\\nline 37\\nline 38\\nline 39\",\n       \"source\": \"chip wording as this CLI folds a long paste\"\n@@ -202,8 +202,8 @@\n       \"expect\": {\n         \"outcome\": \"delivery-unknown\",\n         \"sentTexts\": 1,\n-        \"minEnters\": 2,\n-        \"maxEnters\": 7\n+        \"minEnters\": 1,\n+        \"maxEnters\": 6\n       },\n       \"message\": \"Reply with the single word ok. Do not use any tools.\",\n       \"source\": \"real screen after a turn that finished before the first look; with no composer rule the short echoed brief sits in the bottom lines and reads as an unsent draft, so Enter is offered a bounded number of times and the outcome stays unknown\"\n@@ -474,6 +474,34 @@\n       },\n       \"message\": \"Reply with the single word ok. Do not use any tools.\",\n       \"source\": \"real working screen recorded 2026-10-18 from pi on herdr (state working, rule working_border)\"\n+    },\n+    {\n+      \"name\": \"brief-goes-in-one-prompt-door-send-that-submits-itself\",\n+      \"step\": \"deliver-brief\",\n+      \"script\": {\n+        \"frames\": [\n+          {\n+            \"at\": 0,\n+            \"file\": \"ready\"\n+          },\n+          {\n+            \"at\": 100,\n+            \"inspection\": {\n+              \"state\": \"working\",\n+              \"visibleWorking\": true,\n+              \"promptText\": \"\"\n+            }\n+          }\n+        ]\n+      },\n+      \"expect\": {\n+        \"outcome\": \"delivered\",\n+        \"sentTexts\": 1,\n+        \"submitSends\": 1,\n+        \"maxEnters\": 0\n+      },\n+      \"message\": \"Read the brief file and do the task.\",\n+      \"source\": \"the typed path takes 7 to 25 s for a 4 KB brief and can lose its final Enter; the prompt door does not\"\n     }\n   ]\n }\n"
+    },
+    {
+      "file": "packages/agent-protocol/rust/src/terminal/omp.rs",
+      "beforeSha256": "f5b5e3b6cfe6ef34b55e25498c7f56871d7aff0d6cc3228014ae15ea5316b1d0",
+      "afterSha256": "703b7352b006ffbde089ab6d132ecb62401db38639a4d373c9adb892702c05e0",
+      "beforeBytes": 364,
+      "afterBytes": 499,
+      "existingPopulationRecords": [],
+      "diff": "diff --git a/packages/agent-protocol/rust/src/terminal/omp.rs b/packages/agent-protocol/rust/src/terminal/omp.rs\nindex c197898a2..cab1062c9 100644\n--- a/packages/agent-protocol/rust/src/terminal/omp.rs\n+++ b/packages/agent-protocol/rust/src/terminal/omp.rs\n@@ -2,10 +2,12 @@ use super::{ExitCommand, Profile};\n \n /// Ctrl-D on an empty input leaves. A long paste folds into a `📄 #N`\n /// attachment chip that Enter submits. No folder-trust dialog was observed.\n+/// The brief goes through the prompt door: a typed one is slow and a stop can\n+/// land mid-typing, leaving the rest in the pane shell.\n pub const PROFILE: Profile = Profile {\n     cli: \"omp\",\n     exit: ExitCommand::Keys(&[\"C-d\"]),\n     enter_gap_ms: 300,\n-    submit_by_prompt_door: false,\n+    submit_by_prompt_door: true,\n     trust_markers: &[],\n };\n"
+    },
+    {
+      "file": "packages/agent-protocol/rust/src/terminal/pi.rs",
+      "beforeSha256": "e3ced796249d96694014e4e2cff7075e87ec9646ff123c7830875e1dffbde654",
+      "afterSha256": "5fc360741574da169d9189da28901aac30e54b3576b804018ea5b63ffae1c5c0",
+      "beforeBytes": 287,
+      "afterBytes": 402,
+      "existingPopulationRecords": [],
+      "diff": "diff --git a/packages/agent-protocol/rust/src/terminal/pi.rs b/packages/agent-protocol/rust/src/terminal/pi.rs\nindex bc7a536d6..48309c20f 100644\n--- a/packages/agent-protocol/rust/src/terminal/pi.rs\n+++ b/packages/agent-protocol/rust/src/terminal/pi.rs\n@@ -1,10 +1,12 @@\n use super::{ExitCommand, Profile};\n \n-/// Ctrl-D on an empty input leaves. No folder-trust dialog was observed.\n+/// Ctrl-D on an empty input leaves. No folder-trust dialog was observed. A\n+/// 4 KB typed brief takes 7 to 25 s and can lose its final Enter, so the brief\n+/// goes through the prompt door.\n pub const PROFILE: Profile = Profile {\n     cli: \"pi\",\n     exit: ExitCommand::Keys(&[\"C-d\"]),\n     enter_gap_ms: 300,\n-    submit_by_prompt_door: false,\n+    submit_by_prompt_door: true,\n     trust_markers: &[],\n };\n"
+    },
+    {
+      "file": "packages/agent-protocol/rust/tests/terminal_vectors.rs",
+      "beforeSha256": "3054ce2f442a2e3b5d17b9baade1f85e04c9f9698b47304827450c883e783bac",
+      "afterSha256": "4ce5222b93e3a657220a83a652d6d51de83bfbd9b6eb2a1a71ecd24a5937a91c",
+      "beforeBytes": 15612,
+      "afterBytes": 18565,
+      "existingPopulationRecords": [
+        {
+          "file": "packages/agent-protocol/rust/tests/terminal_vectors.rs",
+          "origins": [
+            "step-02l-census-class5.json"
+          ],
+          "censusDigests": [
+            "3054ce2f442a2e3b5d17b9baade1f85e04c9f9698b47304827450c883e783bac"
+          ],
+          "seam": "real-file-tests-goldens",
+          "assignment": "mechanical routing for authoring, not a semantic verdict",
+          "currentSha256": "3054ce2f442a2e3b5d17b9baade1f85e04c9f9698b47304827450c883e783bac",
+          "currentBytes": 15612,
+          "driftFromCensus": false,
+          "referenceIds": [],
+          "dynamicCount": 29
+        }
+      ],
+      "diff": "diff --git a/packages/agent-protocol/rust/tests/terminal_vectors.rs b/packages/agent-protocol/rust/tests/terminal_vectors.rs\nindex 913ae7d2b..35e078cd7 100644\n--- a/packages/agent-protocol/rust/tests/terminal_vectors.rs\n+++ b/packages/agent-protocol/rust/tests/terminal_vectors.rs\n@@ -157,6 +157,10 @@ fn sent_texts(pane: &ScriptedPane) -> usize {\n     pane.sent.iter().filter(|s| s.text.is_some()).count()\n }\n \n+fn submit_sends(pane: &ScriptedPane) -> usize {\n+    pane.sent.iter().filter(|s| s.text.is_some() && s.submit).count()\n+}\n+\n fn sent_enters(pane: &ScriptedPane) -> usize {\n     pane.sent\n         .iter()\n@@ -229,7 +233,7 @@ fn terminal_every_cli_vector_resolves_as_recorded() {\n             };\n             let mut want = expect.clone();\n             if let Some(map) = want.as_object_mut() {\n-                for key in [\"readiness\", \"sentTexts\", \"minEnters\", \"maxEnters\"] {\n+                for key in [\"readiness\", \"sentTexts\", \"submitSends\", \"minEnters\", \"maxEnters\"] {\n                     map.remove(key);\n                 }\n             }\n@@ -245,6 +249,9 @@ fn terminal_every_cli_vector_resolves_as_recorded() {\n             if let Some(count) = expect[\"sentTexts\"].as_u64() {\n                 assert_eq!(sent_texts(&pane) as u64, count, \"{name}: typed brief count\");\n             }\n+            if let Some(count) = expect[\"submitSends\"].as_u64() {\n+                assert_eq!(submit_sends(&pane) as u64, count, \"{name}: prompt-door send count\");\n+            }\n             if let Some(min) = expect[\"minEnters\"].as_u64() {\n                 assert!(\n                     sent_enters(&pane) as u64 >= min,\n@@ -442,3 +449,89 @@ fn unreadable_results_exclude_empty_and_completed_publications_and_track_edits()\n     assert_eq!(outbox.newest_complete(), Some(path));\n     fs::remove_dir_all(dir).unwrap();\n }\n+\n+/// A pane whose attempt starts ending at the first pause after the brief went in:\n+/// from then on every call is refused, as the supervisor's pane access does.\n+struct EndingPane {\n+    now: u64,\n+    ending: bool,\n+    accepted: Vec<SendInput>,\n+    refused: usize,\n+}\n+\n+impl EndingPane {\n+    fn new() -> Self {\n+        Self { now: 0, ending: false, accepted: vec![], refused: 0 }\n+    }\n+\n+    fn gate(&mut self) -> Result<(), IoError> {\n+        if self.ending {\n+            self.refused += 1;\n+            return Err(IoError::Io(\"the attempt is ending\".into()));\n+        }\n+        Ok(())\n+    }\n+}\n+\n+impl AgentIo for EndingPane {\n+    fn send(&mut self, input: &SendInput) -> Result<(), IoError> {\n+        self.gate()?;\n+        self.accepted.push(input.clone());\n+        Ok(())\n+    }\n+    fn read(&mut self) -> Result<Vec<String>, IoError> {\n+        Err(IoError::Unsupported)\n+    }\n+    fn activity(&self) -> Option<u64> {\n+        None\n+    }\n+    fn screen(&mut self) -> Result<String, IoError> {\n+        self.gate()?;\n+        Ok(\"ready\".into())\n+    }\n+    fn inspect(&mut self) -> Result<Inspection, IoError> {\n+        self.gate()?;\n+        Ok(Inspection { state: Some(\"idle\".into()), ..Default::default() })\n+    }\n+    fn now_ms(&self) -> u64 {\n+        self.now\n+    }\n+    fn pause(&mut self, ms: u64) {\n+        self.now += ms;\n+        if !self.accepted.is_empty() {\n+            self.ending = true;\n+        }\n+    }\n+}\n+\n+struct NoOutbox;\n+\n+impl Outbox for NoOutbox {\n+    fn newest_complete(&mut self) -> Option<PathBuf> {\n+        None\n+    }\n+}\n+\n+#[test]\n+fn terminal_delivery_sends_nothing_once_the_attempt_is_ending() {\n+    for cli in CLIS {\n+        let adapter = adapter_for(cli).unwrap();\n+        let mut pane = EndingPane::new();\n+        let outcome = adapter.deliver_brief(&mut pane, \"Read the brief file and do the task.\", &mut NoOutbox);\n+        assert_eq!(outcome.to_json(), json!({ \"outcome\": \"delivery-unknown\" }), \"{cli}\");\n+        assert_eq!(pane.accepted.len(), 1, \"{cli}: only the brief itself went in before the stop\");\n+        assert!(pane.accepted.iter().all(|s| s.text.is_some()), \"{cli}: no key press after the stop\");\n+    }\n+}\n+\n+#[test]\n+fn terminal_delivery_into_an_attempt_that_is_already_ending_types_nothing() {\n+    for cli in CLIS {\n+        let adapter = adapter_for(cli).unwrap();\n+        let mut pane = EndingPane::new();\n+        pane.ending = true;\n+        let outcome = adapter.deliver_brief(&mut pane, \"Read the brief file and do the task.\", &mut NoOutbox);\n+        assert_eq!(outcome.to_json(), json!({ \"outcome\": \"delivery-unknown\" }), \"{cli}\");\n+        assert!(pane.accepted.is_empty(), \"{cli}: nothing reaches the pane\");\n+    }\n+}\n"
+    },
+    {
+      "file": "packages/run-supervisor/rust/src/supervise/terminal.rs",
+      "beforeSha256": "d013fb753402f86628bab660e618692ba9c7b5108da5c0c07b00896b7d3b5183",
+      "afterSha256": "40db457a237ae133ce00b6ba3304af34d88fcd7f129afbc43dc6d8052a6c6cd3",
+      "beforeBytes": 35560,
+      "afterBytes": 35790,
+      "existingPopulationRecords": [
+        {
+          "file": "packages/run-supervisor/rust/src/supervise/terminal.rs",
+          "origins": [
+            "step-02l-census-class6.json"
+          ],
+          "censusDigests": [
+            "d013fb753402f86628bab660e618692ba9c7b5108da5c0c07b00896b7d3b5183"
+          ],
+          "seam": "runtime-defaults-dynamic",
+          "assignment": "mechanical routing for authoring, not a semantic verdict",
+          "currentSha256": "d013fb753402f86628bab660e618692ba9c7b5108da5c0c07b00896b7d3b5183",
+          "currentBytes": 35560,
+          "driftFromCensus": false,
+          "referenceIds": [],
+          "dynamicCount": 31
+        }
+      ],
+      "diff": "diff --git a/packages/run-supervisor/rust/src/supervise/terminal.rs b/packages/run-supervisor/rust/src/supervise/terminal.rs\nindex fad1aa99e..22071e066 100644\n--- a/packages/run-supervisor/rust/src/supervise/terminal.rs\n+++ b/packages/run-supervisor/rust/src/supervise/terminal.rs\n@@ -459,6 +459,9 @@ fn io_err(refusal: TerminalRefusal) -> IoError {\n \n impl AgentIo for TermIo<'_, '_> {\n     fn send(&mut self, input: &SendInput) -> Result<(), IoError> {\n+        // A cancel, deadline or lost gate seen since the last tick must stop this send: a long\n+        // typed brief that lands after the seat was stopped ends up in the pane's shell.\n+        self.sup.tick(self.core, self.key);\n         if self.sup.finished() {\n             return Err(IoError::Io(\"the attempt is ending\".into()));\n         }\n"
+    }
+  ],
+  "step0Receipt": "step-00-l12-67-binding-check.json",
+  "ratchet": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-legacy-docs-ratchet.mjs",
+    "exit": 0,
+    "logPath": "step-00-l12-67-ratchet.log",
+    "logSha256": "9299cb06b5c8c4b7518e62992d0bb4c198371d561f10b129c7456f63c3f59319"
+  }
+}

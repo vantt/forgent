@@ -1,0 +1,1131 @@
+{
+  "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+  "status": "unapplied Phase 9 specifications, pending review/proof",
+  "patches": [
+    {
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "file": ".githooks/pre-commit",
+      "sourceSha256": "ebcefc2815d02910532f1642afff4b7ee1b22ce20d9c5859e8ec44e1019f2943",
+      "mode": "100755",
+      "symbolOrPassage": [
+        "  const fgosWorkerChanges = stagedFgosChangesOnWorkerBranch(committingToplevel);\n  if (fgosWorkerChanges.length > 0) {\n    refuse(`commit refused: this commit on a worker branch stages changes under \".fgos/\" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);\n    return;\n  }",
+        "  if (fgosRegressed.regressedPaths.length > 0) {\n    const paths = fgosRegressed.regressedPaths.map((r) => r.path).join(', ');\n    refuse(`commit refused: this commit stages a modification under \".fgos/\" (${paths}) whose line count is lower than HEAD -- .fgos/ files must not regress in content on main, main is left unchanged. See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);\n    return;\n  }"
+      ],
+      "oldText": [
+        "    refuse(`commit refused: this commit on a worker branch stages changes under \".fgos/\" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);",
+        "    refuse(`commit refused: this commit stages a modification under \".fgos/\" (${paths}) whose line count is lower than HEAD -- .fgos/ files must not regress in content on main, main is left unchanged. See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);"
+      ],
+      "newText": [
+        "    refuse(`commit refused: this commit on a worker branch stages changes under \".fgos/\" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);",
+        "    refuse(`commit refused: this commit stages a modification under \".fgos/\" (${paths}) whose line count is lower than HEAD -- .fgos/ files must not regress in content on main, main is left unchanged. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);"
+      ],
+      "sourceSpans": [
+        {
+          "line": 491,
+          "columnStart": 197,
+          "columnEndExclusive": 247,
+          "text": "docs/how-to/fix-fgos-write-rejected-merge-block.md"
+        },
+        {
+          "line": 523,
+          "columnStart": 206,
+          "columnEndExclusive": 256,
+          "text": "docs/how-to/fix-fgos-write-rejected-merge-block.md"
+        }
+      ],
+      "diff": "--- a/.githooks/pre-commit\n+++ b/.githooks/pre-commit\n@@ -488,7 +488,7 @@\n \n   const fgosWorkerChanges = stagedFgosChangesOnWorkerBranch(committingToplevel);\n   if (fgosWorkerChanges.length > 0) {\n-    refuse(`commit refused: this commit on a worker branch stages changes under \".fgos/\" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);\n+    refuse(`commit refused: this commit on a worker branch stages changes under \".fgos/\" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);\n     return;\n   }\n \n@@ -520,7 +520,7 @@\n   }\n   if (fgosRegressed.regressedPaths.length > 0) {\n     const paths = fgosRegressed.regressedPaths.map((r) => r.path).join(', ');\n-    refuse(`commit refused: this commit stages a modification under \".fgos/\" (${paths}) whose line count is lower than HEAD -- .fgos/ files must not regress in content on main, main is left unchanged. See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);\n+    refuse(`commit refused: this commit stages a modification under \".fgos/\" (${paths}) whose line count is lower than HEAD -- .fgos/ files must not regress in content on main, main is left unchanged. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);\n     return;\n   }\n \n",
+      "expectedAfterSha256": "cf683921c398ba07c573e1bb03ea6efffded6f69f2378d5a687d919dfb06fdd9",
+      "targetOwner": [
+        "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md"
+      ],
+      "claimAnchorProof": [
+        {
+          "target": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+          "docId": "how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-change:fix-fgos-write-rejected-merge-block",
+          "registryPath": "docs/doc-registry.json",
+          "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+          "alias": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+          "targetSha256": "447cc6d849d5749936211b7e5f8c4944791cb9fab8426c8450b4cacbdac325a7",
+          "claim": "live currentPath lookup; no writer destination adopts an alias"
+        },
+        {
+          "target": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+          "docId": "how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-change:fix-fgos-write-rejected-merge-block",
+          "registryPath": "docs/doc-registry.json",
+          "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+          "alias": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+          "targetSha256": "447cc6d849d5749936211b7e5f8c4944791cb9fab8426c8450b4cacbdac325a7",
+          "claim": "live currentPath lookup; no writer destination adopts an alias"
+        }
+      ],
+      "receiptId": "cli-help-messages-pilot",
+      "coCutPaths": [
+        "CHANGELOG.md"
+      ],
+      "expectedOutputSets": [
+        {
+          "file": ".githooks/pre-commit",
+          "referenceId": "reference-000110",
+          "edgeId": "class6-l-000010",
+          "line": 491,
+          "currentExpression": "    refuse(`commit refused: this commit on a worker branch stages changes under \".fgos/\" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);",
+          "candidateExpression": "    refuse(`commit refused: this commit on a worker branch stages changes under \".fgos/\" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);",
+          "oldPointer": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+          "newPointer": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+            "docId": "how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-change:fix-fgos-write-rejected-merge-block",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+            "targetSha256": "447cc6d849d5749936211b7e5f8c4944791cb9fab8426c8450b4cacbdac325a7",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        },
+        {
+          "file": ".githooks/pre-commit",
+          "referenceId": "reference-000111",
+          "edgeId": "class6-l-000011",
+          "line": 523,
+          "currentExpression": "    refuse(`commit refused: this commit stages a modification under \".fgos/\" (${paths}) whose line count is lower than HEAD -- .fgos/ files must not regress in content on main, main is left unchanged. See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);",
+          "candidateExpression": "    refuse(`commit refused: this commit stages a modification under \".fgos/\" (${paths}) whose line count is lower than HEAD -- .fgos/ files must not regress in content on main, main is left unchanged. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);",
+          "oldPointer": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+          "newPointer": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+            "docId": "how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-change:fix-fgos-write-rejected-merge-block",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+            "targetSha256": "447cc6d849d5749936211b7e5f8c4944791cb9fab8426c8450b4cacbdac325a7",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        }
+      ],
+      "testTargets": [
+        "missing: exact emitted/refusal-message migration parity for .githooks/pre-commit"
+      ],
+      "intentionalBehaviorDeltas": [
+        {
+          "file": ".githooks/pre-commit",
+          "referenceId": "reference-000110",
+          "edgeId": "class6-l-000010",
+          "line": 491,
+          "currentExpression": "    refuse(`commit refused: this commit on a worker branch stages changes under \".fgos/\" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);",
+          "candidateExpression": "    refuse(`commit refused: this commit on a worker branch stages changes under \".fgos/\" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);",
+          "oldPointer": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+          "newPointer": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+            "docId": "how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-change:fix-fgos-write-rejected-merge-block",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+            "targetSha256": "447cc6d849d5749936211b7e5f8c4944791cb9fab8426c8450b4cacbdac325a7",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        },
+        {
+          "file": ".githooks/pre-commit",
+          "referenceId": "reference-000111",
+          "edgeId": "class6-l-000011",
+          "line": 523,
+          "currentExpression": "    refuse(`commit refused: this commit stages a modification under \".fgos/\" (${paths}) whose line count is lower than HEAD -- .fgos/ files must not regress in content on main, main is left unchanged. See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);",
+          "candidateExpression": "    refuse(`commit refused: this commit stages a modification under \".fgos/\" (${paths}) whose line count is lower than HEAD -- .fgos/ files must not regress in content on main, main is left unchanged. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);",
+          "oldPointer": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+          "newPointer": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+            "docId": "how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-change:fix-fgos-write-rejected-merge-block",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+            "targetSha256": "447cc6d849d5749936211b7e5f8c4944791cb9fab8426c8450b4cacbdac325a7",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        }
+      ],
+      "prerequisites": [
+        "Lead-started independent semantic review",
+        "Missing exact-output proof",
+        "User-visible CHANGELOG.md Unreleased co-edit in separately authorized Phase 9 packet",
+        "Same-package Step 0 rebind if the final patch touches a bound target"
+      ],
+      "order": "Phase 9 atomic consumer cutover; no apply-now action",
+      "rollbackDiff": "--- a/.githooks/pre-commit\n+++ b/.githooks/pre-commit\n@@ -488,7 +488,7 @@\n \n   const fgosWorkerChanges = stagedFgosChangesOnWorkerBranch(committingToplevel);\n   if (fgosWorkerChanges.length > 0) {\n-    refuse(`commit refused: this commit on a worker branch stages changes under \".fgos/\" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);\n+    refuse(`commit refused: this commit on a worker branch stages changes under \".fgos/\" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);\n     return;\n   }\n \n@@ -520,7 +520,7 @@\n   }\n   if (fgosRegressed.regressedPaths.length > 0) {\n     const paths = fgosRegressed.regressedPaths.map((r) => r.path).join(', ');\n-    refuse(`commit refused: this commit stages a modification under \".fgos/\" (${paths}) whose line count is lower than HEAD -- .fgos/ files must not regress in content on main, main is left unchanged. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);\n+    refuse(`commit refused: this commit stages a modification under \".fgos/\" (${paths}) whose line count is lower than HEAD -- .fgos/ files must not regress in content on main, main is left unchanged. See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);\n     return;\n   }\n \n",
+      "timing": "phase9",
+      "readiness": "pending / cutover-patch-only; never execution-ready"
+    },
+    {
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "file": "bin/fgos.mjs",
+      "sourceSha256": "64ace4da89dbc1222c6d3c0d634272c9b043d1c268a257ed2e2e09385a5eb198",
+      "mode": "100755",
+      "symbolOrPassage": [
+        "      throw new StoreError(\n        'validation',\n        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/decisions/0020-chan-fgos-khoi-worktree-worker.md).`,\n      );\n    }"
+      ],
+      "oldText": [
+        "        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/decisions/0020-chan-fgos-khoi-worktree-worker.md).`,"
+      ],
+      "newText": [
+        "        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập).`,"
+      ],
+      "sourceSpans": [
+        {
+          "line": 5108,
+          "columnStart": 160,
+          "columnEndExclusive": 213,
+          "text": "docs/decisions/0020-chan-fgos-khoi-worktree-worker.md"
+        }
+      ],
+      "diff": "--- a/bin/fgos.mjs\n+++ b/bin/fgos.mjs\n@@ -5105,7 +5105,7 @@\n     if (entry?.requiresExistingStore && !fs.existsSync(dir)) {\n       throw new StoreError(\n         'validation',\n-        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/decisions/0020-chan-fgos-khoi-worktree-worker.md).`,\n+        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập).`,\n       );\n     }\n     // State/root-resolution investigation: a disconnected-snapshot hazard\n",
+      "expectedAfterSha256": "4247d968a59563503a8152205ef6772b75d9fa23af2ec3afa1cac2722b8f0acb",
+      "targetOwner": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md"
+      ],
+      "claimAnchorProof": [
+        {
+          "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+          "anchor": "0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập",
+          "claim": "0020 Chặn fgos khỏi worktree-worker (không khóa, không cô lập): retained narrative states this no-.fgos worker constraint; matches prior Step 3 batch-080 edge maps-j-04927"
+        }
+      ],
+      "receiptId": "cli-help-messages-pilot",
+      "coCutPaths": [
+        "CHANGELOG.md"
+      ],
+      "expectedOutputSets": [
+        {
+          "file": "bin/fgos.mjs",
+          "referenceId": "reference-000228",
+          "edgeId": "class6-l-000113",
+          "line": 5108,
+          "currentExpression": "        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/decisions/0020-chan-fgos-khoi-worktree-worker.md).`,",
+          "candidateExpression": "        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập).`,",
+          "oldPointer": "docs/decisions/0020-chan-fgos-khoi-worktree-worker.md",
+          "newPointer": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+            "targetSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+            "anchor": "0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập",
+            "claim": "0020 Chặn fgos khỏi worktree-worker (không khóa, không cô lập): retained narrative states this no-.fgos worker constraint; matches prior Step 3 batch-080 edge maps-j-04927"
+          }
+        }
+      ],
+      "testTargets": [
+        "missing: exact emitted/refusal-message migration parity for bin/fgos.mjs"
+      ],
+      "intentionalBehaviorDeltas": [
+        {
+          "file": "bin/fgos.mjs",
+          "referenceId": "reference-000228",
+          "edgeId": "class6-l-000113",
+          "line": 5108,
+          "currentExpression": "        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/decisions/0020-chan-fgos-khoi-worktree-worker.md).`,",
+          "candidateExpression": "        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập).`,",
+          "oldPointer": "docs/decisions/0020-chan-fgos-khoi-worktree-worker.md",
+          "newPointer": "docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+            "targetSha256": "69944091cf07f8d2338df4816130b54d9a940af9e20d47c41e39f085c75a078a",
+            "anchor": "0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập",
+            "claim": "0020 Chặn fgos khỏi worktree-worker (không khóa, không cô lập): retained narrative states this no-.fgos worker constraint; matches prior Step 3 batch-080 edge maps-j-04927"
+          }
+        }
+      ],
+      "prerequisites": [
+        "Lead-started independent semantic review",
+        "Missing exact-output proof",
+        "User-visible CHANGELOG.md Unreleased co-edit in separately authorized Phase 9 packet",
+        "Same-package Step 0 rebind if the final patch touches a bound target"
+      ],
+      "order": "Phase 9 atomic consumer cutover; no apply-now action",
+      "rollbackDiff": "--- a/bin/fgos.mjs\n+++ b/bin/fgos.mjs\n@@ -5105,7 +5105,7 @@\n     if (entry?.requiresExistingStore && !fs.existsSync(dir)) {\n       throw new StoreError(\n         'validation',\n-        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/platform/runner/decisions/h-36d872fbb0e5.md#0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập).`,\n+        `.fgos/ not found at \"${dir}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/decisions/0020-chan-fgos-khoi-worktree-worker.md).`,\n       );\n     }\n     // State/root-resolution investigation: a disconnected-snapshot hazard\n",
+      "timing": "phase9",
+      "readiness": "pending / cutover-patch-only; never execution-ready"
+    },
+    {
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "file": "src/cli/command-registry.mjs",
+      "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17",
+      "mode": "100644",
+      "symbolOrPassage": [
+        "      type: 'object',\n      properties: {\n        quadrant: { type: 'string', description: 'The docs/<quadrant> directory to scan (e.g. docs/how-to).' },\n        topic: { type: 'string', description: 'The subject text to skeleton-match against each doc\\'s authoritative_for (required unless --check-duplicates is set).' },\n        'check-duplicates': { type: 'boolean', description: 'Scan for docs that claim the same subject instead of matching one topic.' },",
+        "      required: ['doc-path'],\n    },\n    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n    touchesState: false,\n    requiresExistingStore: false,"
+      ],
+      "oldText": [
+        "    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],",
+        "    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],"
+      ],
+      "newText": [
+        "    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],",
+        "    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],"
+      ],
+      "sourceSpans": [
+        {
+          "line": 1746,
+          "columnStart": 34,
+          "columnEndExclusive": 70,
+          "text": "docs/how-to/check-rollup-progress.md"
+        },
+        {
+          "line": 1746,
+          "columnStart": 34,
+          "columnEndExclusive": 70,
+          "text": "docs/how-to/check-rollup-progress.md"
+        }
+      ],
+      "diff": "--- a/src/cli/command-registry.mjs\n+++ b/src/cli/command-registry.mjs\n@@ -1743,7 +1743,7 @@\n       positional: ['doc-path'],\n       required: ['doc-path'],\n     },\n-    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n+    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],\n     touchesState: false,\n     requiresExistingStore: false,\n     externalEffect: false,\n",
+      "expectedAfterSha256": "65aa9b2dc704b9998383c2929e3fee11377397a1c7ca3635e0e9e7e2446b8c02",
+      "targetOwner": [
+        "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md"
+      ],
+      "claimAnchorProof": [
+        {
+          "target": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+          "docId": "how-to-check-a-root-item-s-progress-with-fgos-rollup:check-rollup-progress",
+          "registryPath": "docs/doc-registry.json",
+          "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+          "alias": "docs/how-to/check-rollup-progress.md",
+          "targetSha256": "bc0fb8b50f3958ddcebd76772ed49ea6bfcd69e7be820889900ea884ba69e5ab",
+          "claim": "live currentPath lookup; no writer destination adopts an alias"
+        },
+        {
+          "target": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+          "docId": "how-to-check-a-root-item-s-progress-with-fgos-rollup:check-rollup-progress",
+          "registryPath": "docs/doc-registry.json",
+          "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+          "alias": "docs/how-to/check-rollup-progress.md",
+          "targetSha256": "bc0fb8b50f3958ddcebd76772ed49ea6bfcd69e7be820889900ea884ba69e5ab",
+          "claim": "live currentPath lookup; no writer destination adopts an alias"
+        }
+      ],
+      "receiptId": "cli-help-messages-pilot",
+      "coCutPaths": [
+        "CHANGELOG.md"
+      ],
+      "expectedOutputSets": [
+        {
+          "file": "src/cli/command-registry.mjs",
+          "referenceId": "reference-003641",
+          "edgeId": "class6-l-000219",
+          "line": 1746,
+          "currentExpression": "    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],",
+          "candidateExpression": "    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],",
+          "oldPointer": "docs/how-to",
+          "newPointer": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+            "docId": "how-to-check-a-root-item-s-progress-with-fgos-rollup:check-rollup-progress",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/check-rollup-progress.md",
+            "targetSha256": "bc0fb8b50f3958ddcebd76772ed49ea6bfcd69e7be820889900ea884ba69e5ab",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        },
+        {
+          "file": "src/cli/command-registry.mjs",
+          "referenceId": "reference-003655",
+          "edgeId": "class6-l-000218",
+          "line": 1746,
+          "currentExpression": "    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],",
+          "candidateExpression": "    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],",
+          "oldPointer": "docs/how-to/check-rollup-progress.md",
+          "newPointer": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+            "docId": "how-to-check-a-root-item-s-progress-with-fgos-rollup:check-rollup-progress",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/check-rollup-progress.md",
+            "targetSha256": "bc0fb8b50f3958ddcebd76772ed49ea6bfcd69e7be820889900ea884ba69e5ab",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        }
+      ],
+      "testTargets": [
+        "missing: exact emitted/refusal-message migration parity for src/cli/command-registry.mjs"
+      ],
+      "intentionalBehaviorDeltas": [
+        {
+          "file": "src/cli/command-registry.mjs",
+          "referenceId": "reference-003641",
+          "edgeId": "class6-l-000219",
+          "line": 1746,
+          "currentExpression": "    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],",
+          "candidateExpression": "    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],",
+          "oldPointer": "docs/how-to",
+          "newPointer": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+            "docId": "how-to-check-a-root-item-s-progress-with-fgos-rollup:check-rollup-progress",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/check-rollup-progress.md",
+            "targetSha256": "bc0fb8b50f3958ddcebd76772ed49ea6bfcd69e7be820889900ea884ba69e5ab",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        },
+        {
+          "file": "src/cli/command-registry.mjs",
+          "referenceId": "reference-003655",
+          "edgeId": "class6-l-000218",
+          "line": 1746,
+          "currentExpression": "    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],",
+          "candidateExpression": "    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],",
+          "oldPointer": "docs/how-to/check-rollup-progress.md",
+          "newPointer": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md",
+            "docId": "how-to-check-a-root-item-s-progress-with-fgos-rollup:check-rollup-progress",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/check-rollup-progress.md",
+            "targetSha256": "bc0fb8b50f3958ddcebd76772ed49ea6bfcd69e7be820889900ea884ba69e5ab",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        }
+      ],
+      "prerequisites": [
+        "Lead-started independent semantic review",
+        "Missing exact-output proof",
+        "User-visible CHANGELOG.md Unreleased co-edit in separately authorized Phase 9 packet",
+        "Same-package Step 0 rebind if the final patch touches a bound target"
+      ],
+      "order": "Phase 9 atomic consumer cutover; no apply-now action",
+      "rollbackDiff": "--- a/src/cli/command-registry.mjs\n+++ b/src/cli/command-registry.mjs\n@@ -1743,7 +1743,7 @@\n       positional: ['doc-path'],\n       required: ['doc-path'],\n     },\n-    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],\n+    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],\n     touchesState: false,\n     requiresExistingStore: false,\n     externalEffect: false,\n",
+      "timing": "phase9",
+      "readiness": "pending / cutover-patch-only; never execution-ready"
+    },
+    {
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "file": "src/intake/plan.mjs",
+      "sourceSha256": "c3c72be35468420d9f42bcf23a0bdec9e48a11c1f4d8dd6bb4b9be09f4c60dc6",
+      "mode": "100644",
+      "symbolOrPassage": [
+        "        kind: 'engine',\n        rationale:\n          'tsk-1gr D1/D2: mechanical path-token check over CONTEXT.md\\'s Locked decisions section -- advisory only, never blocks; see docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md for the failure mode this catches',\n      });\n    }"
+      ],
+      "oldText": [
+        "          'tsk-1gr D1/D2: mechanical path-token check over CONTEXT.md\\'s Locked decisions section -- advisory only, never blocks; see docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md for the failure mode this catches',"
+      ],
+      "newText": [
+        "          'tsk-1gr D1/D2: mechanical path-token check over CONTEXT.md\\'s Locked decisions section -- advisory only, never blocks; see docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md for the failure mode this catches',"
+      ],
+      "sourceSpans": [
+        {
+          "line": 923,
+          "columnStart": 135,
+          "columnEndExclusive": 224,
+          "text": "docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md"
+        }
+      ],
+      "diff": "--- a/src/intake/plan.mjs\n+++ b/src/intake/plan.mjs\n@@ -920,7 +920,7 @@\n         source: 'resolvePlan',\n         kind: 'engine',\n         rationale:\n-          'tsk-1gr D1/D2: mechanical path-token check over CONTEXT.md\\'s Locked decisions section -- advisory only, never blocks; see docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md for the failure mode this catches',\n+          'tsk-1gr D1/D2: mechanical path-token check over CONTEXT.md\\'s Locked decisions section -- advisory only, never blocks; see docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md for the failure mode this catches',\n       });\n     }\n   } catch {\n",
+      "expectedAfterSha256": "65f7f73eb1d826d95278a096668f6a31662c654fdb48aa5b9090b3df9229999f",
+      "targetOwner": [
+        "docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md"
+      ],
+      "claimAnchorProof": [
+        {
+          "target": "docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
+          "docId": "auto-decompose-can-drop-a-locked-decision-from-every-child-s-footprint:auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint",
+          "registryPath": "docs/doc-registry.json",
+          "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+          "alias": "docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
+          "targetSha256": "33adcc0dd734b9ac79ccc6cac1c8339010470740d4e9489d63c195080e8cba3d",
+          "claim": "live currentPath lookup; no writer destination adopts an alias"
+        }
+      ],
+      "receiptId": "cli-help-messages-pilot",
+      "coCutPaths": [
+        "CHANGELOG.md"
+      ],
+      "expectedOutputSets": [
+        {
+          "file": "src/intake/plan.mjs",
+          "referenceId": "reference-003682",
+          "edgeId": "class6-l-000245",
+          "line": 923,
+          "currentExpression": "          'tsk-1gr D1/D2: mechanical path-token check over CONTEXT.md\\'s Locked decisions section -- advisory only, never blocks; see docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md for the failure mode this catches',",
+          "candidateExpression": "          'tsk-1gr D1/D2: mechanical path-token check over CONTEXT.md\\'s Locked decisions section -- advisory only, never blocks; see docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md for the failure mode this catches',",
+          "oldPointer": "docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
+          "newPointer": "docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
+            "docId": "auto-decompose-can-drop-a-locked-decision-from-every-child-s-footprint:auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
+            "targetSha256": "33adcc0dd734b9ac79ccc6cac1c8339010470740d4e9489d63c195080e8cba3d",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        }
+      ],
+      "testTargets": [
+        "missing: exact emitted/refusal-message migration parity for src/intake/plan.mjs"
+      ],
+      "intentionalBehaviorDeltas": [
+        {
+          "file": "src/intake/plan.mjs",
+          "referenceId": "reference-003682",
+          "edgeId": "class6-l-000245",
+          "line": 923,
+          "currentExpression": "          'tsk-1gr D1/D2: mechanical path-token check over CONTEXT.md\\'s Locked decisions section -- advisory only, never blocks; see docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md for the failure mode this catches',",
+          "candidateExpression": "          'tsk-1gr D1/D2: mechanical path-token check over CONTEXT.md\\'s Locked decisions section -- advisory only, never blocks; see docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md for the failure mode this catches',",
+          "oldPointer": "docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
+          "newPointer": "docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
+            "docId": "auto-decompose-can-drop-a-locked-decision-from-every-child-s-footprint:auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
+            "targetSha256": "33adcc0dd734b9ac79ccc6cac1c8339010470740d4e9489d63c195080e8cba3d",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        }
+      ],
+      "prerequisites": [
+        "Lead-started independent semantic review",
+        "Missing exact-output proof",
+        "User-visible CHANGELOG.md Unreleased co-edit in separately authorized Phase 9 packet",
+        "Same-package Step 0 rebind if the final patch touches a bound target"
+      ],
+      "order": "Phase 9 atomic consumer cutover; no apply-now action",
+      "rollbackDiff": "--- a/src/intake/plan.mjs\n+++ b/src/intake/plan.mjs\n@@ -920,7 +920,7 @@\n         source: 'resolvePlan',\n         kind: 'engine',\n         rationale:\n-          'tsk-1gr D1/D2: mechanical path-token check over CONTEXT.md\\'s Locked decisions section -- advisory only, never blocks; see docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md for the failure mode this catches',\n+          'tsk-1gr D1/D2: mechanical path-token check over CONTEXT.md\\'s Locked decisions section -- advisory only, never blocks; see docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md for the failure mode this catches',\n       });\n     }\n   } catch {\n",
+      "timing": "phase9",
+      "readiness": "pending / cutover-patch-only; never execution-ready"
+    },
+    {
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "file": "src/intake/verify-pattern-check.mjs",
+      "sourceSha256": "1cfe3feb6375b999c4b851f6e9ef8fce7b1fb1209a81c29dd0a043939cb69e0c",
+      "mode": "100644",
+      "symbolOrPassage": [
+        "// scoped to the how-to doc's own documented trap, not a bare ban on any\n// TAP-style text.\nconst KNOWN_BAD_VERIFY_PATTERN_DOC = 'docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md';\nconst NODE_TEST_REFERENCE_RE = /node\\s+--test\\b|--test-name-pattern\\b/;\nconst WRONG_REPORTER_GREP_RE = /\\^#\\s*(pass|fail)\\b/;"
+      ],
+      "oldText": [
+        "const KNOWN_BAD_VERIFY_PATTERN_DOC = 'docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md';"
+      ],
+      "newText": [
+        "const KNOWN_BAD_VERIFY_PATTERN_DOC = 'docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md';"
+      ],
+      "sourceSpans": [
+        {
+          "line": 28,
+          "columnStart": 39,
+          "columnEndExclusive": 105,
+          "text": "docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md"
+        }
+      ],
+      "diff": "--- a/src/intake/verify-pattern-check.mjs\n+++ b/src/intake/verify-pattern-check.mjs\n@@ -25,7 +25,7 @@\n // grep shape AND a reference to `node --test`/`--test-name-pattern` (D2) —\n // scoped to the how-to doc's own documented trap, not a bare ban on any\n // TAP-style text.\n-const KNOWN_BAD_VERIFY_PATTERN_DOC = 'docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md';\n+const KNOWN_BAD_VERIFY_PATTERN_DOC = 'docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md';\n const NODE_TEST_REFERENCE_RE = /node\\s+--test\\b|--test-name-pattern\\b/;\n const WRONG_REPORTER_GREP_RE = /\\^#\\s*(pass|fail)\\b/;\n \n",
+      "expectedAfterSha256": "42e2f19d730eb04179754b3f5235fd60f468cac2da33815e9b0a9ceaeccc2fe5",
+      "targetOwner": [
+        "docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md"
+      ],
+      "claimAnchorProof": [
+        {
+          "target": "docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
+          "docId": "avoid-a-vacuous-pass-from-node-test-test-name-pattern:avoid-vacuous-pass-with-node-test-test-name-pattern",
+          "registryPath": "docs/doc-registry.json",
+          "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+          "alias": "docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
+          "targetSha256": "58a955275e233811bf2ba3698d6ed8de5d71b8e10684a735f1e97fe257e042f7",
+          "claim": "live currentPath lookup; no writer destination adopts an alias"
+        }
+      ],
+      "receiptId": "cli-help-messages-pilot",
+      "coCutPaths": [
+        "CHANGELOG.md"
+      ],
+      "expectedOutputSets": [
+        {
+          "file": "src/intake/verify-pattern-check.mjs",
+          "referenceId": "reference-003687",
+          "edgeId": "class6-l-000248",
+          "line": 28,
+          "currentExpression": "const KNOWN_BAD_VERIFY_PATTERN_DOC = 'docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md';",
+          "candidateExpression": "const KNOWN_BAD_VERIFY_PATTERN_DOC = 'docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md';",
+          "oldPointer": "docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
+          "newPointer": "docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
+            "docId": "avoid-a-vacuous-pass-from-node-test-test-name-pattern:avoid-vacuous-pass-with-node-test-test-name-pattern",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
+            "targetSha256": "58a955275e233811bf2ba3698d6ed8de5d71b8e10684a735f1e97fe257e042f7",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        }
+      ],
+      "testTargets": [
+        "missing: exact emitted/refusal-message migration parity for src/intake/verify-pattern-check.mjs"
+      ],
+      "intentionalBehaviorDeltas": [
+        {
+          "file": "src/intake/verify-pattern-check.mjs",
+          "referenceId": "reference-003687",
+          "edgeId": "class6-l-000248",
+          "line": 28,
+          "currentExpression": "const KNOWN_BAD_VERIFY_PATTERN_DOC = 'docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md';",
+          "candidateExpression": "const KNOWN_BAD_VERIFY_PATTERN_DOC = 'docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md';",
+          "oldPointer": "docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
+          "newPointer": "docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
+            "docId": "avoid-a-vacuous-pass-from-node-test-test-name-pattern:avoid-vacuous-pass-with-node-test-test-name-pattern",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
+            "targetSha256": "58a955275e233811bf2ba3698d6ed8de5d71b8e10684a735f1e97fe257e042f7",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        }
+      ],
+      "prerequisites": [
+        "Lead-started independent semantic review",
+        "Missing exact-output proof",
+        "User-visible CHANGELOG.md Unreleased co-edit in separately authorized Phase 9 packet",
+        "Same-package Step 0 rebind if the final patch touches a bound target"
+      ],
+      "order": "Phase 9 atomic consumer cutover; no apply-now action",
+      "rollbackDiff": "--- a/src/intake/verify-pattern-check.mjs\n+++ b/src/intake/verify-pattern-check.mjs\n@@ -25,7 +25,7 @@\n // grep shape AND a reference to `node --test`/`--test-name-pattern` (D2) —\n // scoped to the how-to doc's own documented trap, not a bare ban on any\n // TAP-style text.\n-const KNOWN_BAD_VERIFY_PATTERN_DOC = 'docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md';\n+const KNOWN_BAD_VERIFY_PATTERN_DOC = 'docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md';\n const NODE_TEST_REFERENCE_RE = /node\\s+--test\\b|--test-name-pattern\\b/;\n const WRONG_REPORTER_GREP_RE = /\\^#\\s*(pass|fail)\\b/;\n \n",
+      "timing": "phase9",
+      "readiness": "pending / cutover-patch-only; never execution-ready"
+    },
+    {
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "file": "src/runner/merge.mjs",
+      "sourceSha256": "8ccdb5441f10f806a1753d47394b4c74c655d02c5c7a03f7a1af56ce08024eb4",
+      "mode": "100644",
+      "symbolOrPassage": [
+        "\nexport function formatFgosWriteRejectedDetail(branch, paths, targetLabel) {\n  return `${branch} staged a change under .fgos/ (${paths.join(', ')}); merge aborted, ${targetLabel} unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.`;\n}\n"
+      ],
+      "oldText": [
+        "  return `${branch} staged a change under .fgos/ (${paths.join(', ')}); merge aborted, ${targetLabel} unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.`;"
+      ],
+      "newText": [
+        "  return `${branch} staged a change under .fgos/ (${paths.join(', ')}); merge aborted, ${targetLabel} unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.`;"
+      ],
+      "sourceSpans": [
+        {
+          "line": 996,
+          "columnStart": 128,
+          "columnEndExclusive": 178,
+          "text": "docs/how-to/fix-fgos-write-rejected-merge-block.md"
+        }
+      ],
+      "diff": "--- a/src/runner/merge.mjs\n+++ b/src/runner/merge.mjs\n@@ -993,7 +993,7 @@\n }\n \n export function formatFgosWriteRejectedDetail(branch, paths, targetLabel) {\n-  return `${branch} staged a change under .fgos/ (${paths.join(', ')}); merge aborted, ${targetLabel} unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.`;\n+  return `${branch} staged a change under .fgos/ (${paths.join(', ')}); merge aborted, ${targetLabel} unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.`;\n }\n \n // tsk-4gi: `git checkout HEAD -- <path>` is oblivious to merge attributes --\n",
+      "expectedAfterSha256": "255d832c8ce5d6bbc3cf658da358b140587c3a8e24545e41c3c7f27a32a659ea",
+      "targetOwner": [
+        "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md"
+      ],
+      "claimAnchorProof": [
+        {
+          "target": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+          "docId": "how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-change:fix-fgos-write-rejected-merge-block",
+          "registryPath": "docs/doc-registry.json",
+          "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+          "alias": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+          "targetSha256": "447cc6d849d5749936211b7e5f8c4944791cb9fab8426c8450b4cacbdac325a7",
+          "claim": "live currentPath lookup; no writer destination adopts an alias"
+        }
+      ],
+      "receiptId": "cli-help-messages-pilot",
+      "coCutPaths": [
+        "CHANGELOG.md"
+      ],
+      "expectedOutputSets": [
+        {
+          "file": "src/runner/merge.mjs",
+          "referenceId": "reference-003749",
+          "edgeId": "class6-l-000314",
+          "line": 996,
+          "currentExpression": "  return `${branch} staged a change under .fgos/ (${paths.join(', ')}); merge aborted, ${targetLabel} unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.`;",
+          "candidateExpression": "  return `${branch} staged a change under .fgos/ (${paths.join(', ')}); merge aborted, ${targetLabel} unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.`;",
+          "oldPointer": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+          "newPointer": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+            "docId": "how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-change:fix-fgos-write-rejected-merge-block",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+            "targetSha256": "447cc6d849d5749936211b7e5f8c4944791cb9fab8426c8450b4cacbdac325a7",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        }
+      ],
+      "testTargets": [
+        "missing: exact emitted/refusal-message migration parity for src/runner/merge.mjs"
+      ],
+      "intentionalBehaviorDeltas": [
+        {
+          "file": "src/runner/merge.mjs",
+          "referenceId": "reference-003749",
+          "edgeId": "class6-l-000314",
+          "line": 996,
+          "currentExpression": "  return `${branch} staged a change under .fgos/ (${paths.join(', ')}); merge aborted, ${targetLabel} unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.`;",
+          "candidateExpression": "  return `${branch} staged a change under .fgos/ (${paths.join(', ')}); merge aborted, ${targetLabel} unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.`;",
+          "oldPointer": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+          "newPointer": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md",
+            "docId": "how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-change:fix-fgos-write-rejected-merge-block",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+            "targetSha256": "447cc6d849d5749936211b7e5f8c4944791cb9fab8426c8450b4cacbdac325a7",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        }
+      ],
+      "prerequisites": [
+        "Lead-started independent semantic review",
+        "Missing exact-output proof",
+        "User-visible CHANGELOG.md Unreleased co-edit in separately authorized Phase 9 packet",
+        "Same-package Step 0 rebind if the final patch touches a bound target"
+      ],
+      "order": "Phase 9 atomic consumer cutover; no apply-now action",
+      "rollbackDiff": "--- a/src/runner/merge.mjs\n+++ b/src/runner/merge.mjs\n@@ -993,7 +993,7 @@\n }\n \n export function formatFgosWriteRejectedDetail(branch, paths, targetLabel) {\n-  return `${branch} staged a change under .fgos/ (${paths.join(', ')}); merge aborted, ${targetLabel} unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.`;\n+  return `${branch} staged a change under .fgos/ (${paths.join(', ')}); merge aborted, ${targetLabel} unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.`;\n }\n \n // tsk-4gi: `git checkout HEAD -- <path>` is oblivious to merge attributes --\n",
+      "timing": "phase9",
+      "readiness": "pending / cutover-patch-only; never execution-ready"
+    },
+    {
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "file": "src/runner/worktree.mjs",
+      "sourceSha256": "c99b08a8ba3c0b597223b28d2aeaa4616d533f59da9fefed512815d81f58848d",
+      "mode": "100644",
+      "symbolOrPassage": [
+        "  if (isDirtyRelativeToSync(repoRoot, worktreePath, lastSynced)) {\n    throw new WorktreeError(\n      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,\n      { branch, worktreePath, lastSynced, branchTip },\n    );"
+      ],
+      "oldText": [
+        "      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,"
+      ],
+      "newText": [
+        "      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,"
+      ],
+      "sourceSpans": [
+        {
+          "line": 1088,
+          "columnStart": 484,
+          "columnEndExclusive": 559,
+          "text": "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md"
+        }
+      ],
+      "diff": "--- a/src/runner/worktree.mjs\n+++ b/src/runner/worktree.mjs\n@@ -1085,7 +1085,7 @@\n \n   if (isDirtyRelativeToSync(repoRoot, worktreePath, lastSynced)) {\n     throw new WorktreeError(\n-      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,\n+      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,\n       { branch, worktreePath, lastSynced, branchTip },\n     );\n   }\n",
+      "expectedAfterSha256": "10560a188e78a1be725a7b57ed095b7bddda63216c3c00e0b08f79b47396af21",
+      "targetOwner": [
+        "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md"
+      ],
+      "claimAnchorProof": [
+        {
+          "target": "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+          "docId": "how-to-tell-a-stale-worktree-index-apart-from-real-uncommitted-work:tell-a-stale-worktree-index-apart-from-real-uncommitted-work",
+          "registryPath": "docs/doc-registry.json",
+          "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+          "alias": "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+          "targetSha256": "244a4504e597b7f82e136e10591700372c52626b425931a69bbba2e392d65478",
+          "claim": "live currentPath lookup; no writer destination adopts an alias"
+        }
+      ],
+      "receiptId": "cli-help-messages-pilot",
+      "coCutPaths": [
+        "CHANGELOG.md"
+      ],
+      "expectedOutputSets": [
+        {
+          "file": "src/runner/worktree.mjs",
+          "referenceId": "reference-003784",
+          "edgeId": "class6-l-000333",
+          "line": 1088,
+          "currentExpression": "      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,",
+          "candidateExpression": "      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,",
+          "oldPointer": "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+          "newPointer": "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+            "docId": "how-to-tell-a-stale-worktree-index-apart-from-real-uncommitted-work:tell-a-stale-worktree-index-apart-from-real-uncommitted-work",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+            "targetSha256": "244a4504e597b7f82e136e10591700372c52626b425931a69bbba2e392d65478",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        }
+      ],
+      "testTargets": [
+        "missing: exact emitted/refusal-message migration parity for src/runner/worktree.mjs"
+      ],
+      "intentionalBehaviorDeltas": [
+        {
+          "file": "src/runner/worktree.mjs",
+          "referenceId": "reference-003784",
+          "edgeId": "class6-l-000333",
+          "line": 1088,
+          "currentExpression": "      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,",
+          "candidateExpression": "      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,",
+          "oldPointer": "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+          "newPointer": "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+            "docId": "how-to-tell-a-stale-worktree-index-apart-from-real-uncommitted-work:tell-a-stale-worktree-index-apart-from-real-uncommitted-work",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+            "targetSha256": "244a4504e597b7f82e136e10591700372c52626b425931a69bbba2e392d65478",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        }
+      ],
+      "prerequisites": [
+        "Lead-started independent semantic review",
+        "Missing exact-output proof",
+        "User-visible CHANGELOG.md Unreleased co-edit in separately authorized Phase 9 packet",
+        "Same-package Step 0 rebind if the final patch touches a bound target"
+      ],
+      "order": "Phase 9 atomic consumer cutover; no apply-now action",
+      "rollbackDiff": "--- a/src/runner/worktree.mjs\n+++ b/src/runner/worktree.mjs\n@@ -1085,7 +1085,7 @@\n \n   if (isDirtyRelativeToSync(repoRoot, worktreePath, lastSynced)) {\n     throw new WorktreeError(\n-      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,\n+      `refusing to resync claim worktree \"${worktreePath}\" on \"${branch}\" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in \"${worktreePath}\" before claiming \"${branch}\" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,\n       { branch, worktreePath, lastSynced, branchTip },\n     );\n   }\n",
+      "timing": "phase9",
+      "readiness": "pending / cutover-patch-only; never execution-ready"
+    },
+    {
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "file": "src/state/events-jsonl-truncation-guard.mjs",
+      "sourceSha256": "b4dd68558622a872395138a790bc63926ebdf60323b880c6f69b23ca3d7ee0ab",
+      "mode": "100644",
+      "symbolOrPassage": [
+        "      ok: false,\n      reason: \"content-mismatch\",\n      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/how-to/resolve-an-events-jsonl-truncation.md)`,\n      mark: currentMark,\n    };"
+      ],
+      "oldText": [
+        "      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/how-to/resolve-an-events-jsonl-truncation.md)`,"
+      ],
+      "newText": [
+        "      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md)`,"
+      ],
+      "sourceSpans": [
+        {
+          "line": 140,
+          "columnStart": 260,
+          "columnEndExclusive": 309,
+          "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
+        }
+      ],
+      "diff": "--- a/src/state/events-jsonl-truncation-guard.mjs\n+++ b/src/state/events-jsonl-truncation-guard.mjs\n@@ -137,7 +137,7 @@\n     return {\n       ok: false,\n       reason: \"content-mismatch\",\n-      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/how-to/resolve-an-events-jsonl-truncation.md)`,\n+      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md)`,\n       mark: currentMark,\n     };\n   }\n",
+      "expectedAfterSha256": "695215a9ab63d21a5eef2d314aa146e65269cc078efeb0462c7b252cb8c22c02",
+      "targetOwner": [
+        "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md"
+      ],
+      "claimAnchorProof": [
+        {
+          "target": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+          "docId": "how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events-jsonl-truncation:resolve-an-events-jsonl-truncation",
+          "registryPath": "docs/doc-registry.json",
+          "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+          "alias": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+          "targetSha256": "da410923253f4bdf8219b75fae8176ce4e97b9114e4a2172dbb19adfea460862",
+          "claim": "live currentPath lookup; no writer destination adopts an alias"
+        }
+      ],
+      "receiptId": "cli-help-messages-pilot",
+      "coCutPaths": [
+        "CHANGELOG.md"
+      ],
+      "expectedOutputSets": [
+        {
+          "file": "src/state/events-jsonl-truncation-guard.mjs",
+          "referenceId": "reference-003868",
+          "edgeId": "class6-l-000415",
+          "line": 140,
+          "currentExpression": "      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/how-to/resolve-an-events-jsonl-truncation.md)`,",
+          "candidateExpression": "      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md)`,",
+          "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+          "newPointer": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+            "docId": "how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events-jsonl-truncation:resolve-an-events-jsonl-truncation",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+            "targetSha256": "da410923253f4bdf8219b75fae8176ce4e97b9114e4a2172dbb19adfea460862",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        }
+      ],
+      "testTargets": [
+        "missing: exact emitted/refusal-message migration parity for src/state/events-jsonl-truncation-guard.mjs"
+      ],
+      "intentionalBehaviorDeltas": [
+        {
+          "file": "src/state/events-jsonl-truncation-guard.mjs",
+          "referenceId": "reference-003868",
+          "edgeId": "class6-l-000415",
+          "line": 140,
+          "currentExpression": "      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/how-to/resolve-an-events-jsonl-truncation.md)`,",
+          "candidateExpression": "      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md)`,",
+          "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+          "newPointer": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+            "docId": "how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events-jsonl-truncation:resolve-an-events-jsonl-truncation",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+            "targetSha256": "da410923253f4bdf8219b75fae8176ce4e97b9114e4a2172dbb19adfea460862",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        }
+      ],
+      "prerequisites": [
+        "Lead-started independent semantic review",
+        "Missing exact-output proof",
+        "User-visible CHANGELOG.md Unreleased co-edit in separately authorized Phase 9 packet",
+        "Same-package Step 0 rebind if the final patch touches a bound target"
+      ],
+      "order": "Phase 9 atomic consumer cutover; no apply-now action",
+      "rollbackDiff": "--- a/src/state/events-jsonl-truncation-guard.mjs\n+++ b/src/state/events-jsonl-truncation-guard.mjs\n@@ -137,7 +137,7 @@\n     return {\n       ok: false,\n       reason: \"content-mismatch\",\n-      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md)`,\n+      message: `seq ${storedMark.seq} now points at a different event than the last recorded mark -- the log was truncated and reappended past this position (git stash/checkout/reset/clean on the shared, git-tracked .fgos/events.jsonl is the known cause; see docs/how-to/resolve-an-events-jsonl-truncation.md)`,\n       mark: currentMark,\n     };\n   }\n",
+      "timing": "phase9",
+      "readiness": "pending / cutover-patch-only; never execution-ready"
+    },
+    {
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "file": "src/setup/registrations.mjs",
+      "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518",
+      "mode": "100644",
+      "symbolOrPassage": [
+        "  return {\n    passed: false,\n    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n  };\n}",
+        "  return {\n    passed: false,\n    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,\n  };\n}",
+        "  }\n  if (missing.length > 0) {\n    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };\n  }\n  return { passed: true, message: 'every domain\\'s taskSpecMap entry and operation resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };"
+      ],
+      "oldText": [
+        "    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,",
+        "    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,",
+        "    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };"
+      ],
+      "newText": [
+        "    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,",
+        "    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md`,",
+        "    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md` };"
+      ],
+      "sourceSpans": [
+        {
+          "line": 3518,
+          "columnStart": 96,
+          "columnEndExclusive": 133,
+          "text": "docs/how-to/cut-a-fgos-release-tag.md"
+        },
+        {
+          "line": 2094,
+          "columnStart": 109,
+          "columnEndExclusive": 158,
+          "text": "docs/how-to/resolve-an-events-jsonl-truncation.md"
+        },
+        {
+          "line": 874,
+          "columnStart": 142,
+          "columnEndExclusive": 174,
+          "text": "docs/how-to/write-a-task-spec.md"
+        }
+      ],
+      "diff": "--- a/src/setup/registrations.mjs\n+++ b/src/setup/registrations.mjs\n@@ -871,7 +871,7 @@\n     }\n   }\n   if (missing.length > 0) {\n-    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };\n+    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md` };\n   }\n   return { passed: true, message: 'every domain\\'s taskSpecMap entry and operation resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };\n }\n@@ -2091,7 +2091,7 @@\n   }\n   return {\n     passed: false,\n-    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,\n+    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md`,\n   };\n }\n \n@@ -3515,7 +3515,7 @@\n   }\n   return {\n     passed: false,\n-    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n+    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n   };\n }\n \n",
+      "expectedAfterSha256": "e5a0579e471f1e173a045ffd28eed898cbc2d7c2462db3c3d438836e9a489d62",
+      "targetOwner": [
+        "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
+        "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+        "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md"
+      ],
+      "claimAnchorProof": [
+        {
+          "target": "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
+          "docId": "how-to-cut-a-fgos-release-tag:cut-a-fgos-release-tag",
+          "registryPath": "docs/doc-registry.json",
+          "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+          "alias": "docs/how-to/cut-a-fgos-release-tag.md",
+          "targetSha256": "9977b7d61ca9fa05bd8025e7d04112e2c087379f793649bb766b7e013d8fb659",
+          "claim": "live currentPath lookup; no writer destination adopts an alias"
+        },
+        {
+          "target": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+          "docId": "how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events-jsonl-truncation:resolve-an-events-jsonl-truncation",
+          "registryPath": "docs/doc-registry.json",
+          "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+          "alias": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+          "targetSha256": "da410923253f4bdf8219b75fae8176ce4e97b9114e4a2172dbb19adfea460862",
+          "claim": "live currentPath lookup; no writer destination adopts an alias"
+        },
+        {
+          "target": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
+          "docId": "how-to-write-a-task-spec:write-a-task-spec",
+          "registryPath": "docs/doc-registry.json",
+          "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+          "alias": "docs/how-to/write-a-task-spec.md",
+          "targetSha256": "dfdd678642adb8b4795088759d783a024d5b9afb41227bb96f907af173659083",
+          "claim": "live currentPath lookup; no writer destination adopts an alias"
+        }
+      ],
+      "receiptId": "setup-doctor-roots-pilot",
+      "coCutPaths": [
+        "CHANGELOG.md"
+      ],
+      "expectedOutputSets": [
+        {
+          "file": "src/setup/registrations.mjs",
+          "referenceId": "reference-003804",
+          "edgeId": "class6-l-000378",
+          "line": 3518,
+          "currentExpression": "    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,",
+          "candidateExpression": "    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,",
+          "oldPointer": "docs/how-to/cut-a-fgos-release-tag.md",
+          "newPointer": "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
+            "docId": "how-to-cut-a-fgos-release-tag:cut-a-fgos-release-tag",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/cut-a-fgos-release-tag.md",
+            "targetSha256": "9977b7d61ca9fa05bd8025e7d04112e2c087379f793649bb766b7e013d8fb659",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        },
+        {
+          "file": "src/setup/registrations.mjs",
+          "referenceId": "reference-003806",
+          "edgeId": "class6-l-000355",
+          "line": 2094,
+          "currentExpression": "    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,",
+          "candidateExpression": "    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md`,",
+          "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+          "newPointer": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+            "docId": "how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events-jsonl-truncation:resolve-an-events-jsonl-truncation",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+            "targetSha256": "da410923253f4bdf8219b75fae8176ce4e97b9114e4a2172dbb19adfea460862",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        },
+        {
+          "file": "src/setup/registrations.mjs",
+          "referenceId": "reference-003811",
+          "edgeId": "class6-l-000351",
+          "line": 874,
+          "currentExpression": "    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };",
+          "candidateExpression": "    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md` };",
+          "oldPointer": "docs/how-to/write-a-task-spec.md",
+          "newPointer": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
+            "docId": "how-to-write-a-task-spec:write-a-task-spec",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/write-a-task-spec.md",
+            "targetSha256": "dfdd678642adb8b4795088759d783a024d5b9afb41227bb96f907af173659083",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        }
+      ],
+      "testTargets": [
+        "missing: exact emitted/refusal-message migration parity for src/setup/registrations.mjs"
+      ],
+      "intentionalBehaviorDeltas": [
+        {
+          "file": "src/setup/registrations.mjs",
+          "referenceId": "reference-003804",
+          "edgeId": "class6-l-000378",
+          "line": 3518,
+          "currentExpression": "    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,",
+          "candidateExpression": "    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,",
+          "oldPointer": "docs/how-to/cut-a-fgos-release-tag.md",
+          "newPointer": "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md",
+            "docId": "how-to-cut-a-fgos-release-tag:cut-a-fgos-release-tag",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/cut-a-fgos-release-tag.md",
+            "targetSha256": "9977b7d61ca9fa05bd8025e7d04112e2c087379f793649bb766b7e013d8fb659",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        },
+        {
+          "file": "src/setup/registrations.mjs",
+          "referenceId": "reference-003806",
+          "edgeId": "class6-l-000355",
+          "line": 2094,
+          "currentExpression": "    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,",
+          "candidateExpression": "    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md`,",
+          "oldPointer": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+          "newPointer": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+            "docId": "how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events-jsonl-truncation:resolve-an-events-jsonl-truncation",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/resolve-an-events-jsonl-truncation.md",
+            "targetSha256": "da410923253f4bdf8219b75fae8176ce4e97b9114e4a2172dbb19adfea460862",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        },
+        {
+          "file": "src/setup/registrations.mjs",
+          "referenceId": "reference-003811",
+          "edgeId": "class6-l-000351",
+          "line": 874,
+          "currentExpression": "    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };",
+          "candidateExpression": "    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md` };",
+          "oldPointer": "docs/how-to/write-a-task-spec.md",
+          "newPointer": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
+          "intent": "Only this recovery/navigation pointer changes. All surrounding interpolation, wording, branch conditions, category/selectors and exit behavior remain identical. This includes persisted engine rationale when emitted by resolvePlan.",
+          "evidence": {
+            "target": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
+            "docId": "how-to-write-a-task-spec:write-a-task-spec",
+            "registryPath": "docs/doc-registry.json",
+            "registrySha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+            "alias": "docs/how-to/write-a-task-spec.md",
+            "targetSha256": "dfdd678642adb8b4795088759d783a024d5b9afb41227bb96f907af173659083",
+            "claim": "live currentPath lookup; no writer destination adopts an alias"
+          }
+        }
+      ],
+      "prerequisites": [
+        "Lead-started independent semantic review",
+        "Missing exact-output proof",
+        "User-visible CHANGELOG.md Unreleased co-edit in separately authorized Phase 9 packet",
+        "Same-package Step 0 rebind if the final patch touches a bound target"
+      ],
+      "order": "Phase 9 atomic consumer cutover; no apply-now action",
+      "rollbackDiff": "--- a/src/setup/registrations.mjs\n+++ b/src/setup/registrations.mjs\n@@ -871,7 +871,7 @@\n     }\n   }\n   if (missing.length > 0) {\n-    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md` };\n+    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };\n   }\n   return { passed: true, message: 'every domain\\'s taskSpecMap entry and operation resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };\n }\n@@ -2091,7 +2091,7 @@\n   }\n   return {\n     passed: false,\n-    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md`,\n+    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,\n   };\n }\n \n@@ -3515,7 +3515,7 @@\n   }\n   return {\n     passed: false,\n-    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n+    message: `README.md recommends installing tag \"${tag}\", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,\n   };\n }\n \n",
+      "timing": "phase9",
+      "readiness": "pending / cutover-patch-only; never execution-ready"
+    }
+  ]
+}

@@ -1,0 +1,360 @@
+{
+  "kind": "Step 5 checker mutation probes",
+  "baselineFailures": 0,
+  "rulesCovered": [
+    "coverage",
+    "fixture-provenance",
+    "gateway",
+    "generated",
+    "message-deltas",
+    "missing-proof",
+    "parks",
+    "patches",
+    "receipts",
+    "rejections",
+    "review",
+    "setup",
+    "source-pins",
+    "source-spans",
+    "targets"
+  ],
+  "probes": [
+    {
+      "name": "Omitting one selected literal fails complete coverage",
+      "owningRule": "coverage",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "coverage",
+          "where": "literal population",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Dropping a dynamic superset tuple cannot silently shrink admission",
+      "owningRule": "coverage",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "coverage",
+          "where": "dynamic population",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Changing a frozen original tuple is rejected",
+      "owningRule": "coverage",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "coverage",
+          "where": "apps/fgos-gateway/src/gateway.rs:dynamic-000661",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Whole-file digest drift cannot inherit acceptance",
+      "owningRule": "source-pins",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "source-pins",
+          "where": "apps/fgos-gateway/src/gateway.rs",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Untrue whole-file read declaration is rejected",
+      "owningRule": "source-pins",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "source-pins",
+          "where": "apps/fgos-gateway/src/gateway.rs",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "A prior canonical record digest cannot be changed",
+      "owningRule": "source-pins",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "source-pins",
+          "where": "apps/fgos-gateway/src/gateway.rs",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Physical token corruption is rejected",
+      "owningRule": "source-spans",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "source-spans",
+          "where": "apps/fgos-gateway/src/gateway.rs:reference-000161",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Generic unrelated rejection without own passage is rejected",
+      "owningRule": "rejections",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "rejections",
+          "where": "apps/fgos-gateway/src/gateway.rs:reference-000161",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "A rejected comment cannot carry a behavioral patch",
+      "owningRule": "rejections",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "rejections",
+          "where": "apps/fgos-gateway/src/gateway.rs:reference-000161",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "A park without its blocker is rejected",
+      "owningRule": "parks",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "parks",
+          "where": "bin/fgos.mjs:reference-000277",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "An unrelated extra full-file hunk is rejected",
+      "owningRule": "patches",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "patches",
+          "where": ".githooks/pre-commit",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "A wrong candidate output digest is rejected",
+      "owningRule": "patches",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "patches",
+          "where": ".githooks/pre-commit",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Missing inverse rollback is rejected",
+      "owningRule": "patches",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "patches",
+          "where": ".githooks/pre-commit",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Frozen decision-index rename copy is not a generator target",
+      "owningRule": "targets",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "targets",
+          "where": ".githooks/pre-commit:reference-000110",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "An alias writer destination is refused",
+      "owningRule": "targets",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "targets",
+          "where": ".githooks/pre-commit:reference-000110",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "A diff on a generated output is refused",
+      "owningRule": "generated",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "generated",
+          "where": "docs/decisions/index.md",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "A missing receipt comparison field is rejected",
+      "owningRule": "receipts",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "receipts",
+          "where": "gateway-contract-pilot",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "A missing per-file seam receipt join is rejected",
+      "owningRule": "receipts",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "receipts",
+          "where": "apps/fgos-gateway/src/gateway.rs",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Missing HTTP proof cannot become pass without execution log",
+      "owningRule": "missing-proof",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "missing-proof",
+          "where": "gateway-contract-pilot:HTTP body bytes/content-type/fresh read; missing/unreadable/invalid UTF-8 500 JSON fields; MCP missing/read/YAML-parse-error parity",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "A proof log digest is validated against actual bytes",
+      "owningRule": "missing-proof",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "missing-proof",
+          "where": "gateway-contract-pilot:Raw body files and complete parsed OpenAPI equality; 21 operations and 7 schemas",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "HTTP file equality cannot replace missing response proof",
+      "owningRule": "gateway",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "gateway",
+          "where": "gateway-contract-pilot",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Missing-file HTTP JSON status drift is detected",
+      "owningRule": "gateway",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "gateway",
+          "where": "gateway-contract-pilot",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "An unreviewed instruction scan-root delta is detected",
+      "owningRule": "setup",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "setup",
+          "where": "setup-doctor-roots-pilot",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "A dropped emitted-message intentional delta is detected",
+      "owningRule": "message-deltas",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "message-deltas",
+          "where": ".githooks/pre-commit:reference-000110",
+          "error": "condition false"
+        },
+        {
+          "rule": "message-deltas",
+          "where": ".githooks/pre-commit:reference-000111",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Oversized or unbound review payload metadata is refused",
+      "owningRule": "review",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "review",
+          "where": "step-05-pilot-p01.json",
+          "error": "condition false"
+        },
+        {
+          "rule": "review",
+          "where": "all refs/dynamic/meta/receipts",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Synthetic fixture cannot lose constructor/test provenance",
+      "owningRule": "fixture-provenance",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "fixture-provenance",
+          "where": "apps/fgos-gateway/src/gateway.rs:reference-000169",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Every admitted reference retains its owning proof command or explicit missing",
+      "owningRule": "receipts",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "receipts",
+          "where": "apps/fgos-gateway/src/gateway.rs:reference-000168",
+          "error": "condition false"
+        }
+      ]
+    }
+  ],
+  "passed": 27,
+  "total": 27,
+  "failures": []
+}

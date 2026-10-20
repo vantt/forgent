@@ -1,0 +1,1376 @@
+{
+  "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+  "main": "f91dc5dbe4f7d8d5ca3e9e32aa27c5e9de37ea66",
+  "mergeBase": "8fe15654ea57ce52708dcfbfeae45d5fc00628e0",
+  "mainCommits": 10,
+  "files": [
+    {
+      "file": "docs/platform/agent-protocol/spec.md",
+      "digest": "cea88d449291b8ca29094fedb0bd9df1e0f06bd07bfed4a6bbb1163a39a226b6",
+      "bytes": 14951,
+      "equalAuthorPin": true,
+      "previousDigest": "236da5383cf15476b84f06f106d7a941b00d9abc7ef8f32190a6606f4a95bfb7",
+      "units": 37
+    }
+  ],
+  "extractorsAgree": true,
+  "extractors": [
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "extractor": "step10-sync287-lib.mjs",
+      "extractorSha256": "083795c90eac1d5601fedc2261390f15668fceed68a3053777960fea9a927dc3",
+      "units": {
+        "docs/platform/agent-protocol/spec.md": [
+          {
+            "unitKind": "heading",
+            "level": 1,
+            "title": "Agent Protocol Component Specification",
+            "anchor": "agent-protocol-component-specification",
+            "githubAnchor": "agent-protocol-component-specification",
+            "stableAnchor": "h-7fd092e8d84f",
+            "startLine": 1,
+            "endLine": 1,
+            "textDigest": "cdcb0880baa754ddeb1a8d6431de32ce53705dde48232d1ed887118a6874b042",
+            "sample": "Agent Protocol Component Specification",
+            "sectionPayloadDigest": "4c4d6353f5f0f88f550c394738a15b0359c30bfa4b5595b11da7fc3fd93fa34b",
+            "followingBlockDigest": "4c4d6353f5f0f88f550c394738a15b0359c30bfa4b5595b11da7fc3fd93fa34b",
+            "identityFingerprint": "ab83efcedb98fff76b0cc82905ca8a248aedc19cf257de442b66b46d47d42091",
+            "ancestry": [],
+            "text": "# Agent Protocol Component Specification",
+            "sectionText": "# Agent Protocol Component Specification\n\n```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the pure per-CLI adapters that read what an agent CLI showed and name what happened, for the run supervisor\nDesign status: Accepted\nImplementation status: Built (direct and terminal adapters for claude, codex, agy, pi, omp)\nCanonical: Yes\nOwner: Agent-protocol component (L3)\nSource: packages/agent-protocol/rust (crate fgos-agent-protocol)\nContracts: packages/agent-protocol/contracts/\nLast reviewed: 2026-10-18\nRelated:\n- docs/platform/run-supervisor/spec.md\n- docs/platform/terminal-control/spec.md\n- docs/platform/component-boundary.md\n- docs/specs/runner.md\n- plans/261016-1351-run-supervisor-rust-core-direct-mode/plan.md\n- plans/261016-1351-terminal-mode-and-launcher-identity/plan.md\n- plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md\n```"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-1",
+            "githubAnchor": "unheaded-block-1",
+            "stableAnchor": "unheaded-block-1",
+            "title": "Unheaded block 1",
+            "startLine": 3,
+            "endLine": 22,
+            "textDigest": "4c4d6353f5f0f88f550c394738a15b0359c30bfa4b5595b11da7fc3fd93fa34b",
+            "sample": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the pure per-CLI adapters that read what an agent CLI s",
+            "identityFingerprint": "35312c4fa0da786a96edca9b2623490e6e4df3ea7cad6dec565a020a90511242",
+            "ancestry": [
+              "Agent Protocol Component Specification"
+            ],
+            "text": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the pure per-CLI adapters that read what an agent CLI showed and name what happened, for the run supervisor\nDesign status: Accepted\nImplementation status: Built (direct and terminal adapters for claude, codex, agy, pi, omp)\nCanonical: Yes\nOwner: Agent-protocol component (L3)\nSource: packages/agent-protocol/rust (crate fgos-agent-protocol)\nContracts: packages/agent-protocol/contracts/\nLast reviewed: 2026-10-18\nRelated:\n- docs/platform/run-supervisor/spec.md\n- docs/platform/terminal-control/spec.md\n- docs/platform/component-boundary.md\n- docs/specs/runner.md\n- plans/261016-1351-run-supervisor-rust-core-direct-mode/plan.md\n- plans/261016-1351-terminal-mode-and-launcher-identity/plan.md\n- plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md\n```"
+          },
+          {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "1. Purpose",
+            "anchor": "1-purpose",
+            "githubAnchor": "1-purpose",
+            "stableAnchor": "h-35665566fc92",
+            "startLine": 24,
+            "endLine": 24,
+            "textDigest": "9ba4a5a48a15a1c3bc7741ec8ec960ff3ac25667f36bf4d667ba8fc80f13ee42",
+            "sample": "1. Purpose",
+            "sectionPayloadDigest": "5279f7ca52e957a675c16ab65de58d23b4c60bc0ee4c067ae2799b60ef6fe8ed",
+            "followingBlockDigest": "5279f7ca52e957a675c16ab65de58d23b4c60bc0ee4c067ae2799b60ef6fe8ed",
+            "identityFingerprint": "5ec8d74998002770f4e10b3b601e8f01786af81f94a2e22e028f5c601c7ff773",
+            "ancestry": [
+              "Agent Protocol Component Specification"
+            ],
+            "text": "## 1. Purpose",
+            "sectionText": "## 1. Purpose\n\nAn adapter is a pure state machine for one agent CLI in one launch mode. It reads what the agent left behind (a capture tail, an exit, an outbox listing) and names the result. It never opens a tab, picks a model, changes a timeout or decides a retry. It has no dependency on terminal-control, on a lock or on an attempt; the run supervisor wires it."
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-2",
+            "githubAnchor": "unheaded-block-2",
+            "stableAnchor": "unheaded-block-2",
+            "title": "Unheaded block 2",
+            "startLine": 26,
+            "endLine": 26,
+            "textDigest": "5279f7ca52e957a675c16ab65de58d23b4c60bc0ee4c067ae2799b60ef6fe8ed",
+            "sample": "An adapter is a pure state machine for one agent CLI in one launch mode. It reads what the agent left behind (a capture tail, an exit, an outbox listing) and names the result. It n",
+            "identityFingerprint": "6cb02f08e9a72f793458a3f536c1e4bfda4b0507494a1a54ad902a32b56620d9",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "1. Purpose"
+            ],
+            "text": "An adapter is a pure state machine for one agent CLI in one launch mode. It reads what the agent left behind (a capture tail, an exit, an outbox listing) and names the result. It never opens a tab, picks a model, changes a timeout or decides a retry. It has no dependency on terminal-control, on a lock or on an attempt; the run supervisor wires it."
+          },
+          {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "2. Ownership boundary",
+            "anchor": "2-ownership-boundary",
+            "githubAnchor": "2-ownership-boundary",
+            "stableAnchor": "h-6d5df7fe58db",
+            "startLine": 28,
+            "endLine": 28,
+            "textDigest": "5167b9cfea62668aff2eb18aa88952c7a594591c80ec414aa8f5a9cf1cde4c36",
+            "sample": "2. Ownership boundary",
+            "sectionPayloadDigest": "458c0457aad61f3ce3c2136ad8e3b81f12ed4660b3095acb83e5f509682b2aed",
+            "followingBlockDigest": "458c0457aad61f3ce3c2136ad8e3b81f12ed4660b3095acb83e5f509682b2aed",
+            "identityFingerprint": "d4b35e39b66a8d15ad86eda48dc3aa9f76c37f7f79a322e6bf6a79a7c43cd010",
+            "ancestry": [
+              "Agent Protocol Component Specification"
+            ],
+            "text": "## 2. Ownership boundary",
+            "sectionText": "## 2. Ownership boundary\n\n| Owns | Does not own |\n|---|---|\n| The named results (section 4) | Argv, model or executor choice (Execution Core; `resolveExecutorCommand` in `src/runner/dispatch/transport.mjs` builds argv from the executor configuration) |\n| Stdin policy per CLI (section 6) | Timeouts, deadlines, retry, fallback (supervisor, controller) |\n| The activity signal the idle timer counts (section 7) | Judging the work (Run Result Evaluator) |\n| One fixture file of real screen or output tails per CLI and mode | Terminal screens and keys (terminal-control: the supervisor wires `AgentIo` to it) |"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-3",
+            "githubAnchor": "unheaded-block-3",
+            "stableAnchor": "unheaded-block-3",
+            "title": "Unheaded block 3",
+            "startLine": 30,
+            "endLine": 35,
+            "textDigest": "458c0457aad61f3ce3c2136ad8e3b81f12ed4660b3095acb83e5f509682b2aed",
+            "sample": "| Owns | Does not own |\n|---|---|\n| The named results (section 4) | Argv, model or executor choice (Execution Core; `resolveExecutorCommand` in `src/runner/dispatch/transport.mjs` ",
+            "identityFingerprint": "519a85af65b8f28c73cdb8f24e0af830d14ed56a93a231bf16505c8a7b7a3278",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "2. Ownership boundary"
+            ],
+            "text": "| Owns | Does not own |\n|---|---|\n| The named results (section 4) | Argv, model or executor choice (Execution Core; `resolveExecutorCommand` in `src/runner/dispatch/transport.mjs` builds argv from the executor configuration) |\n| Stdin policy per CLI (section 6) | Timeouts, deadlines, retry, fallback (supervisor, controller) |\n| The activity signal the idle timer counts (section 7) | Judging the work (Run Result Evaluator) |\n| One fixture file of real screen or output tails per CLI and mode | Terminal screens and keys (terminal-control: the supervisor wires `AgentIo` to it) |"
+          },
+          {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "3. The IO gate",
+            "anchor": "3-the-io-gate",
+            "githubAnchor": "3-the-io-gate",
+            "stableAnchor": "h-a23e14eb4b7b",
+            "startLine": 37,
+            "endLine": 37,
+            "textDigest": "5525d3aff46d50a346c530318abf64be848cf8f73de38c69133b1b5f0664275c",
+            "sample": "3. The IO gate",
+            "sectionPayloadDigest": "b428061847f9ad460f752839eef1b4f8263e8784e768291d7717a95f63bb1739",
+            "followingBlockDigest": "d8b463d1c67e79e614910a7a021e9317210d8ec541d38728104db0c02fdb065d",
+            "identityFingerprint": "bfa840ec56e6a1de81867638de1e62966c98180ca2c5745c8455f7db51698b64",
+            "ancestry": [
+              "Agent Protocol Component Specification"
+            ],
+            "text": "## 3. The IO gate",
+            "sectionText": "## 3. The IO gate\n\nThe contract ([agent-protocol.v1.json](../../../packages/agent-protocol/contracts/agent-protocol.v1.json)) gives each adapter one port, `AgentIo`:\n\n| Operation | Meaning | Modes |\n|---|---|---|\n| `send(text?, keys?, submit)` | Put input in front of the agent | terminal only; in direct mode it answers `Unsupported` |\n| `read()` | New lines since the previous read: the stdout capture tail | direct |\n| `activity()` | A monotonic counter that rises on anything the idle timer counts, or absent | direct |\n| `screen()` | The visible screen of the pane | terminal |\n| `inspect()` | The screen detector's verdict (`state`, `visible_blocker`, `visible_idle`, `visible_working`, whether a rule matched, the prompt text) | terminal |\n| `now_ms()`, `pause(ms)` | The clock and the only way time passes: the supervisor keeps its own watch (deadlines, cancel, carrier) running inside `pause`, and a test drives a virtual clock | terminal |\n\nIn direct mode the supervisor does not need `send`: the gate gave the brief to the agent at spawn (argv or stdin file) and owns its IO."
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-4",
+            "githubAnchor": "unheaded-block-4",
+            "stableAnchor": "unheaded-block-4",
+            "title": "Unheaded block 4",
+            "startLine": 39,
+            "endLine": 39,
+            "textDigest": "d8b463d1c67e79e614910a7a021e9317210d8ec541d38728104db0c02fdb065d",
+            "sample": "The contract ([agent-protocol.v1.json](../../../packages/agent-protocol/contracts/agent-protocol.v1.json)) gives each adapter one port, `AgentIo`:",
+            "identityFingerprint": "7fc54b9c2eaf9dd909de8d8b1f5d0945995641d946f1aeb0cd394fc04a8aa6df",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "3. The IO gate"
+            ],
+            "text": "The contract ([agent-protocol.v1.json](../../../packages/agent-protocol/contracts/agent-protocol.v1.json)) gives each adapter one port, `AgentIo`:"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-5",
+            "githubAnchor": "unheaded-block-5",
+            "stableAnchor": "unheaded-block-5",
+            "title": "Unheaded block 5",
+            "startLine": 41,
+            "endLine": 48,
+            "textDigest": "c0a0efac2a6fb9c429fd34b7b3df2ce7fac5d105deb4159e01c86030793c72ce",
+            "sample": "| Operation | Meaning | Modes |\n|---|---|---|\n| `send(text?, keys?, submit)` | Put input in front of the agent | terminal only; in direct mode it answers `Unsupported` |\n| `read()`",
+            "identityFingerprint": "7d21017ead52338fcda3ed523c59524f9340c79cd4bf89c1615e991f114da7d3",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "3. The IO gate"
+            ],
+            "text": "| Operation | Meaning | Modes |\n|---|---|---|\n| `send(text?, keys?, submit)` | Put input in front of the agent | terminal only; in direct mode it answers `Unsupported` |\n| `read()` | New lines since the previous read: the stdout capture tail | direct |\n| `activity()` | A monotonic counter that rises on anything the idle timer counts, or absent | direct |\n| `screen()` | The visible screen of the pane | terminal |\n| `inspect()` | The screen detector's verdict (`state`, `visible_blocker`, `visible_idle`, `visible_working`, whether a rule matched, the prompt text) | terminal |\n| `now_ms()`, `pause(ms)` | The clock and the only way time passes: the supervisor keeps its own watch (deadlines, cancel, carrier) running inside `pause`, and a test drives a virtual clock | terminal |"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-6",
+            "githubAnchor": "unheaded-block-6",
+            "stableAnchor": "unheaded-block-6",
+            "title": "Unheaded block 6",
+            "startLine": 50,
+            "endLine": 50,
+            "textDigest": "bc7d1786a830bf9b05798d7968331a3ff3593e3a121a90bf3cfe442389b99e75",
+            "sample": "In direct mode the supervisor does not need `send`: the gate gave the brief to the agent at spawn (argv or stdin file) and owns its IO.",
+            "identityFingerprint": "ac0df237c39f22b264ec91da7a763e6813df2954d0713f6ac5fd04e7d9f0d3f6",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "3. The IO gate"
+            ],
+            "text": "In direct mode the supervisor does not need `send`: the gate gave the brief to the agent at spawn (argv or stdin file) and owns its IO."
+          },
+          {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "4. Named results",
+            "anchor": "4-named-results",
+            "githubAnchor": "4-named-results",
+            "stableAnchor": "h-e801a2e6b49e",
+            "startLine": 52,
+            "endLine": 52,
+            "textDigest": "cc7f7378f0c80efe248e08a05af477a864c28a9c081fe4cad66f5f3f4a7d618c",
+            "sample": "4. Named results",
+            "sectionPayloadDigest": "df0378ee2dc4c4df4b5ca786c8fde978a92ef03ffc2dd4209ff199e04b4b9a50",
+            "followingBlockDigest": "c30681ce152929e4f6d294020e34b16be2b57956b6ca18ad9247e16ce823987f",
+            "identityFingerprint": "375e72965c659e9a949424d6ffb3953aa31051bfdef1709a339e7ffcc1b637c6",
+            "ancestry": [
+              "Agent Protocol Component Specification"
+            ],
+            "text": "## 4. Named results",
+            "sectionText": "## 4. Named results\n\n| Result | Meaning | Mode |\n|---|---|---|\n| `completed(resultPath)` | The agent finished and `outbox/result-<N>.json` exists (the newest by number) | both |\n| `blocked(reason)` with `login`, `trust-dialog`, `usage-limit` | The CLI waits for something only a person can do | both |\n| `needs-human` | The agent asked a question only a person can answer | both |\n| `exited(code)` | The process exited without a result file | direct |\n| `ready` | The CLI shows an empty prompt and can take the brief | terminal |\n| `delivered` | The brief is confirmed submitted: the CLI shows it working **and** its composer no longer holds the brief (or it keeps working for 8 s, longer than a paste takes to be ingested), or its composer is empty **and** the brief is echoed in the conversation, or a complete result already exists. A changed screen, or one look at `working` while the TUI takes in the paste, is not proof | terminal |\n| `delivery-unknown` | Delivery could not be confirmed, or the prompt never became ready. Nothing is resent blind | terminal |\n\nRules for direct mode, as implemented:\n\n1. A result file wins over everything else: `completed`, whatever the tail says (a wording quoted inside the agent's own output is not a block).\n2. Without a result file the **final words** decide: only the last 5 non-empty lines of the capture are examined (`TAIL_LINES`). A login or quota wording far up a long capture is not a block.\n3. Login wordings (for example `oauth refresh failed`, `invalid_grant`, `run /login`, `not logged in`, an API key reported missing, invalid or expired) give `blocked(login)`. Quota wordings (`you've hit your usage limit`, `usage limit has been reached`, `individual quota reached`) give `blocked(usage-limit)`. The wordings are those the Node runner already classifies at settlement (`provider-auth-failure.mjs`), cut down to what a live round needs.\n4. Otherwise `exited(code)`.\n\n`trust-dialog` and `needs-human` exist in the contract; the direct adapters have no output pattern for them (they belong to the interactive prompt). Only the terminal adapters return them (section 5.1). A usage limit is a `blocked` reason in direct mode only: in a pane a limit screen reaches the controller as the screen tail the supervisor records, and the settle step classifies it."
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-7",
+            "githubAnchor": "unheaded-block-7",
+            "stableAnchor": "unheaded-block-7",
+            "title": "Unheaded block 7",
+            "startLine": 54,
+            "endLine": 62,
+            "textDigest": "c30681ce152929e4f6d294020e34b16be2b57956b6ca18ad9247e16ce823987f",
+            "sample": "| Result | Meaning | Mode |\n|---|---|---|\n| `completed(resultPath)` | The agent finished and `outbox/result-<N>.json` exists (the newest by number) | both |\n| `blocked(reason)` wit",
+            "identityFingerprint": "0ca53ec58bcb4af4691ad993d8a1342f1d532bc5210a49047b6569d9dd8bd013",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "4. Named results"
+            ],
+            "text": "| Result | Meaning | Mode |\n|---|---|---|\n| `completed(resultPath)` | The agent finished and `outbox/result-<N>.json` exists (the newest by number) | both |\n| `blocked(reason)` with `login`, `trust-dialog`, `usage-limit` | The CLI waits for something only a person can do | both |\n| `needs-human` | The agent asked a question only a person can answer | both |\n| `exited(code)` | The process exited without a result file | direct |\n| `ready` | The CLI shows an empty prompt and can take the brief | terminal |\n| `delivered` | The brief is confirmed submitted: the CLI shows it working **and** its composer no longer holds the brief (or it keeps working for 8 s, longer than a paste takes to be ingested), or its composer is empty **and** the brief is echoed in the conversation, or a complete result already exists. A changed screen, or one look at `working` while the TUI takes in the paste, is not proof | terminal |\n| `delivery-unknown` | Delivery could not be confirmed, or the prompt never became ready. Nothing is resent blind | terminal |"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-8",
+            "githubAnchor": "unheaded-block-8",
+            "stableAnchor": "unheaded-block-8",
+            "title": "Unheaded block 8",
+            "startLine": 64,
+            "endLine": 64,
+            "textDigest": "50e7d7993b5b01f9dcb16395a8e5d5566ab09d5070a7941f34c3002a6995a5df",
+            "sample": "Rules for direct mode, as implemented:",
+            "identityFingerprint": "31bf63a15008670cc547b6a718c5789bd182d25995382110dea0492db5c5d99e",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "4. Named results"
+            ],
+            "text": "Rules for direct mode, as implemented:"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-9",
+            "githubAnchor": "unheaded-block-9",
+            "stableAnchor": "unheaded-block-9",
+            "title": "Unheaded block 9",
+            "startLine": 66,
+            "endLine": 69,
+            "textDigest": "a5c48d048922d1f3594b05a75a241d0cb6ba684fe44359528105abe133b99171",
+            "sample": "1. A result file wins over everything else: `completed`, whatever the tail says (a wording quoted inside the agent's own output is not a block).\n2. Without a result file the **fina",
+            "identityFingerprint": "e100814abf40f2bb1b50cefbdf604b5539c7948ee33114b451b34cd917aeee40",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "4. Named results"
+            ],
+            "text": "1. A result file wins over everything else: `completed`, whatever the tail says (a wording quoted inside the agent's own output is not a block).\n2. Without a result file the **final words** decide: only the last 5 non-empty lines of the capture are examined (`TAIL_LINES`). A login or quota wording far up a long capture is not a block.\n3. Login wordings (for example `oauth refresh failed`, `invalid_grant`, `run /login`, `not logged in`, an API key reported missing, invalid or expired) give `blocked(login)`. Quota wordings (`you've hit your usage limit`, `usage limit has been reached`, `individual quota reached`) give `blocked(usage-limit)`. The wordings are those the Node runner already classifies at settlement (`provider-auth-failure.mjs`), cut down to what a live round needs.\n4. Otherwise `exited(code)`."
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-10",
+            "githubAnchor": "unheaded-block-10",
+            "stableAnchor": "unheaded-block-10",
+            "title": "Unheaded block 10",
+            "startLine": 71,
+            "endLine": 71,
+            "textDigest": "b1537404e23fe1aef97a301571286856c3df06129e4c9b30853154a9bc83fd71",
+            "sample": "`trust-dialog` and `needs-human` exist in the contract; the direct adapters have no output pattern for them (they belong to the interactive prompt). Only the terminal adapters retu",
+            "identityFingerprint": "444d6ce30996ee0efd15b82e1bd0489c228f044f14ac14c70111a9a411d0a779",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "4. Named results"
+            ],
+            "text": "`trust-dialog` and `needs-human` exist in the contract; the direct adapters have no output pattern for them (they belong to the interactive prompt). Only the terminal adapters return them (section 5.1). A usage limit is a `blocked` reason in direct mode only: in a pane a limit screen reaches the controller as the screen tail the supervisor records, and the settle step classifies it."
+          },
+          {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "5. Adapter per CLI and mode",
+            "anchor": "5-adapter-per-cli-and-mode",
+            "githubAnchor": "5-adapter-per-cli-and-mode",
+            "stableAnchor": "h-7415a328e0bd",
+            "startLine": 73,
+            "endLine": 73,
+            "textDigest": "e2dee472aa5526d98f1ab51bbbce0f0947df2193c132f62119cd63773cbd2448",
+            "sample": "5. Adapter per CLI and mode",
+            "sectionPayloadDigest": "ff5756c741f5bd014eb6f35ba4393d94a1d8c59fc1c5a5cf91959a0591afeec1",
+            "followingBlockDigest": "2db4c24e2343f88a62f835fbec5317bc4561ba904bbfc558a9ea27f891fc9e00",
+            "identityFingerprint": "fe8153b350c5027ae77196c72dad1b88b40296aa13df1734b3c8b5a88e44f38d",
+            "ancestry": [
+              "Agent Protocol Component Specification"
+            ],
+            "text": "## 5. Adapter per CLI and mode",
+            "sectionText": "## 5. Adapter per CLI and mode\n\n| CLI | `direct` | `terminal` |\n|---|---|---|\n| claude | landed | landed: exit `/exit` + Enter; folder-trust dialog; Enter gap 300 ms |\n| codex | landed; stdin always the null device | landed: exit `/quit` + Enter; trust dialog (v0.163 words it \"Trust this folder?\" and opens it about a second after the first prompt screen); brief delivered through the prompt door (one `agent prompt` send, text plus submit; typed text then Enter loses its first Enters to a long paste, 4 to 6 or more); Enter gap 600 ms still applies to the typed path; a draft that stays in the composer gets Enter again every 2.5 s, six times at most; chip wording `[Pasted Content N chars]`; launch argv carries `-c shell_environment_policy.set={FGOS_SESSION_ID=\"<id>\"}` |\n| agy | landed | landed: exit `/exit` + Enter; trust dialog; Enter gap 300 ms |\n| pi | landed | landed: exit Ctrl-D on empty input; no trust dialog observed; brief delivered through the prompt door (one `agent prompt` send, text plus submit; a 4 KB brief typed raw takes 7 to 25 s and its final Enter is sometimes lost); a draft that stays in the composer gets Enter again every 2.5 s, six times at most |\n| omp | landed | landed: exit Ctrl-D on empty input; no trust dialog observed; attachment chip that Enter submits; brief delivered through the prompt door, as for pi (a stop that landed while the brief was still being typed sent the rest of it into the pane's shell) |\n\nAn unknown CLI name (matching is case-insensitive) in `envelope.agentProtocol.cli` gets the **generic** adapter in direct mode: exit and outbox only, no output patterns, no block detection. In terminal mode an envelope naming a CLI without a terminal adapter is refused before launch (`agent-protocol-unsupported`). Today the five direct adapters share one behavior and differ only where a CLI needs it (codex); each has its own fixture file under `packages/agent-protocol/contracts/fixtures/direct/<cli>/vectors.json` with the same six cases (completed with outbox, exited without outbox, blocked login, blocked usage limit, a login wording far up is not a block, an outbox beats a quoted wording)."
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-11",
+            "githubAnchor": "unheaded-block-11",
+            "stableAnchor": "unheaded-block-11",
+            "title": "Unheaded block 11",
+            "startLine": 75,
+            "endLine": 81,
+            "textDigest": "2db4c24e2343f88a62f835fbec5317bc4561ba904bbfc558a9ea27f891fc9e00",
+            "sample": "| CLI | `direct` | `terminal` |\n|---|---|---|\n| claude | landed | landed: exit `/exit` + Enter; folder-trust dialog; Enter gap 300 ms |\n| codex | landed; stdin always the null devi",
+            "identityFingerprint": "aebfaca1e9fc46a8883258f9274c0ed22ad17ceddf1fa925fd509c9443b87afe",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "5. Adapter per CLI and mode"
+            ],
+            "text": "| CLI | `direct` | `terminal` |\n|---|---|---|\n| claude | landed | landed: exit `/exit` + Enter; folder-trust dialog; Enter gap 300 ms |\n| codex | landed; stdin always the null device | landed: exit `/quit` + Enter; trust dialog (v0.163 words it \"Trust this folder?\" and opens it about a second after the first prompt screen); brief delivered through the prompt door (one `agent prompt` send, text plus submit; typed text then Enter loses its first Enters to a long paste, 4 to 6 or more); Enter gap 600 ms still applies to the typed path; a draft that stays in the composer gets Enter again every 2.5 s, six times at most; chip wording `[Pasted Content N chars]`; launch argv carries `-c shell_environment_policy.set={FGOS_SESSION_ID=\"<id>\"}` |\n| agy | landed | landed: exit `/exit` + Enter; trust dialog; Enter gap 300 ms |\n| pi | landed | landed: exit Ctrl-D on empty input; no trust dialog observed; brief delivered through the prompt door (one `agent prompt` send, text plus submit; a 4 KB brief typed raw takes 7 to 25 s and its final Enter is sometimes lost); a draft that stays in the composer gets Enter again every 2.5 s, six times at most |\n| omp | landed | landed: exit Ctrl-D on empty input; no trust dialog observed; attachment chip that Enter submits; brief delivered through the prompt door, as for pi (a stop that landed while the brief was still being typed sent the rest of it into the pane's shell) |"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-12",
+            "githubAnchor": "unheaded-block-12",
+            "stableAnchor": "unheaded-block-12",
+            "title": "Unheaded block 12",
+            "startLine": 83,
+            "endLine": 83,
+            "textDigest": "cb32864b4a50349ad542afd491b680b288c6af95fc7b74791a32dcb2f93b69c7",
+            "sample": "An unknown CLI name (matching is case-insensitive) in `envelope.agentProtocol.cli` gets the **generic** adapter in direct mode: exit and outbox only, no output patterns, no block d",
+            "identityFingerprint": "59d3ffb544c15df44c5a553046ac2a2407cf9df5734e431c6e719e1701065c59",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "5. Adapter per CLI and mode"
+            ],
+            "text": "An unknown CLI name (matching is case-insensitive) in `envelope.agentProtocol.cli` gets the **generic** adapter in direct mode: exit and outbox only, no output patterns, no block detection. In terminal mode an envelope naming a CLI without a terminal adapter is refused before launch (`agent-protocol-unsupported`). Today the five direct adapters share one behavior and differ only where a CLI needs it (codex); each has its own fixture file under `packages/agent-protocol/contracts/fixtures/direct/<cli>/vectors.json` with the same six cases (completed with outbox, exited without outbox, blocked login, blocked usage limit, a login wording far up is not a block, an outbox beats a quoted wording)."
+          },
+          {
+            "unitKind": "heading",
+            "level": 3,
+            "title": "5.1 Terminal adapters",
+            "anchor": "51-terminal-adapters",
+            "githubAnchor": "51-terminal-adapters",
+            "stableAnchor": "h-4db83ed86fbe",
+            "startLine": 85,
+            "endLine": 85,
+            "textDigest": "7b3a483f6224f3cdea55a7dcaaf11713a9f2486732d9c500fee605422a88f530",
+            "sample": "5.1 Terminal adapters",
+            "sectionPayloadDigest": "a87dbf01be4a47153eac22d6af7173e7b501ca92e115b40c7c4ab3e446a2f947",
+            "followingBlockDigest": "d25d2cbe7c39fb73845b52032859b0585abfb02acb565fb68ac12504c7b92d79",
+            "identityFingerprint": "5b0534e07f3ef6672408413d956fca57b50e2d922c4f30e2b7413efbdc6851ba",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "5. Adapter per CLI and mode"
+            ],
+            "text": "### 5.1 Terminal adapters",
+            "sectionText": "### 5.1 Terminal adapters\n\nContract: [terminal-outcomes.v1.json](../../../packages/agent-protocol/contracts/terminal-outcomes.v1.json); code `packages/agent-protocol/rust/src/terminal/` (`mod.rs` the state machine, `common.rs` the shared matchers and timings, one profile per CLI: exit command, Enter gap, trust wording). The order of outcomes is `ready` then one of `blocked`, `delivered`, `delivery-unknown`, then `completed` or `needs-human`; `completed` only after `delivered`, which the supervisor enforces.\n\n| Step | Rule |\n|---|---|\n| Ready | Wait for the CLI's own rule to say idle (claude, codex), or, where no rule exists (agy, pi, omp), for the screen to be drawn and to hold still; a process that never draws is typed at after a bounded wait (15 s). After the settle wait the detector is asked once more, so a dialog that opened over a prompt that already looked ready still blocks. A trust dialog or login screen gives `blocked`; an unrecognised blocking dialog gives `needs-human`; a readiness timeout gives `delivery-unknown` with nothing typed |\n| Brief | Typed as text, then the CLI's Enter gap, then Enter as a key (codex, pi, omp: one prompt-door send that submits itself, so a stop cannot split the brief between a typing call and an Enter). A draft left in the composer (paste chip, history above the composer, or a composer that grew to show a window of a long paste: two or more of the brief's own lines in the last six) is recognised by the matchers ported from the old controller (`PASTE_CHIP_RE`, the working-tail wording, `isDraftStillInComposer`). The detector's prompt text is not trusted alone: codex reports its window title there, so the screen is always looked at |\n| Delivered | Section 4. Typing is repeated only when the typing call itself failed **and**, after one render interval, the pane equals its screen from before the send, is idle and shows no draft; at most 2 resends. A typing call that succeeded is never repeated |\n| Completed | A result counts only when `outbox/result-<N>.json` parses as a JSON object and keeps its size over 20 ms; temporary names (`*.tmp.*`) are ignored. Measured: claude renames a full file into place, codex, agy and omp write in place, pi shows the name empty first |\n| Exit | The CLI's exit command (the envelope's `terminal.exitCommand` overrides it) |\n\nReal screens were recorded from herdr panes (`contracts/fixtures/terminal/<cli>/*.txt`, the detector verdict beside each as `*.insp.json`) and replayed on a virtual clock, 17 to 19 vectors per CLI. The Node tests of the old controller's wait logic became vectors (the mapping is in the P04 report). The working screens of codex, omp, pi and agy (a start-up spinner and a mid-turn screen) were recorded on herdr in the integration round, with the long-paste window and the late folder dialog of codex. Known limits: omp's detector never says `working` (its `⎋ Working…` footer is read from the screen), so an omp that is already working when its brief arrives cannot be told from an idle one; pi and omp have no composer rule, so a short brief echoed in the last six lines of a finished turn reads as a draft (the outcome is then `delivery-unknown` unless a result exists, which is the safe direction)."
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-13",
+            "githubAnchor": "unheaded-block-13",
+            "stableAnchor": "unheaded-block-13",
+            "title": "Unheaded block 13",
+            "startLine": 87,
+            "endLine": 87,
+            "textDigest": "d25d2cbe7c39fb73845b52032859b0585abfb02acb565fb68ac12504c7b92d79",
+            "sample": "Contract: [terminal-outcomes.v1.json](../../../packages/agent-protocol/contracts/terminal-outcomes.v1.json); code `packages/agent-protocol/rust/src/terminal/` (`mod.rs` the state m",
+            "identityFingerprint": "2f4a7f96b61564c340b14409c3fec297ae1baf1335a6c020b4318f614536826d",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "5. Adapter per CLI and mode",
+              "5.1 Terminal adapters"
+            ],
+            "text": "Contract: [terminal-outcomes.v1.json](../../../packages/agent-protocol/contracts/terminal-outcomes.v1.json); code `packages/agent-protocol/rust/src/terminal/` (`mod.rs` the state machine, `common.rs` the shared matchers and timings, one profile per CLI: exit command, Enter gap, trust wording). The order of outcomes is `ready` then one of `blocked`, `delivered`, `delivery-unknown`, then `completed` or `needs-human`; `completed` only after `delivered`, which the supervisor enforces."
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-14",
+            "githubAnchor": "unheaded-block-14",
+            "stableAnchor": "unheaded-block-14",
+            "title": "Unheaded block 14",
+            "startLine": 89,
+            "endLine": 95,
+            "textDigest": "cbec098a41a001c7528fae9305c2fb1cc9bb690bd738df4b33c939fc92594e04",
+            "sample": "| Step | Rule |\n|---|---|\n| Ready | Wait for the CLI's own rule to say idle (claude, codex), or, where no rule exists (agy, pi, omp), for the screen to be drawn and to hold still; ",
+            "identityFingerprint": "f156467925a644d77c8b1b81fc077865096c0aba319047ab3984c4b7a81e3cb6",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "5. Adapter per CLI and mode",
+              "5.1 Terminal adapters"
+            ],
+            "text": "| Step | Rule |\n|---|---|\n| Ready | Wait for the CLI's own rule to say idle (claude, codex), or, where no rule exists (agy, pi, omp), for the screen to be drawn and to hold still; a process that never draws is typed at after a bounded wait (15 s). After the settle wait the detector is asked once more, so a dialog that opened over a prompt that already looked ready still blocks. A trust dialog or login screen gives `blocked`; an unrecognised blocking dialog gives `needs-human`; a readiness timeout gives `delivery-unknown` with nothing typed |\n| Brief | Typed as text, then the CLI's Enter gap, then Enter as a key (codex, pi, omp: one prompt-door send that submits itself, so a stop cannot split the brief between a typing call and an Enter). A draft left in the composer (paste chip, history above the composer, or a composer that grew to show a window of a long paste: two or more of the brief's own lines in the last six) is recognised by the matchers ported from the old controller (`PASTE_CHIP_RE`, the working-tail wording, `isDraftStillInComposer`). The detector's prompt text is not trusted alone: codex reports its window title there, so the screen is always looked at |\n| Delivered | Section 4. Typing is repeated only when the typing call itself failed **and**, after one render interval, the pane equals its screen from before the send, is idle and shows no draft; at most 2 resends. A typing call that succeeded is never repeated |\n| Completed | A result counts only when `outbox/result-<N>.json` parses as a JSON object and keeps its size over 20 ms; temporary names (`*.tmp.*`) are ignored. Measured: claude renames a full file into place, codex, agy and omp write in place, pi shows the name empty first |\n| Exit | The CLI's exit command (the envelope's `terminal.exitCommand` overrides it) |"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-15",
+            "githubAnchor": "unheaded-block-15",
+            "stableAnchor": "unheaded-block-15",
+            "title": "Unheaded block 15",
+            "startLine": 97,
+            "endLine": 97,
+            "textDigest": "0dd79779079244e98d9f3e47f5c0d06efb169d692b066d701d0a847c06a43847",
+            "sample": "Real screens were recorded from herdr panes (`contracts/fixtures/terminal/<cli>/*.txt`, the detector verdict beside each as `*.insp.json`) and replayed on a virtual clock, 17 to 19",
+            "identityFingerprint": "6e69ed493397580789270b8fbfa50b9bb8cc11bcf4b29b6e45abc526c3400982",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "5. Adapter per CLI and mode",
+              "5.1 Terminal adapters"
+            ],
+            "text": "Real screens were recorded from herdr panes (`contracts/fixtures/terminal/<cli>/*.txt`, the detector verdict beside each as `*.insp.json`) and replayed on a virtual clock, 17 to 19 vectors per CLI. The Node tests of the old controller's wait logic became vectors (the mapping is in the P04 report). The working screens of codex, omp, pi and agy (a start-up spinner and a mid-turn screen) were recorded on herdr in the integration round, with the long-paste window and the late folder dialog of codex. Known limits: omp's detector never says `working` (its `⎋ Working…` footer is read from the screen), so an omp that is already working when its brief arrives cannot be told from an idle one; pi and omp have no composer rule, so a short brief echoed in the last six lines of a finished turn reads as a draft (the outcome is then `delivery-unknown` unless a result exists, which is the safe direction)."
+          },
+          {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "6. Design decision: argv stays in the executor configuration",
+            "anchor": "6-design-decision-argv-stays-in-the-executor-configuration",
+            "githubAnchor": "6-design-decision-argv-stays-in-the-executor-configuration",
+            "stableAnchor": "h-05eaa210bb76",
+            "startLine": 99,
+            "endLine": 99,
+            "textDigest": "9ed74a85de514e502f44fad0726f672d58c299cfafb09c55be45c7a47a681db4",
+            "sample": "6. Design decision: argv stays in the executor configuration",
+            "sectionPayloadDigest": "e1845f55eda5bed8a17d52f99a4cf56baf27cdc19be15ef2d6e3a0187f6f0fcf",
+            "followingBlockDigest": "e8f01b5f5d1bcaac00447100f634a92e6f91f15334c5563feacfab57436607e4",
+            "identityFingerprint": "9f0976d06f76f0259b7d3d0fee17709c07daafa7f52b6439d0c3f90a0a23e1d8",
+            "ancestry": [
+              "Agent Protocol Component Specification"
+            ],
+            "text": "## 6. Design decision: argv stays in the executor configuration",
+            "sectionText": "## 6. Design decision: argv stays in the executor configuration\n\nThe adapter does not build argv. The controller resolves the command through `resolveExecutorCommand` from the executor configuration and writes `launch.command`, `launch.args`, `launch.env` and `launch.stdinPolicy` into the immutable envelope; the gate runs exactly that. Reason: moving argv rendering to Rust would move the ProviderAdapter binder (`transport.mjs`) to Rust, which a run that survives a dead controller does not need (owner decision 2026-10-16, plan decision D4). If that rendering ever moves, this spec and the contract change together.\n\nWhat the adapter does decide for direct mode:\n\n| Decision | Rule |\n|---|---|\n| Stdin | Null device by default for every CLI (`stdinPolicy: null` in the envelope; `/dev/null`, `NUL` on Windows). The other policy is `brief-file`, where the gate opens `launch.briefPath` read-only as stdin; the envelope states which one applies, and the adapter's `stdin_policy()` default is the null device. **codex must use the null device**: it probes piped stdin (\"Reading additional input from stdin...\") and blocks for ever on an open pipe nothing writes to |\n| Activity for idle | Section 7 |\n| Completion | The agent exited (reported by `gate-exit.json`) and `outbox/result-<N>.json` exists; the newest result is the one with the highest number, and a name with a sign or a non-numeric part is ignored |\n| Named blocks | Section 4 |"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-16",
+            "githubAnchor": "unheaded-block-16",
+            "stableAnchor": "unheaded-block-16",
+            "title": "Unheaded block 16",
+            "startLine": 101,
+            "endLine": 101,
+            "textDigest": "e8f01b5f5d1bcaac00447100f634a92e6f91f15334c5563feacfab57436607e4",
+            "sample": "The adapter does not build argv. The controller resolves the command through `resolveExecutorCommand` from the executor configuration and writes `launch.command`, `launch.args`, `l",
+            "identityFingerprint": "25aec306c46048ca0fee18612ef7b21338bfb1a78e3ed2f47f64600760c15858",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "6. Design decision: argv stays in the executor configuration"
+            ],
+            "text": "The adapter does not build argv. The controller resolves the command through `resolveExecutorCommand` from the executor configuration and writes `launch.command`, `launch.args`, `launch.env` and `launch.stdinPolicy` into the immutable envelope; the gate runs exactly that. Reason: moving argv rendering to Rust would move the ProviderAdapter binder (`transport.mjs`) to Rust, which a run that survives a dead controller does not need (owner decision 2026-10-16, plan decision D4). If that rendering ever moves, this spec and the contract change together."
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-17",
+            "githubAnchor": "unheaded-block-17",
+            "stableAnchor": "unheaded-block-17",
+            "title": "Unheaded block 17",
+            "startLine": 103,
+            "endLine": 103,
+            "textDigest": "6af2b737421a7b66a73a3fdf02c6a3699dbf0d978e0424ff8a2b3fa8daeb827e",
+            "sample": "What the adapter does decide for direct mode:",
+            "identityFingerprint": "39a00575e58f709d7cb3ff47a9754663889852ddb5f5099208356a36a290ad48",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "6. Design decision: argv stays in the executor configuration"
+            ],
+            "text": "What the adapter does decide for direct mode:"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-18",
+            "githubAnchor": "unheaded-block-18",
+            "stableAnchor": "unheaded-block-18",
+            "title": "Unheaded block 18",
+            "startLine": 105,
+            "endLine": 110,
+            "textDigest": "fda40725790f480bd880dc280f268ec79a3b8bf9167f786eae0b9a07d8c81124",
+            "sample": "| Decision | Rule |\n|---|---|\n| Stdin | Null device by default for every CLI (`stdinPolicy: null` in the envelope; `/dev/null`, `NUL` on Windows). The other policy is `brief-file`,",
+            "identityFingerprint": "7891fb94f43e2d47f22f1fe27f882053493fdaeda889434e284b80866edc6b1f",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "6. Design decision: argv stays in the executor configuration"
+            ],
+            "text": "| Decision | Rule |\n|---|---|\n| Stdin | Null device by default for every CLI (`stdinPolicy: null` in the envelope; `/dev/null`, `NUL` on Windows). The other policy is `brief-file`, where the gate opens `launch.briefPath` read-only as stdin; the envelope states which one applies, and the adapter's `stdin_policy()` default is the null device. **codex must use the null device**: it probes piped stdin (\"Reading additional input from stdin...\") and blocks for ever on an open pipe nothing writes to |\n| Activity for idle | Section 7 |\n| Completion | The agent exited (reported by `gate-exit.json`) and `outbox/result-<N>.json` exists; the newest result is the one with the highest number, and a name with a sign or a non-numeric part is ignored |\n| Named blocks | Section 4 |"
+          },
+          {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "7. Activity source for idle",
+            "anchor": "7-activity-source-for-idle",
+            "githubAnchor": "7-activity-source-for-idle",
+            "stableAnchor": "h-55e5d1b42800",
+            "startLine": 112,
+            "endLine": 112,
+            "textDigest": "34270fa6bd518c552ef02358d91f4b16bac9b4fbd9b684918fc486dc2be59561",
+            "sample": "7. Activity source for idle",
+            "sectionPayloadDigest": "2ad6fccc279065bcea6d0a95a633d66862410f56ebb0fa0cdd965a616f60d90d",
+            "followingBlockDigest": "de2255e5d3689966877f01aa79026072e758d312dcc4491d6478b3834871c67f",
+            "identityFingerprint": "f5c8f8e0eb2e280c84cbc997079726299f6228f59497a5775985d84798fb3262",
+            "ancestry": [
+              "Agent Protocol Component Specification"
+            ],
+            "text": "## 7. Activity source for idle",
+            "sectionText": "## 7. Activity source for idle\n\nThe supervisor tails the stdout and stderr capture files (up to 64 KiB per tick) and asks the adapter to judge each new chunk:\n\n| Chunk | Activity |\n|---|---|\n| Empty or only whitespace | `Quiet`: the idle timer keeps running |\n| Plain text | `Output` |\n| A line that starts with `{` and ends with `}` | `Event` (a CLI that streams JSON events) |\n\n`Output` and `Event` both reset the idle timer. The supervisor then stops the agent after `idleMs` of `Quiet` (cause `idle`).  Heartbeat files are for display and never count as activity."
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-19",
+            "githubAnchor": "unheaded-block-19",
+            "stableAnchor": "unheaded-block-19",
+            "title": "Unheaded block 19",
+            "startLine": 114,
+            "endLine": 114,
+            "textDigest": "de2255e5d3689966877f01aa79026072e758d312dcc4491d6478b3834871c67f",
+            "sample": "The supervisor tails the stdout and stderr capture files (up to 64 KiB per tick) and asks the adapter to judge each new chunk:",
+            "identityFingerprint": "8f828e59441d2823699c2961e19fca7e7ed1bae2ccb45bf29939f74e2a6131ba",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "7. Activity source for idle"
+            ],
+            "text": "The supervisor tails the stdout and stderr capture files (up to 64 KiB per tick) and asks the adapter to judge each new chunk:"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-20",
+            "githubAnchor": "unheaded-block-20",
+            "stableAnchor": "unheaded-block-20",
+            "title": "Unheaded block 20",
+            "startLine": 116,
+            "endLine": 120,
+            "textDigest": "d8528b6efbd467b7b1619ab5332bdabcd2b6c20466989382b2f085e23f6be356",
+            "sample": "| Chunk | Activity |\n|---|---|\n| Empty or only whitespace | `Quiet`: the idle timer keeps running |\n| Plain text | `Output` |\n| A line that starts with `{` and ends with `}` | `Eve",
+            "identityFingerprint": "4a36abc62ce559c18a98bd249efa84dbc42e068f968d8e498a40145ae2596e90",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "7. Activity source for idle"
+            ],
+            "text": "| Chunk | Activity |\n|---|---|\n| Empty or only whitespace | `Quiet`: the idle timer keeps running |\n| Plain text | `Output` |\n| A line that starts with `{` and ends with `}` | `Event` (a CLI that streams JSON events) |"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-21",
+            "githubAnchor": "unheaded-block-21",
+            "stableAnchor": "unheaded-block-21",
+            "title": "Unheaded block 21",
+            "startLine": 122,
+            "endLine": 122,
+            "textDigest": "c301b44aef5213224603d7e3f972e97a985b73e2a6efb519d20e6d94707a0e63",
+            "sample": "`Output` and `Event` both reset the idle timer. The supervisor then stops the agent after `idleMs` of `Quiet` (cause `idle`).  Heartbeat files are for display and never count as ac",
+            "identityFingerprint": "c9384f2606ce98fa0d020d9a22f3484b28bc39835ff3b5b671f75afc1b864c0a",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "7. Activity source for idle"
+            ],
+            "text": "`Output` and `Event` both reset the idle timer. The supervisor then stops the agent after `idleMs` of `Quiet` (cause `idle`).  Heartbeat files are for display and never count as activity."
+          },
+          {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "8. Boundaries",
+            "anchor": "8-boundaries",
+            "githubAnchor": "8-boundaries",
+            "stableAnchor": "h-4b8f69ac8190",
+            "startLine": 124,
+            "endLine": 124,
+            "textDigest": "6c19d2943d003385f749f55fbf72933ab840cb93d3a01205e9939fa98743fe2e",
+            "sample": "8. Boundaries",
+            "sectionPayloadDigest": "90c06ab7f85ab2b16fc38d61de846674247425e8dda7552e300faa24ccd93dec",
+            "followingBlockDigest": "90c06ab7f85ab2b16fc38d61de846674247425e8dda7552e300faa24ccd93dec",
+            "identityFingerprint": "478ac25f06ba3247f5f3843ed1b760ab4ab63742b669053da1c9d68f21a7307c",
+            "ancestry": [
+              "Agent Protocol Component Specification"
+            ],
+            "text": "## 8. Boundaries",
+            "sectionText": "## 8. Boundaries\n\n- No dependency on terminal-control, locks, attempts, envelopes or the filesystem layout of a run: the supervisor passes in the tail, the exit and the outbox listing.\n- No retry decision: `blocked(login)` and `blocked(usage-limit)` are facts the controller turns into provider-capacity behavior (fail over to another account, lock a dead login) elsewhere.\n- The terminal adapters read screens through the supervisor's `AgentIo` over terminal-control, by key; they never call terminal-control themselves."
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-22",
+            "githubAnchor": "unheaded-block-22",
+            "stableAnchor": "unheaded-block-22",
+            "title": "Unheaded block 22",
+            "startLine": 126,
+            "endLine": 128,
+            "textDigest": "90c06ab7f85ab2b16fc38d61de846674247425e8dda7552e300faa24ccd93dec",
+            "sample": "- No dependency on terminal-control, locks, attempts, envelopes or the filesystem layout of a run: the supervisor passes in the tail, the exit and the outbox listing.\n- No retry de",
+            "identityFingerprint": "f998b45e9c49a522bc49b1407945143321d0dbe326a8a73b40b3f48a1191a232",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "8. Boundaries"
+            ],
+            "text": "- No dependency on terminal-control, locks, attempts, envelopes or the filesystem layout of a run: the supervisor passes in the tail, the exit and the outbox listing.\n- No retry decision: `blocked(login)` and `blocked(usage-limit)` are facts the controller turns into provider-capacity behavior (fail over to another account, lock a dead login) elsewhere.\n- The terminal adapters read screens through the supervisor's `AgentIo` over terminal-control, by key; they never call terminal-control themselves."
+          },
+          {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "9. Lịch sử quyết định",
+            "anchor": "9-lịch-sử-quyết-định",
+            "githubAnchor": "9-lịch-sử-quyết-định",
+            "stableAnchor": "h-7fc009edd63d",
+            "startLine": 130,
+            "endLine": 130,
+            "textDigest": "ba6d298ad6751381376f574a459b96905accb95e6859d5474482c5d020536627",
+            "sample": "9. Lịch sử quyết định",
+            "sectionPayloadDigest": "27427a91bc8f310256bd74d65c4cc06ee11a6d25479d2cf765e98a4946ed8350",
+            "followingBlockDigest": "230949a9039c92f2ec7b01195f9a926ffdf0746d7e77d94019b3b91cb3ab0151",
+            "identityFingerprint": "5f61cbe1a89aa41d7683b8a4ac96441025ea32c7e139729c216d05cef00f4302",
+            "ancestry": [
+              "Agent Protocol Component Specification"
+            ],
+            "text": "## 9. Lịch sử quyết định",
+            "sectionText": "## 9. Lịch sử quyết định\n\n- **2026-10-16 — D4: cấu hình executor là nguồn duy nhất của argv.** Adapter `direct` không dựng argv; chỉ quyết stdin, nguồn hoạt động, nhận xong và kết quả có tên. Chuyển binder ProviderAdapter sang Rust thêm khoảng 8 giờ và một phase riêng, không cần cho mục tiêu sống qua controller chết.\n- **2026-10-18 — Adapter `direct` đọc đuôi 5 dòng, outbox thắng.** Lời login hay hết quota nằm xa phía trên không phải một lần chặn; kết quả trong outbox được quyết bất kể đuôi nói gì.\n\n- **2026-10-18 — Adapters `terminal` portable từ vòng canh của controller.** Regex và logic chờ cũ (`PASTE_CHIP_RE`, `isDraftStillInComposer`, `MAX_RESENDS`) chuyển nguyên sang Rust; test Node cũ thành vector màn hình thật. Gõ lại chỉ khi lời gõ lỗi và pane không đổi; một lời gõ thành công không bao giờ lặp. Kết quả chỉ tính khi file parse được và kích thước ổn định (đo: pi tạo file rỗng rồi mới điền)."
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-23",
+            "githubAnchor": "unheaded-block-23",
+            "stableAnchor": "unheaded-block-23",
+            "title": "Unheaded block 23",
+            "startLine": 132,
+            "endLine": 133,
+            "textDigest": "230949a9039c92f2ec7b01195f9a926ffdf0746d7e77d94019b3b91cb3ab0151",
+            "sample": "- **2026-10-16 — D4: cấu hình executor là nguồn duy nhất của argv.** Adapter `direct` không dựng argv; chỉ quyết stdin, nguồn hoạt động, nhận xong và kết quả có tên. Chuyển binder ",
+            "identityFingerprint": "382f45bc5b736ed6c8468e58175a68aaf9456664e2587849097fa6468d74ff03",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "9. Lịch sử quyết định"
+            ],
+            "text": "- **2026-10-16 — D4: cấu hình executor là nguồn duy nhất của argv.** Adapter `direct` không dựng argv; chỉ quyết stdin, nguồn hoạt động, nhận xong và kết quả có tên. Chuyển binder ProviderAdapter sang Rust thêm khoảng 8 giờ và một phase riêng, không cần cho mục tiêu sống qua controller chết.\n- **2026-10-18 — Adapter `direct` đọc đuôi 5 dòng, outbox thắng.** Lời login hay hết quota nằm xa phía trên không phải một lần chặn; kết quả trong outbox được quyết bất kể đuôi nói gì."
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-24",
+            "githubAnchor": "unheaded-block-24",
+            "stableAnchor": "unheaded-block-24",
+            "title": "Unheaded block 24",
+            "startLine": 135,
+            "endLine": 135,
+            "textDigest": "d2182824512bfa7fae58eaae8463713205c0416186583bc77f7488f046ca57d2",
+            "sample": "- **2026-10-18 — Adapters `terminal` portable từ vòng canh của controller.** Regex và logic chờ cũ (`PASTE_CHIP_RE`, `isDraftStillInComposer`, `MAX_RESENDS`) chuyển nguyên sang Rus",
+            "identityFingerprint": "92d730e6119428f4d20efde9af74091db7893aaaa385d669c9e69450f60bc442",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "9. Lịch sử quyết định"
+            ],
+            "text": "- **2026-10-18 — Adapters `terminal` portable từ vòng canh của controller.** Regex và logic chờ cũ (`PASTE_CHIP_RE`, `isDraftStillInComposer`, `MAX_RESENDS`) chuyển nguyên sang Rust; test Node cũ thành vector màn hình thật. Gõ lại chỉ khi lời gõ lỗi và pane không đổi; một lời gõ thành công không bao giờ lặp. Kết quả chỉ tính khi file parse được và kích thước ổn định (đo: pi tạo file rỗng rồi mới điền)."
+          },
+          {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "10. Related files",
+            "anchor": "10-related-files",
+            "githubAnchor": "10-related-files",
+            "stableAnchor": "h-60d5f3acd7c8",
+            "startLine": 137,
+            "endLine": 137,
+            "textDigest": "1d1974c39f127d689f2fd1861b84c2c12991332e5dec8815ce620a6d8bf56b5f",
+            "sample": "10. Related files",
+            "sectionPayloadDigest": "cb59a4643039920bbed74a5c13989fbb82d64a2f6d7ec80d9410697cbc2be841",
+            "followingBlockDigest": "cb59a4643039920bbed74a5c13989fbb82d64a2f6d7ec80d9410697cbc2be841",
+            "identityFingerprint": "72263bfe3453377d1c79aceb131b96f50137e18d6ea68d94b24c79d75b0dfc86",
+            "ancestry": [
+              "Agent Protocol Component Specification"
+            ],
+            "text": "## 10. Related files",
+            "sectionText": "## 10. Related files\n\n| Relationship | File |\n|---|---|\n| defines | [agent-protocol.v1.json](../../../packages/agent-protocol/contracts/agent-protocol.v1.json) |\n| consumer | [run-supervisor/spec.md](../run-supervisor/spec.md) |\n| boundary | [component-boundary.md](../component-boundary.md) |\n| plans | [direct mode](../../../plans/261016-1351-run-supervisor-rust-core-direct-mode/plan.md), [terminal mode](../../../plans/261016-1351-terminal-mode-and-launcher-identity/plan.md) |\n| design | [design r6, section 8](../../../plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md) |"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-25",
+            "githubAnchor": "unheaded-block-25",
+            "stableAnchor": "unheaded-block-25",
+            "title": "Unheaded block 25",
+            "startLine": 139,
+            "endLine": 145,
+            "textDigest": "cb59a4643039920bbed74a5c13989fbb82d64a2f6d7ec80d9410697cbc2be841",
+            "sample": "| Relationship | File |\n|---|---|\n| defines | [agent-protocol.v1.json](../../../packages/agent-protocol/contracts/agent-protocol.v1.json) |\n| consumer | [run-supervisor/spec.md](..",
+            "identityFingerprint": "71d404fc82a30c12415c51eef6c6ce2c7c746d23647bb4c928b753495f73f90b",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "10. Related files"
+            ],
+            "text": "| Relationship | File |\n|---|---|\n| defines | [agent-protocol.v1.json](../../../packages/agent-protocol/contracts/agent-protocol.v1.json) |\n| consumer | [run-supervisor/spec.md](../run-supervisor/spec.md) |\n| boundary | [component-boundary.md](../component-boundary.md) |\n| plans | [direct mode](../../../plans/261016-1351-run-supervisor-rust-core-direct-mode/plan.md), [terminal mode](../../../plans/261016-1351-terminal-mode-and-launcher-identity/plan.md) |\n| design | [design r6, section 8](../../../plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md) |"
+          }
+        ]
+      }
+    },
+    {
+      "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "extractor": "lib.mjs",
+      "extractorSha256": "48e153938d145bd41986b47ba816d4506db1a90c664170ee08e17bc60341ba41",
+      "units": {
+        "docs/platform/agent-protocol/spec.md": [
+          {
+            "unitKind": "heading",
+            "level": 1,
+            "title": "Agent Protocol Component Specification",
+            "anchor": "agent-protocol-component-specification",
+            "githubAnchor": "agent-protocol-component-specification",
+            "stableAnchor": "h-7fd092e8d84f",
+            "startLine": 1,
+            "endLine": 1,
+            "textDigest": "cdcb0880baa754ddeb1a8d6431de32ce53705dde48232d1ed887118a6874b042",
+            "sample": "Agent Protocol Component Specification",
+            "sectionPayloadDigest": "4c4d6353f5f0f88f550c394738a15b0359c30bfa4b5595b11da7fc3fd93fa34b",
+            "followingBlockDigest": "4c4d6353f5f0f88f550c394738a15b0359c30bfa4b5595b11da7fc3fd93fa34b",
+            "identityFingerprint": "ab83efcedb98fff76b0cc82905ca8a248aedc19cf257de442b66b46d47d42091",
+            "ancestry": [],
+            "text": "# Agent Protocol Component Specification",
+            "sectionText": "# Agent Protocol Component Specification\n\n```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the pure per-CLI adapters that read what an agent CLI showed and name what happened, for the run supervisor\nDesign status: Accepted\nImplementation status: Built (direct and terminal adapters for claude, codex, agy, pi, omp)\nCanonical: Yes\nOwner: Agent-protocol component (L3)\nSource: packages/agent-protocol/rust (crate fgos-agent-protocol)\nContracts: packages/agent-protocol/contracts/\nLast reviewed: 2026-10-18\nRelated:\n- docs/platform/run-supervisor/spec.md\n- docs/platform/terminal-control/spec.md\n- docs/platform/component-boundary.md\n- docs/specs/runner.md\n- plans/261016-1351-run-supervisor-rust-core-direct-mode/plan.md\n- plans/261016-1351-terminal-mode-and-launcher-identity/plan.md\n- plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md\n```"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-1",
+            "githubAnchor": "unheaded-block-1",
+            "stableAnchor": "unheaded-block-1",
+            "title": "Unheaded block 1",
+            "startLine": 3,
+            "endLine": 22,
+            "textDigest": "4c4d6353f5f0f88f550c394738a15b0359c30bfa4b5595b11da7fc3fd93fa34b",
+            "sample": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the pure per-CLI adapters that read what an agent CLI s",
+            "identityFingerprint": "35312c4fa0da786a96edca9b2623490e6e4df3ea7cad6dec565a020a90511242",
+            "ancestry": [
+              "Agent Protocol Component Specification"
+            ],
+            "text": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the pure per-CLI adapters that read what an agent CLI showed and name what happened, for the run supervisor\nDesign status: Accepted\nImplementation status: Built (direct and terminal adapters for claude, codex, agy, pi, omp)\nCanonical: Yes\nOwner: Agent-protocol component (L3)\nSource: packages/agent-protocol/rust (crate fgos-agent-protocol)\nContracts: packages/agent-protocol/contracts/\nLast reviewed: 2026-10-18\nRelated:\n- docs/platform/run-supervisor/spec.md\n- docs/platform/terminal-control/spec.md\n- docs/platform/component-boundary.md\n- docs/specs/runner.md\n- plans/261016-1351-run-supervisor-rust-core-direct-mode/plan.md\n- plans/261016-1351-terminal-mode-and-launcher-identity/plan.md\n- plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md\n```"
+          },
+          {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "1. Purpose",
+            "anchor": "1-purpose",
+            "githubAnchor": "1-purpose",
+            "stableAnchor": "h-35665566fc92",
+            "startLine": 24,
+            "endLine": 24,
+            "textDigest": "9ba4a5a48a15a1c3bc7741ec8ec960ff3ac25667f36bf4d667ba8fc80f13ee42",
+            "sample": "1. Purpose",
+            "sectionPayloadDigest": "5279f7ca52e957a675c16ab65de58d23b4c60bc0ee4c067ae2799b60ef6fe8ed",
+            "followingBlockDigest": "5279f7ca52e957a675c16ab65de58d23b4c60bc0ee4c067ae2799b60ef6fe8ed",
+            "identityFingerprint": "5ec8d74998002770f4e10b3b601e8f01786af81f94a2e22e028f5c601c7ff773",
+            "ancestry": [
+              "Agent Protocol Component Specification"
+            ],
+            "text": "## 1. Purpose",
+            "sectionText": "## 1. Purpose\n\nAn adapter is a pure state machine for one agent CLI in one launch mode. It reads what the agent left behind (a capture tail, an exit, an outbox listing) and names the result. It never opens a tab, picks a model, changes a timeout or decides a retry. It has no dependency on terminal-control, on a lock or on an attempt; the run supervisor wires it."
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-2",
+            "githubAnchor": "unheaded-block-2",
+            "stableAnchor": "unheaded-block-2",
+            "title": "Unheaded block 2",
+            "startLine": 26,
+            "endLine": 26,
+            "textDigest": "5279f7ca52e957a675c16ab65de58d23b4c60bc0ee4c067ae2799b60ef6fe8ed",
+            "sample": "An adapter is a pure state machine for one agent CLI in one launch mode. It reads what the agent left behind (a capture tail, an exit, an outbox listing) and names the result. It n",
+            "identityFingerprint": "6cb02f08e9a72f793458a3f536c1e4bfda4b0507494a1a54ad902a32b56620d9",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "1. Purpose"
+            ],
+            "text": "An adapter is a pure state machine for one agent CLI in one launch mode. It reads what the agent left behind (a capture tail, an exit, an outbox listing) and names the result. It never opens a tab, picks a model, changes a timeout or decides a retry. It has no dependency on terminal-control, on a lock or on an attempt; the run supervisor wires it."
+          },
+          {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "2. Ownership boundary",
+            "anchor": "2-ownership-boundary",
+            "githubAnchor": "2-ownership-boundary",
+            "stableAnchor": "h-6d5df7fe58db",
+            "startLine": 28,
+            "endLine": 28,
+            "textDigest": "5167b9cfea62668aff2eb18aa88952c7a594591c80ec414aa8f5a9cf1cde4c36",
+            "sample": "2. Ownership boundary",
+            "sectionPayloadDigest": "458c0457aad61f3ce3c2136ad8e3b81f12ed4660b3095acb83e5f509682b2aed",
+            "followingBlockDigest": "458c0457aad61f3ce3c2136ad8e3b81f12ed4660b3095acb83e5f509682b2aed",
+            "identityFingerprint": "d4b35e39b66a8d15ad86eda48dc3aa9f76c37f7f79a322e6bf6a79a7c43cd010",
+            "ancestry": [
+              "Agent Protocol Component Specification"
+            ],
+            "text": "## 2. Ownership boundary",
+            "sectionText": "## 2. Ownership boundary\n\n| Owns | Does not own |\n|---|---|\n| The named results (section 4) | Argv, model or executor choice (Execution Core; `resolveExecutorCommand` in `src/runner/dispatch/transport.mjs` builds argv from the executor configuration) |\n| Stdin policy per CLI (section 6) | Timeouts, deadlines, retry, fallback (supervisor, controller) |\n| The activity signal the idle timer counts (section 7) | Judging the work (Run Result Evaluator) |\n| One fixture file of real screen or output tails per CLI and mode | Terminal screens and keys (terminal-control: the supervisor wires `AgentIo` to it) |"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-3",
+            "githubAnchor": "unheaded-block-3",
+            "stableAnchor": "unheaded-block-3",
+            "title": "Unheaded block 3",
+            "startLine": 30,
+            "endLine": 35,
+            "textDigest": "458c0457aad61f3ce3c2136ad8e3b81f12ed4660b3095acb83e5f509682b2aed",
+            "sample": "| Owns | Does not own |\n|---|---|\n| The named results (section 4) | Argv, model or executor choice (Execution Core; `resolveExecutorCommand` in `src/runner/dispatch/transport.mjs` ",
+            "identityFingerprint": "519a85af65b8f28c73cdb8f24e0af830d14ed56a93a231bf16505c8a7b7a3278",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "2. Ownership boundary"
+            ],
+            "text": "| Owns | Does not own |\n|---|---|\n| The named results (section 4) | Argv, model or executor choice (Execution Core; `resolveExecutorCommand` in `src/runner/dispatch/transport.mjs` builds argv from the executor configuration) |\n| Stdin policy per CLI (section 6) | Timeouts, deadlines, retry, fallback (supervisor, controller) |\n| The activity signal the idle timer counts (section 7) | Judging the work (Run Result Evaluator) |\n| One fixture file of real screen or output tails per CLI and mode | Terminal screens and keys (terminal-control: the supervisor wires `AgentIo` to it) |"
+          },
+          {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "3. The IO gate",
+            "anchor": "3-the-io-gate",
+            "githubAnchor": "3-the-io-gate",
+            "stableAnchor": "h-a23e14eb4b7b",
+            "startLine": 37,
+            "endLine": 37,
+            "textDigest": "5525d3aff46d50a346c530318abf64be848cf8f73de38c69133b1b5f0664275c",
+            "sample": "3. The IO gate",
+            "sectionPayloadDigest": "b428061847f9ad460f752839eef1b4f8263e8784e768291d7717a95f63bb1739",
+            "followingBlockDigest": "d8b463d1c67e79e614910a7a021e9317210d8ec541d38728104db0c02fdb065d",
+            "identityFingerprint": "bfa840ec56e6a1de81867638de1e62966c98180ca2c5745c8455f7db51698b64",
+            "ancestry": [
+              "Agent Protocol Component Specification"
+            ],
+            "text": "## 3. The IO gate",
+            "sectionText": "## 3. The IO gate\n\nThe contract ([agent-protocol.v1.json](../../../packages/agent-protocol/contracts/agent-protocol.v1.json)) gives each adapter one port, `AgentIo`:\n\n| Operation | Meaning | Modes |\n|---|---|---|\n| `send(text?, keys?, submit)` | Put input in front of the agent | terminal only; in direct mode it answers `Unsupported` |\n| `read()` | New lines since the previous read: the stdout capture tail | direct |\n| `activity()` | A monotonic counter that rises on anything the idle timer counts, or absent | direct |\n| `screen()` | The visible screen of the pane | terminal |\n| `inspect()` | The screen detector's verdict (`state`, `visible_blocker`, `visible_idle`, `visible_working`, whether a rule matched, the prompt text) | terminal |\n| `now_ms()`, `pause(ms)` | The clock and the only way time passes: the supervisor keeps its own watch (deadlines, cancel, carrier) running inside `pause`, and a test drives a virtual clock | terminal |\n\nIn direct mode the supervisor does not need `send`: the gate gave the brief to the agent at spawn (argv or stdin file) and owns its IO."
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-4",
+            "githubAnchor": "unheaded-block-4",
+            "stableAnchor": "unheaded-block-4",
+            "title": "Unheaded block 4",
+            "startLine": 39,
+            "endLine": 39,
+            "textDigest": "d8b463d1c67e79e614910a7a021e9317210d8ec541d38728104db0c02fdb065d",
+            "sample": "The contract ([agent-protocol.v1.json](../../../packages/agent-protocol/contracts/agent-protocol.v1.json)) gives each adapter one port, `AgentIo`:",
+            "identityFingerprint": "7fc54b9c2eaf9dd909de8d8b1f5d0945995641d946f1aeb0cd394fc04a8aa6df",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "3. The IO gate"
+            ],
+            "text": "The contract ([agent-protocol.v1.json](../../../packages/agent-protocol/contracts/agent-protocol.v1.json)) gives each adapter one port, `AgentIo`:"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-5",
+            "githubAnchor": "unheaded-block-5",
+            "stableAnchor": "unheaded-block-5",
+            "title": "Unheaded block 5",
+            "startLine": 41,
+            "endLine": 48,
+            "textDigest": "c0a0efac2a6fb9c429fd34b7b3df2ce7fac5d105deb4159e01c86030793c72ce",
+            "sample": "| Operation | Meaning | Modes |\n|---|---|---|\n| `send(text?, keys?, submit)` | Put input in front of the agent | terminal only; in direct mode it answers `Unsupported` |\n| `read()`",
+            "identityFingerprint": "7d21017ead52338fcda3ed523c59524f9340c79cd4bf89c1615e991f114da7d3",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "3. The IO gate"
+            ],
+            "text": "| Operation | Meaning | Modes |\n|---|---|---|\n| `send(text?, keys?, submit)` | Put input in front of the agent | terminal only; in direct mode it answers `Unsupported` |\n| `read()` | New lines since the previous read: the stdout capture tail | direct |\n| `activity()` | A monotonic counter that rises on anything the idle timer counts, or absent | direct |\n| `screen()` | The visible screen of the pane | terminal |\n| `inspect()` | The screen detector's verdict (`state`, `visible_blocker`, `visible_idle`, `visible_working`, whether a rule matched, the prompt text) | terminal |\n| `now_ms()`, `pause(ms)` | The clock and the only way time passes: the supervisor keeps its own watch (deadlines, cancel, carrier) running inside `pause`, and a test drives a virtual clock | terminal |"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-6",
+            "githubAnchor": "unheaded-block-6",
+            "stableAnchor": "unheaded-block-6",
+            "title": "Unheaded block 6",
+            "startLine": 50,
+            "endLine": 50,
+            "textDigest": "bc7d1786a830bf9b05798d7968331a3ff3593e3a121a90bf3cfe442389b99e75",
+            "sample": "In direct mode the supervisor does not need `send`: the gate gave the brief to the agent at spawn (argv or stdin file) and owns its IO.",
+            "identityFingerprint": "ac0df237c39f22b264ec91da7a763e6813df2954d0713f6ac5fd04e7d9f0d3f6",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "3. The IO gate"
+            ],
+            "text": "In direct mode the supervisor does not need `send`: the gate gave the brief to the agent at spawn (argv or stdin file) and owns its IO."
+          },
+          {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "4. Named results",
+            "anchor": "4-named-results",
+            "githubAnchor": "4-named-results",
+            "stableAnchor": "h-e801a2e6b49e",
+            "startLine": 52,
+            "endLine": 52,
+            "textDigest": "cc7f7378f0c80efe248e08a05af477a864c28a9c081fe4cad66f5f3f4a7d618c",
+            "sample": "4. Named results",
+            "sectionPayloadDigest": "df0378ee2dc4c4df4b5ca786c8fde978a92ef03ffc2dd4209ff199e04b4b9a50",
+            "followingBlockDigest": "c30681ce152929e4f6d294020e34b16be2b57956b6ca18ad9247e16ce823987f",
+            "identityFingerprint": "375e72965c659e9a949424d6ffb3953aa31051bfdef1709a339e7ffcc1b637c6",
+            "ancestry": [
+              "Agent Protocol Component Specification"
+            ],
+            "text": "## 4. Named results",
+            "sectionText": "## 4. Named results\n\n| Result | Meaning | Mode |\n|---|---|---|\n| `completed(resultPath)` | The agent finished and `outbox/result-<N>.json` exists (the newest by number) | both |\n| `blocked(reason)` with `login`, `trust-dialog`, `usage-limit` | The CLI waits for something only a person can do | both |\n| `needs-human` | The agent asked a question only a person can answer | both |\n| `exited(code)` | The process exited without a result file | direct |\n| `ready` | The CLI shows an empty prompt and can take the brief | terminal |\n| `delivered` | The brief is confirmed submitted: the CLI shows it working **and** its composer no longer holds the brief (or it keeps working for 8 s, longer than a paste takes to be ingested), or its composer is empty **and** the brief is echoed in the conversation, or a complete result already exists. A changed screen, or one look at `working` while the TUI takes in the paste, is not proof | terminal |\n| `delivery-unknown` | Delivery could not be confirmed, or the prompt never became ready. Nothing is resent blind | terminal |\n\nRules for direct mode, as implemented:\n\n1. A result file wins over everything else: `completed`, whatever the tail says (a wording quoted inside the agent's own output is not a block).\n2. Without a result file the **final words** decide: only the last 5 non-empty lines of the capture are examined (`TAIL_LINES`). A login or quota wording far up a long capture is not a block.\n3. Login wordings (for example `oauth refresh failed`, `invalid_grant`, `run /login`, `not logged in`, an API key reported missing, invalid or expired) give `blocked(login)`. Quota wordings (`you've hit your usage limit`, `usage limit has been reached`, `individual quota reached`) give `blocked(usage-limit)`. The wordings are those the Node runner already classifies at settlement (`provider-auth-failure.mjs`), cut down to what a live round needs.\n4. Otherwise `exited(code)`.\n\n`trust-dialog` and `needs-human` exist in the contract; the direct adapters have no output pattern for them (they belong to the interactive prompt). Only the terminal adapters return them (section 5.1). A usage limit is a `blocked` reason in direct mode only: in a pane a limit screen reaches the controller as the screen tail the supervisor records, and the settle step classifies it."
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-7",
+            "githubAnchor": "unheaded-block-7",
+            "stableAnchor": "unheaded-block-7",
+            "title": "Unheaded block 7",
+            "startLine": 54,
+            "endLine": 62,
+            "textDigest": "c30681ce152929e4f6d294020e34b16be2b57956b6ca18ad9247e16ce823987f",
+            "sample": "| Result | Meaning | Mode |\n|---|---|---|\n| `completed(resultPath)` | The agent finished and `outbox/result-<N>.json` exists (the newest by number) | both |\n| `blocked(reason)` wit",
+            "identityFingerprint": "0ca53ec58bcb4af4691ad993d8a1342f1d532bc5210a49047b6569d9dd8bd013",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "4. Named results"
+            ],
+            "text": "| Result | Meaning | Mode |\n|---|---|---|\n| `completed(resultPath)` | The agent finished and `outbox/result-<N>.json` exists (the newest by number) | both |\n| `blocked(reason)` with `login`, `trust-dialog`, `usage-limit` | The CLI waits for something only a person can do | both |\n| `needs-human` | The agent asked a question only a person can answer | both |\n| `exited(code)` | The process exited without a result file | direct |\n| `ready` | The CLI shows an empty prompt and can take the brief | terminal |\n| `delivered` | The brief is confirmed submitted: the CLI shows it working **and** its composer no longer holds the brief (or it keeps working for 8 s, longer than a paste takes to be ingested), or its composer is empty **and** the brief is echoed in the conversation, or a complete result already exists. A changed screen, or one look at `working` while the TUI takes in the paste, is not proof | terminal |\n| `delivery-unknown` | Delivery could not be confirmed, or the prompt never became ready. Nothing is resent blind | terminal |"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-8",
+            "githubAnchor": "unheaded-block-8",
+            "stableAnchor": "unheaded-block-8",
+            "title": "Unheaded block 8",
+            "startLine": 64,
+            "endLine": 64,
+            "textDigest": "50e7d7993b5b01f9dcb16395a8e5d5566ab09d5070a7941f34c3002a6995a5df",
+            "sample": "Rules for direct mode, as implemented:",
+            "identityFingerprint": "31bf63a15008670cc547b6a718c5789bd182d25995382110dea0492db5c5d99e",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "4. Named results"
+            ],
+            "text": "Rules for direct mode, as implemented:"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-9",
+            "githubAnchor": "unheaded-block-9",
+            "stableAnchor": "unheaded-block-9",
+            "title": "Unheaded block 9",
+            "startLine": 66,
+            "endLine": 69,
+            "textDigest": "a5c48d048922d1f3594b05a75a241d0cb6ba684fe44359528105abe133b99171",
+            "sample": "1. A result file wins over everything else: `completed`, whatever the tail says (a wording quoted inside the agent's own output is not a block).\n2. Without a result file the **fina",
+            "identityFingerprint": "e100814abf40f2bb1b50cefbdf604b5539c7948ee33114b451b34cd917aeee40",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "4. Named results"
+            ],
+            "text": "1. A result file wins over everything else: `completed`, whatever the tail says (a wording quoted inside the agent's own output is not a block).\n2. Without a result file the **final words** decide: only the last 5 non-empty lines of the capture are examined (`TAIL_LINES`). A login or quota wording far up a long capture is not a block.\n3. Login wordings (for example `oauth refresh failed`, `invalid_grant`, `run /login`, `not logged in`, an API key reported missing, invalid or expired) give `blocked(login)`. Quota wordings (`you've hit your usage limit`, `usage limit has been reached`, `individual quota reached`) give `blocked(usage-limit)`. The wordings are those the Node runner already classifies at settlement (`provider-auth-failure.mjs`), cut down to what a live round needs.\n4. Otherwise `exited(code)`."
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-10",
+            "githubAnchor": "unheaded-block-10",
+            "stableAnchor": "unheaded-block-10",
+            "title": "Unheaded block 10",
+            "startLine": 71,
+            "endLine": 71,
+            "textDigest": "b1537404e23fe1aef97a301571286856c3df06129e4c9b30853154a9bc83fd71",
+            "sample": "`trust-dialog` and `needs-human` exist in the contract; the direct adapters have no output pattern for them (they belong to the interactive prompt). Only the terminal adapters retu",
+            "identityFingerprint": "444d6ce30996ee0efd15b82e1bd0489c228f044f14ac14c70111a9a411d0a779",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "4. Named results"
+            ],
+            "text": "`trust-dialog` and `needs-human` exist in the contract; the direct adapters have no output pattern for them (they belong to the interactive prompt). Only the terminal adapters return them (section 5.1). A usage limit is a `blocked` reason in direct mode only: in a pane a limit screen reaches the controller as the screen tail the supervisor records, and the settle step classifies it."
+          },
+          {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "5. Adapter per CLI and mode",
+            "anchor": "5-adapter-per-cli-and-mode",
+            "githubAnchor": "5-adapter-per-cli-and-mode",
+            "stableAnchor": "h-7415a328e0bd",
+            "startLine": 73,
+            "endLine": 73,
+            "textDigest": "e2dee472aa5526d98f1ab51bbbce0f0947df2193c132f62119cd63773cbd2448",
+            "sample": "5. Adapter per CLI and mode",
+            "sectionPayloadDigest": "ff5756c741f5bd014eb6f35ba4393d94a1d8c59fc1c5a5cf91959a0591afeec1",
+            "followingBlockDigest": "2db4c24e2343f88a62f835fbec5317bc4561ba904bbfc558a9ea27f891fc9e00",
+            "identityFingerprint": "fe8153b350c5027ae77196c72dad1b88b40296aa13df1734b3c8b5a88e44f38d",
+            "ancestry": [
+              "Agent Protocol Component Specification"
+            ],
+            "text": "## 5. Adapter per CLI and mode",
+            "sectionText": "## 5. Adapter per CLI and mode\n\n| CLI | `direct` | `terminal` |\n|---|---|---|\n| claude | landed | landed: exit `/exit` + Enter; folder-trust dialog; Enter gap 300 ms |\n| codex | landed; stdin always the null device | landed: exit `/quit` + Enter; trust dialog (v0.163 words it \"Trust this folder?\" and opens it about a second after the first prompt screen); brief delivered through the prompt door (one `agent prompt` send, text plus submit; typed text then Enter loses its first Enters to a long paste, 4 to 6 or more); Enter gap 600 ms still applies to the typed path; a draft that stays in the composer gets Enter again every 2.5 s, six times at most; chip wording `[Pasted Content N chars]`; launch argv carries `-c shell_environment_policy.set={FGOS_SESSION_ID=\"<id>\"}` |\n| agy | landed | landed: exit `/exit` + Enter; trust dialog; Enter gap 300 ms |\n| pi | landed | landed: exit Ctrl-D on empty input; no trust dialog observed; brief delivered through the prompt door (one `agent prompt` send, text plus submit; a 4 KB brief typed raw takes 7 to 25 s and its final Enter is sometimes lost); a draft that stays in the composer gets Enter again every 2.5 s, six times at most |\n| omp | landed | landed: exit Ctrl-D on empty input; no trust dialog observed; attachment chip that Enter submits; brief delivered through the prompt door, as for pi (a stop that landed while the brief was still being typed sent the rest of it into the pane's shell) |\n\nAn unknown CLI name (matching is case-insensitive) in `envelope.agentProtocol.cli` gets the **generic** adapter in direct mode: exit and outbox only, no output patterns, no block detection. In terminal mode an envelope naming a CLI without a terminal adapter is refused before launch (`agent-protocol-unsupported`). Today the five direct adapters share one behavior and differ only where a CLI needs it (codex); each has its own fixture file under `packages/agent-protocol/contracts/fixtures/direct/<cli>/vectors.json` with the same six cases (completed with outbox, exited without outbox, blocked login, blocked usage limit, a login wording far up is not a block, an outbox beats a quoted wording)."
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-11",
+            "githubAnchor": "unheaded-block-11",
+            "stableAnchor": "unheaded-block-11",
+            "title": "Unheaded block 11",
+            "startLine": 75,
+            "endLine": 81,
+            "textDigest": "2db4c24e2343f88a62f835fbec5317bc4561ba904bbfc558a9ea27f891fc9e00",
+            "sample": "| CLI | `direct` | `terminal` |\n|---|---|---|\n| claude | landed | landed: exit `/exit` + Enter; folder-trust dialog; Enter gap 300 ms |\n| codex | landed; stdin always the null devi",
+            "identityFingerprint": "aebfaca1e9fc46a8883258f9274c0ed22ad17ceddf1fa925fd509c9443b87afe",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "5. Adapter per CLI and mode"
+            ],
+            "text": "| CLI | `direct` | `terminal` |\n|---|---|---|\n| claude | landed | landed: exit `/exit` + Enter; folder-trust dialog; Enter gap 300 ms |\n| codex | landed; stdin always the null device | landed: exit `/quit` + Enter; trust dialog (v0.163 words it \"Trust this folder?\" and opens it about a second after the first prompt screen); brief delivered through the prompt door (one `agent prompt` send, text plus submit; typed text then Enter loses its first Enters to a long paste, 4 to 6 or more); Enter gap 600 ms still applies to the typed path; a draft that stays in the composer gets Enter again every 2.5 s, six times at most; chip wording `[Pasted Content N chars]`; launch argv carries `-c shell_environment_policy.set={FGOS_SESSION_ID=\"<id>\"}` |\n| agy | landed | landed: exit `/exit` + Enter; trust dialog; Enter gap 300 ms |\n| pi | landed | landed: exit Ctrl-D on empty input; no trust dialog observed; brief delivered through the prompt door (one `agent prompt` send, text plus submit; a 4 KB brief typed raw takes 7 to 25 s and its final Enter is sometimes lost); a draft that stays in the composer gets Enter again every 2.5 s, six times at most |\n| omp | landed | landed: exit Ctrl-D on empty input; no trust dialog observed; attachment chip that Enter submits; brief delivered through the prompt door, as for pi (a stop that landed while the brief was still being typed sent the rest of it into the pane's shell) |"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-12",
+            "githubAnchor": "unheaded-block-12",
+            "stableAnchor": "unheaded-block-12",
+            "title": "Unheaded block 12",
+            "startLine": 83,
+            "endLine": 83,
+            "textDigest": "cb32864b4a50349ad542afd491b680b288c6af95fc7b74791a32dcb2f93b69c7",
+            "sample": "An unknown CLI name (matching is case-insensitive) in `envelope.agentProtocol.cli` gets the **generic** adapter in direct mode: exit and outbox only, no output patterns, no block d",
+            "identityFingerprint": "59d3ffb544c15df44c5a553046ac2a2407cf9df5734e431c6e719e1701065c59",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "5. Adapter per CLI and mode"
+            ],
+            "text": "An unknown CLI name (matching is case-insensitive) in `envelope.agentProtocol.cli` gets the **generic** adapter in direct mode: exit and outbox only, no output patterns, no block detection. In terminal mode an envelope naming a CLI without a terminal adapter is refused before launch (`agent-protocol-unsupported`). Today the five direct adapters share one behavior and differ only where a CLI needs it (codex); each has its own fixture file under `packages/agent-protocol/contracts/fixtures/direct/<cli>/vectors.json` with the same six cases (completed with outbox, exited without outbox, blocked login, blocked usage limit, a login wording far up is not a block, an outbox beats a quoted wording)."
+          },
+          {
+            "unitKind": "heading",
+            "level": 3,
+            "title": "5.1 Terminal adapters",
+            "anchor": "51-terminal-adapters",
+            "githubAnchor": "51-terminal-adapters",
+            "stableAnchor": "h-4db83ed86fbe",
+            "startLine": 85,
+            "endLine": 85,
+            "textDigest": "7b3a483f6224f3cdea55a7dcaaf11713a9f2486732d9c500fee605422a88f530",
+            "sample": "5.1 Terminal adapters",
+            "sectionPayloadDigest": "a87dbf01be4a47153eac22d6af7173e7b501ca92e115b40c7c4ab3e446a2f947",
+            "followingBlockDigest": "d25d2cbe7c39fb73845b52032859b0585abfb02acb565fb68ac12504c7b92d79",
+            "identityFingerprint": "5b0534e07f3ef6672408413d956fca57b50e2d922c4f30e2b7413efbdc6851ba",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "5. Adapter per CLI and mode"
+            ],
+            "text": "### 5.1 Terminal adapters",
+            "sectionText": "### 5.1 Terminal adapters\n\nContract: [terminal-outcomes.v1.json](../../../packages/agent-protocol/contracts/terminal-outcomes.v1.json); code `packages/agent-protocol/rust/src/terminal/` (`mod.rs` the state machine, `common.rs` the shared matchers and timings, one profile per CLI: exit command, Enter gap, trust wording). The order of outcomes is `ready` then one of `blocked`, `delivered`, `delivery-unknown`, then `completed` or `needs-human`; `completed` only after `delivered`, which the supervisor enforces.\n\n| Step | Rule |\n|---|---|\n| Ready | Wait for the CLI's own rule to say idle (claude, codex), or, where no rule exists (agy, pi, omp), for the screen to be drawn and to hold still; a process that never draws is typed at after a bounded wait (15 s). After the settle wait the detector is asked once more, so a dialog that opened over a prompt that already looked ready still blocks. A trust dialog or login screen gives `blocked`; an unrecognised blocking dialog gives `needs-human`; a readiness timeout gives `delivery-unknown` with nothing typed |\n| Brief | Typed as text, then the CLI's Enter gap, then Enter as a key (codex, pi, omp: one prompt-door send that submits itself, so a stop cannot split the brief between a typing call and an Enter). A draft left in the composer (paste chip, history above the composer, or a composer that grew to show a window of a long paste: two or more of the brief's own lines in the last six) is recognised by the matchers ported from the old controller (`PASTE_CHIP_RE`, the working-tail wording, `isDraftStillInComposer`). The detector's prompt text is not trusted alone: codex reports its window title there, so the screen is always looked at |\n| Delivered | Section 4. Typing is repeated only when the typing call itself failed **and**, after one render interval, the pane equals its screen from before the send, is idle and shows no draft; at most 2 resends. A typing call that succeeded is never repeated |\n| Completed | A result counts only when `outbox/result-<N>.json` parses as a JSON object and keeps its size over 20 ms; temporary names (`*.tmp.*`) are ignored. Measured: claude renames a full file into place, codex, agy and omp write in place, pi shows the name empty first |\n| Exit | The CLI's exit command (the envelope's `terminal.exitCommand` overrides it) |\n\nReal screens were recorded from herdr panes (`contracts/fixtures/terminal/<cli>/*.txt`, the detector verdict beside each as `*.insp.json`) and replayed on a virtual clock, 17 to 19 vectors per CLI. The Node tests of the old controller's wait logic became vectors (the mapping is in the P04 report). The working screens of codex, omp, pi and agy (a start-up spinner and a mid-turn screen) were recorded on herdr in the integration round, with the long-paste window and the late folder dialog of codex. Known limits: omp's detector never says `working` (its `⎋ Working…` footer is read from the screen), so an omp that is already working when its brief arrives cannot be told from an idle one; pi and omp have no composer rule, so a short brief echoed in the last six lines of a finished turn reads as a draft (the outcome is then `delivery-unknown` unless a result exists, which is the safe direction)."
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-13",
+            "githubAnchor": "unheaded-block-13",
+            "stableAnchor": "unheaded-block-13",
+            "title": "Unheaded block 13",
+            "startLine": 87,
+            "endLine": 87,
+            "textDigest": "d25d2cbe7c39fb73845b52032859b0585abfb02acb565fb68ac12504c7b92d79",
+            "sample": "Contract: [terminal-outcomes.v1.json](../../../packages/agent-protocol/contracts/terminal-outcomes.v1.json); code `packages/agent-protocol/rust/src/terminal/` (`mod.rs` the state m",
+            "identityFingerprint": "2f4a7f96b61564c340b14409c3fec297ae1baf1335a6c020b4318f614536826d",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "5. Adapter per CLI and mode",
+              "5.1 Terminal adapters"
+            ],
+            "text": "Contract: [terminal-outcomes.v1.json](../../../packages/agent-protocol/contracts/terminal-outcomes.v1.json); code `packages/agent-protocol/rust/src/terminal/` (`mod.rs` the state machine, `common.rs` the shared matchers and timings, one profile per CLI: exit command, Enter gap, trust wording). The order of outcomes is `ready` then one of `blocked`, `delivered`, `delivery-unknown`, then `completed` or `needs-human`; `completed` only after `delivered`, which the supervisor enforces."
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-14",
+            "githubAnchor": "unheaded-block-14",
+            "stableAnchor": "unheaded-block-14",
+            "title": "Unheaded block 14",
+            "startLine": 89,
+            "endLine": 95,
+            "textDigest": "cbec098a41a001c7528fae9305c2fb1cc9bb690bd738df4b33c939fc92594e04",
+            "sample": "| Step | Rule |\n|---|---|\n| Ready | Wait for the CLI's own rule to say idle (claude, codex), or, where no rule exists (agy, pi, omp), for the screen to be drawn and to hold still; ",
+            "identityFingerprint": "f156467925a644d77c8b1b81fc077865096c0aba319047ab3984c4b7a81e3cb6",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "5. Adapter per CLI and mode",
+              "5.1 Terminal adapters"
+            ],
+            "text": "| Step | Rule |\n|---|---|\n| Ready | Wait for the CLI's own rule to say idle (claude, codex), or, where no rule exists (agy, pi, omp), for the screen to be drawn and to hold still; a process that never draws is typed at after a bounded wait (15 s). After the settle wait the detector is asked once more, so a dialog that opened over a prompt that already looked ready still blocks. A trust dialog or login screen gives `blocked`; an unrecognised blocking dialog gives `needs-human`; a readiness timeout gives `delivery-unknown` with nothing typed |\n| Brief | Typed as text, then the CLI's Enter gap, then Enter as a key (codex, pi, omp: one prompt-door send that submits itself, so a stop cannot split the brief between a typing call and an Enter). A draft left in the composer (paste chip, history above the composer, or a composer that grew to show a window of a long paste: two or more of the brief's own lines in the last six) is recognised by the matchers ported from the old controller (`PASTE_CHIP_RE`, the working-tail wording, `isDraftStillInComposer`). The detector's prompt text is not trusted alone: codex reports its window title there, so the screen is always looked at |\n| Delivered | Section 4. Typing is repeated only when the typing call itself failed **and**, after one render interval, the pane equals its screen from before the send, is idle and shows no draft; at most 2 resends. A typing call that succeeded is never repeated |\n| Completed | A result counts only when `outbox/result-<N>.json` parses as a JSON object and keeps its size over 20 ms; temporary names (`*.tmp.*`) are ignored. Measured: claude renames a full file into place, codex, agy and omp write in place, pi shows the name empty first |\n| Exit | The CLI's exit command (the envelope's `terminal.exitCommand` overrides it) |"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-15",
+            "githubAnchor": "unheaded-block-15",
+            "stableAnchor": "unheaded-block-15",
+            "title": "Unheaded block 15",
+            "startLine": 97,
+            "endLine": 97,
+            "textDigest": "0dd79779079244e98d9f3e47f5c0d06efb169d692b066d701d0a847c06a43847",
+            "sample": "Real screens were recorded from herdr panes (`contracts/fixtures/terminal/<cli>/*.txt`, the detector verdict beside each as `*.insp.json`) and replayed on a virtual clock, 17 to 19",
+            "identityFingerprint": "6e69ed493397580789270b8fbfa50b9bb8cc11bcf4b29b6e45abc526c3400982",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "5. Adapter per CLI and mode",
+              "5.1 Terminal adapters"
+            ],
+            "text": "Real screens were recorded from herdr panes (`contracts/fixtures/terminal/<cli>/*.txt`, the detector verdict beside each as `*.insp.json`) and replayed on a virtual clock, 17 to 19 vectors per CLI. The Node tests of the old controller's wait logic became vectors (the mapping is in the P04 report). The working screens of codex, omp, pi and agy (a start-up spinner and a mid-turn screen) were recorded on herdr in the integration round, with the long-paste window and the late folder dialog of codex. Known limits: omp's detector never says `working` (its `⎋ Working…` footer is read from the screen), so an omp that is already working when its brief arrives cannot be told from an idle one; pi and omp have no composer rule, so a short brief echoed in the last six lines of a finished turn reads as a draft (the outcome is then `delivery-unknown` unless a result exists, which is the safe direction)."
+          },
+          {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "6. Design decision: argv stays in the executor configuration",
+            "anchor": "6-design-decision-argv-stays-in-the-executor-configuration",
+            "githubAnchor": "6-design-decision-argv-stays-in-the-executor-configuration",
+            "stableAnchor": "h-05eaa210bb76",
+            "startLine": 99,
+            "endLine": 99,
+            "textDigest": "9ed74a85de514e502f44fad0726f672d58c299cfafb09c55be45c7a47a681db4",
+            "sample": "6. Design decision: argv stays in the executor configuration",
+            "sectionPayloadDigest": "e1845f55eda5bed8a17d52f99a4cf56baf27cdc19be15ef2d6e3a0187f6f0fcf",
+            "followingBlockDigest": "e8f01b5f5d1bcaac00447100f634a92e6f91f15334c5563feacfab57436607e4",
+            "identityFingerprint": "9f0976d06f76f0259b7d3d0fee17709c07daafa7f52b6439d0c3f90a0a23e1d8",
+            "ancestry": [
+              "Agent Protocol Component Specification"
+            ],
+            "text": "## 6. Design decision: argv stays in the executor configuration",
+            "sectionText": "## 6. Design decision: argv stays in the executor configuration\n\nThe adapter does not build argv. The controller resolves the command through `resolveExecutorCommand` from the executor configuration and writes `launch.command`, `launch.args`, `launch.env` and `launch.stdinPolicy` into the immutable envelope; the gate runs exactly that. Reason: moving argv rendering to Rust would move the ProviderAdapter binder (`transport.mjs`) to Rust, which a run that survives a dead controller does not need (owner decision 2026-10-16, plan decision D4). If that rendering ever moves, this spec and the contract change together.\n\nWhat the adapter does decide for direct mode:\n\n| Decision | Rule |\n|---|---|\n| Stdin | Null device by default for every CLI (`stdinPolicy: null` in the envelope; `/dev/null`, `NUL` on Windows). The other policy is `brief-file`, where the gate opens `launch.briefPath` read-only as stdin; the envelope states which one applies, and the adapter's `stdin_policy()` default is the null device. **codex must use the null device**: it probes piped stdin (\"Reading additional input from stdin...\") and blocks for ever on an open pipe nothing writes to |\n| Activity for idle | Section 7 |\n| Completion | The agent exited (reported by `gate-exit.json`) and `outbox/result-<N>.json` exists; the newest result is the one with the highest number, and a name with a sign or a non-numeric part is ignored |\n| Named blocks | Section 4 |"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-16",
+            "githubAnchor": "unheaded-block-16",
+            "stableAnchor": "unheaded-block-16",
+            "title": "Unheaded block 16",
+            "startLine": 101,
+            "endLine": 101,
+            "textDigest": "e8f01b5f5d1bcaac00447100f634a92e6f91f15334c5563feacfab57436607e4",
+            "sample": "The adapter does not build argv. The controller resolves the command through `resolveExecutorCommand` from the executor configuration and writes `launch.command`, `launch.args`, `l",
+            "identityFingerprint": "25aec306c46048ca0fee18612ef7b21338bfb1a78e3ed2f47f64600760c15858",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "6. Design decision: argv stays in the executor configuration"
+            ],
+            "text": "The adapter does not build argv. The controller resolves the command through `resolveExecutorCommand` from the executor configuration and writes `launch.command`, `launch.args`, `launch.env` and `launch.stdinPolicy` into the immutable envelope; the gate runs exactly that. Reason: moving argv rendering to Rust would move the ProviderAdapter binder (`transport.mjs`) to Rust, which a run that survives a dead controller does not need (owner decision 2026-10-16, plan decision D4). If that rendering ever moves, this spec and the contract change together."
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-17",
+            "githubAnchor": "unheaded-block-17",
+            "stableAnchor": "unheaded-block-17",
+            "title": "Unheaded block 17",
+            "startLine": 103,
+            "endLine": 103,
+            "textDigest": "6af2b737421a7b66a73a3fdf02c6a3699dbf0d978e0424ff8a2b3fa8daeb827e",
+            "sample": "What the adapter does decide for direct mode:",
+            "identityFingerprint": "39a00575e58f709d7cb3ff47a9754663889852ddb5f5099208356a36a290ad48",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "6. Design decision: argv stays in the executor configuration"
+            ],
+            "text": "What the adapter does decide for direct mode:"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-18",
+            "githubAnchor": "unheaded-block-18",
+            "stableAnchor": "unheaded-block-18",
+            "title": "Unheaded block 18",
+            "startLine": 105,
+            "endLine": 110,
+            "textDigest": "fda40725790f480bd880dc280f268ec79a3b8bf9167f786eae0b9a07d8c81124",
+            "sample": "| Decision | Rule |\n|---|---|\n| Stdin | Null device by default for every CLI (`stdinPolicy: null` in the envelope; `/dev/null`, `NUL` on Windows). The other policy is `brief-file`,",
+            "identityFingerprint": "7891fb94f43e2d47f22f1fe27f882053493fdaeda889434e284b80866edc6b1f",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "6. Design decision: argv stays in the executor configuration"
+            ],
+            "text": "| Decision | Rule |\n|---|---|\n| Stdin | Null device by default for every CLI (`stdinPolicy: null` in the envelope; `/dev/null`, `NUL` on Windows). The other policy is `brief-file`, where the gate opens `launch.briefPath` read-only as stdin; the envelope states which one applies, and the adapter's `stdin_policy()` default is the null device. **codex must use the null device**: it probes piped stdin (\"Reading additional input from stdin...\") and blocks for ever on an open pipe nothing writes to |\n| Activity for idle | Section 7 |\n| Completion | The agent exited (reported by `gate-exit.json`) and `outbox/result-<N>.json` exists; the newest result is the one with the highest number, and a name with a sign or a non-numeric part is ignored |\n| Named blocks | Section 4 |"
+          },
+          {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "7. Activity source for idle",
+            "anchor": "7-activity-source-for-idle",
+            "githubAnchor": "7-activity-source-for-idle",
+            "stableAnchor": "h-55e5d1b42800",
+            "startLine": 112,
+            "endLine": 112,
+            "textDigest": "34270fa6bd518c552ef02358d91f4b16bac9b4fbd9b684918fc486dc2be59561",
+            "sample": "7. Activity source for idle",
+            "sectionPayloadDigest": "2ad6fccc279065bcea6d0a95a633d66862410f56ebb0fa0cdd965a616f60d90d",
+            "followingBlockDigest": "de2255e5d3689966877f01aa79026072e758d312dcc4491d6478b3834871c67f",
+            "identityFingerprint": "f5c8f8e0eb2e280c84cbc997079726299f6228f59497a5775985d84798fb3262",
+            "ancestry": [
+              "Agent Protocol Component Specification"
+            ],
+            "text": "## 7. Activity source for idle",
+            "sectionText": "## 7. Activity source for idle\n\nThe supervisor tails the stdout and stderr capture files (up to 64 KiB per tick) and asks the adapter to judge each new chunk:\n\n| Chunk | Activity |\n|---|---|\n| Empty or only whitespace | `Quiet`: the idle timer keeps running |\n| Plain text | `Output` |\n| A line that starts with `{` and ends with `}` | `Event` (a CLI that streams JSON events) |\n\n`Output` and `Event` both reset the idle timer. The supervisor then stops the agent after `idleMs` of `Quiet` (cause `idle`).  Heartbeat files are for display and never count as activity."
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-19",
+            "githubAnchor": "unheaded-block-19",
+            "stableAnchor": "unheaded-block-19",
+            "title": "Unheaded block 19",
+            "startLine": 114,
+            "endLine": 114,
+            "textDigest": "de2255e5d3689966877f01aa79026072e758d312dcc4491d6478b3834871c67f",
+            "sample": "The supervisor tails the stdout and stderr capture files (up to 64 KiB per tick) and asks the adapter to judge each new chunk:",
+            "identityFingerprint": "8f828e59441d2823699c2961e19fca7e7ed1bae2ccb45bf29939f74e2a6131ba",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "7. Activity source for idle"
+            ],
+            "text": "The supervisor tails the stdout and stderr capture files (up to 64 KiB per tick) and asks the adapter to judge each new chunk:"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-20",
+            "githubAnchor": "unheaded-block-20",
+            "stableAnchor": "unheaded-block-20",
+            "title": "Unheaded block 20",
+            "startLine": 116,
+            "endLine": 120,
+            "textDigest": "d8528b6efbd467b7b1619ab5332bdabcd2b6c20466989382b2f085e23f6be356",
+            "sample": "| Chunk | Activity |\n|---|---|\n| Empty or only whitespace | `Quiet`: the idle timer keeps running |\n| Plain text | `Output` |\n| A line that starts with `{` and ends with `}` | `Eve",
+            "identityFingerprint": "4a36abc62ce559c18a98bd249efa84dbc42e068f968d8e498a40145ae2596e90",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "7. Activity source for idle"
+            ],
+            "text": "| Chunk | Activity |\n|---|---|\n| Empty or only whitespace | `Quiet`: the idle timer keeps running |\n| Plain text | `Output` |\n| A line that starts with `{` and ends with `}` | `Event` (a CLI that streams JSON events) |"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-21",
+            "githubAnchor": "unheaded-block-21",
+            "stableAnchor": "unheaded-block-21",
+            "title": "Unheaded block 21",
+            "startLine": 122,
+            "endLine": 122,
+            "textDigest": "c301b44aef5213224603d7e3f972e97a985b73e2a6efb519d20e6d94707a0e63",
+            "sample": "`Output` and `Event` both reset the idle timer. The supervisor then stops the agent after `idleMs` of `Quiet` (cause `idle`).  Heartbeat files are for display and never count as ac",
+            "identityFingerprint": "c9384f2606ce98fa0d020d9a22f3484b28bc39835ff3b5b671f75afc1b864c0a",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "7. Activity source for idle"
+            ],
+            "text": "`Output` and `Event` both reset the idle timer. The supervisor then stops the agent after `idleMs` of `Quiet` (cause `idle`).  Heartbeat files are for display and never count as activity."
+          },
+          {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "8. Boundaries",
+            "anchor": "8-boundaries",
+            "githubAnchor": "8-boundaries",
+            "stableAnchor": "h-4b8f69ac8190",
+            "startLine": 124,
+            "endLine": 124,
+            "textDigest": "6c19d2943d003385f749f55fbf72933ab840cb93d3a01205e9939fa98743fe2e",
+            "sample": "8. Boundaries",
+            "sectionPayloadDigest": "90c06ab7f85ab2b16fc38d61de846674247425e8dda7552e300faa24ccd93dec",
+            "followingBlockDigest": "90c06ab7f85ab2b16fc38d61de846674247425e8dda7552e300faa24ccd93dec",
+            "identityFingerprint": "478ac25f06ba3247f5f3843ed1b760ab4ab63742b669053da1c9d68f21a7307c",
+            "ancestry": [
+              "Agent Protocol Component Specification"
+            ],
+            "text": "## 8. Boundaries",
+            "sectionText": "## 8. Boundaries\n\n- No dependency on terminal-control, locks, attempts, envelopes or the filesystem layout of a run: the supervisor passes in the tail, the exit and the outbox listing.\n- No retry decision: `blocked(login)` and `blocked(usage-limit)` are facts the controller turns into provider-capacity behavior (fail over to another account, lock a dead login) elsewhere.\n- The terminal adapters read screens through the supervisor's `AgentIo` over terminal-control, by key; they never call terminal-control themselves."
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-22",
+            "githubAnchor": "unheaded-block-22",
+            "stableAnchor": "unheaded-block-22",
+            "title": "Unheaded block 22",
+            "startLine": 126,
+            "endLine": 128,
+            "textDigest": "90c06ab7f85ab2b16fc38d61de846674247425e8dda7552e300faa24ccd93dec",
+            "sample": "- No dependency on terminal-control, locks, attempts, envelopes or the filesystem layout of a run: the supervisor passes in the tail, the exit and the outbox listing.\n- No retry de",
+            "identityFingerprint": "f998b45e9c49a522bc49b1407945143321d0dbe326a8a73b40b3f48a1191a232",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "8. Boundaries"
+            ],
+            "text": "- No dependency on terminal-control, locks, attempts, envelopes or the filesystem layout of a run: the supervisor passes in the tail, the exit and the outbox listing.\n- No retry decision: `blocked(login)` and `blocked(usage-limit)` are facts the controller turns into provider-capacity behavior (fail over to another account, lock a dead login) elsewhere.\n- The terminal adapters read screens through the supervisor's `AgentIo` over terminal-control, by key; they never call terminal-control themselves."
+          },
+          {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "9. Lịch sử quyết định",
+            "anchor": "9-lịch-sử-quyết-định",
+            "githubAnchor": "9-lịch-sử-quyết-định",
+            "stableAnchor": "h-7fc009edd63d",
+            "startLine": 130,
+            "endLine": 130,
+            "textDigest": "ba6d298ad6751381376f574a459b96905accb95e6859d5474482c5d020536627",
+            "sample": "9. Lịch sử quyết định",
+            "sectionPayloadDigest": "27427a91bc8f310256bd74d65c4cc06ee11a6d25479d2cf765e98a4946ed8350",
+            "followingBlockDigest": "230949a9039c92f2ec7b01195f9a926ffdf0746d7e77d94019b3b91cb3ab0151",
+            "identityFingerprint": "5f61cbe1a89aa41d7683b8a4ac96441025ea32c7e139729c216d05cef00f4302",
+            "ancestry": [
+              "Agent Protocol Component Specification"
+            ],
+            "text": "## 9. Lịch sử quyết định",
+            "sectionText": "## 9. Lịch sử quyết định\n\n- **2026-10-16 — D4: cấu hình executor là nguồn duy nhất của argv.** Adapter `direct` không dựng argv; chỉ quyết stdin, nguồn hoạt động, nhận xong và kết quả có tên. Chuyển binder ProviderAdapter sang Rust thêm khoảng 8 giờ và một phase riêng, không cần cho mục tiêu sống qua controller chết.\n- **2026-10-18 — Adapter `direct` đọc đuôi 5 dòng, outbox thắng.** Lời login hay hết quota nằm xa phía trên không phải một lần chặn; kết quả trong outbox được quyết bất kể đuôi nói gì.\n\n- **2026-10-18 — Adapters `terminal` portable từ vòng canh của controller.** Regex và logic chờ cũ (`PASTE_CHIP_RE`, `isDraftStillInComposer`, `MAX_RESENDS`) chuyển nguyên sang Rust; test Node cũ thành vector màn hình thật. Gõ lại chỉ khi lời gõ lỗi và pane không đổi; một lời gõ thành công không bao giờ lặp. Kết quả chỉ tính khi file parse được và kích thước ổn định (đo: pi tạo file rỗng rồi mới điền)."
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-23",
+            "githubAnchor": "unheaded-block-23",
+            "stableAnchor": "unheaded-block-23",
+            "title": "Unheaded block 23",
+            "startLine": 132,
+            "endLine": 133,
+            "textDigest": "230949a9039c92f2ec7b01195f9a926ffdf0746d7e77d94019b3b91cb3ab0151",
+            "sample": "- **2026-10-16 — D4: cấu hình executor là nguồn duy nhất của argv.** Adapter `direct` không dựng argv; chỉ quyết stdin, nguồn hoạt động, nhận xong và kết quả có tên. Chuyển binder ",
+            "identityFingerprint": "382f45bc5b736ed6c8468e58175a68aaf9456664e2587849097fa6468d74ff03",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "9. Lịch sử quyết định"
+            ],
+            "text": "- **2026-10-16 — D4: cấu hình executor là nguồn duy nhất của argv.** Adapter `direct` không dựng argv; chỉ quyết stdin, nguồn hoạt động, nhận xong và kết quả có tên. Chuyển binder ProviderAdapter sang Rust thêm khoảng 8 giờ và một phase riêng, không cần cho mục tiêu sống qua controller chết.\n- **2026-10-18 — Adapter `direct` đọc đuôi 5 dòng, outbox thắng.** Lời login hay hết quota nằm xa phía trên không phải một lần chặn; kết quả trong outbox được quyết bất kể đuôi nói gì."
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-24",
+            "githubAnchor": "unheaded-block-24",
+            "stableAnchor": "unheaded-block-24",
+            "title": "Unheaded block 24",
+            "startLine": 135,
+            "endLine": 135,
+            "textDigest": "d2182824512bfa7fae58eaae8463713205c0416186583bc77f7488f046ca57d2",
+            "sample": "- **2026-10-18 — Adapters `terminal` portable từ vòng canh của controller.** Regex và logic chờ cũ (`PASTE_CHIP_RE`, `isDraftStillInComposer`, `MAX_RESENDS`) chuyển nguyên sang Rus",
+            "identityFingerprint": "92d730e6119428f4d20efde9af74091db7893aaaa385d669c9e69450f60bc442",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "9. Lịch sử quyết định"
+            ],
+            "text": "- **2026-10-18 — Adapters `terminal` portable từ vòng canh của controller.** Regex và logic chờ cũ (`PASTE_CHIP_RE`, `isDraftStillInComposer`, `MAX_RESENDS`) chuyển nguyên sang Rust; test Node cũ thành vector màn hình thật. Gõ lại chỉ khi lời gõ lỗi và pane không đổi; một lời gõ thành công không bao giờ lặp. Kết quả chỉ tính khi file parse được và kích thước ổn định (đo: pi tạo file rỗng rồi mới điền)."
+          },
+          {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "10. Related files",
+            "anchor": "10-related-files",
+            "githubAnchor": "10-related-files",
+            "stableAnchor": "h-60d5f3acd7c8",
+            "startLine": 137,
+            "endLine": 137,
+            "textDigest": "1d1974c39f127d689f2fd1861b84c2c12991332e5dec8815ce620a6d8bf56b5f",
+            "sample": "10. Related files",
+            "sectionPayloadDigest": "cb59a4643039920bbed74a5c13989fbb82d64a2f6d7ec80d9410697cbc2be841",
+            "followingBlockDigest": "cb59a4643039920bbed74a5c13989fbb82d64a2f6d7ec80d9410697cbc2be841",
+            "identityFingerprint": "72263bfe3453377d1c79aceb131b96f50137e18d6ea68d94b24c79d75b0dfc86",
+            "ancestry": [
+              "Agent Protocol Component Specification"
+            ],
+            "text": "## 10. Related files",
+            "sectionText": "## 10. Related files\n\n| Relationship | File |\n|---|---|\n| defines | [agent-protocol.v1.json](../../../packages/agent-protocol/contracts/agent-protocol.v1.json) |\n| consumer | [run-supervisor/spec.md](../run-supervisor/spec.md) |\n| boundary | [component-boundary.md](../component-boundary.md) |\n| plans | [direct mode](../../../plans/261016-1351-run-supervisor-rust-core-direct-mode/plan.md), [terminal mode](../../../plans/261016-1351-terminal-mode-and-launcher-identity/plan.md) |\n| design | [design r6, section 8](../../../plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md) |"
+          },
+          {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-25",
+            "githubAnchor": "unheaded-block-25",
+            "stableAnchor": "unheaded-block-25",
+            "title": "Unheaded block 25",
+            "startLine": 139,
+            "endLine": 145,
+            "textDigest": "cb59a4643039920bbed74a5c13989fbb82d64a2f6d7ec80d9410697cbc2be841",
+            "sample": "| Relationship | File |\n|---|---|\n| defines | [agent-protocol.v1.json](../../../packages/agent-protocol/contracts/agent-protocol.v1.json) |\n| consumer | [run-supervisor/spec.md](..",
+            "identityFingerprint": "71d404fc82a30c12415c51eef6c6ce2c7c746d23647bb4c928b753495f73f90b",
+            "ancestry": [
+              "Agent Protocol Component Specification",
+              "10. Related files"
+            ],
+            "text": "| Relationship | File |\n|---|---|\n| defines | [agent-protocol.v1.json](../../../packages/agent-protocol/contracts/agent-protocol.v1.json) |\n| consumer | [run-supervisor/spec.md](../run-supervisor/spec.md) |\n| boundary | [component-boundary.md](../component-boundary.md) |\n| plans | [direct mode](../../../plans/261016-1351-run-supervisor-rust-core-direct-mode/plan.md), [terminal mode](../../../plans/261016-1351-terminal-mode-and-launcher-identity/plan.md) |\n| design | [design r6, section 8](../../../plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md) |"
+          }
+        ]
+      }
+    }
+  ],
+  "directBindingsChecked": 0,
+  "directBindings": [],
+  "sourceIdentityJoins": [],
+  "remainingTargetDigestDrift": 0,
+  "rebindingsApplied": 0,
+  "step3Rebindings": "Deferred once to Step 7 atomic assembly under L12-58(1); no Step 3 record changed.",
+  "acceptance": "Binding existence/content check only. No source identity, content approval, or committed-byte reproduction acceptance."
+}

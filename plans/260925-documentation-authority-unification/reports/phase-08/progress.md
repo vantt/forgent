@@ -978,3 +978,21 @@ Deterministic history now follows each record's pinned author ancestry. All 609 
 Merge fd126f0c8 (14 main commits): all seven docs accounted; reading-map/runner/workflow digest refreshes and Seat Binding `allowed-new-file` under existing rules. Ratchet 0; serial ratchet/binding/ledger tests **172/172** (ratchet 28/28), citation drift 0, whitespace 0. Step 0 **297 direct + 128 members** checked; **24 direct + 128 member corrections in 16 group records**, all **40 records pending independent review**, 0 post-write drift. Three decision shards changed; source/group identities unchanged. **14 Step 3 overlaps deferred once to Step 7**, no Step 3 record changes.
 
 Step 5 generated-index delta **+1 reference**, queue **1,447 files/carries / 5,312 references / 227 exclusions / 39,861 dynamic sites / 201 old carries / 29 parts**. No production behavioral source changed; new Seat Binding reference is merge-pinned supplemental data, and Phase 9 candidate carry remains required. Updated population/hash/request plus 145 prior-record join digests; no parity acceptance inferred. Full ruling/accounting is in owner-answers L12-66; machine receipts are `step-04-l12-66-*`, `step-03-l12-66-*`, `step-00-l12-66-*`, `step-05-l12-66-population-delta.json`. Runner commit and Lead L12-11 accounting/review remain owed; no reviewers started and no consumer byte changed. needsWrites empty.
+
+
+### L12-67 / Step 5 admission pilot — in progress
+
+Records-only author started at aa8d343746a292d2cb476ab76e6489411fd59a62. First accounting candidate agent-protocol binding, Step 3/4 overlaps and package population delta; then whole-file admission for gateway, CLI messages (including promoted runtime exclusions), and setup/doctor. No consumers or live state touched; no CLI, build, gateway, cargo or git writes. Independent review remains pending.
+
+
+### Step 5 admission pilot / L12-67 — completed author handback
+
+gateway-contract: 40 refs / 18 admitted / 22 rejected / 2 behavioral records (2 physical file records) / 0 parked files; cli-help-messages: 40 refs / 37 admitted / 3 rejected / 9 behavioral records (9 physical file records) / 2 parked files; setup-doctor-roots: 69 refs / 25 admitted / 44 rejected / 5 behavioral records (26 physical file records) / 6 parked files.
+
+Merge aa8d34374 accounted: both extractors agree on 37 agent-protocol units; no inbound bindings/rebinds; two Step 3/4 physical overlaps deferred to Step 7. Six changed package files journaled; two existing Step 5 files need fresh later owning-seam trace. No legacy-root changes, no ledger changes, ratchet 0.
+
+37 canonical file records / 149 refs / 2,017 tuples, 16 behavioral records, 8 parked files. Nine unapplied Phase 9 full diffs; three joined parity receipts. Gateway raw/parsed file parity equal, both readers retained, HTTP/MCP error proof missing. Setup manifest/default roots retained; bounded exports/final scan-set parity missing. Full checker 0 failures; 27/27 probes over 15 rule families; current-root tests 84/84. All code/consumer/generator/gate/Step 3–4 bytes unchanged.
+
+Review request/index: 22 mandatory parts <=60 records/400 KB, max 389,887 bytes. No reviewers launched. File/literal/dynamic survival 43.2%/53.7%/17.7%; remaining five seams project 616 behavioral records, 2,774 literal refs and 6,719 tuples, ~801 full-context parts (11 count-only minimum). Review time remains unmeasured; 51.3–154 h is sensitivity, not approved budget. Timed machine author passes 0.538/0.449/8.766 s exclude shared investigation and cannot forecast semantic reviewer speed. Full limitations and per-seam sizing are in owner-answers L12-67 and step-05-pilot-review-request.md.
+
+Lead handoff: resize review and start independent readers; provide bounded state/inventory exports only to affected seams; retain Step 7 overlap/binding and ordinary L12-11 runner-commit accounting. No cutover, authority flip, process start or proof readiness claimed. needsWrites empty.

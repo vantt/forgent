@@ -1,0 +1,1 @@
+{"kind": "Step 5 checker mutation probes", "baselineFailures": 0, "rulesCovered": ["coverage", "fixture-provenance", "gateway", "generated", "message-deltas", "missing-proof", "parks", "patches", "receipts", "rejections", "review", "setup", "source-pins", "source-spans", "targets"], "passed": 27, "total": 27, "failures": []}

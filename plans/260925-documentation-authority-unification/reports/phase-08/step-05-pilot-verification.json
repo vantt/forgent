@@ -1,0 +1,362 @@
+{
+  "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+  "verifiedAt": "2026-10-20T16:02:29.452337+00:00",
+  "writeScopeCheck": {
+    "exit": 0,
+    "changedStatusPaths": [
+      "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-67-binding-check.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-67-ratchet.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-l12-67-merge-accounting.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-author.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-author.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-check-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-check.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-cutover-specs.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-gateway-compare.mjs",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-gateway-file-parity.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-light-tests.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-measurements.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p01.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p02.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p03.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p04.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p05.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p06.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p07.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p08.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p09.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p10.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p11.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p12.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p13.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p14.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p15.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p16.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p17.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p18.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p19.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p20.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p21.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p22.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-packet.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-packet.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-parity-receipts.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-probes-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-probes.log",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-review-index.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-review-request.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-step0.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/"
+    ],
+    "noSourceConsumerChanges": true,
+    "noBytecode": true
+  },
+  "frozenGenerator": {
+    "path": "scripts/generate-shipped-path-inventory.mjs",
+    "gitBlob": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+    "workingBytesEqualInput": true
+  },
+  "protectedPins": {
+    "scripts/generate-shipped-path-inventory.mjs": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284",
+    "plans/260925-documentation-authority-unification/transitional-switchboard.json": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+    "docs/transitional-switchboard.md": "b058029179bae791d084a6881660adc3f64da7537d4880cd51421158f8e2b752",
+    "AGENTS.md": "7100231ae81a24ba491542a5564d8413d778208772d2a756a42e3e91725578cf",
+    "CLAUDE.md": "384fb0e29c88662a86a6eec0334f557a71bb2c533f2f6c2ce137552a90b32568",
+    "scripts/check-legacy-docs-ratchet.mjs": "d63fdd10f4fe225b41ee1f92aa8e81ef3255b421f4cb3aebc3bd0bda2bd17b7e",
+    "scripts/check-legacy-docs-ratchet.baseline.json": "5783052e9a89e496c254ebeb99beec956e71ec4f592dbd6c6c5df5c40b53f7b8"
+  },
+  "proofs": [
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID python3 -B plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-step0.py",
+      "exit": 0,
+      "result": "both extractors agree; 37 units; 0 inbound bindings; 0 rebindings/drift"
+    },
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID python3 -B plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+      "exit": 0,
+      "result": {
+        "files": 37,
+        "literalReferences": 149,
+        "dynamicTuples": 2017,
+        "failureCount": 0
+      }
+    },
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID python3 -B plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py",
+      "exit": 0,
+      "result": {
+        "rules": 15,
+        "passed": 27,
+        "total": 27
+      }
+    },
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID node plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-gateway-compare.mjs",
+      "exit": 0,
+      "result": "raw and whole parsed equality; not HTTP proof"
+    },
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/docs/rul11-anchor-phrase.test.mjs test/docs/decisions-corpus-retired.test.mjs test/setup/instruction-registry.test.mjs test/scripts/check-decision-citation-drift.test.mjs",
+      "exit": 0,
+      "result": "84/84; zero failures/skips"
+    },
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-legacy-docs-ratchet.mjs",
+      "exit": 0,
+      "result": "997 checked, 28 accounted edits, three accounted new"
+    },
+    {
+      "command": "git diff --check",
+      "exit": 0
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-67-binding-check.json",
+      "sha256": "2c8489ef466d20b0e6ac3be3bbc725d6e1255c40b91e96261f331fcca1483c8a",
+      "bytes": 127405
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-67-ratchet.log",
+      "sha256": "9299cb06b5c8c4b7518e62992d0bb4c198371d561f10b129c7456f63c3f59319",
+      "bytes": 108
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+      "sha256": "c962501c6645f8a408d052c173604ea9cc0b293907389c8f0806830d6fc809a8",
+      "bytes": 16617
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-l12-67-merge-accounting.json",
+      "sha256": "5f0086c00e6bc7e260549c7f45d21da7cb2ce9ddf29c5a514b4cfce6bc42e260",
+      "bytes": 19726
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-author.log",
+      "sha256": "5df2cb6d62ac6a73d291a876a48e77adc7a03b46eba19e55a58e46934535fa6b",
+      "bytes": 1731
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-author.py",
+      "sha256": "1c00279a0a68e57f8572e4ffb9a2e43b7cf866babda8795dcf27932b96aab1a8",
+      "bytes": 29604
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-check-result.json",
+      "sha256": "22cc8b4286144979e44da6e705554cab455b16d51129a1fe3a8f153682a2845d",
+      "bytes": 2442
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-check.log",
+      "sha256": "9dc8be42a3de909d97ab1f8e6982f51ffe33a8698b254e716fb43d0b63d6adb4",
+      "bytes": 2294
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-cutover-specs.json",
+      "sha256": "279af62079be8ce09a7cc135ab3014ced8a9525ad55618dd9618ff70fff37a93",
+      "bytes": 104884
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-gateway-compare.mjs",
+      "sha256": "ee69fb27a0acf7589fcc6718c5a170dae1bed19b9de658abd087de0bdd23b06e",
+      "bytes": 1005
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-gateway-file-parity.log",
+      "sha256": "311cf14378c0d0d875d05d75a6976c60794c788e2d2820045749194f75ec7c62",
+      "bytes": 390
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-light-tests.log",
+      "sha256": "a9c6d890b0a76df9ce704920c5533551de7df7299f524dbe30fbfd2ca1ec916a",
+      "bytes": 8352
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-measurements.json",
+      "sha256": "3a9556d9ecb9da98bce7a599d87212a8684a8d7ef80796270b85f5fb7aa6cd72",
+      "bytes": 2348
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p01.json",
+      "sha256": "e93ebfe08482c10bd6630e3997b531e67feca67946067ad3e533b11d4012752e",
+      "bytes": 389887
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p02.json",
+      "sha256": "c97356ea1d3ee927da53062c15a3546afdc120294b88a9c32ba7456ae6697430",
+      "bytes": 387682
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p03.json",
+      "sha256": "b1225f76aacd5a6c08f67480352a55d5e578da69a58bed9d215c634f799b2804",
+      "bytes": 386119
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p04.json",
+      "sha256": "20da03c3d28d335d6515078aad9eddff96e87cf8fc8d17843b964fd7a54d5e1f",
+      "bytes": 386957
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p05.json",
+      "sha256": "ddbf809b42f8f4fb7fcf3f76fd15ec3754a65da4e39a79205303af5b8e065e45",
+      "bytes": 383825
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p06.json",
+      "sha256": "70a04330411e920f2b430601bfec154b8a1b02adf0331c8018d7edca2f13d46c",
+      "bytes": 387781
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p07.json",
+      "sha256": "bce701639ed49e62266d8fa21c702c7b0617ff7610de345a0575b15ab9fff2ba",
+      "bytes": 388426
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p08.json",
+      "sha256": "f8c05bc5d8c55afc63aed7282030af7bdb1d211a52e08bdd8d56c0dd8f026803",
+      "bytes": 387495
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p09.json",
+      "sha256": "b7de0d396b36be724c71f509b0a3ac765d4fd7fa9c03343175a6d03a773bd668",
+      "bytes": 387872
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p10.json",
+      "sha256": "fdf7858db41902d9bcf98b05b0065a37f26dc392eeb0fadac6133ec9d842a661",
+      "bytes": 377532
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p11.json",
+      "sha256": "a8154354a578174bc153bbc374305ee70b87a4eb4b1f335044ae131c29b24462",
+      "bytes": 389879
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p12.json",
+      "sha256": "cdea86e6abed894326ba9a61a32fd1d33801afd1f642608cd186f7194f04b931",
+      "bytes": 389130
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p13.json",
+      "sha256": "df04bfeb4314e5e97b47be21d7e0518a974985cf6011727cf3bd831ff9809ec8",
+      "bytes": 387419
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p14.json",
+      "sha256": "6c7fe7a62d4996f6964b146b5f5aafffde93181a88e7cf02569026fe189492ef",
+      "bytes": 388372
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p15.json",
+      "sha256": "e49d759c06419e29bba0f020ea86bb3442f55c1c9d38ec30130b218b1a00b099",
+      "bytes": 389841
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p16.json",
+      "sha256": "9459408c900d320548bffb4d03e3020012b3018ba33ff7b4dabb09a8438bbaac",
+      "bytes": 389101
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p17.json",
+      "sha256": "0b03e5eae917ae23b8d31efcf1e9bc414a2dfd9ca824c869abd388f7020a4e06",
+      "bytes": 388440
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p18.json",
+      "sha256": "68116c6a5a815277a58540463602c69717a4facfe7dcac6bbc548cb9599d47dc",
+      "bytes": 387417
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p19.json",
+      "sha256": "a1a1f4628578842cef23f0073c81dfeeaa2798b083e0aebaf8211b880220c4c8",
+      "bytes": 389099
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p20.json",
+      "sha256": "b380ba1488d68ea960c48d546444f14db109523c65376e24011886ebd50c6f63",
+      "bytes": 352706
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p21.json",
+      "sha256": "a1d01b4b37d4010410acfa1a5bef83cd471e1f3f4a866552e63ce0474a171bdf",
+      "bytes": 366257
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-p22.json",
+      "sha256": "124312c7f44ea850d9785caa65bbe0da9bbe491bdc3a543d87c0cbaabe0e34ff",
+      "bytes": 24118
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-packet.log",
+      "sha256": "db4fd5dd053b8424954e93e69e21a632602b2bdc72cea2d441afee7872ed1509",
+      "bytes": 3486
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-packet.py",
+      "sha256": "996524c4e3dbdf748a0e99f0c34ccbdd59a0ad85ee50de05f6a3eb69590bce2a",
+      "bytes": 25641
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-parity-receipts.json",
+      "sha256": "e76f9a62fb306b9996b23cda636d6cb24012baf10ea5ee4f66e0b1b5fd0415b4",
+      "bytes": 446099
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-probes-result.json",
+      "sha256": "047e28f6d8a70f0dd558395bcfc56f954c3558fcd440f47b64f99127feae1ae1",
+      "bytes": 9091
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-probes.log",
+      "sha256": "03503415f6161dce824ab848cf44c2c5d3d62ca449a970bfadde1da0d071f061",
+      "bytes": 327
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-review-index.json",
+      "sha256": "15a27ddceb21ddde46129713381f89711f0ca853d1bd47761a411d81b88acf36",
+      "bytes": 13877
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-review-request.md",
+      "sha256": "e3e4c89ebfafbb68b63bf62319a68b7203ef3e560160ac34f253ee6bf481f185",
+      "bytes": 7266
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-step0.py",
+      "sha256": "b87ef693f8ce722a4817c825ad306188ae48b01be92bb2087cd3a4b50583d0f2",
+      "bytes": 3802
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py",
+      "sha256": "8a6a0c41177db4d4494fc05f6d55341fc0e3b104eb19c9fe4bb2e17d0bdae725",
+      "bytes": 6203
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+      "sha256": "1bf8a714e9dd577722acf83b76b384396955731e3068f5ad3a469257860a317c",
+      "bytes": 349149
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl",
+      "sha256": "5c34992cd718ec495f19472eadab26c161774492727cafda19e20f747c81d94f",
+      "bytes": 387166
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sha256": "d8bf812a5fcada2a845411ae9bd1e2a89eb656e7fd90e7db62f69f747ac7836a",
+      "bytes": 3384427
+    }
+  ],
+  "limitations": [
+    "Semantic independent review pending; all 22 parts mandatory.",
+    "HTTP/MCP error proof and bounded source state/inventory/final scan-set parity missing.",
+    "Machine per-seam authoring-pass elapsed is measured; end-to-end semantic per-seam labor and reviewer speed are not measured.",
+    "No full npm/cargo, generated outputs, installed parity, process/gateway start or cutover execution.",
+    "Runner actual-commit L12-11 accounting and Step 7 deferred overlaps/binding review remain Lead work."
+  ],
+  "needsWrites": []
+}
