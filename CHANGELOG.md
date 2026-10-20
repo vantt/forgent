@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `fgos doctor` check `git-mutation-one-door` reads the release's `packages/git/contracts/mutation-census.v1.json`, which the release build writes from `scripts/git-one-door-scan.mjs`. The check fails when the census lists any `git` or hook spawn outside the fgos-git driver, or was not built from the payload it ships in. `npm test` also fails when product code (`src`, `bin`, `scripts`) starts `git` or a hook while the suite runs, and names the call site.
   - Commands from operator configuration or from a Work item's declared verify command count as configured binaries, not sites.
+  - The census built from this tree lists no site, so the check passes. Executor commands are traced to the runner config files and their defaults. The holder-lock borrow vectors, which run `git` only in a temp repository they create, count as the production sandbox probe.
   - Scripts of a skill that declares `metadata.oneDoor: standalone` in its SKILL.md (`distill`, `instruction-audit`) are counted as `standalone-skill-script`, not as sites; the test spy now watches `core/skills/` too.
   - The scan now follows functions passed around as values and methods of returned objects. The phase 07 unit 22 report names each open site.
 

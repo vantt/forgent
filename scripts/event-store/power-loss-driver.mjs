@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { sandboxGit } from '../lib/sandbox-git.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 import { openStore } from '../../src/event-store/index.mjs';
 
@@ -27,9 +28,11 @@ const event = n => ({ eventType: 'powerloss.appended', schemaVersion: 1, payload
 
 export function init(dir) {
   const repo = repoOf(dir);
-  const git = (...args) => execFileSync('git', ['-C', repo, '-c', 'user.name=power-loss', '-c', 'user.email=power-loss@example.invalid', ...args]);
+  // The repository on the device under test is the script's own sandbox: it goes through the sandbox door.
   fs.mkdirSync(stateOf(dir), { recursive: true, mode: 0o700 });
-  execFileSync('git', ['init', '-q', repo]);
+  const sandbox = sandboxGit(dir);
+  const git = (...args) => sandbox(['-C', repo, '-c', 'user.name=power-loss', '-c', 'user.email=power-loss@example.invalid', ...args]);
+  sandbox(['init', '-q', path.resolve(repo)]);
   git('config', 'fgos.machineId', 'power-loss');
   git('commit', '--allow-empty', '-qm', 'seed');
   fs.mkdirSync(path.join(repo, '.git/fgos/events/locks'), { recursive: true, mode: 0o700 });

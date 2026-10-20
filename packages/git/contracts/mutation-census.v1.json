@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "87242aea3bf3341b83ea1e0b791542db983092080447bd94a0d2b84725c03cfc",
+  "payloadDigest": "d694974f6219a763b3e17fb86de6a7ff51aebb3f5f1933ca1ac59ec1414bc4b9",
   "files": {
     ".githooks/pre-commit": "53c4ce05726ed6372d34f15f41d32c563d208204142b1459f4ec1b8d8d58cab2",
     "apps/fgctl/src/main.rs": "3f59cfc17cfd6c8268d15dcbeb0649b8cead1d18c387c7b20e14ce55ab26b9ff",
@@ -80,10 +80,10 @@
     "packages/agent-protocol/rust/src/terminal/codex.rs": "6a2afc4a961fc4345a7ef95716a348d10319a43c079506117288accd0c297514",
     "packages/agent-protocol/rust/src/terminal/common.rs": "7c2769f7206ae44d734585b1fbb8776189329d136d510bd4ae72309b67387ce5",
     "packages/agent-protocol/rust/src/terminal/mod.rs": "a8bcbddcb16733601bca7f76c6531b21d0f3ea2495e8ab174a457e2fbe1ebcd7",
-    "packages/agent-protocol/rust/src/terminal/omp.rs": "f5b5e3b6cfe6ef34b55e25498c7f56871d7aff0d6cc3228014ae15ea5316b1d0",
-    "packages/agent-protocol/rust/src/terminal/pi.rs": "e3ced796249d96694014e4e2cff7075e87ec9646ff123c7830875e1dffbde654",
+    "packages/agent-protocol/rust/src/terminal/omp.rs": "703b7352b006ffbde089ab6d132ecb62401db38639a4d373c9adb892702c05e0",
+    "packages/agent-protocol/rust/src/terminal/pi.rs": "5fc360741574da169d9189da28901aac30e54b3576b804018ea5b63ffae1c5c0",
     "packages/agent-protocol/rust/tests/direct_vectors.rs": "287adbd0bb43ffed9ec20c81085d33d4b9423266eeda4098ea6ce71548d324ba",
-    "packages/agent-protocol/rust/tests/terminal_vectors.rs": "3054ce2f442a2e3b5d17b9baade1f85e04c9f9698b47304827450c883e783bac",
+    "packages/agent-protocol/rust/tests/terminal_vectors.rs": "4ce5222b93e3a657220a83a652d6d51de83bfbd9b6eb2a1a71ecd24a5937a91c",
     "packages/canonical-json/rust/src/lib.rs": "e390b41a00319d727bd0f0d44ad7f6fda85218a53bae914186699f91a27b7944",
     "packages/convention/rust/src/lib.rs": "659d829be33a7eceff3e2e1e0a804740b58374e9d5a4b9eefca4c2b9f014496b",
     "packages/convention/rust/src/operations.rs": "cb2cb56e25a81f5475fc6120353fcf1e5483ebce9d0df80de16bfb3b69919d30",
@@ -349,7 +349,7 @@
     "packages/run-supervisor/rust/src/route.rs": "fdac6b485591ca182afc2cf3110761b5597354b078aa8ea3d2ead4335ac37d01",
     "packages/run-supervisor/rust/src/steps.rs": "55892a633e62ff2605b98f4afc57f281704a35e912edc63550206d93e03295ae",
     "packages/run-supervisor/rust/src/supervise.rs": "1eaee62f4709ac7b135302ed40068905fb50f5ba42d845228fa84d9407d091de",
-    "packages/run-supervisor/rust/src/supervise/terminal.rs": "d013fb753402f86628bab660e618692ba9c7b5108da5c0c07b00896b7d3b5183",
+    "packages/run-supervisor/rust/src/supervise/terminal.rs": "40db457a237ae133ce00b6ba3304af34d88fcd7f129afbc43dc6d8052a6c6cd3",
     "packages/run-supervisor/rust/src/supervise/unix.rs": "90da8b30403bdb2ab47ab2f26665adcd70ee89758c8cedac43e6a563a119d408",
     "packages/run-supervisor/rust/src/supervise/windows.rs": "e2b04b6d2499d769206aa1c8121eada6ab248351e25ad81ab90befa7c81d7205",
     "packages/run-supervisor/rust/src/terminal_slot.rs": "830e9565e41c9787f775c291390f8669e069cecc6759f43859b680354b7ea757",
@@ -438,6 +438,9 @@
     "scripts/ci-external-consumer.sh": "d097aeeacae5d35e7e2163e8d4fcc859df69efe57c05c22ca940e83beb6ab954",
     "scripts/decision-question-hook.mjs": "5f4d242754bea6fa460288e790a4354d6780d847305ef3779c4547137d6872d1",
     "scripts/dispatch-decide-hook.mjs": "c3385557ec6c469ea6709d30dcbcd704a1a74d1c7f5011109bfc0f999dec08af",
+    "scripts/event-store/forge-probe.sh": "3f83b9300b5918dc35c9816fd71dfd8f83d67328ce772cc70deefa820dfb2778",
+    "scripts/event-store/power-loss-driver.mjs": "aee1d6e31c79c658c339f0583f1392275229af30614062031fcc1d38766d6429",
+    "scripts/event-store/power-loss.sh": "f0ec9f1e7bcbc2ab6993597a9f702ca19de649348e57051df97b10e4553b4ed2",
     "scripts/event-store/store-increment-worker.mjs": "677424f7dae51f0566c9eb61cd96171347084ef2d93f5da1fc8133cea2f5af2a",
     "scripts/event-store/v-spawn-bench.mjs": "a9f2da47d5410ef6baef1200d9d5261c2bf3fed24cfe7450ce4d6913712a1890",
     "scripts/events-jsonl-truncation-guard.mjs": "772467fc1de75f0ecb39efecd08b607bb593c4f0b38b3586c82e2c4a4f710654",
@@ -512,11 +515,11 @@
     "src/event-store/native.mjs": "43899fbb698c2b6d698efe018cfbbeb1fe34e67d623243f96d44dcd2d81b10f8",
     "src/evolve/iron-law.mjs": "c3dce0c23705a8fd1ec463a782fba000ee67f21889f47e7ff350043f7a7ff8d7",
     "src/git/config.mjs": "18bdab21173350229a189c2b815351f26031389f356a2879befd46960bf26a95",
-    "src/git/index.mjs": "d3bbc06b9c54dc28692eb22b3a7a5da7fc0744e1bdb23856288d80a2772849c2",
+    "src/git/index.mjs": "8553e54d46431f3e458978dd3d577901ce10fcdb806b8df288a03562113f3ad5",
     "src/git/inspect.mjs": "1d9cd860b232056e1b982df31fb4041194f07b3a50505fa0ec00d62d5c0e2397",
     "src/git/land.mjs": "0c8a1c878a46ac19343040b6c85fc11dd0e59ac6d18b7a1490b85a06940524da",
     "src/git/native-lock.mjs": "b75f10cf57a5bc07f916b45c2ef241ab62eff89f1cf6f67505a3cb3a7ad6d515",
-    "src/git/native.mjs": "8bf9ff07bb5166bc872c22d29a613561a79745c7085851d68ed8007b348a9509",
+    "src/git/native.mjs": "9e1495a95649c17c689379a2dcb555464d23dbe810210751689c3453939b4a03",
     "src/git/recovery.mjs": "9b0baba9cc59665d700d1269c5f35dd5f7750b918d1dbf0273a8c651e03e4941",
     "src/git/refs.mjs": "eb8dfa75531652a19f0c524357d8e1c57d54bf281548f3d0e3a7657a4ee18502",
     "src/git/remote.mjs": "58aafc6f9ff17488427f515268cba52271696f1005ff44e6863977c9859ece4e",
@@ -712,9 +715,9 @@
     "src/setup/instruction-projections.mjs": "9d239c9f1d139f07cbc6bfc02701a7f138b38aad9fa2ac3f5061a34ccd357c8f",
     "src/setup/instruction-registry.mjs": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
     "src/setup/lock-record-checks.mjs": "d72db4c75a047cf55437b661e42ec7e0cb38b6370e98bfb9f8942f9eef7bb278",
-    "src/setup/model-pool-checks.mjs": "20ba5af80a42069dd20f750abce9068aa66d99d671095faa451ddad2e97d29bf",
+    "src/setup/model-pool-checks.mjs": "9a5f4c2319d630932b4c1ef3bf97ba90c41a2147271725fa1c87e64b472b1ec1",
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
-    "src/setup/registrations.mjs": "e0f87f7eb9ce5c952075bc357c71e65fea140ae849c58e84cb402a62c82afd19",
+    "src/setup/registrations.mjs": "35881dceb6935250616e16a2356a8cd03e3661a8b64ef6770b54df93f7ac9fbd",
     "src/setup/run-supervisor-checks.mjs": "4d44ebc8f640f3aad66f84df74a1c5ce28851ced8c1c708f31313e986a93e1ac",
     "src/setup/shell-rc.mjs": "36c0eb600e6943d5c6ed94918d5d6a294d447fa8a6491076faaf525aa80807c0",
     "src/setup/skill-wrappers.mjs": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
@@ -827,1394 +830,7 @@
     "src/workflow/unit-handoff.mjs": "76f4be618c5202f829311d0c161d144ef0fb1b4ddcf08425eef43afee78991bd",
     "src/workflow/units-source.mjs": "4e7c37fd0b0cced310b968154d579b8dc0c1949e27493f8ca68bb92421e91745"
   },
-  "sites": [
-    {
-      "path": "packages/holder-lock/rust/src/semantics.rs",
-      "line": 118,
-      "spawn": "Command::new",
-      "binary": "? argv.next()",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "packages/process/rust/src/containment/linux.rs",
-      "line": 28,
-      "spawn": "Command::new <- packages/process/rust/src/containment/linux.rs:50",
-      "binary": "? bwrap",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "packages/process/rust/src/containment/linux.rs",
-      "line": 128,
-      "spawn": "Command::new",
-      "binary": "? prefix[0]",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1414,
-      "spawn": "compileDispatchPlan -> src/runner/dispatch/assignment-runner.mjs:2544",
-      "binary": "? effectiveAssignment.policy.model",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1414,
-      "spawn": "compileDispatchPlan -> src/runner/dispatch/assignment-runner.mjs:2544",
-      "binary": "? normalizedPolicy.model",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1414,
-      "spawn": "compileDispatchPlan -> src/runner/dispatch/assignment-runner.mjs:2544",
-      "binary": "? remaining.model",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1707,
-      "spawn": "attemptProviderCapacityFallback -> src/runner/dispatch/assignment-runner.mjs:1056",
-      "binary": "? effectiveAssignment.policy.model",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1707,
-      "spawn": "attemptProviderCapacityFallback -> src/runner/dispatch/assignment-runner.mjs:1056",
-      "binary": "? normalizedPolicy.model",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1707,
-      "spawn": "attemptProviderCapacityFallback -> src/runner/dispatch/assignment-runner.mjs:1056",
-      "binary": "? remaining.model",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2323,
-      "spawn": "prepareConfinementForLaunch -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "? []",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2323,
-      "spawn": "prepareConfinementForLaunch -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "? [] (data flow too deep)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2323,
-      "spawn": "prepareConfinementForLaunch -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "? { ...DEFAULT_RIGOR_TO_TIER } (data flow too deep)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2323,
-      "spawn": "prepareConfinementForLaunch -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "? { claude: { nano: 'haiku', standard: 'sonnet (data flow too deep)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2323,
-      "spawn": "prepareConfinementForLaunch -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "? { command: 'claude', args: [ '-p', '{pro (data flow too deep)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2323,
-      "spawn": "prepareConfinementForLaunch -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "? { defaultRule: { mutatingMinRigor: 'standard' }, rev (data flow too deep)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2323,
-      "spawn": "prepareConfinementForLaunch -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "? { maxRoots: 4, maxLeavesPerRoot: 4, } (data flow too deep)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2323,
-      "spawn": "prepareConfinementForLaunch -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "? { orgPolicy: { dischargeOn: [...DEFAULT_COORDINATION_ORG_DIS (data flow too deep",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2323,
-      "spawn": "prepareConfinementForLaunch -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "? { strict: false, } (data flow too deep)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2323,
-      "spawn": "prepareConfinementForLaunch -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "? 900000 (data flow too deep)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2323,
-      "spawn": "prepareConfinementForLaunch -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "? cfg.executor.command",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2323,
-      "spawn": "prepareConfinementForLaunch -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "? cliInvocation.command",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2323,
-      "spawn": "prepareConfinementForLaunch -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "? elements of defaults[key]",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2323,
-      "spawn": "prepareConfinementForLaunch -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "? elements of existing[key]",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2323,
-      "spawn": "prepareConfinementForLaunch -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "? elements of opts.runnerConfig",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2323,
-      "spawn": "prepareConfinementForLaunch -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "? elements of withGlobal.runner",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2323,
-      "spawn": "prepareConfinementForLaunch -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "? executor (data flow too deep)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2323,
-      "spawn": "prepareConfinementForLaunch -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "? executor.command",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2323,
-      "spawn": "prepareConfinementForLaunch -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "? resolvedCmd.command",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2323,
-      "spawn": "prepareConfinementForLaunch -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "? undefined",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2323,
-      "spawn": "prepareConfinementForLaunch -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "param defaultConfig (no caller found for mergeConfigDefaults)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2323,
-      "spawn": "prepareConfinementForLaunch -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "param existing (no caller found for mergeInto)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2323,
-      "spawn": "prepareConfinementForLaunch -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "param existingConfig (no caller found for mergeConfigDefaults)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? '\\\\\\\\' + p.slice(8)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? effectiveContract ? { ...effectiveContract, assi (data flow too deep)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? effectivePolicy.model",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? effectivePolicy.tier (data flow too deep)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? elements of (effectiveMutation !== 'mutating' ? { sharedCwd: true } : {})",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? elements of (hasExplicitInvocationPin ? { invocationId: opts.cliOverride.preferI",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? elements of (opts.blind === true ? { blind: true, contextRefs: effectiveAssignme",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? elements of (postureBinding?.posture ? { requirement: confinementRequirement, ..",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? elements of (providerCapacityForLaunch ? { providerCapacity: providerCapacityFor",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? elements of defaults[key]",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? elements of existing[key]",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? explicitReasoningEffort(effectivePolicy) (data flow too deep)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? facts.trustedMainRoot",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? facts.worktreeRoot",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? fs.realpathSync.native(p)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? lines.join('\\n')",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? model (data flow too deep)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? opts.agentType (data flow too deep)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? opts.capabilityHints (data flow too deep)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? opts.cliOverride?.model (data flow too deep)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? opts.dispatchBatchKey (data flow too deep)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? opts.onChunk (data flow too deep)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? p.slice(4)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? path.resolve(runDir) (data flow too deep)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? process.cwd()",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? resolvedModel (data flow too deep)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? resolveTierCandidates(cfg, tier, provider)[0].model",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? timeoutMs (data flow too deep)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "? undefined",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "param defaultConfig (no caller found for mergeConfigDefaults)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "param existing (no caller found for mergeInto)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2544,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
-      "binary": "param existingConfig (no caller found for mergeConfigDefaults)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/cli.mjs",
-      "line": 735,
-      "spawn": "executeThroughConfinement -> src/runner/dispatch/confinement/authority.mjs:1015",
-      "binary": "? []",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/cli.mjs",
-      "line": 735,
-      "spawn": "executeThroughConfinement -> src/runner/dispatch/confinement/authority.mjs:1015",
-      "binary": "? cliInvocation.command",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/cli.mjs",
-      "line": 735,
-      "spawn": "executeThroughConfinement -> src/runner/dispatch/confinement/authority.mjs:1015",
-      "binary": "? elements of defaults[key]",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/cli.mjs",
-      "line": 735,
-      "spawn": "executeThroughConfinement -> src/runner/dispatch/confinement/authority.mjs:1015",
-      "binary": "? elements of existing[key]",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/cli.mjs",
-      "line": 735,
-      "spawn": "executeThroughConfinement -> src/runner/dispatch/confinement/authority.mjs:1015",
-      "binary": "? executor.command",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/cli.mjs",
-      "line": 735,
-      "spawn": "executeThroughConfinement -> src/runner/dispatch/confinement/authority.mjs:1015",
-      "binary": "? undefined",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/cli.mjs",
-      "line": 735,
-      "spawn": "executeThroughConfinement -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "param defaultConfig (no caller found for mergeConfigDefaults)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/cli.mjs",
-      "line": 735,
-      "spawn": "executeThroughConfinement -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "param existing (no caller found for mergeInto)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/cli.mjs",
-      "line": 735,
-      "spawn": "executeThroughConfinement -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "param existingConfig (no caller found for mergeConfigDefaults)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/cli.mjs",
-      "line": 1037,
-      "spawn": "executeAssignment -> src/runner/dispatch/assignment-runner.mjs:2323",
-      "binary": "? '\\\\\\\\' + p.slice(8)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/cli.mjs",
-      "line": 1037,
-      "spawn": "executeAssignment -> src/runner/dispatch/assignment-runner.mjs:2323",
-      "binary": "? facts.trustedMainRoot",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/cli.mjs",
-      "line": 1037,
-      "spawn": "executeAssignment -> src/runner/dispatch/assignment-runner.mjs:2323",
-      "binary": "? facts.worktreeRoot",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/cli.mjs",
-      "line": 1037,
-      "spawn": "executeAssignment -> src/runner/dispatch/assignment-runner.mjs:2323",
-      "binary": "? fs.realpathSync.native(p)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/cli.mjs",
-      "line": 1037,
-      "spawn": "executeAssignment -> src/runner/dispatch/assignment-runner.mjs:2323",
-      "binary": "? function renewCredential({ provider, accountId, credentialSource, runtimeDir }) ",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/cli.mjs",
-      "line": 1037,
-      "spawn": "executeAssignment -> src/runner/dispatch/assignment-runner.mjs:2323",
-      "binary": "? p.slice(4)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/cli.mjs",
-      "line": 1037,
-      "spawn": "executeAssignment -> src/runner/dispatch/assignment-runner.mjs:2323",
-      "binary": "? process.cwd()",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/cli.mjs",
-      "line": 1037,
-      "spawn": "executeAssignment -> src/runner/dispatch/assignment-runner.mjs:1414",
-      "binary": "param assignment (no caller found for dispatch)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/cli.mjs",
-      "line": 1037,
-      "spawn": "executeAssignment -> src/runner/dispatch/assignment-runner.mjs:2323",
-      "binary": "param cliOverride (no caller found for dispatch)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/cli.mjs",
-      "line": 1037,
-      "spawn": "executeAssignment -> src/runner/dispatch/assignment-runner.mjs:2323",
-      "binary": "param runnerConfig (no caller found for dispatch)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/confinement/authority.mjs",
-      "line": 1142,
-      "spawn": "cliSpawnAdapter -> src/runner/dispatch/transport.mjs:408",
-      "binary": "? elements of (preparedConfinement?.agentArgv ?? [request.invocation.command, ...(",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/confinement/authority.mjs",
-      "line": 1142,
-      "spawn": "cliSpawnAdapter -> src/runner/dispatch/transport.mjs:408",
-      "binary": "? elements of null",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/confinement/authority.mjs",
-      "line": 1142,
-      "spawn": "cliSpawnAdapter -> src/runner/dispatch/transport.mjs:408",
-      "binary": "? sourceInvocation.command",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/case-admission-port.mjs",
-      "line": 76,
-      "spawn": "resolvePanelRoles -> src/runner/execution/patterns/panel.mjs:93",
-      "binary": "? preset.params.params.synthesizeRole",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/dry-bind.mjs",
-      "line": 45,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? unit.pattern || 'solo'.params.params.params.synthesizeRole",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/dry-bind.mjs",
-      "line": 45,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? unit.pattern || 'solo'.params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/patterns/debate.mjs",
-      "line": 96,
-      "spawn": "runRole -> src/runner/execution/run.mjs:1081",
-      "binary": "? [results.find((r) => r.role === other && (r.round ?? 1) === 1)]",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/patterns/debate.mjs",
-      "line": 96,
-      "spawn": "runRole -> src/runner/execution/run.mjs:1081",
-      "binary": "param role (no caller found for anonymous function)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/patterns/debate.mjs",
-      "line": 125,
-      "spawn": "runRole -> src/runner/execution/run.mjs:1081",
-      "binary": "? [...results]",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/patterns/index.mjs",
-      "line": 38,
-      "spawn": "resolvePattern -> src/runner/execution/patterns/index.mjs:46",
-      "binary": "? patternInput.params.params.params.synthesizeRole",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/patterns/index.mjs",
-      "line": 38,
-      "spawn": "resolvePattern -> src/runner/execution/patterns/index.mjs:42",
-      "binary": "? patternInput.params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/patterns/index.mjs",
-      "line": 42,
-      "spawn": "runSolo -> src/runner/execution/patterns/solo.mjs:33",
-      "binary": "? preset.params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/patterns/index.mjs",
-      "line": 46,
-      "spawn": "runPanel -> src/runner/execution/patterns/panel.mjs:52",
-      "binary": "? preset.params.params.params.synthesizeRole",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/patterns/panel.mjs",
-      "line": 68,
-      "spawn": "runRole -> src/runner/execution/run.mjs:1081",
-      "binary": "param role (no caller found for anonymous function)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/patterns/panel.mjs",
-      "line": 93,
-      "spawn": "runRole -> src/runner/execution/run.mjs:1081",
-      "binary": "? (unit?.writes || []).length === 0",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/patterns/panel.mjs",
-      "line": 93,
-      "spawn": "runRole -> src/runner/execution/run.mjs:1081",
-      "binary": "? settledMembers.map((result) => result.value)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/patterns/reviewed.mjs",
-      "line": 288,
-      "spawn": "runRole -> src/runner/execution/run.mjs:1081",
-      "binary": "? (unit?.writes || []).length === 0",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/patterns/reviewed.mjs",
-      "line": 328,
-      "spawn": "runRole -> src/runner/execution/run.mjs:1081",
-      "binary": "? [producerResult]",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/patterns/reviewed.mjs",
-      "line": 328,
-      "spawn": "runRole -> src/runner/execution/run.mjs:1081",
-      "binary": "param checkerRole (no caller found for anonymous function)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/patterns/solo.mjs",
-      "line": 33,
-      "spawn": "runRole -> src/runner/execution/run.mjs:1081",
-      "binary": "? (unit?.writes || []).length === 0",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 351,
-      "spawn": "simulateUnitBindings -> src/runner/execution/dry-bind.mjs:45",
-      "binary": "? chosenPattern(options, unit).params.params.params.synthesizeRole",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 351,
-      "spawn": "simulateUnitBindings -> src/runner/execution/dry-bind.mjs:45",
-      "binary": "? chosenPattern(options, unit).params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 395,
-      "spawn": "runUnitBody -> src/runner/execution/run.mjs:831",
-      "binary": "? new LockHandle({ name: lock.name, path: lock.v3Path, rank: lock.rank, kind: lock",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 582,
-      "spawn": "assertAccountPinsBeforeRun -> src/runner/execution/run.mjs:351",
-      "binary": "? (pattern !== undefined ? { pattern } : {}).pattern.params.params.params.synthesi",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 582,
-      "spawn": "assertAccountPinsBeforeRun -> src/runner/execution/run.mjs:351",
-      "binary": "? (pattern !== undefined ? { pattern } : {}).pattern.params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 582,
-      "spawn": "assertAccountPinsBeforeRun -> src/runner/execution/run.mjs:351",
-      "binary": "? (prefer !== undefined ? { prefer } : {}).pattern.params.params.params.synthesize",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 582,
-      "spawn": "assertAccountPinsBeforeRun -> src/runner/execution/run.mjs:351",
-      "binary": "? (prefer !== undefined ? { prefer } : {}).pattern.params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 582,
-      "spawn": "assertAccountPinsBeforeRun -> src/runner/execution/run.mjs:351",
-      "binary": "? (raw.anonymizeInputs === true ? { anonymizeInputs: true } : {}).pattern.params.p",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 582,
-      "spawn": "assertAccountPinsBeforeRun -> src/runner/execution/run.mjs:351",
-      "binary": "? (raw.blind === true ? { blind: true } : {}).pattern.params.params.params.synthes",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 582,
-      "spawn": "assertAccountPinsBeforeRun -> src/runner/execution/run.mjs:351",
-      "binary": "? (raw.blind === true ? { blind: true } : {}).pattern.params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 582,
-      "spawn": "assertAccountPinsBeforeRun -> src/runner/execution/run.mjs:351",
-      "binary": "? (raw.persona !== undefined ? { persona: raw.persona.trim() } : {}).pattern.param",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 582,
-      "spawn": "assertAccountPinsBeforeRun -> src/runner/execution/run.mjs:351",
-      "binary": "? (raw.stanceOptions !== undefined ? { stanceOptions: normalizeStanceOptions(raw.s",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 582,
-      "spawn": "assertAccountPinsBeforeRun -> src/runner/execution/run.mjs:351",
-      "binary": "? (raw.timeoutMs !== undefined ? { timeoutMs: raw.timeoutMs } : {}).pattern.params",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 582,
-      "spawn": "assertAccountPinsBeforeRun -> src/runner/execution/run.mjs:351",
-      "binary": "? (raw.verify !== undefined ? { verify: raw.verify.trim() } : {}).pattern.params.p",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 582,
-      "spawn": "assertAccountPinsBeforeRun -> src/runner/execution/run.mjs:351",
-      "binary": "? (rigor !== undefined ? { rigor } : {}).pattern.params.params.params.synthesizeRo",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 582,
-      "spawn": "assertAccountPinsBeforeRun -> src/runner/execution/run.mjs:351",
-      "binary": "? (rigor !== undefined ? { rigor } : {}).pattern.params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 582,
-      "spawn": "assertAccountPinsBeforeRun -> src/runner/execution/run.mjs:351",
-      "binary": "? (skills !== undefined ? { skills } : {}).pattern.params.params.params.synthesize",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 582,
-      "spawn": "assertAccountPinsBeforeRun -> src/runner/execution/run.mjs:351",
-      "binary": "? (skills !== undefined ? { skills } : {}).pattern.params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 582,
-      "spawn": "assertAccountPinsBeforeRun -> src/runner/execution/run.mjs:351",
-      "binary": "? (syncBase !== undefined ? { syncBase } : {}).pattern.params.params.params.synthe",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 582,
-      "spawn": "assertAccountPinsBeforeRun -> src/runner/execution/run.mjs:351",
-      "binary": "? (syncBase !== undefined ? { syncBase } : {}).pattern.params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 582,
-      "spawn": "assertAccountPinsBeforeRun -> src/runner/execution/run.mjs:351",
-      "binary": "? (syncOnly ? { syncOnly: true } : {}).pattern.params.params.params.synthesizeRole",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 582,
-      "spawn": "assertAccountPinsBeforeRun -> src/runner/execution/run.mjs:351",
-      "binary": "? (syncOnly ? { syncOnly: true } : {}).pattern.params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 582,
-      "spawn": "assertAccountPinsBeforeRun -> src/runner/execution/run.mjs:351",
-      "binary": "? options.stanceOptions === undefined ? raw : { ...raw, stanceOptions: options.sta",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 582,
-      "spawn": "assertAccountPinsBeforeRun -> src/runner/execution/run.mjs:351",
-      "binary": "? raw.pattern.params.params.params.synthesizeRole",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 582,
-      "spawn": "assertAccountPinsBeforeRun -> src/runner/execution/run.mjs:351",
-      "binary": "? raw.pattern.params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 582,
-      "spawn": "assertAccountPinsBeforeRun -> src/runner/execution/run.mjs:351",
-      "binary": "? unitRecord.unit.pattern.params.params.params.synthesizeRole",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 582,
-      "spawn": "assertAccountPinsBeforeRun -> src/runner/execution/run.mjs:351",
-      "binary": "? unitRecord.unit.pattern.params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 602,
-      "spawn": "seatLaunchesOf -> src/runner/execution/case-admission-port.mjs:67",
-      "binary": "? pattern.params.params.synthesizeRole",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 831,
-      "spawn": "executeAssignment -> src/runner/dispatch/assignment-runner.mjs:2323",
-      "binary": "? async function probeCredential({ account, cli = null, spawnHolding }) { const so",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 831,
-      "spawn": "executeAssignment -> src/runner/dispatch/assignment-runner.mjs:2323",
-      "binary": "? elements of (bound.timeoutMs ? { timeoutMs: bound.timeoutMs } : {})",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 831,
-      "spawn": "executeAssignment -> src/runner/dispatch/assignment-runner.mjs:2323",
-      "binary": "? elements of (carriesOperation ? { operations: unitRecord.declared.operations, pi",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 831,
-      "spawn": "executeAssignment -> src/runner/dispatch/assignment-runner.mjs:2323",
-      "binary": "? elements of (options.providerCapacityRuntimeDir ? { providerCapacityRuntimeDir: ",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 831,
-      "spawn": "executeAssignment -> src/runner/dispatch/assignment-runner.mjs:2323",
-      "binary": "? elements of (scope.admission ? { caseContext: { caseId: scope.admission.caseId, ",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 831,
-      "spawn": "executeAssignment -> src/runner/dispatch/assignment-runner.mjs:2323",
-      "binary": "? elements of (unit.blind ? { blind: true } : {})",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 831,
-      "spawn": "executeAssignment -> src/runner/dispatch/assignment-runner.mjs:2323",
-      "binary": "? function renewCredential({ provider, accountId, credentialSource, runtimeDir }) ",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 831,
-      "spawn": "executeAssignment -> src/runner/dispatch/assignment-runner.mjs:2323",
-      "binary": "? result.trustedMainRoot",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 831,
-      "spawn": "executeAssignment -> src/runner/dispatch/assignment-runner.mjs:2323",
-      "binary": "? result.worktreeRoot",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 831,
-      "spawn": "executeAssignment -> src/runner/dispatch/assignment-runner.mjs:2323",
-      "binary": "? undefined",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 831,
-      "spawn": "executeAssignment -> src/runner/dispatch/assignment-runner.mjs:2323",
-      "binary": "param defaultConfig (no caller found for mergeConfigDefaults)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 831,
-      "spawn": "executeAssignment -> src/runner/dispatch/assignment-runner.mjs:2323",
-      "binary": "param existingConfig (no caller found for mergeConfigDefaults)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1081,
-      "spawn": "dispatchBound -> src/runner/execution/run.mjs:831",
-      "binary": "? []",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1081,
-      "spawn": "dispatchBound -> src/runner/execution/run.mjs:831",
-      "binary": "? recorded[recorded.length - 1].binding",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1081,
-      "spawn": "dispatchBound -> src/runner/execution/run.mjs:831",
-      "binary": "? undefined",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? (pattern !== undefined ? { pattern } : {}).pattern.params.params.params.synthesi",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? (pattern !== undefined ? { pattern } : {}).pattern.params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? (prefer !== undefined ? { prefer } : {}).pattern.params.params.params.synthesize",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? (prefer !== undefined ? { prefer } : {}).pattern.params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? (raw.anonymizeInputs === true ? { anonymizeInputs: true } : {}).pattern.params.p",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? (raw.blind === true ? { blind: true } : {}).pattern.params.params.params.synthes",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? (raw.blind === true ? { blind: true } : {}).pattern.params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? (raw.persona !== undefined ? { persona: raw.persona.trim() } : {}).pattern.param",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? (raw.stanceOptions !== undefined ? { stanceOptions: normalizeStanceOptions(raw.s",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? (raw.timeoutMs !== undefined ? { timeoutMs: raw.timeoutMs } : {}).pattern.params",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? (raw.verify !== undefined ? { verify: raw.verify.trim() } : {}).pattern.params.p",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? (rigor !== undefined ? { rigor } : {}).pattern.params.params.params.synthesizeRo",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? (rigor !== undefined ? { rigor } : {}).pattern.params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? (skills !== undefined ? { skills } : {}).pattern.params.params.params.synthesize",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? (skills !== undefined ? { skills } : {}).pattern.params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? (syncBase !== undefined ? { syncBase } : {}).pattern.params.params.params.synthe",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? (syncBase !== undefined ? { syncBase } : {}).pattern.params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? (syncOnly ? { syncOnly: true } : {}).pattern.params.params.params.synthesizeRole",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? (syncOnly ? { syncOnly: true } : {}).pattern.params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? options.stanceOptions === undefined ? raw : { ...raw, stanceOptions: options.sta",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? patternName.params.params.params.synthesizeRole",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? patternName.params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? raw.pattern.params.params.params.synthesizeRole",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? raw.pattern.params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? unitRecord.unit.pattern.params.params.params.synthesizeRole",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "? unitRecord.unit.pattern.params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/execution/unit-summary.mjs",
-      "line": 84,
-      "spawn": "resolvePanelRoles -> src/runner/execution/patterns/panel.mjs:93",
-      "binary": "? preset.params.params.synthesizeRole",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/setup/blind-steps-proven-pools.mjs",
-      "line": 118,
-      "spawn": "simulateUnitBindings -> src/runner/execution/dry-bind.mjs:45",
-      "binary": "? template.pattern.params.params.params.synthesizeRole",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/setup/blind-steps-proven-pools.mjs",
-      "line": 118,
-      "spawn": "simulateUnitBindings -> src/runner/execution/dry-bind.mjs:45",
-      "binary": "? template.pattern.params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/setup/workflow-pool-independence.mjs",
-      "line": 163,
-      "spawn": "simulateUnitBindings -> src/runner/execution/dry-bind.mjs:45",
-      "binary": "? template.pattern.params.params.params.synthesizeRole",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/setup/workflow-pool-independence.mjs",
-      "line": 163,
-      "spawn": "simulateUnitBindings -> src/runner/execution/dry-bind.mjs:45",
-      "binary": "? template.pattern.params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/workflow/case-start.mjs",
-      "line": 233,
-      "spawn": "simulateUnitBindings -> src/runner/execution/dry-bind.mjs:45",
-      "binary": "? unit.template.params.params.params.synthesizeRole",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/workflow/case-start.mjs",
-      "line": 233,
-      "spawn": "simulateUnitBindings -> src/runner/execution/dry-bind.mjs:45",
-      "binary": "? unit.template.params.params.role",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/workflow/case-verbs.mjs",
-      "line": 133,
-      "spawn": "advanceWorkflowRun -> src/workflow/runner.mjs:375",
-      "binary": "? all.get(id)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/workflow/case-verbs.mjs",
-      "line": 133,
-      "spawn": "advanceWorkflowRun -> src/workflow/runner.mjs:375",
-      "binary": "? fallbackAll.get(id)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/workflow/case-verbs.mjs",
-      "line": 133,
-      "spawn": "advanceWorkflowRun -> src/workflow/runner.mjs:375",
-      "binary": "? result.trustedMainRoot",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/workflow/case-verbs.mjs",
-      "line": 133,
-      "spawn": "advanceWorkflowRun -> src/workflow/runner.mjs:375",
-      "binary": "? result.worktreeRoot",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/workflow/case-verbs.mjs",
-      "line": 133,
-      "spawn": "advanceWorkflowRun -> src/workflow/runner.mjs:375",
-      "binary": "? undefined",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/workflow/case-verbs.mjs",
-      "line": 133,
-      "spawn": "advanceWorkflowRun -> src/workflow/runner.mjs:375",
-      "binary": "param hold (no caller found for anonymous function)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/workflow/case-verbs.mjs",
-      "line": 133,
-      "spawn": "advanceWorkflowRun -> src/workflow/runner.mjs:375",
-      "binary": "param params (no caller found for startWorkflow)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/workflow/case-verbs.mjs",
-      "line": 230,
-      "spawn": "advanceWorkflowRun -> src/workflow/runner.mjs:375",
-      "binary": "? result.trustedMainRoot",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/workflow/case-verbs.mjs",
-      "line": 230,
-      "spawn": "advanceWorkflowRun -> src/workflow/runner.mjs:375",
-      "binary": "? result.worktreeRoot",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/workflow/case-verbs.mjs",
-      "line": 230,
-      "spawn": "advanceWorkflowRun -> src/workflow/runner.mjs:375",
-      "binary": "? undefined",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/workflow/case-verbs.mjs",
-      "line": 230,
-      "spawn": "advanceWorkflowRun -> src/workflow/runner.mjs:375",
-      "binary": "param params (no caller found for answerWorkflow)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/workflow/case-verbs.mjs",
-      "line": 230,
-      "spawn": "advanceWorkflowRun -> src/workflow/runner.mjs:375",
-      "binary": "param workflowRunId (no caller found for answerWorkflow)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/workflow/case-verbs.mjs",
-      "line": 303,
-      "spawn": "advanceWorkflowRun -> src/workflow/runner.mjs:375",
-      "binary": "? result.trustedMainRoot",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/workflow/case-verbs.mjs",
-      "line": 303,
-      "spawn": "advanceWorkflowRun -> src/workflow/runner.mjs:375",
-      "binary": "? result.worktreeRoot",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/workflow/case-verbs.mjs",
-      "line": 303,
-      "spawn": "advanceWorkflowRun -> src/workflow/runner.mjs:375",
-      "binary": "? undefined",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/workflow/case-verbs.mjs",
-      "line": 303,
-      "spawn": "advanceWorkflowRun -> src/workflow/runner.mjs:375",
-      "binary": "param options (no caller found for resumeWorkflow)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/workflow/case-verbs.mjs",
-      "line": 303,
-      "spawn": "advanceWorkflowRun -> src/workflow/runner.mjs:375",
-      "binary": "param workflowRunId (no caller found for resumeWorkflow)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/workflow/runner.mjs",
-      "line": 375,
-      "spawn": "simulateUnitBindings -> src/runner/execution/dry-bind.mjs:45",
-      "binary": "? unitPatternOf(u.template) || 'solo'.params.params.params.synthesizeRole",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/workflow/runner.mjs",
-      "line": 375,
-      "spawn": "simulateUnitBindings -> src/runner/execution/dry-bind.mjs:45",
-      "binary": "? unitPatternOf(u.template) || 'solo'.params.params.role",
-      "family": "unresolved-binary"
-    }
-  ],
+  "sites": [],
   "classes": [
     {
       "path": ".githooks/pre-commit",
@@ -2829,6 +1445,15 @@
     },
     {
       "path": "packages/distribution/rust/src/init.rs",
+      "line": 1115,
+      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:146",
+      "binary": "git",
+      "class": "production-sandbox-probe",
+      "function": "run",
+      "repository": "self.repo.to_string_lossy().into_owned()"
+    },
+    {
+      "path": "packages/distribution/rust/src/init.rs",
       "line": 2080,
       "spawn": "Command::new",
       "binary": "sh",
@@ -3126,11 +1751,28 @@
       "repository": "&dir"
     },
     {
+      "path": "packages/holder-lock/rust/src/route.rs",
+      "line": 514,
+      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:146",
+      "binary": "git",
+      "class": "production-sandbox-probe",
+      "function": "run",
+      "repository": "self.repo.to_string_lossy().into_owned()"
+    },
+    {
       "path": "packages/holder-lock/rust/src/route/hold.rs",
       "line": 193,
       "spawn": "Command::new <- packages/process/rust/src/mapped.rs:146",
       "binary": "(parsed configuration (request .get(\"argv\") .and_then(Value::as_array) .ok_or(\"argv))",
       "class": "configured-binary"
+    },
+    {
+      "path": "packages/holder-lock/rust/src/semantics.rs",
+      "line": 118,
+      "spawn": "Command::new",
+      "binary": "(self)",
+      "class": "argv-runner",
+      "resolvedAt": "packages/holder-lock/rust/src/port.rs:70"
     },
     {
       "path": "packages/holder-lock/rust/tests/borrow_git.rs",
@@ -3175,10 +1817,10 @@
       "class": "rust-test"
     },
     {
-      "path": "packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs",
-      "line": 45,
+      "path": "packages/host-runtime/rust/src/providers/external_process/adapter.rs",
+      "line": 176,
       "spawn": "Command::new <- packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs:210",
-      "binary": "(uncalled new)",
+      "binary": "(uncalled for_fixture)",
       "class": "uncalled-wrapper"
     },
     {
@@ -3224,6 +1866,54 @@
       "class": "rust-test"
     },
     {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 50,
+      "spawn": "Command::new",
+      "binary": "/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:28"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 50,
+      "spawn": "Command::new",
+      "binary": "/usr/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:28"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 50,
+      "spawn": "Command::new",
+      "binary": "/usr/local/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:28"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 128,
+      "spawn": "Command::new",
+      "binary": "/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:29"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 128,
+      "spawn": "Command::new",
+      "binary": "/usr/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:29"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 128,
+      "spawn": "Command::new",
+      "binary": "/usr/local/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:29"
+    },
+    {
       "path": "packages/process/rust/tests/containment_bwrap.rs",
       "line": 125,
       "spawn": "Command::new",
@@ -3242,6 +1932,20 @@
       "line": 153,
       "spawn": "Command::new <- packages/run-supervisor/rust/src/steps.rs:223",
       "binary": "(parsed configuration (step[\"hostBin\"].as_str().ok_or_else(|| fail(\"step has no hos))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "packages/run-supervisor/rust/src/supervise.rs",
+      "line": 415,
+      "spawn": "Command::new <- packages/process/rust/src/containment/linux.rs:128",
+      "binary": "(parsed configuration (envelope[\"containment\"][\"bwrapPrefix\"].as_array().and_then(|))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "packages/run-supervisor/rust/src/supervise/unix.rs",
+      "line": 184,
+      "spawn": "Command::new <- packages/process/rust/src/containment/linux.rs:128",
+      "binary": "(parsed configuration (envelope[\"containment\"][\"bwrapPrefix\"].as_array().map(|items))",
       "class": "configured-binary"
     },
     {
@@ -3330,10 +2034,122 @@
       "class": "configured-binary"
     },
     {
+      "path": "scripts/event-store/power-loss-driver.mjs",
+      "line": 24,
+      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/event-store/power-loss-driver.mjs",
+      "line": 25,
+      "spawn": "openStore -> src/event-store/native.mjs:71",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/event-store/store-increment-worker.mjs",
+      "line": 12,
+      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/event-store/store-increment-worker.mjs",
+      "line": 15,
+      "spawn": "openStore -> src/event-store/native.mjs:71",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git-addon.mjs",
+      "line": 13,
+      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e1-power-cut.mjs",
+      "line": 72,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e1-power-cut.mjs",
+      "line": 121,
+      "spawn": "createGitRecovery -> src/git/recovery.mjs:7",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 104,
+      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 106,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 116,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 148,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 286,
+      "spawn": "typedOperationRows -> scripts/git/e3-bench.mjs:298",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 444,
+      "spawn": "checkoutInspect -> scripts/git/e3-bench.mjs:48",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
       "path": "scripts/git/e3-bench.mjs",
       "line": 446,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 448,
+      "spawn": "typedOperationRows -> scripts/git/e3-bench.mjs:298",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 462,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 479,
+      "spawn": "createGitScopedCommit -> src/git/scoped-commit.mjs:7",
+      "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
@@ -3345,6 +2161,27 @@
     },
     {
       "path": "scripts/git/e3-bench.mjs",
+      "line": 649,
+      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 662,
+      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 680,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:753",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
       "line": 680,
       "spawn": "rollback -> scripts/git/e3-bench.mjs:723",
       "binary": "(env FGOS_HOST_BIN)",
@@ -3352,9 +2189,30 @@
     },
     {
       "path": "scripts/git/e3-bench.mjs",
+      "line": 778,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:753",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
       "line": 783,
       "spawn": "rollbackOnly -> scripts/git/e3-bench.mjs:778",
       "binary": "(command-line arguments)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/p-space-resource.mjs",
+      "line": 61,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/p-space-resource.mjs",
+      "line": 96,
+      "spawn": "createGitRecovery -> src/git/recovery.mjs:7",
+      "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
@@ -3389,6 +2247,45 @@
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
+    },
+    {
+      "path": "src/event-store/native.mjs",
+      "line": 176,
+      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "binary": "param loaderOptions",
+      "class": "uncalled-wrapper",
+      "function": "decodeLegacyFiles"
+    },
+    {
+      "path": "src/event-store/native.mjs",
+      "line": 182,
+      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "binary": "param loaderOptions",
+      "class": "uncalled-wrapper",
+      "function": "branchKey"
+    },
+    {
+      "path": "src/git/index.mjs",
+      "line": 10,
+      "spawn": "Command::new <- packages/holder-lock/rust/src/semantics.rs:118",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/git/index.mjs",
+      "line": 17,
+      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "binary": "param loaderOptions",
+      "class": "uncalled-wrapper",
+      "function": "versions"
+    },
+    {
+      "path": "src/git/native-lock.mjs",
+      "line": 7,
+      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "binary": "param loaderOptions",
+      "class": "uncalled-wrapper",
+      "function": "createGitNativeLockRepair"
     },
     {
       "path": "src/holder-lock/driver.mjs",
@@ -3511,20 +2408,6 @@
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1414,
-      "spawn": "compileDispatchPlan -> src/runner/dispatch/assignment-runner.mjs:2544",
-      "binary": "(configuration file data)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1707,
-      "spawn": "attemptProviderCapacityFallback -> src/runner/dispatch/assignment-runner.mjs:1056",
-      "binary": "(configuration file data)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
       "line": 2255,
       "spawn": "mintAttemptWriterId -> src/util/session-identity.mjs:224",
       "binary": "(env FGOS_HOST_BIN)",
@@ -3552,11 +2435,33 @@
       "class": "configured-binary"
     },
     {
+      "path": "src/runner/dispatch/cli.mjs",
+      "line": 735,
+      "spawn": "executeThroughConfinement -> src/runner/dispatch/confinement/authority.mjs:1142",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
       "path": "src/runner/dispatch/confinement/authority.mjs",
       "line": 823,
       "spawn": "verifyRequiredProbe -> src/runner/dispatch/confinement/authority.mjs:168",
       "binary": "(configuration file data)",
       "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/authority.mjs",
+      "line": 1142,
+      "spawn": "cliSpawnAdapter -> src/runner/dispatch/transport.mjs:408",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/authority.mjs",
+      "line": 1142,
+      "spawn": "cliSpawnAdapter -> src/runner/dispatch/transport.mjs:408",
+      "binary": "param driver",
+      "class": "uncalled-wrapper",
+      "function": "registerBackendDriver"
     },
     {
       "path": "src/runner/dispatch/worker-session-boot.mjs",
@@ -3566,25 +2471,12 @@
       "class": "configured-binary"
     },
     {
-      "path": "src/runner/execution/run.mjs",
-      "line": 582,
-      "spawn": "assertAccountPinsBeforeRun -> src/runner/execution/run.mjs:351",
-      "binary": "(configuration file data)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 602,
-      "spawn": "seatLaunchesOf -> src/runner/execution/case-admission-port.mjs:67",
-      "binary": "(configuration file data)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 831,
-      "spawn": "executeAssignment -> src/runner/dispatch/assignment-runner.mjs:2323",
-      "binary": "(configuration file data)",
-      "class": "configured-binary"
+      "path": "src/runner/execution/commit-unit-work.mjs",
+      "line": 30,
+      "spawn": "state -> src/runner/execution/commit-unit-work.mjs:28",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "changedPaths"
     },
     {
       "path": "src/runner/execution/run.mjs",
@@ -3598,20 +2490,6 @@
       "line": 1200,
       "spawn": "runCommand -> src/runner/goal-check.mjs:61",
       "binary": "(consumer verify command (unit?.verify))",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/runner/execution/run.mjs",
-      "line": 1233,
-      "spawn": "runPattern -> src/runner/execution/patterns/index.mjs:38",
-      "binary": "(configuration file data)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/runner/execution/unit-summary.mjs",
-      "line": 82,
-      "spawn": "resolvePattern -> src/runner/execution/unit-summary.mjs:84",
-      "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
@@ -3687,6 +2565,14 @@
       "spawn": "execFileSync",
       "binary": "(configuration file data)",
       "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/event-store-checks.mjs",
+      "line": 32,
+      "spawn": "checkEventStore -> src/setup/event-store-checks.mjs:56",
+      "binary": "param options",
+      "class": "uncalled-wrapper",
+      "function": "eventStoreDoctor"
     },
     {
       "path": "src/setup/holder-lock-checks.mjs",
@@ -3843,12 +2729,68 @@
       "class": "configured-binary"
     },
     {
+      "path": "src/verbs/events/export.mjs",
+      "line": 14,
+      "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "exportUseCase"
+    },
+    {
+      "path": "src/verbs/events/migrate.mjs",
+      "line": 68,
+      "spawn": "eventStoreFacts -> src/event-store/native.mjs:154",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "migrateUseCase"
+    },
+    {
       "path": "src/verbs/events/migrate.mjs",
       "line": 70,
       "spawn": "checkStopped -> src/holder-lock/fences.mjs:489",
       "binary": "param ctx",
       "class": "uncalled-wrapper",
       "function": "migrateUseCase"
+    },
+    {
+      "path": "src/verbs/events/migrate.mjs",
+      "line": 73,
+      "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "migrateUseCase"
+    },
+    {
+      "path": "src/verbs/events/migrate.mjs",
+      "line": 95,
+      "spawn": "createGitScopedCommit -> src/git/scoped-commit.mjs:7",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "migrateUseCase"
+    },
+    {
+      "path": "src/verbs/events/rebuild.mjs",
+      "line": 8,
+      "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "rebuildStoreUseCase"
+    },
+    {
+      "path": "src/verbs/events/status.mjs",
+      "line": 3,
+      "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "statusUseCase"
+    },
+    {
+      "path": "src/verbs/events/sync.mjs",
+      "line": 3,
+      "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "syncUseCase"
     }
   ]
 }

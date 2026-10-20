@@ -81,8 +81,10 @@ function kindOf(name, source) {
 
 function binaryClass(value) {
   if (value.self) return 'other';
+  if (value.fnref) return 'other'; // a function is no program name
   if (value.external) return 'external';
-  if (value.object !== undefined) return 'unknown';
+  // An object or array literal is no program: child_process refuses any binary that is not a string.
+  if (value.object !== undefined) return 'other';
   if (value.unknown !== undefined) return 'unknown';
   if (value.param !== undefined) return 'param';
   const v = value.lit.trim();
@@ -95,6 +97,18 @@ function binaryClass(value) {
 }
 
 // ---------- JavaScript ----------
+
+// A property path is a list of keys; `*` is any one element and `**` one or more nested elements, so a
+// path that a recursion deepens (a deep merge reading `existing[key]` again and again) stays finite.
+function normalPath(path) {
+  const out = [];
+  for (const key of path) {
+    const last = out.at(-1);
+    if ((key === '*' || key === '**') && (last === '*' || last === '**')) out[out.length - 1] = '**';
+    else out.push(key);
+  }
+  return out;
+}
 
 function splitArgs(shape, open) {
   // `open` indexes the '(' of a call; returns [{from, to}] for each top-level argument and the close index.
@@ -145,7 +159,26 @@ function functionSpans(shape) {
     spans.push({ name, from: open, bodyFrom: k, to: end, params });
     header.lastIndex = open + 1;
   }
-  return spans;
+  // An arrow with one bare parameter (`const scoped = ctx => ...`).
+  for (const m of shape.matchAll(/(?:\b([A-Za-z_$][\w$]*)\s*[:=]\s*)?(?<![\w$.])(?:async\s+)?([A-Za-z_$][\w$]*)\s*=>/g)) {
+    const at = m.index + m[0].lastIndexOf(m[2]);
+    if (m[2] === 'async' || (m[1] && /^(?:const|let|var)$/.test(m[1]))) continue;
+    let k = m.index + m[0].length;
+    while (/\s/.test(shape[k] ?? '')) k++;
+    let end;
+    if (shape[k] === '{') {
+      let depth = 0;
+      for (end = k; end < shape.length; end++) { if (shape[end] === '{') depth++; else if (shape[end] === '}' && --depth === 0) break; }
+    } else {
+      let depth = 0;
+      for (end = k; end < shape.length; end++) {
+        const c = shape[end];
+        if ('([{'.includes(c)) depth++; else if (')]}'.includes(c)) { if (depth-- === 0) break; } else if ((c === ',' || c === ';') && depth === 0) break;
+      }
+    }
+    spans.push({ name: m[1] ?? null, from: at, bodyFrom: k, to: end, params: [m[2]] });
+  }
+  return spans.sort((a, b) => a.from - b.from);
 }
 
 function paramNames(text) {
@@ -163,7 +196,43 @@ function enclosing(spans, index) {
 }
 
 // Each spawn site gets a bounded share of evaluation steps; past it the binary is unknown, never safe.
-const budget = { steps: 0, limit: 4000 };
+// Within one share, an expression already evaluated at the same place gives the same values. One met again
+// while it is still being evaluated (a cycle: `x = { ...x, extra }`) starts from no values and is evaluated
+// again until its values stop growing; past a few rounds it is also unknown. Nothing computed from a cycle
+// still in progress is kept.
+const budget = { steps: 0, limit: 300000, memo: new Map(), stack: [] };
+const MAX_CYCLE_ROUNDS = 4;
+const valueKey = (v) => JSON.stringify([v.lit, v.external, v.unknown, v.self, v.param, v.fn?.from, v.file?.name, v.path, v.object, v.at, v.bound]);
+function memoized(key, compute) {
+  const { memo, stack } = budget;
+  const known = memo.get(key);
+  if (known?.done) return known.value;
+  if (known) {
+    // A cycle back to an entry still in progress: everything evaluated since depends on its current value.
+    known.hit = true;
+    for (let i = stack.lastIndexOf(known) + 1; i < stack.length; i++) stack[i].tainted = true;
+    return known.value;
+  }
+  const entry = { value: [], done: false, hit: false, tainted: false };
+  memo.set(key, entry);
+  stack.push(entry);
+  try {
+    for (let round = 1; ; round++) {
+      entry.hit = false;
+      const out = compute();
+      const grew = out.some((v) => !entry.value.some((w) => valueKey(w) === valueKey(v)));
+      entry.value = out;
+      if (!entry.hit || !grew) break;
+      if (round >= MAX_CYCLE_ROUNDS) { entry.value = [...out, { unknown: `${key.split('\0').pop().slice(0, 60)} (cyclic data flow)` }]; break; }
+    }
+    if (entry.tainted) memo.delete(key); else entry.done = true;
+    return entry.value;
+  } finally {
+    stack.pop();
+  }
+}
+// How deep one evaluation may nest: a configuration value crosses many modules on its way to a spawn.
+const MAX_DEPTH = 200;
 
 class JsFile {
   constructor(name, source, ctx) {
@@ -180,10 +249,15 @@ class JsFile {
 
   /** Possible values of expression `expr` (code text) evaluated at `index`. */
   evaluate(expr, index, depth = 0) {
+    return memoized(`e\0${this.name}\0${index}\0${expr.trim()}`, () => this.evaluateOnce(expr, index, depth));
+  }
+
+  evaluateOnce(expr, index, depth) {
     if (++budget.steps > budget.limit) return [{ unknown: `${expr.trim().slice(0, 60)} (data flow too deep)` }];
     expr = expr.trim().replace(/^await\s+/, '').replace(/^\(([\s\S]*)\)$/, '$1').trim();
-    if (depth > 40) return [{ unknown: `${expr} (data flow too deep)` }];
+    if (depth > MAX_DEPTH) return [{ unknown: `${expr} (data flow too deep)` }];
     if (expr.startsWith('{') && lexSource(expr).shape.trimEnd().endsWith('}')) return [{ object: expr, file: this, at: index }];
+    if (expr.startsWith('[') && splitArgs(lexSource(expr).shape, 0).close === lexSource(expr).shape.trimEnd().length - 1) return [{ object: expr, file: this, at: index, array: true }];
     const str = /^(['"])((?:\\.|(?!\1).)*)\1$/s.exec(expr);
     if (str) return [{ lit: str[2] }];
     const tpl = /^`([^`]*)`$/s.exec(expr);
@@ -205,13 +279,22 @@ class JsFile {
       const at = topLevel(shapeExpr, op);
       if (at >= 0) return [...this.evaluate(expr.slice(0, at), index, depth + 1), ...this.evaluate(expr.slice(at + op.length), index, depth + 1)];
     }
+    // `a && b` is `b`, or a falsy `a`, which is no binary.
+    const and = topLevel(shapeExpr, '&&');
+    if (and >= 0) return this.evaluate(expr.slice(and + 2), index, depth + 1);
     // `.trim()` keeps the value it trims; a declared `verify` command is consumer data however it is reached.
     if (/(?:\?\.|\.)trim\(\s*\)$/.test(shapeExpr)) return this.evaluate(expr.replace(/(?:\?\.|\.)trim\(\s*\)$/, ''), index, depth + 1);
     if (/(?:\?\.|\.)verify$/.test(shapeExpr)) return [{ external: `consumer verify command (${expr})` }];
+    // `.filter`/`.slice`/... of an array holds a subset of its elements: the same possible values.
+    const narrowed = /^([\s\S]+?)\s*\.\s*(?:filter|slice|concat|reverse|sort)\s*\(/.exec(shapeExpr);
+    if (narrowed && splitArgs(shapeExpr, narrowed[0].length - 1).close === shapeExpr.trimEnd().length - 1) return this.evaluate(expr.slice(0, narrowed[1].length), index, depth + 1);
     const pick = /^([\s\S]+?)\s*(?:\?\.|\.)\s*(?:find|findLast|at)\s*\(/.exec(shapeExpr);
     if (pick && splitArgs(shapeExpr, pick[0].length - 1).close === shapeExpr.trimEnd().length - 1) return this.elements(expr.slice(0, pick[1].length), index, depth + 1);
-    const indexed = /^([A-Za-z_$][\w$]*(?:\??\.[A-Za-z_$][\w$]*)*)\s*(?:\?\.)?\[[^\[\]]+\]$/.exec(shapeExpr);
-    if (indexed) return this.elements(expr.slice(0, indexed[1].length), index, depth + 1);
+    const indexed = /^([A-Za-z_$][\w$]*(?:\??\.[A-Za-z_$][\w$]*)*)\s*(?:\?\.)?\[([^\[\]]+)\]$/.exec(shapeExpr);
+    if (indexed) return /^\s*\d+\s*$/.test(indexed[2]) ? this.property(expr.slice(0, indexed[1].length), [indexed[2].trim()], index, depth + 1) : this.elements(expr.slice(0, indexed[1].length), index, depth + 1);
+    // `table[key].command`: the property read off any element.
+    const indexedMember = /^([A-Za-z_$][\w$]*(?:\??\.[A-Za-z_$][\w$]*)*)\s*(?:\?\.)?\[([^\[\]]+)\]((?:\??\.[A-Za-z_$][\w$]*)+)$/.exec(shapeExpr);
+    if (indexedMember) return this.property(expr.slice(0, indexedMember[1].length), [/^\s*\d+\s*$/.test(indexedMember[2]) ? indexedMember[2].trim() : '*', ...indexedMember[3].split(/\??\./).filter(Boolean)], index, depth + 1);
     const ctor = /^new\s+URL\s*\(/.exec(shapeExpr);
     if (ctor && splitArgs(shapeExpr, ctor[0].length - 1).close === shapeExpr.trimEnd().length - 1) return this.callValue('new URL', expr, ctor[0].length - 1, index, depth);
     const callMember = /^([A-Za-z_$][\w$.]*)\s*\(/.exec(shapeExpr);
@@ -245,20 +328,35 @@ class JsFile {
       const at = fn.params.findIndex((p) => paramNames(p).includes(id));
       if (at >= 0) {
         const head = this.code.slice(fn.from, fn.bodyFrom);
-        const fallback = new RegExp(`\\b${id.replace(/\$/g, '\\$')}\\s*=(?!=)\\s*`).exec(head);
+        const fallback = new RegExp(`\\b${id.replace(/\$/g, '\\$')}\\s*=(?![=>])\\s*`).exec(head);
         const fallbackText = fallback ? head.slice(fallback.index + fallback[0].length, fallback.index + fallback[0].length + statementEnd(lexSource(head.slice(fallback.index + fallback[0].length)).shape, 0)) : null;
         const defaults = fallbackText ? this.evaluate(fallbackText, fn.bodyFrom, depth + 1) : [];
-        return [{ param: id, index: at, fn, destructured: /[{[]/.test(fn.params[at]), path: [], defaults }, ...defaults];
+        return [{ param: id, index: at, fn, file: this, destructured: /[{[]/.test(fn.params[at]), path: [], defaults }, ...defaults];
       }
       if (fn.from <= 0) break;
     }
     // The binding visible at `index`: `const id = ...` or `const { key: id } = ...`, in the innermost
     // function that encloses both, the nearest preceding one there, else the first one in that scope.
     const binding = this.binding(id, index);
-    if (!binding) return [{ unknown: expr }];
+    if (!binding) {
+      // A constant imported from a relative module: its value there.
+      const imported = this.ctx && importedBinding(this.ctx, this, id);
+      if (imported) return imported.file.evaluate(imported.name, imported.file.code.length, depth + 1);
+      // A function declared here or imported: the function itself, as a value.
+      const fnref = this.ctx && resolveFunction(this.ctx, this, id);
+      return fnref ? [{ fnref }] : [{ unknown: expr }];
+    }
     if (binding.key !== undefined) {
       const start = binding.m.index + binding.m[0].length;
       return this.property(this.code.slice(start, statementEnd(this.shape, start)), [binding.key], start, depth + 1);
+    }
+    if (binding.ofIndex !== undefined) {
+      const start = binding.m.index + binding.m[0].length;
+      const iterable = this.code.slice(start, statementEnd(this.shape, start)).trim();
+      // `Object.entries(x)` pairs a key (a string, no binary) with an element of `x`.
+      const entries = /^Object\.entries\s*\(([\s\S]*)\)$/.exec(iterable);
+      if (entries) return binding.ofIndex === 0 ? [] : binding.ofIndex === 1 ? this.elements(entries[1], start, depth + 1) : [];
+      return this.property(iterable, ['*', String(binding.ofIndex)], start, depth + 1);
     }
     if (binding.of || binding.array) {
       const start = binding.m.index + binding.m[0].length;
@@ -289,8 +387,14 @@ class JsFile {
 
   /** Possible values of the elements of an array expression: a literal, a name bound to one, `.filter`/`.slice` of one. */
   elements(expr, index, depth) {
+    return memoized(`l\0${this.name}\0${index}\0${expr.trim()}`, () => this.elementsOnce(expr, index, depth));
+  }
+
+  elementsOnce(expr, index, depth) {
     expr = expr.trim();
-    if (depth > 40) return [{ unknown: expr }];
+    for (let inner; expr.startsWith('(') && splitArgs(lexSource(expr).shape, 0).close === lexSource(expr).shape.trimEnd().length - 1 && (inner = expr.slice(1, -1).trim());) expr = inner;
+    if (++budget.steps > budget.limit) return [{ unknown: `elements of ${expr.slice(0, 60)} (data flow too deep)` }];
+    if (depth > MAX_DEPTH) return [{ unknown: `${expr.slice(0, 60)} (data flow too deep)` }];
     const shape = lexSource(expr).shape;
     if (shape.startsWith('[') && splitArgs(shape, 0).close === shape.trimEnd().length - 1) {
       return splitArgs(shape, 0).args.flatMap(({ from, to }) => {
@@ -319,10 +423,13 @@ class JsFile {
     const narrowed = /^([\s\S]+?)\s*\.\s*(?:filter|slice|concat|reverse|sort)\s*\(/.exec(shape);
     if (narrowed && splitArgs(shape, narrowed[0].length - 1).close === shape.trimEnd().length - 1) return this.elements(expr.slice(0, narrowed[1].length), index, depth + 1);
     if (/^process\.argv\b/.test(expr)) return [{ external: 'command-line arguments' }];
+    // `table[key]` and `table[key].list`: the elements of what any element holds there.
+    const indexed = /^([A-Za-z_$][\w$]*(?:\??\.[A-Za-z_$][\w$]*)*)\s*(?:\?\.)?\[[^\[\]]+\]((?:\??\.[A-Za-z_$][\w$]*)*)$/.exec(shape);
+    if (indexed) return this.property(expr.slice(0, indexed[1].length), ['*', ...indexed[2].split(/\??\./).filter(Boolean), '*'], index, depth + 1);
     if (/^[A-Za-z_$][\w$]*(?:\??\.[A-Za-z_$][\w$]*)+$/.test(expr)) {
       return this.evaluate(expr, index, depth + 1).flatMap((v) => {
         if (v.object !== undefined) return bindCall(v, v.file.elements(v.object, v.at, depth + 1), depth); // an object literal's values
-        return [v.external || v.param !== undefined ? (v.param !== undefined ? { ...v, elements: true } : v) : { unknown: `elements of ${expr}` }];
+        return [v.external || v.param !== undefined ? (v.param !== undefined ? { ...v, path: normalPath([...v.path, '*']) } : v) : { unknown: `elements of ${expr}` }];
       });
     }
     const mapped = /^([\s\S]+?)\s*\.\s*(?:map|flatMap)\s*\(/.exec(shape);
@@ -338,20 +445,15 @@ class JsFile {
     if (call && splitArgs(shape, call[0].length - 1).close === shape.trimEnd().length - 1) {
       if (call[1] === 'JSON.parse') return [{ external: 'configuration file data' }];
       const target = this.ctx && resolveFunction(this.ctx, this, call[1]);
-      if (!target) return [{ unknown: `elements of ${expr}` }];
+      if (!target) return this.follow(this.evaluate(expr, index, depth + 1), [], `elements of ${expr}`, depth, 'elements');
       const out = returnTexts(target.file, target.fn).flatMap(({ text, at }) => target.file.elements(text, at, depth + 1));
       const argText = splitArgs(shape, call[0].length - 1).args.map(({ from, to }) => expr.slice(from, to));
-      return out.flatMap((v) => {
-        if (v.param === undefined || v.fn !== target.fn) return [v];
-        const a = argText[v.index];
-        if (a === undefined) return [];
-        return v.elements ? this.elements(a, index, depth + 1) : this.evaluate(a, index, depth + 1);
-      });
+      return out.flatMap((v) => (v.param === undefined || v.fn !== target.fn ? [v] : argumentValues(this, v, argText, index, depth)));
     }
     if (/^[A-Za-z_$][\w$]*$/.test(expr)) {
       for (let fn = enclosing(this.spans, index); fn; fn = enclosing(this.spans, fn.from - 1)) {
         const at = fn.params.findIndex((p) => paramNames(p).includes(expr));
-        if (at >= 0) return [{ param: expr, index: at, fn, destructured: /[{[]/.test(fn.params[at]), path: [], defaults: [], elements: true, rest: fn.params[at].trim().startsWith('...') }];
+        if (at >= 0) return [{ param: expr, index: at, fn, file: this, destructured: /[{[]/.test(fn.params[at]), path: ['*'], defaults: [], rest: fn.params[at].trim().startsWith('...') }];
         if (fn.from <= 0) break;
       }
       const b = this.binding(expr, index);
@@ -359,10 +461,8 @@ class JsFile {
         const start = b.m.index + b.m[0].length;
         return this.elements(this.code.slice(start, statementEnd(this.shape, start)), start, depth + 1);
       }
-      if (b && !b.of && b.key === undefined && b.m[1].startsWith('=')) {
-        const start = b.m.index + b.m[0].length;
-        return this.elements(this.code.slice(start, statementEnd(this.shape, start)), start, depth + 1);
-      }
+      // A local or imported name: the elements of every value it is bound or later assigned.
+      return this.follow(this.evaluate(expr, index, depth + 1), [], `elements of ${expr}`, depth, 'elements');
     }
     return [{ unknown: `elements of ${expr}` }];
   }
@@ -384,6 +484,12 @@ class JsFile {
     }
     const loop = new RegExp(`\\bfor\\s*\\(\\s*(?:const|let|var)\\s+${name}\\s+of\\s+`, 'g');
     for (let m; (m = loop.exec(this.shape));) candidates.push({ m, of: true });
+    // `for (const [key, value] of entries)`: position `ofIndex` of each element.
+    const loopPair = /\bfor\s*\(\s*(?:const|let|var)\s*\[([^\]]*)\]\s+of\s+/g;
+    for (let m; (m = loopPair.exec(this.shape));) {
+      const at = this.code.slice(m.index, m.index + m[0].length).match(/\[([^\]]*)\]/)[1].split(',').map((x) => x.trim().replace(/\s*=.*$/, '')).indexOf(id);
+      if (at >= 0) candidates.push({ m, of: true, ofIndex: at });
+    }
     const visible = candidates.map((c) => ({ ...c, scope: enclosing(this.spans, c.m.index) })).filter((c) => !c.scope || (c.scope.bodyFrom <= index && index <= c.scope.to));
     if (!visible.length) return null;
     const depthOf = (c) => c.scope?.bodyFrom ?? -1;
@@ -416,30 +522,78 @@ class JsFile {
     if (callee === 'JSON.parse') return [{ external: 'configuration file data' }];
     if (/^(fs\.realpathSync|path\.basename|String)$/.test(callee)) return argText.length ? this.evaluate(argText[0], index, depth + 1) : [{ unknown: expr }];
     if (callee === 'Object.freeze') return argText.length ? this.evaluate(argText[0], index, depth + 1) : [{ unknown: expr }];
+    // `registry.get(key)` on a module-private Map: any value the module stores in it.
+    const mapGet = /^([A-Za-z_$][\w$]*)\.get$/.exec(callee);
+    const stored = mapGet && this.mapValues(mapGet[1], index, depth);
+    if (stored) return stored;
     // `obj.method(args)`: the method of each object `obj` may hold, returning with its own arguments bound.
+    // On a parameter, the method of whatever its callers pass, applied to these arguments.
     if (this.ctx && callee.includes('.')) {
       const dot = callee.lastIndexOf('.');
+      const method = callee.slice(dot + 1);
       const out = this.evaluate(callee.slice(0, dot), index, depth + 1).flatMap((holder) => {
-        const target = holder.object !== undefined ? objectMethod(this.ctx, holder, callee.slice(dot + 1)) : null;
-        return target ? bindCall(holder, this.returnsOf(target, argText, index, depth), depth) : [{ unknown: expr }];
+        if (holder.param !== undefined && !holder.applied) return [{ ...holder, applied: { pre: [...holder.path, method], argText, caller: this, index }, path: [] }];
+        const target = holder.object !== undefined ? objectMethod(this.ctx, holder, method) : null;
+        if (target) return bindCall(holder, this.returnsOf(target, argText, index, depth), depth);
+        // A literal with no such member, no spread and no later writes: the call throws, no program runs.
+        if (holder.object !== undefined && !holder.bound && !holder.array && literalMember(holder.object, method) === null
+          && !splitArgs(lexSource(holder.object).shape, 0).args.some(({ from, to }) => holder.object.slice(from, to).trim().startsWith('...'))
+          && !new RegExp(`(?:^\\{|,)\\s*(?:async\\s+)?${method}\\s*\\(`).test(lexSource(holder.object).shape)) return [];
+        return [{ unknown: expr }];
       });
       return out.length ? out : [{ unknown: expr }];
     }
     const target = this.ctx && resolveFunction(this.ctx, this, callee);
-    if (!target) return [{ unknown: expr }];
-    return this.returnsOf(target, argText, index, depth, expr);
+    if (target) return this.returnsOf(target, argText, index, depth, expr);
+    // A call of a name that holds a function: what that function returns. A parameter holding one is
+    // resolved where the caller passes the function (`sanitize(raw)` with `{ sanitize: sanitizeConfig }`).
+    if (!this.ctx || !IDENT_RE.test(callee)) return [{ unknown: expr }];
+    const out = this.evaluate(callee, index, depth + 1).flatMap((held) => {
+      if (held.fnref) return this.returnsOf(held.fnref, argText, index, depth, expr);
+      if (held.param !== undefined && !held.applied) return [{ ...held, applied: { pre: held.path, argText, caller: this, index }, path: [] }];
+      return [{ unknown: expr }];
+    });
+    return out.length ? out : [{ unknown: expr }];
+  }
+
+  /**
+   * Values stored in the Map bound to `id`: `new Map([[k, v], ...])` entries and every `id.set(k, v)` in this
+   * module. Null when `id` is no module-private Map or the Map goes anywhere but its own get/set/has calls.
+   */
+  mapValues(id, index, depth) {
+    const b = this.binding(id, index);
+    if (!b || b.key !== undefined || b.of || b.array || !b.m[1].startsWith('=')) return null;
+    const start = b.m.index + b.m[0].length;
+    const init = this.code.slice(start, statementEnd(this.shape, start)).trim();
+    const ctor = /^new\s+(?:Weak)?Map\s*\(/.exec(init);
+    if (!ctor || /\bexport\s+$/.test(this.shape.slice(Math.max(0, b.m.index - 8), b.m.index))) return null;
+    const name = id.replace(/\$/g, '\\$');
+    const uses = [...this.shape.matchAll(new RegExp(`(?<![\\w$.])${name}\\b`, 'g'))].filter((m) => m.index !== b.m.index + b.m[0].indexOf(id));
+    if (uses.some((m) => !/^\s*\.\s*(?:get|set|has|delete|keys|size)\b/.test(this.shape.slice(m.index + id.length)))) return null;
+    const out = [];
+    const { args: [entries] } = splitArgs(lexSource(init).shape, ctor[0].length - 1);
+    if (entries) out.push(...this.property(init.slice(entries.from, entries.to), ['*', '1'], start, depth + 1));
+    for (const m of this.shape.matchAll(new RegExp(`(?<![\\w$.])${name}\\s*\\.\\s*set\\s*\\(`, 'g'))) {
+      const open = m.index + m[0].length - 1;
+      const value = splitArgs(this.shape, open).args[1];
+      if (value) out.push(...this.evaluate(this.code.slice(value.from, value.to), open, depth + 1));
+    }
+    return out;
   }
 
   /** What calling `target` with `argText` (evaluated here) returns. */
   returnsOf(target, argText, index, depth, expr = target.fn.name) {
     const out = [];
     for (const v of returnValues(target.file, target.fn, depth + 1)) {
-      if (v.param !== undefined && v.fn === target.fn) {
-        const a = v.rest ? argText.slice(v.index).join(', ') : argText[v.index];
-        if (a === undefined) continue; // undefined is not a binary; a default is already among the values
-        if (v.elements) { out.push(...this.elements(v.rest ? `[${a}]` : a, index, depth + 1)); continue; }
-        out.push(...(v.destructured || v.path.length ? this.property(a, [...(v.destructured ? [v.param] : []), ...v.path], index, depth + 1) : this.evaluate(a, index, depth + 1)));
-      } else out.push(v.object !== undefined && !v.call ? { ...v, call: { fn: target.fn, argText, caller: this, index } } : v);
+      // An omitted argument is not a binary; a default is already among the values.
+      if (v.param !== undefined && v.fn === target.fn) out.push(...argumentValues(this, v, argText, index, depth));
+      else if (v.object === undefined) out.push(v);
+      else {
+        // An object returned through more than one call keeps every call, innermost first.
+        const call = { fn: target.fn, argText, caller: this, index };
+        const within = (c) => (c ? { ...c, outer: within(c.outer) } : call);
+        out.push({ ...v, call: within(v.call) });
+      }
     }
     return out.length ? out : [{ unknown: expr }];
   }
@@ -456,22 +610,30 @@ class JsFile {
 
   /** `keys` read off each possible value. */
   access(base, keys, label, depth) {
+    return this.follow(base, keys, label, depth);
+  }
+
+  /** `keys` (`*` for any element) read off each possible value; with `leaf` 'elements', that value's elements. */
+  follow(base, keys, label, depth, leaf = 'value') {
+    if (!keys.length && leaf === 'value') return base;
+    const tail = leaf === 'elements' ? [...keys, '*'] : keys;
     const out = [];
     for (const v of base) {
-      if (v.param !== undefined) out.push({ ...v, path: [...v.path, ...keys] });
-      else if (v.object !== undefined) out.push(...bindCall(v, [...v.file.property(v.object, keys, v.at, depth + 1), ...v.file.writes(v, keys, depth + 1)], depth));
+      if (v.param !== undefined) out.push({ ...v, path: normalPath([...v.path, ...tail]) });
+      else if (v.object !== undefined) out.push(...bindCall(v, [...v.file.property(v.object, keys, v.at, depth + 1, leaf), ...(keys.length ? v.file.writes(v, keys, depth + 1, leaf) : [])], depth));
       else if (v.external) out.push(v);
-      else out.push({ unknown: label });
+      else if (v.lit !== undefined || v.self) continue; // a string has no property that is a binary
+      else out.push(v.unknown !== undefined ? v : { unknown: label });
     }
     return out;
   }
 
   /** Values a bound object receives after its literal: `name.key = x` and `name[expr] = x`. */
   writes(v, keys, depth, leaf = 'value') {
-    if (!v.bound || depth > 40) return [];
+    if (!v.bound || depth > MAX_DEPTH) return [];
     const [key, ...rest] = keys;
     const name = v.bound.replace(/\$/g, '\\$');
-    const re = new RegExp(`(?<![\\w$.])${name}\\s*(\\.\\s*${key.replace(/\$/g, '\\$')}\\b|\\[)`, 'g');
+    const re = key === '*' || key === '**' ? new RegExp(`(?<![\\w$.])${name}\\s*(\\[)`, 'g') : new RegExp(`(?<![\\w$.])${name}\\s*(\\.\\s*${key.replace(/\$/g, '\\$')}\\b|\\[)`, 'g');
     const out = [];
     for (let m; (m = re.exec(this.shape));) {
       let after = m.index + m[0].length;
@@ -479,7 +641,9 @@ class JsFile {
       const eq = /^\s*=(?![=>])\s*/.exec(this.shape.slice(after));
       if (!eq) continue;
       const s = after + eq[0].length;
-      out.push(...this.property(this.code.slice(s, statementEnd(this.shape, s)), rest, s, depth + 1, leaf));
+      const text = this.code.slice(s, statementEnd(this.shape, s));
+      out.push(...this.property(text, rest, s, depth + 1, leaf));
+      if (key === '**') out.push(...this.property(text, keys, s, depth + 1, leaf));
     }
     return out;
   }
@@ -487,10 +651,31 @@ class JsFile {
   /** The `command:` value of an object literal or of the identifier bound to one. */
   property(expr, keys, index, depth = 0, leaf = 'value') {
     if (typeof keys === 'string') keys = [keys];
+    return memoized(`p\0${this.name}\0${index}\0${leaf}\0${keys.join('.')}\0${expr.trim()}`, () => this.propertyOnce(expr, keys, index, depth, leaf));
+  }
+
+  propertyOnce(expr, keys, index, depth, leaf) {
     expr = expr.trim();
+    if (++budget.steps > budget.limit) return [{ unknown: `${expr.slice(0, 60)}.${keys.join('.')} (data flow too deep)` }];
     if (!keys.length) return leaf === 'elements' ? this.elements(expr, index, depth + 1) : this.evaluate(expr, index, depth + 1);
-    if (depth > 40) return [{ unknown: expr }];
+    if (depth > MAX_DEPTH) return [{ unknown: `${expr.slice(0, 60)} (data flow too deep)` }];
     const [key, ...rest] = keys;
+    // `*` is any element: the elements of this value, then the rest of the path off each one.
+    if (key === '*') return this.follow(this.elements(expr, index, depth + 1), rest, `elements of ${expr}`, depth, leaf);
+    if (key === '**') {
+      const items = this.elements(expr, index, depth + 1);
+      return [...this.follow(items, rest, `elements of ${expr}`, depth, leaf), ...this.follow(items, keys, `elements of ${expr}`, depth, leaf)];
+    }
+    if (expr.startsWith('[') && splitArgs(lexSource(expr).shape, 0).close === lexSource(expr).shape.trimEnd().length - 1) {
+      // Element `n` of an array literal: that item, unless a spread before it moves it (then any element).
+      if (/^\d+$/.test(key)) {
+        const items = splitArgs(lexSource(expr).shape, 0).args.map(({ from, to }) => expr.slice(from, to).trim());
+        const n = Number(key);
+        if (items.slice(0, n + 1).some((item) => item.startsWith('...'))) return this.property(expr, ['*', ...rest], index, depth + 1, leaf);
+        return items[n] === undefined ? [] : this.property(items[n], rest, index, depth + 1, leaf);
+      }
+      return []; // a named property of an array literal (`.length`) is no binary
+    }
     if (expr.startsWith('{')) {
       const shape = lexSource(expr).shape;
       const m = new RegExp(`(?:^\\{|,)\\s*${key}\\s*(:|,|\\})`).exec(shape.replace(/\{(?=[^{]*$)/, '{'));
@@ -515,16 +700,22 @@ class JsFile {
       const value = expr.slice(s, s + statementEnd(lexSource(expr.slice(s)).shape, 0));
       return this.property(value, rest, index, depth + 1, leaf);
     }
-    const values = this.evaluate(expr, index, depth + 1);
-    const out = [];
-    for (const v of values) {
-      if (v.param !== undefined) out.push({ ...v, path: [...v.path, ...keys] });
-      else if (v.object !== undefined) out.push(...bindCall(v, [...v.file.property(v.object, keys, v.at, depth + 1, leaf), ...v.file.writes(v, keys, depth + 1, leaf)], depth));
-      else if (v.external) out.push(v);
-      else out.push({ unknown: `${expr}.${keys.join('.')}` });
-    }
-    return out;
+    return this.follow(this.evaluate(expr, index, depth + 1), keys, `${expr}.${keys.join('.')}`, depth, leaf);
   }
+}
+
+/** The module and local name of a binding `id` imported into `file` from a relative module, if it is declared there. */
+function importedBinding(ctx, file, id) {
+  for (const m of file.code.matchAll(/import\s*\{([^}]*)\}\s*from\s*['"]([^'"]+)['"]/g)) {
+    if (!m[2].startsWith('.')) continue;
+    for (const part of m[1].split(',')) {
+      const [orig, alias] = part.trim().split(/\s+as\s+/);
+      if ((alias ?? orig) !== id || !IDENT_RE.test(orig ?? '')) continue;
+      const other = ctx.js.get(path.posix.normalize(path.posix.join(path.posix.dirname(file.name), m[2])));
+      if (other && other.binding(orig, other.code.length)) return { file: other, name: orig };
+    }
+  }
+  return null;
 }
 
 let depthOfReexport = 0;
@@ -564,12 +755,16 @@ function objectMethod(ctx, holder, name) {
   return ref && /^[A-Za-z_$][\w$]*$/.test(ref) ? resolveFunction(ctx, file, ref) : null;
 }
 
-const returning = new Set();
+// A recursive function is entered again under the next call's arguments, a bounded number of times: each
+// level reads one more key of a finite property path (a deep merge), and past the bound the value is unknown.
+const returning = new Map();
+const MAX_REENTRY = 1;
 /** Possible values a function returns: its `return` expressions (not nested functions'), or an arrow body. */
 function returnValues(file, fn, depth) {
   const key = `${file.name}:${fn.from}`;
-  if (returning.has(key) || depth > 40) return [{ unknown: `${fn.name}() (recursive)` }];
-  returning.add(key);
+  const active = returning.get(key) ?? 0;
+  if (active >= MAX_REENTRY || depth > MAX_DEPTH) return [{ unknown: `${fn.name}() (recursive)` }];
+  returning.set(key, active + 1);
   try {
     if (file.shape[fn.bodyFrom] !== '{') return file.evaluate(file.code.slice(fn.bodyFrom, fn.to), fn.bodyFrom, depth);
     const out = [];
@@ -585,7 +780,7 @@ function returnValues(file, fn, depth) {
     }
     return out.length ? out : [{ unknown: `${fn.name}() (no return value)` }];
   } finally {
-    returning.delete(key);
+    if (active) returning.set(key, active); else returning.delete(key);
   }
 }
 
@@ -732,13 +927,42 @@ function launchedCommand(launcher, operands) {
 /** Values read off an object a call returned: the callee's parameters there are that call's arguments. */
 function bindCall(v, results, depth) {
   if (!v.call) return results;
-  return results.flatMap((r) => {
-    if (r.param === undefined || r.fn !== v.call.fn) return [r];
-    const a = r.rest ? v.call.argText.slice(r.index).join(', ') : v.call.argText[r.index];
-    if (a === undefined) return [];
-    if (r.elements) return v.call.caller.elements(r.rest ? `[${a}]` : a, v.call.index, depth + 1);
-    return r.destructured || r.path.length ? v.call.caller.property(a, [...(r.destructured ? [r.param] : []), ...r.path], v.call.index, depth + 1) : v.call.caller.evaluate(a, v.call.index, depth + 1);
-  });
+  const { outer } = v.call;
+  // An object read out of a bound one keeps its calls: its own parameters are bound when it is read.
+  const bound = results.flatMap((r) => (r.param !== undefined && r.fn === v.call.fn
+    ? argumentValues(v.call.caller, r, v.call.argText, v.call.index, depth).map((a) => withCalls(a, outer))
+    : [withCalls(r, v.call)]));
+  return outer ? bindCall({ call: outer }, bound, depth) : bound;
+}
+
+/** Object value `v` with the call chain `chain` after its own calls (innermost first), once. */
+function withCalls(v, chain) {
+  if (v.object === undefined || !chain) return v;
+  for (let c = v.call; c; c = c.outer) if (c === chain) return v;
+  const append = (c) => (c ? { ...c, outer: append(c.outer) } : chain);
+  return { ...v, call: append(v.call) };
+}
+
+/**
+ * Values of the argument a parameter value `v` stands for, evaluated in `caller` at `index`: the argument
+ * (or, for a rest parameter, the arguments from its position on) read at `v`'s property path, where `*` is
+ * any element. An omitted argument is not a binary.
+ */
+function argumentValues(caller, v, argText, index, depth) {
+  const a = v.rest ? `[${argText.slice(v.index).join(', ')}]` : argText[v.index];
+  if (a === undefined) return [];
+  if (v.applied) {
+    // The parameter held a function that was called: the functions passed here, applied to that call's arguments.
+    const pre = [...(v.destructured ? [v.param] : []), ...v.applied.pre];
+    const { caller: at, argText: args, index: where } = v.applied;
+    return (pre.length ? caller.property(a, pre, index, depth + 1) : caller.evaluate(a, index, depth + 1)).flatMap((held) => {
+      if (held.fnref) return at.follow(at.returnsOf(held.fnref, args, where, depth + 1), v.path, `${held.fnref.fn.name}(...)`, depth);
+      if (held.param !== undefined && !held.applied) return [{ ...held, applied: { ...v.applied, pre: held.path }, path: v.path }];
+      return held.unknown !== undefined ? [held] : [];
+    });
+  }
+  const keys = [...(v.destructured ? [v.param] : []), ...v.path];
+  return keys.length ? caller.property(a, keys, index, depth + 1) : caller.evaluate(a, index, depth + 1);
 }
 
 /** The source text of `key`'s value in an object literal, or null. */
@@ -852,7 +1076,7 @@ function scanJs(name, source, ctx) {
   const file = ctx.js.get(name) ?? new JsFile(name, source, ctx);
   ctx.js.set(name, file);
   for (const site of jsCallSites(file)) {
-    budget.steps = 0;
+    budget.steps = 0; budget.memo.clear(); budget.stack.length = 0;
     for (const entry of jsBinaries(file, site)) {
       const cls = classifyJs(file, site, entry);
       const line = lineOf(source, site.open);
@@ -881,6 +1105,7 @@ function describe(value) {
   if (value.lit !== undefined) return value.lit.length > 80 ? `${value.lit.slice(0, 77)}...` : value.lit;
   if (value.param !== undefined) return `param ${value.param}`;
   if (value.self) return '(self)';
+  if (value.fnref) return `(function ${value.fnref.fn.name})`;
   if (value.external) return `(${value.external})`;
   return `? ${String(value.unknown).replace(/\s+/g, ' ').slice(0, 80)}`;
 }
@@ -892,7 +1117,7 @@ function importersOf(ctx, file) {
 }
 
 function findImporters(ctx, file) {
-  return [...ctx.js.values()].filter((other) => other !== file && [...other.code.matchAll(/(?:import|export)\s*\{[^}]*\}\s*from\s*['"]([^'"]+)['"]|import\s*\(\s*['"]([^'"]+)['"]/g)].some((m) => {
+  return [...ctx.js.values()].filter((other) => other !== file && [...other.code.matchAll(/(?:import|export)\s*(?:\{[^}]*\}|\*(?:\s*as\s+[A-Za-z_$][\w$]*)?)\s*from\s*['"]([^'"]+)['"]|import\s*\(\s*['"]([^'"]+)['"]/g)].some((m) => {
     const spec = m[1] ?? m[2];
     return spec.startsWith('.') && path.posix.normalize(path.posix.join(path.posix.dirname(other.name), spec)) === file.name;
   }));
@@ -901,9 +1126,16 @@ function findImporters(ctx, file) {
 // Calls of a function `fnName` defined in `file`: same file, and importers by relative specifier.
 function callersOf(ctx, file, fnName) {
   if (!fnName) return [];
+  const cache = (ctx.callerCache ??= new Map());
+  const cacheKey = `${file.name}\0${fnName}`;
+  if (!cache.has(cacheKey)) cache.set(cacheKey, findCallers(ctx, file, fnName));
+  return cache.get(cacheKey);
+}
+
+function findCallers(ctx, file, fnName) {
   const out = [];
   const find = (f, local) => {
-    const re = new RegExp(`(?:(?<![\\w$.])|(?<=\\bthis\\.))${local.replace(/\$/g, '\\$')}\\s*\\(`, 'g');
+    const re = new RegExp(`(?:(?<![\\w$.])|(?<=\\.\\.\\.)|(?<=\\bthis\\.))${local.replace(/\$/g, '\\$')}\\s*\\(`, 'g');
     for (let m; (m = re.exec(f.shape));) {
       if (/(function|async)\s*\*?\s*$/.test(f.shape.slice(Math.max(0, m.index - 14), m.index))) continue;
       const open = m.index + m[0].length - 1;
@@ -942,16 +1174,33 @@ function callersOf(ctx, file, fnName) {
   }
   const exported = new RegExp(`export\\s+(?:async\\s+)?(?:function\\s*\\*?\\s*|const\\s+|let\\s+)${fnName}\\b|export\\s*\\{[^}]*\\b${fnName}\\b`).test(file.code);
   if (!exported) return dedupeCalls(out);
+  const names = (other, spec) => spec.startsWith('.') && path.posix.normalize(path.posix.join(path.posix.dirname(other.name), spec)) === file.name;
   for (const other of ctx.js.values()) {
     if (other === file) continue;
-    for (const m of other.code.matchAll(/import\s*\{([^}]*)\}\s*from\s*['"]([^'"]+)['"]/g)) {
-      if (!m[2].startsWith('.')) continue;
-      const target = path.posix.normalize(path.posix.join(path.posix.dirname(other.name), m[2]));
-      if (target !== file.name) continue;
-      for (const part of m[1].split(',')) {
-        const [orig, alias] = part.trim().split(/\s+as\s+/);
+    for (const m of other.code.matchAll(/import\s*\{([^}]*)\}\s*from\s*['"]([^'"]+)['"]|(?:const|let|var)\s*\{([^}]*)\}\s*=\s*await\s+import\s*\(\s*['"]([^'"]+)['"]\s*\)/g)) {
+      if (!names(other, m[2] ?? m[4])) continue;
+      for (const part of (m[1] ?? m[3]).split(',')) {
+        const [orig, alias] = part.trim().split(m[1] !== undefined ? /\s+as\s+/ : /\s*:\s*/);
         if (orig === fnName) find(other, alias ?? orig);
       }
+    }
+    // A namespace import, static or dynamic: called as `ns.fnName(`.
+    for (const m of other.code.matchAll(/import\s*\*\s*as\s+([A-Za-z_$][\w$]*)\s+from\s*['"]([^'"]+)['"]|(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*await\s+import\s*\(\s*['"]([^'"]+)['"]\s*\)/g)) {
+      if (!names(other, m[2] ?? m[4])) continue;
+      const re = new RegExp(`(?<![\\w$.])${(m[1] ?? m[3]).replace(/\$/g, '\\$')}\\s*\\.\\s*${name}\\s*\\(`, 'g');
+      for (let c; (c = re.exec(other.shape));) out.push({ file: other, open: c.index + c[0].length - 1 });
+    }
+    // A re-export (`export { fnName as alias } from`, `export * from`): the callers of that module's name.
+    for (const m of other.code.matchAll(/export\s*(?:\{([^}]*)\}|\*)\s*from\s*['"]([^'"]+)['"]/g)) {
+      if (!names(other, m[2]) || (ctx.reexporting ??= new Set()).has(`${other.name}:${fnName}`)) continue;
+      let part = m[1] === undefined ? fnName : null;
+      for (const x of (m[1] ?? '').split(',')) {
+        const [orig, alias] = x.trim().split(/\s+as\s+/);
+        if (orig === fnName) part = alias ?? orig;
+      }
+      if (!part) continue;
+      ctx.reexporting.add(`${other.name}:${fnName}`);
+      try { out.push(...findCallers(ctx, other, part)); } finally { ctx.reexporting.delete(`${other.name}:${fnName}`); }
     }
   }
   return dedupeCalls(out);
@@ -1275,10 +1524,16 @@ function destructuredPairs(pattern) {
 /** Whether any scanned file names `fn` other than at its definition or in an import/export clause. */
 function referenced(ctx, file, fn) {
   const name = fn.name.replace(/\$/g, '\\$');
-  for (const f of ctx.js.values()) {
+  // Another module can name this function only by importing it (or re-exporting it).
+  for (const f of [file, ...importersOf(ctx, file)]) {
     const shape = f.shape.replace(/(?:import|export)\s*\{[^}]*\}\s*from\s*['"][^'"]*['"]|import\s+[^;]*?\s+from\s*['"][^'"]*['"]/g, (m) => ' '.repeat(m.length));
     for (const m of shape.matchAll(new RegExp(`(?<![\\w$])${name}(?![\\w$])`, 'g'))) {
-      if (f === file && f.spans.some((s) => s.name === fn.name && m.index < s.from && m.index >= s.from - fn.name.length - 40 && /^[\s\w$]*\(?$/.test(f.shape.slice(m.index + fn.name.length, s.from + 1)))) continue;
+      // `obj.name` is a property of something else, unless `obj` is a namespace import of this module.
+      if (/\.\s*$/.test(shape.slice(Math.max(0, m.index - 4), m.index))) {
+        const ns = /([A-Za-z_$][\w$]*)\s*\.\s*$/.exec(shape.slice(Math.max(0, m.index - 60), m.index))?.[1];
+        if (!ns || f === file || !new RegExp(`import\\s*\\*\\s*as\\s+${ns}\\b|\\b${ns}\\s*=\\s*await\\s+import\\s*\\(`).test(f.code)) continue;
+      }
+      if (f === file && f.spans.some((s) => s.name === fn.name && m.index < s.from && m.index >= s.from - fn.name.length - 40 && /^[\s\w$:=*]*\(?$/.test(f.shape.slice(m.index + fn.name.length, s.from + 1)))) continue;
       return true;
     }
   }
@@ -1293,16 +1548,18 @@ function resolveWrappers(ctx) {
     const w = queue.shift();
     const { value } = w.entry;
     const fn = value.fn;
+    // The function the parameter belongs to may sit in another module than the call that reached it.
+    const home = value.file ?? w.file;
     // runBorrowed's own spawn of `spec.command`: every runBorrowed call is already a site of its own.
     if (fn?.name === 'runBorrowed' && childProcessBindings(w.file).borrowed.has('runBorrowed')) continue;
     const key = `${w.record.path}:${w.record.line}:${fn?.name}:${value.param}:${(value.path ?? []).join('.')}`;
     if (seen.has(key) || seen.size > 20000) continue;
     seen.add(key);
-    let callers = callersOf(ctx, w.file, fn?.name);
-    // No call by name: the function may still be called where it travels as a value.
-    const flow = !callers.length && fn?.name ? valueFlowCalls(ctx, w.file, fn) : null;
-    if (flow) callers = flow.calls;
-    if (!callers.length && fn?.name && !referenced(ctx, w.file, fn)) {
+    let callers = callersOf(ctx, home, fn?.name);
+    // Called by name or not, the function may also be called wherever it travels as a value: both count.
+    const flow = fn?.name ? valueFlowCalls(ctx, home, fn) : null;
+    if (flow) callers = dedupeCalls([...callers, ...flow.calls]);
+    if (!callers.length && fn?.name && !referenced(ctx, home, fn)) {
       // Nothing in the payload names it outside its definition and import clauses: no product data flow
       // reaches it. Tests that call it are watched by the runtime spy.
       ctx.classes.push({ ...w.record, class: 'uncalled-wrapper', function: fn.name });
@@ -1315,20 +1572,12 @@ function resolveWrappers(ctx) {
     // The value also goes somewhere the flow cannot follow: the call sites found are not all of them.
     if (flow?.escapes.length) ctx.raw.push({ ...w.record, family: 'unresolved-binary', binary: `${w.record.binary} (${fn.name} escapes: ${flow.escapes[0]})`, file: w.file, site: w.site, enclosing: enclosing(w.file.spans, w.site.open) });
     for (const c of callers) {
-      budget.steps = 0;
+      budget.steps = 0; budget.memo.clear(); budget.stack.length = 0;
       const { args } = splitArgs(c.file.shape, c.open);
       const arg = args[value.index];
-      let values;
       if (!arg) continue; // undefined is not a binary; a default is already among the values
-      else if (value.elements) {
-        const text = value.rest ? `[${args.slice(value.index).map(({ from, to }) => c.file.code.slice(from, to)).join(', ')}]` : c.file.code.slice(arg.from, arg.to);
-        values = c.file.elements(text, c.open, 0);
-      } else {
-        const text = c.file.code.slice(arg.from, arg.to);
-        const keys = [...(value.destructured ? [value.param] : []), ...(value.path ?? [])];
-        values = keys.length ? c.file.property(text, keys, c.open) : c.file.evaluate(text, c.open);
-        if (keys.length && values.length === 0) continue; // the default applies
-      }
+      const values = argumentValues(c.file, value, args.map(({ from, to }) => c.file.code.slice(from, to)), c.open, -1);
+      if (values.length === 0) continue; // the default applies
       // A launcher (`timeout`, `env`, a shell) runs its argv: read the argv the wrapper takes from the same parameter.
       const argvKey = new RegExp(`^\\s*${String(value.param).replace(/\$/g, '\\$')}((?:\\.[A-Za-z_$][\\w$]*)+)\\s*$`).exec(w.entry.argvText ?? '');
       const expanded = [];
@@ -1418,7 +1667,7 @@ function rustModel(name, source) {
   const evalRust = (expr, index, depth = 0) => {
     for (let prev; prev !== expr;) {
       prev = expr;
-      expr = expr.trim().replace(/^&\*?|\?$|\.(?:as_str|as_ref|clone|as_os_str|to_path_buf|to_owned|to_string|into|as_path|into_iter|collect(?:::<[^>]*>)?)\(\)$|\.map\(\s*Into::into\s*\)$|\.with_extension\([^()]*\)$|\.(?:unwrap_or_default|unwrap)\(\)$|\.expect\(\s*"[^"]*"\s*\)$/g, '').trim();
+      expr = expr.trim().replace(/^\(\s*([\s\S]*?)\s*\)$/, (m, inner) => (rustBalanced(inner) ? inner : m)).replace(/^&\*?|\?$|\.(?:as_str|as_ref|clone|as_os_str|to_path_buf|to_owned|to_string|to_string_lossy|into_owned|into_os_string|into|as_path|into_iter|collect(?:::<[^>]*>)?)\(\)$|\.map\(\s*Into::into\s*\)$|\.with_extension\([^()]*\)$|\.(?:unwrap_or_default|unwrap)\(\)$|\.expect\(\s*"[^"]*"\s*\)$/g, '').trim();
     }
     // A string-keyed index into parsed data (`launch["command"]`): configuration, not product code.
     if (/\[\s*"[^"]+"\s*\]|\.get\(\s*"[^"]+"\s*\)/.test(expr)) return [{ external: `parsed configuration (${expr.replace(/\s+/g, ' ').slice(0, 60)})` }];
@@ -1429,6 +1678,17 @@ function rustModel(name, source) {
     if (/current_exe\(\)|env!\(\s*"CARGO_BIN_EXE_|std::env::args/.test(expr)) return [{ self: true }];
     const ifElse = /^if\b[^{]*\{\s*([\s\S]*?)\s*\}\s*else\s*\{\s*([\s\S]*?)\s*\}$/.exec(expr);
     if (ifElse) return [...evalRust(ifElse[1], index, depth + 1), ...evalRust(ifElse[2], index, depth + 1)];
+    // `None` and an `Err(..)` carry no program.
+    if (/^None(?:\s*\[\s*0\s*\])?$/.test(expr) || /^Err\s*\(/.test(expr)) return [];
+    // `match x { Some(p) => a, None => b }`: every arm's value, a binding standing for the scrutinee.
+    const arms = rustMatchArms(expr);
+    if (arms) return arms.flatMap(({ pattern, body }) => evalRust(rustBindArm(pattern, arms.scrutinee, body), index, depth + 1));
+    // `cond.then(|| v)` is `v` or `None`.
+    const then = /^[\s\S]+\.then\(\s*(?:move\s*)?\|\s*\|\s*([\s\S]+)\)$/.exec(expr);
+    if (then && rustBalanced(then[1])) return evalRust(then[1], index, depth + 1);
+    // `LIST.iter().map(PathBuf::from).find(..)`: an element of the list.
+    const pick = /^([\s\S]+?)\.(?:iter|into_iter)\(\)(?:\.(?:map\(\s*(?:\w+::)*\w+\s*\)|copied\(\)|cloned\(\)))*\.(?:find\([\s\S]*\)|next\(\)|last\(\))$/.exec(expr);
+    if (pick) return rustElements(pick[1], index, depth + 1);
     const call = /^([a-z_]\w*)\s*\(/i.exec(expr);
     if (call && !fns.some((f) => f.name === call[1])) {
       // A local closure (`let pick = |..| body`): its body.
@@ -1459,7 +1719,7 @@ function rustModel(name, source) {
     if (path.length && /(?:\.join|PathBuf::from|Path::new)\([^()]*\)\s*(?:\)\s*)*$/.test(expr)) return path.flatMap((p) => evalRust(p, index, depth + 1)).map((v) => (v.lit !== undefined ? { lit: v.lit.split('/').pop() } : v));
     // A field of a parameter or of `self` (`spec.argv[0]`, `self.config.executable_path`, `config.bin()`):
     // resolved where values of that type are built.
-    const field = /^([a-z_]\w*)((?:\s*\.\s*[a-z_]\w*(?:\(\))?)+)(\s*\[\s*0\s*\])?$/i.exec(expr);
+    const field = /^([a-z_]\w*)((?:\s*\.\s*(?:[a-z_]\w*(?:\(\))?|\d+))+)(\s*\[\s*0\s*\])?$/i.exec(expr);
     const fn = within(index);
     if (field && fn && (field[1] === 'self' || new RegExp(`\\b${field[1]}\\s*:`).test(fn.params))) {
       return [{ param: field[1], fn, path: field[2].split('.').map((k) => k.trim()).filter(Boolean), first: Boolean(field[3]) }];
@@ -1469,13 +1729,23 @@ function rustModel(name, source) {
       const local = new RegExp(`\\blet\\s+(?:mut\\s+)?${field[1]}\\b[^=;]*=\\s*([A-Z]\\w*)(?:::\\w+\\s*\\(|\\s*\\{)`).exec(code.slice(fn.bodyFrom, index));
       if (local) return [{ param: field[1], fn, type: local[1], path: field[2].split('.').map((k) => k.trim()).filter(Boolean), first: Boolean(field[3]) }];
     }
+    // The first `it.next()` on an iterator local is its first element.
+    const next = /^([a-z_]\w*)\s*\.\s*next\(\)$/i.exec(expr);
+    if (next && fn && (code.slice(fn.bodyFrom, index).match(new RegExp(`\\b${next[1]}\\s*\\.\\s*next\\(`, 'g')) ?? []).length === 0) return evalRust(`${next[1]}[0]`, index, depth + 1);
     const firstOf = /^([a-z_]\w*)\s*\[\s*0\s*\]$/i.exec(expr);
     if (firstOf) {
       if (fn && new RegExp(`\\b${firstOf[1]}\\s*:`).test(fn.params)) return [{ param: firstOf[1], fn, path: [], first: true }];
       const d = new RegExp(`\\blet\\s+(?:mut\\s+)?${firstOf[1]}\\b[^=;]*=\\s*(?:vec!\\s*)?\\[\\s*([^,\\]]+)`).exec(code.slice(fn?.bodyFrom ?? 0, index));
-      if (d) return evalRust(d[1], index, depth + 1);
+      if (d) {
+        // An argv `[program, "-C", repo, ..]` names its repository: kept with the program it starts.
+        const open = (fn?.bodyFrom ?? 0) + d.index + d[0].lastIndexOf('[');
+        const items = rustArgs(model, open).map((a) => a.text.trim().replace(/\.into\(\)$/, ''));
+        const at = items.indexOf('"-C"');
+        const repo = at >= 1 && items[at + 1] ? { model, fn, text: items[at + 1] } : null;
+        return evalRust(d[1], index, depth + 1).map((v) => (repo && !v.sandboxRepo ? { ...v, sandboxRepo: repo } : v));
+      }
       // `let argv = shape(&spec.argv);`: the first element of the Vec that local function returns.
-      const c = new RegExp(`\\blet\\s+(?:mut\\s+)?${firstOf[1]}\\b[^=;]*=\\s*([a-z_]\\w*)\\s*\\(([^;]*)\\)\\s*;`).exec(code.slice(fn?.bodyFrom ?? 0, index));
+      const c = new RegExp(`\\blet\\s+(?:mut\\s+)?${firstOf[1]}\\b[^=;]*=\\s*(?:self\\s*\\.\\s*)?([a-z_]\\w*)\\s*\\(([^;]*)\\)\\s*\\??\\s*;`).exec(code.slice(fn?.bodyFrom ?? 0, index));
       const callee = c && fns.find((f) => f.name === c[1]);
       if (callee) return firstReturned(callee, c[2], index, depth + 1);
       // A Vec read out of parsed data (`request.get("argv")...collect()`): its elements are that data too.
@@ -1483,6 +1753,8 @@ function rustModel(name, source) {
       if (read) {
         const values = evalRust(read[1], index, depth + 1);
         if (values.length && values.every((v) => v.external)) return values;
+        // A field or method result of a parameter (`helper.argv()`): its first element, resolved there.
+        if (values.length && values.every((v) => v.param !== undefined)) return values.map((v) => ({ ...v, first: true }));
       }
     }
     const id = /^[a-z_][\w]*$/i.test(expr) ? expr : null;
@@ -1491,6 +1763,18 @@ function rustModel(name, source) {
     // `let Some((program, args)) = spec.argv.split_first()`: the first element.
     const split = new RegExp(`\\blet\\s+Some\\(\\(\\s*${id}\\s*,[^=]*=\\s*([^;]+?)\\s*\\.split_first\\(\\)`).exec(code.slice(fn?.bodyFrom ?? 0, index));
     if (split) return evalRust(`${source.slice((fn?.bodyFrom ?? 0) + split.index + split[0].indexOf(split[1]), (fn?.bodyFrom ?? 0) + split.index + split[0].indexOf(split[1]) + split[1].length)}[0]`, index, depth + 1);
+    // `if let Some(id) = expr {`, `while let Some(id) = expr {` and `let Some(id) = expr else {`: the
+    // value the Option holds.
+    const before = code.slice(fn?.bodyFrom ?? 0, index);
+    const someLet = [...before.matchAll(new RegExp(`\\blet\\s+(?:Some|Ok)\\(\\s*(?:ref\\s+)?(?:mut\\s+)?${id}\\s*\\)\\s*=\\s*`, 'g'))].at(-1);
+    if (someLet) {
+      const from = (fn?.bodyFrom ?? 0) + someLet.index + someLet[0].length;
+      const end = rustLetEnd(code, from);
+      return evalRust(source.slice(from, end), from, depth + 1);
+    }
+    // A closure parameter (`opt.map(|p| ..)`): what the receiver holds.
+    const closure = [...before.matchAll(new RegExp(`([a-z_][\\w.]*)\\s*\\.\\s*(?:map|and_then|filter|inspect|is_some_and|map_or_else)\\(\\s*(?:move\\s*)?\\|\\s*&?${id}\\s*(?::[^|]*)?\\|`, 'g'))].at(-1);
+    if (closure) return evalRust(closure[1], (fn?.bodyFrom ?? 0) + closure.index, depth + 1);
     const decl = new RegExp(`\\b(?:let\\s+(?:mut\\s+)?|const\\s+|static\\s+)${id}\\b[^=;]*=\\s*([^;]+);`, 'g');
     let found = null;
     for (let m; (m = decl.exec(code));) if (!found || m.index < index) found = m;
@@ -1504,16 +1788,30 @@ function rustModel(name, source) {
   const firstReturned = (f, argText, index, depth) => {
     const body = code.slice(f.bodyFrom, f.to);
     const args = argText.split(',');
-    const out = rustExits(model, f).map((e) => e.replace(/^[\s\S]*\}\s*([a-z_]\w*)$/i, '$1')).flatMap((e) => {
+    const firstOfExit = (e) => {
+      e = e.trim().replace(/^(?:Ok|Some)\(([\s\S]*)\)$/, '$1').replace(/\.clone\(\)$/, '');
+      if (/^Err\s*\(/.test(e)) return [];
+      const arms = rustMatchArms(e);
+      if (arms) return arms.flatMap(({ pattern, body: arm }) => firstOfExit(rustBindArm(pattern, arms.scrutinee, arm)));
       const lit = /^(?:vec!\s*)?\[\s*([^,\]]+)/.exec(e);
       if (lit) return evalRust(lit[1], f.bodyFrom + 1, depth + 1);
       if (!/^[a-z_]\w*$/i.test(e)) return [{ unknown: `first element of ${e}` }];
+      // A local built as `vec![first, ..]` and pushed onto afterwards.
+      const built = new RegExp(`\\blet\\s+(?:mut\\s+)?${e}\\b[^=;]*=\\s*vec!\\s*\\[\\s*([^,\\]]+)`).exec(body);
+      if (built) return evalRust(built[1], f.bodyFrom + built.index, depth + 1);
+      // Bound by `let Some(e) = .. else`: the first element of what the Option holds.
+      const held = new RegExp(`\\blet\\s+Some\\(\\s*${e}\\s*\\)\\s*=\\s*`).exec(body);
+      if (held) {
+        const from = f.bodyFrom + held.index + held[0].length;
+        return evalRust(`${source.slice(from, rustLetEnd(code, from)).trim().replace(/^&/, '')}[0]`, from, depth + 1);
+      }
       const push = new RegExp(`\\b${e}\\.push\\(`).exec(body);
       if (!push || !new RegExp(`\\blet\\s+mut\\s+${e}\\b[^=;]*=\\s*Vec::`).test(body.slice(0, push.index))) return [{ unknown: `first element of ${e}` }];
       const open = f.bodyFrom + push.index + push[0].length - 1;
       const [first] = rustArgs(model, open);
       return first ? evalRust(first.text, open, depth + 1) : [{ unknown: `first element of ${e}` }];
-    }).flatMap((v) => {
+    };
+    const out = rustExits(model, f).map((e) => e.replace(/^[\s\S]*\}\s*([a-z_]\w*)$/i, '$1')).flatMap(firstOfExit).flatMap((v) => {
       if (v.param === undefined || v.fn !== f || v.path?.length) return [v];
       const pos = f.params.split(',').findIndex((p) => new RegExp(`^\\s*(?:mut\\s+)?${v.param}\\s*:`).test(p));
       if (args[pos] === undefined) return [{ unknown: `${f.name} argument ${v.param}` }];
@@ -1522,15 +1820,99 @@ function rustModel(name, source) {
     });
     return out.length ? out : [{ unknown: `first element of ${f.name}()` }];
   };
+  // The elements of a list: an array or `vec!` literal, or the const or local bound to one.
+  const rustElements = (list, index, depth) => {
+    let text = list.trim();
+    const d = /^[a-z_]\w*$/i.test(text) && new RegExp(`\\b(?:let\\s+(?:mut\\s+)?|const\\s+|static\\s+)${text}\\s*(?::[^=]*)?=\\s*`).exec(code);
+    if (d) text = source.slice(d.index + d[0].length, rustLetEnd(code, d.index + d[0].length)).trim();
+    const arr = /^(?:vec!\s*)?\[([\s\S]*)\]$/.exec(text);
+    if (!arr) return [{ unknown: `elements of ${list}` }];
+    return rustSplit(arr[1]).flatMap((item) => evalRust(item, index, depth + 1));
+  };
   model.eval = evalRust;
   return model;
+}
+
+/** Whether brackets in `text` balance and never close more than they opened. */
+function rustBalanced(text) {
+  let d = 0;
+  for (const ch of text) { if ('([{'.includes(ch)) d++; else if (')]}'.includes(ch) && --d < 0) return false; }
+  return d === 0;
+}
+
+/** Top-level comma-separated parts of `text`. */
+function rustSplit(text) {
+  const parts = [];
+  let d = 0;
+  let s = 0;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if ('([{'.includes(ch)) d++;
+    else if (')]}'.includes(ch)) d--;
+    else if (ch === ',' && d === 0) { parts.push(text.slice(s, i)); s = i + 1; }
+  }
+  parts.push(text.slice(s));
+  return parts.map((p) => p.trim()).filter(Boolean);
+}
+
+/** Where the right side of `let PAT = expr` ends: its `;`, the `{` of `if let`/`while let`, or `else`. */
+function rustLetEnd(code, from) {
+  let d = 0;
+  for (let i = from; i < code.length; i++) {
+    const ch = code[i];
+    if (d === 0 && (ch === ';' || ch === '{' || /^\selse\b/.test(code.slice(i, i + 6)))) return i;
+    if ('([{'.includes(ch)) d++;
+    else if (')]}'.includes(ch)) d--;
+  }
+  return code.length;
+}
+
+/** The arms of a `match scrutinee { pat => body, ... }` expression, or null. */
+function rustMatchArms(expr) {
+  const head = /^match\s+/.exec(expr);
+  if (!head || !expr.endsWith('}')) return null;
+  let open = -1;
+  for (let i = head[0].length, d = 0; i < expr.length; i++) {
+    const ch = expr[i];
+    if (ch === '{' && d === 0) { open = i; break; }
+    if ('([{'.includes(ch)) d++; else if (')]}'.includes(ch)) d--;
+  }
+  if (open < 0) return null;
+  const inner = expr.slice(open + 1, -1);
+  const arms = [];
+  let i = 0;
+  while (i < inner.length) {
+    const arrow = inner.indexOf('=>', i);
+    if (arrow < 0) break;
+    const pattern = inner.slice(i, arrow).trim().replace(/^,/, '').trim();
+    let j = arrow + 2;
+    while (/\s/.test(inner[j] ?? '')) j++;
+    let end = j;
+    for (let d = 0; end < inner.length; end++) {
+      const ch = inner[end];
+      if ('([{'.includes(ch)) d++;
+      else if (')]}'.includes(ch)) { d--; if (d === 0 && inner[j] === '{' && end > j) { end++; break; } }
+      else if (ch === ',' && d === 0) break;
+    }
+    arms.push({ pattern, body: inner.slice(j, end).trim().replace(/^\{([\s\S]*)\}$/, '$1').trim() });
+    i = end + 1;
+  }
+  arms.scrutinee = expr.slice(head[0].length, open).trim().replace(/^&/, '');
+  return arms;
+}
+
+/** An arm's body with the name its `Some(name)` / `Ok(name)` pattern binds read as the scrutinee itself. */
+function rustBindArm(pattern, scrutinee, body) {
+  const bound = /^(?:Some|Ok)\(\s*(?:ref\s+)?([a-z_]\w*)\s*\)$/.exec(pattern);
+  return bound ? body.replace(new RegExp(`\\b${bound[1]}\\b`, 'g'), `(${scrutinee})`) : body;
 }
 
 /** A function's result expressions: `return x;` and a tail expression, `Ok(..)`/`Some(..)` unwrapped. */
 function rustExits(model, fn) {
   const body = model.source.slice(fn.bodyFrom + 1, fn.to);
   const exits = [...body.matchAll(/\breturn\s+([^;]+);/g)].map((m) => m[1]);
-  const tail = body.trim().split(/;\s*\n/).pop().trim();
+  // The tail expression, after any blocks that close before it.
+  const tail = body.trim().split(/;\s*\n/).pop().trim().replace(/^(?:\}\s*)+/, '');
   if (tail && !tail.endsWith(';')) exits.push(tail);
   return exits.map((e) => e.trim().replace(/^(?:Ok|Some)\(([\s\S]*)\)$/, '$1'));
 }
@@ -1571,13 +1953,46 @@ function rustCallers(ctx, model, fn, param) {
       if (m === model && c.index >= fn.from && c.index <= fn.bodyFrom) continue;
       if (/\bfn\s+$/.test(m.code.slice(Math.max(0, c.index - 8), c.index))) continue;
       if (m.inTest(c.index)) continue;
-      if (!visible(m, c[1] === '.')) continue;
+      // A path names this function by its module (also under a `use module as alias`) or its impl type.
+      const q = c[1] === '::' ? /(\w+)::$/.exec(m.code.slice(Math.max(0, c.index - 40), c.index + 2)) : null;
+      const named = q && (q[1] === stem || q[1] === implType || new RegExp(`\\buse\\s+(?:[\\w:]*::)?${stem}\\s+as\\s+${q[1]}\\s*;`).test(m.code));
+      if (!visible(m, c[1] === '.' || (named && q[1] === implType))) continue;
       if ((c[1] === '.') !== selfParam) continue; // a method is called as `.name(`, a free function is not
-      if (m !== model && c[1] !== '.' && m.fns.some((f) => f.name === fn.name)) continue; // that file's own function of the name
-      if (c[1] === '::') { const q = /(\w+)::$/.exec(m.code.slice(Math.max(0, c.index - 40), c.index + 2)); if (q && q[1] !== stem && !/^(self|super|crate|Self)$/.test(q[1]) && q[1] !== implType) continue; }
+      if (m !== model && c[1] !== '.' && !named && m.fns.some((f) => f.name === fn.name)) continue; // that file's own function of the name
+      if (q && !named && !/^(self|super|crate|Self)$/.test(q[1])) continue;
       const args = rustArgs(m, c.index + c[0].length - 1);
       const at = selfParam && c[1] === '.' ? pos - 1 : pos;
       if (args[at]) out.push({ model: m, index: c.index, arg: args[at] });
+    }
+  }
+  return out;
+}
+
+/**
+ * A parameter of an N-API constructor (`#[napi(constructor)]` in an impl of `Type`) crosses from Node: it is
+ * the argument at the same position of each `new <addon>.Type(...)` in the JavaScript payload, resolved
+ * there. A JavaScript parameter continues through the JavaScript callers. Null when `fn` is no N-API
+ * constructor.
+ */
+function napiCallers(ctx, model, value) {
+  const fn = value.fn;
+  if (!/#\[napi\(\s*constructor\s*\)\]\s*(?:#\[[^\]]*\]\s*)*(?:pub\s+)?$/.test(model.code.slice(Math.max(0, fn.from - 80), fn.from))) return null;
+  const type = model.impls.filter((i) => i.from <= fn.from && fn.to <= i.to).sort((a, b) => b.from - a.from)[0]?.type;
+  const pos = fn.params.split(',').map((p) => p.trim()).filter(Boolean).findIndex((p) => new RegExp(`^(?:mut\\s+)?${value.param}\\s*:`).test(p));
+  if (!type || pos < 0) return null;
+  const out = [];
+  for (const file of ctx.js.values()) {
+    for (const m of file.shape.matchAll(new RegExp(`\\bnew\\s+(?:[A-Za-z_$][\\w$]*\\.)*${type}\\s*\\(`, 'g'))) {
+      const open = m.index + m[0].length - 1;
+      const arg = splitArgs(file.shape, open).args[pos];
+      if (!arg) continue;
+      budget.steps = 0; budget.memo.clear(); budget.stack.length = 0;
+      const line = lineOf(file.source, open);
+      for (const v of file.evaluate(file.code.slice(arg.from, arg.to), open)) {
+        const record = { path: file.name, line, spawn: `N-API ${type} -> ${model.name}:${lineOf(model.source, fn.from)}`, binary: describe(v) };
+        if (v.param !== undefined) ctx.wrappers.push({ file, site: { open }, entry: { value: v }, record });
+        else out.push({ value: v, at: { path: file.name, line } });
+      }
     }
   }
   return out;
@@ -1607,7 +2022,13 @@ function rustFieldType(ctx, type, key) {
  * type is built (non-test code only). Each result: {value, at: {path, line}}.
  */
 function rustResolve(ctx, model, value, depth = 0) {
-  if (depth > 4) return [{ value: { unknown: 'argv data flow too deep' }, at: { path: model.name, line: lineOf(model.source, value.fn.from) } }];
+  const out = rustResolveOnce(ctx, model, value, depth);
+  // The repository an argv names travels with the program it resolves to.
+  return value.sandboxRepo ? out.map((r) => (r.value.sandboxRepo ? r : { ...r, value: { ...r.value, sandboxRepo: value.sandboxRepo } })) : out;
+}
+
+function rustResolveOnce(ctx, model, value, depth) {
+  if (depth > 8) return [{ value: { unknown: 'argv data flow too deep' }, at: { path: model.name, line: lineOf(model.source, value.fn.from) } }];
   const out = [];
   const keep = (m, index, values) => {
     for (const v of values) {
@@ -1617,6 +2038,10 @@ function rustResolve(ctx, model, value, depth = 0) {
   };
   if (!value.path.length) {
     const callers = rustCallers(ctx, model, value.fn, value.param);
+    // An N-API constructor is also called from Node: those callers count beside the Rust ones.
+    const fromNode = napiCallers(ctx, model, value);
+    if (fromNode) out.push(...fromNode);
+    if (!callers.length && fromNode) return out;
     if (!callers.length) return [{ value: { uncalled: value.fn.name }, at: { path: model.name, line: lineOf(model.source, value.fn.from) } }];
     for (const c of callers) {
       const text = value.first ? `${c.arg.text.trim().replace(/^&/, '').replace(/(?:\.into_iter\(\)|\.map\(\s*Into::into\s*\)|\.collect(?:::<[^>]*>)?\(\)|\.to_vec\(\)|\.clone\(\))+$/, '')}[0]` : c.arg.text;
@@ -1641,9 +2066,11 @@ function rustResolve(ctx, model, value, depth = 0) {
           for (const e of rustExits(m, f)) {
             const branch = /^if\b[^{]*\{\s*([\s\S]*?)\s*\}\s*else\s*\{\s*([\s\S]*?)\s*\}$/.exec(e);
             for (const x of branch ? [branch[1], branch[2]] : [e]) {
-              const v = m.eval(x, f.bodyFrom + 1);
+              // The first element of a method's `vec![..]` result is its first item.
+              const item = value.first && !keys.length && /^(?:vec!\s*)?\[\s*([^,\]]+)/.exec(x.trim());
+              const v = m.eval(item ? item[1] : x, f.bodyFrom + 1);
               for (const r of v) {
-                if (r.param === 'self' && r.path.length) next = { model: m, value: { ...r, path: [...r.path, ...keys] } };
+                if (r.param === 'self' && r.path.length) next = { model: m, value: { ...r, path: [...r.path, ...keys], first: item ? false : value.first } };
                 else keep(m, f.bodyFrom, [r]);
               }
             }
@@ -1673,6 +2100,29 @@ function rustConstructions(ctx, type, key, first, depth) {
     const def = new RegExp(`#\\[derive\\(([^)]*)\\)\\]\\s*(?:#\\[[^\\]]*\\]\\s*)*(?:pub(?:\\([^)]*\\))?\\s+)?struct\\s+${type}\\b`).exec(m.code);
     if (def && /Deserialize/.test(def[1])) derives = true;
     const selfSpans = m.impls.filter((i) => i.type === type);
+    if (/^\d+$/.test(key)) {
+      // A tuple struct: `Type(a, b)` (any module path before it), or `Type` passed as its constructor
+      // function (`.map(Type)`), whose field 0 is what the receiver holds.
+      for (const lit of m.code.matchAll(new RegExp(`(?<![\\w])(?:\\w+::)*(${type}|Self)\\s*\\(`, 'g'))) {
+        if (lit[1] === 'Self' && !selfSpans.some((i) => i.from <= lit.index && lit.index <= i.to)) continue;
+        if (/\b(?:struct|enum|impl|for|trait|fn)\s+(?:<[^>]*>\s*)?(?:\w+::)*$/.test(m.code.slice(Math.max(0, lit.index - 30), lit.index)) || m.inTest(lit.index)) continue;
+        const part = rustArgs(m, lit.index + lit[0].length - 1)[Number(key)];
+        if (!part) continue;
+        for (const v of m.eval(first ? `${part.text.trim()}[0]` : part.text, part.at)) {
+          if (v.param !== undefined) out.push(...rustResolve(ctx, m, v, depth + 1));
+          else out.push({ value: v, at: { path: m.name, line: lineOf(m.source, lit.index) } });
+        }
+      }
+      for (const ctor of m.code.matchAll(new RegExp(`([\\s\\S]{0,200}?)\\.\\s*map\\(\\s*(?:\\w+::)*${type}\\s*\\)`, 'g'))) {
+        if (key !== '0' || m.inTest(ctor.index)) continue;
+        const receiver = /([A-Za-z_][\w:]*(?:\([^()]*\))?(?:\s*\.\s*\w+\([^()]*\))*)\s*$/.exec(m.source.slice(ctor.index, ctor.index + ctor[1].length))?.[1];
+        for (const v of receiver ? m.eval(receiver, ctor.index + ctor[1].length) : [{ unknown: `${type} built from an unknown value` }]) {
+          if (v.param !== undefined) out.push(...rustResolve(ctx, m, v, depth + 1));
+          else out.push({ value: v, at: { path: m.name, line: lineOf(m.source, ctor.index + ctor[1].length) } });
+        }
+      }
+      continue;
+    }
     for (const lit of m.code.matchAll(new RegExp(`(?<![\\w:])(${type}|Self)\\s*\\{`, 'g'))) {
       if (lit[1] === 'Self' && !selfSpans.some((i) => i.from <= lit.index && lit.index <= i.to)) continue;
       if (/\b(?:struct|enum|impl|for|trait)\s+(?:<[^>]*>\s*)?$/.test(m.code.slice(Math.max(0, lit.index - 20), lit.index))) continue;
@@ -1699,8 +2149,22 @@ function rustConstructions(ctx, type, key, first, depth) {
 /** Whether the repository expression `text` (evaluated in `fn`) is always a directory under `temp_dir()`. */
 function rustTempRepo(ctx, model, fn, text, depth = 0) {
   if (depth > 6 || !fn) return false;
-  let expr = text.trim().replace(/^&/, '').replace(/(?:\.join\([^()]*\)|\.as_path\(\)|\.to_path_buf\(\))+$/, '').trim();
+  let expr = text.trim().replace(/^&/, '').replace(/(?:\.join\([^()]*\)|\.as_path\(\)|\.to_path_buf\(\)|\.to_string_lossy\(\)|\.into_owned\(\))+$/, '').trim();
   if (/\btemp_dir\(\)/.test(expr)) return true;
+  // `self.field`: every non-test construction of the impl's type sets it to a temp repository.
+  const own = /^self\s*\.\s*([a-z_]\w*)$/.exec(expr);
+  if (own) {
+    const type = rustRootType(model, fn, 'self');
+    const built = [];
+    for (const m of ctx.rust.values()) {
+      for (const lit of m.code.matchAll(new RegExp(`(?<![\\w:])${type}\\s*\\{`, 'g'))) {
+        if (m.inTest(lit.index) || /\b(?:struct|impl|for)\s+(?:<[^>]*>\s*)?$/.test(m.code.slice(Math.max(0, lit.index - 20), lit.index))) continue;
+        const part = rustArgs(m, lit.index + lit[0].length - 1).find((p) => new RegExp(`^\\s*${own[1]}\\s*(?::|$)`).test(p.text));
+        if (part) built.push({ m, fn: m.within(lit.index), text: part.text.includes(':') ? part.text.slice(part.text.indexOf(':') + 1) : own[1] });
+      }
+    }
+    return built.length > 0 && built.every((b) => rustTempRepo(ctx, b.m, b.fn, b.text, depth + 1));
+  }
   if (!/^[a-z_]\w*$/i.test(expr)) return false;
   if (new RegExp(`\\b${expr}\\s*:`).test(fn.params)) {
     const callers = rustCallers(ctx, model, fn, expr);
@@ -1753,6 +2217,12 @@ function scanRust(model, ctx) {
         if (/^packages\/git\/rust\/src\//.test(where.path) && (cls === 'git' || (runner && cls !== 'hook'))) { ctx.classes.push({ ...site, class: 'git-driver' }); continue; }
         if (cls === 'git' && repo && fn && (rustTempRepo(ctx, model, fn, repo) || (/temp_dir\(\)/.test(code.slice(fn.bodyFrom, fn.to)) && /\binit\b/.test(source.slice(fn.bodyFrom, fn.to))))) {
           ctx.classes.push({ ...record, class: 'production-sandbox-probe', function: fn.name, repository: repo.trim() }); continue;
+        }
+        // A program reached through an argv runner whose argv names its repository (`[git, "-C", repo]`):
+        // the same probe when that repository is a temp directory the probe creates.
+        const named = v.sandboxRepo;
+        if (cls === 'git' && named && rustTempRepo(ctx, named.model, named.fn, named.text)) {
+          ctx.classes.push({ ...site, class: 'production-sandbox-probe', function: named.fn?.name, repository: named.text.trim() }); continue;
         }
         ctx.raw.push({ ...site, family: cls === 'unknown' || cls === 'param' ? 'unresolved-binary' : cls === 'hook' ? 'hook-spawn' : 'rust' });
       }

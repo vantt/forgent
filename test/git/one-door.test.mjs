@@ -36,6 +36,14 @@ const SHAPES = [
   ['method-return', 'src/run.mjs', 'spawn', "the binary returned by a method of a factory's object"],
   ['rust-first-push', 'packages/demo/rust/src/lib.rs', 'rust', 'git as the first push of a Vec a local Rust function builds'],
   ['shell-data-operand', 'scripts/setup.sh', 'shell', 'a command substitution inside a quoted echo operand'],
+  // Configuration and value shapes the flow follows by property path, and the N-API boundary.
+  ['config-path-flow', 'src/run.mjs', 'wrapper-caller', 'git as an executor command in defaults deep-merged under parsed config'],
+  ['function-param-call', 'src/run.mjs', 'wrapper-caller', 'git returned by a function the caller passes in a parameter'],
+  ['map-registry', 'src/run.mjs', 'spawn', 'git returned by a method of a value stored in a module-private Map'],
+  ['both-ways-value', 'src/run.mjs', 'wrapper-caller', 'a wrapper called by name and also handed on as a value called with git'],
+  ['rust-option-match', 'packages/demo/rust/src/lib.rs', 'rust', 'a Rust if-let over a match whose arm picks git from a const list'],
+  ['rust-sandbox-argv', 'packages/demo/rust/src/lib.rs', 'rust', 'git through a Rust argv runner on a repository the caller names'],
+  ['napi-node-caller', 'src/port.mjs', 'rust', 'git passed from Node to an N-API constructor whose field a Rust spawn runs'],
 ];
 
 test('the static scan reports a Git spawn in each shape a literal search misses', () => {
@@ -55,6 +63,10 @@ test('a declared standalone skill and text quoted into a data command are not si
   assert.deepEqual(skills.classes.map((c) => [c.class, c.path, c.skill]), [['standalone-skill-script', 'core/skills/learn/scripts/run.mjs', 'learn']]);
   // `die "... (git clone ...)"` only prints: line 3 is not a site, the substitution on line 4 is.
   assert.deepEqual(scan({ root: path.join(PROBES, 'shell-data-operand') }).sites.map((s) => s.line), [4]);
+  // The same argv runner: on a repository under temp_dir() it is the sandbox probe, on a named one a site.
+  const sandbox = scan({ root: path.join(PROBES, 'rust-sandbox-argv') });
+  assert.deepEqual(sandbox.sites.map((s) => s.line), [22]);
+  assert.deepEqual(sandbox.classes.map((c) => [c.class, c.function]), [['production-sandbox-probe', 'probe']]);
 });
 
 test('doctor refuses a census that lists a site, or whose files do not match the payload it sits in', () => {

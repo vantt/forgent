@@ -8,6 +8,12 @@ import { OWN_PAYLOAD_ROOT, releasePayloadManifest } from '../run-supervisor/payl
 const require = createRequire(import.meta.url);
 let handover;
 const verified = new Map();
+// The release's own `fgos` host beside each loaded addon, kept apart from the addon's exports.
+const helperExes = new WeakMap();
+/** The verified `fgos` host executable of the release `addon` was loaded from, or null. */
+export function nativeHelperExe(addon) {
+  return helperExes.get(addon) ?? null;
+}
 /** A native port error as its typed fields (`cause`, `stderr` bytes, ...);
  * an error that is not one keeps its message as the cause. */
 export function nativeError(error) {
@@ -51,7 +57,7 @@ export function loadNativeAddon({ hostBin = process.env.FGOS_HOST_BIN, descripto
     if (typeof helper === 'string' && helper && !path.isAbsolute(helper) && !helper.split(/[\\/]/).includes('..')) {
       const resolved = fs.realpathSync(path.join(root, helper));
       if (!resolved.startsWith(`${root}${path.sep}`)) throw unavailable('helper escaped release');
-      addon.helperExe = resolved;
+      helperExes.set(addon, resolved);
     }
     const versions = addon.versions(); // Enforce the process marker before exposing either crate.
     if (versions.napi !== entry.napiVersion || typeof versions.git !== 'string' || typeof versions.eventStore !== 'string') throw unavailable('combined addon ABI mismatch');
