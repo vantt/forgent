@@ -11,6 +11,7 @@ sp=importlib.util.spec_from_file_location('step03',P/'step-03-check.py');m=impor
 sha=m.sha
 SEAMS=['gateway-contract','cli-help-messages','setup-doctor-roots']
 PROMOTED={'reference-000228','reference-000277','reference-003682','reference-003687','reference-003708','reference-003749','reference-003771','reference-003784','reference-003868'}
+asp=importlib.util.spec_from_file_location('admission',P/'step-05-admission-rules.py');admission=importlib.util.module_from_spec(asp);asp.loader.exec_module(admission)
 def read(n):return json.loads((P/n).read_text())
 def rows(n):return [json.loads(l) for l in (P/n).read_text().splitlines()]
 def load():return [r for s in SEAMS for r in rows('step-05-records/'+s+'.jsonl')]
@@ -37,6 +38,8 @@ def dynamic_operand(d):
  operands; metadata labels, comments, types, guards and formatting are not.
  This is a necessary admission check, not a substitute for semantic review.
  """
+ if d.get('pathOperand'):
+  return d['pathOperand'] in d['currentPassage']['text'] and d.get('nonDocumentUse') is None
  x=d['originalTuple'][4];c=d['currentPassage'];lines=c['text'].splitlines()
  i=(d['currentLine'] or c['startLine'])-c['startLine'];line=lines[i] if 0<=i<len(lines) else ''
  if line.lstrip().startswith(('//','/*','*')):return False
@@ -124,6 +127,8 @@ RULES={
  'message-deltas':'Every admitted patch has exact current/candidate emitted expression and changelog prerequisite.',
  'review':'Every file/reference/tuple/source byte appears in hash-bound parts <=60 records / 400000 bytes; no sample.',
 }
+
+RULES.update(admission.RULES)
 
 def check(rs,receipts=None,index=None,check_packets=True):
  receipts=receipts if receipts is not None else read('step-05-pilot-parity-receipts.json')['receipts'];index=index if index is not None else read('step-05-pilot-review-index.json')
@@ -316,74 +321,9 @@ def check(rs,receipts=None,index=None,check_packets=True):
    for e in r['references']:
     if e['disposition']=='patch':test('message-deltas',r['file']+':'+e['referenceId'],lambda r=r,e=e:(r['file'],e['referenceId']) in deltas and deltas[r['file'],e['referenceId']]['oldPointer']==e['matchedExpression'] and deltas[r['file'],e['referenceId']]['newPointer']==e['proposedReplacement'])
  if check_packets:
-  refseen=[];dynseen=[];metaseen=[];source={};priorseen=[];receiptseen=[]
-  fragments={}
-  packet_items=[]
-  for part in index['parts']:
-   def packet(part=part):
-    b=(P/part['payload']).read_bytes();assert sha(b)==part['payloadSha256'] and len(b)==part['bytes'] and len(b)<=400000
-    data=json.loads(b);fs={x['file'] for x in data['items'] if x.get('file')};assert len(fs)<=60 and sorted(fs)==part['files'] and len(fs)==part['fileRecords']
-    assert part['report']==f"review-a38-step-05-pilot-p{part['part']:02}.md"
-    for it in data['items']:
-     if it['kind']=='item-fragment':fragments.setdefault(it['fragmentOf'],[]).append(it)
-     else:packet_items.append(it)
-   test('review',part['payload'],packet)
-  for key,frag in fragments.items():
-   def restore(frag=frag):
-    ordered=sorted(frag,key=lambda x:x['fragment']);assert [x['fragment'] for x in ordered]==list(range(ordered[0]['fragments']))
-    raw=''.join(x['text'] for x in ordered);assert all(sha(raw)==x['completeItemSha256'] for x in ordered)
-    packet_items.append(json.loads(raw))
-   test('review','streamed item '+str(key),restore)
-  byfile={r['file']:r for r in rs}
-  for it in packet_items:
-   def item_equal(it=it):
-    kind=it['kind']
-    if kind in ['references','dynamicTraces','priorRecordRefs']:assert it['value']==byfile[it['file']][kind][it['index']]
-    if kind=='record-metadata':assert it['value']=={k:v for k,v in byfile[it['file']].items() if k not in ['references','dynamicTraces','priorRecordRefs']}
-    if kind=='receipt':assert it['value']==rec[it['value']['id']]
-   test('review','canonical item '+str(it.get('file',it.get('seam'))),item_equal)
-   if it['kind']=='references':refseen.append(it['value']['referenceId'])
-   if it['kind']=='dynamicTraces':dynseen.append(it['value']['id'])
-   if it['kind']=='record-metadata':metaseen.append(it['file'])
-   if it['kind']=='receipt':receiptseen.append(it['value']['id'])
-   if it['kind']=='priorRecordRefs':priorseen.append((it['file'],it['index']))
-   if it['kind']=='source-context':source.setdefault(it['file'],[]).append(it)
-  test('review','all refs/dynamic/meta/receipts',lambda:sorted(refseen)==sorted(allrefs) and sorted(dynseen)==sorted(alldyn) and sorted(metaseen)==sorted(r['file'] for r in rs) and sorted(receiptseen)==sorted(rec))
-  for r in rs:
-   def fullcontext(r=r):
-    chunks=sorted(source.get(r['file'],[]),key=lambda x:x['startLine']);assert ''.join(c['text'] for c in chunks)==(ROOT/r['file']).read_text()
-    assert sorted(i for f,i in priorseen if f==r['file'])==list(range(len(r['priorRecordRefs'])))
-   test('review','full-file '+r['file'],fullcontext)
-
-  rr=read('step-05-pilot-rereview-index.json');outcomes=read('step-05-pilot-rework-outcomes.json')
-  changed={x['file']:x for x in outcomes['files']};changedids={e['id'] for x in changed.values() for e in x['changes']}
-  expected_rr=changedids|{e['referenceId'] for r in rs if r['file'] in changed for e in r['references'] if e['admission']=='ADMIT'}
-  rrseen=[]
-  for part in rr['parts']:
-   def rr_packet(part=part):
-    raw=(P/part['payload']).read_bytes();data=json.loads(raw)
-    assert sha(raw)==part['sha256'] and len(raw)==part['bytes'] and len(raw)<=400000
-    assert len(data['records'])==part['records']<=60 and part['report']==f"review-a38-step-05-pilot-rr-p{part['part']:02}.md"
-    assert sorted({it['file'] for it in data['records']})==part['files'] and set(part['files'])<=set(changed)
-    for it in data['records']:
-     record=byfile[it['file']];key='referenceId' if it['kind']=='references' else 'id'
-     assert it['record']==next(e for e in record[it['kind']] if e[key]==it['id'])
-
-     if it['record']['disposition']=='patch':assert 'cutoverSpecification' in it
-     if 'cutoverSpecification' in it:
-      current_spec=next(s for s in read('step-05-pilot-cutover-specs.json')['patches'] if s['file']==it['file'])
-      assert it['cutoverSpecification']=={k:v for k,v in current_spec.items() if k not in ['symbolOrPassage','oldText','newText','expectedOutputSets','intentionalBehaviorDeltas']}
-
-     assert it['inputCommit']==record['authorInputCommit'] and it['sourceSha256']==record['sourceSha256']
-     w=it['window'];lines=pinned(record['authorInputCommit'],record['file']).splitlines();e=it['record']
-     a=min(span['line'] for span in e['sourceSpans']) if it['kind']=='references' and e['sourceSpans'] else e['currentLine']
-     b=max(span['line'] for span in e['sourceSpans']) if it['kind']=='references' and e['sourceSpans'] else a
-     assert (w['startLine'],w['endLine'])==(max(1,a-40),min(len(lines),b+40))
-     assert w['text']=='\n'.join(lines[w['startLine']-1:w['endLine']])
-     if it['id'] in changedids:assert it['change']==next(x for x in changed[it['file']]['changes'] if x['id']==it['id'])
-     rrseen.append(it['id'])
-   test('review','bounded re-review '+part['payload'],rr_packet)
-  test('review','only changed files and complete final-state windows',lambda:len(rrseen)==len(set(rrseen)) and set(rrseen)==expected_rr and rr['changedFileCount']==len(changed) and rr['changedIdCount']==len(changedids))
+  admission.review_obligations(rs,index,test,'review',sha,read)
+ shared=admission.check(rs)
+ errors.extend(shared['failures']);checks.update(shared['checks'])
  return {'kind':'Step 5 pilot full mechanical checker; semantic independent review pending','rules':RULES,'checks':dict(checks),'files':len(rs),'literalReferences':len(allrefs),'dynamicTuples':len(alldyn),'failures':errors,'failureCount':len(errors),'sourceCensusGrep':sourcegrep,'reviewStatus':'pending; checker success is not semantic acceptance or cutover readiness'}
 
 if __name__=='__main__':

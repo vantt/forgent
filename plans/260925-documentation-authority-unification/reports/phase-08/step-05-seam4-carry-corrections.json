@@ -1,0 +1,108 @@
+{
+  "changes": [
+    {
+      "id": "dynamic-015135",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "REJECT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "reason": "L12-72: src/setup/skill-wrappers.mjs: root-only; own operation 'const root = resolveProjectRoot(targetPath, projectRoot);' does not read, write, probe or emit a document path. Own census operand 'root = resolveProjectRoot(targetPath'."
+    },
+    {
+      "id": "dynamic-015141",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "REJECT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "reason": "L12-72: src/setup/skill-wrappers.mjs: root-only; own operation 'const root = resolveProjectRoot(targetPath, projectRoot);' does not read, write, probe or emit a document path. Own census operand 'root = resolveProjectRoot(targetPath'."
+    },
+    {
+      "id": "dynamic-015143",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "REJECT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "reason": "L12-72: src/setup/skill-wrappers.mjs: root-only; own operation 'const root = resolveProjectRoot(sourcePath, projectRoot);' does not read, write, probe or emit a document path. Own census operand 'root = resolveProjectRoot(sourcePath'."
+    },
+    {
+      "id": "dynamic-015161",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "REJECT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "reason": "L12-72: src/setup/skill-wrappers.mjs: finding-path-field; own operation 'canonicalDir: relPath,' does not read, write, probe or emit a document path. Own census operand 'canonicalDir: relPath'."
+    },
+    {
+      "id": "dynamic-015169",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "REJECT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "reason": "L12-72: src/setup/skill-wrappers.mjs: finding-path-field; own operation 'canonicalDir: relPath,' does not read, write, probe or emit a document path. Own census operand 'canonicalDir: relPath'."
+    },
+    {
+      "id": "dynamic-015205",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "REJECT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "reason": "L12-72: src/setup/skill-wrappers.mjs: finding-path-field; own operation 'relativeFragmentPath: entryRel,' does not read, write, probe or emit a document path. Own census operand 'relativeFragmentPath: entryRel'."
+    },
+    {
+      "id": "dynamic-015206",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "REJECT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "reason": "L12-72: src/setup/skill-wrappers.mjs: finding-path-field; own operation 'sourcePath: projectRelPath,' does not read, write, probe or emit a document path. Own census operand 'sourcePath: projectRelPath'."
+    },
+    {
+      "id": "dynamic-015232",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "REJECT",
+        "preserve"
+      ],
+      "ruling": "L12-72",
+      "reason": "L12-72: src/setup/skill-wrappers.mjs: accumulator; own operation 'function rewritePackagedSkillReferences(content, filePath, skillsDir, sharedRoots = [], projectRoot) {' does not read, write, probe or emit a document path. Own census operand 'sharedRoots = []'."
+    }
+  ]
+}

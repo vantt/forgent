@@ -2,6 +2,11 @@
   "kind": "Seam4 rejecting mutation probes",
   "baselineFailures": 0,
   "rulesCovered": [
+    "a-passage-agreement",
+    "b-real-blocker",
+    "c-render-owner",
+    "d-own-operand",
+    "e-retired-successor",
     "s4-carries",
     "s4-coverage",
     "s4-greps",
@@ -17,8 +22,8 @@
     "s4-review",
     "s4-spans"
   ],
-  "passed": 22,
-  "total": 22,
+  "passed": 32,
+  "total": 32,
   "probes": [
     {
       "name": "Dropping a promoted generated-output reference cannot shrink coverage",
@@ -231,12 +236,7 @@
       "caught": [
         {
           "rule": "s4-review",
-          "where": "step-05-seam4-p01.json",
-          "error": "condition false"
-        },
-        {
-          "rule": "s4-review",
-          "where": "all source specifications, metadata, receipts and closure changes",
+          "where": "historical packet step-05-seam4-p01.json",
           "error": "condition false"
         }
       ]
@@ -286,6 +286,131 @@
           "rule": "s4-spans",
           "where": "docs/doc-registry.json:reference-000387",
           "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Literal-literal same passage admission is all-pairs",
+      "owningRule": "a-passage-agreement",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "a-passage-agreement",
+          "where": ".agents/skills/_shared/capability-catalog.md:reference-000001/reference-000002",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Dynamic-dynamic nested path operation must agree",
+      "owningRule": "a-passage-agreement",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "a-passage-agreement",
+          "where": "scripts/check-doc-inventory-gates.mjs:dynamic-006738/dynamic-006739",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Literal-dynamic shared retained root must agree",
+      "owningRule": "a-passage-agreement",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "a-passage-agreement",
+          "where": "core/skills/distill/scripts/distill.mjs:reference-000286/dynamic-001704",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "A verbatim blocker reused in different files is rejected",
+      "owningRule": "b-real-blocker",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "b-real-blocker",
+          "where": "docs/decisions/index.md:reference-000310",
+          "error": "condition false"
+        },
+        {
+          "rule": "b-real-blocker",
+          "where": "docs/doc-registry.json:reference-000387",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "A generated preserve owner cannot acquire an own park",
+      "owningRule": "c-render-owner",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "c-render-owner",
+          "where": ".agents/skills/_shared/capability-catalog.md:reference-000002",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Every admitted tuple needs exact own pathOperand",
+      "owningRule": "d-own-operand",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "d-own-operand",
+          "where": "core/skills/distill/scripts/distill.mjs:dynamic-001704",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Unknown nonDocumentUse category is rejected",
+      "owningRule": "d-own-operand",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "d-own-operand",
+          "where": "docs/decisions/index.md:dynamic-001876",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Borrowed neighbouring path cannot replace own operand",
+      "owningRule": "d-own-operand",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "d-own-operand",
+          "where": "core/skills/distill/scripts/distill.mjs:dynamic-001704",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Wrapped retired citation requires its live narrative successor",
+      "owningRule": "e-retired-successor",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "e-retired-successor",
+          "where": "scripts/backfill-status-category.mjs:reference-002431",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "An existing unrelated heading cannot impersonate the decision successor",
+      "owningRule": "e-retired-successor",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "e-retired-successor",
+          "where": "scripts/backfill-status-category.mjs:reference-002431",
+          "error": "successor heading must own the cited decision id"
         }
       ]
     }

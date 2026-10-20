@@ -1,0 +1,177 @@
+{
+  "kind": "L12-72 records-only final verification",
+  "inputCommit": "d23a6aa3a09fae1cd039918b718e322177cb273e",
+  "createdAt": "2026-10-20T19:33:14.554414+00:00",
+  "fullChecker": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID PYTHONDONTWRITEBYTECODE=1 python3 -B plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+    "exit": 0,
+    "files": 291,
+    "literalReferences": 2419,
+    "dynamicTuples": 5654,
+    "failureCount": 0
+  },
+  "probes": {
+    "pilot": {
+      "exit": 0,
+      "passed": 42,
+      "total": 42
+    },
+    "generators": {
+      "exit": 0,
+      "passed": 32,
+      "total": 32
+    },
+    "totalPassed": 74,
+    "total": 74,
+    "environment": "CLAUDE_CODE_SESSION_ID unset; PYTHONDONTWRITEBYTECODE=1; python3 -B"
+  },
+  "sweep": {
+    "initialStructuralHits": {
+      "a-passage-agreement": 92,
+      "b-real-blocker": 2958,
+      "c-render-owner": 522,
+      "d-own-operand": 5654,
+      "e-retired-successor": 16
+    },
+    "counting": "Initial structural violations, one check per tuple/reference, or all unordered overlapping-operation pairs for (a); dynamic operation coordinates come from verified final own-source witnesses. These counts are not unique files and not additive defects.",
+    "finalFailureCount": 0,
+    "outcomeChanges": 1013,
+    "authorAddedReferences": 59
+  },
+  "rereview": {
+    "sourceFiles": 195,
+    "generatedFiles": 70,
+    "unreviewedParts": [
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29
+    ],
+    "status": "pending Lead repack and independent semantic review"
+  },
+  "scope": {
+    "allowed": "plans/260925-documentation-authority-unification/reports/phase-08",
+    "consumerBytesChanged": false,
+    "gitWrites": false,
+    "fgosCli": false,
+    "buildsOrServices": false,
+    "needsWrites": []
+  },
+  "artifacts": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+      "sha256": "82e49219f39e3c2d81fb70899db9d6e79cbfa696ac988c3de99b09e9c917550e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-check.py",
+      "sha256": "8e30cd1b6dee7de8bf2be7ead4fd9f678d5bc888fd4ff3fc60f69962d8bc98f9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-admission-rules.py",
+      "sha256": "ec3e97b80457373345d1db9bc41c7b9d40166bfa67bc1c4518fac8f874e89fca"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py",
+      "sha256": "3eb07852852a608a6325a06a7d97f413cd77c067b761ec60008a0fe2b413f309"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes.py",
+      "sha256": "a9c7c01df385bda6401078917488b2109332198d938ab9a533c584c3193e9c77"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-full-check-result.json",
+      "sha256": "0b8d42a4aea6020bb77ea5cdbbd59095e649d770d5bb6dcdb8dec72332507e44"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-full-check.log",
+      "sha256": "15e33d13c9e00e692743b10bed8503680a5c9f67e2c1cd8910e8687dd0c92c73"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-probes-result.json",
+      "sha256": "548100b3746b48526a49b4d6bc6f9acc2e7de9969b7628efbe049dfaf926dbad"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-probes.log",
+      "sha256": "d76e74ddac4ac147022a0f730f5b072976a422417a3d40e926b7bfbef92d9791"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes-result.json",
+      "sha256": "522a83237371abd4bbc8914990294bef5b311438d3e9abf85176bac30726cfb8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes.log",
+      "sha256": "c17cd9aa50555f00e226eb850aacd2676c1f8d7c6a14e59d6006759b40cfeb5f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-rulings-sweep.json",
+      "sha256": "e98827e0d179d8dac9ca8f7bd1200f124f4e5fa9116cc9f3838eff833376f68f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-rereview-list.json",
+      "sha256": "4c2c3729e798316e4d57b7f003dde1ae1807314aab1881b4ffec7b815990440d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-cutover-specs.json",
+      "sha256": "c42d30379157f80ecca7f328d4fb083ff7bfb2554a46389d2e73889d4234c145"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-parity-receipts.json",
+      "sha256": "cbae4747fc7ca5c47daa11c4b5e4c72a017ba8b50378e13f289db37f5636c7b9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+      "sha256": "154bca4f2a635f9a4e1c1c15fd315f0049dc6c5dfda20f8e4b75cad760b7ee20"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+      "sha256": "82d9d94c6c4ab83f2128f9ba2d8324f2e058bfacc9fd3b145ee1d7fabe4ccfb6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+      "sha256": "3674eaae1cbd7b42baa7d92bcd78e0bbbc85c42d1b6421fc18497e1ac8c1a958"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl",
+      "sha256": "844dc45d9e32617a76956c3e00acdbaed53b8334dfcc498e7c3d830afa4e16b7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-decision-index.jsonl",
+      "sha256": "dc20a4fbae0868885ee0b63a0ec37d34c89e4d21daa22321f7ffce1e1dbc4bab"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-doc-registry.jsonl",
+      "sha256": "347a36417e8b0ae034b09627ed2932d212c29fc23fad1e6d1df6ea2c85284c57"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-enduser-index.jsonl",
+      "sha256": "9daf6559dc22a0b4e0331de6e3a6dbf4d43bb3cd4ff0fc279a53aefe1c67d00d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-instructions.jsonl",
+      "sha256": "07ae357138552ada1d486eb4b4a8f3f9ffddfb42a5bf9f3d1c9ea648789b090e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+      "sha256": "5c82b4b389ea1045baccbbc17306859e0ef45ac0a77af2d7c740805ce55b670e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sha256": "c180d2468a0dcafa7391b05a959441350d61353d9c487dff83d1cd003125f124"
+    }
+  ],
+  "readiness": "Author handback complete; Lead repack, independent semantic review, Step 7 composition and Phase 9 same-input generator/state parity remain pending."
+}

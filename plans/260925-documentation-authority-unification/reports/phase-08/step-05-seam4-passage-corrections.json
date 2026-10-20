@@ -1,0 +1,681 @@
+{
+  "changes": [
+    {
+      "file": ".githooks/pre-commit",
+      "id": "dynamic-000566",
+      "owner": "reference-000110",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "patch"
+      ]
+    },
+    {
+      "file": ".githooks/pre-commit",
+      "id": "dynamic-000571",
+      "owner": "reference-000111",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "patch"
+      ]
+    },
+    {
+      "file": ".agents/skills/distill/scripts/distill.mjs",
+      "id": "dynamic-000009",
+      "owner": "dynamic-000008",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": ".claude/skills/distill/scripts/distill.mjs",
+      "id": "dynamic-000180",
+      "owner": "dynamic-000179",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "core/skills/distill/scripts/distill.mjs",
+      "id": "dynamic-001672",
+      "owner": "dynamic-001671",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/check-backlog-reconciliation.mjs",
+      "id": "dynamic-006471",
+      "owner": "dynamic-006472",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-007008",
+      "owner": "reference-002488",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/check-doc-inventory-gates.mjs",
+      "id": "dynamic-006928",
+      "owner": "dynamic-006929",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/doc-inventory-artifact.mjs",
+      "id": "dynamic-007393",
+      "owner": "dynamic-007392",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007569",
+      "owner": "dynamic-007570",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007571",
+      "owner": "dynamic-007572",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007598",
+      "owner": "dynamic-007599",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007613",
+      "owner": "dynamic-007612",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007721",
+      "owner": "dynamic-007720",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007732",
+      "owner": "dynamic-007731",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007734",
+      "owner": "dynamic-007733",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007735",
+      "owner": "dynamic-007736",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007738",
+      "owner": "dynamic-007739",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007762",
+      "owner": "dynamic-007763",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007785",
+      "owner": "dynamic-007784",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/generate-doc-inventory.mjs",
+      "id": "dynamic-007786",
+      "owner": "dynamic-007784",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "id": "dynamic-007846",
+      "owner": "dynamic-007845",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-bootstrap.mjs",
+      "id": "dynamic-008088",
+      "owner": "reference-003608",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-bootstrap.mjs",
+      "id": "dynamic-008089",
+      "owner": "reference-003608",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-bootstrap.mjs",
+      "id": "dynamic-008084",
+      "owner": "dynamic-008085",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "parked"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008136",
+      "owner": "reference-003609",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008137",
+      "owner": "reference-003609",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008132",
+      "owner": "dynamic-008133",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "parked"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-classifier.mjs",
+      "id": "dynamic-008145",
+      "owner": "dynamic-008144",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008152",
+      "owner": "reference-003610",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008153",
+      "owner": "reference-003610",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008177",
+      "owner": "reference-003614",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008178",
+      "owner": "reference-003614",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008179",
+      "owner": "reference-003615",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008180",
+      "owner": "reference-003615",
+      "from": [
+        "ADMIT",
+        "parked"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008157",
+      "owner": "dynamic-008156",
+      "from": [
+        "ADMIT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "parked"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008160",
+      "owner": "dynamic-008159",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "parked"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008165",
+      "owner": "dynamic-008164",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "parked"
+      ]
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "dynamic-008166",
+      "owner": "dynamic-008164",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "parked"
+      ]
+    },
+    {
+      "file": "scripts/project-agents.mjs",
+      "id": "dynamic-008511",
+      "owner": "dynamic-008510",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/project-agents.mjs",
+      "id": "dynamic-008535",
+      "owner": "dynamic-008534",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/project-agents.mjs",
+      "id": "dynamic-008537",
+      "owner": "dynamic-008538",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/project-agents.mjs",
+      "id": "dynamic-008542",
+      "owner": "dynamic-008541",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "preserve"
+      ]
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008554",
+      "owner": "reference-003625",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "parked"
+      ]
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "id": "dynamic-008555",
+      "owner": "reference-003625",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "parked"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-01.mjs",
+      "id": "dynamic-009174",
+      "owner": "reference-003638",
+      "from": [
+        "ADMIT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "parked"
+      ]
+    },
+    {
+      "file": "scripts/verify-phase-01.mjs",
+      "id": "dynamic-009175",
+      "owner": "reference-003639",
+      "from": [
+        "ADMIT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "parked"
+      ]
+    },
+    {
+      "file": "src/report/capability-plan-lint.mjs",
+      "id": "dynamic-009734",
+      "owner": "dynamic-009733",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "parked"
+      ]
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015049",
+      "owner": "dynamic-015047",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "parked"
+      ]
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015051",
+      "owner": "dynamic-015050",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "parked"
+      ]
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015063",
+      "owner": "dynamic-015064",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "parked"
+      ]
+    },
+    {
+      "file": "src/setup/skill-wrappers.mjs",
+      "id": "dynamic-015197",
+      "owner": "dynamic-015198",
+      "from": [
+        "REJECT",
+        "preserve"
+      ],
+      "to": [
+        "ADMIT",
+        "parked"
+      ]
+    }
+  ],
+  "count": 52
+}

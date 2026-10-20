@@ -49,6 +49,19 @@ run('An uncomputed generated intermediate cannot claim a candidate hash','s4-rec
 def wrong_field_role(rs,rc,ss,ix):
  next(e for r in rs for e in r['references'] if e.get('projectionFieldAtSpan')=='aliases').__setitem__('role','capture/provenance-key')
 run('Equal alias and capture strings cannot borrow each others field role','s4-spans',wrong_field_role)
+def item(rs,id):return next(e for r in rs for e in r['references']+r['dynamicTraces']+r.get('authorAddedReferences',[]) if e.get('id',e.get('referenceId'))==id)
+run('Literal-literal same passage admission is all-pairs','a-passage-agreement',lambda rs,rc,ss,ix:item(rs,'reference-000002').__setitem__('admission','REJECT'))
+run('Dynamic-dynamic nested path operation must agree','a-passage-agreement',lambda rs,rc,ss,ix:item(rs,'dynamic-006739').__setitem__('admission','REJECT'))
+run('Literal-dynamic shared retained root must agree','a-passage-agreement',lambda rs,rc,ss,ix:item(rs,'dynamic-001704').__setitem__('disposition','parked'))
+def shared_block(rs,rc,ss,ix):
+ pairs=[(r,e) for r in rs for e in r['references'] if e['disposition']=='parked'];r,e=pairs[0];q,t=next((q,t) for q,t in pairs if q['file']!=r['file']);t['blockedReason']=e['blockedReason']
+run('A verbatim blocker reused in different files is rejected','b-real-blocker',shared_block)
+run('A generated preserve owner cannot acquire an own park','c-render-owner',lambda rs,rc,ss,ix:item(rs,'reference-000002').__setitem__('disposition','parked'))
+run('Every admitted tuple needs exact own pathOperand','d-own-operand',lambda rs,rc,ss,ix:item(rs,'dynamic-001704').pop('pathOperand'))
+run('Unknown nonDocumentUse category is rejected','d-own-operand',lambda rs,rc,ss,ix:next(d for r in rs for d in r['dynamicTraces'] if d['admission']=='REJECT').__setitem__('nonDocumentUse','anything-goes'))
+run('Borrowed neighbouring path cannot replace own operand','d-own-operand',lambda rs,rc,ss,ix:item(rs,'dynamic-001704').__setitem__('pathOperand','function requireRoot(args)'))
+run('Wrapped retired citation requires its live narrative successor','e-retired-successor',lambda rs,rc,ss,ix:item(rs,'reference-002431').__setitem__('successorNote',None))
+run('An existing unrelated heading cannot impersonate the decision successor','e-retired-successor',lambda rs,rc,ss,ix:item(rs,'reference-002431').__setitem__('successorNote','docs/platform/component-boundary.md#18-implementation-reality-additional-boundaries-found-in-code'))
 assert {p['owningRule'] for p in probes}==set(m.RULES)
 out={'kind':'Seam4 rejecting mutation probes','baselineFailures':baseline['failureCount'],'rulesCovered':sorted(m.RULES),'passed':sum(p['pass'] for p in probes),'total':len(probes),'probes':probes,'failures':[p for p in probes if not p['pass']]}
 (P/'step-05-seam4-probes-result.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n');print(json.dumps({k:v for k,v in out.items() if k!='probes'}));sys.exit(bool(out['failures']))

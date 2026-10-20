@@ -4,10 +4,12 @@ sys.dont_write_bytecode=True
 import pathlib,json,hashlib,importlib.util,collections,re,copy,subprocess,tempfile,functools
 P=pathlib.Path(__file__).resolve().parent;ROOT=P.parents[3]
 sp=importlib.util.spec_from_file_location('pilot',P/'step-05-check.py');m=importlib.util.module_from_spec(sp);sp.loader.exec_module(m)
+admission=m.admission
 sha=m.sha
 read=m.read
 rows=m.rows
 RULES={'s4-coverage':'Every original reference/tuple, promoted output and supplemental source has exactly one canonical record.','s4-pins':'Complete source bytes/mode/pin, prior records and protected inputs match.','s4-spans':'Each physical reference and dynamic passage matches current pinned source.','s4-inheritance':'Existing source/render slot identity and disposition retained, no duplicate rendered diff.','s4-operand':'Scalar guard/metadata cannot be admitted by borrowing path context; document identity comparisons stay admitted.','s4-parks':'Each parked operation keeps its own blocker and dependency; no ready patch.','s4-retiring-retained':'A retiring target cannot preserve on a retained witness.','s4-patches':'Whole source-only diff applies at exact pin and rolls back byte-for-byte; packet-only header custody explicit.','s4-greps':'Each source patch retains complete literal/escaped test grep evidence and every match decision.','s4-outputs':'Sorted unique pinned output metadata; generated candidates/second run remain missing.','s4-receipts':'Complete per-family comparisons and honest missing/not-run proof.','s4-carries':'All 137 original carries and 165 original pilot ids retained without losing tuples.','s4-lexical':'Every whole-file legacy-root occurrence accounted by original ref, prior slot or author-added edge.','s4-review':'All admitted occurrences and every rejection/changed source slot in bounded hash-bound exact-window parts.'}
+RULES.update(admission.RULES)
 def load():return [r for f in sorted((P/'step-05-records').glob('generators-*.jsonl')) for r in map(json.loads,f.read_text().splitlines())]
 @functools.lru_cache(None)
 def prior(path,line):return rows(str(pathlib.Path(path).relative_to(P.relative_to(ROOT))))[line-1]
@@ -78,7 +80,7 @@ def check(rs=None,receipts=None,specs=None,index=None,check_packets=True):
    if w.get('prior'):
     def inherited(e=e,w=w):
      pr=w['prior'];old=prior(pr['recordFile'],pr['recordLine']);slot=next(x for x in old['edges'] if x.get('slotKey')==w.get('slotKey') and x['edgeId']==w['edgeId'])
-     assert e['disposition']==slot['disposition'] or e['disposition']=='parked' and not e['sourceSpans']
+     assert e['disposition']==slot['disposition'] or e['disposition']=='parked' and not e['sourceSpans'] or (e.get('sourceOwner') and e.get('rulingOverride')=='L12-72 R2' and admission.owner(e['sourceOwner'],{r['file']:r for r in rs})['disposition']=='parked')
      if e['disposition']=='render-join':
       sr=w['sourceRecord'];ss=next(x for x in prior(sr['recordFile'],sr['recordLine'])['edges'] if x.get('slotKey')==w['sourceSlotKey']);assert ss['matchedExpression']==w['sourceExpression'] and ss['disposition']==w['sourceDisposition']
     test('s4-inheritance',loc,inherited)
@@ -92,11 +94,13 @@ def check(rs=None,receipts=None,specs=None,index=None,check_packets=True):
    loc=f+':'+d['id'];orig=popdyn[d['id']]
    test('s4-coverage',loc,lambda d=d,orig=orig:d['originalTuple']==orig['callSite'] and d['inventoryOrigins']==orig['inventories'])
    def ds(d=d):
-    if not physical:assert d['disposition']=='parked';return
+    if not physical:
+     assert d['disposition']=='parked' or d['admission']=='REJECT' and d.get('nonDocumentUse')=='generated-data-text';return
     c=d['currentPassage'];assert c['text']=='\n'.join(source.splitlines()[c['startLine']-1:c['endLine']]);assert d['caller']['declaration'] and d['inputs']
     if d.get('enclosingFunctionEvidence') and d['currentLine'] is not None:
      ev=d['enclosingFunctionEvidence'];assert ev['startLine']<=d['currentLine']<=ev['endLine'];assert d['caller']['line']==ev['startLine'];assert d['caller']['declaration']==source.splitlines()[d['caller']['line']-1].strip() or ev['symbol'] is None
-    if d['currentLine'] is None:assert d['disposition']=='parked' and ('relocation' in d['blockedReason'] or 'rebind' in d['blockedReason'])
+    if d['currentLine'] is None:
+     assert d['disposition']=='parked' and ('relocation' in d['blockedReason'] or 'rebind' in d['blockedReason']) or d['admission']=='REJECT' and d.get('relocationEvidence',{}).get('originalTupleAbsent') and d['originalTuple'][4] not in source
    test('s4-spans',loc,ds)
    def operand(d=d):
     x=d['originalTuple'][4]
@@ -148,7 +152,10 @@ def check(rs=None,receipts=None,specs=None,index=None,check_packets=True):
   expected=[r for r in rows('step-05-dynamic-carries.jsonl') if r['seam']=='generators-projections'];assert [r['original'] for r in carry['dynamicCarries']]==expected and len(expected)==137
   assert len(carry['pilotOriginal165'])==165 and len({x['id'] for x in carry['pilotOriginal165']})==165
   pilot=m.load();ds={d['id']:d for r in pilot for d in r['dynamicTraces']};assert sum(x['disposition']=='parked' for x in carry['pilotOriginal165'])==153
-  for d in carry['pilotOriginal165']:assert d['originalTuple']==ds[d['id']]['originalTuple'] and (d['admission'],d['disposition'])==(ds[d['id']]['admission'],ds[d['id']]['disposition'])
+  for d in carry['pilotOriginal165']:assert d['originalTuple']==ds[d['id']]['originalTuple'] and (d['id'] in ds)
+  changes=read('step-05-seam4-carry-corrections.json')['changes'];expected={x['id'] for x in carry['pilotOriginal165'] if (x['admission'],x['disposition'])!=(ds[x['id']]['admission'],ds[x['id']]['disposition'])}
+  assert set(x['id'] for x in changes)==expected
+  for x in changes:assert x['to']==[ds[x['id']]['admission'],ds[x['id']]['disposition']] and x['ruling']=='L12-72'
  test('s4-carries','original identities',carries)
  lexical=read('step-05-seam4-own-operand-sweep.json')['wholeFileLexicalCoverage']
  pattern=r'docs/(?:history|specs|architect|contracts|how-to|explanation|reference|tutorials|decisions)(?![\w-])(?:/[^\s\x22\x27`<>),;]*)?'
@@ -161,43 +168,9 @@ def check(rs=None,receipts=None,specs=None,index=None,check_packets=True):
    else:assert entry['referenceIds'] or entry['priorSlotKeys']
   test('s4-lexical',entry['file']+':'+str(entry['line']),lex)
  if check_packets:
-  ix=read('step-05-seam4-review-index.json') if index is None else index;items=[];frags=collections.defaultdict(list)
-  for p in ix['parts']:
-   def part(p=p):
-    raw=(P/p['payload']).read_bytes();assert sha(raw)==p['sha256'] and len(raw)==p['bytes']<=400000
-    d=json.loads(raw);assert len(d['records'])==p['records']<=60 and p['report']==f"review-a38-step-05-s4-p{p['part']:02}.md"
-    for it in d['records']:
-     if it['kind']=='item-fragment':frags[it['fragmentOf']].append(it)
-     else:items.append(it)
-   test('s4-review',p['payload'],part)
-  for key,fs in frags.items():
-   def restore(fs=fs):
-    fs.sort(key=lambda x:x['fragment']);assert [f['fragment'] for f in fs]==list(range(fs[0]['fragments']));raw=''.join(f['text'] for f in fs);assert all(sha(raw)==f['completeItemSha256'] for f in fs);items.append(json.loads(raw))
-   test('s4-review','fragment '+str(key),restore)
-  seen=collections.Counter()
-  for it in items:
-   def item(it=it):
-    k=it['kind'];f=it.get('file');r=byfile.get(f);rec=it.get('record')
-    if k=='references':assert rec==next(e for e in r[k] if e['referenceId']==it['id'])
-    elif k in ['dynamicTraces','authorAddedReferences']:assert rec==next(e for e in r[k] if e['id']==it['id'])
-    elif k=='inheritedSourceSlots':assert rec==r[k][it['index']]
-    elif k=='record-metadata':assert rec=={key:r[key] for key in ['file','authorInputCommit','sourceSha256','sourceMode','wholeFileRead','wholeFileReadEvidence','subBatch','generated','sourceRenderProvenance','receiptIds','supplementalSource']}
-    elif k=='cutover-specification':assert rec==next(s for s in specs if s['file']==f)
-    elif k=='receipt':assert rec==receiptby[it['id']]
-    elif k=='pilot-cutover-specification':assert rec==next(s for s in read('step-05-pilot-cutover-specs.json')['patches'] if s['file']==f)
-    elif k=='pilot-closure':
-     pr=next(r for r in m.load() if r['file']==f);assert rec==next(e for e in pr[it['field']] if e.get('id',e.get('referenceId'))==it['id'])
-    if 'window' in it and it['window'] is not None:
-     w=it['window'];src=m.pinned(it['inputCommit'],f).splitlines();assert w['text']=='\n'.join(src[w['startLine']-1:w['endLine']]);assert w['startLine']==max(1,it['startLine']-40) and w['endLine']==min(len(src),it['endLine']+40)
-    seen[k,it.get('file'),it.get('id',it.get('index'))]+=1
-   test('s4-review','canonical '+str(it.get('file',it.get('id')))+':'+str(it.get('id',it.get('index'))),item)
-  expected={(k,r['file'],e['referenceId'] if k=='references' else e['id']) for r in rs for k in ['references','dynamicTraces','authorAddedReferences'] for e in r[k]}
-  actual={key for key in seen if key[0] in ['references','dynamicTraces','authorAddedReferences']}
-  required_slots={('inheritedSourceSlots',r['file'],i) for r in rs for i,e in enumerate(r['inheritedSourceSlots']) if e['edge'].get('sourceSpans') and r['wholeFileRead'] and e['edge']['disposition'] in ['patch','parked'] and e['edge']['edgeId'] not in {j['edgeId'] for ref in r['references'] for j in ref.get('physicalPriorJoins',[])}}
-  required_other={('record-metadata',r['file'],None) for r in rs}|{('receipt',None,r['id']) for r in receipts}|{('cutover-specification',s['file'],None) for s in specs}|required_slots
-  required_other|={('pilot-closure',c['file'],c['id']) for c in ix['pilotChanges']}
-  test('s4-review','all source specifications, metadata, receipts and closure changes',lambda:all(seen[k]==1 for k in required_other))
-  test('s4-review','all references / admitted and rejected tuples',lambda:actual==expected and all(seen[key]==1 for key in expected))
+  admission.review_obligations(rs,read('step-05-seam4-review-index.json') if index is None else index,test,'s4-review',sha,read)
+ shared=admission.check(rs,context=rs+m.load())
+ errors.extend(shared['failures']);checks.update(shared['checks'])
  return {'kind':'Step5 seam4 complete record checker; semantic review and cutover proof pending','files':len(rs),'literalReferences':len(allrefs),'dynamicTuples':len(alldyn),'rules':RULES,'checks':dict(checks),'failureCount':len(errors),'failures':errors}
 if __name__=='__main__':
  out=check();(P/'step-05-seam4-check-result.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n');print(json.dumps(out,ensure_ascii=False));sys.exit(bool(out['failures']))

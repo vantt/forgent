@@ -1,0 +1,18 @@
+{
+  "rules": {
+    "a-passage-agreement": "All pairs of overlapping operation intervals on the same line/passage agree in admission and effective disposition; independent adjacent expressions have distinct source intervals.",
+    "b-real-blocker": "No listed boilerplate or verbatim blocker shared by parks in different files; every park names the missing input/obligation for its own file.",
+    "c-render-owner": "Every generated source-copy reference/tuple derives its disposition from the exact source owner; a park cites an actually parked source owner.",
+    "d-own-operand": "Each admitted dynamic tuple has its exact document-yielding sub-expression pathOperand in its pinned passage; every rejection names a closed R5 nonDocumentUse category.",
+    "e-retired-successor": "Preserved retired decision citations carry a live successorNote with a real heading anchor."
+  },
+  "checks": {
+    "a-passage-agreement": 682,
+    "d-own-operand": 5654,
+    "b-real-blocker": 2181,
+    "c-render-owner": 522,
+    "e-retired-successor": 10
+  },
+  "failures": [],
+  "failureCount": 0
+}

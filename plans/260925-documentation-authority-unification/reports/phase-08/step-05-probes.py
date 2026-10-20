@@ -59,6 +59,19 @@ run('Receipt cannot omit a matching owning test from atomic co-cut set','co-cut-
 run('Array-join warning template cannot masquerade as a path operation','dynamic-operand',lambda rs,rc,ix:find_dyn(rs,'dynamic-014072').update(admission='ADMIT',disposition='preserve'))
 run('Whole-file census grep cannot lose post-census comment custody','coverage',lambda rs,rc,ix:rc[2].__setitem__('postCensusCode',[e for e in rc[2]['postCensusCode'] if e.get('line')!=6659]))
 run('A retiring target cannot preserve on a retained witness','retiring-retained',lambda rs,rc,ix:find_ref(rs,'reference-003819').__setitem__('resolverWitness',{'rule':'retained target'}))
+def same_dynamic(rs,rc,ix):
+ find_dyn(rs,'dynamic-000571')['disposition']='preserve'
+run('All-pairs shared literal/template operation cannot diverge','a-passage-agreement',same_dynamic)
+def boilerplate(rs,rc,ix):
+ r=next(r for r in rs if any(d['disposition']=='parked' for d in r['dynamicTraces']));d=next(d for d in r['dynamicTraces'] if d['disposition']=='parked');d['blockedReason']=r['file']+': no bounded artifact/export supplied; preserve gate bytes'
+run('Listed boilerplate is rejected even with a file prefix','b-real-blocker',boilerplate)
+def missing_owner(rs,rc,ix):
+ r=next(r for r in rs if r['references']);r.update(generated=True,sourceRenderProvenance={'sourceFile':r['file']})
+run('A rendered file cannot lose its exact source owner','c-render-owner',missing_owner)
+run('An admitted tuple cannot omit its own pathOperand','d-own-operand',lambda rs,rc,ix:find_dyn(rs,'dynamic-000571').pop('pathOperand'))
+def lost_successor(rs,rc,ix):
+ e=next(e for r in rs for e in r['references'] if e['disposition']=='preserve');e['matchedExpression']='docs/decisions/0027-removed.md';e['successorNote']=None
+run('A preserved retired decision cannot lose its live successor','e-retired-successor',lost_successor)
 base=m.check(BASE,RECEIPTS,INDEX)
 assert base['failureCount']==0,base['failures'][:3]
 covered={p['owningRule'] for p in probes};assert covered==set(m.RULES)

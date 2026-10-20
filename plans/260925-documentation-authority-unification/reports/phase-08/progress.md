@@ -1047,3 +1047,19 @@ Full Step5 checker **291 records / 2,419 refs / 5,654 tuples / 0 failures**. **5
 Option-B request/index: **181 parts**, ≤60 records and ≤389,936 UTF-8 bytes each, total **68,814,484 bytes**; every admitted ref and every rejection/changed tuple has an exact ±40-line window. Large unchanged evidence streams by digest-bound fragments. 39 pilot changed IDs across six files join the same review packet. No reviewer started and no semantic acceptance claimed.
 
 Measured author elapsed **48.57 minutes** at final checks. Lead retains independent review, final Step7 assembly/binding and A34/A45/A47 carries, missing state/generator proof and ordinary L12-11 accounting once the runner commit exists. Markdown preview stays with Lead under the records-only boundary. `needsWrites: []`.
+
+
+## Generator review closure — in progress (2026-10-21)
+
+Acknowledged records-only brief. Reading all twelve review reports and canonical records before applying L12-72 rulings, extending owning checker and rejecting probes, then sweeping seams 1–4. No consumer changes, CLI, builds or git writes.
+
+
+## Generator review closure / L12-72 — completed author handback (2026-10-21)
+
+Closed the requested outcome and record-text defects in all twelve reports and swept every authored Step 5 seam. Lead R1–R9 are recorded verbatim with question-by-question evidence in owner-answers.md. Initial structural hits a–e: **92 / 2,958 / 522 / 5,654 / 16**; these overlap and include newly required field/owner contracts. Final shared admission sweep has zero failures.
+
+Full checker: **291 records / 2,419 original references / 5,654 original tuples / 0 failures**. **74/74 rejecting probes** (42 pilot + 32 generator). 59 author-added source slots in total; all original identities, 137 carry rows and original 165 pilot tuple snapshots retained, with explicit final correction accounting. Source-only proposed patches apply and roll back in scratch; no source or output bytes changed. Historical full-evidence packets retain their hashes; R1 current review obligations bind final record hashes and Lead windows instead.
+
+`step-05-seam4-rereview-list.json` lists **195 physical source files**, including all original p12–p29 files (60 source locators); 70 changed generated outputs are listed separately for per-file review. Original transient light payload partition was reproduced from the unchanged Lead packer and committed input records in scratch, stopping before output. Lead repacks and reviews; no independent acceptance or cutover claimed.
+
+Verification: `step-05-seam4-rulings-verification.json`. Records only; no CLI, build, services, cargo/npm suite, consumer/gate/baseline edits, or git writes. Markdown preview stays with Lead. `needsWrites: []`.

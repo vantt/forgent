@@ -2,9 +2,14 @@
   "kind": "Step 5 checker mutation probes",
   "baselineFailures": 0,
   "rulesCovered": [
+    "a-passage-agreement",
+    "b-real-blocker",
+    "c-render-owner",
     "co-cut-grep",
     "coverage",
+    "d-own-operand",
     "dynamic-operand",
+    "e-retired-successor",
     "fixture-provenance",
     "gateway",
     "generated",
@@ -325,12 +330,7 @@
       "caught": [
         {
           "rule": "review",
-          "where": "step-05-pilot-p01.json",
-          "error": "condition false"
-        },
-        {
-          "rule": "review",
-          "where": "all refs/dynamic/meta/receipts",
+          "where": "historical packet step-05-pilot-p01.json",
           "error": "condition false"
         }
       ]
@@ -483,9 +483,74 @@
           "error": "retiring tree cannot be a retained witness"
         }
       ]
+    },
+    {
+      "name": "All-pairs shared literal/template operation cannot diverge",
+      "owningRule": "a-passage-agreement",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "a-passage-agreement",
+          "where": ".githooks/pre-commit:reference-000111/dynamic-000571",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "Listed boilerplate is rejected even with a file prefix",
+      "owningRule": "b-real-blocker",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "b-real-blocker",
+          "where": "src/setup/instruction-registry.mjs:dynamic-014034",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "A rendered file cannot lose its exact source owner",
+      "owningRule": "c-render-owner",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "c-render-owner",
+          "where": "apps/fgos-gateway/src/gateway.rs:reference-000161",
+          "error": "'sourceOwner'"
+        },
+        {
+          "rule": "c-render-owner",
+          "where": "apps/fgos-gateway/src/gateway.rs:reference-000162",
+          "error": "'sourceOwner'"
+        }
+      ]
+    },
+    {
+      "name": "An admitted tuple cannot omit its own pathOperand",
+      "owningRule": "d-own-operand",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "d-own-operand",
+          "where": ".githooks/pre-commit:dynamic-000571",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "A preserved retired decision cannot lose its live successor",
+      "owningRule": "e-retired-successor",
+      "pass": true,
+      "caught": [
+        {
+          "rule": "e-retired-successor",
+          "where": "apps/fgos-gateway/src/gateway.rs:reference-000162",
+          "error": "condition false"
+        }
+      ]
     }
   ],
-  "passed": 37,
-  "total": 37,
+  "passed": 42,
+  "total": 42,
   "failures": []
 }

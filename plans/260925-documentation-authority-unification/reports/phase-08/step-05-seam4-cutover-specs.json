@@ -13896,6 +13896,122 @@
           "sourceMode": "100644"
         }
       ]
+    },
+    {
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "file": "core/skills/_shared/catchup-self-recovery.md",
+      "sourceSha256": "84afa75b23b685d1357210eb31f0b257fbbe959fc519598e9992e1fcf3e091a8",
+      "mode": "100644",
+      "symbolOrPassage": "docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+      "sourceSpans": [
+        {
+          "line": 47,
+          "columnStart": 37,
+          "columnEndExclusive": 102,
+          "text": "docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md"
+        }
+      ],
+      "targetOwner": "docs/knowledge/how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+      "claimAnchorProof": {
+        "rule": "Live holder exists; source has no owning prior slot, add exact source slot before render-joining copies.",
+        "targetSha256": "8665cacdffc205725876d9ba54a5fb14c03ab5bdda88d28299220b8c748df02d"
+      },
+      "receiptId": "generators-skills-and-support",
+      "testTargets": [
+        "env -u CLAUDE_CODE_SESSION_ID node --test test/skills/fgos-mirror.test.mjs test/setup/skill-wrappers.test.mjs"
+      ],
+      "prerequisites": [
+        "Step 7 composes source hunks; Phase 9 executes build:skills from the composed sources and compares same-input output sets."
+      ],
+      "order": "Source before render",
+      "timing": "phase9",
+      "coCutTestGreps": [
+        {
+          "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+          "oldPointer": "docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+            "docs\\/how-to\\/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+            "docs\\/how-to\\/diagnose-a-verify-fail-post-merge-block-on-approve\\.md"
+          ],
+          "matches": []
+        }
+      ],
+      "coCutTestDecisions": [],
+      "oldText": "docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+      "newText": "docs/knowledge/how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+      "diff": "--- a/core/skills/_shared/catchup-self-recovery.md\n+++ b/core/skills/_shared/catchup-self-recovery.md\n@@ -44,7 +44,7 @@\n ### Playbook: verify-fail-post-merge\n \n - **Signal**: `{picked: <id>, approve: {blocked, reason: \"verify-fail-post-merge\"}}` — the post-merge verify genuinely ran and failed (`timedOut` is absent or `false`); the merge was rolled back and the target is unchanged.\n-- **What the machine tries**: Walk `docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md`'s steps directly, in this same session:\n+- **What the machine tries**: Walk `docs/knowledge/how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post/diagnose-a-verify-fail-post-merge-block-on-approve.md`'s steps directly, in this same session:\n   1. Read `approve`'s own `output` field from the response (the full test-suite output, not just the recorded `verify` command) and identify exactly which test(s) failed.\n   2. Check whether the failing test's file is inside the item's own diff (`fgos review <id>` or branch's changed files) — a failure in a file the item never touched is the first signal it's unrelated noise.\n   3. Re-run the failing test file alone a few times (`node --test path/to/the-failing.test.mjs`) — reproduces deterministically (a genuine pre-existing bug) or only fails under full-suite run (load-induced flake).\n",
+      "rollbackDiff": "--- a/core/skills/_shared/catchup-self-recovery.md\n+++ b/core/skills/_shared/catchup-self-recovery.md\n@@ -44,7 +44,7 @@\n ### Playbook: verify-fail-post-merge\n \n - **Signal**: `{picked: <id>, approve: {blocked, reason: \"verify-fail-post-merge\"}}` — the post-merge verify genuinely ran and failed (`timedOut` is absent or `false`); the merge was rolled back and the target is unchanged.\n-- **What the machine tries**: Walk `docs/knowledge/how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post/diagnose-a-verify-fail-post-merge-block-on-approve.md`'s steps directly, in this same session:\n+- **What the machine tries**: Walk `docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md`'s steps directly, in this same session:\n   1. Read `approve`'s own `output` field from the response (the full test-suite output, not just the recorded `verify` command) and identify exactly which test(s) failed.\n   2. Check whether the failing test's file is inside the item's own diff (`fgos review <id>` or branch's changed files) — a failure in a file the item never touched is the first signal it's unrelated noise.\n   3. Re-run the failing test file alone a few times (`node --test path/to/the-failing.test.mjs`) — reproduces deterministically (a genuine pre-existing bug) or only fails under full-suite run (load-induced flake).\n",
+      "expectedAfterSha256": "a1848e92b8967dfd3551e36966db73dac993024465cbc92fd4452b53a52fb34d",
+      "coCutPaths": [
+        "CHANGELOG.md",
+        "core/skills/_shared/catchup-self-recovery.md"
+      ],
+      "expectedOutputSets": {
+        "current": "step-05-seam4-output-provenance.json",
+        "candidate": null
+      },
+      "intentionalBehaviorDeltas": "Source navigation points to existing live knowledge holder; generated copies follow source.",
+      "readiness": "pending independent review and Phase 9 same-input generated parity"
+    },
+    {
+      "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+      "file": "domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+      "sourceSha256": "6b188d5ee25ba155e7988e694d7a0dafef07589cbdbd51b304d6c54449564042",
+      "mode": "100644",
+      "symbolOrPassage": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+      "sourceSpans": [
+        {
+          "line": 49,
+          "columnStart": 2,
+          "columnEndExclusive": 54,
+          "text": "docs/how-to/write-verify-for-a-skill-prose-change.md"
+        }
+      ],
+      "targetOwner": "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md",
+      "claimAnchorProof": {
+        "rule": "Live holder exists; source has no owning prior slot, add exact source slot before render-joining copies.",
+        "targetSha256": "b9a68bd927266d032b15f8acd64c64ddb3939065fceb98831ad91e6da720dc97"
+      },
+      "receiptId": "generators-skills-and-support",
+      "testTargets": [
+        "env -u CLAUDE_CODE_SESSION_ID node --test test/skills/fgos-mirror.test.mjs test/setup/skill-wrappers.test.mjs"
+      ],
+      "prerequisites": [
+        "Step 7 composes source hunks; Phase 9 executes build:skills from the composed sources and compares same-input output sets."
+      ],
+      "order": "Source before render",
+      "timing": "phase9",
+      "coCutTestGreps": [
+        {
+          "inputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
+          "oldPointer": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+          "method": "git grep -n -F at input pin under test/; literal and escaped slash/dot spellings",
+          "needles": [
+            "docs/how-to/write-verify-for-a-skill-prose-change.md",
+            "docs\\/how-to\\/write-verify-for-a-skill-prose-change.md",
+            "docs\\/how-to\\/write-verify-for-a-skill-prose-change\\.md"
+          ],
+          "matches": []
+        }
+      ],
+      "coCutTestDecisions": [],
+      "oldText": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+      "newText": "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md",
+      "diff": "--- a/domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md\n+++ b/domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md\n@@ -46,7 +46,7 @@\n \n If the item touches a skill-prose path (`.claude/skills/**/SKILL.md`,\n `.agents/skills/**/SKILL.md`, `plugins/fgOS/skills/**/SKILL.md`), read\n-`docs/how-to/write-verify-for-a-skill-prose-change.md` before proposing\n+`docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md` before proposing\n or approving this item's `verify` field — it documents the correct `npm\n test && POSITIVE && NEGATIVE` shape and the standing rebuttal for when\n the second-pass judge demands proof of prose comprehension, a demand the\n",
+      "rollbackDiff": "--- a/domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md\n+++ b/domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md\n@@ -46,7 +46,7 @@\n \n If the item touches a skill-prose path (`.claude/skills/**/SKILL.md`,\n `.agents/skills/**/SKILL.md`, `plugins/fgOS/skills/**/SKILL.md`), read\n-`docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md` before proposing\n+`docs/how-to/write-verify-for-a-skill-prose-change.md` before proposing\n or approving this item's `verify` field — it documents the correct `npm\n test && POSITIVE && NEGATIVE` shape and the standing rebuttal for when\n the second-pass judge demands proof of prose comprehension, a demand the\n",
+      "expectedAfterSha256": "70f31f7c19e1b5de9c6314d12a30c7b6c3d748369224971a78fb104df8f406e0",
+      "coCutPaths": [
+        "CHANGELOG.md",
+        "domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md"
+      ],
+      "expectedOutputSets": {
+        "current": "step-05-seam4-output-provenance.json",
+        "candidate": null
+      },
+      "intentionalBehaviorDeltas": "Source navigation points to existing live knowledge holder; generated copies follow source.",
+      "readiness": "pending independent review and Phase 9 same-input generated parity"
     }
   ],
   "generatedDiffs": 0
