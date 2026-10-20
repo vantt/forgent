@@ -1,0 +1,548 @@
+{
+  "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "inventoryInputCommit": "1a0f61ac53433292e08fb378ebbb6c1c72fd3b74",
+  "files": [
+    {
+      "file": "docs/knowledge/why-an-is-ancestor-of-main-verify-check-can-never-pass-throu/why-an-is-ancestor-of-main-verify-check-can-never-pass-through-fgos-approve.md",
+      "set": "batch-076",
+      "sourceBytes": 3053,
+      "digest": "25c9c71ad8e08fb4802dd4d08695cfcb5c6035f577a6aac89bbd6eb3a8baea98",
+      "inventoryFileDigest": "25c9c71ad8e08fb4802dd4d08695cfcb5c6035f577a6aac89bbd6eb3a8baea98",
+      "diffSha256": "57091ded2a376e3218e4e2fe204fa9cffacbafddbdeaa5d9a8e2dba8cd084a8b",
+      "recordSha256": "82f271d1a831785ab17b051a81e0ba660a7d85973b88430686de85698eb4138f",
+      "recordBytes": 10743,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-approve-blocks-closing-a-milestone-with-drifted-targets/why-approve-blocks-closing-a-milestone-with-drifted-targets.md",
+      "set": "batch-076",
+      "sourceBytes": 3992,
+      "digest": "929e1506c0ce1d718a7861a33c1898534f5873e0429bd3ee90df074ed5703b78",
+      "inventoryFileDigest": "929e1506c0ce1d718a7861a33c1898534f5873e0429bd3ee90df074ed5703b78",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "28c7ae9a6a76a913aa0061fd923138d74905583a1f4f2cbe58f3eed573810ac6",
+      "recordBytes": 3342,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-approve-checks-acceptance-evidence-before-merging-not-af/why-approve-checks-acceptance-evidence-before-merging-not-after.md",
+      "set": "batch-076",
+      "sourceBytes": 5664,
+      "digest": "4d103acc94e31bfe9e86025d7ff94669782986340388a8ab35c08b06715fab33",
+      "inventoryFileDigest": "4d103acc94e31bfe9e86025d7ff94669782986340388a8ab35c08b06715fab33",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "bf2d59c13e710f4952f1953540a4cf7fa818bdd501cf7ad36e4e19527250c1c3",
+      "recordBytes": 2446,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-approve-logs-post-success-movework-faults-outside-events/why-approve-logs-post-success-movework-faults-outside-events-lock.md",
+      "set": "batch-076",
+      "sourceBytes": 5261,
+      "digest": "e2e74587011c2a1e2d9555705c00913a1932d873facde78a10fce2a0486be517",
+      "inventoryFileDigest": "e2e74587011c2a1e2d9555705c00913a1932d873facde78a10fce2a0486be517",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "48330420ede4140c6014625d43903052be4e2f07ed0e1e1ed24b656ddd55a6f9",
+      "recordBytes": 971,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-approve-s-iron-law-gate-scopes-changedfiles-to-the-leaf/why-approves-iron-law-gate-scopes-changedfiles-to-the-leafs-own-root.md",
+      "set": "batch-076",
+      "sourceBytes": 4672,
+      "digest": "195ebb770516a102d0051ebde7e2072fc37bc2aff5325d0fc344e73562f86268",
+      "inventoryFileDigest": "195ebb770516a102d0051ebde7e2072fc37bc2aff5325d0fc344e73562f86268",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "7a24120c0359d443dab7badaa5160a5e55624a54d33d0e55dbdb284aee49cada",
+      "recordBytes": 5183,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/why-auto-decompose-children-now-carry-action-read-first-dire/why-auto-decompose-children-carry-action-and-read-first-directive-prose.md",
+      "set": "batch-076",
+      "sourceBytes": 6966,
+      "digest": "f83d8b7bc19780105fbee3d13c87115b7baf96d9b44fe5ef0f4cadd48adf0787",
+      "inventoryFileDigest": "f83d8b7bc19780105fbee3d13c87115b7baf96d9b44fe5ef0f4cadd48adf0787",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "219b9cbd72ce163f6aea073d4d75f45425dbe53bf07817236fc8002c08e43740",
+      "recordBytes": 3203,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-auto-launched-herdr-panes-must-be-labeled-before-spawnin/why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude.md",
+      "set": "batch-076",
+      "sourceBytes": 9132,
+      "digest": "22a1ddab689a956c84266ac29e4fdab14335c7855662c3ca8f231cf099ab28b0",
+      "inventoryFileDigest": "22a1ddab689a956c84266ac29e4fdab14335c7855662c3ca8f231cf099ab28b0",
+      "diffSha256": "937438be63344e65c0bfb1f387a56c6df4be7944732c41d745d708b18ab60ba9",
+      "recordSha256": "80bfae43c2d01a8497bf01137e4363c5fac8136eb61c4cbeceac6b986dbeb29c",
+      "recordBytes": 11700,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-awaiting-approval-became-an-overridable-ceiling-not-a-ha/why-awaiting-approval-became-an-overridable-ceiling.md",
+      "set": "batch-076",
+      "sourceBytes": 4028,
+      "digest": "7ea5d48e028cdbe58f7d829d81cfe2eaf598af2e4f5aac4a7b11ad643e7ea318",
+      "inventoryFileDigest": "7ea5d48e028cdbe58f7d829d81cfe2eaf598af2e4f5aac4a7b11ad643e7ea318",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "99f9d18bc9099d163d15e16187dcb4eb3302d67c3aaf4e6804c6eb21786140a2",
+      "recordBytes": 957,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-backlog-is-a-new-global-status-before-todo-not-a-domain/why-backlog-is-a-new-global-status-before-todo-not-a-domain-relabel.md",
+      "set": "batch-076",
+      "sourceBytes": 6208,
+      "digest": "d419ae152cb37d678e78d59a1606757ccb0f6a71e6260d40ced07c51623fc2fb",
+      "inventoryFileDigest": "d419ae152cb37d678e78d59a1606757ccb0f6a71e6260d40ced07c51623fc2fb",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "c566a693aacd0612ad4cb34d2e2f4efcad265f6dd4c394b78247c5574b199a8a",
+      "recordBytes": 972,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-bee-prefixed-identifiers-became-fgos-prefixed-and-some-d/why-bee-prefixed-identifiers-became-fgos-prefixed.md",
+      "set": "batch-076",
+      "sourceBytes": 5027,
+      "digest": "c2992e44ed10dfe403beedcb77001594c6863b82c8e841e6a58ae47d448ce0cb",
+      "inventoryFileDigest": "c2992e44ed10dfe403beedcb77001594c6863b82c8e841e6a58ae47d448ce0cb",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "fc0cd64bfe0fde2f786c78a2480cf75645b70b6fc03dae9ce5cdc459acf2d745",
+      "recordBytes": 6954,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/knowledge/why-checkmergestillresolves-can-false-positive-after-a-root/why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune.md",
+      "set": "batch-076",
+      "sourceBytes": 18137,
+      "digest": "1125cb274a451615e583b9607186cf6345e9297553907ea863eaa4b26a06772c",
+      "inventoryFileDigest": "1125cb274a451615e583b9607186cf6345e9297553907ea863eaa4b26a06772c",
+      "diffSha256": "9c901c50189aec4899961d6ceb5083a9f01e0b0983caae8ef73578534158768e",
+      "recordSha256": "4cc8b92bc750c04887072e767e5ff623452e5552ed5f2f72ceb2e4f1737c8fb9",
+      "recordBytes": 26495,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "preserve": 3,
+        "parked": 1,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-checkretrospectivecontent-s-cleanup-to-done-gate-reads-o/why-the-retrospective-content-gate-checked-the-wrong-fields.md",
+      "set": "batch-076",
+      "sourceBytes": 7886,
+      "digest": "addb9073214616efb359f7f9d7a77c789dc3b71cb21c2a2fd7691fff2302a02c",
+      "inventoryFileDigest": "addb9073214616efb359f7f9d7a77c789dc3b71cb21c2a2fd7691fff2302a02c",
+      "diffSha256": "ea9f03dc5f34ddeac70cf038084fc675c771027a74cb30c593beacb965138d8c",
+      "recordSha256": "ca66defaa28caf3102c316c178d3a42120118d46867873e9ce8abbca65d59c63",
+      "recordBytes": 12643,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md",
+      "set": "batch-076",
+      "sourceBytes": 4562,
+      "digest": "1d419499c1f0fad727a3dded7ff5e1f73c92f50fef4c45a1c76013920233414a",
+      "inventoryFileDigest": "1d419499c1f0fad727a3dded7ff5e1f73c92f50fef4c45a1c76013920233414a",
+      "diffSha256": "24d2eace5668c7e55cb3f0c1cc1d9eb6e1bed4eb3b9cd758b50e7b5bce277a14",
+      "recordSha256": "f8dd4de4a67a299f8ac1552bb46d897fa0249cae32ff3d9a0e0f856d0292c5eb",
+      "recordBytes": 18996,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "parked": 1,
+        "preserve": 1,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-clarify-split-into-clarify-discovery-and-exploring/why-clarify-split-into-clarify-discovery-and-exploring.md",
+      "set": "batch-076",
+      "sourceBytes": 26122,
+      "digest": "b06349f25aa7eaf60e75331ba1d9f67eebc85e438f41f467e7b5dab15834363b",
+      "inventoryFileDigest": "b06349f25aa7eaf60e75331ba1d9f67eebc85e438f41f467e7b5dab15834363b",
+      "diffSha256": "f694155e65db008006ea705b13e8e821e37fdaff9fcfa876dc617c5bb04d8123",
+      "recordSha256": "9b9f4c8513fa6ac8c74c4ad48848e5576d2da7b05c24b6367bf8006f77fbc573",
+      "recordBytes": 18677,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "preserve": 4,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-cleanup-loop-has-no-iteration-cap-unlike-discover-loop/why-cleanup-loop-has-no-iteration-cap-unlike-discover-loop.md",
+      "set": "batch-076",
+      "sourceBytes": 4880,
+      "digest": "d0d0e9abb38e307f9aca90f86488e37b6f9e4a691a558a17ba732a9f17922f73",
+      "inventoryFileDigest": "d0d0e9abb38e307f9aca90f86488e37b6f9e4a691a558a17ba732a9f17922f73",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "c4ef0a9501b4f7d2cb05a639c8193a4017a3fe248d43f73dc34f11f017e5b7cf",
+      "recordBytes": 2353,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-context-md-enforcement-is-scoped-to-b-or-c-and-why-it-s/context-md-enforcement-scope.md",
+      "set": "batch-076",
+      "sourceBytes": 4900,
+      "digest": "15b709ea8f430507be6c62d3893548694ceb94621c6740f5997d1384ba8200b4",
+      "inventoryFileDigest": "15b709ea8f430507be6c62d3893548694ceb94621c6740f5997d1384ba8200b4",
+      "diffSha256": "4a9c12ca46e584e6b559f7097b6cb22f92718b3970eeaf32661fb683693af19c",
+      "recordSha256": "2e7942e2ee143ecab28f9c9f3f8d2461539900d02e277ce305e745aef1d28eee",
+      "recordBytes": 15355,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "patch": 1,
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/why-cook-and-pick-were-retrofitted-to-call-fgos-coding-drivi/why-cook-and-pick-were-retrofitted-to-call-fgos-coding-driving.md",
+      "set": "batch-076",
+      "sourceBytes": 3620,
+      "digest": "ad8e7272357724becb45fc3cdd9351557d1cfec0cef8d685660a1477eb7ccdab",
+      "inventoryFileDigest": "ad8e7272357724becb45fc3cdd9351557d1cfec0cef8d685660a1477eb7ccdab",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "b13cb6fbbf71933066c84669feccdbd0610956c1408487a287d744c44fa525dd",
+      "recordBytes": 968,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-cook-s-never-auto-approve-prose-lost-to-gate-bypass/why-cooks-never-auto-approve-prose-lost-to-gate-bypass.md",
+      "set": "batch-076",
+      "sourceBytes": 4478,
+      "digest": "e50bec7d471413db4661758e61078ba444108d1f81923b69b72ab3fe1e4b0916",
+      "inventoryFileDigest": "e50bec7d471413db4661758e61078ba444108d1f81923b69b72ab3fe1e4b0916",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "15cdc1d2ce2a51d31941b599d3734d8742e2298800d79e9a0c1f80c6192e6d28",
+      "recordBytes": 4324,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/knowledge/why-decide-for-execute-for-impact-analysis-reported-unavaila/why-capacity-for-and-capability-fields-were-unified-and-mcp-tools-get-a-hand-back.md",
+      "set": "batch-076",
+      "sourceBytes": 2948,
+      "digest": "03fc5d0b05633d7d730ddbcc730c209bacd17a23d46c592f7bc15166fbe40a60",
+      "inventoryFileDigest": "03fc5d0b05633d7d730ddbcc730c209bacd17a23d46c592f7bc15166fbe40a60",
+      "diffSha256": "23892de741f0e5c69bd3bae6d2cef11446eefa250d95dccd3f7ee7c3ccc5f30f",
+      "recordSha256": "0ca84189cbb4a60632aec950cc14a22b7950c4028b95ba839adcbc550610fa35",
+      "recordBytes": 21024,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/knowledge/why-decisions-already-locked-and-approved-by-a-person-still/decision-record.md",
+      "set": "batch-076",
+      "sourceBytes": 2933,
+      "digest": "51855521f9c2d11a4f50d8dd9ac9bc3a9cf00bd17ab1f11d6b10c32ced9becd9",
+      "inventoryFileDigest": "51855521f9c2d11a4f50d8dd9ac9bc3a9cf00bd17ab1f11d6b10c32ced9becd9",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "f80550b5ee496b767fdab3a6f19c4266226a5701be5cd64429d9039eab7cf213",
+      "recordBytes": 3476,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-decompose-checks-footprint-overlap-before-creating-child/why-decompose-checks-footprint-overlap-before-creating-children.md",
+      "set": "batch-076",
+      "sourceBytes": 7375,
+      "digest": "c9a802661b09e00aa8b6eabdec333866f3f8c57c251c0677798394e674cc966c",
+      "inventoryFileDigest": "c9a802661b09e00aa8b6eabdec333866f3f8c57c251c0677798394e674cc966c",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "2721baf8532ee72b3a58ebe3d5686153e6086da84fdc47494a06db0dd4a33030",
+      "recordBytes": 3235,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-decompose-s-skip-and-advance-is-narrower-than-discovery/why-decomposes-skip-and-advance-is-narrower-than-discoverys.md",
+      "set": "batch-076",
+      "sourceBytes": 7769,
+      "digest": "87d7c0bf65e09c2b90ee706a149093b7ac6122da797d9486cab8f1e31df7d132",
+      "inventoryFileDigest": "87d7c0bf65e09c2b90ee706a149093b7ac6122da797d9486cab8f1e31df7d132",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "b5b4fc66db8f890d2c82d2e7e8d67b0b58ed5e8831188e3a5bf90da388351b61",
+      "recordBytes": 964,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-discover-loop-s-pool-ordering-and-stop-rules-diverge-fro/discover-loop-pool-ordering-and-stop-rules.md",
+      "set": "batch-076",
+      "sourceBytes": 13377,
+      "digest": "e9df4a30d1c6072041c8c7d8598380e5ab19e3e7cc5f943a31b02092c8037d23",
+      "inventoryFileDigest": "e9df4a30d1c6072041c8c7d8598380e5ab19e3e7cc5f943a31b02092c8037d23",
+      "diffSha256": "e69c8e99cf6ef9e3686d54c57b1830991b3401b1defd9f1582cdfc099edadc61",
+      "recordSha256": "061417fa6287e567944b175f02cb6256bac91715e7639dfea22a94a1d0cc77de",
+      "recordBytes": 28785,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "patch": 1,
+        "parked": 2
+      }
+    },
+    {
+      "file": "docs/knowledge/why-discover-was-rewritten-as-a-clean-enrich-self-research-r/why-discover-was-rewritten-as-a-clean-enrich-self-research-recipe.md",
+      "set": "batch-076",
+      "sourceBytes": 6559,
+      "digest": "87de7f83cbd024480eddda66c426a831b7f24ef92a168cce01ce335bb2dd3f82",
+      "inventoryFileDigest": "87de7f83cbd024480eddda66c426a831b7f24ef92a168cce01ce335bb2dd3f82",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "17f085d55a6f074364dfa6d8cf64d02ad5cbfa9968abf8523e89ceb94135508e",
+      "recordBytes": 971,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/knowledge/why-dispatch-binding-moved-from-name-keying-to-needs-for-cap/dispatch-binding-moves-from-name-keying-to-needs-for-capability-declaration.md",
+      "set": "batch-076",
+      "sourceBytes": 9020,
+      "digest": "e56c40506ac92875f41cd7363169d4ca3bdb83545969641eac23be3a9db508b0",
+      "inventoryFileDigest": "e56c40506ac92875f41cd7363169d4ca3bdb83545969641eac23be3a9db508b0",
+      "diffSha256": "93632f0674cc8f751df4289b221b49e59f8779593be9ab420e3e5fb268f17995",
+      "recordSha256": "dc787bdebfa4f9a1bffa251961cba3cc4805411f49bb85957f26c70013264c8a",
+      "recordBytes": 30119,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "preserve": 3,
+        "patch": 2
+      }
+    }
+  ],
+  "sets": [
+    {
+      "set": "batch-076",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000076",
+      "population": [
+        "docs/knowledge/why-an-is-ancestor-of-main-verify-check-can-never-pass-throu/why-an-is-ancestor-of-main-verify-check-can-never-pass-through-fgos-approve.md",
+        "docs/knowledge/why-auto-launched-herdr-panes-must-be-labeled-before-spawnin/why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude.md",
+        "docs/knowledge/why-checkmergestillresolves-can-false-positive-after-a-root/why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune.md",
+        "docs/knowledge/why-checkretrospectivecontent-s-cleanup-to-done-gate-reads-o/why-the-retrospective-content-gate-checked-the-wrong-fields.md",
+        "docs/knowledge/why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md",
+        "docs/knowledge/why-clarify-split-into-clarify-discovery-and-exploring/why-clarify-split-into-clarify-discovery-and-exploring.md",
+        "docs/knowledge/why-context-md-enforcement-is-scoped-to-b-or-c-and-why-it-s/context-md-enforcement-scope.md",
+        "docs/knowledge/why-decide-for-execute-for-impact-analysis-reported-unavaila/why-capacity-for-and-capability-fields-were-unified-and-mcp-tools-get-a-hand-back.md",
+        "docs/knowledge/why-discover-loop-s-pool-ordering-and-stop-rules-diverge-fro/discover-loop-pool-ordering-and-stop-rules.md",
+        "docs/knowledge/why-dispatch-binding-moved-from-name-keying-to-needs-for-cap/dispatch-binding-moves-from-name-keying-to-needs-for-capability-declaration.md"
+      ],
+      "populationCount": 10,
+      "ranks": [
+        {
+          "file": "docs/knowledge/why-auto-launched-herdr-panes-must-be-labeled-before-spawnin/why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude.md",
+          "rankHash": "471a4b17847bb8e5626f4ee1020adcb82493357abc45641accbd905a7c81c9ef"
+        },
+        {
+          "file": "docs/knowledge/why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md",
+          "rankHash": "654a000246acb020198308260d3cc645cd369375105eb3fecc6034f9de285df4"
+        },
+        {
+          "file": "docs/knowledge/why-an-is-ancestor-of-main-verify-check-can-never-pass-throu/why-an-is-ancestor-of-main-verify-check-can-never-pass-through-fgos-approve.md",
+          "rankHash": "69b767dbc81ae51e7a674dfc3d055a5b72fb0ef6a96f9621ef09db9347a63791"
+        },
+        {
+          "file": "docs/knowledge/why-dispatch-binding-moved-from-name-keying-to-needs-for-cap/dispatch-binding-moves-from-name-keying-to-needs-for-capability-declaration.md",
+          "rankHash": "8561b01acbe152fdc79bcfbda4d2a1e8d5d5e842fae4f7798b538e33c4970b2a"
+        },
+        {
+          "file": "docs/knowledge/why-discover-loop-s-pool-ordering-and-stop-rules-diverge-fro/discover-loop-pool-ordering-and-stop-rules.md",
+          "rankHash": "b12058e0e3bc62a6b7177df089e45a1044f6875ed1a5978cbb6f0ecb651948de"
+        },
+        {
+          "file": "docs/knowledge/why-decide-for-execute-for-impact-analysis-reported-unavaila/why-capacity-for-and-capability-fields-were-unified-and-mcp-tools-get-a-hand-back.md",
+          "rankHash": "bebfbd4494d4feeb5ddf67bbd1c3e37b744dd2a6586c2093b34d102690d1b262"
+        },
+        {
+          "file": "docs/knowledge/why-checkmergestillresolves-can-false-positive-after-a-root/why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune.md",
+          "rankHash": "ca8df7a1efdaf96531d7d736f67c2d94da9c8e86a1fb47be20300c7a84a1512e"
+        },
+        {
+          "file": "docs/knowledge/why-checkretrospectivecontent-s-cleanup-to-done-gate-reads-o/why-the-retrospective-content-gate-checked-the-wrong-fields.md",
+          "rankHash": "dddc0df0ea55b74365e9e442355680699b87349e64584beb2a8086a2734b60bb"
+        },
+        {
+          "file": "docs/knowledge/why-clarify-split-into-clarify-discovery-and-exploring/why-clarify-split-into-clarify-discovery-and-exploring.md",
+          "rankHash": "e3a517024737e3fae506593e55817151088c9a8d8e9b84094e63abab37937125"
+        },
+        {
+          "file": "docs/knowledge/why-context-md-enforcement-is-scoped-to-b-or-c-and-why-it-s/context-md-enforcement-scope.md",
+          "rankHash": "fb8dc55cedb4e137d51622039cdf076ba8569d476f4db1e3bd1c2c7e2c2397d6"
+        }
+      ],
+      "sample": [
+        "docs/knowledge/why-auto-launched-herdr-panes-must-be-labeled-before-spawnin/why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude.md",
+        "docs/knowledge/why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/knowledge/why-auto-launched-herdr-panes-must-be-labeled-before-spawnin/why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude.md",
+        "docs/knowledge/why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md"
+      ],
+      "distinctReviewCount": 2,
+      "pilotFullReviewFiles": [
+        "docs/knowledge/why-an-is-ancestor-of-main-verify-check-can-never-pass-throu/why-an-is-ancestor-of-main-verify-check-can-never-pass-through-fgos-approve.md",
+        "docs/knowledge/why-approve-blocks-closing-a-milestone-with-drifted-targets/why-approve-blocks-closing-a-milestone-with-drifted-targets.md",
+        "docs/knowledge/why-approve-checks-acceptance-evidence-before-merging-not-af/why-approve-checks-acceptance-evidence-before-merging-not-after.md",
+        "docs/knowledge/why-approve-logs-post-success-movework-faults-outside-events/why-approve-logs-post-success-movework-faults-outside-events-lock.md",
+        "docs/knowledge/why-approve-s-iron-law-gate-scopes-changedfiles-to-the-leaf/why-approves-iron-law-gate-scopes-changedfiles-to-the-leafs-own-root.md",
+        "docs/knowledge/why-auto-decompose-children-now-carry-action-read-first-dire/why-auto-decompose-children-carry-action-and-read-first-directive-prose.md",
+        "docs/knowledge/why-auto-launched-herdr-panes-must-be-labeled-before-spawnin/why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude.md",
+        "docs/knowledge/why-awaiting-approval-became-an-overridable-ceiling-not-a-ha/why-awaiting-approval-became-an-overridable-ceiling.md",
+        "docs/knowledge/why-backlog-is-a-new-global-status-before-todo-not-a-domain/why-backlog-is-a-new-global-status-before-todo-not-a-domain-relabel.md",
+        "docs/knowledge/why-bee-prefixed-identifiers-became-fgos-prefixed-and-some-d/why-bee-prefixed-identifiers-became-fgos-prefixed.md",
+        "docs/knowledge/why-checkmergestillresolves-can-false-positive-after-a-root/why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune.md",
+        "docs/knowledge/why-checkretrospectivecontent-s-cleanup-to-done-gate-reads-o/why-the-retrospective-content-gate-checked-the-wrong-fields.md",
+        "docs/knowledge/why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md",
+        "docs/knowledge/why-clarify-split-into-clarify-discovery-and-exploring/why-clarify-split-into-clarify-discovery-and-exploring.md",
+        "docs/knowledge/why-cleanup-loop-has-no-iteration-cap-unlike-discover-loop/why-cleanup-loop-has-no-iteration-cap-unlike-discover-loop.md",
+        "docs/knowledge/why-context-md-enforcement-is-scoped-to-b-or-c-and-why-it-s/context-md-enforcement-scope.md",
+        "docs/knowledge/why-cook-and-pick-were-retrofitted-to-call-fgos-coding-drivi/why-cook-and-pick-were-retrofitted-to-call-fgos-coding-driving.md",
+        "docs/knowledge/why-cook-s-never-auto-approve-prose-lost-to-gate-bypass/why-cooks-never-auto-approve-prose-lost-to-gate-bypass.md",
+        "docs/knowledge/why-decide-for-execute-for-impact-analysis-reported-unavaila/why-capacity-for-and-capability-fields-were-unified-and-mcp-tools-get-a-hand-back.md",
+        "docs/knowledge/why-decisions-already-locked-and-approved-by-a-person-still/decision-record.md",
+        "docs/knowledge/why-decompose-checks-footprint-overlap-before-creating-child/why-decompose-checks-footprint-overlap-before-creating-children.md",
+        "docs/knowledge/why-decompose-s-skip-and-advance-is-narrower-than-discovery/why-decomposes-skip-and-advance-is-narrower-than-discoverys.md",
+        "docs/knowledge/why-discover-loop-s-pool-ordering-and-stop-rules-diverge-fro/discover-loop-pool-ordering-and-stop-rules.md",
+        "docs/knowledge/why-discover-was-rewritten-as-a-clean-enrich-self-research-r/why-discover-was-rewritten-as-a-clean-enrich-self-research-recipe.md",
+        "docs/knowledge/why-dispatch-binding-moved-from-name-keying-to-needs-for-cap/dispatch-binding-moves-from-name-keying-to-needs-for-capability-declaration.md"
+      ],
+      "dispositions": {
+        "patch": 11,
+        "preserve": 34,
+        "parked": 4
+      }
+    }
+  ],
+  "unpatchedStrata": {
+    "076": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-076",
+      "population": [
+        "docs/knowledge/why-approve-blocks-closing-a-milestone-with-drifted-targets/why-approve-blocks-closing-a-milestone-with-drifted-targets.md",
+        "docs/knowledge/why-approve-checks-acceptance-evidence-before-merging-not-af/why-approve-checks-acceptance-evidence-before-merging-not-after.md",
+        "docs/knowledge/why-approve-s-iron-law-gate-scopes-changedfiles-to-the-leaf/why-approves-iron-law-gate-scopes-changedfiles-to-the-leafs-own-root.md",
+        "docs/knowledge/why-auto-decompose-children-now-carry-action-read-first-dire/why-auto-decompose-children-carry-action-and-read-first-directive-prose.md",
+        "docs/knowledge/why-bee-prefixed-identifiers-became-fgos-prefixed-and-some-d/why-bee-prefixed-identifiers-became-fgos-prefixed.md",
+        "docs/knowledge/why-cleanup-loop-has-no-iteration-cap-unlike-discover-loop/why-cleanup-loop-has-no-iteration-cap-unlike-discover-loop.md",
+        "docs/knowledge/why-cook-s-never-auto-approve-prose-lost-to-gate-bypass/why-cooks-never-auto-approve-prose-lost-to-gate-bypass.md",
+        "docs/knowledge/why-decisions-already-locked-and-approved-by-a-person-still/decision-record.md",
+        "docs/knowledge/why-decompose-checks-footprint-overlap-before-creating-child/why-decompose-checks-footprint-overlap-before-creating-children.md"
+      ],
+      "populationCount": 9,
+      "ranks": [
+        {
+          "file": "docs/knowledge/why-decompose-checks-footprint-overlap-before-creating-child/why-decompose-checks-footprint-overlap-before-creating-children.md",
+          "rankHash": "2dfcc5ed13d17e8acce6cc438b250b030d6ffc54ba60a75ec4094eec02cd10cf"
+        },
+        {
+          "file": "docs/knowledge/why-decisions-already-locked-and-approved-by-a-person-still/decision-record.md",
+          "rankHash": "2f704779d8054ec8165ca1412ad797ee8210d14fd3a558b6cf7ff150ecdfaeec"
+        },
+        {
+          "file": "docs/knowledge/why-cleanup-loop-has-no-iteration-cap-unlike-discover-loop/why-cleanup-loop-has-no-iteration-cap-unlike-discover-loop.md",
+          "rankHash": "672a65d8ec11c8f81962f7ad43156c7230a2d3372631efe0bf5619cd00a25e20"
+        },
+        {
+          "file": "docs/knowledge/why-bee-prefixed-identifiers-became-fgos-prefixed-and-some-d/why-bee-prefixed-identifiers-became-fgos-prefixed.md",
+          "rankHash": "990d8082d1c9ff8348fde1636b005b0ac295fc05a60e6f40ef5a287694ab0035"
+        },
+        {
+          "file": "docs/knowledge/why-approve-s-iron-law-gate-scopes-changedfiles-to-the-leaf/why-approves-iron-law-gate-scopes-changedfiles-to-the-leafs-own-root.md",
+          "rankHash": "b0b2640fa9da057bfaa7f740819f728e1a9faecfc4818ab9563d5ada1526e79b"
+        },
+        {
+          "file": "docs/knowledge/why-approve-checks-acceptance-evidence-before-merging-not-af/why-approve-checks-acceptance-evidence-before-merging-not-after.md",
+          "rankHash": "da078b6f22ce786ab32914a2e9f455b47e862f03c6ceab3fac884420849630d1"
+        },
+        {
+          "file": "docs/knowledge/why-approve-blocks-closing-a-milestone-with-drifted-targets/why-approve-blocks-closing-a-milestone-with-drifted-targets.md",
+          "rankHash": "e4558328e0c9fdeb7f3dbea4ff52ddf00bbe81ad33bb7c0c6e80f12100b41d1f"
+        },
+        {
+          "file": "docs/knowledge/why-cook-s-never-auto-approve-prose-lost-to-gate-bypass/why-cooks-never-auto-approve-prose-lost-to-gate-bypass.md",
+          "rankHash": "fc4ab1916b75b9e7bf269ef252e24e0b9dc917ebeb8023edf744b0e3f8ef87d3"
+        },
+        {
+          "file": "docs/knowledge/why-auto-decompose-children-now-carry-action-read-first-dire/why-auto-decompose-children-carry-action-and-read-first-directive-prose.md",
+          "rankHash": "fdfbcb02dd90168489165744b00c3e2e7efdf339b38cd7095daebd709fd070ff"
+        }
+      ],
+      "selected": [
+        "docs/knowledge/why-decompose-checks-footprint-overlap-before-creating-child/why-decompose-checks-footprint-overlap-before-creating-children.md",
+        "docs/knowledge/why-decisions-already-locked-and-approved-by-a-person-still/decision-record.md"
+      ],
+      "reworkNumerator": "pending",
+      "acceptance": "Lead only; no pooled denominator"
+    }
+  },
+  "recordFiles": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-076.jsonl",
+      "sha256": "d778db417be032dc72af601c223b93c95d3482af13dad4c54dc335c0c71dfe77"
+    }
+  ]
+}

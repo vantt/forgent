@@ -1,0 +1,30 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "completedBatches": [
+    "076"
+  ],
+  "pendingBatches": [
+    "077",
+    "078",
+    "079",
+    "080",
+    "081",
+    "082"
+  ],
+  "stopReason": "Whole-file authoring budget boundary after batch 076; batches 077–082 remain unauthored.",
+  "files": 25,
+  "inventoryEdges": 49,
+  "addedEdges": 0,
+  "edges": 49,
+  "patchedFiles": 10,
+  "dispositions": {
+    "patch": 11,
+    "preserve": 34,
+    "parked": 4
+  },
+  "parks": {
+    "description-rewrite": 3,
+    "dead-link": 1
+  },
+  "reviewAcceptance": "pending independent A51 review"
+}

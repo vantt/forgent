@@ -1,0 +1,684 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "binding": "step-03-wave4f-binding-manifest.json",
+  "historicalSample": "step-03-wave4d-manifest.json",
+  "rule": "L12-42(2): all batch-073 files, no reseeding",
+  "selectedFiles": 25,
+  "selectedEdges": 116,
+  "parts": [
+    {
+      "part": 1,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-batch073-x-p01.md",
+      "files": [
+        {
+          "file": "docs/knowledge/how-to-reconcile-a-blocked-item-after-a-leaf-into-root-merge/reconcile-a-blocked-item-after-a-leaf-into-root-merge-race.md",
+          "set": "batch-073",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 0,
+          "recordSha256": "e558aa5297118073df3ded6b315e00400eb68aec9397759ad75cef798333b4e4",
+          "sourceDigest": "ae82a549d4a48d9794346f9af03c6938add3322cbd29a114f0ddbbaa81cdf7d8",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 964,
+          "sourceBytes": 3802,
+          "contextPlusRecordBytes": 4766
+        },
+        {
+          "file": "docs/knowledge/how-to-reconstruct-fgos-tracking-state-after-an-operator-mis/reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-events-jsonl.md",
+          "set": "batch-073",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 4,
+          "recordSha256": "2fe0909c073f476f21453f852ccdfcef562e4d5e3f88f313da95dbb9326686c0",
+          "sourceDigest": "5acf88d76e1a437c85661672129003116298037972bcb18151e1d63e82141c0e",
+          "diffSha256": "5c8342b852ae1430307e3113828888b7f173b580d70b4c7ffc4289c2b3db8a94",
+          "recordBytes": 36120,
+          "sourceBytes": 4314,
+          "contextPlusRecordBytes": 40434
+        },
+        {
+          "file": "docs/knowledge/how-to-recover-a-blocked-item-with-fgos-catchup-from-inside/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md",
+          "set": "batch-073",
+          "strata": [
+            "full-set-expansion",
+            "historical-patched-selected"
+          ],
+          "edges": 4,
+          "recordSha256": "590f6e19777963bed2961cfa3c0a1dad3f75199188df7fae092cfc129d14b3e5",
+          "sourceDigest": "e552fb38bc9b1fbb415512b2ab0975703dfe8295621a89bb9a25e61efcda7144",
+          "diffSha256": "53285f413939d7cd69c947fcd5175fa4a77c2fd56d47c1329c9c1a8b0e9ed546",
+          "recordBytes": 95101,
+          "sourceBytes": 3970,
+          "contextPlusRecordBytes": 99071
+        },
+        {
+          "file": "docs/knowledge/how-to-recover-a-blocked-merge-conflict-item-when-fgos-catch/recover-a-blocked-merge-conflict-when-catchup-cannot-reconcile-it.md",
+          "set": "batch-073",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 4,
+          "recordSha256": "6861765dc5ec4d0f780e5e45d664e61e7deb6042f2c72ee8bd62052cf1704f59",
+          "sourceDigest": "34113d4abada8b419df858ebe4fe3507110a9294d3f42490a91493e9c16b18c2",
+          "diffSha256": "a89061ee0073c9fe7594252f7795ecb809af2b663a6b0eef24408dfd6bf2a5db",
+          "recordBytes": 31125,
+          "sourceBytes": 6054,
+          "contextPlusRecordBytes": 37179
+        },
+        {
+          "file": "docs/knowledge/how-to-recover-a-stuck-doing-claim-after-a-worktree-creation/recover-a-stuck-doing-claim-after-worktree-creation-failure.md",
+          "set": "batch-073",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 7,
+          "recordSha256": "a248e0a9730801e10e95c80eb95fa5e92722619ac12f17903a7ff3fe5bb1df97",
+          "sourceDigest": "456db3126fffc12422cada04e46ad0e699cad632790361d7c14471c58ccc9965",
+          "diffSha256": "a5abb32ff9aaa33f9ff9ac771be176666c68a301006f2afd93d08cc1add7bede",
+          "recordBytes": 25701,
+          "sourceBytes": 7645,
+          "contextPlusRecordBytes": 33346
+        },
+        {
+          "file": "docs/knowledge/how-to-recover-fgos-approve-fgos-sync-root-from-inside-a-wor/recover-approve-sync-root-from-inside-a-worktree-with-trust-dir.md",
+          "set": "batch-073",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 0,
+          "recordSha256": "4f718cf9203c8d04cde53af410c1c9d0abb479c79699996d419f7d0c7aed7c3e",
+          "sourceDigest": "b5aa56ffaa8cefd466642878efabe91a02231a037963b947f999abc863a6860d",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 969,
+          "sourceBytes": 4152,
+          "contextPlusRecordBytes": 5121
+        }
+      ],
+      "fileCount": 6,
+      "edges": 19,
+      "sourcePlusRecordBytes": 219917,
+      "readingPages": [
+        {
+          "file": "docs/knowledge/how-to-reconcile-a-blocked-item-after-a-leaf-into-root-merge/reconcile-a-blocked-item-after-a-leaf-into-root-merge-race.md",
+          "edgeRanges": [],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-reconstruct-fgos-tracking-state-after-an-operator-mis/reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-events-jsonl.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 4
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-recover-a-blocked-item-with-fgos-catchup-from-inside/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 4
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-recover-a-blocked-merge-conflict-item-when-fgos-catch/recover-a-blocked-merge-conflict-when-catchup-cannot-reconcile-it.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 4
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-recover-a-stuck-doing-claim-after-a-worktree-creation/recover-a-stuck-doing-claim-after-worktree-creation-failure.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 7
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-recover-fgos-approve-fgos-sync-root-from-inside-a-wor/recover-approve-sync-root-from-inside-a-worktree-with-trust-dir.md",
+          "edgeRanges": [],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 2,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-batch073-x-p02.md",
+      "files": [
+        {
+          "file": "docs/knowledge/how-to-register-a-fixable-doctor-check-in-fgos/register-a-fixable-doctor-check-in-fgos.md",
+          "set": "batch-073",
+          "strata": [
+            "full-set-expansion",
+            "historical-unpatched-selected"
+          ],
+          "edges": 6,
+          "recordSha256": "fcb0652a909cca8b003aadbbcbd7f75d7a655f1061abf5fba1425e0bfbc454ae",
+          "sourceDigest": "f695c8800bd7892b8f0477413085b0f77101f0647a48d65df1f5130e2c3844fe",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 8040,
+          "sourceBytes": 8175,
+          "contextPlusRecordBytes": 16215
+        },
+        {
+          "file": "docs/knowledge/how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-wit/resolve-an-events-jsonl-merge-conflict.md",
+          "set": "batch-073",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 11,
+          "recordSha256": "b0a66b545c5615ff2c4474cbed54f5841984e5ce0467605fe682071aa7ec8501",
+          "sourceDigest": "580077e82919d354ca2e905d5ee54e0c40f86fd1b745c3163a53384c5951ff2c",
+          "diffSha256": "1d8b17603b24f2f8f5fca0b944e8c7b3bc7b6cf43e1b83d7b0acfe8d98cbb1af",
+          "recordBytes": 40160,
+          "sourceBytes": 8293,
+          "contextPlusRecordBytes": 48453
+        },
+        {
+          "file": "docs/knowledge/how-to-resolve-ambiguous-multi-target-errors-from-an-impact/resolve-ambiguous-multi-target-errors-from-an-impact-analysis-provider.md",
+          "set": "batch-073",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 0,
+          "recordSha256": "a34f25f3ec7b166eec576b4533cbe483f89513f616b327a655db7a741fa58db9",
+          "sourceDigest": "737974e91ba956ff3e07b7b2bc4ba5d8780990f377f112cd41355a25c422abca",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 975,
+          "sourceBytes": 3669,
+          "contextPlusRecordBytes": 4644
+        },
+        {
+          "file": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+          "set": "batch-073",
+          "strata": [
+            "full-set-expansion",
+            "corrected-lead-supplement"
+          ],
+          "edges": 16,
+          "recordSha256": "9f053e2de8fea80b2de5038b4859bbed97b657424bbc1415ba32999ff3f7a3b3",
+          "sourceDigest": "7f647ad2b7018ed4f490179321407228cb13dd2a9176d2241e9218593d4c569a",
+          "diffSha256": "1d1191e36ea7ab4a6d1c1f8f6ca202536f7307f123603aa0d56258416f8bb2a8",
+          "recordBytes": 89119,
+          "sourceBytes": 8837,
+          "contextPlusRecordBytes": 97956
+        },
+        {
+          "file": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+          "set": "batch-073",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 6,
+          "recordSha256": "a6993e88f8856ce5d59f5f98439b269cb76fb2b3a68fec0e6e2f21ade2202e05",
+          "sourceDigest": "da410923253f4bdf8219b75fae8176ce4e97b9114e4a2172dbb19adfea460862",
+          "diffSha256": "ab90c8d4d23a9bd3288b20ac9cda5f50b4ec914493a612d47d5a6cca5215f909",
+          "recordBytes": 24735,
+          "sourceBytes": 4925,
+          "contextPlusRecordBytes": 29660
+        },
+        {
+          "file": "docs/knowledge/how-to-reuse-the-shared-executor-dispatch-fallback-fragment/reuse-the-shared-executor-dispatch-fallback-fragment.md",
+          "set": "batch-073",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 6,
+          "recordSha256": "054c164597534e48404a4ddd261062616520bc725eb59d4cbec4b03055e54771",
+          "sourceDigest": "88f14ab11fee895292e401b9a6df75cded6b493691012c173c589cd936ebbb04",
+          "diffSha256": "b031043cf8f3c434d84d6e62ba547952db9c8b8fd1df613e3290ed130acb5e19",
+          "recordBytes": 62025,
+          "sourceBytes": 6239,
+          "contextPlusRecordBytes": 68264
+        }
+      ],
+      "fileCount": 6,
+      "edges": 45,
+      "sourcePlusRecordBytes": 265192,
+      "readingPages": [
+        {
+          "file": "docs/knowledge/how-to-register-a-fixable-doctor-check-in-fgos/register-a-fixable-doctor-check-in-fgos.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 6
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-wit/resolve-an-events-jsonl-merge-conflict.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 11
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-resolve-ambiguous-multi-target-errors-from-an-impact/resolve-ambiguous-multi-target-errors-from-an-impact-analysis-provider.md",
+          "edgeRanges": [],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 16
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 6
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-reuse-the-shared-executor-dispatch-fallback-fragment/reuse-the-shared-executor-dispatch-fallback-fragment.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 6
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 3,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-batch073-x-p03.md",
+      "files": [
+        {
+          "file": "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md",
+          "set": "batch-073",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 11,
+          "recordSha256": "8476691384f4f4c03653e7fc7317c2fd4998ee8e4f109a86236b938c8f1c646b",
+          "sourceDigest": "1a8538b7cdea6dd66d14df178bef307bad333305eaae3a9a3893c0c96a662605",
+          "diffSha256": "58b0c953bbf1a66ff485d7156bd669b64392668b7fec0c22dba6dcfa99a22dda",
+          "recordBytes": 95507,
+          "sourceBytes": 13958,
+          "contextPlusRecordBytes": 109465
+        },
+        {
+          "file": "docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md",
+          "set": "batch-073",
+          "strata": [
+            "full-set-expansion",
+            "historical-patched-selected"
+          ],
+          "edges": 3,
+          "recordSha256": "25d41c8ce4446b275f2830d83515052fcc1601817ce51cc01a44a5d13960acae",
+          "sourceDigest": "ec9f6195763d768c6470a0b3751bf82f3043b5ddd6be7ff88401ed8d2ed4307a",
+          "diffSha256": "5a969259322d2c37806d2d2b8bd410c313e905eb8fc9618537d16bd4d5c7c680",
+          "recordBytes": 22018,
+          "sourceBytes": 7483,
+          "contextPlusRecordBytes": 29501
+        },
+        {
+          "file": "docs/knowledge/how-to-see-done-items-in-fgos-list-fgos-triage/see-done-items-in-list-and-triage.md",
+          "set": "batch-073",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 7,
+          "recordSha256": "b001353559bbf99d768a2f44147942969b98ca04fbc809533a07b7780175c940",
+          "sourceDigest": "09c9d35d624e13873356f381f2fb7bcceec71030252be1be8c50dfe9ba09326f",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 9792,
+          "sourceBytes": 6392,
+          "contextPlusRecordBytes": 16184
+        },
+        {
+          "file": "docs/knowledge/how-to-self-resolve-a-merge-block-reported-as-verify-timeout/self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures.md",
+          "set": "batch-073",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 3,
+          "recordSha256": "4d4abf7d9be7052ec63f51c8c916af615091483bef0041b15ef101a7c66c9467",
+          "sourceDigest": "627526f65f8b85949f2538f35c3fc9814959a4c958caac1a5b329372ad8062dd",
+          "diffSha256": "3ceac083aa13bc7143cb7459ccd59ca723d51ccfd23a6fcdd952d2d65f432d8e",
+          "recordBytes": 21986,
+          "sourceBytes": 5355,
+          "contextPlusRecordBytes": 27341
+        },
+        {
+          "file": "docs/knowledge/how-to-smoke-test-fgos-coding-implement-with-a-trivial-verif/smoke-test-fgos-code-implement-with-a-trivial-item.md",
+          "set": "batch-073",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 3,
+          "recordSha256": "b7f4de6df088ac637d756c07facaa0ec9b37e62c52b5941ddf2d800b991f8cca",
+          "sourceDigest": "b16ea69f31b4c66c6a88e997a16d1ee29991be49cd9d96f8ea1b75c33901058e",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 4544,
+          "sourceBytes": 4409,
+          "contextPlusRecordBytes": 8953
+        },
+        {
+          "file": "docs/knowledge/how-to-sweep-the-clarify-decompose-backlog-with-fgos-discove/sweep-the-clarify-decompose-backlog-with-discover-loop.md",
+          "set": "batch-073",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 0,
+          "recordSha256": "994d7873a1bc61e8e9bf17a681611dee07980129a796491bf33a65c83d8e7c1b",
+          "sourceDigest": "a6e4aa8a1aba39ed5ebf4f3cebeb437a1e7907ff27fd56c47b3d56be37d9828c",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 960,
+          "sourceBytes": 4036,
+          "contextPlusRecordBytes": 4996
+        }
+      ],
+      "fileCount": 6,
+      "edges": 27,
+      "sourcePlusRecordBytes": 196440,
+      "readingPages": [
+        {
+          "file": "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 11
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-see-done-items-in-fgos-list-fgos-triage/see-done-items-in-list-and-triage.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 7
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-self-resolve-a-merge-block-reported-as-verify-timeout/self-resolve-verify-timeout-integration-drift-and-unclassified-merge-failures.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-smoke-test-fgos-coding-implement-with-a-trivial-verif/smoke-test-fgos-code-implement-with-a-trivial-item.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-sweep-the-clarify-decompose-backlog-with-fgos-discove/sweep-the-clarify-decompose-backlog-with-discover-loop.md",
+          "edgeRanges": [],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 4,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-batch073-x-p04.md",
+      "files": [
+        {
+          "file": "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+          "set": "batch-073",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 1,
+          "recordSha256": "7e0e52aad13e5e0a606cc38c8450eac99e864967a2fabd0552025387693cc88b",
+          "sourceDigest": "244a4504e597b7f82e136e10591700372c52626b425931a69bbba2e392d65478",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 2019,
+          "sourceBytes": 3796,
+          "contextPlusRecordBytes": 5815
+        },
+        {
+          "file": "docs/knowledge/how-to-unify-two-independently-written-working-tree-clean-ch/unify-a-duplicated-clean-tree-check-across-return-and-approve.md",
+          "set": "batch-073",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 4,
+          "recordSha256": "0f87529b443a9300eda4f23467c0d5c12bef65cabacb61008c77baa130e5cef4",
+          "sourceDigest": "b1b62aed4f6eb7afe365aca1d66053643d33f659f67d61d719b8d021e42bb467",
+          "diffSha256": "9f06586c5876952240737b4c0d5c2c96e3cfefcfa9cd640c2a0d8478c272c457",
+          "recordBytes": 33213,
+          "sourceBytes": 6093,
+          "contextPlusRecordBytes": 39306
+        },
+        {
+          "file": "docs/knowledge/how-to-verify-herdr-cockpit-reuses-its-existing-tab-instead/verify-herdr-cockpit-reuses-existing-tab-instead-of-losing-one.md",
+          "set": "batch-073",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 2,
+          "recordSha256": "552b04a432ddd58ef0b3341687fdb328b420ef1b18713b282cdeaa7c3867f735",
+          "sourceDigest": "7ac7b6e6dbf3bfa4bad486a649de2939799b02ea9cefaae6b051379069a303b8",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 3117,
+          "sourceBytes": 3404,
+          "contextPlusRecordBytes": 6521
+        },
+        {
+          "file": "docs/knowledge/how-to-wait-out-a-genuinely-active-main-checkout-lock-holder/wait-out-an-active-main-checkout-lock-holder.md",
+          "set": "batch-073",
+          "strata": [
+            "full-set-expansion",
+            "historical-patched-selected"
+          ],
+          "edges": 7,
+          "recordSha256": "fd300a51238ff6f2433dcf0b09d5e2ae3ff411aeee465a1f4fdcd30bee7cc194",
+          "sourceDigest": "abfe5ba54e0f8b9a9a10434f4d42da0290e03e7ff5a6ed8ce6d19611e8800ebf",
+          "diffSha256": "5cbec11efc7ff3c88fd7a6cee8fba44acd673da686acc216332558cb7fde5472",
+          "recordBytes": 39551,
+          "sourceBytes": 7408,
+          "contextPlusRecordBytes": 46959
+        },
+        {
+          "file": "docs/knowledge/how-to-wire-a-headless-function-through-an-agent-executor-ex/wire-a-headless-function-through-an-agent-executor-executor.md",
+          "set": "batch-073",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 5,
+          "recordSha256": "4156fc955a3ea3c6e098e8bcc04f641b17c0f2da576ead1d7219200680aeae6e",
+          "sourceDigest": "f4b936f885ab8718273d76695bb31753337e4658d5a59b3a2ef78f3ef6e74018",
+          "diffSha256": "140fecfbf1fb2e298583946711013bbf01712ec27c9b60e941b36598db6aded5",
+          "recordBytes": 39902,
+          "sourceBytes": 6342,
+          "contextPlusRecordBytes": 46244
+        },
+        {
+          "file": "docs/knowledge/how-to-write-a-doctor-check-that-detects-real-shell-function/write-a-doctor-check-that-detects-real-shell-function-breakage.md",
+          "set": "batch-073",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 5,
+          "recordSha256": "e15635e82726690219d6f096667dd3aee1b4ac9f444241ae3bc853af4ce09e4c",
+          "sourceDigest": "42c956d24e8cbfd593b2eb9a375b5d021ba7b3c3cd9e8d282d859ef0780820af",
+          "diffSha256": "6c3de7b8492640e7833d4177a9a1207f21de1a156d527f7f5e4de05def4cc485",
+          "recordBytes": 14784,
+          "sourceBytes": 5325,
+          "contextPlusRecordBytes": 20109
+        }
+      ],
+      "fileCount": 6,
+      "edges": 24,
+      "sourcePlusRecordBytes": 164954,
+      "readingPages": [
+        {
+          "file": "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-unify-two-independently-written-working-tree-clean-ch/unify-a-duplicated-clean-tree-check-across-return-and-approve.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 4
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-verify-herdr-cockpit-reuses-its-existing-tab-instead/verify-herdr-cockpit-reuses-existing-tab-instead-of-losing-one.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-wait-out-a-genuinely-active-main-checkout-lock-holder/wait-out-an-active-main-checkout-lock-holder.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 7
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-wire-a-headless-function-through-an-agent-executor-ex/wire-a-headless-function-through-an-agent-executor-executor.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 5
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/how-to-write-a-doctor-check-that-detects-real-shell-function/write-a-doctor-check-that-detects-real-shell-function-breakage.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 5
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    },
+    {
+      "part": 5,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-batch073-x-p05.md",
+      "files": [
+        {
+          "file": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
+          "set": "batch-073",
+          "strata": [
+            "full-set-expansion"
+          ],
+          "edges": 1,
+          "recordSha256": "99d97a50c05502ab7a8ea6a8a253ce887e07ef60f89f537bf852ef3b98e20eaf",
+          "sourceDigest": "dfdd678642adb8b4795088759d783a024d5b9afb41227bb96f907af173659083",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 2022,
+          "sourceBytes": 3363,
+          "contextPlusRecordBytes": 5385
+        }
+      ],
+      "fileCount": 1,
+      "edges": 1,
+      "sourcePlusRecordBytes": 5385,
+      "readingPages": [
+        {
+          "file": "docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 1
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    }
+  ],
+  "reviewedDenominator": 0,
+  "reworkNumerator": "pending",
+  "reviewersStarted": 0,
+  "accepted": 0
+}

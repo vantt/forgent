@@ -1,0 +1,183 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "changes": [
+    {
+      "edgeId": "maps-j-04449",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 69,
+            "columnStart": 4,
+            "line": 157,
+            "text": "docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md"
+          }
+        ],
+        "diffHunk": null,
+        "blockedCategory": "description-rewrite",
+        "disposition": "parked",
+        "edgeId": "maps-j-04449",
+        "blockedReason": "Description needs rewrite: The Related gloss still claims blocked -> proposed is the same recovery edge as step 5. The live recovery edge is awaiting-approval (L12-31 and L12-40 do not authorize certifying proposed). Rewrite the whole source status/recipe comparison before redirecting to the diagnose guide.",
+        "dependencyCategory": "description-rewrite",
+        "target": null,
+        "timing": "none",
+        "reason": "L12-30, L12-32, L12-34: Description needs rewrite: The Related gloss still claims blocked -> proposed is the same recovery edge as step 5. The live recovery edge is awaiting-approval (L12-31 and L12-40 do not authorize certifying proposed). Rewrite the whole source status/recipe comparison before redirecting to the diagnose guide. Source path renamed at d178d241f0fb9a1d03f5671d6b1ef191a4c2ff24 to docs/knowledge/how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post/diagnose-a-verify-fail-post-merge-block-on-approve.md; original source spelling conserved.",
+        "anchor": null,
+        "dependency": "Description needs rewrite: The Related gloss still claims blocked -> proposed is the same recovery edge as step 5. The live recovery edge is awaiting-approval (L12-31 and L12-40 do not authorize certifying proposed). Rewrite the whole source status/recipe comparison before redirecting to the diagnose guide.",
+        "matchedExpression": "docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+        "unitId": "item-L157",
+        "searchWitness": {
+          "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+          "roots": [
+            "docs/platform",
+            "docs/knowledge",
+            "docs/reference",
+            "docs/tutorials"
+          ],
+          "legacyPath": "docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+          "passage": "- `docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md` — the",
+          "aliasLookups": [
+            {
+              "source": "plans/260925-documentation-authority-unification/alias-table.json",
+              "matches": []
+            },
+            {
+              "source": "docs/doc-registry.json",
+              "matches": [
+                {
+                  "docId": "how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post-merge:diagnose-a-verify-fail-post-merge-block-on-approve",
+                  "topicId": "how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post-merge",
+                  "role": "diagnose-a-verify-fail-post-merge-block-on-approve",
+                  "framework": "diataxis",
+                  "mode": "how-to",
+                  "docLifecycle": "provisional",
+                  "currentPath": "docs/knowledge/how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+                  "aliases": [
+                    "docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+                    "docs/how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post-merge/diagnose-a-verify-fail-post-merge-block-on-approve.md"
+                  ],
+                  "sourceCaptureIds": [
+                    "docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md"
+                  ],
+                  "createdAt": "2026-08-26T00:16:25.947Z",
+                  "updatedAt": "2026-08-27T08:19:43.161Z"
+                }
+              ]
+            }
+          ],
+          "queries": [
+            {
+              "query": "docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+              "hitCount": 9,
+              "liveHitCount": 9,
+              "hitsSha256": "ca52ce46c3b537786938199e6c8d0cb8434c52cc8085899bbefc6c79fe50a579"
+            }
+          ],
+          "assessment": "Description needs rewrite: The Related gloss still claims blocked -> proposed is the same recovery edge as step 5. The live recovery edge is awaiting-approval (L12-31 and L12-40 do not authorize certifying proposed). Rewrite the whole source status/recipe comparison before redirecting to the diagnose guide.",
+          "hitGroups": [
+            {
+              "query": "docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+              "carriageCount": 0,
+              "liveCount": 9,
+              "carriageAssessment": "L12-30(3): source snapshot/history carriage is not a patch target.",
+              "liveAssessment": "Description needs rewrite: The Related gloss still claims blocked -> proposed is the same recovery edge as step 5. The live recovery edge is awaiting-approval (L12-31 and L12-40 do not authorize certifying proposed). Rewrite the whole source status/recipe comparison before redirecting to the diagnose guide.",
+              "category": "citation-only",
+              "note": "Description needs rewrite: The Related gloss still claims blocked -> proposed is the same recovery edge as step 5. The live recovery edge is awaiting-approval (L12-31 and L12-40 do not authorize certifying proposed). Rewrite the whole source status/recipe comparison before redirecting to the diagnose guide."
+            }
+          ]
+        },
+        "targetFacts": [
+          {
+            "path": "docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+            "state": "renamed",
+            "commit": "d178d241f0fb9a1d03f5671d6b1ef191a4c2ff24",
+            "successor": "docs/knowledge/how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post/diagnose-a-verify-fail-post-merge-block-on-approve.md"
+          }
+        ]
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 69,
+            "columnStart": 4,
+            "line": 157,
+            "text": "docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md"
+          }
+        ],
+        "diffHunk": "@@ -154,7 +154,7 @@",
+        "blockedCategory": null,
+        "disposition": "patch",
+        "edgeId": "maps-j-04449",
+        "blockedReason": null,
+        "dependencyCategory": null,
+        "target": "docs/knowledge/how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+        "timing": "Phase 9",
+        "reason": "L12-26, L12-30, L12-31, L12-32, L12-37: Phase 9 citation patch to exact committed holder docs/knowledge/how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post/diagnose-a-verify-fail-post-merge-block-on-approve.md. L12-42(1): Related names the complete sibling how-to for approve verify-fail-post-merge. Its step 5 explicitly documents blocked -> proposed and the same retry-approve command as source step 5, including the later awaiting-approval status-name note. Both guides express that same recovery edge; redirecting the complete guide does not change status names or certify a different current runtime recipe.",
+        "anchor": null,
+        "dependency": null,
+        "matchedExpression": "docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+        "unitId": "item-L157"
+      }
+    },
+    {
+      "edgeId": "maps-j-04553",
+      "before": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 30,
+            "columnStart": 4,
+            "line": 109,
+            "text": "docs/specs/distribution.md"
+          }
+        ],
+        "diffHunk": null,
+        "blockedCategory": null,
+        "disposition": "preserve",
+        "edgeId": "maps-j-04553",
+        "blockedReason": null,
+        "dependencyCategory": null,
+        "target": null,
+        "timing": "none",
+        "reason": "A51, L12-26, L12-38: Source path exists at author pin: docs/specs/distribution.md; tree retires at Phase 9. L12-40 and L12-39(6): preserve original captured output or explicit Document history identity. Exact source unit: '> \"adding `herdr-orchestrator-configured` also needs\\n> `docs/specs/distribution.md`\\'s Data Dictionary row #7 updated, or\\n> `registrations.test.mjs`\\'s enumeration test fails.\"\\n> — real commit message, `f14f1175`, branch `fgw/tsk-2m5`'",
+        "anchor": null,
+        "dependency": null,
+        "matchedExpression": "docs/specs/distribution.md",
+        "unitId": "line-L109",
+        "targetFacts": [
+          {
+            "path": "docs/specs/distribution.md",
+            "state": "exists"
+          }
+        ]
+      },
+      "after": {
+        "sourceSpans": [
+          {
+            "columnEndExclusive": 30,
+            "columnStart": 4,
+            "line": 109,
+            "text": "docs/specs/distribution.md"
+          }
+        ],
+        "diffHunk": null,
+        "blockedCategory": null,
+        "disposition": "preserve",
+        "edgeId": "maps-j-04553",
+        "blockedReason": null,
+        "dependencyCategory": null,
+        "target": null,
+        "timing": "none",
+        "reason": "A51, L12-26, L12-38: Source path exists at author pin: docs/specs/distribution.md; tree retires at Phase 9. L12-40 and L12-39(6): preserve original captured output or explicit Document history identity. Exact source unit: '> \"adding `herdr-orchestrator-configured` also needs\\n> `docs/specs/distribution.md`\\'s Data Dictionary row #7 updated, or\\n> `registrations.test.mjs`\\'s enumeration test fails.\"\\n> — real commit message, `f14f1175`, branch `fgw/tsk-2m5`' L12-42(3): verbatim commit-message capture; non-executable successor note: docs/platform/packaging-distribution/spec.md.",
+        "anchor": null,
+        "dependency": null,
+        "matchedExpression": "docs/specs/distribution.md",
+        "unitId": "line-L109",
+        "targetFacts": [
+          {
+            "path": "docs/specs/distribution.md",
+            "state": "exists"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,146 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "manifest": "step-03-wave4f-manifest.json",
+  "binding": "step-03-wave4f-binding-manifest.json",
+  "selectedFiles": 4,
+  "selectedEdges": 9,
+  "perSet": [
+    {
+      "set": "batch-076",
+      "allFiles": 25,
+      "patchedPopulation": 10,
+      "patchedSeedSample": 2,
+      "mandatoryFiles": 0,
+      "patchedAndMandatoryDistinct": 2,
+      "unpatchedEligiblePopulation": 9,
+      "unpatchedSample": 2,
+      "distinctSelected": 4,
+      "patchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      },
+      "unpatchedStratum": {
+        "selectedDenominator": 2,
+        "reviewedDenominator": 0,
+        "reworkNumerator": "pending"
+      }
+    }
+  ],
+  "parts": [
+    {
+      "part": 1,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-08/review-a38-step-03-wave4f-p01.md",
+      "files": [
+        {
+          "file": "docs/knowledge/why-auto-launched-herdr-panes-must-be-labeled-before-spawnin/why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude.md",
+          "set": "batch-076",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "80bfae43c2d01a8497bf01137e4363c5fac8136eb61c4cbeceac6b986dbeb29c",
+          "sourceDigest": "22a1ddab689a956c84266ac29e4fdab14335c7855662c3ca8f231cf099ab28b0",
+          "diffSha256": "937438be63344e65c0bfb1f387a56c6df4be7944732c41d745d708b18ab60ba9",
+          "recordBytes": 11700,
+          "sourceBytes": 9132,
+          "contextPlusRecordBytes": 20832
+        },
+        {
+          "file": "docs/knowledge/why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md",
+          "set": "batch-076",
+          "strata": [
+            "patched-seeded"
+          ],
+          "edges": 3,
+          "recordSha256": "f8dd4de4a67a299f8ac1552bb46d897fa0249cae32ff3d9a0e0f856d0292c5eb",
+          "sourceDigest": "1d419499c1f0fad727a3dded7ff5e1f73c92f50fef4c45a1c76013920233414a",
+          "diffSha256": "24d2eace5668c7e55cb3f0c1cc1d9eb6e1bed4eb3b9cd758b50e7b5bce277a14",
+          "recordBytes": 18996,
+          "sourceBytes": 4562,
+          "contextPlusRecordBytes": 23558
+        },
+        {
+          "file": "docs/knowledge/why-decisions-already-locked-and-approved-by-a-person-still/decision-record.md",
+          "set": "batch-076",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "f80550b5ee496b767fdab3a6f19c4266226a5701be5cd64429d9039eab7cf213",
+          "sourceDigest": "51855521f9c2d11a4f50d8dd9ac9bc3a9cf00bd17ab1f11d6b10c32ced9becd9",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 3476,
+          "sourceBytes": 2933,
+          "contextPlusRecordBytes": 6409
+        },
+        {
+          "file": "docs/knowledge/why-decompose-checks-footprint-overlap-before-creating-child/why-decompose-checks-footprint-overlap-before-creating-children.md",
+          "set": "batch-076",
+          "strata": [
+            "unpatched-seeded"
+          ],
+          "edges": 2,
+          "recordSha256": "2721baf8532ee72b3a58ebe3d5686153e6086da84fdc47494a06db0dd4a33030",
+          "sourceDigest": "c9a802661b09e00aa8b6eabdec333866f3f8c57c251c0677798394e674cc966c",
+          "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "recordBytes": 3235,
+          "sourceBytes": 7375,
+          "contextPlusRecordBytes": 10610
+        }
+      ],
+      "fileCount": 4,
+      "edges": 9,
+      "sourcePlusRecordBytes": 61409,
+      "readingPages": [
+        {
+          "file": "docs/knowledge/why-auto-launched-herdr-panes-must-be-labeled-before-spawnin/why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-claimwork-s-cas-reread-stays-while-its-one-redundant-ful/why-claimworks-cas-reread-stays-while-its-redundant-full-log-read-was-deduped.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 3
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-decisions-already-locked-and-approved-by-a-person-still/decision-record.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        },
+        {
+          "file": "docs/knowledge/why-decompose-checks-footprint-overlap-before-creating-child/why-decompose-checks-footprint-overlap-before-creating-children.md",
+          "edgeRanges": [
+            {
+              "first": 1,
+              "last": 2
+            }
+          ],
+          "maxFieldPageBytes": 300000,
+          "method": "Stream source in consecutive ≤120-line chunks and one edge/proof field at a time; a field longer than 300000 bytes is paged as text slices. One complete per-file verdict and diff remain indivisible."
+        }
+      ],
+      "indivisibleOversize": false
+    }
+  ],
+  "reviewersStarted": 0,
+  "accepted": 0
+}
