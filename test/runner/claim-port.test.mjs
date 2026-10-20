@@ -1,4 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
+import { activateGitFixture } from './worktree-native-fixture.helper.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -45,6 +46,7 @@ function initTempRepo() {
   fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
   return repoRoot;
 }
 

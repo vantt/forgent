@@ -34,7 +34,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { execFileSync } from 'node:child_process';
+import { currentHead, inspectGit, gitWorktrees, compareCommits, removeWorktree, isCheckoutDirty } from './worktree.mjs';
 import { fgosDirFromRoot, resolveMainCheckoutRoot } from './paths.mjs';
 import { pidExists } from './dispatch/process-identity.mjs';
 import { acquireSync, createLockScope, lockHolders, resolveLock } from '../holder-lock/index.mjs';
@@ -60,9 +60,6 @@ export class SessionError extends Error {
   }
 }
 
-function gitAt(cwd, args) {
-  return execFileSync('git', args, { cwd, encoding: 'utf8', shell: false });
-}
 
 function fgosDirOf(repoRoot) {
   return fgosDirFromRoot(repoRoot);
@@ -121,7 +118,11 @@ export function isSessionWorktree(repoRoot) {
 function unlinkFgosSymlink(worktreePath) {
   const linkPath = path.join(worktreePath, '.fgos');
   try {
-    if (fs.lstatSync(linkPath).isSymbolicLink()) fs.unlinkSync(linkPath);
+    if (fs.lstatSync(linkPath).isSymbolicLink()) {
+      const target = fs.readlinkSync(linkPath);
+      fs.unlinkSync(linkPath);
+      return target;
+    }
   } catch {
     // nothing to clean (already gone / never created) — fine
   }
@@ -140,20 +141,11 @@ function unlinkFgosSymlink(worktreePath) {
  * session's own worktree; the shared repoRoot `.fgos/` store is never touched,
  * and only HEAD's committed content (never live events) is materialized, moments
  * before the worktree is deleted wholesale. */
-function restoreTrackedFgos(worktreePath) {
-  let tracked;
-  try {
-    tracked = gitAt(worktreePath, ['ls-tree', 'HEAD', '--', '.fgos']).trim();
-  } catch {
-    return; // cannot inspect HEAD — leave git's own remove-time check as the arbiter
-  }
-  if (!tracked) return; // .fgos not tracked at HEAD — nothing to restore
-  try {
-    gitAt(worktreePath, ['checkout', '--', '.fgos']);
-  } catch {
-    // best-effort: if the restore did not fully clean the tree, the subsequent
-    // plain `git worktree remove` stays the honest arbiter and still refuses.
-  }
+
+function restoreFgosSymlink(worktreePath, target) {
+  if (!target) return;
+  try { fs.symlinkSync(target, path.join(worktreePath, '.fgos'), 'dir'); }
+  catch { /* Never mask the guarded removal's original refusal or overwrite new bytes. */ }
 }
 
 /** Blocking exclusive acquire of the `sessions` kernel lock. Waits until it
@@ -247,16 +239,12 @@ function realpathOr(p) {
 function listWorktreePaths(repoRoot) {
   let out;
   try {
-    out = gitAt(repoRoot, ['worktree', 'list', '--porcelain']);
+    out = gitWorktrees(repoRoot);
   } catch (err) {
     throw new SessionError(`listing git worktrees failed: ${err.message}`, {});
   }
   const paths = new Set();
-  for (const line of out.split('\n')) {
-    if (line.startsWith('worktree ')) {
-      paths.add(realpathOr(line.slice('worktree '.length).trim()));
-    }
-  }
+  for (const row of out) paths.add(realpathOr(Buffer.from(row.path).toString('utf8')));
   return paths;
 }
 
@@ -282,10 +270,10 @@ export function createSession(repoRoot, opts = {}) {
   }
 
   const fgosDir = fgosDirOf(repoRoot);
-  const currentHeadSha = gitAt(repoRoot, ['rev-parse', 'HEAD']).trim();
+  const currentHeadSha = currentHead(repoRoot);
   const cwdReal = realpathOr(process.cwd());
 
-  const lock = acquireSessionsLock(fgosDir);
+  let lock = acquireSessionsLock(fgosDir);
   try {
     const entries = readRegistry(fgosDir);
 
@@ -301,6 +289,8 @@ export function createSession(repoRoot, opts = {}) {
       }
     }
 
+    lock.release();
+    lock = null;
     const baseDir = opts.sessionsDir ?? path.join(os.tmpdir(), 'fgos-sessions');
     fs.mkdirSync(baseDir, { recursive: true });
     const worktreePath = fs.mkdtempSync(path.join(baseDir, `${sessionId}-`));
@@ -310,7 +300,7 @@ export function createSession(repoRoot, opts = {}) {
       addWorktreeSync(createLockScope('session-worktree'), repoRoot, ['--detach', worktreePath, currentHeadSha]);
     } catch (err) {
       try {
-        fs.rmSync(worktreePath, { recursive: true, force: true });
+        fs.rmdirSync(worktreePath);
       } catch {
         // best-effort cleanup of the empty mkdtemp dir; surface the git error.
       }
@@ -328,27 +318,13 @@ export function createSession(repoRoot, opts = {}) {
     // THIS just-created worktree's own path; the real repoRoot .fgos/ (the
     // symlink target) is never touched.
     const worktreeFgos = path.join(worktreePath, '.fgos');
-    try {
-      fs.rmSync(worktreeFgos, { recursive: true, force: true });
-    } catch (err) {
-      try {
-        gitAt(repoRoot, ['worktree', 'remove', '--force', worktreePath]);
-      } catch {
-        // best-effort rollback of the just-created worktree.
-      }
-      throw new SessionError(
-        `removing checked-out .fgos in session "${sessionId}" worktree failed: ${err.message}`,
-        { sessionId, worktreePath },
-      );
-    }
-
     // D10: never copy .fgos/ — symlink it (absolute target, 'dir' type). fs
     // reads/writes are transparent through it (same inode; spike-confirmed).
     try {
       fs.symlinkSync(fgosDir, worktreeFgos, 'dir');
     } catch (err) {
       try {
-        gitAt(repoRoot, ['worktree', 'remove', '--force', worktreePath]);
+        removeWorktree(repoRoot, worktreePath, { force: true });
       } catch {
         // best-effort rollback of the just-created worktree.
       }
@@ -366,11 +342,13 @@ export function createSession(repoRoot, opts = {}) {
       pid: process.pid,
       startedAt: new Date().toISOString(),
     };
-    entries.push(entry);
-    writeRegistry(fgosDir, entries);
+    lock = acquireSessionsLock(fgosDir);
+    const currentEntries = readRegistry(fgosDir);
+    currentEntries.push(entry);
+    writeRegistry(fgosDir, currentEntries);
     return { ...entry };
   } finally {
-    lock.release();
+    lock?.release();
   }
 }
 
@@ -395,7 +373,7 @@ export function endSession(repoRoot, sessionId, { force = false } = {}) {
     if (!force) {
       let headNow;
       try {
-        headNow = gitAt(entry.worktreePath, ['rev-parse', 'HEAD']).trim();
+        headNow = currentHead(entry.worktreePath);
       } catch (err) {
         throw new SessionError(
           `cannot read HEAD of session "${sessionId}" worktree at "${entry.worktreePath}": ${err.message}`,
@@ -403,10 +381,7 @@ export function endSession(repoRoot, sessionId, { force = false } = {}) {
         );
       }
       if (headNow !== entry.startCommit) {
-        const divergent = gitAt(entry.worktreePath, ['rev-list', `${entry.startCommit}..HEAD`])
-          .split('\n')
-          .map((s) => s.trim())
-          .filter(Boolean);
+        const divergent = compareCommits(entry.worktreePath, entry.startCommit, headNow).commits;
         throw new SessionError(
           `session "${sessionId}" worktree at "${entry.worktreePath}" has diverged from its start commit ${entry.startCommit} — refusing to remove without force. Dangling commit(s): ${divergent.join(', ')}`,
           { sessionId, worktreePath: entry.worktreePath, startCommit: entry.startCommit, divergent },
@@ -414,22 +389,15 @@ export function endSession(repoRoot, sessionId, { force = false } = {}) {
       }
     }
 
-    unlinkFgosSymlink(entry.worktreePath);
-    restoreTrackedFgos(entry.worktreePath);
-    const args = ['worktree', 'remove', entry.worktreePath];
-    if (force) args.push('--force');
+    const sessionLink = unlinkFgosSymlink(entry.worktreePath);
     try {
-      gitAt(repoRoot, args);
+      removeWorktree(repoRoot, entry.worktreePath, { force });
     } catch (err) {
+      restoreFgosSymlink(entry.worktreePath, sessionLink);
       throw new SessionError(`git worktree remove failed for session "${sessionId}": ${err.message}`, {
         sessionId,
         worktreePath: entry.worktreePath,
       });
-    }
-    try {
-      gitAt(repoRoot, ['worktree', 'prune']);
-    } catch {
-      // best-effort — a failed prune does not invalidate a successful remove.
     }
 
     writeRegistry(
@@ -513,7 +481,7 @@ export function reclaimOrphanedSessions(repoRoot) {
       if (onDisk && !missingFromGit) {
         let headNow = null;
         try {
-          headNow = gitAt(entry.worktreePath, ['rev-parse', 'HEAD']).trim();
+          headNow = currentHead(entry.worktreePath);
         } catch {
           headNow = null;
         }
@@ -532,7 +500,7 @@ export function reclaimOrphanedSessions(repoRoot) {
         let dirty = true;
         try {
           // Explicit untracked mode: a user's status.showUntrackedFiles=no would hide new files.
-          dirty = gitAt(entry.worktreePath, ['status', '--porcelain', '--untracked-files=normal', '--', ':!.fgos']).trim().length > 0;
+          dirty = isCheckoutDirty(repoRoot, entry.worktreePath);
         } catch {
           dirty = true;
         }
@@ -544,16 +512,20 @@ export function reclaimOrphanedSessions(repoRoot) {
       }
 
       if (onDisk) {
+        const sessionLink = unlinkFgosSymlink(entry.worktreePath);
         try {
-          gitAt(repoRoot, ['worktree', 'remove', '--force', entry.worktreePath]);
+          removeWorktree(repoRoot, entry.worktreePath, { force: true });
         } catch {
-          // fall through to prune git's own bookkeeping
+          restoreFgosSymlink(entry.worktreePath, sessionLink);
+          skipped.push(entry.sessionId);
+          kept.push(entry);
+          continue;
         }
       }
-      try {
-        gitAt(repoRoot, ['worktree', 'prune']);
-      } catch {
-        // best-effort
+      if (!missingFromGit && !onDisk) {
+        skipped.push(entry.sessionId);
+        kept.push(entry);
+        continue;
       }
       reclaimed.push(entry.sessionId);
     }

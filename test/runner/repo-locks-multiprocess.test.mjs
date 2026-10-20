@@ -1,4 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
+import { activateGitFixture } from './worktree-native-fixture.helper.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -116,6 +117,7 @@ test('addWorktree runs git worktree add under the worktree-admin lock', { skip }
   const git = (...args) => spawnSync('git', args, { cwd: root, encoding: 'utf8' });
   git('init', '-q', '-b', 'main');
   git('-c', 'user.email=t@example.com', '-c', 'user.name=T', 'commit', '-q', '--allow-empty', '-m', 'seed');
+  activateGitFixture(root);
   const holder = await holdLockInChild('worktree-admin', { fgosDir });
   const target = path.join(root, 'wt');
   await assert.rejects(addWorktree(createLockScope('wt-blocked'), root, ['-b', 'fgw/wt', target]), (err) => err.code === 'lock-held');

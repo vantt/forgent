@@ -1,4 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
+import { activateGitFixture } from './worktree-native-fixture.helper.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -26,6 +27,7 @@ function tempRepo() {
   const git = (...args) => spawnSync('git', args, { cwd: root, encoding: 'utf8' });
   git('init', '-q', '-b', 'main');
   git('-c', 'user.email=t@example.com', '-c', 'user.name=T', 'commit', '-q', '--allow-empty', '-m', 'seed');
+  activateGitFixture(root);
   return { root, fgosDir: path.join(root, '.fgos'), git };
 }
 

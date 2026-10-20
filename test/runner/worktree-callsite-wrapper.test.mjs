@@ -1,4 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
+import { activateGitFixture } from './worktree-native-fixture.helper.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -25,6 +26,7 @@ function initTempRepo() {
   fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
   return repoRoot;
 }
 
@@ -140,6 +142,7 @@ test('createDispatchWorktree is a passthrough to createWorktree (worktreeDir/bas
   execFileSync('git', ['checkout', 'root-branch'], { cwd: repoRoot });
   fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed on root\n');
   execFileSync('git', ['commit', '-aq', '-m', 'root-only commit'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
   execFileSync('git', ['checkout', initialBranch], { cwd: repoRoot });
 
   const wt = createDispatchWorktree(repoRoot, 'leaf-item', { worktreeDir, baseRef: 'root-branch' });

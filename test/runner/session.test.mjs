@@ -1,4 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
+import { activateGitFixture } from './worktree-native-fixture.helper.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -30,6 +31,7 @@ function initTempRepo() {
   fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
   // seed .fgos with a real committed store file, as the product repo has
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '');
@@ -50,6 +52,7 @@ function initTempRepoWithCommittedFgos() {
   fs.writeFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '{"seed":true}\n');
   execFileSync('git', ['add', '-A'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'init with committed .fgos'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
   return repoRoot;
 }
 
@@ -581,4 +584,19 @@ test('reclaimOrphanedSessions never reclaims the caller\'s own worktree, even wi
   } finally {
     cleanup(repoRoot, sessionsDir);
   }
+});
+
+test('guarded removal refusal preserves the session store link, checkout and registry', () => {
+  const repoRoot = initTempRepo();
+  const sessionsDir = mkSessionsDir();
+  try {
+    const session = createSession(repoRoot, { sessionId: 'preserved', sessionsDir });
+    const tip = commitInside(session.worktreePath);
+    const link = path.join(session.worktreePath, '.fgos');
+    const target = fs.readlinkSync(link);
+    assert.throws(() => endSession(repoRoot, session.sessionId, { force: true }), /delivery-unreachable/);
+    assert.equal(fs.readlinkSync(link), target);
+    assert.equal(listSessions(repoRoot).length, 1);
+    assert.equal(execFileSync('git', ['rev-parse', 'HEAD'], { cwd: session.worktreePath, encoding: 'utf8' }).trim(), tip);
+  } finally { cleanup(repoRoot, sessionsDir); }
 });

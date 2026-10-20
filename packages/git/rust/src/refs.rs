@@ -968,6 +968,22 @@ pub(crate) fn acquire_worktree_admin<'a>(
 ) -> Result<LockScope<'a>> {
     require_lock_scope_platform()?;
     let mut scope = LockScope::seeded(held).map_err(failure)?;
+    if let Some(admin) = scope.handle("worktree-admin") {
+        let expected = repo
+            .trusted_main_root()
+            .join(".fgos/locks/worktree-admin.lock");
+        if admin.path() != expected
+            || scope
+                .holding()
+                .map_err(failure)?
+                .iter()
+                .any(|h| h.rank > 40)
+        {
+            return Err(failure("worktree-admin-authority-mismatch"));
+        }
+        scope.validate().map_err(failure)?;
+        return Ok(scope);
+    }
     scope
         .assert_can_acquire("worktree-admin")
         .map_err(failure)?;

@@ -56,6 +56,17 @@ fn inspect_real_repositories_byte_paths_pages_and_optional_locks() {
         };
         let first = Oid::parse(&first_text, repo.object_format()).unwrap();
         let second = Oid::parse(&second_text, repo.object_format()).unwrap();
+        let comparison = driver.compare_commits(&repo, &first, &second).unwrap();
+        assert_eq!(comparison["mergeBase"], first_text);
+        assert_eq!(comparison["right"], 1);
+        assert_eq!(comparison["commits"], serde_json::json!([second_text]));
+        assert_eq!(
+            driver.list_branches(&repo, "refs/heads/trunk").unwrap(),
+            vec!["refs/heads/trunk"]
+        );
+        let checkout = driver.checkout_facts(&repo, &second).unwrap();
+        assert_eq!(checkout["lastSynced"], second_text);
+        assert_eq!(checkout["delta"], serde_json::json!([]));
         assert!(driver.ancestry(&repo, &first, &second).unwrap());
         assert!(!driver.ancestry(&repo, &second, &first).unwrap());
         assert!(!driver.compare_content(&repo, &first, &second).unwrap());

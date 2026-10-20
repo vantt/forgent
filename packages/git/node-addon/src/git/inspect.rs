@@ -50,6 +50,26 @@ impl GitInspect {
             serde_json::from_value(args.get("paths").cloned().unwrap_or(json!([]))).map_err(error)
         };
         match method.as_str() {
+            "compareCommits" => Ok(json!(self
+                .driver
+                .compare_commits(&repo, &oid("left")?, &oid("right")?)
+                .map_err(operation)?)),
+            "listBranches" => Ok(json!(self
+                .driver
+                .list_branches(&repo, text(&args, "prefix")?)
+                .map_err(operation)?)),
+            "checkoutFacts" => Ok(json!(self
+                .driver
+                .checkout_facts(&repo, &oid("revision")?)
+                .map_err(operation)?)),
+            "remoteTracking" => Ok(json!(self
+                .driver
+                .remote_tracking(
+                    &repo,
+                    &RefName::parse(text(&args, "branch")?).map_err(error)?,
+                    text(&args, "remote")?
+                )
+                .map_err(operation)?)),
             "resolveRepo" => Ok(
                 json!({"commonDir":repo.common_dir(),"gitDir":repo.git_dir(),"worktreeRoot":repo.work_tree(),"trustedMainRoot":repo.trusted_main_root(),"objectFormat":repo.object_format()}),
             ),

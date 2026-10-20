@@ -368,7 +368,9 @@ pub(crate) fn worktree_resources(kind: &OperationKind) -> WalResult<Vec<String>>
 impl Intent {
     /// Delete keeps the old object reachable until its terminal receipt.
     pub fn candidate(&self) -> &Tip {
-        if self.next == Tip::Absent {
+        if self.next == Tip::Absent
+            || matches!(&self.kind, OperationKind::Restore(p) if p.request.discard_local_delta)
+        {
             &self.expected
         } else {
             &self.next
@@ -936,7 +938,9 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
             },
         ) => expected == i.candidate(),
         (Phase::PinReleaseAttempt { .. }, Phase::PinReleased) => true,
-        (Phase::Outcome(_), Phase::RestoreAcknowledged) => matches!(i.kind, OperationKind::Restore(_)),
+        (Phase::Outcome(_) | Phase::PinReleased, Phase::RestoreAcknowledged) => {
+            matches!(i.kind, OperationKind::Restore(_))
+        }
         _ => false,
     };
     if valid {
@@ -1209,6 +1213,52 @@ impl<F: FileSystem> Wal<F> {
         self.fs.checkpoint("restore-snapshot-durable")?;
         let _: serde_json::Value = self.read_restore_snapshot(&digest)?;
         Ok(digest)
+    }
+    pub(crate) fn store_restore_patch(
+        &self,
+        reference: &str,
+        id: &str,
+        bytes: &[u8],
+    ) -> WalResult<PathBuf> {
+        if !valid_id(id) || !reference.starts_with("refs/heads/") {
+            return Err(corrupt("invalid restore patch identity"));
+        }
+        let branch = reference
+            .trim_start_matches("refs/heads/")
+            .replace('/', "-");
+        let dir = self.common.child("fgos-resync-patches", true, &self.fs)?;
+        let name = format!("{branch}-{id}.patch");
+        install_ordered(
+            &dir.path(),
+            &name,
+            bytes,
+            &FaultAdapter(&self.fs),
+            None,
+            &mut || Ok(()),
+            &[],
+        )
+        .map_err(|e| WalError::Io(e.source))?;
+        Ok(dir.path().join(name).canonicalize()?)
+    }
+    pub(crate) fn clear_restore_patch(
+        &self,
+        reference: &str,
+        id: &str,
+        bytes: &[u8],
+    ) -> WalResult<bool> {
+        let branch = reference
+            .trim_start_matches("refs/heads/")
+            .replace('/', "-");
+        let dir = self.common.child("fgos-resync-patches", false, &self.fs)?;
+        let path = dir.path().join(format!("{branch}-{id}.patch"));
+        if !fs::symlink_metadata(&path).is_ok_and(|m| m.is_file() && !m.file_type().is_symlink())
+            || fs::read(&path)? != bytes
+        {
+            return Ok(false);
+        }
+        fs::remove_file(path)?;
+        dir.file.sync_all()?;
+        Ok(true)
     }
     pub(crate) fn release_restore_snapshots(&self, digests: &[String]) -> WalResult<()> {
         let retained = self.retained(100_000)?;

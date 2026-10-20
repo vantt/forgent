@@ -11,6 +11,10 @@ fn request(f: &Fixture, reapply: bool) -> RestoreRequest {
         reason: "carry producer work to descendant".into(),
         reapply_local_delta: reapply,
         allowed_replacements: vec![],
+        checkout_baseline: None,
+        discard_local_delta: false,
+        require_clean_baseline: false,
+        require_staged_only: false,
     }
 }
 fn dirty(f: &Fixture) {
@@ -765,8 +769,20 @@ fn case_only_target_rename_preserves_index_identity() {
     git(&f.main, &["mv", "Readme", "README"]); git(&f.main, &["commit", "-qm", "rename"]);
     let target = git(&f.main, &["rev-parse", "HEAD"]);
     git(&f.main, &["reset", "--hard", &expected]);
-    let r = RestoreRequest { expected_head: expected, target, reason: "case rename".into(), reapply_local_delta: false, allowed_replacements: vec![] };
-    f.driver.apply_restore(&f.repo, vec![], &r, "fixture", "case-rename").unwrap();
+    let r = RestoreRequest {
+        expected_head: expected,
+        target,
+        reason: "case rename".into(),
+        reapply_local_delta: false,
+        allowed_replacements: vec![],
+        checkout_baseline: None,
+        discard_local_delta: false,
+        require_clean_baseline: false,
+        require_staged_only: false,
+    };
+    f.driver
+        .apply_restore(&f.repo, vec![], &r, "fixture", "case-rename")
+        .unwrap();
     assert_eq!(fs::read(f.main.join("README")).unwrap(), b"tracked");
 }
 
@@ -782,8 +798,18 @@ fn case_sensitive_untracked_hardlink_is_not_an_index_alias() {
     // This assertion applies only where the two spellings are distinct names.
     if !f.main.join("README").exists() {
         fs::hard_link(f.main.join("Readme"), f.main.join("README")).unwrap();
-        let r = RestoreRequest { expected_head: expected, target, reason: "hardlink collision".into(), reapply_local_delta: false, allowed_replacements: vec![] };
-        let error = f.driver.preview_restore(&f.repo,vec![],&r).unwrap_err();
+        let r = RestoreRequest {
+            expected_head: expected,
+            target,
+            reason: "hardlink collision".into(),
+            reapply_local_delta: false,
+            allowed_replacements: vec![],
+            checkout_baseline: None,
+            discard_local_delta: false,
+            require_clean_baseline: false,
+            require_staged_only: false,
+        };
+        let error = f.driver.preview_restore(&f.repo, vec![], &r).unwrap_err();
         assert!(error.cause.contains("untracked-target-collision"));
     }
 }
