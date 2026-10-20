@@ -1,0 +1,97 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "inputHead": "b334b55f3fcb441b8e4edd17ae58b410365a9ef9",
+  "changedEdges": 74,
+  "addedEdges": 1,
+  "sourceTuplesUnchanged": true,
+  "livePatchTargetsAndDiffsUnchanged": true,
+  "all130FinalRecordHashesMatchChecker": true,
+  "protectedFilesUnchanged": 64,
+  "fullChecker": {
+    "batchCount": 130,
+    "files": 1037,
+    "edges": 9424,
+    "failureCount": 0,
+    "notClosableSets": []
+  },
+  "openLeadRuling": 0,
+  "probes": {
+    "negativeProbes": 208,
+    "allRejected": true,
+    "formControlsReplayed": 2,
+    "suiteCount": 12
+  },
+  "lightTests": {
+    "tests": 95,
+    "pass": 95,
+    "fail": 0,
+    "skipped": 0
+  },
+  "pipeline": [
+    {
+      "name": "full",
+      "command": [
+        "python3",
+        "-B",
+        "/tmp/fgos-work/touchup/verify.py",
+        "full"
+      ],
+      "log": "/tmp/fgos-work/touchup/full.log",
+      "exitCode": 0,
+      "elapsedSeconds": 335.95
+    },
+    {
+      "name": "probes",
+      "command": [
+        "python3",
+        "-B",
+        "/tmp/fgos-work/touchup/verify.py",
+        "probes"
+      ],
+      "log": "/tmp/fgos-work/touchup/probes.log",
+      "exitCode": 0,
+      "elapsedSeconds": 141.85
+    },
+    {
+      "name": "lightTests",
+      "command": [
+        "node",
+        "--test",
+        "test/scripts/doc-link-pass.test.mjs",
+        "test/scripts/check-doc-candidate-status.test.mjs",
+        "test/scripts/check-doc-constitution.test.mjs"
+      ],
+      "log": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-touchup-light-tests.log",
+      "exitCode": 0,
+      "elapsedSeconds": 1.4
+    }
+  ],
+  "replay": {
+    "base": "step-03-final-verify.py",
+    "changes": "Only scratch root and result artifact destinations redirected; predicates, resolver and suites unchanged. Exact executed scratch wrapper follows.",
+    "wrapper": "#!/usr/bin/env python3\n\"\"\"Serial final replay. No record mutation; all scratch paths stay under final/.\"\"\"\nimport sys\nsys.dont_write_bytecode=True\nimport importlib.util, importlib.machinery, pathlib, tempfile, types, json, argparse, hashlib\nP=pathlib.Path('/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08')\nPIN='ae141550c2e022310de7a0efea757580c0b2479f'\nSCRATCH=pathlib.Path('/tmp/fgos-work/touchup');SCRATCH.mkdir(parents=True,exist_ok=True)\noriginal_exec=importlib.machinery.SourceFileLoader.exec_module\noriginal_path=pathlib.Path;original_tmp=tempfile.TemporaryDirectory\n\ndef scoped_exec(loader,module):\n    original_exec(loader,module)\n    if loader.path.endswith('/step-03-resolve.py'):\n        module.pathlib=types.SimpleNamespace(Path=lambda x:original_path(SCRATCH/'anchor-cache' if str(x)=='/tmp/fgos-work/step03-anchor-cache' else x))\nimportlib.machinery.SourceFileLoader.exec_module=scoped_exec\n\ndef scoped_tmp(*args,**kwargs):\n    if str(kwargs.get('dir','')).startswith('/tmp/fgos-work'):kwargs['dir']=str(SCRATCH)\n    return original_tmp(*args,**kwargs)\ntempfile.TemporaryDirectory=scoped_tmp\n\ndef load(name):\n    spec=importlib.util.spec_from_file_location(name.replace('-','_'),P/name)\n    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module\n\ndef save(name,value):(P/name).write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\\n')\ndef digest(path):return hashlib.sha256(path.read_bytes()).hexdigest()\n\ndef main():\n    ap=argparse.ArgumentParser();ap.add_argument('mode',choices=['probes','full']);args=ap.parse_args()\n    if args.mode=='probes':\n        results=[]\n        for path in sorted(P.glob('step-03*probes.py')):\n            sys.argv=[str(path)]+(['--author-commit',PIN] if path.name=='step-03-probes.py' else [])\n            out=load(path.name).main();assert out['allRejected'],path.name\n            results.append({'suite':path.name,'sha256':digest(path),'result':out})\n            print(path.name,out['negativeProbes'],'rejected',flush=True)\n        m=load('step-03-check.py');file='docs/platform/agent-coordination/spec.md'\n        for old,expected in [('[docs/specs/runner.md](../../specs/runner.md)','[docs/platform/runner/spec.md](../runner/spec.md)'),('[docs/specs/work-state.md](../../specs/runner.md)','[docs/specs/work-state.md](../runner/spec.md)')]:assert m.form(old,file,'docs/platform/runner/spec.md',None)==expected\n        out={'pin':PIN,'allRejected':True,'negativeProbes':sum(x['result']['negativeProbes'] for x in results),'formControlsReplayed':2,'checkerSha256':digest(P/'step-03-check.py'),'suites':results}\n        save('step-03-touchup-probe-results.json',out);print('Total rejected:',out['negativeProbes'])\n    else:\n        m=load('step-03-check.py');m.SETS=tuple(f'{i:03}' for i in range(1,131));rs=m.records();out=m.Checker(PIN).all(rs)\n        out.update(batchCount=len(m.SETS),checkedBatches=list(m.SETS),openLeadRulingEdgesPerSet={'batch-'+b:[e['edgeId'] for r in rs if r['reviewSet']=='batch-'+b for e in r['edges'] if e.get('blockedCategory')=='lead-ruling'] for b in m.SETS},checkerSha256=digest(P/'step-03-check.py'),resolverSha256=digest(P/'step-03-resolve.py'),recordFiles=[{'path':str(p.relative_to(m.ROOT)),'sha256':digest(p)} for p in sorted((P/'step-03-records').glob('batch-[0-9][0-9][0-9].jsonl'))])\n        save('step-03-touchup-check-result.json',out)\n        print(json.dumps({k:out[k] for k in ['batchCount','files','edges','failureCount','failures','notClosableSets']},ensure_ascii=False));return bool(out['failureCount'])\n    return 0\nif __name__=='__main__':raise SystemExit(main())\n",
+    "environment": {
+      "CLAUDE_CODE_SESSION_ID": "unset",
+      "TMPDIR": "/tmp/fgos-work/touchup"
+    }
+  },
+  "render": "step-03-touchup-render-check.json",
+  "scope": {
+    "trackedChanges": [
+      "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-093.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-102.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-107.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-115.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-122.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-130.jsonl"
+    ],
+    "progressPriorTextPreserved": true,
+    "gitDiffCheck": true,
+    "gitWrites": false,
+    "fgosCli": false,
+    "scratch": "/tmp/fgos-work/touchup/",
+    "outbox": "explicit atomic contract exception"
+  },
+  "diagnostics": "Initial full replay found two author metadata errors (unbound removed-state fact, retiring-preserve wording); corrected before the final serial pipeline. Two superseded full attempts were stopped when records changed. Targeted check of all changed records then passed. No predicate or probe altered."
+}

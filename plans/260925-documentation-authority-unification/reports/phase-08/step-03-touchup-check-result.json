@@ -1,0 +1,901 @@
+{
+  "authorCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": 1037,
+  "edges": 9424,
+  "failures": [],
+  "failureCount": 0,
+  "locatorReviewFlags": [
+    {
+      "file": "docs/reading-map.md",
+      "edgeId": "maps-j-08011",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "§13.1."
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "This is the initial whole-file confinement spec pointer; §13.1 belongs to the later private-home recipe citation (08012), which remains parked separately.",
+      "correspondence": null
+    },
+    {
+      "file": "docs/routing-handoff-contract.md",
+      "edgeId": "maps-j-08056",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "ADR-0005"
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "ADR-0005 is headed 0005 in the live decision file. The source D3/D4 clause labels remain verbatim; this pointer targets the complete Runner isolation decision, not an area portal.",
+      "correspondence": null
+    },
+    {
+      "file": "docs/specs/reading-map.md",
+      "edgeId": "maps-j-08184",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "§13.1."
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "This is the initial whole-file confinement spec pointer; §13.1 belongs to the later private-home recipe citation (08185), which remains parked separately.",
+      "correspondence": null
+    },
+    {
+      "file": "docs/specs/workflow.md",
+      "edgeId": "maps-j-08379",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "0027"
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "The source labels this as Lifecycle Work and universal tail, a whole-file current lifecycle pointer. The dated 0027 decision number is kept; its narrative remains in retired decision history, not an executable target.",
+      "correspondence": null
+    },
+    {
+      "file": "docs/how-to/configure-and-operate-agent-confinement.md",
+      "edgeId": "maps-j-03990",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "§9.2."
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "Complete source claim is bound to the pinned target passage; the repository anchor API supplies the closest enclosing heading.",
+      "correspondence": null
+    },
+    {
+      "file": "docs/platform/runner/contracts/routing-handoff.md",
+      "edgeId": "maps-j-07614",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "ADR-0005"
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "The source ADR-prefixed identifier and Vietnamese title identify the exact 0005 heading; the prefix is a citation convention, not a separate decision.",
+      "correspondence": {
+        "source": "ADR-0005",
+        "target": "0005 — Runner & cô lập worker",
+        "reason": "The source ADR-prefixed identifier and Vietnamese title identify the exact 0005 heading; the prefix is a citation convention, not a separate decision."
+      }
+    },
+    {
+      "file": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+      "edgeId": "maps-j-07732",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "RUL11",
+        "curated capability catalog"
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "The source quoted catalog label names this explicit runner.capabilities catalog heading and its declared-name/alias validation. RUL11 is the local enclosing rule, not a locator attributed to the external reference.",
+      "correspondence": {
+        "source": "curated capability catalog",
+        "target": "The curated `runner.capabilities` catalog",
+        "reason": "The source quoted catalog label names this explicit runner.capabilities catalog heading and its declared-name/alias validation. RUL11 is the local enclosing rule, not a locator attributed to the external reference."
+      }
+    },
+    {
+      "file": "docs/platform/system-overview/spec.md",
+      "edgeId": "maps-j-07807",
+      "check": "patch-locator-review",
+      "locatorTokens": [
+        "Cửa pull giao–nhận việc"
+      ],
+      "reason": "No physical-passage locator token occurs in the target passage; independently confirm translated heading or sibling-locator scope.",
+      "recordedScopeReason": "The source Vietnamese pull-door title and target English heading refer to the same take/return section; pinned content verifies same frontier, clean-tree/advanced-HEAD/verify, claim ownership and head markers.",
+      "correspondence": {
+        "source": "Cửa pull giao–nhận việc",
+        "target": "7. Pull Door Take And Return",
+        "reason": "The source Vietnamese pull-door title and target English heading refer to the same take/return section; pinned content verifies same frontier, clean-tree/advanced-HEAD/verify, claim ownership and head markers."
+      }
+    }
+  ],
+  "openLeadRulingEdgesBySet": {},
+  "notClosableSets": [],
+  "batchCount": 130,
+  "checkedBatches": [
+    "001",
+    "002",
+    "003",
+    "004",
+    "005",
+    "006",
+    "007",
+    "008",
+    "009",
+    "010",
+    "011",
+    "012",
+    "013",
+    "014",
+    "015",
+    "016",
+    "017",
+    "018",
+    "019",
+    "020",
+    "021",
+    "022",
+    "023",
+    "024",
+    "025",
+    "026",
+    "027",
+    "028",
+    "029",
+    "030",
+    "031",
+    "032",
+    "033",
+    "034",
+    "035",
+    "036",
+    "037",
+    "038",
+    "039",
+    "040",
+    "041",
+    "042",
+    "043",
+    "044",
+    "045",
+    "046",
+    "047",
+    "048",
+    "049",
+    "050",
+    "051",
+    "052",
+    "053",
+    "054",
+    "055",
+    "056",
+    "057",
+    "058",
+    "059",
+    "060",
+    "061",
+    "062",
+    "063",
+    "064",
+    "065",
+    "066",
+    "067",
+    "068",
+    "069",
+    "070",
+    "071",
+    "072",
+    "073",
+    "074",
+    "075",
+    "076",
+    "077",
+    "078",
+    "079",
+    "080",
+    "081",
+    "082",
+    "083",
+    "084",
+    "085",
+    "086",
+    "087",
+    "088",
+    "089",
+    "090",
+    "091",
+    "092",
+    "093",
+    "094",
+    "095",
+    "096",
+    "097",
+    "098",
+    "099",
+    "100",
+    "101",
+    "102",
+    "103",
+    "104",
+    "105",
+    "106",
+    "107",
+    "108",
+    "109",
+    "110",
+    "111",
+    "112",
+    "113",
+    "114",
+    "115",
+    "116",
+    "117",
+    "118",
+    "119",
+    "120",
+    "121",
+    "122",
+    "123",
+    "124",
+    "125",
+    "126",
+    "127",
+    "128",
+    "129",
+    "130"
+  ],
+  "openLeadRulingEdgesPerSet": {
+    "batch-001": [],
+    "batch-002": [],
+    "batch-003": [],
+    "batch-004": [],
+    "batch-005": [],
+    "batch-006": [],
+    "batch-007": [],
+    "batch-008": [],
+    "batch-009": [],
+    "batch-010": [],
+    "batch-011": [],
+    "batch-012": [],
+    "batch-013": [],
+    "batch-014": [],
+    "batch-015": [],
+    "batch-016": [],
+    "batch-017": [],
+    "batch-018": [],
+    "batch-019": [],
+    "batch-020": [],
+    "batch-021": [],
+    "batch-022": [],
+    "batch-023": [],
+    "batch-024": [],
+    "batch-025": [],
+    "batch-026": [],
+    "batch-027": [],
+    "batch-028": [],
+    "batch-029": [],
+    "batch-030": [],
+    "batch-031": [],
+    "batch-032": [],
+    "batch-033": [],
+    "batch-034": [],
+    "batch-035": [],
+    "batch-036": [],
+    "batch-037": [],
+    "batch-038": [],
+    "batch-039": [],
+    "batch-040": [],
+    "batch-041": [],
+    "batch-042": [],
+    "batch-043": [],
+    "batch-044": [],
+    "batch-045": [],
+    "batch-046": [],
+    "batch-047": [],
+    "batch-048": [],
+    "batch-049": [],
+    "batch-050": [],
+    "batch-051": [],
+    "batch-052": [],
+    "batch-053": [],
+    "batch-054": [],
+    "batch-055": [],
+    "batch-056": [],
+    "batch-057": [],
+    "batch-058": [],
+    "batch-059": [],
+    "batch-060": [],
+    "batch-061": [],
+    "batch-062": [],
+    "batch-063": [],
+    "batch-064": [],
+    "batch-065": [],
+    "batch-066": [],
+    "batch-067": [],
+    "batch-068": [],
+    "batch-069": [],
+    "batch-070": [],
+    "batch-071": [],
+    "batch-072": [],
+    "batch-073": [],
+    "batch-074": [],
+    "batch-075": [],
+    "batch-076": [],
+    "batch-077": [],
+    "batch-078": [],
+    "batch-079": [],
+    "batch-080": [],
+    "batch-081": [],
+    "batch-082": [],
+    "batch-083": [],
+    "batch-084": [],
+    "batch-085": [],
+    "batch-086": [],
+    "batch-087": [],
+    "batch-088": [],
+    "batch-089": [],
+    "batch-090": [],
+    "batch-091": [],
+    "batch-092": [],
+    "batch-093": [],
+    "batch-094": [],
+    "batch-095": [],
+    "batch-096": [],
+    "batch-097": [],
+    "batch-098": [],
+    "batch-099": [],
+    "batch-100": [],
+    "batch-101": [],
+    "batch-102": [],
+    "batch-103": [],
+    "batch-104": [],
+    "batch-105": [],
+    "batch-106": [],
+    "batch-107": [],
+    "batch-108": [],
+    "batch-109": [],
+    "batch-110": [],
+    "batch-111": [],
+    "batch-112": [],
+    "batch-113": [],
+    "batch-114": [],
+    "batch-115": [],
+    "batch-116": [],
+    "batch-117": [],
+    "batch-118": [],
+    "batch-119": [],
+    "batch-120": [],
+    "batch-121": [],
+    "batch-122": [],
+    "batch-123": [],
+    "batch-124": [],
+    "batch-125": [],
+    "batch-126": [],
+    "batch-127": [],
+    "batch-128": [],
+    "batch-129": [],
+    "batch-130": []
+  },
+  "checkerSha256": "20bbeca2b0b104df357de506e479062b589e6faa31164a80761deddc31578b2b",
+  "resolverSha256": "766f96d8417af71a275f37da64072277e04bf21608a83c67a5c52afdffb3b8ba",
+  "recordFiles": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-001.jsonl",
+      "sha256": "78ce07e713d194f142fdcd43393436abf2ecaa1e6ec83b0b2d26adfcd5b8537a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-002.jsonl",
+      "sha256": "098c200cf541423eee03191dbbfcce7a68f3bb8b0a9956c9f71fc97d5e457fe0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-003.jsonl",
+      "sha256": "08c01c8258dec6910b9a629557f1a8ede54ef597d9facb02cfa3f1b8a648acd4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-004.jsonl",
+      "sha256": "26020e7e42701ad62bd9f2e829a88e9cc75fb707a1c247295276fe267acbcd8f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-005.jsonl",
+      "sha256": "0d32397f1e7f370b6be07922d2eaccae8ef44f95d4daa23b55b420a553bb78c2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-006.jsonl",
+      "sha256": "62ff854f61d9dfba736517e9bf289b9b383d334059654aafb9368a4daeffa1b1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-007.jsonl",
+      "sha256": "274a0ad083d291ad632aa9654496132df5303a47f135faa7ed3e612eefcef354"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-008.jsonl",
+      "sha256": "3069bb82fc1edd87a6538f7db4391aa62df1ac0e8a02e91de81aeb75033cd140"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-009.jsonl",
+      "sha256": "32c45ee2932cad40a6ea66b44e6854be92522fdd2cf43e9518cefe5c6e7fad0a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-010.jsonl",
+      "sha256": "f446b558e996b05f94b34079176b3907cd4aaf65a7e0d5c98e426097da0b06bf"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-011.jsonl",
+      "sha256": "9bd96e6f9bfff0351b6c4fa1154f15f4c4d68d6745747f669b439bd7a9e871cb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-012.jsonl",
+      "sha256": "70a595d080e5e929e3651149655ccad758459a0894068fb5a3237fcd61c6e057"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-013.jsonl",
+      "sha256": "c9fe0883495a0d6df9fccfa7fbbc13b122702e8d0fb20cc0a46a6e0c0a6fa306"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-014.jsonl",
+      "sha256": "ba6f5e2f56ad8d1e791d6242edcdf373c145e198ba2dac1cb13a0c6d06c9e3d4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-015.jsonl",
+      "sha256": "de8882c4bdadd2f5aa0bf2f965fd04b2f9f5237d05e959a82f1ec16849bce496"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-016.jsonl",
+      "sha256": "75d3e6308bb3f5650adc16a8ca6c631c4b1e82104b390a2849086315f870b3bd"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-017.jsonl",
+      "sha256": "b2a683f19c352375017ca574f056560402383302658107f2884b9a2b527ad3a1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-018.jsonl",
+      "sha256": "708cc5ed88f3950ea91f8de2655a288131942b52d692a5a0536ee7721c961de3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-019.jsonl",
+      "sha256": "1a0643cf59c111defe5cafd81d9eac903e019ebacad5ee1bb3d7424f933a14e8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-020.jsonl",
+      "sha256": "b3518e4d63ff79a4d77570137958a6b0af2a13a5b2faa48edbd41fc9812b8fa7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-021.jsonl",
+      "sha256": "9f2e01db86667304913ab94232c34c22a459f843223df6d6fd3fee297215bdcb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-022.jsonl",
+      "sha256": "8657c897000c42c9b0a7fe2aed7161010efbe7daea966d355eeb8cdcf352d980"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-023.jsonl",
+      "sha256": "4c54ba05692d41cce18f67ecd93a0f60a4ac9f435d397c2f1fbc082fce937a15"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-024.jsonl",
+      "sha256": "6a76603d574229139d0d2dc6bec6bd110043802e91d0a3238280efddc7ab1165"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-025.jsonl",
+      "sha256": "61ac79210490083bb1470277916c78acfc4200d1b0610a8a1c3cd2ea7fe1a329"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-026.jsonl",
+      "sha256": "7b12b874b3f5b4b0f8e4a7f281a0319d6f8913ba414809366c2a8ce25dcfa6f3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-027.jsonl",
+      "sha256": "e7363cafc833e77b7bdf94f48cb49d68eb26b568ac227579de5c530e92eaaa85"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-028.jsonl",
+      "sha256": "4aef3af3f87e0a36ca1e85b2117f84f937e61a3cbc664c8de766ecddf85a8e47"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-029.jsonl",
+      "sha256": "a07ae82c5cc68c66abe264e9c6ab6d716e7ca48e405a92b6a69c0ab25471f433"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-030.jsonl",
+      "sha256": "e3c84ff75c77abba07b481903f3943f267d1a72c140bb2b86d179775ff4fcbf6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-031.jsonl",
+      "sha256": "2262650c235b18d231b68cf2881c0ca6391bb71caa26bb21b262f9082b9732de"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-032.jsonl",
+      "sha256": "cf683c2663c1d9a77f4253b08108a99998b192ba317eca311a8364c4a835f708"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-033.jsonl",
+      "sha256": "3a4b99e987d76a60993de665495637f2cd98f9339c458722607891bc5e005a43"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-034.jsonl",
+      "sha256": "a0eb8a8a75e00e4467ca7fecdd66ebcbfe9f372a70c69c0f84694fd831d8e75a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-035.jsonl",
+      "sha256": "eced999dc9d536b4882061e8b30816adbc69945c555d2ffc6e96ca17bc0d865a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-036.jsonl",
+      "sha256": "44e22e3c315397d6691c250f902ede369037ebf97e289a5af327dd6dc7fb9258"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-037.jsonl",
+      "sha256": "38eb0aaacea683b9fe8ca0026781cdbc564b543acd7c21c0e7648248bd15ad4d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-038.jsonl",
+      "sha256": "11aad87a084c8a125eef008229a863f6d3acbd56e41e39b68a597057641be5f2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-039.jsonl",
+      "sha256": "33435ed06c40758704685b6f8aa0c45a166b43869b3cc57a3cc26198aa00e31d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-040.jsonl",
+      "sha256": "c6abe0d0d1dc05b38728e9acd61da96fd0d01e2957ee7ed1bd9d406ed3a6b43b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-041.jsonl",
+      "sha256": "e2fefb1a31bba3a2ec3031d5490cf47bf2d9af3f3c426961c891672b74f0884f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-042.jsonl",
+      "sha256": "287d6cf3632a95ab416e2ebad3a3295bbc4d0dda34e472bafa66ea99d0cf10f4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-043.jsonl",
+      "sha256": "91b9faa7c292f9cdd276e0346e9fc9a230f445e5d688797f810a7bf47c1914fd"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-044.jsonl",
+      "sha256": "caeb971925934f2f21a684d0a69ab264ad15793074f12b753666916a29061b29"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-045.jsonl",
+      "sha256": "079c1065a0fbc9396b9b071cb761e8048990ed874e8b6ef3e5b53d0e22be0472"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-046.jsonl",
+      "sha256": "911011cbf1c7ccbe53884ce1cffd615639127a1b86a1b94e5f638a5da16fc9b7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-047.jsonl",
+      "sha256": "c52249a7a30805b93fe3800337d2b1a36cf7907b79fa51e566bb9d47eb2bb4f3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-048.jsonl",
+      "sha256": "f24093b482346b77a7c17842824f8b0c55f39bf15d7d99fd6dcc43dc420fb1d5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-049.jsonl",
+      "sha256": "4ecaeda857f444c5bcdac7f109482f76ee9d0fd03a4b1e0ac6e29df586ed77da"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-050.jsonl",
+      "sha256": "02ff5b99b51d2225631801903716bb0d2791bef7b22b5982ea01689a27f9ae5b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-051.jsonl",
+      "sha256": "8e97a1d396eabb24a023f1b03292fb78a51ef7d767c1df5f47563905e8156f83"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-052.jsonl",
+      "sha256": "90df44d30f8699bf0d24a9051ad8e8dffdd0cc5b01f57bb2ace5c8c5e6e435b0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-053.jsonl",
+      "sha256": "097915ff94a5c6d7af9fa67b8e1da31c5e4d5ca22902cc368aed7060ca32c6bb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-054.jsonl",
+      "sha256": "16e4cbbb7724df633058e2779af01c7e0a1d67fd9880b42e52a183e7475ea924"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-055.jsonl",
+      "sha256": "ad84aa24fefb096eb1ec24090c5ad7c0e4aa5e23bf941cbeb772c10a103d11bf"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-056.jsonl",
+      "sha256": "58138975dde677714ab67f46270594b5d78d3f2aefcc7e137b4726babcdbf78e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-057.jsonl",
+      "sha256": "5de2308b31bdf028b7843a47a52727573d5f1dc6706385b6b31e96214836b980"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-058.jsonl",
+      "sha256": "575f8e420b456713019e0f9bfd5c50ed76fcf7e2fbcd3270bdf1f642be3e8d53"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-059.jsonl",
+      "sha256": "3d46f9ec8ba8ca9c52c33db4aa486593f0470a17dd1c299b3a1e5b8394185642"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-060.jsonl",
+      "sha256": "6caa5182154e7e8b84dd3b7fae8af4c7f12765755117c26e78fd0e2730b196c2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-061.jsonl",
+      "sha256": "992cfc73b5083c26c324fceedc1d69fca28fa4a0cfc1a40f6e6783bb24f7ccaa"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-062.jsonl",
+      "sha256": "482538a35729a6fd64139f15b13b30995400544d60f903c8339a010740352703"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-063.jsonl",
+      "sha256": "cf26e3113a7e730c8252deb6f7fa3616c8307be673da103f648b468a5c89f138"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-064.jsonl",
+      "sha256": "98e18b8e21cfaf7422bacfc16ccb42e3d6872c7aa609c68dabd3d1cf515f0690"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-065.jsonl",
+      "sha256": "83ab48b377ce021f0f1c8ec5519115e1d4eb330025e423059df422e5e89d9771"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-066.jsonl",
+      "sha256": "997ec29e616454af919d70af8914aff7160bb91187ff9b59ea1db22780dd2dfc"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-067.jsonl",
+      "sha256": "5b2d481c4abd83d7c8f5e0087e59a1b8e629d479bb3f750f92e4fe0c1d399a96"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-068.jsonl",
+      "sha256": "21085224f3c993a2c03f2fa82855bb9e454411b75ae965c08bcfb56e04e4b4fc"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-069.jsonl",
+      "sha256": "63e7b50c6f29a002b379c1951fbf0276acf51f683743af185992ff3af0703e4c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-070.jsonl",
+      "sha256": "80860e2425f908deb193e1da4b30aad0e0d8bd8054b8e1c4e3a23c5e75cd4edd"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-071.jsonl",
+      "sha256": "9f8c4cecb44ff7a23f04591c18bc8e16eb9fe79a4d74fa213600024093933bb7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-072.jsonl",
+      "sha256": "446f65abfb95c915ff3f8092ff6edce81e1ba1b2f5dda637a16ac458b38a5bb5"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-073.jsonl",
+      "sha256": "d2a5955229e3cf3d16f8d210414f3eeae078415062031f93380786792e667596"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-074.jsonl",
+      "sha256": "87c7b58d69c4b4c784f3f9a3d47874fc5d5d8dbcec0df748f48678127f3de90e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-075.jsonl",
+      "sha256": "37123a7b74e3136258bfca24e49aee0bf607c93d63dfc4ae50731ee848dcf190"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-076.jsonl",
+      "sha256": "d778db417be032dc72af601c223b93c95d3482af13dad4c54dc335c0c71dfe77"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-077.jsonl",
+      "sha256": "3cb37fcfab3d5c44c3f4d9199239da5f1d4162fd529afd6a933c8458ee498157"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-078.jsonl",
+      "sha256": "8d5d9645a1153b9a4c8b91a10e79c8676ebe71f571def34884ba9f5172c631c3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-079.jsonl",
+      "sha256": "342c6ed695bfc103fccaf1de08dbd8a8959fb5d74f0eed359a5cab73f376bd59"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-080.jsonl",
+      "sha256": "5b00a4a48894b07626759f3cbf548cf0b498cf571e0af4018383aa682a215bbb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-081.jsonl",
+      "sha256": "fa9bf4bc063ca2cbb6477c05bb4a0459ea615fe232ae79b793d3aa80ec1a0454"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-082.jsonl",
+      "sha256": "8d90dfa7f77e6bb77065c33727f694cd8d6e37fc7347cc8d52470a1d4c367b8e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-083.jsonl",
+      "sha256": "5a162275f1549ea6aee6a6f7a11c44d3e8703a1374fa8645efb7eb0313580c66"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-084.jsonl",
+      "sha256": "dec0768bf5563eccfac0f741c6a6f0704544720ab10b2d68a3a062c0722146ba"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-085.jsonl",
+      "sha256": "05a375a17f91dd9b96f5bfd27127bf490193059faf9ba1435a0438851d1cbd24"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-086.jsonl",
+      "sha256": "e956e431ddf2652619db9dca3914cdf3063fbd4acee42edb1d106d82adcf9571"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-087.jsonl",
+      "sha256": "cca538ea055f80a40bc0d7cf2385df3a03eaf8d0bac0674fbd2e934f426c09f2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-088.jsonl",
+      "sha256": "02c67a5f6d38dbac4a0ddbabd43b346cc3fe2646be1248faf24b693177584818"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-089.jsonl",
+      "sha256": "ceacb87ef5b1d71120e0086e0f8fa80192ce2cae7dc92269b3d71a14c61a5b80"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-090.jsonl",
+      "sha256": "f0c88d09b6722f295c5e91b9844263d7714cb7426f26277e82c02f40db00d636"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-091.jsonl",
+      "sha256": "662d8fb47b98eb3ac70d79e2cd5b864b4b4c73ad05cac8f34843a5096a926325"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-092.jsonl",
+      "sha256": "a47f70ea03b6b0075dd67fa0c7bbfb9a6e6224795c8e9c78b0a2da4bc44b0837"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-093.jsonl",
+      "sha256": "72e80f9ace4d06233840b5bacba116b50bf1cd65fd000ea01c2bd8fb7ea9563c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-094.jsonl",
+      "sha256": "6c62f05914147915288be83cf6978d8e257846bbe644635d8a1710c0d6fe1c64"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-095.jsonl",
+      "sha256": "69cba94bd4ce75d89334dda93b355059bf30931224253b7a979980790e8b25e1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-096.jsonl",
+      "sha256": "6f01c93b9a470507590c697e40a3bc253ebe417bf3a2f2499d4f3e880c1dd80c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-097.jsonl",
+      "sha256": "5c0dad7687732eb17c0cb90c09e83b243ffd60f2e6538f8d0de020f0e3bbcf29"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-098.jsonl",
+      "sha256": "6378992725c38a937e3fe71108cf943031260f2ea18666f2fc96d9398dccdaf1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-099.jsonl",
+      "sha256": "5ae76cb8b15d19d129a8789380ef07bb179535aa2ca9f9df60f28cd25edb813d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-100.jsonl",
+      "sha256": "923d2d13bfadebb1bdeebfffd2265aff2f62f0c2bca6dbec18389077c563e9bb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-101.jsonl",
+      "sha256": "ff71e38fe41152e19c5d5bcc08db3d94da6fd05e7ad7533b2f2a513a8d7f73d2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-102.jsonl",
+      "sha256": "1ace0a7b444f9faf2d9c97e666e43b0f28708854ec2e99f2bbf3765e7b148c89"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-103.jsonl",
+      "sha256": "120e23a16f56b5b8162ee3522f71ac033f760f1926d67ba6fdfab6465752f1d6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-104.jsonl",
+      "sha256": "32262d48a7b4222dfc167d2bf4353f86b1dd80d663b23477f6332db8256bbbb8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-105.jsonl",
+      "sha256": "484e295443381df4b847b1af6ccbcab44ec2e1134b2f9d245a0473bb18b2de78"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-106.jsonl",
+      "sha256": "0582babed0d22737a10430131fed96df151c4d589b46bc81aea906ce31aa9fe2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-107.jsonl",
+      "sha256": "73b3dad92579ca41d7518e471860d46863264eb8346af90800b2740fe706fc93"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-108.jsonl",
+      "sha256": "7a280461fd37d2983a585addaa82ede1f42e5137639bb1cc70f378348d27ce73"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-109.jsonl",
+      "sha256": "f2b5075238c7d8414c028ab9da421c4a2f2660171000004de38ea9f4a7ebff9a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-110.jsonl",
+      "sha256": "5383c78b7577f1d4c5ea4e00d43d8d06411b9743db0f534de73b8e2d19c9c481"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-111.jsonl",
+      "sha256": "29dcf8a4158a503e64ec79c1a74f37c40b3e167414bb295e23ff43e5ee67bdc6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-112.jsonl",
+      "sha256": "f7f988ddfdea948f63838686d1b681a8d14b78ad1fa91da24cd8be862baf261a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-113.jsonl",
+      "sha256": "6411e5cf28d3d8495b580afb473757fe06478c489fb444bccb2fc2d59877dc06"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-114.jsonl",
+      "sha256": "6ffaa5af335e06b481d4d57614dfebdbe869492574379be3928e3ecee8a29cb3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-115.jsonl",
+      "sha256": "d69eb2c17581d68fc1dee2bda7ccd3e817fa4b9153b13cdb93fa37e85c829c83"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-116.jsonl",
+      "sha256": "8ae756a8cd98f418150c2f5f59afe96019c667158ee2c064ce20e59b94e95bbd"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-117.jsonl",
+      "sha256": "a4405e44eaea58e1f3d6696acea261b3157ddc383f8b38d9ec2b8f3d48459a4d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-118.jsonl",
+      "sha256": "935cb9a46ea1911ce058a418a091eefb3769525cd0c49432ab69fa935cf29380"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-119.jsonl",
+      "sha256": "523e4f21f0d4525332b7325da10e3adb3e9005264257db6e2031af988af9f8d1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-120.jsonl",
+      "sha256": "6d50eb8551c3b688dca33c723e80fabfa59377f89ce71adada5a81c35303907a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-121.jsonl",
+      "sha256": "330cd96994a31bd68a1105f77e861ca78fd93732f3487c922a8d69ddcca62ada"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-122.jsonl",
+      "sha256": "7b8c79be84c65a0efe5a9d4678b005d5487cb4f7436b6b01446beb9a16c10549"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-123.jsonl",
+      "sha256": "8e7101e9f4e36034a9275f791677aafada760bf9185aa4b31d89e837881a42f9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-124.jsonl",
+      "sha256": "bcba33b9ebfabf52589eecc29ea5572202a621df88d331250c90727ee38eb443"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-125.jsonl",
+      "sha256": "979622849cd9f9ce8a11796672ef46a9e71fe9a2a34edc09917ef5aa9310a5dc"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-126.jsonl",
+      "sha256": "9fcfc11561556c7a1e9d7a6522c3cb47f54430f9d516537ac45314e39f801bf3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-127.jsonl",
+      "sha256": "e8556b1ff5b9596a19861a2ef0f675afb73fc2173a30a0e2996cbc11e4051eda"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-128.jsonl",
+      "sha256": "7e6db968429ea8ce2ce0b133ef6ec2b8462a33d1ed7e0321f3910659435200b1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-129.jsonl",
+      "sha256": "318a6c95f294fb245a6a5043415d019177454932411b920b3c3335018525f4e7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-130.jsonl",
+      "sha256": "d6b1b2caebd6ac5b0ba3e01a43022d5a5df68bc76eebf3044f110414ba619633"
+    }
+  ]
+}

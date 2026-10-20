@@ -1,0 +1,436 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "changedEdges": [
+    {
+      "batch": "batch-093.jsonl",
+      "file": "docs/platform/component-boundary.md",
+      "edgeId": "maps-j-06647"
+    },
+    {
+      "batch": "batch-107.jsonl",
+      "file": "docs/platform/intent-preservation-ledger.md",
+      "edgeId": "maps-j-07172"
+    },
+    {
+      "batch": "batch-107.jsonl",
+      "file": "docs/platform/intent-preservation-ledger.md",
+      "edgeId": "maps-j-07180"
+    },
+    {
+      "batch": "batch-115.jsonl",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "edgeId": "maps-j-07681"
+    },
+    {
+      "batch": "batch-115.jsonl",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "edgeId": "author-final-L112C2-batch-115"
+    },
+    {
+      "batch": "batch-115.jsonl",
+      "file": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "edgeId": "author-touchup-L1084C10-batch-115",
+      "added": true
+    },
+    {
+      "batch": "batch-122.jsonl",
+      "file": "docs/platform/work-state/architecture/implementation-pointers.md",
+      "edgeId": "maps-j-07898"
+    },
+    {
+      "batch": "batch-122.jsonl",
+      "file": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "edgeId": "maps-j-07913"
+    },
+    {
+      "batch": "batch-122.jsonl",
+      "file": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "edgeId": "maps-j-07934"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/id-systems-audit.md",
+      "edgeId": "author-wave5c-docs-id-systems-audit-L164C100"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08392"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08393"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08394"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08395"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08396"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08397"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08398"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08399"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08400"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08401"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08402"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08403"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08404"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08405"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08406"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08407"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08408"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08409"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08410"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08411"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08412"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08413"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08414"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08415"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08416"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08417"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08418"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08419"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08420"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08421"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08422"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08423"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08424"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08425"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08426"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08427"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08428"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08429"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08430"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08431"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08432"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08433"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08434"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08435"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08436"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08437"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08438"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08439"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08440"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08441"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08442"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08443"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08444"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08445"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08446"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08447"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08448"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08449"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08450"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08451"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08452"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08454"
+    },
+    {
+      "batch": "batch-130.jsonl",
+      "file": "docs/transitional-switchboard.md",
+      "edgeId": "maps-j-08455"
+    },
+    {
+      "batch": "batch-102.jsonl",
+      "file": "docs/platform/governance.md",
+      "edgeId": "maps-j-06909"
+    }
+  ],
+  "labelledSourceFlips": [
+    {
+      "edgeId": "maps-j-06647",
+      "file": "docs/platform/component-boundary.md",
+      "label": "detailed component-boundary source",
+      "extra": true
+    },
+    {
+      "edgeId": "maps-j-07898",
+      "file": "docs/platform/work-state/architecture/implementation-pointers.md",
+      "label": "Legacy source: docs/specs/work-state.md",
+      "extra": false
+    },
+    {
+      "edgeId": "maps-j-07913",
+      "file": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "label": "Legacy source: docs/specs/work-state.md",
+      "extra": false
+    },
+    {
+      "edgeId": "maps-j-07934",
+      "file": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "label": "Legacy source: docs/specs/work-state.md",
+      "extra": false
+    },
+    {
+      "edgeId": "maps-j-06909",
+      "file": "docs/platform/governance.md",
+      "label": "source design discussion",
+      "extra": true
+    }
+  ],
+  "extraFlips": [
+    {
+      "edgeId": "maps-j-06647",
+      "file": "docs/platform/component-boundary.md",
+      "label": "detailed component-boundary source",
+      "extra": true
+    },
+    {
+      "edgeId": "maps-j-06909",
+      "file": "docs/platform/governance.md",
+      "label": "source design discussion",
+      "extra": true
+    }
+  ],
+  "statusUnitsChanged": [
+    "switchboard L38–40",
+    "switchboard L41–44"
+  ],
+  "unlabelled07786": "parked unchanged",
+  "recordFilesScanned": 130,
+  "recordsScanned": 1037,
+  "parkedAfter": 2265,
+  "scanMethod": "Every edge inspected; every parked Related/duplicate/consolidation reason cross-checked against complete pinned source line; labelled-source matches include Relationship table labels. Unlabelled Related pointers remain parked.",
+  "sourceTuplesUnchanged": true,
+  "livePatchTargetsAndDiffsUnchanged": true,
+  "edgeObjectsScanned": 7937,
+  "edgesAfter": 9424,
+  "remainingParkedSourceLabelledRelatedRows": []
+}

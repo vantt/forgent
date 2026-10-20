@@ -1,0 +1,29 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "appliedOnlyInScratch": true,
+  "listSequences": [
+    [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  ],
+  "tableColumnCounts": [
+    6,
+    6,
+    4,
+    2
+  ],
+  "constraintNotesOutsideTables": 2,
+  "documentationSystemStatus": "retained",
+  "appliedSha256": "389ed411e6f7426c91961bbc09a149c028385d3b05afc16b6d1dd3278ed8efa7"
+}
