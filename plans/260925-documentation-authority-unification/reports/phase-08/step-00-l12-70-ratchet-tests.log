@@ -1,0 +1,36 @@
+✔ deterministic generation: generating baseline twice yields byte-for-byte identical content (8.010865ms)
+✔ class/scope: properly classifies markdown authority, retained sources, and non-markdown evidence (0.525163ms)
+✔ new maintained file: unreviewed new file under legacy root is refused with unreviewed-new-file (4.142449ms)
+✔ accounted edit: file modified with valid reviewed exception passes (1.985259ms)
+✔ unaccounted edit: file modified without exception or with digest mismatch is refused (2.081205ms)
+✔ unexpected deletion: baselined file missing without exception is refused (1.767755ms)
+✔ malformed baseline: schema validator rejects invalid baseline structures (1.301374ms)
+✔ malformed exception: schema validator rejects invalid exception objects (2.934244ms)
+✔ canonicalizeExceptionPath: canonicalizes posix relative paths and rejects absolute/traversal paths (R2) (2.602764ms)
+✔ dotfiles: unreviewed dotfile under legacy root is detected and refused (2.317782ms)
+✔ non-regular entries: FIFOs and sockets under legacy roots are refused as forbidden-entry (R4) (10.499411ms)
+✔ symlink identity: replacing a symlink with regular file of identical bytes is refused (1.867256ms)
+✔ symlink target: retargeting a symlink to another file of equal bytes is refused (1.583968ms)
+✔ tree escape: symlink pointing outside repository root or directory symlink is refused (2.082953ms)
+✔ classification: includes curated generated projections alongside maintained authority (0.324393ms)
+✔ CLI: exits 0 on clean tree and exits 1 on finding (379.075467ms)
+✔ live self-check: repository baseline and ratchet verify cleanly (347.593854ms)
+✔ policy-aware: permits edited and new generated projections without exception (1.118866ms)
+✔ policy-aware: permits new and edited history-evidence payloads without exception (1.555443ms)
+✔ maintained controls: blocks unreviewed new maintained-authority and retained-source files (5.170285ms)
+✔ maintained controls: blocks unaccounted edits to maintained-authority and retained-source (1.481808ms)
+✔ safety: detects and refuses class spoofing attempts in baseline (7.805839ms)
+✔ messages: ensure messages do not call non-authority payloads maintained authority (1.05258ms)
+✔ expired exceptions: exceptions past expiry date are flagged with expired-exception (7.668278ms)
+✔ unused exceptions: exceptions with no matching on-disk edit or new file are flagged with unused-exception (1.319651ms)
+✔ root-aware and case-safe: blocks docs/specs/*.txt, *.yml, *.MD from bypassing ratchet (F1) (1.121319ms)
+✔ exact generated projection matching: docs/specs/platform-foundations.MD and PLATFORM-FOUNDATIONS.md classify as maintained-authority and are refused as unreviewed new files (F1 residual) (2.399606ms)
+✔ expiry boundary: explicitly tests active vs expired on expiry date (F4) (3.774394ms)
+ℹ tests 28
+ℹ suites 0
+ℹ pass 28
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1015.305588

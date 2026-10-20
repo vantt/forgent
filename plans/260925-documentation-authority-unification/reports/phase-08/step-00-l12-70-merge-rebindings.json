@@ -1,0 +1,113 @@
+{
+  "inputHEAD": "080e7ccad88dbbfa472be335759efc991b150ce1",
+  "prior": "9db99d45507403a887c83830827da433f389d944",
+  "merge": "080e7ccad88dbbfa472be335759efc991b150ce1",
+  "main": "e4ee4235900299ee412d45e523628d159fe3ca0b",
+  "base": "a191c7b1efa26fe9226161ec6cf21202cf00732f",
+  "accountedMerges": [
+    {
+      "merge": "c8eec31a28a2a8cbf443f11d9f8df59f13491ba6",
+      "firstParent": "e49cacc01726a575084ce117498c36fe9f6ff159",
+      "main": "d59fca8407ea48927d15cbd10d317adee61f2601",
+      "base": "a191c7b1efa26fe9226161ec6cf21202cf00732f",
+      "mainCommits": 6,
+      "changedPaths": [
+        "CHANGELOG.md",
+        "plans/261017-1313-fgos-platform-program-board/plan.md",
+        "plans/reports/phase-lead-261020-2015-conductor-case-settle-records-milestones.md",
+        "src/workflow/case-admission-port.mjs",
+        "test/workflow/conductor-case.test.mjs"
+      ],
+      "changedCandidateFiles": []
+    },
+    {
+      "merge": "080e7ccad88dbbfa472be335759efc991b150ce1",
+      "firstParent": "9db99d45507403a887c83830827da433f389d944",
+      "main": "e4ee4235900299ee412d45e523628d159fe3ca0b",
+      "base": "d59fca8407ea48927d15cbd10d317adee61f2601",
+      "mainCommits": 5,
+      "changedPaths": [
+        "CHANGELOG.md",
+        "docs/backlog.md",
+        "plans/261017-1313-fgos-platform-program-board/plan.md",
+        "plans/reports/phase-lead-261020-2215-seat-binding-pre-wave.md",
+        "scripts/run-rust-dev-host.mjs",
+        "src/runner/execution/run.mjs",
+        "test/runner/execution/run.test.mjs",
+        "test/scripts/run-rust-dev-host-staging.test.mjs"
+      ],
+      "changedCandidateFiles": []
+    }
+  ],
+  "mainCommits": 11,
+  "changedPaths": [
+    "CHANGELOG.md",
+    "docs/backlog.md",
+    "plans/261017-1313-fgos-platform-program-board/plan.md",
+    "plans/reports/phase-lead-261020-2015-conductor-case-settle-records-milestones.md",
+    "plans/reports/phase-lead-261020-2215-seat-binding-pre-wave.md",
+    "scripts/run-rust-dev-host.mjs",
+    "src/runner/execution/run.mjs",
+    "src/workflow/case-admission-port.mjs",
+    "test/runner/execution/run.test.mjs",
+    "test/scripts/run-rust-dev-host-staging.test.mjs",
+    "test/workflow/conductor-case.test.mjs"
+  ],
+  "changedCandidateFiles": [],
+  "changedDocs": [
+    "docs/backlog.md"
+  ],
+  "mainPathCommits": {
+    "CHANGELOG.md": [
+      "15a819af3 Merge branch 'main' into worktree-agent-a10d4f4b965b29c24",
+      "d4c846d8d fix(workflow): a conductor case's settle proposes the milestones its activity produces",
+      "5a04092ba Merge branch 'worktree-agent-ad99e1f6c09176eb4'",
+      "17f551556 feat(runner): dev door names its staged host and resume refuses records from a newer release"
+    ],
+    "docs/backlog.md": [
+      "6f3013d8b docs(backlog): record codex seats hitting the herdr launch and paste faults"
+    ],
+    "plans/261017-1313-fgos-platform-program-board/plan.md": [
+      "d59fca840 docs(board): record the conductor settle milestone lane merge",
+      "e4ee42359 docs(board): record the seat binding pre-wave merge and the herdr pane check"
+    ],
+    "plans/reports/phase-lead-261020-2015-conductor-case-settle-records-milestones.md": [
+      "18a936336 docs(plans): report on conductor case settle recording milestones"
+    ],
+    "plans/reports/phase-lead-261020-2215-seat-binding-pre-wave.md": [
+      "17f551556 feat(runner): dev door names its staged host and resume refuses records from a newer release"
+    ],
+    "scripts/run-rust-dev-host.mjs": [
+      "17f551556 feat(runner): dev door names its staged host and resume refuses records from a newer release"
+    ],
+    "src/runner/execution/run.mjs": [
+      "17f551556 feat(runner): dev door names its staged host and resume refuses records from a newer release"
+    ],
+    "src/workflow/case-admission-port.mjs": [
+      "d4c846d8d fix(workflow): a conductor case's settle proposes the milestones its activity produces"
+    ],
+    "test/runner/execution/run.test.mjs": [
+      "17f551556 feat(runner): dev door names its staged host and resume refuses records from a newer release"
+    ],
+    "test/scripts/run-rust-dev-host-staging.test.mjs": [
+      "17f551556 feat(runner): dev door names its staged host and resume refuses records from a newer release"
+    ],
+    "test/workflow/conductor-case.test.mjs": [
+      "d4c846d8d fix(workflow): a conductor case's settle proposes the milestones its activity produces"
+    ]
+  },
+  "extractorsAgree": true,
+  "checkedBindings": [],
+  "successorGroupMemberChecks": [],
+  "entries": [],
+  "parked": [],
+  "needsWrites": [],
+  "counts": {
+    "directChecked": 0,
+    "groupMembersChecked": 0,
+    "changedBindings": 0,
+    "pendingReview": 0
+  },
+  "phase9ConservationUnionAdditions": [],
+  "acceptance": "Author binding verification only; independent changed-binding review and real runner commit L12-11 accounting remain owed."
+}

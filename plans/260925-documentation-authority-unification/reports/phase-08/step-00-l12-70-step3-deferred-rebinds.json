@@ -1,0 +1,11 @@
+[
+  {
+    "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-126.jsonl",
+    "file": "docs/backlog.md",
+    "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+    "recordSha256": "952ab5dcafe6959ac00b12b43d7711345370f81d5bbc7e0ac325dce5ea4932fc",
+    "digest": "b9f6678387c5f2a15766739e0e14919c1dc8cb7087e5c3784c985f26a1a2dc6d",
+    "currentDigest": "2e0cd5cd4e216a77ad108e187e109135571c0ca57e53bda77efcc2cef4e6331d",
+    "action": "Deferred once to Step 7 final atomic assembly; relocate complete passage/hunk/target then independently review; retirement records recheck conservation."
+  }
+]

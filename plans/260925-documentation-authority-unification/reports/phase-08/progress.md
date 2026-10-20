@@ -1020,3 +1020,12 @@ All 13 requested items completed as records only. Canonical pilot pin remains `a
 - Re-review: only **12 outcome-changed files / 65 ids**, **4 parts / 122 logical records**, max **33 records / 389,048 UTF-8 bytes**. `step-05-pilot-rereview-request.md` and its hash-bound index name `review-a38-step-05-pilot-rr-p01..04.md`; reviewers never run checker/probes. No reviewer launched or acceptance claimed.
 
 Step 7 receives verify-pattern-check's two source hunks, later bin/command-registry composition, shared test-diff de-duplication and the post-census workflow comment. Runner commits; independent semantic review and final assembly remain Lead custody. Markdown preview remains with Lead's authorized environment.
+
+
+### L12-70 — local-main merges c8eec31a2 and 080e7ccad accounting (completed author handback)
+
+Accounted two sequential local-main merges: `c8eec31a2` (6 main commits / 5 paths; 0 under docs/AGENTS/CLAUDE) and `080e7ccad` (5 main commits / 8 paths; only `docs/backlog.md` under docs/). Total 11 main commits, 11 distinct paths. Ratchet clean (997 checked / 28 accounted edits / 3 accounted new; exit 0); ratchet tests **28/28** pass; citation drift 0 findings; no exceptions refreshed.
+
+Step 0: both extractors agree on 5 units of `docs/backlog.md`; 0 candidate files changed; 0 inbound targetOwner bindings, 0 drifted bindings, 0 rebindings applied, 0 remaining target drift. All decision shards and approvals untouched.
+
+Step 3/4/5 overlaps: Step 3 overlap in `batch-126.jsonl` (`docs/backlog.md`), Step 4 overlap in `step04-017.jsonl` (`CHANGELOG.md`), both deferred once to Step 7 under L12-58(1). Authored Step 5 records (37 records across gateway, CLI messages, setup/doctor) have 0 primary consumer overlaps; all 37 file hashes match disk, **0 `currentPassage` moved at the pin**. CHANGELOG.md noted in coCutPaths of 8 CLI records; 4 changed queue files (`docs/backlog.md`, `scripts/run-rust-dev-host.mjs`, `src/runner/execution/run.mjs`, `test/runner/execution/run.test.mjs`) have no authored Step 5 records or currentPassage pins yet. Artifacts: `step-00-l12-70-{ratchet.log,ratchet-tests.log,binding-check.json,merge-rebindings.json,step3-deferred-rebinds.json,consumer-overlaps.json}`. No code, docs or consumer bytes edited; needsWrites empty.
