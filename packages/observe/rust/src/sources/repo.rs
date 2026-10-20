@@ -1,7 +1,18 @@
 //! Repo observation source and helpers (Lane A2 - Phase F2).
 
+use fgos_git::{GitDriver, RepoHandle, ResolveRepo};
 use std::path::Path;
 use std::process::Command;
+
+/// The repository holding `root`, opened for the Git component's typed reads;
+/// `None` outside a repository or when the driver refuses it.
+pub(crate) fn open_repository(root: &Path) -> Option<(GitDriver, RepoHandle)> {
+    let driver = GitDriver::new(&fgos_holder_lock::state_root::state_root().0).ok()?;
+    match driver.resolve_repo(root, root).ok()? {
+        ResolveRepo::Repository(repo) => Some((driver, repo)),
+        ResolveRepo::NotARepository => None,
+    }
+}
 
 /// Counts commits between two revisions using `git rev-list --count`.
 /// If `head_at_open` is None, counts all commits up to `head_at_close`.

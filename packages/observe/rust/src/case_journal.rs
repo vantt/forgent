@@ -10,7 +10,6 @@ use serde::{Deserialize, Serialize};
 use std::fs::{self, OpenOptions};
 use std::io::{BufRead, BufReader, Write};
 use std::path::Path;
-use std::process::Command;
 
 /// Maximum allowable line length (1 MiB) to guard against corrupted or huge lines.
 const MAX_LINE_BYTES: usize = 1024 * 1024;
@@ -117,20 +116,9 @@ pub fn get_git_head(root: &Path) -> Option<String> {
             return Some(trimmed.to_string());
         }
     }
-    let output = Command::new("git")
-        .arg("rev-parse")
-        .arg("HEAD")
-        .current_dir(root)
-        .output()
-        .ok()?;
-
-    if output.status.success() {
-        let rev = String::from_utf8_lossy(&output.stdout).trim().to_string();
-        if !rev.is_empty() {
-            return Some(rev);
-        }
-    }
-    None
+    let (driver, repo) = crate::sources::repo::open_repository(root)?;
+    let head = driver.resolve_commit_ref(&repo, "HEAD").ok()??;
+    Some(head.as_str().to_string())
 }
 
 /// Reads all valid case records from `.fgos/observe/cases/*.jsonl`, skipping

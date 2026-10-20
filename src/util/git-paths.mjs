@@ -48,3 +48,20 @@ export function nameStatusPaths(output) {
   }
   return paths;
 }
+
+/** Every entry of a paged Git Inspect read (`status`, `diff`, `listWorktrees`), page after page. */
+export function inspectEntries(read) {
+  const entries = [];
+  let cursor = null;
+  do {
+    const page = read({ cursor, maxEntries: 4096 });
+    entries.push(...page.entries);
+    cursor = page.nextCursor;
+  } while (cursor);
+  return entries;
+}
+
+/** A path Git Inspect names as its bytes, as the string a path list carries. */
+export function inspectPath(bytes) {
+  return Buffer.from(bytes).toString('utf8');
+}

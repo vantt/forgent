@@ -7,7 +7,7 @@
 // returns `{ safe: true }` for a given member.
 
 import { execFileSync } from 'node:child_process';
-import { branchExists, branchNameFor, findCheckoutPath, isCheckoutDirty } from './worktree.mjs';
+import { branchExists, branchNameFor, checkoutPathForBranch, compareCommits, isCheckoutDirty } from './worktree.mjs';
 
 function git(repoRoot, args) {
   return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
@@ -21,13 +21,12 @@ function git(repoRoot, args) {
  * listing — mirrors `isCheckoutDirty`'s own fail-closed stance.
  */
 function checkoutActivity(repoRoot, branch) {
-  let listing;
+  let checkoutPath;
   try {
-    listing = git(repoRoot, ['worktree', 'list', '--porcelain']);
+    checkoutPath = checkoutPathForBranch(repoRoot, branch);
   } catch (err) {
     return { active: true, detail: `could not list worktrees: ${err.message}` };
   }
-  const checkoutPath = findCheckoutPath(listing, branch);
   if (!checkoutPath) return { active: false, detail: null };
   if (isCheckoutDirty(repoRoot, checkoutPath)) {
     return { active: true, detail: `"${branch}" is checked out at "${checkoutPath}" with uncommitted changes` };
@@ -46,7 +45,7 @@ function checkoutActivity(repoRoot, branch) {
  * files changed on both sides.
  */
 function mergeConflictRisk(repoRoot, branch, target) {
-  const mergeBase = git(repoRoot, ['merge-base', target, branch]).trim();
+  const { mergeBase } = compareCommits(repoRoot, target, branch);
   const output = git(repoRoot, ['merge-tree', mergeBase, target, branch]);
   const hasConflict = output.includes('<<<<<<<');
   return { hasConflict, detail: hasConflict ? output : null };

@@ -6,9 +6,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { branchNameFor, findCheckoutPath } from './worktree.mjs';
+import { branchNameFor, checkoutPathForBranch } from './worktree.mjs';
 import { STALE_DOING_DEFAULTS } from '../state/graph-metrics.mjs';
-import { statusPaths, GIT_LIST_MAX_BUFFER } from '../util/git-paths.mjs';
+import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
+import { inspectEntries, inspectPath } from '../util/git-paths.mjs';
 
 function git(repoRoot, args) {
   return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
@@ -24,7 +25,7 @@ function git(repoRoot, args) {
  * it as inconclusive (D5), the same as a genuinely recent timestamp --
  * never as "ancient enough to reclaim" by accident.
  *
- * The `:!.fgos` status exclusion mirrors `isCheckoutDirty`
+ * The `.fgos` status exclusion mirrors `isCheckoutDirty`
  * (`worktree.mjs`) -- ADR0020's own `.fgos` removal on checkout must never
  * look like real activity.
  */
@@ -40,40 +41,24 @@ export function lastActivityAt(repoRoot, id) {
     return null; // branch doesn't exist -- nothing to measure at all
   }
 
-  let porcelainWorktrees;
+  let worktreePath;
+  let dirtyPaths;
   try {
-    porcelainWorktrees = git(repoRoot, ['worktree', 'list', '--porcelain']);
-  } catch {
-    return commitTs ?? null;
-  }
-
-  const worktreePath = findCheckoutPath(porcelainWorktrees, branch);
-  if (!worktreePath) return commitTs ?? null; // branch exists, no live checkout -- commit time is all there is
-
-  let statusOutput;
-  try {
-    // tsk-f8f: `-z` (NUL-terminated records), not the human-readable
-    // newline format -- `git status --porcelain` (no `-z`) C-style-quotes
-    // any path containing whitespace or other "unusual" characters (`??
-    // "my file.txt"`), which the old `trimmed.split(/\s+/).pop()` parse
-    // took literally, yielding a fragment like `file.txt"` (a lone
-    // trailing quote character) that never matches a real file --
-    // `statSync` fails, the entry is silently skipped, and that file's
-    // mtime never contributes to the activity signal. `-z` mode never
-    // quotes paths at all (verified empirically: a path with spaces comes
-    // through raw, byte-for-byte), so there is no escape/quote format to
-    // parse in the first place.
-    statusOutput = execFileSync('git', ['-C', worktreePath, 'status', '--porcelain=v1', '-z', '--untracked-files=all', '--', ':!.fgos'], {
-      cwd: repoRoot, encoding: 'utf8', shell: false, maxBuffer: GIT_LIST_MAX_BUFFER,
-    });
+    worktreePath = checkoutPathForBranch(repoRoot, branch);
+    if (!worktreePath) return commitTs ?? null; // branch exists, no live checkout -- commit time is all there is
+    // Byte for byte, with renames as both halves: the source half no longer
+    // exists, so its statSync fails and is skipped. ADR0020's own `.fgos`
+    // removal on checkout must never look like real activity.
+    const status = createGitInspect(gitPortOptions(worktreePath));
+    dirtyPaths = inspectEntries((page) => status.status({ ...page, untracked: 'all' }))
+      .map((entry) => inspectPath(entry.path))
+      .filter((filePath) => filePath !== '.fgos' && !filePath.startsWith('.fgos/'));
   } catch {
     return commitTs ?? null;
   }
 
   let newestMtime;
-  // Parsed by `statusPaths`: a rename or copy gives both halves, and the
-  // source half no longer exists, so its statSync fails and is skipped.
-  for (const filePath of statusPaths(statusOutput)) {
+  for (const filePath of dirtyPaths) {
     try {
       const mtime = fs.statSync(path.join(worktreePath, filePath)).mtimeMs;
       if (newestMtime === undefined || mtime > newestMtime) newestMtime = mtime;

@@ -27,12 +27,12 @@
 // (measured: the probes used /var/tmp). It is the caller's obligation, stated
 // here rather than dressed up as a check that does nothing.
 
-import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { uniqueTmpTag } from '../../util/unique-tmp-tag.mjs';
+import { createGitInspect, gitPortOptions } from '../../git/inspect.mjs';
 
 /** Raised for every refusal and every failure. Carries a `code` so a caller can
  * branch on the reason without matching message text. */
@@ -155,10 +155,9 @@ export function trustedProjectEntry() {
 export function trustRoots(projectPath, repoRoot) {
   const roots = [repoRoot];
   try {
-    const common = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], {
-      cwd: projectPath, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
-    }).trim();
-    if (common && path.basename(common) === '.git') roots.push(path.dirname(common));
+    const facts = createGitInspect(gitPortOptions(projectPath)).resolveRepo();
+    // The checkout that owns the common `.git`; a bare repository has none.
+    if (!facts.notARepository && path.basename(facts.commonDir) === '.git') roots.push(path.dirname(facts.commonDir));
   } catch { /* not a checkout: only the declared root is a candidate */ }
   return [...new Set(roots)];
 }

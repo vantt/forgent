@@ -44,7 +44,9 @@
 import path from 'node:path';
 import fs from 'node:fs';
 import os from 'node:os';
-import { spawn, execFileSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
+import { createGitInspect, gitPortOptions } from '../../git/inspect.mjs';
+import { inspectEntries, inspectPath } from '../../util/git-paths.mjs';
 import { RunnerConfigError, assertReasoningEffort } from './config.mjs';
 import { resolveExecutorConfig } from './resolve.mjs';
 import { credentialStoreOf } from './provider-capacity.mjs';
@@ -129,20 +131,35 @@ export { resolveHerdrBin };
  * Returns `{baseCommit, headRef}`, either field `null` when it could not
  * be read.
  */
-function captureDispatchAttestation(fgosDir, attestRoot) {
+export function captureDispatchAttestation(fgosDir, attestRoot) {
   const repoRoot = attestRoot ?? (fgosDir ? path.dirname(fgosDir) : null);
   if (!repoRoot) return { baseCommit: null, headRef: null };
-  const readGit = (args) => {
+  const read = (fn) => {
     try {
-      return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+      return fn();
     } catch {
       return null;
     }
   };
+  const inspect = read(() => createGitInspect(gitPortOptions(repoRoot)));
+  if (!inspect) return { baseCommit: null, headRef: null };
+  const head = read(() => inspect.resolveCommit({ name: 'HEAD' }));
   return {
-    baseCommit: readGit(['rev-parse', 'HEAD']),
-    headRef: readGit(['symbolic-ref', '--short', '-q', 'HEAD']), // null on detached HEAD, never a throw
+    baseCommit: typeof head === 'string' ? head : null,
+    headRef: read(() => checkedOutBranch(inspect)), // null on detached HEAD, never a throw
   };
+}
+
+// The short name of the branch the inspected checkout has checked out, from
+// its own row of the worktree list; null when that checkout is detached.
+function checkedOutBranch(inspect) {
+  const { worktreeRoot } = inspect.resolveRepo();
+  if (!worktreeRoot) return null;
+  const own = fs.realpathSync(worktreeRoot);
+  const row = inspectEntries((page) => inspect.listWorktrees(page)).find((entry) => {
+    try { return fs.realpathSync(inspectPath(entry.path)) === own; } catch { return false; }
+  });
+  return row?.branch?.startsWith('refs/heads/') ? row.branch.slice('refs/heads/'.length) : null;
 }
 
 export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, fgosDir, attestRoot, contentCarries, resolvedAgentType, invocationId, reasoningEffort, requestedModel } = {}) {

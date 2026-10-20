@@ -38,7 +38,8 @@ import {
   quarantineProviderAccount,
 } from './provider-capacity.mjs';
 import { AUTH_FAILURE_TAIL_LINES, matchAuthFailureLine, matchQuotaLimitLine } from './provider-auth-failure.mjs';
-import { nulPaths, statusPaths, GIT_LIST_MAX_BUFFER } from '../../util/git-paths.mjs';
+import { inspectEntries, inspectPath, statusPaths, GIT_LIST_MAX_BUFFER } from '../../util/git-paths.mjs';
+import { createGitInspect, gitPortOptions } from '../../git/inspect.mjs';
 
 /**
  * Safely resolve root path without failing if not in a git repository.
@@ -138,12 +139,8 @@ export function isSubstantiveReportText(text) {
 export function safeGitHead(dir) {
   if (!dir) return null;
   try {
-    return execFileSync('git', ['rev-parse', 'HEAD'], {
-      cwd: dir,
-      encoding: 'utf8',
-      shell: false,
-      stdio: ['ignore', 'pipe', 'ignore'],
-    }).trim();
+    const head = createGitInspect(gitPortOptions(dir)).resolveCommit({ name: 'HEAD' });
+    return typeof head === 'string' ? head : null;
   } catch {
     return null;
   }
@@ -180,14 +177,10 @@ export function safeGitStatusFiles(dir) {
 export function safeGitCommittedDiffFiles(dir, gitBefore, gitAfter) {
   if (!dir || !gitBefore || !gitAfter || gitBefore === gitAfter) return [];
   try {
-    const output = execFileSync('git', ['diff', '--name-only', '--no-renames', '--no-relative', '-z', `${gitBefore}..${gitAfter}`], {
-      cwd: dir,
-      encoding: 'utf8',
-      maxBuffer: GIT_LIST_MAX_BUFFER,
-      shell: false,
-      stdio: ['ignore', 'pipe', 'ignore'],
-    });
-    return nulPaths(output).filter((s) => !isStorePath(s));
+    const inspect = createGitInspect(gitPortOptions(dir));
+    return inspectEntries((page) => inspect.diff({ ...page, before: gitBefore, after: gitAfter }))
+      .map((entry) => inspectPath(entry.path))
+      .filter((s) => !isStorePath(s));
   } catch {
     return [];
   }

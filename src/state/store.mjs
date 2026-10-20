@@ -27,7 +27,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { viewRevision, serializeView, readAllEventsFromDir, rebuildViewFromDir, buildSnapshotFromDir, VIEW_SCHEMA_VERSION } from './replay.mjs';
 import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlapAmong, goalScopedCriticalPath, goalScopedGreedyTopUnblock, computeSchedule, detectCycles } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './status-fsm.mjs';
@@ -614,20 +614,22 @@ function checkPlanEvidence(id, work, repoRoot) {
   }
   candidates.push(`docs/history/${id}/plan.md`);
 
-  const hasBranch = (() => {
-    try {
-      execFileSync('git', ['rev-parse', '--verify', '--quiet', `refs/heads/${branch}`], { cwd: repoRoot, stdio: 'ignore' });
-      return true;
-    } catch {
-      return false;
-    }
-  })();
+  let inspect = null;
+  let tip = null;
+  try {
+    inspect = createGitInspect(gitPortOptions(repoRoot));
+    const ref = inspect.resolveRef({ name: `refs/heads/${branch}` });
+    if (ref.kind === 'direct') tip = ref.oid;
+  } catch {
+    // no readable branch: the current tree is what there is
+  }
+  const hasBranch = tip !== null;
 
   const hasPlan = candidates.some((candidate) => {
     if (hasBranch) {
       try {
-        execFileSync('git', ['cat-file', '-e', `${branch}:${candidate}`], { cwd: repoRoot, stdio: 'ignore' });
-        return true;
+        const [read] = inspect.pathsAtRevision({ revision: tip, paths: [[...Buffer.from(candidate)]], maxBlobBytes: 32 * 1024 * 1024 });
+        return read.value.kind === 'present' || read.value.kind === 'notABlob';
       } catch {
         return false;
       }
