@@ -1,0 +1,206 @@
+{
+  "inputHEAD": "35512e2789f1d58a1410edf64d9e0c08c516cdf9",
+  "status": "author-preparation-verified",
+  "failureCount": 0,
+  "failures": [],
+  "mechanical": {
+    "rawRefs": 2962,
+    "joinedSlots": 2809,
+    "remainingFiles": 301,
+    "remainingSlots": 823,
+    "sourceOwners": 262,
+    "batches": 31,
+    "sourceReviewPartsEstimate": 32,
+    "accountingPartsEstimate": 31,
+    "boundSpanFailures": [],
+    "worktreeConsumerDigestFailures": [],
+    "historicalUnresolvedSpans": [
+      {
+        "file": "archive/plans/260915-code-implementation-track-policy/plan.md",
+        "id": "evidence-099",
+        "class": "preserve",
+        "reason": "Historical evidence occurrence ambiguous; preserve literal file; no executable patch or accepted current span."
+      },
+      {
+        "file": "archive/plans/260915-code-implementation-track-policy/plan.md",
+        "id": "evidence-099",
+        "class": "preserve",
+        "reason": "Historical evidence occurrence ambiguous; preserve literal file; no executable patch or accepted current span."
+      },
+      {
+        "file": "archive/plans/260915-code-implementation-track-policy/plan.md",
+        "id": "evidence-099",
+        "class": "preserve",
+        "reason": "Historical evidence occurrence ambiguous; preserve literal file; no executable patch or accepted current span."
+      },
+      {
+        "file": "archive/plans/260915-code-implementation-track-policy/plan.md",
+        "id": "evidence-099",
+        "class": "preserve",
+        "reason": "Historical evidence occurrence ambiguous; preserve literal file; no executable patch or accepted current span."
+      },
+      {
+        "file": "archive/plans/260915-code-implementation-track-policy/plan.md",
+        "id": "evidence-099",
+        "class": "preserve",
+        "reason": "Historical evidence occurrence ambiguous; preserve literal file; no executable patch or accepted current span."
+      },
+      {
+        "file": "archive/plans/260915-code-implementation-track-policy/plan.md",
+        "id": "evidence-099",
+        "class": "preserve",
+        "reason": "Historical evidence occurrence ambiguous; preserve literal file; no executable patch or accepted current span."
+      },
+      {
+        "file": "archive/plans/260915-code-implementation-track-policy/reports/track-closeout.md",
+        "id": "evidence-101",
+        "class": "preserve",
+        "reason": "Historical evidence occurrence ambiguous; preserve literal file; no executable patch or accepted current span."
+      },
+      {
+        "file": "archive/plans/260915-code-implementation-track-policy/reports/track-closeout.md",
+        "id": "evidence-101",
+        "class": "preserve",
+        "reason": "Historical evidence occurrence ambiguous; preserve literal file; no executable patch or accepted current span."
+      },
+      {
+        "file": "archive/plans/260915-code-implementation-track-policy/reports/track-closeout.md",
+        "id": "evidence-101",
+        "class": "preserve",
+        "reason": "Historical evidence occurrence ambiguous; preserve literal file; no executable patch or accepted current span."
+      }
+    ],
+    "L12-44CoverageEdges": 305,
+    "L12-44Unresolved": 0,
+    "protectedConsumersChanged": 0,
+    "inputArtifactPinsUnchanged": true
+  },
+  "commands": [
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-link-pass.test.mjs test/scripts/check-doc-candidate-status.test.mjs test/scripts/check-doc-constitution.test.mjs",
+      "exit": 0,
+      "tests": 95,
+      "passed": 95,
+      "failed": 0,
+      "skipped": 0,
+      "stdoutTail": "ource and Legacy source columns protect only their own cells (0.966355ms)\n✔ canonical in narrative text is not a source relationship label (0.16813ms)\n✔ a labelled source relationship inside any cell protects that cell alone (0.216643ms)\n✔ a source relationship link label inside any cell stays verbatim (0.099842ms)\n✔ a source-column link label does not turn preservation targets into source relationships (0.151974ms)\n✔ prose destinations and bare legacy names do not protect candidate links (0.127647ms)\n✔ relationship labels protect their own link, not other links in the same cell (0.110561ms)\nℹ tests 95\nℹ suites 0\nℹ pass 95\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 991.986974\n"
+    },
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-legacy-docs-ratchet.mjs",
+      "exit": 0,
+      "output": "check-legacy-docs-ratchet: clean (996 legacy files checked; 26 accounted edit(s), 2 accounted new file(s)).\n"
+    },
+    {
+      "command": "git diff --check",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "command": "git diff --name-only HEAD; git ls-files --others --exclude-standard (separate read-only calls)",
+      "output": [
+        "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-04-authoring-request.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-04-batches.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-04-l12-44-rebind-report.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-04-population-gaps.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-04-population.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-04-preparation-report.md",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-04-source-render-provenance.json",
+        "plans/260925-documentation-authority-unification/reports/phase-08/step-04-verification.json"
+      ],
+      "scopeOk": true
+    }
+  ],
+  "readInputs": [
+    {
+      "path": "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md",
+      "sha256": "641151ef178b178f67427492ec3896f894200bdf2ad31f31e6dd33610de20cac",
+      "commit": "35512e2789f1d58a1410edf64d9e0c08c516cdf9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md",
+      "sha256": "fd834a9a8dd25a6996dd4d10f28f7b40426e5d8c52388a37e8e7d40d34f4a58a",
+      "commit": "35512e2789f1d58a1410edf64d9e0c08c516cdf9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/consumer-inventory.md",
+      "sha256": "2aea368c10be658d627539ec00bf4629ee4ea08e4d755d3d6cab79532db47121",
+      "commit": "35512e2789f1d58a1410edf64d9e0c08c516cdf9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/consumer-inventory.json",
+      "sha256": "a9bf46c5f1b1f2896bf4afbd868f21d788526205b1920ea7452da749e32cb29d",
+      "commit": "35512e2789f1d58a1410edf64d9e0c08c516cdf9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-02-census.md",
+      "sha256": "d98ac68c4e0cf64da61402387f77dcebd3cc7b014ae32a9e7911d8ce20d206c0",
+      "commit": "35512e2789f1d58a1410edf64d9e0c08c516cdf9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-authoring-request.md",
+      "sha256": "b20042db4a54e24e8e5c92e468f13b7984300a7fc3e1da3184fcecea2ab7aec6",
+      "commit": "35512e2789f1d58a1410edf64d9e0c08c516cdf9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-check.py",
+      "sha256": "20bbeca2b0b104df357de506e479062b589e6faa31164a80761deddc31578b2b",
+      "commit": "35512e2789f1d58a1410edf64d9e0c08c516cdf9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-00-l12-44-step3-deferred-rebinds.json",
+      "sha256": "69e19e02b3340bda9c34b497d754731e219c9356f49eec8c01c512e69002c4cc",
+      "commit": "35512e2789f1d58a1410edf64d9e0c08c516cdf9"
+    }
+  ],
+  "artifactPins": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/progress.md",
+      "bytes": 202029,
+      "sha256": "607a553c2284ab29b6ca9fdbb22ac350c3016dd8175a9d48e11a373046e3afeb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-authoring-request.md",
+      "bytes": 17149,
+      "sha256": "31399c5af323f5d7d0a4318913e4054125c368503eb6d0e7d759d8307bdd9511"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-batches.json",
+      "bytes": 453782,
+      "sha256": "96826c4ff36e6ff2e706a70a63febb21a1c36a7cd3e9c9ba1435b279da63587f"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-l12-44-rebind-report.json",
+      "bytes": 711294,
+      "sha256": "6b5113b77343aae6bc42c6bf3dd00434e5991e79aa851dfc9f2d5b46371aebcf"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-population-gaps.json",
+      "bytes": 234369,
+      "sha256": "c4fb9bed895b2f3d43df5328208d6039b4c09c2422426c158450f25c9c781518"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-population.json",
+      "bytes": 9803778,
+      "sha256": "2968807b6ecd7609186f3612a2107ad7b447fdd8479615f2da9d6495775f0de9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-preparation-report.md",
+      "bytes": 16343,
+      "sha256": "efa9a0feac9779bf0679879660dd702fade543ea23ee138d8863d15d91c8203b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-source-render-provenance.json",
+      "bytes": 286486,
+      "sha256": "dc0fa31fd54dcdeae507ba65c57c7d59191c6534a51b537b99a7f9c9479fbf87"
+    }
+  ],
+  "proofLimits": [
+    "Preparation only; no exact new per-file diff or semantic acceptance.",
+    "9 historical ambiguous spans are preserved, explicitly not executable source bindings.",
+    "Nine domain no-census files and 17 host/plugin provenance gaps remain; ignored/external/state and dynamic runtime coverage unproven.",
+    "No build:skills, full npm suite, installed-package/runtime parity, independent review, committed-byte accounting/reproduction acceptance.",
+    "No consumer, Step3 record, earlier request, frozen gate/test/baseline or reproduction manifest edited.",
+    "Scratch replay scripts and logs only /tmp/fgos-work/step4/; result/report outbox required atomic exception."
+  ]
+}
