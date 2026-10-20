@@ -1,0 +1,36 @@
+{
+  "authorCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": 67,
+  "edges": 659,
+  "failures": [],
+  "failureCount": 0,
+  "locatorReviewFlags": [],
+  "openLeadRulingEdgesBySet": {},
+  "notClosableSets": [],
+  "checkedBatches": [
+    "105",
+    "106",
+    "107",
+    "108",
+    "109",
+    "110",
+    "111",
+    "112",
+    "113"
+  ],
+  "openLeadRulingEdgesPerSet": {
+    "batch-105": [],
+    "batch-106": [],
+    "batch-107": [],
+    "batch-108": [],
+    "batch-109": [],
+    "batch-110": [],
+    "batch-111": [],
+    "batch-112": [],
+    "batch-113": []
+  },
+  "checkerSourceSha256": "2126a1ad0c5dc6dc4298ae5abaed46c00b0a94f0e8cd4bca4be636f914a64428",
+  "resolverSourceSha256": "766f96d8417af71a275f37da64072277e04bf21608a83c67a5c52afdffb3b8ba",
+  "scratch": "/tmp/fgos-work/wave5f/",
+  "scope": "Every canonical record present; historical review manifests remain immutable. Only L12-51 form extension changes a checker predicate."
+}

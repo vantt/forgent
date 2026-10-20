@@ -1,0 +1,17 @@
+{
+  "rule": "L12-51(5)",
+  "positive": {
+    "name": "same-file-root-label-relative-destination",
+    "old": "[docs/specs/runner.md](../../specs/runner.md)",
+    "expected": "[docs/platform/runner/spec.md](../runner/spec.md)",
+    "actual": "[docs/platform/runner/spec.md](../runner/spec.md)"
+  },
+  "negative": {
+    "name": "different-file-root-label-not-rewritten",
+    "old": "[docs/specs/work-state.md](../../specs/runner.md)",
+    "expected": "[docs/specs/work-state.md](../runner/spec.md)",
+    "actual": "[docs/specs/work-state.md](../runner/spec.md)"
+  },
+  "oldImplementationFailsPositive": true,
+  "passed": 2
+}

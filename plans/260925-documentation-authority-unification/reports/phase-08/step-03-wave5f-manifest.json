@@ -1,0 +1,1773 @@
+{
+  "authorInputCommit": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "inventoryInputCommit": "1a0f61ac53433292e08fb378ebbb6c1c72fd3b74",
+  "files": [
+    {
+      "file": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "set": "batch-105",
+      "sourceBytes": 13564,
+      "digest": "e6f0c282eb6fcafe142d61b199dee5f6f8ad80fb9cd7ed1f317dbf70701a9111",
+      "inventoryFileDigest": "e6f0c282eb6fcafe142d61b199dee5f6f8ad80fb9cd7ed1f317dbf70701a9111",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "5f8045567519e6d67aea8de649d902b800d3ddb8ef5a339021a80e0f34b9c486",
+      "recordBytes": 15773,
+      "retiresWithTree": false,
+      "edgeCount": 16,
+      "dispositions": {
+        "preserve": 16
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
+      "set": "batch-105",
+      "sourceBytes": 4519,
+      "digest": "e736adcf550e767e87fe080adb6791b2dd1931f84b2d2078f761f1869882fc84",
+      "inventoryFileDigest": "e736adcf550e767e87fe080adb6791b2dd1931f84b2d2078f761f1869882fc84",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "7efca184069cbd902478d6649c3ab900c1ef9897ae4fff432631399868af2b9e",
+      "recordBytes": 4034,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/architecture/invocation-kernel.md",
+      "set": "batch-105",
+      "sourceBytes": 4386,
+      "digest": "389412c0eca0db5c2acd67a6d54ad368d05e44ed4075ef131f00e48cd008785b",
+      "inventoryFileDigest": "389412c0eca0db5c2acd67a6d54ad368d05e44ed4075ef131f00e48cd008785b",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "02fbb7581cb425cd20e8cacc1a7cb40661b02511391036cca55c30d2136a1e58",
+      "recordBytes": 5729,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "set": "batch-105",
+      "sourceBytes": 17758,
+      "digest": "900076c8bbb4ddfa56589f86e4d51df2e28ea712dd0f8866b4f67bce9794a2c4",
+      "inventoryFileDigest": "900076c8bbb4ddfa56589f86e4d51df2e28ea712dd0f8866b4f67bce9794a2c4",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "6d2639e8236a01a19d96d980243d7e39fb283e5146eb28c9469a15f6f5d23f86",
+      "recordBytes": 15430,
+      "retiresWithTree": false,
+      "edgeCount": 17,
+      "dispositions": {
+        "preserve": 17
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "set": "batch-105",
+      "sourceBytes": 23764,
+      "digest": "c4be1d2cd83c8207a89608d3f6e6822b30973a6947ad8004c26fa1e45399a49b",
+      "inventoryFileDigest": "c4be1d2cd83c8207a89608d3f6e6822b30973a6947ad8004c26fa1e45399a49b",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "23667bb0c80bc2a71529ee04cadde46dae586c314698a1a794c29b0513a3da6e",
+      "recordBytes": 15410,
+      "retiresWithTree": false,
+      "edgeCount": 16,
+      "dispositions": {
+        "preserve": 16
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+      "set": "batch-105",
+      "sourceBytes": 4798,
+      "digest": "2660a8e9f0291a4c99f0dd06dc7dc4695d407965d6c937117639639690773c2e",
+      "inventoryFileDigest": "2660a8e9f0291a4c99f0dd06dc7dc4695d407965d6c937117639639690773c2e",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "866636617100e15e4c7097a6b3306d0328b994e9f601fae9fa23e64c2211708d",
+      "recordBytes": 6704,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "preserve": 5
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "set": "batch-105",
+      "sourceBytes": 15339,
+      "digest": "f8e978fb99dbb6f794353e68f654d5b80396a7149f485c530ee46fcf9a8f84f9",
+      "inventoryFileDigest": "f8e978fb99dbb6f794353e68f654d5b80396a7149f485c530ee46fcf9a8f84f9",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "185333f2f3618f3562f05eeb816b3c95a23d4d9fa7223611e684eec6d0d95e03",
+      "recordBytes": 20999,
+      "retiresWithTree": false,
+      "edgeCount": 16,
+      "dispositions": {
+        "preserve": 16
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/contracts/command-route-descriptor.md",
+      "set": "batch-105",
+      "sourceBytes": 3587,
+      "digest": "aba85b7f20eab828165bfaea494c77c4a526bea3db511d51276401443de07b54",
+      "inventoryFileDigest": "aba85b7f20eab828165bfaea494c77c4a526bea3db511d51276401443de07b54",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "3bac7ed2b574a2769744a0c84ff0f2fb759bd75b72dbe3b4a648ab8d4ddc0501",
+      "recordBytes": 1798,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "set": "batch-105",
+      "sourceBytes": 17761,
+      "digest": "ce3f29b86c0b2ad7f35c44e64c0bc4369000fad68baf0499bc108021e0139f70",
+      "inventoryFileDigest": "ce3f29b86c0b2ad7f35c44e64c0bc4369000fad68baf0499bc108021e0139f70",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "8458e0491046d209a85e876e645854ae52733fbf0b6f98fc412b6d9de409c023",
+      "recordBytes": 15948,
+      "retiresWithTree": false,
+      "edgeCount": 15,
+      "dispositions": {
+        "preserve": 15
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+      "set": "batch-105",
+      "sourceBytes": 3235,
+      "digest": "19a69423f450586e21e98f5c932dcb5c1520ab1ccee370ccc0dcac14b2815714",
+      "inventoryFileDigest": "19a69423f450586e21e98f5c932dcb5c1520ab1ccee370ccc0dcac14b2815714",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "7640f142ea5e0ee1c7a3100417c66d7b6fc324d62a9a73a097d8884e557e3074",
+      "recordBytes": 3904,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/contracts/legacy-payload.md",
+      "set": "batch-105",
+      "sourceBytes": 3777,
+      "digest": "30d88a025bf714263860005e1f0f37c96be1c338166febe7b3668ee1c10bd6d6",
+      "inventoryFileDigest": "30d88a025bf714263860005e1f0f37c96be1c338166febe7b3668ee1c10bd6d6",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "1e5b9e39a1b97cec93b934d0cd84cc61e3d571107f7e859b2c85e2832670aad3",
+      "recordBytes": 2856,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/contracts/operation-catalog.md",
+      "set": "batch-105",
+      "sourceBytes": 3300,
+      "digest": "6b453ba9878a7f93509832c677e78d75f5686d3f4a371fbcdd03fe55388246ab",
+      "inventoryFileDigest": "6b453ba9878a7f93509832c677e78d75f5686d3f4a371fbcdd03fe55388246ab",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "a3f24d808ea8c627a13b0fbc75156d4d5635cc6df476b5a5d13dc1a5f58e3e2a",
+      "recordBytes": 2970,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/contracts/operation-provider.md",
+      "set": "batch-105",
+      "sourceBytes": 3338,
+      "digest": "a0627e1f394730024382a9d1c220c1a75f7e32fb6d60a1f98615b678289c2ef5",
+      "inventoryFileDigest": "a0627e1f394730024382a9d1c220c1a75f7e32fb6d60a1f98615b678289c2ef5",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "7f22eb8900f6b66425b79a742156dd0ea5646eee9aaa2de7377952a01da83a47",
+      "recordBytes": 1837,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md",
+      "set": "batch-105",
+      "sourceBytes": 4029,
+      "digest": "701eaf883e485b77fa8e0972a41ce4438d110affffd8da85fd748ad109f1813a",
+      "inventoryFileDigest": "701eaf883e485b77fa8e0972a41ce4438d110affffd8da85fd748ad109f1813a",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "630cd4b296e53c7cbd60d0fa8ae4b718a571e9943c37d1669b4038baf60a4ce3",
+      "recordBytes": 2978,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "set": "batch-105",
+      "sourceBytes": 22496,
+      "digest": "3739b4d22b221a87b2c8a4c60679dd3de6d524a0931b8fd5bfea4ffe0829b8ca",
+      "inventoryFileDigest": "3739b4d22b221a87b2c8a4c60679dd3de6d524a0931b8fd5bfea4ffe0829b8ca",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "6a170231d4d458f2178bcc9bc75bbec3819d29951b9ae4cb16acdb49a65306e6",
+      "recordBytes": 42938,
+      "retiresWithTree": false,
+      "edgeCount": 27,
+      "dispositions": {
+        "preserve": 27
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/history/host-invocation-baseline.md",
+      "set": "batch-105",
+      "sourceBytes": 2648,
+      "digest": "165f732b474ace314c8f890888082544e13573d15291c94871b7de58655238a4",
+      "inventoryFileDigest": "165f732b474ace314c8f890888082544e13573d15291c94871b7de58655238a4",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "3318976587d280c59577199b58353d45fd2f7c1dd5c1ca608f1c9960ee50be4e",
+      "recordBytes": 2758,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/history/source-inventory.md",
+      "set": "batch-105",
+      "sourceBytes": 5623,
+      "digest": "60189711d4193579d0acc5213ec765adb17224f6d81a275fdc7e7fc3abe5c01b",
+      "inventoryFileDigest": "60189711d4193579d0acc5213ec765adb17224f6d81a275fdc7e7fc3abe5c01b",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "ca63a7feca94ea7f237772c403afbca36dc74ff56bdd56b72174efd3a93eccad",
+      "recordBytes": 15528,
+      "retiresWithTree": false,
+      "edgeCount": 13,
+      "dispositions": {
+        "preserve": 13
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "set": "batch-105",
+      "sourceBytes": 34308,
+      "digest": "aaf8bfe8bf316eb9a0f052efaff3e39878386f79572c6e110201d0ce404b1878",
+      "inventoryFileDigest": "aaf8bfe8bf316eb9a0f052efaff3e39878386f79572c6e110201d0ce404b1878",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "d1d934d621fd413c3b82af65325d0ff55c6b8c8c5aaa3ccb00380d847c16926e",
+      "recordBytes": 59483,
+      "retiresWithTree": false,
+      "edgeCount": 51,
+      "dispositions": {
+        "preserve": 51
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/r2-external-process-rollout-plan.md",
+      "set": "batch-105",
+      "sourceBytes": 1399,
+      "digest": "2188f9a15473d9dd2149b7c75ad471f733329bf6283b0edfcb526f6be7ba8476",
+      "inventoryFileDigest": "2188f9a15473d9dd2149b7c75ad471f733329bf6283b0edfcb526f6be7ba8476",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "db7dd3f286569641cdd53b5ecfc598eb39a38249b7ec89dfed7b5112a15b89f9",
+      "recordBytes": 943,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/r3-remote-peer-rollout-plan.md",
+      "set": "batch-105",
+      "sourceBytes": 1360,
+      "digest": "a93b6eaa791dbde6be510d6f2f035102eccca8393a71093febd6924236dc5a27",
+      "inventoryFileDigest": "a93b6eaa791dbde6be510d6f2f035102eccca8393a71093febd6924236dc5a27",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "84e88c502fca53df26f0da13a7a932db9690bd6ee6f7750a8cd50e1c2cd43d19",
+      "recordBytes": 938,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/spec.md",
+      "set": "batch-105",
+      "sourceBytes": 32766,
+      "digest": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f",
+      "inventoryFileDigest": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "4cdffc3a16f639663ad505b2f368bc91fbde24d32369284c58ee936350c3af24",
+      "recordBytes": 5949,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+      "set": "batch-105",
+      "sourceBytes": 7254,
+      "digest": "4cd3b4a66ad636ace987474315e5575a202391e35b9925285a032e8b307a4ce2",
+      "inventoryFileDigest": "4cd3b4a66ad636ace987474315e5575a202391e35b9925285a032e8b307a4ce2",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "c261d9bdbf3ef0cffd5014536d6625ee0bb02c4fe287a288987b8acdc29ce8d6",
+      "recordBytes": 5802,
+      "retiresWithTree": false,
+      "edgeCount": 5,
+      "dispositions": {
+        "preserve": 5
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+      "set": "batch-105",
+      "sourceBytes": 11243,
+      "digest": "c3f31468ab486cf548fdd942ceb5fb0743a2abf476fb3820784a6f62c8b1a448",
+      "inventoryFileDigest": "c3f31468ab486cf548fdd942ceb5fb0743a2abf476fb3820784a6f62c8b1a448",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "0e934dcc3f38cf2a96a1b96b07b49f0b82d0d099a6a79bd86a7d723c56a9a704",
+      "recordBytes": 4572,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+      "set": "batch-105",
+      "sourceBytes": 5518,
+      "digest": "88fd9d8bab58c2d320f4769383cd3f6de146f95fa97bf5271e96634a32602be4",
+      "inventoryFileDigest": "88fd9d8bab58c2d320f4769383cd3f6de146f95fa97bf5271e96634a32602be4",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "cbf33d2673e26cf66b7d4371a89787361fcc8bb58effd3a0c7bcc6639a2b670b",
+      "recordBytes": 2994,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+      "set": "batch-105",
+      "sourceBytes": 10956,
+      "digest": "455c0a5c92ad6d0c11fce08f2c45e0634b843a977dfe34a644cfc3f735bcea0c",
+      "inventoryFileDigest": "455c0a5c92ad6d0c11fce08f2c45e0634b843a977dfe34a644cfc3f735bcea0c",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "52e2971d98dae05d359d793581b953212ddad574ddf537317504fc9a0451805e",
+      "recordBytes": 7869,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "preserve": 6
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+      "set": "batch-106",
+      "sourceBytes": 10951,
+      "digest": "f8febf215e54b9302fb205b18e04efbfe94f11156d80682a874193dcd1b073a5",
+      "inventoryFileDigest": "f8febf215e54b9302fb205b18e04efbfe94f11156d80682a874193dcd1b073a5",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "7fb4e53a27150e51ea80c2dd056b175508e5551b5ec1ed3b6a67607f2b26a867",
+      "recordBytes": 4527,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+      "set": "batch-106",
+      "sourceBytes": 15798,
+      "digest": "40b8f3d8ed14f9b9e7f3cb1fcb663dcceefb9fee23f0ddeb5bca82512170da89",
+      "inventoryFileDigest": "40b8f3d8ed14f9b9e7f3cb1fcb663dcceefb9fee23f0ddeb5bca82512170da89",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "bda40c8a98a304098cf87704ad9edf0e6e5c27e466f5db9c9dea3b2b9962da9f",
+      "recordBytes": 25564,
+      "retiresWithTree": false,
+      "edgeCount": 18,
+      "dispositions": {
+        "preserve": 17,
+        "phase9-row-flip": 1
+      }
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/vision.md",
+      "set": "batch-106",
+      "sourceBytes": 5639,
+      "digest": "37e2e505dfd4481341e40be7ce505422529846fd8754e0fed1e6ea84163973bd",
+      "inventoryFileDigest": "37e2e505dfd4481341e40be7ce505422529846fd8754e0fed1e6ea84163973bd",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "9f16b00c4060d8d8945655d4366808c7c4af4dcf6b4e871f1abfee99be4a295c",
+      "recordBytes": 11171,
+      "retiresWithTree": false,
+      "edgeCount": 8,
+      "dispositions": {
+        "preserve": 8
+      }
+    },
+    {
+      "file": "docs/platform/intent-preservation-ledger.md",
+      "set": "batch-107",
+      "sourceBytes": 17191,
+      "digest": "c32388310dcd5e30abc94d0c49718229ab0678196d4c8002c8a1629e16070121",
+      "inventoryFileDigest": "c32388310dcd5e30abc94d0c49718229ab0678196d4c8002c8a1629e16070121",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "2f5b5f1f6981355ca4c56d7b95bd67e87d7241c7fe49d2e65bbb67edbda3dc48",
+      "recordBytes": 14659,
+      "retiresWithTree": false,
+      "edgeCount": 10,
+      "dispositions": {
+        "preserve": 10
+      }
+    },
+    {
+      "file": "docs/platform/migration-authoring-rules.md",
+      "set": "batch-108",
+      "sourceBytes": 5765,
+      "digest": "7b7d5bd462e55d6ac9ee993bbbb12607e37c8de19cb004e9d8bd4b020c605163",
+      "inventoryFileDigest": "7b7d5bd462e55d6ac9ee993bbbb12607e37c8de19cb004e9d8bd4b020c605163",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "7a280461fd37d2983a585addaa82ede1f42e5137639bb1cc70f378348d27ce73",
+      "recordBytes": 46569,
+      "retiresWithTree": false,
+      "edgeCount": 15,
+      "dispositions": {
+        "preserve": 3,
+        "phase9-row-flip": 4,
+        "parked": 8
+      }
+    },
+    {
+      "file": "docs/platform/observe/decisions/observe-component-architecture.md",
+      "set": "batch-109",
+      "sourceBytes": 3732,
+      "digest": "e9c67f18fb66c7ae9144db38da213de5adea71c258e95e6565c079f4e0ffd265",
+      "inventoryFileDigest": "e9c67f18fb66c7ae9144db38da213de5adea71c258e95e6565c079f4e0ffd265",
+      "diffSha256": "2aa5978a8e67f699940578d8de3f2a47f9a4818c6d7027077c821ef4906ee6cf",
+      "recordSha256": "e4c21a2e1dbc00674e27a145e5041d4c5accf4f16827799b5d24bf2f7d96d199",
+      "recordBytes": 8322,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 1,
+        "patch": 1
+      }
+    },
+    {
+      "file": "docs/platform/observe/spec.md",
+      "set": "batch-109",
+      "sourceBytes": 19735,
+      "digest": "65d6f6e8e17fca248a7b027eb427c034205c3a70e5aab8b479eee1c374396460",
+      "inventoryFileDigest": "65d6f6e8e17fca248a7b027eb427c034205c3a70e5aab8b479eee1c374396460",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "e885db195ca06a1458311cec92f848f884fcac92f54f799e2c6c210d82474956",
+      "recordBytes": 10418,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "preserve": 5,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+      "set": "batch-110",
+      "sourceBytes": 6776,
+      "digest": "baaf434769eaf074a7879bbbbe22be594aa8a9054ca4c5ad6968e4b86e5307e0",
+      "inventoryFileDigest": "baaf434769eaf074a7879bbbbe22be594aa8a9054ca4c5ad6968e4b86e5307e0",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "2bf58b0cb32ef29bd4ddd7ba68fc4c6b20a7705a13370a2ebfde54db3abafa72",
+      "recordBytes": 1571,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "set": "batch-110",
+      "sourceBytes": 6129,
+      "digest": "96b84e54fe6e483f474628d348d21a76fbff8e364c9be45b4f2523e8c383e897",
+      "inventoryFileDigest": "96b84e54fe6e483f474628d348d21a76fbff8e364c9be45b4f2523e8c383e897",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "cf35944e1ce39cd4570cc0ccb0cfca053271b7f9e017063bba8d356ca440b0b4",
+      "recordBytes": 5183,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 4
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "set": "batch-110",
+      "sourceBytes": 19443,
+      "digest": "542886733d06d326fc47e4f65064f07cdfaea9a0f7074a903ad34aae0f2ce74e",
+      "inventoryFileDigest": "542886733d06d326fc47e4f65064f07cdfaea9a0f7074a903ad34aae0f2ce74e",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "6672f3ecc0eb7a84dac81f511920bae90f5fc98930fe960579bb3bc28a410747",
+      "recordBytes": 15003,
+      "retiresWithTree": false,
+      "edgeCount": 13,
+      "dispositions": {
+        "preserve": 12,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/code-panel-rollout-plan.md",
+      "set": "batch-110",
+      "sourceBytes": 19183,
+      "digest": "932f7e4e53e44601840a644dd9d1d155a380ce7a1aa81294f200dadbe096867f",
+      "inventoryFileDigest": "932f7e4e53e44601840a644dd9d1d155a380ce7a1aa81294f200dadbe096867f",
+      "diffSha256": "6b3c5e68d07922ef8c83971228d7cd078dfa672e8712463f0fa0d4f3c1204d1c",
+      "recordSha256": "7fadd69bab4e031f413fa8b54392dfdefb55120db3d3e4057a3e1c83e5048f9e",
+      "recordBytes": 8926,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "patch": 1,
+        "phase9-row-flip": 1
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "set": "batch-110",
+      "sourceBytes": 20626,
+      "digest": "059f595448c5d697af0f73a26fb92d5d240e35e92c53badc91d7ae503bfa3724",
+      "inventoryFileDigest": "059f595448c5d697af0f73a26fb92d5d240e35e92c53badc91d7ae503bfa3724",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "2bd6b5941e3a7ed02b74be6ddb24aa20f6fbb66e7f216dd99d978f3842b77814",
+      "recordBytes": 1568,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "set": "batch-110",
+      "sourceBytes": 5863,
+      "digest": "c60f62fd26004410268079055a2f33e7024c9bc2d0a1c8b8ef0203de0e7a503f",
+      "inventoryFileDigest": "c60f62fd26004410268079055a2f33e7024c9bc2d0a1c8b8ef0203de0e7a503f",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "a379e58f8fbd1b891cb23c21e497b8c761ae05749193d0250b9aecc9ba97ebfd",
+      "recordBytes": 2518,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "set": "batch-110",
+      "sourceBytes": 6861,
+      "digest": "8ebcf75f26cc668fd42d33cc1fc5baaf4c251ea505aad221550544ec840cea3f",
+      "inventoryFileDigest": "8ebcf75f26cc668fd42d33cc1fc5baaf4c251ea505aad221550544ec840cea3f",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "5ab810343190d5ccd0e2214fb933f11e378dc229fed3f770266fd8c91fe77aa5",
+      "recordBytes": 1565,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "set": "batch-110",
+      "sourceBytes": 13913,
+      "digest": "6b211f36e62d24bca59a1ebea32cf9862ce784cce8d420bfbb03f7d4e4988e7f",
+      "inventoryFileDigest": "6b211f36e62d24bca59a1ebea32cf9862ce784cce8d420bfbb03f7d4e4988e7f",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "a02d19967735a1af42c0424e0d3807dcda80cd1133fa981b451a7ffcc77ba6e3",
+      "recordBytes": 2239,
+      "retiresWithTree": false,
+      "edgeCount": 2,
+      "dispositions": {
+        "preserve": 2
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "set": "batch-110",
+      "sourceBytes": 15373,
+      "digest": "ad7ef96c4b60b4c3f3b6d76da600e42cee1571832c219ff3902124c91cf2da0b",
+      "inventoryFileDigest": "ad7ef96c4b60b4c3f3b6d76da600e42cee1571832c219ff3902124c91cf2da0b",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "477f2fb5b678f052c190f0c7583d56c2a8ebfe52ac539856e07e2b6f32b95f25",
+      "recordBytes": 9418,
+      "retiresWithTree": false,
+      "edgeCount": 4,
+      "dispositions": {
+        "preserve": 3,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "set": "batch-110",
+      "sourceBytes": 20006,
+      "digest": "986c26c6f0ed2892f5a9ae7983fe987856894fafb43d7792d7194d11e39dc9ad",
+      "inventoryFileDigest": "986c26c6f0ed2892f5a9ae7983fe987856894fafb43d7792d7194d11e39dc9ad",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "258fab381311a9aac8a596ae1b0f7e59183c30ae352d77501f2c9e1153074b54",
+      "recordBytes": 3321,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+      "set": "batch-110",
+      "sourceBytes": 3367,
+      "digest": "f6bf6994580d75df3dbfff0658d269d77e32a59f8d0a24e328f426400c02ab99",
+      "inventoryFileDigest": "f6bf6994580d75df3dbfff0658d269d77e32a59f8d0a24e328f426400c02ab99",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "e87902b4fc69afde827af15f509fda5c1aad997b96f7d3701e358589c02e9b8f",
+      "recordBytes": 1390,
+      "retiresWithTree": false,
+      "edgeCount": 0,
+      "dispositions": {}
+    },
+    {
+      "file": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "set": "batch-110",
+      "sourceBytes": 49005,
+      "digest": "770f949ac340a17c9d4236e6635ae679b872795e974c11d641b50c3029a4c977",
+      "inventoryFileDigest": "770f949ac340a17c9d4236e6635ae679b872795e974c11d641b50c3029a4c977",
+      "diffSha256": "8b60f9b16b8570478c105d6bc969d0c6f5be4a61d3093ac98f892b6c49bacbba",
+      "recordSha256": "a4cda577ef0b3feef08a9d7aad369ab97cde172928ea52e2ec52e1caf117e2e0",
+      "recordBytes": 31843,
+      "retiresWithTree": false,
+      "edgeCount": 28,
+      "dispositions": {
+        "preserve": 26,
+        "patch": 1,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/history/distribution-vision.md",
+      "set": "batch-110",
+      "sourceBytes": 13780,
+      "digest": "347a50e8030788b2d0852665b0f90600069e8a820ddc14566b0dd57d5cdcb68e",
+      "inventoryFileDigest": "347a50e8030788b2d0852665b0f90600069e8a820ddc14566b0dd57d5cdcb68e",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "c74c960b4f9d8eeb985f0fbe25101b99a9fabd79b523558b23f3114118383bb3",
+      "recordBytes": 10343,
+      "retiresWithTree": false,
+      "edgeCount": 8,
+      "dispositions": {
+        "preserve": 8
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "set": "batch-110",
+      "sourceBytes": 14558,
+      "digest": "440db2077af6b47a31de11c589ef06860b7bed61a892a62bdec02d7e6760266b",
+      "inventoryFileDigest": "440db2077af6b47a31de11c589ef06860b7bed61a892a62bdec02d7e6760266b",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "688baf9baafdd7bb66a1c844519b1caebe44fe5976fa8cd4b4b677897324f594",
+      "recordBytes": 14748,
+      "retiresWithTree": false,
+      "edgeCount": 20,
+      "dispositions": {
+        "preserve": 20
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/reports/track-closeout.md",
+      "set": "batch-110",
+      "sourceBytes": 12466,
+      "digest": "637a1c3c2a8fab87f188b508e59a9dc1b8480efb62ec6d1d4acd094777a924ef",
+      "inventoryFileDigest": "637a1c3c2a8fab87f188b508e59a9dc1b8480efb62ec6d1d4acd094777a924ef",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "67b55b53781351330808f62d5500a5d3debb569095e8f33f986f0b48c8e99d69",
+      "recordBytes": 9723,
+      "retiresWithTree": false,
+      "edgeCount": 9,
+      "dispositions": {
+        "preserve": 9
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/spec.md",
+      "set": "batch-110",
+      "sourceBytes": 99733,
+      "digest": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+      "inventoryFileDigest": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "9afb20d687caad48f2ed6f502f66a56ad8515ad7c78365be7afb35cb0840860e",
+      "recordBytes": 43986,
+      "retiresWithTree": false,
+      "edgeCount": 27,
+      "dispositions": {
+        "preserve": 23,
+        "parked": 4
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/verification/implementation-alignment.md",
+      "set": "batch-110",
+      "sourceBytes": 14320,
+      "digest": "15f5f3db04b2e759d3d17b82a02ecd87f48c7b0c7d87e1963a6947f0c4f35a44",
+      "inventoryFileDigest": "15f5f3db04b2e759d3d17b82a02ecd87f48c7b0c7d87e1963a6947f0c4f35a44",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "13a1fe6a0c1da2eb3e910e7797b72662a1f50726e1faf083ab610b8e37887156",
+      "recordBytes": 7462,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "preserve": 6
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
+      "set": "batch-110",
+      "sourceBytes": 13448,
+      "digest": "f64194e4f363c1202f0309c9c07dfc309fe401e62f3712353e845334e5cee09d",
+      "inventoryFileDigest": "f64194e4f363c1202f0309c9c07dfc309fe401e62f3712353e845334e5cee09d",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "59c9b01583eac40408d3f9f438d51a1c97bec9301d584392495c4b3ef1dcb488",
+      "recordBytes": 2369,
+      "retiresWithTree": false,
+      "edgeCount": 1,
+      "dispositions": {
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/verification/source-preservation-audit.md",
+      "set": "batch-110",
+      "sourceBytes": 17529,
+      "digest": "e6a389aa7495b41e4b953323511470e02322897f6a9d794d49ae8bacb77aa85b",
+      "inventoryFileDigest": "e6a389aa7495b41e4b953323511470e02322897f6a9d794d49ae8bacb77aa85b",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "e2bf5942ad03891e1b47f24bdc529c652a3ea182e25956da4aac9c77af31fcb9",
+      "recordBytes": 61133,
+      "retiresWithTree": false,
+      "edgeCount": 50,
+      "dispositions": {
+        "preserve": 50
+      }
+    },
+    {
+      "file": "docs/platform/packaging-distribution/vision.md",
+      "set": "batch-110",
+      "sourceBytes": 6876,
+      "digest": "4a028337dc8a2ac3e80a4779c0e3af8601b854e6360c0d6cef32d644bfa74ad3",
+      "inventoryFileDigest": "4a028337dc8a2ac3e80a4779c0e3af8601b854e6360c0d6cef32d644bfa74ad3",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "654807d16e587374ccf3eaba6e5e7439cfa7b00ca83a1efdb0cdf110a22cfa8a",
+      "recordBytes": 4447,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "preserve": 3
+      }
+    },
+    {
+      "file": "docs/platform/platform-foundations.md",
+      "set": "batch-111",
+      "sourceBytes": 21729,
+      "digest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+      "inventoryFileDigest": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "29dcf8a4158a503e64ec79c1a74f37c40b3e167414bb295e23ff43e5ee67bdc6",
+      "recordBytes": 54913,
+      "retiresWithTree": false,
+      "edgeCount": 30,
+      "dispositions": {
+        "preserve": 11,
+        "parked": 4,
+        "phase9-row-flip": 15
+      }
+    },
+    {
+      "file": "docs/platform/process/spec.md",
+      "set": "batch-112",
+      "sourceBytes": 18818,
+      "digest": "11b2aafffa0aa412c1489957fad0d42df0d3105aa037378fbc609947f28185b1",
+      "inventoryFileDigest": "11b2aafffa0aa412c1489957fad0d42df0d3105aa037378fbc609947f28185b1",
+      "diffSha256": "262bd8df86e14ec7293c5c935ef51ac5769d7e311580f3ac9e63e51560c130b3",
+      "recordSha256": "f7f988ddfdea948f63838686d1b681a8d14b78ad1fa91da24cd8be862baf261a",
+      "recordBytes": 15395,
+      "retiresWithTree": false,
+      "edgeCount": 3,
+      "dispositions": {
+        "patch": 2,
+        "preserve": 1
+      }
+    },
+    {
+      "file": "docs/platform/proposals/architecture-advisory-panel.md",
+      "set": "batch-113",
+      "sourceBytes": 33205,
+      "digest": "6d9ccca7be37d1174b1d122598a2003800fc816b9d6c45d8c2d08c3271c424c2",
+      "inventoryFileDigest": "6d9ccca7be37d1174b1d122598a2003800fc816b9d6c45d8c2d08c3271c424c2",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "8c7a6b6f3dee1e8dae4548d5dfcd41a225ad7f5a87bf608c85704c9b8575bd2c",
+      "recordBytes": 17888,
+      "retiresWithTree": false,
+      "edgeCount": 9,
+      "dispositions": {
+        "preserve": 8,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/proposals/coordination-capability-envelope.md",
+      "set": "batch-113",
+      "sourceBytes": 30098,
+      "digest": "cb550ddf91b56b91cabac628285a1d8c224a3a93ac91c08dbbbe089bbaf7df13",
+      "inventoryFileDigest": "cb550ddf91b56b91cabac628285a1d8c224a3a93ac91c08dbbbe089bbaf7df13",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "f68b37b1f87bbffdd4e9de830b26674add709b73de5b12d42d9c0ae1fb501196",
+      "recordBytes": 15686,
+      "retiresWithTree": false,
+      "edgeCount": 8,
+      "dispositions": {
+        "preserve": 7,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/proposals/coordination-dispatch-contract.md",
+      "set": "batch-113",
+      "sourceBytes": 15987,
+      "digest": "9b58b9d781eb2dfd2a67aa8e635e0b02a9beede172d38325adedd7bbd68aa402",
+      "inventoryFileDigest": "9b58b9d781eb2dfd2a67aa8e635e0b02a9beede172d38325adedd7bbd68aa402",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "50d666bcd9003e7645409f2027b75ba56713cae91dca6fefa521c116b8f020ee",
+      "recordBytes": 12819,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "preserve": 5,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/proposals/coordination-envelope-probe-contract.md",
+      "set": "batch-113",
+      "sourceBytes": 12167,
+      "digest": "d294fc201b1ff9b73b18899b366e8e0366faaf3e2e910f3eeca7ca603569b24b",
+      "inventoryFileDigest": "d294fc201b1ff9b73b18899b366e8e0366faaf3e2e910f3eeca7ca603569b24b",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "d650ce1046a4f36a7d759856dc37d24251510324c7a02a33f203998c00a4e9b4",
+      "recordBytes": 13826,
+      "retiresWithTree": false,
+      "edgeCount": 7,
+      "dispositions": {
+        "preserve": 6,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/proposals/coordination-worker-provider-boundary.md",
+      "set": "batch-113",
+      "sourceBytes": 14992,
+      "digest": "0f7a5b0db1cf1cb22c22fd0d270306af2e34010c48e09a651d1764c1b7e226f9",
+      "inventoryFileDigest": "0f7a5b0db1cf1cb22c22fd0d270306af2e34010c48e09a651d1764c1b7e226f9",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "3167bf89545ae3267ae7aed7d89543720cd5bbc752ce8ac07d4f2b514b28168e",
+      "recordBytes": 16595,
+      "retiresWithTree": false,
+      "edgeCount": 9,
+      "dispositions": {
+        "preserve": 8,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/proposals/dispatch-control-plane-redesign.md",
+      "set": "batch-113",
+      "sourceBytes": 1895,
+      "digest": "1f7fd2299fd6c451f8a983c87a5be2056e158c664fa19aeb0de787b641b6aaf9",
+      "inventoryFileDigest": "1f7fd2299fd6c451f8a983c87a5be2056e158c664fa19aeb0de787b641b6aaf9",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "f410b00632e80d3412ed6384938729d8910e8a44a88046167289df4c58ad7823",
+      "recordBytes": 10589,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "preserve": 5,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/proposals/documentation-system-unification.md",
+      "set": "batch-113",
+      "sourceBytes": 53565,
+      "digest": "2ed9005ac755ea48408d791a0783c23ed61b3678358152e7164ea9c22b98d88f",
+      "inventoryFileDigest": "2ed9005ac755ea48408d791a0783c23ed61b3678358152e7164ea9c22b98d88f",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "9039687a69ff34a38b18b5c806d8a00a29d988024141efb4ba5e2a038953eba2",
+      "recordBytes": 128337,
+      "retiresWithTree": false,
+      "edgeCount": 34,
+      "dispositions": {
+        "preserve": 12,
+        "parked": 18,
+        "phase9-row-flip": 4
+      }
+    },
+    {
+      "file": "docs/platform/proposals/doing-coordination-redesign.md",
+      "set": "batch-113",
+      "sourceBytes": 38568,
+      "digest": "65b9928c8644826a64a73c6eacda9e5bff15c16696b8eab4e64944e9e644c28f",
+      "inventoryFileDigest": "65b9928c8644826a64a73c6eacda9e5bff15c16696b8eab4e64944e9e644c28f",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "430455632076d8b3b2ea533913aadff3ae840bcf6bc19634f2fcbe4d53fa81d6",
+      "recordBytes": 10054,
+      "retiresWithTree": false,
+      "edgeCount": 6,
+      "dispositions": {
+        "preserve": 5,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/proposals/knowledge-registry-redesign.md",
+      "set": "batch-113",
+      "sourceBytes": 35396,
+      "digest": "86eeb55d9643c559469f49cdb6fd2981722cbe52bf7cac6a2b6365faa12fe113",
+      "inventoryFileDigest": "86eeb55d9643c559469f49cdb6fd2981722cbe52bf7cac6a2b6365faa12fe113",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "b061c50056512b0e61dd7e636f204e71256e56a4ba88e47ad567e0b4dce186ad",
+      "recordBytes": 32396,
+      "retiresWithTree": false,
+      "edgeCount": 15,
+      "dispositions": {
+        "preserve": 11,
+        "parked": 4
+      }
+    },
+    {
+      "file": "docs/platform/proposals/step-09-group-thinking-substrate.md",
+      "set": "batch-113",
+      "sourceBytes": 32581,
+      "digest": "002c0b30a6d7073a8ad136907b5462d1150abbafa841697028bfa1f0e64be41f",
+      "inventoryFileDigest": "002c0b30a6d7073a8ad136907b5462d1150abbafa841697028bfa1f0e64be41f",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "f6752a407113f8601ba22828ddfca47396a6914c066cfbeb87dfcc1183ad3d16",
+      "recordBytes": 25945,
+      "retiresWithTree": false,
+      "edgeCount": 14,
+      "dispositions": {
+        "preserve": 13,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+      "set": "batch-113",
+      "sourceBytes": 24741,
+      "digest": "4c421a90ae1c48bbbd6fef7e781010ed8aa2b26af8edc63f07ad2945c26ab46e",
+      "inventoryFileDigest": "4c421a90ae1c48bbbd6fef7e781010ed8aa2b26af8edc63f07ad2945c26ab46e",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "b36bc36de87b4ef80a505939fb9ad060420839026fa7f448e281f4d62551ba69",
+      "recordBytes": 17125,
+      "retiresWithTree": false,
+      "edgeCount": 11,
+      "dispositions": {
+        "preserve": 10,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+      "set": "batch-113",
+      "sourceBytes": 54522,
+      "digest": "7285d2a7d7ec8da851731f6215760640e31fbb226d869358708b8529a73e67f4",
+      "inventoryFileDigest": "7285d2a7d7ec8da851731f6215760640e31fbb226d869358708b8529a73e67f4",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "f4fd3da0e119850646de4bf0ee585445233f1539cbcb58d7d6633bce3b85c846",
+      "recordBytes": 35856,
+      "retiresWithTree": false,
+      "edgeCount": 19,
+      "dispositions": {
+        "preserve": 18,
+        "parked": 1
+      }
+    },
+    {
+      "file": "docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md",
+      "set": "batch-113",
+      "sourceBytes": 69137,
+      "digest": "63b6988127e494a845e7ce09d64fc584f802221b61b2089cb78ee2c5f27ca858",
+      "inventoryFileDigest": "63b6988127e494a845e7ce09d64fc584f802221b61b2089cb78ee2c5f27ca858",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recordSha256": "4188fc8916732af5c23e5ef0394c3ed7bb89c4b02a9b975884fe3a4480ea33e2",
+      "recordBytes": 34817,
+      "retiresWithTree": false,
+      "edgeCount": 22,
+      "dispositions": {
+        "preserve": 21,
+        "parked": 1
+      }
+    }
+  ],
+  "sets": [
+    {
+      "set": "batch-105",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000105",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+          "bytes": 34308,
+          "edges": 51,
+          "sizeThreshold": false,
+          "edgeThreshold": true
+        }
+      ],
+      "selected": [
+        "docs/platform/host-invocation-routing/intent-preservation-ledger.md"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
+        "docs/platform/host-invocation-routing/architecture/invocation-kernel.md",
+        "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "docs/platform/host-invocation-routing/contracts/command-route-descriptor.md",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+        "docs/platform/host-invocation-routing/contracts/legacy-payload.md",
+        "docs/platform/host-invocation-routing/contracts/operation-catalog.md",
+        "docs/platform/host-invocation-routing/contracts/operation-provider.md",
+        "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md",
+        "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+        "docs/platform/host-invocation-routing/history/host-invocation-baseline.md",
+        "docs/platform/host-invocation-routing/history/source-inventory.md",
+        "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+        "docs/platform/host-invocation-routing/r2-external-process-rollout-plan.md",
+        "docs/platform/host-invocation-routing/r3-remote-peer-rollout-plan.md",
+        "docs/platform/host-invocation-routing/spec.md",
+        "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+        "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+        "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+        "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+      ],
+      "dispositions": {
+        "preserve": 213
+      }
+    },
+    {
+      "set": "batch-106",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000106",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "pilotFullReviewFiles": [
+        "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+        "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+        "docs/platform/host-invocation-routing/vision.md"
+      ],
+      "dispositions": {
+        "preserve": 28,
+        "phase9-row-flip": 1
+      }
+    },
+    {
+      "set": "batch-107",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000107",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "pilotFullReviewFiles": [
+        "docs/platform/intent-preservation-ledger.md"
+      ],
+      "dispositions": {
+        "preserve": 10
+      }
+    },
+    {
+      "set": "batch-108",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000108",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "pilotFullReviewFiles": [
+        "docs/platform/migration-authoring-rules.md"
+      ],
+      "dispositions": {
+        "preserve": 3,
+        "phase9-row-flip": 4,
+        "parked": 8
+      }
+    },
+    {
+      "set": "batch-109",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000109",
+      "population": [
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/observe/decisions/observe-component-architecture.md",
+          "rankHash": "2071c0d4124a5181702b3abc2c8df0285bb4afc65eb2809bc8ba9cf5e2c64b59"
+        }
+      ],
+      "sample": [
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/platform/observe/decisions/observe-component-architecture.md"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/platform/observe/decisions/observe-component-architecture.md",
+        "docs/platform/observe/spec.md"
+      ],
+      "dispositions": {
+        "preserve": 6,
+        "patch": 1,
+        "parked": 1
+      }
+    },
+    {
+      "set": "batch-110",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000110",
+      "population": [
+        "docs/platform/packaging-distribution/code-panel-rollout-plan.md",
+        "docs/platform/packaging-distribution/history/distribution-baseline.md"
+      ],
+      "populationCount": 2,
+      "ranks": [
+        {
+          "file": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+          "rankHash": "3d3c7608b5963f6941bff341ed832f558153232bcd170aff1f58d806b35cbfe4"
+        },
+        {
+          "file": "docs/platform/packaging-distribution/code-panel-rollout-plan.md",
+          "rankHash": "c00f3c12fc0c7207fec6bd12e1dc6ef765b29054df6c472c5a957c5e4a7dcc4f"
+        }
+      ],
+      "sample": [
+        "docs/platform/packaging-distribution/history/distribution-baseline.md"
+      ],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/platform/packaging-distribution/spec.md",
+          "bytes": 99733,
+          "edges": 27,
+          "sizeThreshold": true,
+          "edgeThreshold": false
+        },
+        {
+          "file": "docs/platform/packaging-distribution/verification/source-preservation-audit.md",
+          "bytes": 17529,
+          "edges": 50,
+          "sizeThreshold": false,
+          "edgeThreshold": true
+        }
+      ],
+      "selected": [
+        "docs/platform/packaging-distribution/history/distribution-baseline.md",
+        "docs/platform/packaging-distribution/spec.md",
+        "docs/platform/packaging-distribution/verification/source-preservation-audit.md"
+      ],
+      "distinctReviewCount": 3,
+      "pilotFullReviewFiles": [
+        "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+        "docs/platform/packaging-distribution/architecture/future-constraints.md",
+        "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "docs/platform/packaging-distribution/code-panel-rollout-plan.md",
+        "docs/platform/packaging-distribution/contracts/activation-binding.md",
+        "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+        "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+        "docs/platform/packaging-distribution/contracts/release-manifest.md",
+        "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+        "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "docs/platform/packaging-distribution/history/distribution-baseline.md",
+        "docs/platform/packaging-distribution/history/distribution-vision.md",
+        "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+        "docs/platform/packaging-distribution/reports/track-closeout.md",
+        "docs/platform/packaging-distribution/spec.md",
+        "docs/platform/packaging-distribution/verification/implementation-alignment.md",
+        "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
+        "docs/platform/packaging-distribution/verification/source-preservation-audit.md",
+        "docs/platform/packaging-distribution/vision.md"
+      ],
+      "dispositions": {
+        "preserve": 175,
+        "parked": 7,
+        "patch": 2,
+        "phase9-row-flip": 1
+      }
+    },
+    {
+      "set": "batch-111",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000111",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [],
+      "selected": [],
+      "distinctReviewCount": 0,
+      "pilotFullReviewFiles": [
+        "docs/platform/platform-foundations.md"
+      ],
+      "dispositions": {
+        "preserve": 11,
+        "parked": 4,
+        "phase9-row-flip": 15
+      }
+    },
+    {
+      "set": "batch-112",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000112",
+      "population": [
+        "docs/platform/process/spec.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/process/spec.md",
+          "rankHash": "b1c436b4f655d900e4aca32aa9768a7f5680b05e02dc863cf13242cdb1f0f692"
+        }
+      ],
+      "sample": [
+        "docs/platform/process/spec.md"
+      ],
+      "mandatoryWitnesses": [],
+      "selected": [
+        "docs/platform/process/spec.md"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/platform/process/spec.md"
+      ],
+      "dispositions": {
+        "patch": 2,
+        "preserve": 1
+      }
+    },
+    {
+      "set": "batch-113",
+      "seed": "A51-step03-file-v1\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000113",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "sample": [],
+      "mandatoryWitnesses": [
+        {
+          "file": "docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md",
+          "bytes": 69137,
+          "edges": 22,
+          "sizeThreshold": true,
+          "edgeThreshold": false
+        }
+      ],
+      "selected": [
+        "docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md"
+      ],
+      "distinctReviewCount": 1,
+      "pilotFullReviewFiles": [
+        "docs/platform/proposals/architecture-advisory-panel.md",
+        "docs/platform/proposals/coordination-capability-envelope.md",
+        "docs/platform/proposals/coordination-dispatch-contract.md",
+        "docs/platform/proposals/coordination-envelope-probe-contract.md",
+        "docs/platform/proposals/coordination-worker-provider-boundary.md",
+        "docs/platform/proposals/dispatch-control-plane-redesign.md",
+        "docs/platform/proposals/documentation-system-unification.md",
+        "docs/platform/proposals/doing-coordination-redesign.md",
+        "docs/platform/proposals/knowledge-registry-redesign.md",
+        "docs/platform/proposals/step-09-group-thinking-substrate.md",
+        "docs/platform/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+        "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md"
+      ],
+      "dispositions": {
+        "preserve": 129,
+        "parked": 33,
+        "phase9-row-flip": 4
+      }
+    }
+  ],
+  "unpatchedStrata": {
+    "105": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-105",
+      "population": [
+        "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
+        "docs/platform/host-invocation-routing/architecture/invocation-kernel.md",
+        "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "docs/platform/host-invocation-routing/contracts/command-route-descriptor.md",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+        "docs/platform/host-invocation-routing/contracts/legacy-payload.md",
+        "docs/platform/host-invocation-routing/contracts/operation-catalog.md",
+        "docs/platform/host-invocation-routing/contracts/operation-provider.md",
+        "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md",
+        "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+        "docs/platform/host-invocation-routing/history/host-invocation-baseline.md",
+        "docs/platform/host-invocation-routing/history/source-inventory.md",
+        "docs/platform/host-invocation-routing/spec.md",
+        "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+        "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+        "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+        "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md"
+      ],
+      "populationCount": 22,
+      "ranks": [
+        {
+          "file": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+          "rankHash": "00afad9873c205b5833e1fb0dbcba9100f63016ea5294c2593f7a5a53ff271ab"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/architecture/invocation-kernel.md",
+          "rankHash": "02f01ec21d97cbbbdb5a184202cd8d069ee20c983043dbc481bb84336ea79398"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+          "rankHash": "0795fcb45a1fd53bb15d3bf6a6114d006e3cae7c2070b7303921fe5b72ac682e"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md",
+          "rankHash": "19ae82164f449aca20642fdf2072b6a8bece9aba3bbe13ba2cbe05a084008def"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+          "rankHash": "25c3bed6a932c6f707cf9ab697aa6ace0cd2c9d926196abcb80b86c8aa478428"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+          "rankHash": "3cea1ecbf894442f572016190bee1ab263eca02e41678c7e4d069ad856298efd"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "rankHash": "3d5a97ad974f0a7f39bef4299738792af0c5dc5503cfd1143b95eb6d787c2e13"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+          "rankHash": "50091c44a9274071bec8b42dfd9c8a012cbc129316099b29d15c6b4f27b26fb5"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+          "rankHash": "53369679458ce47c3e45e2c6da1a5053fcd390101b3f7e2e1f64735ebd9bdef1"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+          "rankHash": "6288f5ec9626857e57ea9e32000123122a8fd8c4585a7e51aca58354f101e89c"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/contracts/legacy-payload.md",
+          "rankHash": "64849360c2827b57d06d3e9a201ba616aea941f26a9fa5e358fe20a8499b5240"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/contracts/operation-provider.md",
+          "rankHash": "6dea698240f9ab2599cf2b6d6e68b231967f245bf025cd3e51ab02f6472d05e9"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+          "rankHash": "6fe48e54ae69a3c758bcbb502afdc084389c96be49732d758ded7c8f042516a1"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
+          "rankHash": "73c4296336c7b6603938a4fca4699f143f29c6396ff0f5bec37f9a6b2dbc746b"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+          "rankHash": "753e9efa0e0b869c8e80a8ba40c23401ca216377631086a4f2d3301c2f88b636"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+          "rankHash": "7b5f00d138690297f287981e575620e50466b2742f8c9f8191a6d37d2ea3e79f"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/contracts/command-route-descriptor.md",
+          "rankHash": "870ae12b60e9ec513ea82d239c1b1c118b99e84547971845bb4c4f3cbe2a154d"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+          "rankHash": "b5bee1ff94c62546da84f35b77035fe0aea27f16ab943953bd5c2e76e6826609"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/contracts/operation-catalog.md",
+          "rankHash": "baf037aa7cf4091d77e0e3dd2313e9209b734c05f33a684750421e87699664d0"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/spec.md",
+          "rankHash": "cbee95d080c9da270c0efbe3e95392434b57d52ccd05d7cbd339db743b4f0d63"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/history/source-inventory.md",
+          "rankHash": "f96e5a7124e7087fe7b6643a2aabb0989dd8c8cbd96d9ab6092f28909d79a055"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/history/host-invocation-baseline.md",
+          "rankHash": "ff3131e9fe7ea6f40deb561790421d3f4e1300a412a44d09f7caf03c2be51098"
+        }
+      ],
+      "selected": [
+        "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "docs/platform/host-invocation-routing/architecture/invocation-kernel.md",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md"
+      ],
+      "reviewedDenominator": 0,
+      "reworkNumerator": "pending"
+    },
+    "106": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-106",
+      "population": [
+        "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+        "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+        "docs/platform/host-invocation-routing/vision.md"
+      ],
+      "populationCount": 3,
+      "ranks": [
+        {
+          "file": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+          "rankHash": "22b22bfec908db39faf69a06be159c925bbc1d71da4eeb5efb442fe123782d67"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+          "rankHash": "bb7fd9182a9980dde63028b227241925623011ac25d8eb12543f71238f2f11ad"
+        },
+        {
+          "file": "docs/platform/host-invocation-routing/vision.md",
+          "rankHash": "bc3079b1f23bba63f43bb66af1e4939d056fc5dccd7767569dee6031270b1a6e"
+        }
+      ],
+      "selected": [
+        "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md"
+      ],
+      "reviewedDenominator": 0,
+      "reworkNumerator": "pending"
+    },
+    "107": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-107",
+      "population": [
+        "docs/platform/intent-preservation-ledger.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/intent-preservation-ledger.md",
+          "rankHash": "e3835de2ce2dbb45877ea4e85efa0a29419dd54bd3c3e7017a4ccd02776d755f"
+        }
+      ],
+      "selected": [
+        "docs/platform/intent-preservation-ledger.md"
+      ],
+      "reviewedDenominator": 0,
+      "reworkNumerator": "pending"
+    },
+    "108": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-108",
+      "population": [
+        "docs/platform/migration-authoring-rules.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/migration-authoring-rules.md",
+          "rankHash": "f0a714775e693066805ecee8cee22b351a327f542ad6f1222d0204f93bb9b42d"
+        }
+      ],
+      "selected": [
+        "docs/platform/migration-authoring-rules.md"
+      ],
+      "reviewedDenominator": 0,
+      "reworkNumerator": "pending"
+    },
+    "109": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-109",
+      "population": [
+        "docs/platform/observe/spec.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/observe/spec.md",
+          "rankHash": "96a1ee1ea766c568d51f00cfcd1083748145e1595e2165791cfcfc20f900dcc5"
+        }
+      ],
+      "selected": [
+        "docs/platform/observe/spec.md"
+      ],
+      "reviewedDenominator": 0,
+      "reworkNumerator": "pending"
+    },
+    "110": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-110",
+      "population": [
+        "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+        "docs/platform/packaging-distribution/architecture/future-constraints.md",
+        "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "docs/platform/packaging-distribution/contracts/activation-binding.md",
+        "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+        "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+        "docs/platform/packaging-distribution/contracts/release-manifest.md",
+        "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+        "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "docs/platform/packaging-distribution/history/distribution-vision.md",
+        "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+        "docs/platform/packaging-distribution/reports/track-closeout.md",
+        "docs/platform/packaging-distribution/verification/implementation-alignment.md",
+        "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
+        "docs/platform/packaging-distribution/vision.md"
+      ],
+      "populationCount": 15,
+      "ranks": [
+        {
+          "file": "docs/platform/packaging-distribution/verification/implementation-alignment.md",
+          "rankHash": "0c6028a9b5802a452f3547faffd7ffda90f029ee200dfa74bc57a0f9611010bb"
+        },
+        {
+          "file": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+          "rankHash": "1ae043b5cdaa2e70fab1c8ad1cba9a1b71d222e51cad02ea9b97b66fbe9bc0fb"
+        },
+        {
+          "file": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+          "rankHash": "1f2c2cbca8eccc82408ca134cb6a9e1d53af04b8f18cf277c0fbf340be56fc6d"
+        },
+        {
+          "file": "docs/platform/packaging-distribution/history/distribution-vision.md",
+          "rankHash": "25c9d0f7f86f7c6c4117a86950dbe5ea5d0a48e71d0ae0af0b52b122afaa1c06"
+        },
+        {
+          "file": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+          "rankHash": "2caee428b3f4625a6b3554a660ec7e4061a14c69fe6cd6c223c7c213844562b7"
+        },
+        {
+          "file": "docs/platform/packaging-distribution/vision.md",
+          "rankHash": "3c48ddcd23c3acd6313868bf2605ab33bdc927d78e9c879ec260b09bdcd08d7a"
+        },
+        {
+          "file": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+          "rankHash": "6ade56677257594967001456049796a5926302d09691d3e464ec9c1c76dcb938"
+        },
+        {
+          "file": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+          "rankHash": "73eed59ae10f5b39bee9661fdf2f1ffb4a18bd9028131a267e09500270b19c22"
+        },
+        {
+          "file": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+          "rankHash": "7ec7dfc9ad217f36f9d9996d55d043dfc1feb22d464ec05aa409c8f14897367e"
+        },
+        {
+          "file": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+          "rankHash": "920a3806f55116cf761ac318758a37db8cc365489df30a6d5cf168e596cba383"
+        },
+        {
+          "file": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+          "rankHash": "9558877fe50a9e97611545a55b3a3219b13a14f9e8fae77d122f144c8cf3cbdd"
+        },
+        {
+          "file": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+          "rankHash": "9e00dda179564f9f3c930dd5f1f887a440d63515e0c0baa01b8d03e7c917a117"
+        },
+        {
+          "file": "docs/platform/packaging-distribution/reports/track-closeout.md",
+          "rankHash": "c4330f531f3119119a03fc93670bac777e35e9f00c67dd35d703b81f93d404d3"
+        },
+        {
+          "file": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
+          "rankHash": "e87c0b3350beb27828f9849777d3ae47197405e8fda0bbfe14194705bf35c581"
+        },
+        {
+          "file": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+          "rankHash": "f736b37d62af3c9f6693dae40cc2f302820d6f9977cffad349143276d2dd8193"
+        }
+      ],
+      "selected": [
+        "docs/platform/packaging-distribution/verification/implementation-alignment.md",
+        "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+        "docs/platform/packaging-distribution/contracts/projection-ledger.md"
+      ],
+      "reviewedDenominator": 0,
+      "reworkNumerator": "pending"
+    },
+    "111": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-111",
+      "population": [
+        "docs/platform/platform-foundations.md"
+      ],
+      "populationCount": 1,
+      "ranks": [
+        {
+          "file": "docs/platform/platform-foundations.md",
+          "rankHash": "29feeab1ba4b993643fdd517bf4540bc3909bc17420aa0ea8da13fda14d7e2d1"
+        }
+      ],
+      "selected": [
+        "docs/platform/platform-foundations.md"
+      ],
+      "reviewedDenominator": 0,
+      "reworkNumerator": "pending"
+    },
+    "112": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-112",
+      "population": [],
+      "populationCount": 0,
+      "ranks": [],
+      "selected": [],
+      "reviewedDenominator": 0,
+      "reworkNumerator": "pending"
+    },
+    "113": {
+      "seed": "A51-step03-file-v1-unpatched\u0000ae141550c2e022310de7a0efea757580c0b2479f\u0000batch-113",
+      "population": [
+        "docs/platform/proposals/architecture-advisory-panel.md",
+        "docs/platform/proposals/coordination-capability-envelope.md",
+        "docs/platform/proposals/coordination-dispatch-contract.md",
+        "docs/platform/proposals/coordination-envelope-probe-contract.md",
+        "docs/platform/proposals/coordination-worker-provider-boundary.md",
+        "docs/platform/proposals/dispatch-control-plane-redesign.md",
+        "docs/platform/proposals/documentation-system-unification.md",
+        "docs/platform/proposals/doing-coordination-redesign.md",
+        "docs/platform/proposals/knowledge-registry-redesign.md",
+        "docs/platform/proposals/step-09-group-thinking-substrate.md",
+        "docs/platform/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+        "docs/platform/proposals/step-10-coding-domain-adoption.md"
+      ],
+      "populationCount": 12,
+      "ranks": [
+        {
+          "file": "docs/platform/proposals/documentation-system-unification.md",
+          "rankHash": "1efeaae735c1a94c4985fe395cde0e770788d2e98225dce9ad51f454ab02b8d2"
+        },
+        {
+          "file": "docs/platform/proposals/coordination-capability-envelope.md",
+          "rankHash": "21962035bcf4c0b452f0d2e61018fa869b6d4f9a0539cc2f5b5c40399ccee82a"
+        },
+        {
+          "file": "docs/platform/proposals/step-09-group-thinking-substrate.md",
+          "rankHash": "3594a7bdf90d9fa4b4b246d44d5b721bb34bfd1bda6a9f009b233e101c50207f"
+        },
+        {
+          "file": "docs/platform/proposals/dispatch-control-plane-redesign.md",
+          "rankHash": "434f8dc0e78f96a0ce3ffa6ceec7d90b20bfb8d44e6c90600a70bf731752641e"
+        },
+        {
+          "file": "docs/platform/proposals/knowledge-registry-redesign.md",
+          "rankHash": "5561bd8e0be88dd41c8a2e06bf4f8c154ed88c811e055101d725fdcd0a85e069"
+        },
+        {
+          "file": "docs/platform/proposals/doing-coordination-redesign.md",
+          "rankHash": "789b53e80bcc0b955c102b64ac0c8c55f338104093cdaafd3b58ae954653b6c4"
+        },
+        {
+          "file": "docs/platform/proposals/coordination-envelope-probe-contract.md",
+          "rankHash": "7a433930d34f3c32a9601a40d479f82c873fbd6756fbbc6d24cf2a7e62a7b2ce"
+        },
+        {
+          "file": "docs/platform/proposals/architecture-advisory-panel.md",
+          "rankHash": "811a4ac2f2973594c91223bdf0f8e546b4a3ea5557c75ea69761f8e53f43aceb"
+        },
+        {
+          "file": "docs/platform/proposals/coordination-dispatch-contract.md",
+          "rankHash": "a3164c07c243fef7ce674f89fb8f303d79af3a10757f9c8f2b32672ddd0cb0e8"
+        },
+        {
+          "file": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+          "rankHash": "acafb9f0e826c280f8d48b32359456cad70936b5c982943edbde75a96e551f75"
+        },
+        {
+          "file": "docs/platform/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+          "rankHash": "dce5a627cb1ae2aca02b08f56810ff2b898b93810f945a9329a93a1a90456c31"
+        },
+        {
+          "file": "docs/platform/proposals/coordination-worker-provider-boundary.md",
+          "rankHash": "fb04de02c7e6d3c854352658ee4986d61afdd8a5f93045eed438fcb2f5e5d699"
+        }
+      ],
+      "selected": [
+        "docs/platform/proposals/documentation-system-unification.md",
+        "docs/platform/proposals/coordination-capability-envelope.md"
+      ],
+      "reviewedDenominator": 0,
+      "reworkNumerator": "pending"
+    }
+  },
+  "recordFiles": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-105.jsonl",
+      "sha256": "f24ee3fc83053d96d82bf1726f1e24d2a5aee98f54f928a9784760ac6a8bbc06"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-106.jsonl",
+      "sha256": "0582babed0d22737a10430131fed96df151c4d589b46bc81aea906ce31aa9fe2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-107.jsonl",
+      "sha256": "2f5b5f1f6981355ca4c56d7b95bd67e87d7241c7fe49d2e65bbb67edbda3dc48"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-108.jsonl",
+      "sha256": "7a280461fd37d2983a585addaa82ede1f42e5137639bb1cc70f378348d27ce73"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-109.jsonl",
+      "sha256": "f2b5075238c7d8414c028ab9da421c4a2f2660171000004de38ea9f4a7ebff9a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-110.jsonl",
+      "sha256": "7ec1ef28779632e5e286e668fb9464ca5488f95b55a075c177dbd8e8675fed74"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-111.jsonl",
+      "sha256": "29dcf8a4158a503e64ec79c1a74f37c40b3e167414bb295e23ff43e5ee67bdc6"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-112.jsonl",
+      "sha256": "f7f988ddfdea948f63838686d1b681a8d14b78ad1fa91da24cd8be862baf261a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-03-records/batch-113.jsonl",
+      "sha256": "6411e5cf28d3d8495b580afb473757fe06478c489fb444bccb2fc2d59877dc06"
+    }
+  ]
+}

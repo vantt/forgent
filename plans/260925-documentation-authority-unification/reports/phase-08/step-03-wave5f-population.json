@@ -1,0 +1,53 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "completedBatches": [
+    "105",
+    "106",
+    "107",
+    "108",
+    "109",
+    "110",
+    "111",
+    "112",
+    "113"
+  ],
+  "stopBoundary": "113; no partial next batch, no authorship of ≥114",
+  "files": 67,
+  "inventoryEdges": 548,
+  "addedEdges": 111,
+  "edges": 659,
+  "patchedFiles": 4,
+  "dispositions": {
+    "preserve": 576,
+    "phase9-row-flip": 25,
+    "parked": 53,
+    "patch": 5
+  },
+  "parks": {
+    "step5-parity": 8,
+    "description-rewrite": 38,
+    "phase9-carry": 3,
+    "GAP-02": 4
+  },
+  "openLeadRulingEdgesPerSet": {
+    "105": [],
+    "106": [],
+    "107": [],
+    "108": [],
+    "109": [],
+    "110": [],
+    "111": [],
+    "112": [],
+    "113": []
+  },
+  "newReview": {
+    "files": 21,
+    "edges": 334,
+    "parts": 5
+  },
+  "expansionReview": {
+    "files": 26,
+    "edges": 1388,
+    "parts": 11
+  }
+}

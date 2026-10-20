@@ -1,0 +1,1922 @@
+{
+  "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+  "files": [
+    {
+      "file": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 13564,
+      "lines": 182,
+      "sha256": "e6f0c282eb6fcafe142d61b199dee5f6f8ad80fb9cd7ed1f317dbf70701a9111",
+      "inventoryEdges": 13,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "e77df0d2dbf877f8805b8ce41d096b06baf3423b64b9dea9a0bbb502c64338ef"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "b7e5ffd8fb65640715748383c0599811309877975f4892f2495c8204737e8e77"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 182,
+          "sha256": "59718d3e5e4f6e292e7b891dd66389a95217d4c6458662f29184c35269496f75"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4519,
+      "lines": 52,
+      "sha256": "e736adcf550e767e87fe080adb6791b2dd1931f84b2d2078f761f1869882fc84",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 52,
+          "sha256": "a0729e33592e5d852ef2d642d21ac7e42d27529cdfe0336462c4a0414da537b4"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/architecture/invocation-kernel.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4386,
+      "lines": 55,
+      "sha256": "389412c0eca0db5c2acd67a6d54ad368d05e44ed4075ef131f00e48cd008785b",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 55,
+          "sha256": "cd4214c4ee8849405cf82aea1e8657fed9747bf953aaf0a08f411ff46f03d12e"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 17758,
+      "lines": 164,
+      "sha256": "900076c8bbb4ddfa56589f86e4d51df2e28ea712dd0f8866b4f67bce9794a2c4",
+      "inventoryEdges": 15,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "387123e53d3f0f9d694a745cd7faf9f5de25b6736632ddf5c9ab16065dd1d7e4"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "bc62b40a6a7d045e53f4593c4a42a0371e488e7dfda55fa7a98b93ee343fc3c8"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 164,
+          "sha256": "3eaa022ac84580089c4f18a7096348b08b6f519250b082268b264d2fc0836d51"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 23764,
+      "lines": 443,
+      "sha256": "c4be1d2cd83c8207a89608d3f6e6822b30973a6947ad8004c26fa1e45399a49b",
+      "inventoryEdges": 13,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "f43de5f1d09b5d115b2a6878df4f47ee3dadd6a29c525a8ca04128235d15ced1"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "2fc32c010bc232eab3eca0b8bc48e44d0a6c03776d6b3cd3e8fc4fda812fb9cb"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "fe16e28eb1904742c17eaf48262e833c09378b49be568e8ddf32302da84b713e"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "e647d702cbaab4665d0e68e53419f708cd6d726cc608d56a055f17a3086da6cb"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "b57b8d13950783a838bda2fcfdef454d3e83de7880e65e46ea669b6a10416629"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 443,
+          "sha256": "b90ee8c6cd6f55c5e9fee6705d30714916b210ec25011afb028d464f7f588b5d"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4798,
+      "lines": 61,
+      "sha256": "2660a8e9f0291a4c99f0dd06dc7dc4695d407965d6c937117639639690773c2e",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 61,
+          "sha256": "b0b22462c32888cb0a264ee3a4f7e6657ffef723eb8387f8db9870fac98cb3b3"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 15339,
+      "lines": 189,
+      "sha256": "f8e978fb99dbb6f794353e68f654d5b80396a7149f485c530ee46fcf9a8f84f9",
+      "inventoryEdges": 9,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "ce1eddd90e9a6e5fef5eacfca508a904f182f39320ac6cdcb77165fc2385150a"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "09ac565eea6a4b6a39ab6822dd579282b507a02e01bf6b38224ffb19029fa39c"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 189,
+          "sha256": "4260e58431db4d17d6f825136338774196c6d2aeb2c5311cffcc31acc1aca642"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/contracts/command-route-descriptor.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3587,
+      "lines": 61,
+      "sha256": "aba85b7f20eab828165bfaea494c77c4a526bea3db511d51276401443de07b54",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 61,
+          "sha256": "658cc6731f00015b2bb75988a1927877f914fc40a807424022ae4e0566ada582"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 17761,
+      "lines": 326,
+      "sha256": "ce3f29b86c0b2ad7f35c44e64c0bc4369000fad68baf0499bc108021e0139f70",
+      "inventoryEdges": 13,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "8bb92ed2fd7ca5ea510f73e1e0896024a95345eee348c2111efec3cd092e90a0"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "8d2a189046e46341f229e0f6873dcaf5b997a4cf0e796ef500b48afdaa25692a"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "d63a92cf43c1b7d73f24b14c9a05052517378f279556fed0dfef97784171ac68"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "46b52f8a8c64046eb8475b9777788ad6cc80057cdcf00762cad0dbf87800f5c4"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 326,
+          "sha256": "e4db1c08cea2ffc758eb632c36222337252c21d0d6fc995832bd9e0e62ce16e6"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3235,
+      "lines": 51,
+      "sha256": "19a69423f450586e21e98f5c932dcb5c1520ab1ccee370ccc0dcac14b2815714",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 51,
+          "sha256": "7e5d7a0e882d5e5378f1f6c995e5492874dd29d0a9ef166fd60e78f3f8702c68"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/contracts/legacy-payload.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3777,
+      "lines": 60,
+      "sha256": "30d88a025bf714263860005e1f0f37c96be1c338166febe7b3668ee1c10bd6d6",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 60,
+          "sha256": "677164368cb8f5327755065c077f04f246a69e1c59fc0606415b825e9fa39c28"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/contracts/operation-catalog.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3300,
+      "lines": 45,
+      "sha256": "6b453ba9878a7f93509832c677e78d75f5686d3f4a371fbcdd03fe55388246ab",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 45,
+          "sha256": "1c70b1fce1e7ab2d50ce608c899d1a6f4a4559bbc36ee417e7a1375b8126e0cf"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/contracts/operation-provider.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3338,
+      "lines": 49,
+      "sha256": "a0627e1f394730024382a9d1c220c1a75f7e32fb6d60a1f98615b678289c2ef5",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 49,
+          "sha256": "4b9f5e912fd5f61dd48322872a799ea2734edc53b5c518eb6954a29a95182218"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 4029,
+      "lines": 57,
+      "sha256": "701eaf883e485b77fa8e0972a41ce4438d110affffd8da85fd748ad109f1813a",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 57,
+          "sha256": "1ae838b3e12dbdac81e219cb311ca0d4c179ba78eaaa60dee1be0888565d03c0"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 22496,
+      "lines": 422,
+      "sha256": "3739b4d22b221a87b2c8a4c60679dd3de6d524a0931b8fd5bfea4ffe0829b8ca",
+      "inventoryEdges": 6,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "9d19409b521203ce9515a7465cc9c4cc4d529b503c68e0ae6687f6780b60d24c"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "e9eea2b9418cd0ee6c91378cf51108adbc2589d9947cc1b12d1f134c65f87594"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "9dee85fe9b0ad42a12e1f9d9a2c9c95993aa6977443a36a5d9c15e939acc939d"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "c1e5b48c28017a4bce263d80f273c1d53e005316618fd11b10308c24e8b05a88"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "820a45e73e2c2c44259ce239a5c8880620869677bc2f0b5fd4d495b3707857b5"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 422,
+          "sha256": "24baa4e6cabfceb0c5b8255c2ac56dab43278d0abb6cf6f79397a34a582c674b"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/history/host-invocation-baseline.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 2648,
+      "lines": 48,
+      "sha256": "165f732b474ace314c8f890888082544e13573d15291c94871b7de58655238a4",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 48,
+          "sha256": "5ce020536b798ad423790dbf3903f4d783c0cc08b468ec8ea721a7698c7a204f"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/history/source-inventory.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5623,
+      "lines": 51,
+      "sha256": "60189711d4193579d0acc5213ec765adb17224f6d81a275fdc7e7fc3abe5c01b",
+      "inventoryEdges": 13,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 51,
+          "sha256": "f7a1c0b41485eaaa59b84d40549fda1de476977a90117becd285090e07acd4ce"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 34308,
+      "lines": 136,
+      "sha256": "aaf8bfe8bf316eb9a0f052efaff3e39878386f79572c6e110201d0ce404b1878",
+      "inventoryEdges": 51,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "6570d9146a5752bfef05a99effa7e63e3fca701c1b7bff861a615a7ea39b8d92"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 136,
+          "sha256": "c9829f4fcaf88d2247091d3dcfdf362d35fd4f84fd87547dc8cdfc53191c8388"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/r2-external-process-rollout-plan.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1399,
+      "lines": 29,
+      "sha256": "2188f9a15473d9dd2149b7c75ad471f733329bf6283b0edfcb526f6be7ba8476",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 29,
+          "sha256": "ada85b26c54444ff4c80b2c6ff2bc746189b19dc8dbfe83388c4fa802213e088"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/r3-remote-peer-rollout-plan.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1360,
+      "lines": 29,
+      "sha256": "a93b6eaa791dbde6be510d6f2f035102eccca8393a71093febd6924236dc5a27",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 29,
+          "sha256": "2a8f6e9a4986910da3ca36e54548d82e63809342e6bce7d181d13a56fbc40b9e"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 32766,
+      "lines": 334,
+      "sha256": "7aaaa030b242b19a0bd4f0f9a8faac74d50b8b6a86c7817a73e7bc2f1848243f",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "fdb67953e3252374908e0650309f9ac96c5c57368d0901a730ffd2fe96fd00f3"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "0f0f627dc24016ba435d16c6eb624e0163885100738fc5871cc0e5d45a173ef1"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "6d06a2a811d650464df33a775ce4f466887a2009b659ce2370240c8e7e018c39"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "269de723049e23f1c03ff4cd460d0ed3844918fe9eef8e527055af6da8fe000a"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 334,
+          "sha256": "5a2fa71ffdf350a3bb6c7ba97bcad953498d67242bf3c871c3c4cb48bd00d571"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 7254,
+      "lines": 134,
+      "sha256": "4cd3b4a66ad636ace987474315e5575a202391e35b9925285a032e8b307a4ce2",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "0df1a65228bb8f68a0152e8ad262253b761271d9e6f0514cc2f18c67b2d80419"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 134,
+          "sha256": "4d4a54f32fb68349fced75f419a4df6995a18013be9012967c809cb405313eab"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 11243,
+      "lines": 63,
+      "sha256": "c3f31468ab486cf548fdd942ceb5fb0743a2abf476fb3820784a6f62c8b1a448",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 63,
+          "sha256": "615dacc43607920e0848af84b8259db340b4348143df72e4e011eb4a59a48aa1"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5518,
+      "lines": 92,
+      "sha256": "88fd9d8bab58c2d320f4769383cd3f6de146f95fa97bf5271e96634a32602be4",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "d3a080d8cd69e8553b7bcd0488ea396ec78b919a8cb8c9efbea30d67ee0077cd"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 92,
+          "sha256": "e0a5fd32fc296b039cd68ce223017a643b5d8f5b48523b505fbedb8179816097"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 10956,
+      "lines": 105,
+      "sha256": "455c0a5c92ad6d0c11fce08f2c45e0634b843a977dfe34a644cfc3f735bcea0c",
+      "inventoryEdges": 6,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "8e1bc02d41e6b55d9772249e341c42b30847f23126f8a3092b2678dd830fd8e3"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 105,
+          "sha256": "f5c5cec5d30da7041c1399e6e87222091babe3adff62653f3a2c145331425217"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 10951,
+      "lines": 112,
+      "sha256": "f8febf215e54b9302fb205b18e04efbfe94f11156d80682a874193dcd1b073a5",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "35f999ef3e683cee1a9ecd61b5000bc8d461c1ca7afb22130274c96f14e5eca2"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 112,
+          "sha256": "b62b43ed3c258fcbf47421cf4c5a7a0b2ba268b44777adbf2d2796a318c36949"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 15798,
+      "lines": 101,
+      "sha256": "40b8f3d8ed14f9b9e7f3cb1fcb663dcceefb9fee23f0ddeb5bca82512170da89",
+      "inventoryEdges": 18,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "ff25f0987e8a68b3e4f29da9c8f1cbe6216a783a514450930b7149d18789fab5"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 101,
+          "sha256": "7be999811a251262771940b1d4f12844ff64ecbbef726f9035d03bca7e95416a"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/host-invocation-routing/vision.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5639,
+      "lines": 79,
+      "sha256": "37e2e505dfd4481341e40be7ce505422529846fd8754e0fed1e6ea84163973bd",
+      "inventoryEdges": 7,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 79,
+          "sha256": "d287a712f46fd4e52ac901e49dec21728086d3a08a2c6cda26aa8c8c48ba5ed9"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/intent-preservation-ledger.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 17191,
+      "lines": 113,
+      "sha256": "c32388310dcd5e30abc94d0c49718229ab0678196d4c8002c8a1629e16070121",
+      "inventoryEdges": 10,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "55b69e4057618de645416ea416794c0639df1ec8f9327bcb0b539dd7fe8afa9d"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 113,
+          "sha256": "ed70459169d53f539efc8502174f93e848b5c71db86276d78b4a456c2382f218"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/migration-authoring-rules.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5765,
+      "lines": 94,
+      "sha256": "7b7d5bd462e55d6ac9ee993bbbb12607e37c8de19cb004e9d8bd4b020c605163",
+      "inventoryEdges": 15,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "220bcef5ac1c4d192e707ffe48d8e24561e4dce76f215d5a0a46f688b4aae0b9"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 94,
+          "sha256": "6686f740da32df6453483706822e0972bdf56e69d9f0294c095dd0657e8e3729"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/observe/decisions/observe-component-architecture.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3732,
+      "lines": 45,
+      "sha256": "e9c67f18fb66c7ae9144db38da213de5adea71c258e95e6565c079f4e0ffd265",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 45,
+          "sha256": "edbf7e28bb9f3498005dfcb55f196aa947e27dc6f2c2b80acc691eef96a85085"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/observe/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 19735,
+      "lines": 96,
+      "sha256": "65d6f6e8e17fca248a7b027eb427c034205c3a70e5aab8b479eee1c374396460",
+      "inventoryEdges": 6,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "1845add8f57792cad66eb78f0a45e67fc2f99b9fcb1fb910c58a61c2febcd7d8"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 96,
+          "sha256": "aa82792ee7614d9724e75af41b14a3fd77b85eb97d1235033bddddc9b3b6bb33"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6776,
+      "lines": 126,
+      "sha256": "baaf434769eaf074a7879bbbbe22be594aa8a9054ca4c5ad6968e4b86e5307e0",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "290c11faea59e0dc2e824d5250c847e5ca77a39c0d9f85096b6493dcbe24bfcb"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 126,
+          "sha256": "168ad394f7e1c2740b15204c699263b2cab26705672cb3713193bd1df5ebd690"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6129,
+      "lines": 161,
+      "sha256": "96b84e54fe6e483f474628d348d21a76fbff8e364c9be45b4f2523e8c383e897",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "8081b47a392f46797725231c95c3e3e9b726d6b105423a70e58c48c4a9fcd6de"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "1c8ded7541dd4340813b561676ee7a80e0b30902e26997b30dd16878dc5ef839"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 161,
+          "sha256": "552373a52bf5747a6b8b3104de9e398548f578d4c5e8242559439fe363010873"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 19443,
+      "lines": 395,
+      "sha256": "542886733d06d326fc47e4f65064f07cdfaea9a0f7074a903ad34aae0f2ce74e",
+      "inventoryEdges": 11,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "b4163e4a512845b98a5539156a105f9ea83e7530b4a0d9e92dd9fecd2e6abec7"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "84a71b3277309bd4bf4b5a98177b49110c585e0b4b288f38ae6a278bb4bbea48"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "73d9269ef81c4852013d59a7445c98ea7aa254f70633ae2809e918464dcfed85"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "fcce2271eec44c7d32c5b8be76b7368889742cf700cd0fcfd6f239e2a4c99df8"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 395,
+          "sha256": "2d858214edd290ea7311231261cc967fceae8c7e0b18e217c4a770007ef9aa1a"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/packaging-distribution/code-panel-rollout-plan.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 19183,
+      "lines": 393,
+      "sha256": "932f7e4e53e44601840a644dd9d1d155a380ce7a1aa81294f200dadbe096867f",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "070addfede187a99d8050e3b213a5a6de31590bdd57fc98e6c2480594a79ab0a"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "6bf804270b155ec69337f5932dcb3ca69470d57cbd15a6256e5501ffe2d1c2fa"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "2bb2e3010efa782fee13e672c082ce2e8199b48b777559e92a7a0e4ad90f4769"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "93517ff1d781ae36f280c99798073d7e87dfd7158a297c7b07e9615abf4321ca"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 393,
+          "sha256": "62972852d7542c4b6cdb1d9a8d8eb0f3dde826e76d92f104da10f807d48b87d2"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 20626,
+      "lines": 481,
+      "sha256": "059f595448c5d697af0f73a26fb92d5d240e35e92c53badc91d7ae503bfa3724",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "b505a5a7548f9622ee4346fb249a86178b801f4c1121e0223d2bb4288d034d60"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "9233b9edb122a14817c8b1e62da486e183a590c283564303c2ae42eaf84a3e38"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "0404260f8ee0d6637e0dee8d3e83f10dcda22ced29f38a66bf72c0ea291ea987"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "78a0a8dbff9958becbfbe81f86884d961e03e097913b2929db5afb1f1b1523fb"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "3613b7b36eda3a7653bb3a80bab92fc4524b4b6365537305489f3d71ba500fd8"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "87566006fc864bee16647fec9aab7977d1e2e13d2b381721d7a4e653cdbff341"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 481,
+          "sha256": "83036d2e80d74b3813b62795854e18dc79896c0dee6554407c339ee02506a2fa"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 5863,
+      "lines": 133,
+      "sha256": "c60f62fd26004410268079055a2f33e7024c9bc2d0a1c8b8ef0203de0e7a503f",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "deb12efe1f16a6035ed8a9130cb2c3f6e6166924bcada3bc16944ce4f530525e"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 133,
+          "sha256": "bfc55a7d8e93c03d72a02a28d241c2dc7c2389030ece4e526f66c0b93b2035ba"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6861,
+      "lines": 171,
+      "sha256": "8ebcf75f26cc668fd42d33cc1fc5baaf4c251ea505aad221550544ec840cea3f",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "1ae29cd14ae3a83c68d9bc0086e5fd3c15077b6432992fdcc7a1312113da8893"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "4ca0c907c8db6381bc0190e2b03ee0c037e83cdd731236fd31588f8912ce1d79"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 171,
+          "sha256": "6aa2f2680dd1fbc418d0d5c98743d1347959949c53ad2df91c08e2deb35ed3a1"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 13913,
+      "lines": 314,
+      "sha256": "6b211f36e62d24bca59a1ebea32cf9862ce784cce8d420bfbb03f7d4e4988e7f",
+      "inventoryEdges": 2,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "375e1c1c2f77375d87f08d289e9b1cb8967cd83099da6aece78f2f8c9821f261"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "5744c7f238459a94c713ebefdec696334dfa5500b857ecb34068b6acd60bb2da"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "92f90e9b3cecb4f80f27bc0088db80bf0cce72a44dd61c915438687b4fa8e60c"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 314,
+          "sha256": "7f7f8df35217f19b61166e987e5c584a014f45b7819f1b19cc42f81871bb13ee"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 15373,
+      "lines": 355,
+      "sha256": "ad7ef96c4b60b4c3f3b6d76da600e42cee1571832c219ff3902124c91cf2da0b",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "c11eac3ca5fe96cb56eb86534a084ff270b839192eb422e0857eca8181bbeafa"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "af547cdf589e52430ae1414a254c65d7943c5e3f0e96affa80f79a6c83354894"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "9ddcc42ef27ceec09659ffc2724c4e273a8d5ab7fe01989eb691f96c039009ab"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "6e958d62c4f23233d777fb34124dbd48c6417cdcb8908dcace69be801ec5f894"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 355,
+          "sha256": "ec415482ac93b74ea72d3673eff1b365188d8e6f43b0ee69f1e81e1575749982"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 20006,
+      "lines": 232,
+      "sha256": "986c26c6f0ed2892f5a9ae7983fe987856894fafb43d7792d7194d11e39dc9ad",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "bc70b6f20eda9c0ae1be0d652883df6adce0e1511247ee1a3cc688c7e06fbb09"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "0518421f37c16d3f10f261ad862c88ae569951053693ce44fc303932bc3718fb"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 232,
+          "sha256": "bfe697c664c7dcf8fe77666c4ddb786e60403cb8882a4212dae10469f6a9658e"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 3367,
+      "lines": 34,
+      "sha256": "f6bf6994580d75df3dbfff0658d269d77e32a59f8d0a24e328f426400c02ab99",
+      "inventoryEdges": 0,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 34,
+          "sha256": "32eecdff35947b098112de2a7e475c097d06d6e7a94f6778f092351757e759e4"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 49005,
+      "lines": 314,
+      "sha256": "770f949ac340a17c9d4236e6635ae679b872795e974c11d641b50c3029a4c977",
+      "inventoryEdges": 27,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "899f832a6fc73f99ab09bd1b68b4b9927d1ffe49c8741a9d55bacff196489150"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "7c442e7cbf21d2ba88593801fc645c06cbb7f57c161e065a7e8d00461911d549"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "35288d6552b64aa3848b18b875d07d07f6ef3ce85389cf1b4336a8eeeaff6a6d"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 314,
+          "sha256": "0317d1773cab05d0b3fc44cebaa988b2cde5084818cb85bb0be78c625016a8b1"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/packaging-distribution/history/distribution-vision.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 13780,
+      "lines": 203,
+      "sha256": "347a50e8030788b2d0852665b0f90600069e8a820ddc14566b0dd57d5cdcb68e",
+      "inventoryEdges": 8,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "945aa8d3e56f019e4bc87df447cdde15c74964c892a1c520987820a3bab238fe"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "30492c546f22c16749ae2814d5eefd13eaf9ed1015c32b7e99feaa226e8d1523"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 203,
+          "sha256": "cb4512ff8343609bdf58db38e8e92b40431860f6f48457e9a989ea5ae7a0977a"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 14558,
+      "lines": 284,
+      "sha256": "440db2077af6b47a31de11c589ef06860b7bed61a892a62bdec02d7e6760266b",
+      "inventoryEdges": 20,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "da41d2cd9d01630811437348b5e4faae9bcbc1b2995abf857f0c87da0f1065f8"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "bed9751a33dc1cf966ab4462e9a735ed0a990ba373167b91d60733e6fe801719"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "4191d242f6441171d65691bf4f06b2f97042130e3ef9bdaa796fa37b860356ae"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 284,
+          "sha256": "6a6d6781d1a8d6a4e1535ac2ad1c51d63077227877b82ec8465f832e4a28916e"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/packaging-distribution/reports/track-closeout.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 12466,
+      "lines": 281,
+      "sha256": "637a1c3c2a8fab87f188b508e59a9dc1b8480efb62ec6d1d4acd094777a924ef",
+      "inventoryEdges": 9,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "ee464eb859fc8717c3da8f78ff0e083469ce08b2deb25b8ec429c65bdc44c3c4"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "d27a0261e321eb5624e06aae84c5c2f09d1b6da569943dadd82061d656d5b0a6"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "f3f81adee122061a9a393911d237e48599dc6ce554aae9b91683d3d00956dfa5"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 281,
+          "sha256": "8820d9b07a6b854f850f3ec2a991c3cc8cc584bdaed474344974727fbfad1405"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/packaging-distribution/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 99733,
+      "lines": 830,
+      "sha256": "b8989c13ff4d883732e19e84b6013b30d0fe4a6937099a1db11c166a47bcdd25",
+      "inventoryEdges": 27,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "0bf46ffd56c168c826748e286a17b423d2d60c2aa17981db890cd1a0721c43a6"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "e51d1c8b79bcdd36e147f0b3628d61565b11afb27be61d45fb172393e1bc7dbb"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "b6401644bf5056ec6e527cbdbde502c08fc09c72b8e9593e3f6e5a9d9081a645"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "4827c8e871c43a708206b43949c0e8d0dcad4edca379cf1f195218d18f2c683e"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "ed2ec92b9fddbc52090493324d0d6161d7da8d1aec1c81945052e4244c853242"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "3d9827e34f7fecf9ec3e04ac634f7c1517f9eb393af28825e2f41be66c14e974"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "2349060a279b66e25db7a964df4ecd044661d9c0b1b222b0565152582a44037f"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "f684e105e7b27aab9a91fb5bf26917c9196677f07eab14d7c2fddd1bcb93483d"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "6230b66c006748a7fe80cdfd27b5645b55a4151c2de8c8b87dc205e65041e9f4"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "ecefe30cf949e6bdbf578b4b3e3874c181c8b739c5f48d42851fedd8b8894935"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 830,
+          "sha256": "d6e4759f342ce4ea6f65316033f1a6c07ead69fe84c07315dc783af4e8582ce0"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/packaging-distribution/verification/implementation-alignment.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 14320,
+      "lines": 87,
+      "sha256": "15f5f3db04b2e759d3d17b82a02ecd87f48c7b0c7d87e1963a6947f0c4f35a44",
+      "inventoryEdges": 6,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "48ef393ed35f465fc2346830ae2ec01516c22ea5f39cc1401602ef3cb5716ade"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 87,
+          "sha256": "112c2bbebb3e41771b4025ab38df0c07f7c4772732b8e76b6dcd49bf1a9b9df1"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 13448,
+      "lines": 180,
+      "sha256": "f64194e4f363c1202f0309c9c07dfc309fe401e62f3712353e845334e5cee09d",
+      "inventoryEdges": 1,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "653e54c8616fe189910fa0d1669283ad0f207d36d493be0d32fb8094d3ceb435"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "1d032d4d0cae88d2f81f90d70eeaa74c5cb644e9156ebbc4a5a22b2e2bf5c717"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 180,
+          "sha256": "c0ec15d5eb3a1a6276323a229eb55db6e10074a56a315ab927407d10baf1f117"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/packaging-distribution/verification/source-preservation-audit.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 17529,
+      "lines": 143,
+      "sha256": "e6a389aa7495b41e4b953323511470e02322897f6a9d794d49ae8bacb77aa85b",
+      "inventoryEdges": 32,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "870144282cdf53d761eaad76723ee54e4b44645a2feff05525602e148176e806"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 143,
+          "sha256": "10914fe4e6ead3d208e6e6124e0fd4dd96992d36028cc7c296298022203f37a9"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/packaging-distribution/vision.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 6876,
+      "lines": 122,
+      "sha256": "4a028337dc8a2ac3e80a4779c0e3af8601b854e6360c0d6cef32d644bfa74ad3",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "ace6be73fcb23b2c9e623abf63bd68bc772ee7357712beb625c6d42bff18af6f"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 122,
+          "sha256": "b35f2f0de3661b4bfd0a46efe56b9a37d6169bf2f34b300064e57e2560c8c91c"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/platform-foundations.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 21729,
+      "lines": 385,
+      "sha256": "6e331bb22467235caa2d1793c621682c4d491d86ff41610dadbf1c55dbc4e753",
+      "inventoryEdges": 30,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "3da9f3377216a0a944e5fb076f97c41100b12ad2580f680f76d7ce9a10e3b8e5"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "d544bcb95cfe3c32ae2822a3ce43b22630d19711079c9fe9255f934a6d868d9f"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "ca030bd5397424ac6c59e26a449e5b4c2aa6eec373839787a2bc3b63a88fac93"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "3599b9b2ee0649470412963098a1a81ff54c7f1c88ff7664823c46bc0b212216"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 385,
+          "sha256": "ceea277128b4b32222b5d9b41fe6f8ebc0c1385d68f5a33da55ee305209e22c5"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/process/spec.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 18818,
+      "lines": 150,
+      "sha256": "11b2aafffa0aa412c1489957fad0d42df0d3105aa037378fbc609947f28185b1",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "36f4bc49ae52c647f09ad28643bbd5a96285917bcbc1459cba942fec0753ed1e"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 150,
+          "sha256": "73fb67960824af5f5a522d007a619b86bed15c31ef0472e5a9341128f6f4de0c"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/proposals/architecture-advisory-panel.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 33205,
+      "lines": 736,
+      "sha256": "6d9ccca7be37d1174b1d122598a2003800fc816b9d6c45d8c2d08c3271c424c2",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "11d80d4adee7b56dde8e5f402f44fcdfdc56dae8886d362b42cc6c348322d729"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "2edfe71b993450d4b64bdafc46bd8ace3f3d6e6bc006418b5992d665e18b7c8c"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "d205145d0bc880055475cde8adb1fba30718c067384c49e82e72b6493163e07a"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "5178d5b24171410ec2dc9c389b25d5b03fb340ae327eb2f4554fcf765aff6086"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "bc82946c97048d892500dc81d8d7dc72a3e3a80a7c7932298629547a46fab03a"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "7a59ebf92ec2484668572cce734caee5ac11989e7a0e629e79bf5745a8162642"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "3baac46acbea16c8cb28937323316df5952f8e814a676d5fb79d52458917efa0"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "1574a9547ea1a6fe569c809beaaf3e7d78d18fdc4176960bb3c45705dd4d60f6"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "8bed64fed3902bbc390e383fe2fc91399561ca0f0d093d4cec8e8e39c7db6cd7"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 736,
+          "sha256": "369776607525698f3471c591cb4e43a599ec9df3c8965629d7a6dcaab8f4866e"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/proposals/coordination-capability-envelope.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 30098,
+      "lines": 465,
+      "sha256": "cb550ddf91b56b91cabac628285a1d8c224a3a93ac91c08dbbbe089bbaf7df13",
+      "inventoryEdges": 4,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "25b2439cf275bf688bab35e9ecfe45f2987e62bbbf49980ad2ded884a2fecb89"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "6aa0aaa592a58f4c02e29eb992914e9f0211f74adc73546644706d57063be271"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "d5a79e243f427fa62f8f94568c734807c9a46857ac398496802fd4af652c14cb"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "3272b6f309eea3f1d8bab9147ba1b41ab322bb954bd71a456d498a09758e7890"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "fcdba6cfbbaeb31381cf8bb33b46de5fd1859504d6f795692fe43d383a5a34c9"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 465,
+          "sha256": "c0d42bef21e599b80b1f9be448a152aa810a36434468562a48bda66183bf624b"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/proposals/coordination-dispatch-contract.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 15987,
+      "lines": 303,
+      "sha256": "9b58b9d781eb2dfd2a67aa8e635e0b02a9beede172d38325adedd7bbd68aa402",
+      "inventoryEdges": 3,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "72d7daae377b55269796445bcdba807a18f0cffafe6ef3a6168068f9e26d5307"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "b3ca65140dc90852b5fb92cc19fa77ebfe36c7efcac478ca401774e9a0ca54f3"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "3ef65e0bf093df6cc266a3c12a005114fd70facfde106fa01af5868f23d7e6cf"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 303,
+          "sha256": "52dd3126928c9a1e2669a1af7481c64be0c356c5b00e6aab6eed061427d23a23"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/proposals/coordination-envelope-probe-contract.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 12167,
+      "lines": 183,
+      "sha256": "d294fc201b1ff9b73b18899b366e8e0366faaf3e2e910f3eeca7ca603569b24b",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "01ac74eaff991fb9132b23852f2917125ab9921f9698999a2065c22c8a338b3e"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "72df2f3c01747fe540dba96c79840c911015c09cac2d9bae9654570132955a01"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 183,
+          "sha256": "ce9b4f6248cf1369769691e6de30fdcbf3fb39523e1ec67cebedd152f69cbcf3"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/proposals/coordination-worker-provider-boundary.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 14992,
+      "lines": 218,
+      "sha256": "0f7a5b0db1cf1cb22c22fd0d270306af2e34010c48e09a651d1764c1b7e226f9",
+      "inventoryEdges": 6,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "e37c2af653568bf5a14a3d7cbe9f4cf2ad0b5c3c04e8271499eedc4d6346e60b"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "f47ede03c80541c15558f3b85a232a96ba4fe8a8ef464ea9834d0585d5e99fd4"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 218,
+          "sha256": "64705869f890f54df9e0f506540720b254c09fc3bfc075785b577d5496b16082"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/proposals/dispatch-control-plane-redesign.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 1895,
+      "lines": 37,
+      "sha256": "1f7fd2299fd6c451f8a983c87a5be2056e158c664fa19aeb0de787b641b6aaf9",
+      "inventoryEdges": 6,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 37,
+          "sha256": "6a54dbf30fc96c54af700b3835b38957b878dc6e85d7160fbcd549ec4e4c377b"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/proposals/documentation-system-unification.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 53565,
+      "lines": 1131,
+      "sha256": "2ed9005ac755ea48408d791a0783c23ed61b3678358152e7164ea9c22b98d88f",
+      "inventoryEdges": 31,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "6399be1c07deda9e1843b3643839d79ba15a981f15f6191c2bf135df28dd277e"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "944b1a7889c7e7d22e126b1a6e5807e5a5583c13fdb8225564fce8a6eb7d7262"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "a887da53ab1176863660e3a43f7dc6e49d19692230872bbe5742ec2a8b9ee2ba"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "4aae0f3c0cb8361911c869a4d3814df62eca9dc63a3e416fa8a4e08cc9b0c01f"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "42522e9351ab709ea7462133fc911ed298b833b53c055254b840d28ff18dcd58"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "ef648c905e4b615928dc4b613102907619b30466b871cf9d876c6a7ccf72fd5f"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "57424909d9e7b2f6a0a066ca6062ee386f91fa87599f4921ad0469043829ce08"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "9344f37ee3449404125cd05193a539ceaaac60c0b6f37a97557cc1d691a352ac"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "6652e1e3871e4c71e332f8cf8d9a8ee0ce6466ea93862e87d6cdd285338241e5"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "d4c05998939f298ed228d4a7d4d15973ee29ba3aa9df5c3c9b8be925eb183fd6"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "8e39088d9089b10153ec3ee595f12f6da305d5099db49a06771281a28e082522"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 960,
+          "sha256": "403f276fc3ee82fb77f680a2750e4ecbd96af69ea3d0cecb10711eff19d0df75"
+        },
+        {
+          "firstLine": 961,
+          "lastLine": 1040,
+          "sha256": "41ea1ad908bd258f0af19560f43f145df649918fbdd216e20d6f773804133fb4"
+        },
+        {
+          "firstLine": 1041,
+          "lastLine": 1120,
+          "sha256": "6a42eadbf1b67541f035ed0d1237db7d8640b2f8ba4e72cd0bf697ac00356adf"
+        },
+        {
+          "firstLine": 1121,
+          "lastLine": 1131,
+          "sha256": "a61710aafdbe1447b1c2ab59e0a3e8614de80a21697ca092079f75e1231b510c"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/proposals/doing-coordination-redesign.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 38568,
+      "lines": 1073,
+      "sha256": "65b9928c8644826a64a73c6eacda9e5bff15c16696b8eab4e64944e9e644c28f",
+      "inventoryEdges": 6,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "5101cfed0effb6019fbd80601c3115856ce9a44256da0caa74f542cf37218f3e"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "7f4f8d6ea8a762f4e3697ec3807a710e9fd093664707cf4093f15c105ae561c1"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "673db16388409d667fe549bcb313b48bb43003336021c0bc5bcfb5bbb887553d"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "cef79e387239cbfac3a443d30e01805476ae99460ae46d276c45e4fa4a49aaf6"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "25af0427a9ce479a6af4485200681dca58b24e6f6c338fcb5f7929458667493b"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "50e8d5852697e054e40aaf96c92fdf52befd1f7fc662952a9f5b9464df405e42"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "f0e52d3e0664c3eadf427ebaaa04359a0263ecb82d9b0fe68d920b7c168f1d72"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "648cc24d0a9d3a4eed745ec8e4184cda7c54e617d5318c160b36779f32671e48"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "be17541cb96378b53306a76b225315db83d78f043552fefb8013fb903543972b"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 800,
+          "sha256": "63bab5ea7be7cc3108143b6897ebe999f8551fa29ef284fc7f6d20e3b7549c1f"
+        },
+        {
+          "firstLine": 801,
+          "lastLine": 880,
+          "sha256": "6d4c3be16cdd4624855feb2555bbf3b4f2fb5787de53ff001933718e6d6562c1"
+        },
+        {
+          "firstLine": 881,
+          "lastLine": 960,
+          "sha256": "571df1b20709ad176422e1217636cb74b7b08e19217c40be65d07529ff7648b9"
+        },
+        {
+          "firstLine": 961,
+          "lastLine": 1040,
+          "sha256": "e9c90ea03ea4cc3f24a33b8a5c22a27fb6fb56953fbb84eec1066f6d6c8aaba2"
+        },
+        {
+          "firstLine": 1041,
+          "lastLine": 1073,
+          "sha256": "6412b43f948d681711aa95d8ac431cbf8acfe731170ea54239e3b7244a52ff64"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/proposals/knowledge-registry-redesign.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 35396,
+      "lines": 767,
+      "sha256": "86eeb55d9643c559469f49cdb6fd2981722cbe52bf7cac6a2b6365faa12fe113",
+      "inventoryEdges": 15,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "62d9f33a816ecf894c87042cedb752c8a193383a0bbafc30e145a473fe560d9b"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "1288168492cdc91156ed80c8346f693a655c0ed5eb0aea3d32b4d51c092a0e5f"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "17cc6ecc2b0250a24234a8d98bacf831104c8480dabdccc44b4787b57968301e"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "227a30c6ba83e8d78418aa7dd028decb21319fc2fc3e4cd366af9bea915ecadc"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "b36d5e4792fb8a109d9839149b7313daa36f132abecf6e6b40007bcb94708758"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "1b2bfcb6f04d265db290fdd41418edd7642b3f04080e6e22ee418bcd86b39455"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "ea1d6abb48098b72eef0aca874f7105c8806cf4eec305c55bf7515ec85aadc81"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "6709547070c4e979765dbaa2f3c1c9d49bac8ea2b661c4f5433da55cdbc7b86d"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "304b1b5fac989189ae89dcef8faa7d3d8053831ed114898439de060f7e4097d4"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 767,
+          "sha256": "debe9e3f001cca00b32847721c42b9cb36511bb4e3ca491414affc942fef3ff0"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/proposals/step-09-group-thinking-substrate.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 32581,
+      "lines": 618,
+      "sha256": "002c0b30a6d7073a8ad136907b5462d1150abbafa841697028bfa1f0e64be41f",
+      "inventoryEdges": 7,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "2eeeaf0fb2d9f8dcaffc3b9b8b14eabd7165882a632b13efb01466e6dcf729a2"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "5f75d34156cba803252b1f4ed178dd82eca3633916f377694f187806e43da008"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "e1df7a8f8992c1b3177bff80d71f41a225cfb0b78ee77909c698d1cd8c6332ce"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "cd0069cd888921ac8c1805791afde7089863942ec758d53ac0c5d28612c2e445"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "bbf001f21f992b66635d994ff4cd97adecf0611f65b86393515893c062d247a7"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "98991e824de68fe4e0562b6988f0a74df0dd2324f0283d64e91727d9597d2828"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "e4b00c0c9455628093c53480e997a401572bb7444f61198390adedcef0bcd291"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 618,
+          "sha256": "617d6317493cdd71482f83165b52ef3019583fac8d6f8639445e2d037ab23348"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 24741,
+      "lines": 737,
+      "sha256": "4c421a90ae1c48bbbd6fef7e781010ed8aa2b26af8edc63f07ad2945c26ab46e",
+      "inventoryEdges": 10,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "4be86f5c447977e69228ab2c149b8e442c335a81aa76b8612af058867af0aea5"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "10416a96c6bcad73f0c6231800ff1cf8dfc85df68f8518e90a1efdd2ee752161"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "a94d8f0b1c1f22d8f32af704e6c75d924ae828cf28152bbfe97e8800fa64bef4"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "5f37f507e883294fd3939016a4b6956afa978f817fb289b62abe553a2620086b"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "725b61f787167b5411b2e3a76260f7c2238957a05b99891bfb73def7762478f2"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "9ca12601fd988fb11ce88156c94bb01bfcd71fb1cd2883edae40829ce9a4a062"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "ec4b83baba07bc2806f39bd62efc05b39e613b393c6b0731d3ffcbe103440737"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "de31021392b820ea4d03891043e0eecb07894bc9e91a7b03ee89fa53e1c5e622"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "af0c33eb6f534f59e8f5d6221d72acf387f593751739700abaad0af554f370e8"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 737,
+          "sha256": "b9237db28f8babe30b28865f4128506816b6a7cb2d105df80783d41383f8283c"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 54522,
+      "lines": 797,
+      "sha256": "7285d2a7d7ec8da851731f6215760640e31fbb226d869358708b8529a73e67f4",
+      "inventoryEdges": 5,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "ebb4a01eb215b3ff6aee595eba896451f3736ec3af367d6462a48f46d7eaf6ef"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "62dc86e47ec35e638b69a3685831d95115f9c654953bd7044be347b7ec828c1b"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "dad760fc430ed3693ab329fe30971e089aa74bdd10336cc7c30e3319b5a09a55"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "54da2608c25c3d0faa2ecc2ff987784c385bb0707208cd7106fd39bbe64df5c7"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "3d02182df4f8e823397bd74cf0f219966cfd410a3995b0813a99d58de096620a"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "bc54001d76b3deec75d340f6717df18363e828763c1211a22fcdb7280152ebb1"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "4080d1443dbb738d520a537a5296f95434e9d72c8767583179a3bac64d84785a"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 640,
+          "sha256": "e7c1f9ee0c674cf2b8c168ac5a88a091c76c5dd151e2d20e0ed92360f8f83edb"
+        },
+        {
+          "firstLine": 641,
+          "lastLine": 720,
+          "sha256": "525ad5b5061ed2b21765b3aa4372c000416b337c4f16419471d43494e8d4b6b0"
+        },
+        {
+          "firstLine": 721,
+          "lastLine": 797,
+          "sha256": "48ceb289b0a83926003128688a9c55511a9e6efc302451f109ca607b52adc8f2"
+        }
+      ]
+    },
+    {
+      "file": "docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md",
+      "pin": "ae141550c2e022310de7a0efea757580c0b2479f",
+      "bytes": 69137,
+      "lines": 598,
+      "sha256": "63b6988127e494a845e7ce09d64fc584f802221b61b2089cb78ee2c5f27ca858",
+      "inventoryEdges": 17,
+      "orderedWholeFileChunks": [
+        {
+          "firstLine": 1,
+          "lastLine": 80,
+          "sha256": "afa312b9759bc5a47d49c7742f8103b84bf71b9f9cda047ae60a246ee7f69a65"
+        },
+        {
+          "firstLine": 81,
+          "lastLine": 160,
+          "sha256": "27ea197d2bf59f3bd13764ec30e18494aeae97f36a58e227412c1d3ccb037e24"
+        },
+        {
+          "firstLine": 161,
+          "lastLine": 240,
+          "sha256": "3c104b361b4234c02736eba0a2ab146d98b82229650ade3ad8d7eb04f5705538"
+        },
+        {
+          "firstLine": 241,
+          "lastLine": 320,
+          "sha256": "e82bc023ae01769935bd81be4f8450bfa4890ef076969587cb31e339b7627f3e"
+        },
+        {
+          "firstLine": 321,
+          "lastLine": 400,
+          "sha256": "aec95a46bd3bbb9adcba6b41b5ad6a8566c72498221dfde1ce559c4d30723e3b"
+        },
+        {
+          "firstLine": 401,
+          "lastLine": 480,
+          "sha256": "dc2b1a8b41a2ff1ed4cdf332eff4ab596123e4a200daab27c9ecae440e4cb10b"
+        },
+        {
+          "firstLine": 481,
+          "lastLine": 560,
+          "sha256": "341506eb1439473ff3649a06371d76cb4138b3ccdc518e25957b706fe6926ce7"
+        },
+        {
+          "firstLine": 561,
+          "lastLine": 598,
+          "sha256": "60929be5cd474a3215bec53aa846f5c34e51d5a8af6babd89513f5eff5bb7b96"
+        }
+      ]
+    }
+  ],
+  "sourceBytes": 1174193,
+  "method": "Final complete immutable source traversal with exact chunk/digest bindings; author evidence only, not independent review."
+}

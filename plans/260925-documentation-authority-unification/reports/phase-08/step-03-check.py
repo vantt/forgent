@@ -105,6 +105,9 @@ def form(old,file,target,anchor):
     if not m: return new
     image,label=m[1],m[2]; stripped=label.strip('`')
     if stripped==dest or stripped==dest.split('#')[0]: label=('`' if label.startswith('`') else '')+new+('`' if label.endswith('`') else '')
+    elif stripped.startswith(('docs/','plans/','src/','scripts/','packages/','apps/','core/')) and stripped==normalize(file,dest).split('#')[0]:
+        # L12-51(5): repo-root path label paired with the same relative destination.
+        label=('`' if label.startswith('`') else '')+plain+('`' if label.endswith('`') else '')
     elif stripped==posixpath.basename(dest.split('#')[0]):
         label=('`' if label.startswith('`') else '')+posixpath.basename(target)+('`' if label.endswith('`') else '')
     return image+'['+label+']('+new+')'
