@@ -225,7 +225,9 @@ Doctor có một dòng kiểm "mọi ghế của mọi preset đã đăng ký đ
 - Câu 5: có hội đồng kiến trúc soát trước khi duyệt.
 - Câu 7: có — persona, nếu ghế có, **phải** được truyền vào Seat Binding và được khai taste model.
 - Câu 10: nghĩ thêm. Hướng owner: domain (vd marketing) cung cấp một **bộ persona chung**; persona để **file riêng** (dễ thay, dễ cập nhật) thay vì khối trong file workflow.
-- Còn mở: 3, 6, 10 (chi tiết), R.
+- 13:17 câu 3: **đồng ý** — chỉ origin người (`human-cli`) được nâng tier; override do agent tạo vượt tier cấu hình → từ chối có tên.
+- 13:17 câu 10: **hỗ trợ cả hai**, persona của domain chỉ thấy trong domain đó: (a) bộ persona chung của domain; (b) workflow đóng gói trong một thư mục riêng thì persona đặt **ngay cạnh** file workflow, không chép vào thư mục `agents/` riêng. Tên theo tiền tố loại: `wf.<name>.<ext>`, `agent.<name>.<ext>` (vd `six-hats/wf.six-hats.yaml`, `six-hats/agent.black-hat.yaml`). Luật tên và nơi đặt này là việc của Convention (sinh/phân giải/kiểm tên + đường dẫn); đọc, thứ tự tầng, ghim nội dung vẫn ở `agent-definitions`. Thứ tự tầng: workspace → thư mục workflow → domain (của chính workflow) → core.
+- Còn mở: 6 (taste, giải thích lại cho owner), R.
 
 ### R. Brainstorm: phạm vi của taste theo role (owner 12:48: global không hợp)
 
