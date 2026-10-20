@@ -668,3 +668,21 @@ All seven new findings have text dispositions; implementation, actual accounting
 - **Final proof / review:** **33 batches / 275 source records / 890 slots**, 609 preserve / 59 unapplied Phase 9 patch / 45 park / 177 render joins; zero apply-now, **0 checker failures / 0 open Lead-ruling slots**, **20/20 probes**. Ratchet, citation drift and whitespace pass; serial binding/ledger/ratchet tests **172/172**, no failures/skips. Checker and protected semantic core/resolver/censuses/switchboard/gates/baselines remain unchanged. ONE request `step-04-wave4-review-request.md`: **only two outcome-changed source files**, four parts, maximum **29 slots / 337,409 UTF-8 bytes**; required reports `review-a38-step-04-wave4-p01.md`–`p04.md`. Record-text-only files need no review. No reviewers launched or independent acceptance claimed.
 
 Runner supplies the actual commit; Lead owes ordinary L12-11 accounting, one independent Step 0 binding review and wave 4 final-state review. This handback certifies the specified merge and existing author pin `dc24ce645`, not newer unmerged main. Local main advanced during verification (exact before/after in the checker receipt); no source freshness, full npm/cargo, generator/installed parity or Phase 9 application is claimed. Markdown preview remains with Lead's environment under the report-only boundary. needsWrites is empty.
+
+## L12-64 — Step 4 closed (Lead, A42/A51, 2026-10-20)
+
+- **Final state at `25b096075`** (Lead's independent checker run): 33 batches, 275 source-owner records, 331 consumer files and **890 slots**: 609 preserve, 59 patch (all Phase 9 timing), 177 render-join and 45 parked. 0 failures, 0 open lead-ruling slots, 20/20 probes. The committed `step-04-l12-62-check-result.json` still shows the pre-de-duplication count of 933. The 890 above is authoritative, and the file is refreshed at the next record turn. **No consumer, source or render byte changes in Phase 8** (L12-58).
+- **Reviews:**
+  - **Wave 1** (21 parts): six reworks.
+  - **Wave 2** (30 of 44 parts; text-only changes checker-verified): 12 reworks.
+  - **Wave 3** (final state, 28 parts / 16 groups over 60 files): 1 rework.
+  - **Wave 4** (the two outcome-changed files): 0 rework. Reports are `review-a38-step-04-wave{1,2,3,4}-*.md`.
+  - Every >3% breach expanded to its whole set in final state (sets 008–011, 016, 019, 022–025, 030, 031).
+- **What made it converge:** the reworks were caused by systemic author habits, fixed by mechanical sweeps with recorded witnesses rather than by per-file fixes. The sweeps were: a passage-content live-holder search for every park, tree and history existence of every preserved path, a complete wrapped-path scan, passage-based anchors via the repository slug function, a placeholder-pattern scan, and render-join/source-slot integrity. Each sweep has a checker rule and a probe.
+- **Batch end (L12-11):** accounting `695b5ae87` gives `audit-report.py` 0, 67/67 and ratchet 0. An intermediate red audit was caused by the Lead running the checker in the plan worktree, which rewrites its result file. From now on the Lead runs checkers only in the read-only review worktree.
+- **Carried forward:**
+  1. **Step 5 parity inputs:** every record's `stepFiveExcluded` list (runtime strings, readers, generators); the citation checker scan roots (`citation-format.md` line 96); the `docs/<quadrant>/` scanner/writer layout; the skill-pointer prompt-template patches, which must co-edit the byte-exact golden in `test/runner/prompt-templates.test.mjs` (lines ~198/215) in the same Phase 9 step and change worker prompt text.
+  2. **Step 7:** regenerate the instruction projection together with the patched `core/instructions/platform-laws.md` source, so the `AGENTS.md` managed block never disagrees with it; rebind the Step 3 records (L12-58(1)); review the pending decision bindings from L12-57/61/63.
+  3. **Phase 9 link pass:** verify that repository-slug anchors (single hyphen across an em dash) render on GitHub.
+  4. **Separate backlog proposal:** `core/instructions/platform-laws.md` ships to consumer projects but cites repo-local paths; a code comment in `fgos.rs` claims the triage doc documents the `goalTier` order, which it never did.
+- **Next:** Step 5, preparing the behavioral consumers and cutover parity.
