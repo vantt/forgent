@@ -99,7 +99,9 @@ Plain `fgos` runs the activated release recorded in
 Use `npm run fgos:dev -- <verb> [args]` to run working-tree code through the Rust
 host. It preserves caller cwd via `INIT_CWD`, honors `CARGO_TARGET_DIR`, and
 materializes confined per-invocation artifacts under `.fgos/runtime/dev-host/`,
-removing only its own directory after the child exits. Serialize invocations
+removing only its own directory after the child exits unless a process (such
+as a detached run supervisor) still runs from it; a later invocation prunes
+such directories once nothing runs from them. Serialize invocations
 across worktrees only where their Cargo target is actually shared.
 
 `fgos doctor` check `active-release-matches-checkout` compares the owned source
