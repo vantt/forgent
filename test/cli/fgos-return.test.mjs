@@ -3,6 +3,7 @@
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
+import { activateGitFixture, initFixtureRepo } from '../helpers/git-fixture.mjs';
 import { appendEvent } from '../../src/state/events.mjs';
 import { writeBeacon, beaconPath } from '../../src/runner/main-checkout-activity.mjs';
 import {
@@ -600,14 +601,7 @@ test('return refuses when HEAD has not advanced past headAtTake — a clean tree
   // which a tracked events.jsonl would otherwise always fail together (this
   // repo's own convention commits events.jsonl, so making the tree clean
   // there always requires a commit that also advances HEAD).
-  const cwd = tmpCwdFast();
-  execFileSync('git', ['init', '-q'], { cwd });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
-  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/\n');
-  fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
-  execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd });
-  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });
+  const cwd = initFixtureRepo(tmpCwdFast(), { ignore: '.fgos/\n' });
   addOk(cwd, 'pull-return-stale', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'pull-return-stale']).status, 0);
 
@@ -626,6 +620,7 @@ test('return --no-new-commits-ok closes out a main-source claim whose HEAD alrea
   fs.writeFileSync(path.join(cwd, 'proof.txt'), 'already done\n');
   execFileSync('git', ['add', '-A'], { cwd });
   execFileSync('git', ['commit', '-q', '-m', 'work already done before claim'], { cwd });
+  activateGitFixture(cwd);
   addOk(cwd, 'main-return-predone', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'main-return-predone']).status, 0);
 
@@ -638,14 +633,7 @@ test('return --no-new-commits-ok closes out a main-source claim whose HEAD alrea
 });
 
 test('return --no-new-commits-ok never bypasses verify itself for a main-source claim — still parks doing -> blocked + friction when verify fails (tsk-4on)', () => {
-  const cwd = tmpCwdFast();
-  execFileSync('git', ['init', '-q'], { cwd });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
-  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/\n');
-  fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
-  execFileSync('git', ['add', '-A'], { cwd });
-  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });
+  const cwd = initFixtureRepo(tmpCwdFast(), { ignore: '.fgos/\n' });
   addOk(cwd, 'main-return-flag-verify-fail', { verify: 'test -f proof.txt' }); // never created
   assert.equal(run(cwd, ['take', '--id', 'main-return-flag-verify-fail']).status, 0);
 

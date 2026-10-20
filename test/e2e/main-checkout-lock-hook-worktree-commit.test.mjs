@@ -9,6 +9,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 import { installHook, HOOK_TEST_SKIP } from '../helpers/main-checkout-hook-repo.mjs';
+import { activateGitFixture } from '../helpers/git-fixture.mjs';
 
 // tsk-sir -- reproduces the bug this item was filed against: a real linked
 // worktree's `git commit` gets refused by the SAME main-checkout.lock a
@@ -59,8 +60,11 @@ function initSharedAbsoluteHooksPathFixture() {
   const stateJsonPath = resolveFgosFile(path.join(mainRoot, '.fgos'), FGOS_FILE.STATE);
   fs.mkdirSync(path.dirname(stateJsonPath), { recursive: true });
   fs.writeFileSync(stateJsonPath, '{}\n');
-  execFileSync('git', ['add', 'seed.txt', '.fgos/cache/state.json'], { cwd: mainRoot });
+  fs.writeFileSync(path.join(mainRoot, '.gitignore'), '.fgos/locks/\n');
+  execFileSync('git', ['add', 'seed.txt', '.gitignore', '.fgos/cache/state.json'], { cwd: mainRoot });
   execFileSync('git', ['commit', '-q', '-m', 'root commit'], { cwd: mainRoot });
+  // After the seed commit, so the fence is never part of it.
+  activateGitFixture(mainRoot);
 
   // Absolute, not relative -- this is the load-bearing difference from
   // installGitHooks's own '.githooks' write (see file header).

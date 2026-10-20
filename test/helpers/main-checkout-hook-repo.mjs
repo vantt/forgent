@@ -10,6 +10,7 @@ import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { resolveActiveHostBin } from '../../src/util/host-bin-path.mjs';
+import { activateGitFixture } from './git-fixture.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const REAL_HOOK = path.join(ROOT, '.githooks', 'pre-commit');
@@ -41,9 +42,12 @@ export function initRepo(prefix = 'fgos-hook-repo-') {
   git(repoRoot, ['config', 'user.email', 'test@example.com']);
   git(repoRoot, ['config', 'user.name', 'Test']);
   git(repoRoot, ['config', 'commit.gpgsign', 'false']);
+  fs.writeFileSync(path.join(repoRoot, '.gitignore'), '.fgos/locks/\n');
   fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
-  git(repoRoot, ['add', 'seed.txt']);
+  git(repoRoot, ['add', 'seed.txt', '.gitignore']);
   git(repoRoot, ['commit', '-q', '-m', 'root commit']);
+  // After the seed (signing already off), so the fence is never committed.
+  activateGitFixture(repoRoot);
   return repoRoot;
 }
 

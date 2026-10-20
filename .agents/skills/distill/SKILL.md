@@ -79,7 +79,9 @@ Capture → Triage → Extract → Compare → Seal
    drops a row into `intake.md`. Ten seconds, no judgment.
 2. **Triage** — HUMAN decides what is worth learning. On accept:
    `add <name> --type git-repo|paper|living-doc --url <u>`, clone/save the
-   copy under `upstreams/<name>/`, delete the intake row.
+   copy under `upstreams/<name>/` (a skill-owned reference clone, git-ignored;
+   no Git write ever targets the project's own repository), delete the
+   intake row.
 3. **Extract** — `delta <name>` tells you what to read (full scan on first
    run; commit range / version gap after). Follow
    `references/extract-rules.md` for entry format, update-vs-new rules, and
@@ -103,7 +105,7 @@ machine surface for future automation (session-start nudges, cron sweeps).
 
 | type | cursor | delta semantics |
 |---|---|---|
-| `git-repo` | `last_analyzed_commit` | `delta` pulls the clone and prints the commit range + changed files |
+| `git-repo` | `last_analyzed_commit` | `delta` pulls the clone (only a skill-owned clone under `upstreams/`, never the project's own repository) and prints the commit range + changed files |
 | `paper` | `extracted_date` | immutable — extract once, seal, never delta again |
 | `living-doc` | `last_analyzed_version` + date | fetch the URL, compare changelog/version against the recorded cursor yourself, extract the gap, seal with `--version` |
 

@@ -2,11 +2,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import crypto from 'node:crypto';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { MANIFEST } from '../test/test-ownership.mjs';
 import { mutants } from '../test/test-ownership-mutants.mjs';
 import { REPO_ROOT, buildTestArgv, buildTestEnv } from './run-tests.mjs';
 import { getFailedTestsFromJunit } from './test-select-compare.mjs';
+import { createVerifyCheckout, removeWorktree } from '../src/runner/worktree.mjs';
+import { ensureScriptAddon } from './lib/git-ports.mjs';
 
 function log(msg) { console.log(msg); }
 function errFn(msg) { console.error(msg); }
@@ -20,7 +22,7 @@ function errFn(msg) { console.error(msg); }
  * found" and pollutes both the mutation full-suite baseline (it's always
  * red) and the mutated run, on any machine where `cargo build` has already
  * run once. `target` is gitignored and never present right after
- * `git worktree add`, and never symlinked when the main checkout has none
+ * checkout creation, and never symlinked when the main checkout has none
  * (Rust genuinely not built here) -- rust-host stays red for its real
  * reason in that case, same as before.
  */
@@ -33,6 +35,28 @@ export function symlinkSharedDirs(worktreePath, repoRoot = REPO_ROOT) {
     fs.symlinkSync(targetSrc, path.join(worktreePath, 'target'), 'dir');
   }
 }
+
+/** Undoes `symlinkSharedDirs`: removes only the links it made, so the guarded removal sees the checkout as Git left it. */
+export function unlinkSharedDirs(worktreePath) {
+  for (const name of ['node_modules', 'target']) {
+    const link = path.join(worktreePath, name);
+    try { if (fs.lstatSync(link).isSymbolicLink()) fs.unlinkSync(link); } catch {}
+  }
+}
+
+/**
+ * Throwaway detached checkouts of HEAD through the runner's own verify
+ * checkout door (Worktree port). Removal is guarded: a checkout that still
+ * holds bytes the run left behind is preserved and reported, never forced.
+ */
+export const headCheckouts = {
+  create: () => { ensureScriptAddon(); return createVerifyCheckout(REPO_ROOT, 'HEAD'); },
+  remove: (worktreePath) => {
+    unlinkSharedDirs(worktreePath);
+    try { removeWorktree(REPO_ROOT, worktreePath); }
+    catch (err) { errFn(`Checkout preserved at ${worktreePath}: ${err.message}`); }
+  },
+};
 
 export function computeRuleHash(rule) {
   if (!rule) return null;
@@ -144,7 +168,7 @@ export function runRelatedCaptured(files, { cwd, spawn = spawnSync } = {}) {
 }
 
 /**
- * Applies one mutant inside an already-prepared (git worktree) directory
+ * Applies one mutant inside an already-prepared detached checkout
  * and classifies the outcome. `runRelated`/`runFull`/`fullBaseline` are injectable so
  * every classification branch (the 6 rows classifyMutant covers) can be
  * exercised with a fake runner, without spawning a real worktree or test
@@ -208,6 +232,8 @@ export function classifyOneMutant({
     }
   } catch {
     result = { infraError: true };
+  } finally {
+    fs.writeFileSync(targetFile, orig);
   }
 
   return { classification: classifyMutant(result) };
@@ -222,7 +248,7 @@ export function runNightlyMutations(options = {}) {
   const ledgerOut = options.ledgerOut || 'nightly-ledger.json';
   const runRelated = options.runRelated || runRelatedCaptured;
   const runFull = options.runFull || runFullSuite;
-  const execFileFn = options.execFileFn || execFileSync;
+  const checkouts = options.checkouts || headCheckouts;
 
   // Failing test names of the full suite on the clean HEAD, computed once and
   // only if some mutant survives its related tests. `null` = the baseline run
@@ -230,11 +256,9 @@ export function runNightlyMutations(options = {}) {
   let baselineCache;
   const fullBaseline = () => {
     if (baselineCache !== undefined) return baselineCache;
-    const baseDir = path.join(os.tmpdir(), 'fgos-mutations');
-    fs.mkdirSync(baseDir, { recursive: true });
-    const baselinePath = fs.mkdtempSync(path.join(baseDir, 'baseline-'));
+    let baselinePath;
     try {
-      execFileFn('git', ['worktree', 'add', '--detach', baselinePath, 'HEAD'], { encoding: 'utf8' });
+      baselinePath = checkouts.create('baseline');
       symlinkSharedDirs(baselinePath);
       const full = runFull({ cwd: baselinePath });
       baselineCache = full.ran ? full.failed : null;
@@ -245,7 +269,7 @@ export function runNightlyMutations(options = {}) {
       log(`Full-suite baseline could not run: ${err.message}`);
       baselineCache = null;
     } finally {
-      try { execFileFn('git', ['worktree', 'remove', '-f', baselinePath], { encoding: 'utf8' }); } catch {}
+      if (baselinePath) checkouts.remove(baselinePath);
     }
     return baselineCache;
   };
@@ -254,13 +278,9 @@ export function runNightlyMutations(options = {}) {
     log(`Applying mutant ${mutant.id} to ${mutant.file}...`);
     const rule = manifest.find((r) => r.id === mutant.ruleId);
 
-    // Create detached worktree
-    const baseDir = path.join(os.tmpdir(), 'fgos-mutations');
-    if (!fs.existsSync(baseDir)) fs.mkdirSync(baseDir, { recursive: true });
-    const worktreePath = fs.mkdtempSync(path.join(baseDir, `mutant-${mutant.id}-`));
-
+    let worktreePath;
     try {
-      execFileFn('git', ['worktree', 'add', '--detach', worktreePath, 'HEAD'], { encoding: 'utf8' });
+      worktreePath = checkouts.create(`mutant-${mutant.id}`);
       symlinkSharedDirs(worktreePath);
 
       const { classification, reason } = classifyOneMutant({ mutant, rule, worktreePath, runRelated, runFull, fullBaseline });
@@ -275,9 +295,7 @@ export function runNightlyMutations(options = {}) {
         classification
       });
     } finally {
-      try {
-        execFileFn('git', ['worktree', 'remove', '-f', worktreePath], { encoding: 'utf8' });
-      } catch (e) {}
+      if (worktreePath) checkouts.remove(worktreePath);
     }
   }
 
