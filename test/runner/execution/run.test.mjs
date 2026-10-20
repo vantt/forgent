@@ -8,6 +8,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 
+import { resolveSeats } from '../../../src/runner/execution/seat-resolver.mjs';
 import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
 import { recordInlineRun, resolveGitRoots, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
 import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
@@ -183,7 +184,9 @@ test('recordInlineRun admits valid producer nonce with existing evidenceRefs', (
   // Create pending-inline.json
   const pending = {
     unitRunId,
+    seat: 'producer',
     role: 'producer',
+    posture: { inlineAllowed: true },
     round: 1,
     nonce: 'secret-nonce-1234',
   };
@@ -230,7 +233,9 @@ test('recordInlineRun refuses invalid nonce, non-producer role, or missing evide
 
   const pending = {
     unitRunId,
+    seat: 'producer',
     role: 'producer',
+    posture: { inlineAllowed: true },
     round: 1,
     nonce: 'valid-nonce',
   };
@@ -245,7 +250,7 @@ test('recordInlineRun refuses invalid nonce, non-producer role, or missing evide
   // 2. Non-producer role
   assert.throws(
     () => recordInlineRun({ unitRunId, role: 'reviewer', round: 1, nonce: 'valid-nonce', evidenceRefs: ['README.md'], repoRoot }),
-    /only producer role may record inline run/,
+    /only the seat that was waiting inline may record an inline run/,
   );
 
   // 3. Non-existent evidence file
@@ -568,7 +573,7 @@ test('a reviewed run never lets the producer family also check its own work', as
     worktree: worktreeDir,
     pattern: 'reviewed',
   });
-  const byRole = Object.fromEntries(res.results.map((r) => [r.role, r.runResult?.executorId]));
+  const byRole = Object.fromEntries(res.results.map((r) => [r.seat, r.runResult?.executorId]));
   assert.equal(byRole.producer, 'alpha');
   assert.equal(byRole.reviewer, 'beta', 'the reviewer must run on a different provider family than the producer');
 });
@@ -584,7 +589,7 @@ test('a reviewed run with a single provider family refuses the checker instead o
     pattern: 'reviewed',
   });
   assert.equal(res.outcome, 'policy-refusal');
-  const checker = res.results.find((r) => r.role === 'reviewer');
+  const checker = res.results.find((r) => r.seat === 'reviewer');
   assert.equal(checker.refused.reason, 'independence');
 });
 
@@ -592,20 +597,25 @@ test('panel members run on different provider families', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma']);
   const res = await runUnit({
-    unitData: { id: 'u-panel', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel' },
+    unitData: { id: 'u-panel', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel', seats: panelSeats(3) },
     repoRoot,
     cwd: worktreeDir,
     worktree: worktreeDir,
     pattern: 'panel',
   });
-  const members = res.results.filter((r) => r.role.startsWith('panelist-')).map((r) => r.runResult?.executorId);
+  const members = res.results.filter((r) => r.seat.startsWith('member-')).map((r) => r.runResult?.executorId);
   assert.equal(members.length, 3);
   assert.equal(new Set(members).size, 3, `panelists must not share a provider family, got ${members.join(',')}`);
 });
 
+// A panel unit declares its seats: `n` producer members and one synthesizer.
+function panelSeats(n) {
+  return [...Array.from({ length: n }, (_, i) => ({ seat: `member-${i + 1}`, role: 'producer' })), { seat: 'synthesizer', role: 'synthesizer' }];
+}
+
 function panelRun(id, members) {
   const { repoRoot, worktreeDir } = setupGitRepo();
-  return { repoRoot, worktreeDir, pattern: members ? { pattern: 'panel', params: { members } } : 'panel', id };
+  return { repoRoot, worktreeDir, pattern: 'panel', id };
 }
 
 const summaryOf = (repoRoot, res) => JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'assignments', res.unitRunId, 'unit-summary.json'), 'utf8'));
@@ -614,7 +624,7 @@ test('a panel with fewer provider families than members runs anyway: seats share
   const { repoRoot, worktreeDir, pattern } = panelRun('u-panel-2', 6);
   reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma']);
   const res = await runUnit({
-    unitData: { id: 'u-panel-2', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel' },
+    unitData: { id: 'u-panel-2', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel', seats: panelSeats(6) },
     repoRoot,
     cwd: worktreeDir,
     worktree: worktreeDir,
@@ -622,24 +632,24 @@ test('a panel with fewer provider families than members runs anyway: seats share
   });
   assert.equal(res.outcome, 'pass');
   assert.ok(!res.results.some((r) => r.refused), 'no seat is refused for sharing a family');
-  const byRole = Object.fromEntries(res.results.map((r) => [r.role, r.runResult?.executorId]));
+  const byRole = Object.fromEntries(res.results.map((r) => [r.seat, r.runResult?.executorId]));
   assert.deepEqual(
-    [1, 2, 3, 4, 5, 6].map((n) => byRole[`panelist-${n}`]),
+    [1, 2, 3, 4, 5, 6].map((n) => byRole[`member-${n}`]),
     ['alpha', 'beta', 'gamma', 'alpha', 'beta', 'gamma'],
     'seats are bound in listed order, each on the first unused family in pool order, then the least used',
   );
   const summary = summaryOf(repoRoot, res);
   assert.equal(summary.seats.filter((seat) => seat.kind === 'panelist').length, 6);
   assert.deepEqual(summary.sharedFamilies.map((entry) => entry.seats.length).sort(), [2, 2, 3]);
-  const alpha = summary.sharedFamilies.find((entry) => entry.seats.includes('panelist-1/1'));
-  assert.deepEqual(alpha.seats, ['panelist-1/1', 'panelist-4/1', 'synthesizer/1']);
+  const alpha = summary.sharedFamilies.find((entry) => entry.seats.includes('member-1/1'));
+  assert.deepEqual(alpha.seats, ['member-1/1', 'member-4/1', 'synthesizer/1']);
 });
 
 test('a panel with enough provider families lands every seat on its own family and the summary shows no sharing', async () => {
   const { repoRoot, worktreeDir, pattern } = panelRun('u-panel-3', 3);
   reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
   const res = await runUnit({
-    unitData: { id: 'u-panel-3', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel' },
+    unitData: { id: 'u-panel-3', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel', seats: panelSeats(3) },
     repoRoot,
     cwd: worktreeDir,
     worktree: worktreeDir,
@@ -654,14 +664,14 @@ test('the panel synthesizer runs on a provider family none of the panelists used
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
   const res = await runUnit({
-    unitData: { id: 'u-panel-synth', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel' },
+    unitData: { id: 'u-panel-synth', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel', seats: panelSeats(3) },
     repoRoot,
     cwd: worktreeDir,
     worktree: worktreeDir,
     pattern: 'panel',
   });
-  const members = res.results.filter((r) => r.role.startsWith('panelist-')).map((r) => r.runResult?.executorId);
-  const synth = res.results.find((r) => r.role === 'synthesizer');
+  const members = res.results.filter((r) => r.seat.startsWith('member-')).map((r) => r.runResult?.executorId);
+  const synth = res.results.find((r) => r.seat === 'synthesizer');
   assert.equal(members.length, 3);
   assert.ok(synth?.runResult?.executorId, `synthesizer should have run, got ${JSON.stringify(res).slice(0, 1500)}`);
   assert.ok(!members.includes(synth.runResult.executorId), 'synthesizer shares a provider family with a panelist');
@@ -671,7 +681,7 @@ test('the panel synthesizer is told to read every panelist report; the panelists
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
   const res = await runUnit({
-    unitData: { id: 'u-panel-refs', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel' },
+    unitData: { id: 'u-panel-refs', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel', seats: panelSeats(3) },
     repoRoot,
     cwd: worktreeDir,
     worktree: worktreeDir,
@@ -685,14 +695,14 @@ test('the panel synthesizer is told to read every panelist report; the panelists
   assert.equal(refs.length, 3, `synthesizer refs: ${JSON.stringify(refs)}`);
   for (const [i, ref] of refs.entries()) {
     assert.ok(path.isAbsolute(ref), `ref is absolute: ${ref}`);
-    assert.ok(ref.includes(`/panelist-${i + 1}/`), `ref ${i} points at panelist-${i + 1}: ${ref}`);
+    assert.ok(ref.includes(`/member-${i + 1}/`), `ref ${i} points at member-${i + 1}: ${ref}`);
     assert.ok(/(report-\d+|agent-report)\.md$/.test(ref), `ref is a report: ${ref}`);
     assert.ok(fs.existsSync(ref), `ref exists: ${ref}`);
   }
-  for (const n of [1, 2, 3]) assert.deepEqual(assignmentOf(`panelist-${n}`).contextRefs, []);
+  for (const n of [1, 2, 3]) assert.deepEqual(assignmentOf(`member-${n}`).contextRefs, []);
 
   // Each role is told its own task: the panelists the plain objective, the synthesizer a synthesis of it.
-  for (const n of [1, 2, 3]) assert.equal(assignmentOf(`panelist-${n}`).objective, 'Review the design');
+  for (const n of [1, 2, 3]) assert.equal(assignmentOf(`member-${n}`).objective, 'Review the design');
   const synthObjective = assignmentOf('synthesizer').objective;
   assert.match(synthObjective, /synthesizer/i);
   assert.ok(synthObjective.includes('Review the design'), 'the panel\'s task is quoted to the synthesizer');
@@ -844,17 +854,17 @@ test('a panel whose every provider family is taken by panelists still runs the s
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma']);
   const res = await runUnit({
-    unitData: { id: 'u-panel-synth-2', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel' },
+    unitData: { id: 'u-panel-synth-2', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel', seats: panelSeats(3) },
     repoRoot,
     cwd: worktreeDir,
     worktree: worktreeDir,
     pattern: 'panel',
   });
   assert.equal(res.outcome, 'pass');
-  const synth = res.results.find((r) => r.role === 'synthesizer');
+  const synth = res.results.find((r) => r.seat === 'synthesizer');
   assert.equal(synth.refused, undefined);
   assert.equal(synth.runResult.executorId, 'alpha', 'every family is used once, so pool order breaks the tie');
-  assert.deepEqual(synth.binding.provenance.familySpread.value.sharedWith, ['panelist-1']);
+  assert.deepEqual(synth.binding.provenance.familySpread.value.sharedWith, ['member-1']);
 });
 
 // A worker that writes a file in its worktree and never touches git.
@@ -1077,7 +1087,7 @@ test('a blind panel synthesizer reads its panelists\' reports as copies in its o
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
   const res = await runUnit({
-    unitData: { id: 'u-panel-blind', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel', blind: true },
+    unitData: { id: 'u-panel-blind', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel', seats: panelSeats(3), blind: true },
     repoRoot,
     cwd: worktreeDir,
     worktree: worktreeDir,
@@ -1088,7 +1098,7 @@ test('a blind panel synthesizer reads its panelists\' reports as copies in its o
   const refs = JSON.parse(fs.readFileSync(path.join(synthDir, 'assignment.json'), 'utf8')).contextRefs;
   assert.deepEqual(refs.map((ref) => path.dirname(ref)), [1, 2, 3].map(() => path.join(synthDir, 'inputs')));
   for (const [i, ref] of refs.entries()) {
-    assert.ok(ref.includes(`panelist-${i + 1}`), `ref ${i} is the copy of panelist-${i + 1}'s report: ${ref}`);
+    assert.ok(ref.includes(`member-${i + 1}`), `ref ${i} is the copy of member-${i + 1}'s report: ${ref}`);
     assert.ok(fs.statSync(ref).size > 0 && !fs.lstatSync(ref).isSymbolicLink());
   }
 });
@@ -1097,19 +1107,19 @@ test('each role of a panel gets its own seat\'s earlier report as own-previous, 
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
   const run = (unitData) => runUnit({ unitData, repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern: 'panel' });
-  const first = await run({ id: 'u-round-1', objective: 'Propose', capability: 'docs:write', writes: [], pattern: 'panel' });
-  const reportOf = (role) => path.join(repoRoot, first.results.find((r) => r.role === role).runResult.settleReports[0].path);
+  const first = await run({ id: 'u-round-1', objective: 'Propose', capability: 'docs:write', writes: [], pattern: 'panel', seats: panelSeats(3) });
+  const reportOf = (role) => path.join(repoRoot, first.results.find((r) => r.seat === role).runResult.settleReports[0].path);
 
   for (const blind of [false, true]) {
     const res = await run({
-      id: `u-round-2-${blind}`, objective: 'Revise', capability: 'docs:write', writes: [], pattern: 'panel', blind,
+      id: `u-round-2-${blind}`, objective: 'Revise', capability: 'docs:write', writes: [], pattern: 'panel', seats: panelSeats(3), blind,
       inputs: [`unit-run:${first.unitRunId}/{seat}`],
     });
     assert.equal(res.outcome, 'pass');
     const unitDir = path.join(repoRoot, '.fgos', 'assignments', res.unitRunId);
     assert.deepEqual(JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8')).resolvedInputs, [], 'resolved per role, not for the unit');
 
-    for (const role of ['panelist-1', 'panelist-2', 'panelist-3']) {
+    for (const role of ['member-1', 'member-2', 'member-3']) {
       const roleDir = path.join(unitDir, role, '1');
       const refs = JSON.parse(fs.readFileSync(path.join(roleDir, 'assignment.json'), 'utf8')).contextRefs;
       const own = path.join(roleDir, 'inputs', 'own-previous.md');
@@ -1127,7 +1137,7 @@ test('a seat the earlier run did not have is refused with a named reason when th
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
   const run = (unitData, pattern) => runUnit({ unitData, repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern });
-  const first = await run({ id: 'u-panel', objective: 'Write docs', capability: 'docs:write', writes: [], pattern: 'panel' }, 'panel');
+  const first = await run({ id: 'u-panel', objective: 'Write docs', capability: 'docs:write', writes: [], pattern: 'panel', seats: panelSeats(3) }, 'panel');
   await assert.rejects(
     () => run({ id: 'u-own', objective: 'x', capability: 'docs:write', writes: [], pattern: 'solo', inputs: [`unit-run:${first.unitRunId}/{seat}`] }, 'solo'),
     /no-such-seat/,
@@ -1146,12 +1156,9 @@ test('unit summaries cover refusal, thrown execution and resume without duplicat
   assert.equal(readSummary().outcome, 'policy-refusal');
   assert.deepEqual(readSummary().seats, []);
   assert.equal(readSummary().workflow, null);
-  // An unknown pattern throws after owner metadata exists.
-  await assert.rejects(runUnit({ unitData, repoRoot, cwd: worktreeDir, pattern: 'nonexistent-pattern' }));
-  const other = fs.readdirSync(path.dirname(dir)).find((name) => name !== refused.unitRunId);
-  const thrown = JSON.parse(fs.readFileSync(path.join(path.dirname(dir), other, 'unit-summary.json'), 'utf8'));
-  assert.equal(thrown.outcome, 'execution-failure');
-  assert.ok(thrown.settledAt);
+  // An unknown pattern has no seats to resolve: the run is refused before any unit directory exists.
+  await assert.rejects(runUnit({ unitData, repoRoot, cwd: worktreeDir, pattern: 'nonexistent-pattern' }), /Unknown collaboration pattern/);
+  assert.deepEqual(fs.readdirSync(path.dirname(dir)), [refused.unitRunId]);
   // A resumed solo uses settled history and never launches the unavailable executor.
   const runDir = path.join(dir, 'producer', '1', 'runs', '01');
   fs.mkdirSync(runDir, { recursive: true });
@@ -1175,14 +1182,21 @@ function recordedUnitFixture(t, pattern = 'solo') {
   fs.mkdirSync(unitDir, { recursive: true });
   const record = {
     unit: { id: 'recorded-question', objective: 'Answer the question', capability: 'not-configured:answer',
-      writes: [], pattern, stanceOptions: ['a', 'b'] },
+      writes: [], pattern, stanceOptions: ['a', 'b'], ...(pattern === 'panel' ? { seats: panelSeats(3) } : {}) },
     pattern,
+    seatSchema: 1,
     resolvedInputs: [],
     configSnapshot: snapshotRunnerConfig(repoRoot),
     overrides: [],
     worktree: fs.realpathSync(worktreeDir),
     createdAt: '2026-10-05T01:00:00Z',
   };
+  // A pattern the resolver does not know leaves a record with no seats, which a resume then refuses.
+  try {
+    record.seats = resolveSeats({ pattern, unit: record.unit, runnerConfig: record.configSnapshot.runner });
+  } catch {
+    record.seats = [];
+  }
   fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify(record));
   const readRecord = () => JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8'));
   const readSummary = () => JSON.parse(fs.readFileSync(path.join(unitDir, 'unit-summary.json'), 'utf8'));
@@ -1191,7 +1205,7 @@ function recordedUnitFixture(t, pattern = 'solo') {
 
 function pendingInlineFixture(fixture) {
   fs.writeFileSync(path.join(fixture.unitDir, 'pending-inline.json'), JSON.stringify({
-    role: 'producer', round: 1, nonce: 'single-use', binding: { executor: 'lead' },
+    seat: 'producer', role: 'producer', posture: { inlineAllowed: true }, round: 1, nonce: 'single-use', binding: { executor: 'lead' },
   }));
   return { repoRoot: fixture.repoRoot, unitRunId: fixture.unitRunId, role: 'producer', round: 1,
     nonce: 'single-use', evidenceRefs: ['README.md'], result: { status: 'done', summary: 'Answered' } };
@@ -1209,7 +1223,7 @@ test('inline reviewed producer remains pending and resume continues through chec
   const resumed = await runUnit({ repoRoot: fixture.repoRoot, cwd: fixture.worktreeDir,
     resumeUnitRunId: fixture.unitRunId });
   assert.equal(resumed.outcome, 'policy-refusal');
-  assert.deepEqual(resumed.results.map(({ role }) => role), ['producer', 'reviewer']);
+  assert.deepEqual(resumed.results.map(({ seat }) => seat), ['producer', 'reviewer']);
   assert.ok(resumed.results[1].refused);
   assert.equal(fs.readFileSync(producerResult, 'utf8'), originalProducer);
   assert.equal(fixture.readRecord().settlement.outcome, 'policy-refusal');
@@ -1367,7 +1381,7 @@ test('a reviewed execution error publishes its summary only after the dispatched
     resumeUnitRunId: fixture.unitRunId }), (error) => error instanceof RunnerConfigError && /cannot be bound inline/.test(error.message));
   const summary = fixture.readSummary();
   assert.equal(summary.outcome, 'execution-failure');
-  const sibling = summary.seats.find((seat) => seat.role === 'red-team');
+  const sibling = summary.seats.find((seat) => seat.seat === 'red-team');
   assert.ok(sibling?.final.runId);
   assert.equal(sibling.final.outcome, 'pass');
   assert.equal(sibling.kind, 'checker');
@@ -1833,7 +1847,7 @@ test('a reviewed run at rigor high puts the producer and both checkers on three 
   withModelPolicies(repoRoot, ['alpha', 'beta', 'gamma']);
   const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-high-3', rigor: 'high' });
   assert.equal(res.outcome, 'pass');
-  const byRole = Object.fromEntries(res.results.map((r) => [r.role, r.runResult?.executorId]));
+  const byRole = Object.fromEntries(res.results.map((r) => [r.seat, r.runResult?.executorId]));
   assert.equal(new Set([byRole.producer, byRole.reviewer, byRole['red-team']]).size, 3, JSON.stringify(byRole));
 });
 
@@ -1844,7 +1858,7 @@ test('a reviewed run at rigor high refuses the checker that no unused family can
   const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-high-2', rigor: 'high' });
   assert.equal(res.outcome, 'policy-refusal');
   const refused = res.results.find((r) => r.refused);
-  assert.equal(refused.role, 'red-team');
+  assert.equal(refused.seat, 'red-team');
   assert.equal(refused.refused.reason, 'independence');
 });
 
@@ -1854,7 +1868,7 @@ test('a reviewed run at rigor standard lets two checkers share a family, as befo
   withModelPolicies(repoRoot, ['alpha', 'beta']);
   const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-std-2', rigor: 'standard' }, { pattern: 'reviewed', params: { minCheckers: ['reviewer', 'red-team'] } });
   assert.equal(res.outcome, 'pass');
-  const byRole = Object.fromEntries(res.results.map((r) => [r.role, r.runResult?.executorId]));
+  const byRole = Object.fromEntries(res.results.map((r) => [r.seat, r.runResult?.executorId]));
   assert.equal(byRole.reviewer, byRole['red-team']);
   assert.notEqual(byRole.producer, byRole.reviewer);
 });
@@ -1865,7 +1879,7 @@ test('a unit verify command runs in the worktree after the producing round and a
   const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-verify-ok', verify: `node -e "require('fs').writeFileSync('verify-ran.txt', process.cwd())"` });
   assert.equal(res.outcome, 'pass');
   assert.equal(res.verify, undefined, 'a run that verified says nothing about missing verify');
-  assert.equal(res.results.filter((r) => r.role === 'verify' && r.outcome === 'pass').length, 1);
+  assert.equal(res.results.filter((r) => r.seat === 'verify' && r.outcome === 'pass').length, 1);
   assert.equal(fs.realpathSync(fs.readFileSync(path.join(worktreeDir, 'verify-ran.txt'), 'utf8')), fs.realpathSync(worktreeDir));
 });
 
@@ -1887,7 +1901,7 @@ test('a writing unit\'s verify child borrows the custody lease while it runs', {
   const script = `const fs = require('fs'); fs.writeFileSync(${JSON.stringify(probe)}, JSON.stringify({ name: process.env.FGOS_LOCK_FD, ino: String(fs.fstatSync(3, { bigint: true }).ino) }))`;
   const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-verify-custody', writes: ['docs'], verify: `node -e ${JSON.stringify(script)}` });
   assert.equal(res.outcome, 'pass', JSON.stringify(res));
-  assert.equal(res.results.find((r) => r.role === 'producer').commit.status, 'committed');
+  assert.equal(res.results.find((r) => r.seat === 'producer').commit.status, 'committed');
   const seen = JSON.parse(fs.readFileSync(probe, 'utf8'));
   const lock = resolveLock('dispatch-cwd', { fgosDir: path.join(repoRoot, '.fgos'), cwd: worktreeDir }).v3Path;
   assert.equal(seen.name, 'dispatch-cwd:3');
@@ -1937,7 +1951,7 @@ test('a reviewed run with no verify command passes but says it verified nothing;
   assert.equal(res.outcome, 'pass');
   assert.equal(res.verify.ran, false);
   assert.match(res.verify.reason, /no verify command/);
-  assert.equal(res.results.some((r) => r.role === 'verify'), false);
+  assert.equal(res.results.some((r) => r.seat === 'verify'), false);
 });
 
 test('a solo run needs no verify and does not claim to have skipped one', async () => {

@@ -17,7 +17,10 @@ import { credentialFaultPools, inspectAccountRotation, mayRotateAccount, triedBi
 import { assertPinnedAccountsUsable, runnerConfigForBinding } from './account-pin.mjs';
 import { simulateUnitBindings } from './dry-bind.mjs';
 import { worktreeSnapshot, writesSince } from './partial-writes.mjs';
-import { createRoleExecutorLedger } from './role-ledger.mjs';
+import { createSeatLedger } from './seat-ledger.mjs';
+import { resolveSeats, assertNoSeatTier, effectiveRigorOf } from './seat-resolver.mjs';
+import { isSeatRecord } from './legacy-seat-read.mjs';
+import { assertSeatId } from '../../convention/seat-id.mjs';
 import { runPattern } from './patterns/index.mjs';
 import { resolvePattern } from './patterns/presets.mjs';
 import { verifyCommandOf } from './patterns/reviewed.mjs';
@@ -67,13 +70,13 @@ function publishUnitSummary(unitDir) {
 }
 
 /**
- * `{ personaPin }` for an assignment policy when the persona bound for this role carries pinned
- * text, else nothing. An override scoped to this very role wins; otherwise the unit's own persona,
- * pinned when the unit run started, applies to whichever role bound that same name. Matching on
- * name keeps a pin from reaching a role that resolved a different persona.
+ * `{ personaPin }` for an assignment policy when the persona bound for this seat carries pinned
+ * text, else nothing. An override scoped to this very seat wins; otherwise the unit's own persona,
+ * pinned when the unit run started, applies to whichever seat bound that same name. Matching on
+ * name keeps a pin from reaching a seat that resolved a different persona.
  */
-function pinnedPersonaFor(unitRecord, role, persona) {
-  const hit = (unitRecord.overrides ?? []).find((o) => o?.personaPin && o.scope?.role === role && o.persona === persona);
+function pinnedPersonaFor(unitRecord, seatId, persona) {
+  const hit = (unitRecord.overrides ?? []).find((o) => o?.personaPin && o.scope?.seat === seatId && o.persona === persona);
   if (hit) return { personaPin: hit.personaPin };
   const unitPin = unitRecord.personaPin;
   return unitPin && unitPin.name === persona ? { personaPin: unitPin } : {};
@@ -324,26 +327,26 @@ function checkedPinInputs(pinInputs) {
   return [...new Set(pinInputs)];
 }
 
-function foreignIndexRefusal(role, round, paths) {
+function foreignIndexRefusal(tag, round, paths) {
   return {
     outcome: 'policy-refusal',
-    role,
+    ...tag,
     round,
     refused: { reason: 'foreign-staged-index', detail: foreignIndexDetail(paths), paths },
   };
 }
 
 /** The preflight refusal of a writing seat: an open merge this run did not start, or a foreign index. */
-function preflightRefusal(role, round, { foreignMerge, foreignStaged }) {
+function preflightRefusal(tag, round, { foreignMerge, foreignStaged }) {
   if (foreignMerge) {
     return {
       outcome: 'policy-refusal',
-      role,
+      ...tag,
       round,
       refused: { reason: 'merge-in-progress', detail: `the worktree has a merge in progress (MERGE_HEAD ${foreignMerge}) that this run did not start; finish or abort it (git merge --abort), then run again` },
     };
   }
-  return foreignStaged.length > 0 ? foreignIndexRefusal(role, round, foreignStaged) : null;
+  return foreignStaged.length > 0 ? foreignIndexRefusal(tag, round, foreignStaged) : null;
 }
 
 /**
@@ -378,18 +381,18 @@ function requireFreeWorktree(port, worktree) {
 async function assertAccountPinsBeforeRun(unit, runnerConfig, options) {
   const overrides = options.overrides ?? [];
   if (!overrides.some((o) => o && typeof o === 'object' && o.account !== undefined)) return;
-  const { roles } = await simulateUnitBindings(
+  const { seats } = await simulateUnitBindings(
     { ...unit, pattern: chosenPattern(options, unit) },
     runnerConfig,
     { session: { herdrPresent: options.session?.herdrPresent ?? detectHerdrPresent(), ...(options.session ?? {}) }, overrides },
   );
-  const refused = roles.find((r) => r.refused?.reason?.startsWith('account-pin'));
-  if (refused) throw new RunnerConfigError(`cannot pin the account for role "${refused.role}": ${refused.refused.detail}`);
-  if (!roles.some((r) => r.account)) {
-    const why = roles.filter((r) => r.accountSkipped).map((r) => `role "${r.role}": ${r.accountSkipped.detail}`);
-    throw new RunnerConfigError(`the pinned account applies to no seat of this unit${why.length ? ` (${why.join('; ')})` : ': no role its override names binds here'}`);
+  const refused = seats.find((r) => r.refused?.reason?.startsWith('account-pin'));
+  if (refused) throw new RunnerConfigError(`cannot pin the account for seat "${refused.seat}": ${refused.refused.detail}`);
+  if (!seats.some((r) => r.account)) {
+    const why = seats.filter((r) => r.accountSkipped).map((r) => `seat "${r.seat}": ${r.accountSkipped.detail}`);
+    throw new RunnerConfigError(`the pinned account applies to no seat of this unit${why.length ? ` (${why.join('; ')})` : ': no seat its override names binds here'}`);
   }
-  assertPinnedAccountsUsable(roles, { runnerConfig, runtimeDir: options.providerCapacityRuntimeDir, what: 'cannot start the unit run' });
+  assertPinnedAccountsUsable(seats, { runnerConfig, runtimeDir: options.providerCapacityRuntimeDir, what: 'cannot start the unit run' });
 }
 
 /**
@@ -524,6 +527,11 @@ async function runUnitBody(options, scope) {
     if (!fs.existsSync(unitJsonPath)) {
       throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": unit.json not found at "${unitJsonPath}"`);
     }
+    // A record written before seats existed keys its attempts by role name. It stays readable (history,
+    // summaries, hand-off refs) and is never resumed: that would re-enter it under the new keys.
+    if (!isSeatRecord(JSON.parse(fs.readFileSync(unitJsonPath, 'utf8')))) {
+      throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": record-predates-seat-binding (its seats were keyed by role name; start the work again as a new unit run)`, { code: 'record-predates-seat-binding' });
+    }
     // One controller per unit: a live one (the run itself, or another resume) refuses this resume; one
     // that died is taken over. Taken before unit.json is read, so a resume that waited behind another
     // never works from a record that other one has since moved on.
@@ -591,6 +599,9 @@ async function runUnitBody(options, scope) {
       throw new RunnerConfigError('runUnit requires --unit <file|-> or unitData');
     }
 
+    // A seat's tier is a recommendation only a registered workflow may make; a unit read from a file or
+    // from stdin never carries one.
+    if (!options.unitData) assertNoSeatTier(raw?.seats, 'a unit file');
     unit = validateUnit(options.stanceOptions === undefined ? raw : { ...raw, stanceOptions: options.stanceOptions });
     // Checked before the unit directory exists: an operation the step does not allow leaves nothing
     // behind. The pattern checked is the one the run will use (see patternName below).
@@ -604,6 +615,9 @@ async function runUnitBody(options, scope) {
       if (ov && typeof ov === 'object' && ov.timeoutMs !== undefined) assertRunTimeoutMs(ov.timeoutMs, 'override timeoutMs');
     }
     const configSnapshot = snapshotRunnerConfig(mainRoot, options.runnerConfig);
+    // The seats the pattern fills, resolved once before anything exists: an undeclared or invalid seat
+    // list refuses the run here, and the record keeps the list so a resume never recomputes it.
+    const seats = resolveSeats({ pattern: chosenPattern(options, unit), unit, runnerConfig: configSnapshot.runner });
     // A pinned account is checked before the unit run exists: every seat it applies to must bind an
     // executor whose provider lists it, and it must not be quarantined now.
     await assertAccountPinsBeforeRun(unit, configSnapshot.runner, options);
@@ -629,7 +643,9 @@ async function runUnitBody(options, scope) {
         seatLaunches: seatLaunchesOf({ pattern, unit, runnerConfig: configSnapshot.runner }),
         blind: unit.blind === true,
         handoffRefs: unit.inputs,
-        rigor: unit.rigor,
+        // The rigor the unit runs at (its own or its capability's, the stronger), so the frame's floor is
+        // judged against what the seats will actually bind at.
+        rigor: effectiveRigorOf(unit, configSnapshot.runner),
       });
       if (admitted.refused) throw new CaseAdmissionRefusedError(admitted.refused);
       scope.admission = { port, caseId: admitted.caseId, reservationId: admitted.reservationId, unitRunId: unitRunIdAtAdmission, started: false, settled: false };
@@ -666,6 +682,8 @@ async function runUnitBody(options, scope) {
 
     unitRecord = {
       unit,
+      seatSchema: 1,
+      seats,
       workflow: scope.admission ? normalizeWorkflowLink({ caseId: scope.admission.caseId, activity: caseRef.activity, reservationId: scope.admission.reservationId }) : null,
       ...(admittedCeiling !== null ? { seatLaunchCeiling: admittedCeiling } : {}),
       pattern: options.pattern ?? unit.pattern ?? 'solo',
@@ -752,20 +770,21 @@ async function runUnitBody(options, scope) {
     .map(([key]) => key));
   const history = () => {
     const pending = pendingCommitKeys();
-    return readUnitRunHistory(unitDir).filter((h) => !pending.has(`${h.role}/${h.round ?? 1}`));
+    return readUnitRunHistory(unitDir).filter((h) => !pending.has(`${h.seat}/${h.round ?? 1}`));
   };
 
-  // Which executors played which role; `independentOf` role names resolve through it (see role-ledger.mjs).
-  const roleLedger = createRoleExecutorLedger();
-  const noteRoleExecutor = roleLedger.note;
-  const resolveIndependence = roleLedger.resolve;
+  // Which executors filled which seat; `independentOf` seat ids resolve through it (see seat-ledger.mjs).
+  // Bind, publish to the ledger and launch are ordered per unit run: the ledger read, the bind and the
+  // publish of one seat queue behind the seats listed before it, and a group of seats launches only once
+  // every seat of the group is bound.
+  const seatLedger = createSeatLedger();
 
-  // Bindings recorded in unit.json, per role/round, one entry per attempt (the first binding,
+  // Bindings recorded in unit.json, per seat/round, one entry per attempt (the first binding,
   // then one per provider-limit fallback). A resumed run reuses them instead of binding again,
-  // so a resume never changes which executor or transport a role was already given.
+  // so a resume never changes which executor or transport a seat was already given.
   if (!unitRecord.bindings || typeof unitRecord.bindings !== 'object') unitRecord.bindings = {};
   for (const attempts of Object.values(unitRecord.bindings)) {
-    for (const attempt of attempts) noteRoleExecutor(attempt.role, attempt.binding?.executor);
+    for (const attempt of attempts) seatLedger.note(attempt.seat, attempt.binding?.executor);
   }
   // Pools whose login failed in this unit and that a seat then walked away from: no later fallback
   // walk of the unit lands on one (a resumed run rebuilds the set from its attempts).
@@ -773,16 +792,16 @@ async function runUnitBody(options, scope) {
   const persistUnitRecord = () => writeJsonAtomic(path.join(unitDir, 'unit.json'), unitRecord);
 
   // One dispatch of an already-bound role. Returns the settled outcome of that attempt.
-  const dispatchBound = async ({ bound, role, round, readOnly, assignmentId, assignmentDir, session, inputs = [], objective = unit.objective, admission }) => {
+  const dispatchBound = async ({ bound, seat, round, readOnly, assignmentId, assignmentDir, session, inputs = [], objective = unit.objective, admission }) => {
     // A pinned account leases from an inventory holding only that account (account-pin.mjs).
     const runnerConfig = runnerConfigForBinding(unitRecord.configSnapshot.runner, bound);
     fs.mkdirSync(assignmentDir, { recursive: true });
 
-    // What the unit names (already resolved to paths), then the accounts of the roles whose
-    // work this role judges (a panel synthesizer reads its panelists' reports).
+    // What the unit names (already resolved to paths), then the accounts of the seats whose
+    // work this seat judges (a panel synthesizer reads its members' reports).
     let contextRefs = [...new Set([...unitRecord.resolvedInputs, ...reportRefsOf(inputs, { mainRoot, worktree: unitRecord.worktree })])];
     if (unit.blind) {
-      // A blind role reads only its own directory of the run state, so what lies elsewhere in it
+      // A blind seat reads only its own directory of the run state, so what lies elsewhere in it
       // reaches the role as a copy there, byte for byte; the copies are what its refs list.
       const inRun = contextRefs.filter((ref) => refIsHiddenFromBlind(ref, mainRoot));
       const entries = [
@@ -792,15 +811,16 @@ async function runUnitBody(options, scope) {
       contextRefs = [...contextRefs.filter((ref) => !inRun.includes(ref)), ...copyHandoffsInto(assignmentDir, entries)];
     }
 
-    // What an earlier run's same seat left for this role: the role's own previous result, copied
+    // What an earlier run's same seat left for this seat: its own previous result, copied
     // into its own directory whether the unit is blind or not.
     if (unit.inputs.some(isSeatInput)) {
-      contextRefs = [...contextRefs, ...copyHandoffsInto(assignmentDir, resolveUnitInputs(unit.inputs, mainRoot, { seat: role, accept: unitRecord.acceptedReports ?? [] }).inputMap)];
+      contextRefs = [...contextRefs, ...copyHandoffsInto(assignmentDir, resolveUnitInputs(unit.inputs, mainRoot, { seat: seat.seat, accept: unitRecord.acceptedReports ?? [] }).inputMap)];
     }
 
     // A unit that runs a Work step operation is that operation's assignment: its seat keeps its
     // name in provenance.role and its directory, the assignment carries the operation's role and stamp.
-    const carriesOperation = declaredOp && role === 'producer';
+    // The seat that does the unit's own work (its posture says it writes) carries the operation.
+    const carriesOperation = declaredOp && seat.posture.writer;
     const operationFields = carriesOperation ? {
       workId: unitRecord.declared.workId,
       domain: declaredOp.domain,
@@ -818,7 +838,9 @@ async function runUnitBody(options, scope) {
     const assignment = {
       assignmentId,
       unitRunId,
-      role: carriesOperation ? declaredOp.role : role,
+      seat: seat.seat,
+      role: carriesOperation ? declaredOp.role : seat.role,
+      posture: seat.posture,
       round,
       ...operationFields,
       // The role's own task when the pattern gave it a unit of its own (a reviewer is told to
@@ -829,7 +851,9 @@ async function runUnitBody(options, scope) {
       provenance: {
         kind: 'unit-run',
         unitRunId,
-        role,
+        seat: seat.seat,
+        role: seat.role,
+        posture: seat.posture,
         round,
         binding: bound,
         ...(carriesOperation ? { declared: declaredOp.declared } : {}),
@@ -849,7 +873,7 @@ async function runUnitBody(options, scope) {
         ...(unit.rigor ? { rigor: unit.rigor } : {}),
         // The persona text a caller pinned for this role when it supplied the override: the prompt
         // renders that text, never a file read again at dispatch time.
-        ...pinnedPersonaFor(unitRecord, role, bound.persona),
+        ...pinnedPersonaFor(unitRecord, seat.seat, bound.persona),
       },
     };
 
@@ -889,16 +913,23 @@ async function runUnitBody(options, scope) {
 
     return {
       outcome: outcomeOfRunResult(runResult),
-      role,
+      seat: seat.seat,
+      role: seat.role,
+      posture: seat.posture,
       round,
       runResult,
       binding: bound,
     };
   };
 
-  // Helper to run a role
-  const runRole = async ({ role, unit: rUnit, readOnly = false, round = 1, independentOf = [], preferIndependentOf = [], inputs = [] }) => {
+  // Helper to run one seat: bind it, publish the binding, then launch it.
+  const runRole = async ({ seat, unit: rUnit, round = 1, independentOf = [], preferIndependentOf = [], inputs = [], batch }) => {
     assertNotCancelled();
+    const seatId = seat.seat;
+    // A seat id names a directory and a ref segment of this run; only Convention's ids reach a path.
+    assertSeatId(seatId);
+    const seatTag = { seat: seatId, role: seat.role, posture: seat.posture };
+    const readOnly = seat.posture.readOnly;
     const runnerConfig = unitRecord.configSnapshot.runner;
     const session = {
       provider: options.session?.provider,
@@ -908,34 +939,49 @@ async function runUnitBody(options, scope) {
       headless: options.session?.headless ?? true,
     };
 
-    const ask = {
+    // What bind() is asked for this seat. The independence and the spread are read from the ledger when
+    // the ask is built, so they see exactly the seats bound before this one.
+    const askOf = () => ({
       unit: rUnit || unit,
-      role,
+      seat: seatId,
+      role: seat.role,
+      posture: seat.posture,
+      ...(seat.persona ? { persona: seat.persona } : {}),
       readOnly,
-      independentOf: resolveIndependence(independentOf),
-      ...(preferIndependentOf.length > 0 ? { preferIndependentOf: roleLedger.seats(preferIndependentOf) } : {}),
+      independentOf: seatLedger.resolve(independentOf),
+      ...(preferIndependentOf.length > 0 ? { preferIndependentOf: seatLedger.seats(preferIndependentOf) } : {}),
       overrides: unitRecord.overrides || [],
       ...(unit.blind ? { blind: true } : {}),
-    };
+    });
     const bindCtx = { runnerConfig, session };
 
-    const key = `${role}/${round}`;
+    const key = `${seatId}/${round}`;
     const recorded = unitRecord.bindings[key] ?? [];
     let attemptNo = recorded.length > 0 ? recorded.length - 1 : 0;
-    let bound = recorded.length > 0 ? recorded[recorded.length - 1].binding : bind(ask, bindCtx);
+    // Ledger read, bind and publish are one queued step: seats started together bind one after the other
+    // in the order they were listed, each seeing the executors its earlier siblings were just given, even
+    // when a bind takes time.
+    let bound;
+    try {
+      bound = await seatLedger.serialize(() => {
+        const first = recorded.length > 0 ? recorded[recorded.length - 1].binding : bind(askOf(), bindCtx);
+        if (!first.refused) seatLedger.note(seatId, first.executor);
+        return first;
+      });
+    } finally {
+      batch?.arrive();
+    }
+    // A group of seats launches only after every seat of the group is bound.
+    await batch?.bound;
 
     if (bound.refused) {
       return {
         outcome: 'policy-refusal',
-        role,
+        ...seatTag,
         round,
         refused: bound.refused,
       };
     }
-
-    // Recorded before anything awaits: roles started together (panelists) bind one after the
-    // other in this same tick, so each sees the executors its siblings were just given.
-    noteRoleExecutor(role, bound.executor);
 
     const writeScope = effectiveWriteScope(unitRecord);
     // A merge a sync left open for this round is concluded first (unit-sync.mjs), then the rest.
@@ -970,12 +1016,12 @@ async function runUnitBody(options, scope) {
     // never spawn the agent a second time.
     const lastRecorded = recorded[recorded.length - 1];
     if (!readOnly && commitPending(lastRecorded, unitRecord.worktree, mainRoot, scope.custody)) {
-      const refusal = preflightRefusal(role, round, preflightUnitWorktree({ worktree: unitRecord.worktree, repoRoot: mainRoot, custody: scope.custody, scope: writeScope, sync: unitRecord.sync }));
+      const refusal = preflightRefusal(seatTag, round, preflightUnitWorktree({ worktree: unitRecord.worktree, repoRoot: mainRoot, custody: scope.custody, scope: writeScope, sync: unitRecord.sync }));
       if (refusal) return refusal;
       assertNotCancelled();
-      const prior = readUnitRunHistory(unitDir).find((h) => h.role === role && (h.round ?? 1) === round);
+      const prior = readUnitRunHistory(unitDir).find((h) => h.seat === seatId && (h.round ?? 1) === round);
       const gate = writeGate(prior?.runResult?.evidence?.changedFiles);
-      if (gate) return { outcome: 'policy-refusal', role, round, refused: gate };
+      if (gate) return { outcome: 'policy-refusal', ...seatTag, round, refused: gate };
       const excludePaths = lastRecorded.preExistingInScope ?? [];
       let commit = commitWork(rUnit || unit, prior?.runResult, excludePaths);
       if (commit.status === 'no-changes') {
@@ -992,18 +1038,18 @@ async function runUnitBody(options, scope) {
       lastRecorded.commit = commit;
       lastRecorded.outcome = commit.status === 'failed' ? 'execution-failure' : 'pass';
       persistUnitRecord();
-      return { outcome: lastRecorded.outcome, role, round, runResult: prior?.runResult, binding: lastRecorded.binding, commit };
+      return { outcome: lastRecorded.outcome, ...seatTag, round, runResult: prior?.runResult, binding: lastRecorded.binding, commit };
     }
 
     if (bound.mechanism === 'inline') {
-      if (!readOnly) return { outcome: 'policy-refusal', role, round, refused: { reason: 'custody-domain-required', detail: 'a mutating producer needs a supervised declared domain', cwd: unitRecord.worktree, executorId: bound.executor, capability: unit.capability } };
-      if (role !== 'producer') {
-        throw new RunnerConfigError(`checker role "${role}" cannot be bound inline (G2 / Q-A violation)`);
+      if (!readOnly) return { outcome: 'policy-refusal', ...seatTag, round, refused: { reason: 'custody-domain-required', detail: 'a mutating producer needs a supervised declared domain', cwd: unitRecord.worktree, executorId: bound.executor, capability: unit.capability } };
+      if (!seat.posture.inlineAllowed) {
+        throw new RunnerConfigError(`seat "${seatId}" cannot be bound inline (its posture keeps it out of the session; G2 / Q-A violation)`);
       }
       const nonce = crypto.randomBytes(16).toString('hex');
       const pendingRecord = {
         unitRunId,
-        role,
+        ...seatTag,
         round,
         nonce,
         binding: bound,
@@ -1012,9 +1058,9 @@ async function runUnitBody(options, scope) {
       fs.writeFileSync(path.join(unitDir, 'pending-inline.json'), JSON.stringify(pendingRecord, null, 2));
       return {
         outcome: 'blocked',
-        role,
+        ...seatTag,
         round,
-        pendingInline: { nonce, role, round },
+        pendingInline: { nonce, seat: seatId, round },
       };
     }
 
@@ -1024,7 +1070,7 @@ async function runUnitBody(options, scope) {
     let preExistingInScope = [];
     if (!readOnly) {
       const preflight = preflightUnitWorktree({ worktree: unitRecord.worktree, repoRoot: mainRoot, custody: scope.custody, scope: writeScope, sync: unitRecord.sync });
-      const refusal = preflightRefusal(role, round, preflight);
+      const refusal = preflightRefusal(seatTag, round, preflight);
       if (refusal) return refusal;
       preExistingInScope = recorded[0]?.preExistingInScope ?? preflight.preExistingInScope;
     }
@@ -1036,8 +1082,8 @@ async function runUnitBody(options, scope) {
     // nothing left the outcome stays provider-limit -- no other executor is guessed at.
     let lastResult = null;
     for (;;) {
-      const assignmentId = attemptNo === 0 ? `${unitRunId}/${role}/${round}` : `${unitRunId}/${role}/${round}-fb${attemptNo}`;
-      const assignmentDir = path.join(unitDir, role, attemptNo === 0 ? String(round) : `${round}-fb${attemptNo}`);
+      const assignmentId = attemptNo === 0 ? `${unitRunId}/${seatId}/${round}` : `${unitRunId}/${seatId}/${round}-fb${attemptNo}`;
+      const assignmentDir = path.join(unitDir, seatId, attemptNo === 0 ? String(round) : `${round}-fb${attemptNo}`);
 
       const attempts = unitRecord.bindings[key] ?? (unitRecord.bindings[key] = []);
       // The seat-launch ceiling the admission handed this run: a launch that would pass it does not
@@ -1046,9 +1092,9 @@ async function runUnitBody(options, scope) {
       if (attempts[attemptNo]?.dispatchRetryId === undefined && seatLaunchCeiling !== null && seatLaunchesUsed(unitRecord) >= seatLaunchCeiling) {
         scope.ceilingHit = true;
         const detail = `the seat-launch ceiling of ${seatLaunchCeiling} for this Unit is spent`;
-        if (attemptNo === 0) return { outcome: 'policy-refusal', role, round, refused: { reason: SEAT_LAUNCH_CEILING, detail } };
+        if (attemptNo === 0) return { outcome: 'policy-refusal', ...seatTag, round, refused: { reason: SEAT_LAUNCH_CEILING, detail } };
         return {
-          ...(lastResult ?? { outcome: 'provider-limit', role, round }),
+          ...(lastResult ?? { outcome: 'provider-limit', ...seatTag, round }),
           fallbackExhausted: {
             from: { executor: bound.executor, invocation: bound.invocation, transport: bound.transport },
             reason: SEAT_LAUNCH_CEILING,
@@ -1058,7 +1104,8 @@ async function runUnitBody(options, scope) {
       }
       if (attempts.length <= attemptNo) {
         attempts.push({
-          role,
+          seat: seatId,
+          role: seat.role,
           round,
           assignmentId,
           binding: bound,
@@ -1091,7 +1138,7 @@ async function runUnitBody(options, scope) {
       delete attempts[attemptNo].outcome;
       persistUnitRecord();
       assertNotCancelled();
-      const result = await dispatchBound({ bound, role, round, readOnly, assignmentId, assignmentDir, session, inputs, objective, admission });
+      const result = await dispatchBound({ bound, seat, round, readOnly, assignmentId, assignmentDir, session, inputs, objective, admission });
       lastResult = result;
 
       // The worker only writes files; this trusted code, outside the confinement, commits the
@@ -1172,14 +1219,16 @@ async function runUnitBody(options, scope) {
       if (credentialFault && bound.pool) credentialFaultPoolSet.add(bound.pool);
       // The independence and the spread are read again now: sibling seats may have changed executors
       // since this seat first bound, and a hard `independentOf` must hold for the executor it falls back to.
-      const walkAsk = {
-        ...ask,
-        independentOf: resolveIndependence(independentOf),
-        ...(preferIndependentOf.length > 0 ? { preferIndependentOf: roleLedger.seats(preferIndependentOf) } : {}),
-      };
-      const next = nextCandidate(bound, walkAsk, bindCtx, 'provider-limit', {
-        tried: triedBindingsOf(attempts, attemptNo + 1),
-        excludePools: [...credentialFaultPoolSet],
+      // The read, the walk and the publish are one queued step, so two seats whose providers fail at once
+      // never both pick their next candidate from the same stale view of each other.
+      const current = bound;
+      const next = await seatLedger.serialize(() => {
+        const candidate = nextCandidate(current, askOf(), bindCtx, 'provider-limit', {
+          tried: triedBindingsOf(attempts, attemptNo + 1),
+          excludePools: [...credentialFaultPoolSet],
+        });
+        if (!candidate.refused && candidate.mechanism !== 'inline') seatLedger.note(seatId, candidate.executor);
+        return candidate;
       });
       if (next.refused || next.mechanism === 'inline') {
         return {
@@ -1187,13 +1236,12 @@ async function runUnitBody(options, scope) {
           fallbackExhausted: {
             from: { executor: bound.executor, invocation: bound.invocation, transport: bound.transport },
             reason: next.refused ? next.refused.reason : 'only-inline-candidate-left',
-            detail: next.refused ? next.refused.detail : 'no out-of-process candidate is left to run this role',
+            detail: next.refused ? next.refused.detail : 'no out-of-process candidate is left to run this seat',
             ...(rotationsSpent > 0 ? { accountRotations: rotationsSpent } : {}),
           },
         };
       }
 
-      noteRoleExecutor(role, next.executor);
       bound = next;
       attemptNo += 1;
     }
@@ -1292,19 +1340,21 @@ async function runUnitBody(options, scope) {
  *
  * @param {object} params
  * @param {string} params.unitRunId
- * @param {string} params.role
+ * @param {string} [params.seat] the seat id; `role` is accepted as its older spelling
  * @param {number} params.round
  * @param {string} params.nonce
  * @param {string[]} params.evidenceRefs
  * @param {object} [params.result]
  * @param {string} [params.repoRoot]
- * @returns {{ok: boolean, unitRunId: string, role: string, round: number}}
+ * @returns {{ok: boolean, unitRunId: string, seat: string, round: number}}
  */
 export function recordInlineRun(params = {}) {
-  const { unitRunId, role, round, nonce, evidenceRefs, result = {}, repoRoot } = params;
-  if (!unitRunId || !role || round === undefined || !nonce) {
-    throw new RunnerConfigError('recordInlineRun requires unitRunId, role, round, and nonce');
+  const { unitRunId, round, nonce, evidenceRefs, result = {}, repoRoot } = params;
+  const seat = params.seat ?? params.role;
+  if (!unitRunId || !seat || round === undefined || !nonce) {
+    throw new RunnerConfigError('recordInlineRun requires unitRunId, seat, round, and nonce');
   }
+  assertSeatId(seat);
 
   const roots = resolveGitRoots(repoRoot || process.cwd());
   const mainRoot = repoRoot ? path.resolve(repoRoot) : roots.mainCheckoutRoot;
@@ -1322,8 +1372,8 @@ export function recordInlineRun(params = {}) {
     throw new RunnerConfigError(`corrupt pending-inline.json for unit run "${unitRunId}": ${err.message}`);
   }
 
-  if (pending.role !== 'producer' || role !== 'producer') {
-    throw new RunnerConfigError(`recordInlineRun refused: only producer role may record inline run, got role "${role}"`);
+  if (pending.seat !== seat || pending.posture?.inlineAllowed !== true) {
+    throw new RunnerConfigError(`recordInlineRun refused: only the seat that was waiting inline may record an inline run, got seat "${seat}"`);
   }
 
   if (pending.nonce !== nonce) {
@@ -1352,12 +1402,13 @@ export function recordInlineRun(params = {}) {
   fs.unlinkSync(pendingFile);
 
   // Write settled result
-  const attemptDir = path.join(unitDir, role, String(round), 'runs', '01');
+  const attemptDir = path.join(unitDir, seat, String(round), 'runs', '01');
   fs.mkdirSync(attemptDir, { recursive: true });
 
   const recordPayload = {
     unitRunId,
-    role,
+    seat,
+    role: pending.role,
     round,
     recordedAt: new Date().toISOString(),
     binding: pending.binding ?? null,
@@ -1379,7 +1430,7 @@ export function recordInlineRun(params = {}) {
   return {
     ok: true,
     unitRunId,
-    role,
+    seat,
     round,
   };
 }

@@ -1347,9 +1347,9 @@ function validateCapabilitiesShape(capabilities, label) {
       }
     }
     if (entry.minCheckers !== undefined) {
-      if (!Array.isArray(entry.minCheckers) || !entry.minCheckers.every((c) => VALID_CHECKER_ROLES.has(c))) {
+      if (!Array.isArray(entry.minCheckers) || !entry.minCheckers.every((c) => VALID_CHECKER_SEATS.has(c))) {
         throw new RunnerConfigError(
-          `runner config (${entryLabel}) "minCheckers" must be an array of strings in [${Array.from(VALID_CHECKER_ROLES).join(', ')}] when present.`,
+          `runner config (${entryLabel}) "minCheckers" must be an array of strings in [${Array.from(VALID_CHECKER_SEATS).join(', ')}] when present.`,
         );
       }
     }
@@ -1380,7 +1380,18 @@ function validateCapabilitiesShape(capabilities, label) {
   }
 }
 
-export const VALID_CHECKER_ROLES = Object.freeze(new Set(['reviewer', 'red-team', 'tester']));
+/**
+ * The checker seats a reviewed unit can name, with the role each takes. `tester` is a seat of its own:
+ * its role is `reviewer` for taste lookup only, and its result is not a verdict (no assessment is
+ * required of it, and it backs no verdict receipt).
+ */
+export const CHECKER_SEATS = Object.freeze({
+  reviewer: Object.freeze({ role: 'reviewer', verdict: true }),
+  'red-team': Object.freeze({ role: 'red-team', verdict: true }),
+  tester: Object.freeze({ role: 'reviewer', verdict: false }),
+});
+
+export const VALID_CHECKER_SEATS = Object.freeze(new Set(Object.keys(CHECKER_SEATS)));
 
 export function validateRunnerPatternsShape(patterns, label) {
   if (!patterns || typeof patterns !== 'object' || Array.isArray(patterns)) {
@@ -1435,9 +1446,9 @@ export function validateRunnerPatternsShape(patterns, label) {
         if (!RIGOR_VALUES.includes(rigor)) {
           throw new RunnerConfigError(`runner config (${label}.reviewed.checkersByRigor) contains unknown rigor "${rigor}".`);
         }
-        if (!Array.isArray(checkers) || !checkers.every((c) => VALID_CHECKER_ROLES.has(c))) {
+        if (!Array.isArray(checkers) || !checkers.every((c) => VALID_CHECKER_SEATS.has(c))) {
           throw new RunnerConfigError(
-            `runner config (${label}.reviewed.checkersByRigor.${rigor}) must be an array of strings in [${Array.from(VALID_CHECKER_ROLES).join(', ')}].`,
+            `runner config (${label}.reviewed.checkersByRigor.${rigor}) must be an array of strings in [${Array.from(VALID_CHECKER_SEATS).join(', ')}].`,
           );
         }
       }

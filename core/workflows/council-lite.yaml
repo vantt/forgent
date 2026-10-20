@@ -25,24 +25,28 @@ steps:
             - core/agents/council-assumptions.yaml
             - core/agents/council-ship-maintain.yaml
             - core/agents/council-feedback-loops.yaml
+          seats:
+            - { seat: assumptions, role: producer }
+            - { seat: ship-maintain, role: producer }
+            - { seat: feedback-loops, role: producer }
+            - { seat: synthesis, role: synthesizer }
           params:
-            members: 3
             roleTasks:
-              panelist-1: >-
+              assumptions: >-
                 Your task posture is council-assumptions. Read core/agents/council-assumptions.yaml
                 from Context refs and apply its description, method, blind spot, and ending rule.
                 This is a task posture, not an actor identity or provider choice. Do not apply the
                 other seats' postures. Do not change repository files. First, in a section named
                 "Restatement", write in your own words, in at most three lines, the question you are
                 answering and what you treat as out of scope; then analyse. {objective}
-              panelist-2: >-
+              ship-maintain: >-
                 Your task posture is council-ship-maintain. Read core/agents/council-ship-maintain.yaml
                 from Context refs and apply its description, method, blind spot, and ending rule.
                 This is a task posture, not an actor identity or provider choice. Do not apply the
                 other seats' postures. Do not change repository files. First, in a section named
                 "Restatement", write in your own words, in at most three lines, the question you are
                 answering and what you treat as out of scope; then analyse. {objective}
-              panelist-3: >-
+              feedback-loops: >-
                 Your task posture is council-feedback-loops. Read core/agents/council-feedback-loops.yaml
                 from Context refs and apply its description, method, blind spot, and ending rule.
                 This is a task posture, not an actor identity or provider choice. Do not apply the
@@ -50,7 +54,7 @@ steps:
                 "Restatement", write in your own words, in at most three lines, the question you are
                 answering and what you treat as out of scope; then analyse. {objective}
               synthesizer: >-
-                Read each panelist report in Context refs; do not answer from scratch or adopt a seat's
+                Read each seat's report in Context refs; do not answer from scratch or adopt a seat's
                 posture. Compare the seats' Restatement sections and list any mismatch in what the seats
                 took the question to be as unresolved evidence. Report unresolved evidence first, each seat's explicit position, agreement or
                 genuine split without inventing consensus, conditions that would change the verdict,

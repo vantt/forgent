@@ -5,12 +5,15 @@ import crypto from 'node:crypto';
 import { readUnitRunSeats } from './unit-run-history.mjs';
 import { normalizeWorkflowLink } from './unit.mjs';
 import { resolvePattern } from './patterns/presets.mjs';
-import { reviewedHistoryOutcome } from './patterns/reviewed.mjs';
-import { resolvePanelRoles, VALID_OUTCOMES } from './patterns/panel.mjs';
-import { debateHistoryOutcome, resolveDebateRoles } from './patterns/debate.mjs';
+import { patternHistoryOutcome } from './patterns/history-outcome.mjs';
+import { VALID_OUTCOMES } from './patterns/panel.mjs';
+import { seatsOfRecord } from './legacy-seat-read.mjs';
+import { seatKind, VERIFY_SEAT } from './seat-resolver.mjs';
 
 // Version 2: every seat carries an owner-written kind, and a finished unit whose pattern was never
-// recorded is published as UNDETERMINED_OUTCOME instead of being derived as if it were solo.
+// recorded is published as UNDETERMINED_OUTCOME instead of being derived as if it were solo. Each
+// seat names its `seat` id and its canonical `role`; a record written before seats existed is read
+// through legacy-seat-read.mjs, which says what each directory name was.
 export const UNIT_SUMMARY_CONTRACT = Object.freeze({ id: 'unit-summary', version: 2 });
 
 /** A finished unit whose outcome cannot be derived from its records; never a pass or a failure. */
@@ -59,18 +62,6 @@ function unitHasActiveRun(unitDir, record) {
   return false;
 }
 
-function patternHistoryOutcome(patternName, params, cfg, unit, history, panelRoles) {
-  if (patternName === 'reviewed') return reviewedHistoryOutcome(unit, cfg, history, params);
-  if (patternName === 'solo') return history.find((seat) => seat.role === (params.role || 'producer'))?.outcome ?? null;
-  if (patternName === 'debate') return debateHistoryOutcome(params, history);
-  if (patternName !== 'panel') return null;
-  const members = panelRoles.panelists.map(({ role }) => history.find((seat) => seat.role === role));
-  if (members.some((seat) => !seat)) return null;
-  const error = members.find((seat) => ['execution-failure', 'policy-refusal', 'provider-limit', 'blocked'].includes(seat.outcome));
-  if (error) return error.outcome;
-  return history.find((seat) => seat.role === panelRoles.synthesizer.role)?.outcome ?? null;
-}
-
 /** Build without changing original records. legacyCompletion must name this exact unit run. */
 export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
   const record = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8'));
@@ -81,11 +72,15 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
   const pattern = record.pattern ?? record.unit?.pattern ?? null;
   const { patternName, params } = pattern === null ? { patternName: null, params: {} } : resolvePattern(pattern);
   const cfg = record.configSnapshot?.runner ?? {};
-  const panelRoles = patternName === 'panel' ? resolvePanelRoles(cfg, {}, params) : null;
-  const debateRoles = patternName === 'debate' ? resolveDebateRoles(params) : null;
-  const kinds = new Map(panelRoles
-    ? [...panelRoles.panelists, panelRoles.synthesizer].map(({ role, kind }) => [role, kind])
-    : debateRoles ? [...debateRoles.sides, debateRoles.judge].map(({ role, kind }) => [role, kind]) : []);
+  const recordSeats = seatsOfRecord(record);
+  const seatInfo = new Map(recordSeats.map((entry) => [entry.seat, entry]));
+  const kindOf = (seatId) => {
+    const known = seatInfo.get(seatId);
+    if (known) return seatKind(known);
+    if (patternName === null) return 'unknown';
+    if (seatId === VERIFY_SEAT || seatId === 'verifier') return 'verifier';
+    return patternName === 'reviewed' ? 'checker' : 'unknown';
+  };
   const options = record.unit?.stanceOptions ?? [];
   const rawSeats = readUnitRunSeats(unitDir);
   const settlementTimes = [];
@@ -95,10 +90,10 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
   const seats = rawSeats.filter((seat) => seat.final).map((seat) => {
     const project = (attempt) => {
       const result = attempt.runResult ?? {};
-      const recordedBinding = record.bindings?.[`${seat.role}/${seat.round}`]?.find((entry) => entry.assignmentId === attempt.assignmentId);
+      const recordedBinding = record.bindings?.[`${seat.seat}/${seat.round}`]?.find((entry) => entry.assignmentId === attempt.assignmentId);
       const binding = recordedBinding?.binding ?? attempt.assignment?.binding ?? result.binding ?? {};
       if (attempt === seat.final && binding.provenance?.familySpread?.value?.family) {
-        familyBySeat.set(`${seat.role}/${seat.round}`, binding.provenance.familySpread.value.family);
+        familyBySeat.set(`${seat.seat}/${seat.round}`, binding.provenance.familySpread.value.family);
       }
       const executor = result.executorId ?? binding.executor ?? null;
       const isInline = !result.runId && result.unitRunId === unitRunId;
@@ -117,17 +112,14 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
       };
     };
     return {
-      role: seat.role,
-      kind: patternName === null ? 'unknown'
-        : panelRoles || debateRoles ? kinds.get(seat.role) ?? 'unknown'
-        : patternName === 'solo' || seat.role === 'producer' ? 'producer'
-          : seat.role === 'verify' || seat.role === 'verifier' ? 'verifier'
-            : patternName === 'reviewed' ? 'checker' : 'unknown',
+      seat: seat.seat,
+      role: seatInfo.get(seat.seat)?.role ?? seat.seat,
+      kind: kindOf(seat.seat),
       round: seat.round,
       final: { ...project(seat.final), stance: extractStance(seat.final.runResult?.agentClaim ?? seat.final.runResult?.result, options) },
       attempts: seat.attempts.map(project),
     };
-  }).sort((a, b) => a.role.localeCompare(b.role) || a.round - b.round);
+  }).sort((a, b) => a.seat.localeCompare(b.seat) || a.round - b.round);
   // Seats that ended up on one provider family. Absent when every spread seat has its own, so a
   // summary never claims independence it lacks and older summaries keep their bytes.
   const seatsByFamily = new Map();
@@ -140,10 +132,12 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
   const settlement = validCompletion(record.settlement) ? record.settlement : null;
   const legacy = validCompletion(legacyCompletion) ? legacyCompletion : null;
   const derivedOutcome = patternName === null ? UNDETERMINED_OUTCOME
-    : patternHistoryOutcome(patternName, params, cfg, record.unit,
-      rawSeats.filter((seat) => seat.final).map((seat) => ({
-        role: seat.role, round: seat.round, outcome: seat.final.outcome,
-      })), panelRoles);
+    : patternHistoryOutcome({
+      patternName, params, unit: record.unit, cfg, seats: recordSeats,
+      history: rawSeats.filter((seat) => seat.final).map((seat) => ({
+        seat: seat.seat, round: seat.round, outcome: seat.final.outcome,
+      })),
+    });
   const outcome = active ? 'unknown' : settlement?.outcome ?? legacy?.outcome ?? derivedOutcome ?? 'unknown';
   return {
     contract: UNIT_SUMMARY_CONTRACT,

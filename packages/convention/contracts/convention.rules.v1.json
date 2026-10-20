@@ -90,5 +90,15 @@
       "generated": false,
       "requiredMetadataFields": []
     }
+  ],
+  "identifiers": [
+    {
+      "id": "seat-id",
+      "description": "A seat id names a directory and a ref segment of a unit run, so it is a short lowercase slug and never a name the run layout or the runner itself uses.",
+      "first": "abcdefghijklmnopqrstuvwxyz",
+      "rest": "abcdefghijklmnopqrstuvwxyz0123456789-",
+      "maxLength": 40,
+      "reserved": ["runs", "outbox", "inbox", "inputs", "unit-control", "control", "sync", "verify", "verifier"]
+    }
   ]
 }

@@ -3,6 +3,15 @@
  * Single source of truth for named pattern presets.
  */
 
+const seatList = (seats) => Object.freeze(seats.map((seat) => Object.freeze(seat)));
+const PRESET_SEATS_CONSULT = seatList([{ seat: 'advisor', role: 'producer' }]);
+const PRESET_SEATS_FAN_OUT = seatList([
+  { seat: 'researcher-1', role: 'producer' },
+  { seat: 'researcher-2', role: 'producer' },
+  { seat: 'researcher-3', role: 'producer' },
+  { seat: 'synthesizer', role: 'synthesizer' },
+]);
+
 export const PRESETS = Object.freeze({
   'code-change': Object.freeze({
     pattern: 'reviewed',
@@ -13,23 +22,19 @@ export const PRESETS = Object.freeze({
   'consult': Object.freeze({
     pattern: 'solo',
     params: Object.freeze({
-      role: 'advisor',
+      seats: PRESET_SEATS_CONSULT,
     }),
   }),
   'research-fan-out': Object.freeze({
     pattern: 'panel',
     params: Object.freeze({
-      members: 3,
-      role: 'researcher',
-      synthesizeRole: 'synthesizer',
+      seats: PRESET_SEATS_FAN_OUT,
     }),
   }),
   'research-fan-out-gated': Object.freeze({
     pattern: 'panel',
     params: Object.freeze({
-      members: 3,
-      role: 'researcher',
-      synthesizeRole: 'synthesizer',
+      seats: PRESET_SEATS_FAN_OUT,
       gated: true,
     }),
   }),

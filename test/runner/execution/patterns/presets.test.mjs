@@ -4,6 +4,13 @@ import assert from 'node:assert/strict';
 import { PRESETS, resolvePattern } from '../../../../src/runner/execution/patterns/presets.mjs';
 import { roleUnit } from '../../../../src/runner/execution/patterns/role-tasks.mjs';
 
+const FAN_OUT_SEATS = [
+  { seat: 'researcher-1', role: 'producer' },
+  { seat: 'researcher-2', role: 'producer' },
+  { seat: 'researcher-3', role: 'producer' },
+  { seat: 'synthesizer', role: 'synthesizer' },
+];
+
 test('PRESETS contains standard named presets with immutable shapes', () => {
   assert.ok(PRESETS['code-change'], 'code-change preset exists');
   assert.equal(PRESETS['code-change'].pattern, 'reviewed');
@@ -12,19 +19,17 @@ test('PRESETS contains standard named presets with immutable shapes', () => {
 
   assert.ok(PRESETS['consult'], 'consult preset exists');
   assert.equal(PRESETS['consult'].pattern, 'solo');
-  assert.equal(PRESETS['consult'].params.role, 'advisor');
+  assert.deepEqual(PRESETS['consult'].params.seats, [{ seat: 'advisor', role: 'producer' }]);
 
   assert.ok(PRESETS['research-fan-out'], 'research-fan-out preset exists');
   assert.equal(PRESETS['research-fan-out'].pattern, 'panel');
-  assert.equal(PRESETS['research-fan-out'].params.members, 3);
-  assert.equal(PRESETS['research-fan-out'].params.role, 'researcher');
-  assert.equal(PRESETS['research-fan-out'].params.synthesizeRole, 'synthesizer');
+  assert.deepEqual(PRESETS['research-fan-out'].params.seats, FAN_OUT_SEATS);
+  assert.equal('members' in PRESETS['research-fan-out'].params, false, 'a preset names its seats, not a member count');
 
   assert.ok(PRESETS['research-fan-out-gated'], 'research-fan-out-gated preset exists');
   assert.equal(PRESETS['research-fan-out-gated'].pattern, 'panel');
-  assert.equal(PRESETS['research-fan-out-gated'].params.members, 3);
-  assert.equal(PRESETS['research-fan-out-gated'].params.role, 'researcher');
-  assert.equal(PRESETS['research-fan-out-gated'].params.synthesizeRole, 'synthesizer');
+  assert.deepEqual(PRESETS['research-fan-out-gated'].params.seats, FAN_OUT_SEATS);
+  assert.equal('members' in PRESETS['research-fan-out-gated'].params, false, 'a preset names its seats, not a member count');
   assert.equal(PRESETS['research-fan-out-gated'].params.gated, true);
 
   assert.ok(PRESETS['rfc'], 'rfc preset exists');
@@ -41,19 +46,15 @@ test('resolvePattern resolves preset names to patternName and params', () => {
 
   const resolvedConsult = resolvePattern('consult');
   assert.equal(resolvedConsult.patternName, 'solo');
-  assert.equal(resolvedConsult.params.role, 'advisor');
+  assert.deepEqual(resolvedConsult.params.seats, [{ seat: 'advisor', role: 'producer' }]);
 
   const resolvedResearch = resolvePattern('research-fan-out');
   assert.equal(resolvedResearch.patternName, 'panel');
-  assert.equal(resolvedResearch.params.members, 3);
-  assert.equal(resolvedResearch.params.role, 'researcher');
-  assert.equal(resolvedResearch.params.synthesizeRole, 'synthesizer');
+  assert.deepEqual(resolvedResearch.params.seats, FAN_OUT_SEATS);
 
   const resolvedGated = resolvePattern('research-fan-out-gated');
   assert.equal(resolvedGated.patternName, 'panel');
-  assert.equal(resolvedGated.params.members, 3);
-  assert.equal(resolvedGated.params.role, 'researcher');
-  assert.equal(resolvedGated.params.synthesizeRole, 'synthesizer');
+  assert.deepEqual(resolvedGated.params.seats, FAN_OUT_SEATS);
   assert.equal(resolvedGated.params.gated, true);
 
   const resolvedRfc = resolvePattern('rfc');
@@ -88,12 +89,12 @@ test('resolvePattern defaults to solo when falsy', () => {
 test('rfc checkers are briefed on the supplied artifact and the producer report, not the latest commit', () => {
   const { params } = resolvePattern('rfc');
   const unit = { id: 'u1', capability: 'advise', objective: 'Red-team the proposal in docs/pricing-v2.md' };
-  for (const role of ['reviewer', 'red-team']) {
-    const { objective } = roleUnit(unit, { role, params });
-    assert.ok(objective.includes(unit.objective), `${role} still sees the original task`);
-    assert.match(objective, /Context refs/, `${role} is pointed at the producer report`);
-    assert.doesNotMatch(objective, /git log|git show/, `${role} is not sent to the latest commit`);
+  for (const seat of ['reviewer', 'red-team']) {
+    const { objective } = roleUnit(unit, { seat, params });
+    assert.ok(objective.includes(unit.objective), `${seat} still sees the original task`);
+    assert.match(objective, /Context refs/, `${seat} is pointed at the producer report`);
+    assert.doesNotMatch(objective, /git log|git show/, `${seat} is not sent to the latest commit`);
     assert.match(objective, /do not change any file/i);
   }
-  assert.notEqual(roleUnit(unit, { role: 'reviewer', params }).objective, roleUnit(unit, { role: 'red-team', params }).objective);
+  assert.notEqual(roleUnit(unit, { seat: 'reviewer', params }).objective, roleUnit(unit, { seat: 'red-team', params }).objective);
 });

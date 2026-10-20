@@ -4,8 +4,8 @@
   "timestamp": "2026-10-05T10:00:00Z",
   "entries": [
     { "assignmentId": "legacy", "attempt": "01", "runId": "flat", "role": "producer" },
-    { "assignmentId": "unit-run-example/panelist-1/1", "attempt": "01", "runId": "nested", "role": "panelist-1" },
-    { "assignmentId": "unit-run-example/panelist-1/1-fb1", "attempt": "01", "runId": "fallback", "role": "panelist-1" },
+    { "assignmentId": "unit-run-example/member-1/1", "attempt": "01", "runId": "nested", "role": "member-1" },
+    { "assignmentId": "unit-run-example/member-1/1-fb1", "attempt": "01", "runId": "fallback", "role": "member-1" },
     { "assignmentId": "without-assignment", "attempt": "02", "runId": "no-assignment", "assignmentJson": false },
     { "assignmentId": "inline", "attempt": "01", "unitRunId": "unit-inline", "skip": "inline-record" },
     { "assignmentId": "broken", "attempt": "01", "skip": "unparseable" },

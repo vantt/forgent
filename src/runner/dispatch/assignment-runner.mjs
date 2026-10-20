@@ -48,6 +48,7 @@ import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { bind } from '../execution/bind.mjs';
 import { walkStateOf } from '../execution/account-rotation.mjs';
+import { bindSeatOf } from '../execution/seat-resolver.mjs';
 import { legacyStateKey } from './llm-accounts.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir, withDefaultExecutor } from './config.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot } from '../paths.mjs';
@@ -466,7 +467,7 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
     const recomputed = bind(
       {
         unit: unitRecord.unit,
-        role: seatRoleOf(asgn),
+        ...bindSeatOf(unitRecord, seatIdOf(asgn)),
         readOnly: false,
         overrides: unitRecord.overrides || [],
       },
@@ -474,7 +475,7 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
         runnerConfig: unitRecord.configSnapshot?.runner || opts.runnerConfig,
         session: opts.session || {},
       },
-      walkStateOf(unitRecord, { role: seatRoleOf(asgn), round: asgn.round, assignmentId: asgn.assignmentId }),
+      walkStateOf(unitRecord, { seat: seatIdOf(asgn), round: asgn.round, assignmentId: asgn.assignmentId }),
     );
 
     if (recomputed.refused) {
@@ -1167,9 +1168,9 @@ function attemptProviderCapacityFallback({
 }
 
 // The seat a unit-run assignment fills: a unit running a Work step operation stamps the
-// operation's role on the assignment and keeps the seat's own name in provenance.
-function seatRoleOf(asgn) {
-  return asgn.provenance?.kind === 'unit-run' ? (asgn.provenance.role ?? asgn.role) : asgn.role;
+// operation's role on the assignment and keeps the seat's own id in provenance.
+function seatIdOf(asgn) {
+  return asgn.provenance?.kind === 'unit-run' ? (asgn.provenance.seat ?? asgn.role) : asgn.role;
 }
 
 /**
@@ -2393,7 +2394,7 @@ export async function executeAssignment(assignment, opts = {}) {
           terminalConfig: opts.terminalConfig,
           // The persisted contract does not name the role; the brief a pane worker reads has to
           // (an assessment role must be told its claim needs assessment.verdict).
-          effectiveContract: { ...effectiveContract, assignment: { role: effectiveAssignment.role, operation: effectiveAssignment.operation } },
+          effectiveContract: { ...effectiveContract, assignment: { role: effectiveAssignment.role, posture: effectiveAssignment.posture, operation: effectiveAssignment.operation } },
         });
       }
 
@@ -2564,7 +2565,7 @@ export async function executeAssignment(assignment, opts = {}) {
           // The persisted contract does not name the role; the brief a pane worker reads has to
           // (an assessment role must be told its claim needs assessment.verdict).
           effectiveContract: effectiveContract
-            ? { ...effectiveContract, assignment: { role: effectiveAssignment.role, operation: effectiveAssignment.operation } }
+            ? { ...effectiveContract, assignment: { role: effectiveAssignment.role, posture: effectiveAssignment.posture, operation: effectiveAssignment.operation } }
             : effectiveContract,
           ...(providerCapacityForLaunch ? { providerCapacity: providerCapacityForLaunch } : {}),
           // Read-only Assignments never take the per-cwd lock on the supervisor path above; the

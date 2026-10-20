@@ -10,7 +10,7 @@ import { runDebate } from './debate.mjs';
 import { resolvePattern, PRESETS } from './presets.mjs';
 
 export { runSolo } from './solo.mjs';
-export { runReviewed, resolveCheckers, DEFAULT_CHECKERS_BY_RIGOR } from './reviewed.mjs';
+export { runReviewed } from './reviewed.mjs';
 export { runPanel } from './panel.mjs';
 export { runDebate } from './debate.mjs';
 export { resolvePattern, PRESETS } from './presets.mjs';

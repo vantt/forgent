@@ -21,10 +21,21 @@ function nonEmptyString(value) {
   return typeof value === 'string' && value.trim() !== '';
 }
 
-export function isAssessmentRequired(context = {}) {
+/**
+ * Whether the assignment's result is a checker's verdict. A seat of a unit run says so through its
+ * posture (`tester` is a checker seat whose posture is not a verdict); an assignment that names no
+ * posture, such as a domain operation's, is a verdict when its declared role is a checker role.
+ */
+export function isVerdictSeat(context = {}) {
+  const posture = context.posture ?? context.assignment?.posture;
+  if (posture) return posture.verdict === true;
   const role = context.role ?? context.assignment?.role;
+  return role === 'reviewer' || role === 'red-team';
+}
+
+export function isAssessmentRequired(context = {}) {
   const operation = context.operation ?? context.assignment?.operation;
-  return role === 'reviewer' || role === 'red-team' || (typeof operation === 'string' && operation.includes('recheck'));
+  return isVerdictSeat(context) || (typeof operation === 'string' && operation.includes('recheck'));
 }
 
 export function assessmentRequirement(context = {}) {
