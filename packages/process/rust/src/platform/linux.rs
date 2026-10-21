@@ -426,13 +426,6 @@ pub fn file_users(dev: u64, ino: u64) -> Option<Vec<facts::FileUser>> {
     Some(users)
 }
 
-/// Compare open descriptions without keeping a duplicate alive.
-pub fn kcmp_same_file(pid_a: ProcId, fd_a: FdSlot, pid_b: ProcId, fd_b: FdSlot) -> io::Result<bool> {
-    // SAFETY: KCMP_FILE (0) compares descriptor identities and changes nothing.
-    let result = unsafe { libc::syscall(libc::SYS_kcmp, pid_a.0, pid_b.0, 0, fd_a.0 as libc::c_ulong, fd_b.0 as libc::c_ulong) };
-    if result < 0 { Err(io::Error::last_os_error()) } else { Ok(result == 0) }
-}
-
 /// The scan view of one process. Each read that fails is named in
 /// `unreadable` with the OS error (another user's process gives
 /// `permission denied`; a kernel thread has no exe).
@@ -559,17 +552,7 @@ mod tests {
         let token = own_lock_token(&file).unwrap();
         let me = proc_self_pid().unwrap();
         assert!(lock_table_entries().unwrap().iter().any(|entry| entry.kind == "FLOCK" && entry.pid == i64::from(me.0) && entry.token == token));
-        let dup = file.try_clone().unwrap();
-        let independent = File::open(&path).unwrap();
-        match kcmp_same_file(me, FdSlot(file.as_raw_fd() as u32), me, FdSlot(dup.as_raw_fd() as u32)) {
-            Ok(same) => {
-                assert!(same);
-                assert!(!kcmp_same_file(me, FdSlot(file.as_raw_fd() as u32), me, FdSlot(independent.as_raw_fd() as u32)).unwrap());
-            }
-            Err(e) if matches!(e.raw_os_error(), Some(libc::EPERM | libc::ENOSYS)) => eprintln!("skip: kcmp unavailable: {e}"),
-            Err(e) => panic!("kcmp: {e}"),
-        }
-        drop((file, dup, independent));
+        drop(file);
         fs::remove_file(path).unwrap();
     }
 

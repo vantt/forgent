@@ -85,6 +85,9 @@ function unavailable(reason, detail, extra = {}) {
  * from spawn) into the route's parsed line, or throw the named error. A
  * child this process killed on its own deadline comes back as
  * `{ result: 'killed' }`: nothing was acquired, the caller closes its fd. */
+/** The next step every route failure that is not a version mismatch names. */
+const ROUTE_NEXT_STEP = 'Run `fgos doctor`; if the host binary is stale or broken, rebuild the host from this checkout (`npm run fgos:dev`) or restage the active release.';
+
 function interpretRoute({ status, signal, stdout, stderr, error, timedOut }, bin, verb) {
   if (error && (error.code === 'ENOENT' || error.code === 'EACCES')) {
     throw unavailable('no-host-binary', `cannot run ${bin} (${error.code})`, { tried: [bin] });
@@ -93,7 +96,7 @@ function interpretRoute({ status, signal, stdout, stderr, error, timedOut }, bin
     return { v: PROTOCOL, protocol: PROTOCOL, result: 'killed' };
   }
   if (error) {
-    throw new HolderLockError('lock-route-error', `${bin} ${verb} failed to run: ${error.message}`, { cause: error.code ?? null });
+    throw new HolderLockError('lock-route-error', `${bin} ${verb} failed to run: ${error.message}. ${ROUTE_NEXT_STEP}`, { cause: error.code ?? null });
   }
   const text = String(stdout ?? '');
   if (text.trim() === '') {
@@ -105,7 +108,7 @@ function interpretRoute({ status, signal, stdout, stderr, error, timedOut }, bin
       throw unavailable('host-version-mismatch', `${bin} ${verb} refused protocol ${PROTOCOL}: ${err.slice(0, 300)}`);
     }
     const how = signal ? `signal ${signal}` : `exit ${status}`;
-    throw new HolderLockError('lock-route-bad-output', `${bin} ${verb} printed nothing (${how})${err ? `: ${err.slice(0, 300)}` : ''}`, { status, signal, stderr: err.slice(0, 300) });
+    throw new HolderLockError('lock-route-bad-output', `${bin} ${verb} printed nothing (${how})${err ? `: ${err.slice(0, 300)}` : ''}. ${ROUTE_NEXT_STEP}`, { status, signal, stderr: err.slice(0, 300) });
   }
   return routeLineOrThrow(parseRouteLine(text, bin), bin, verb, status);
 }
@@ -116,7 +119,7 @@ export function routeLineOrThrow(line, bin, verb, status = null) {
   if (line.result === 'error') {
     if (line.code === 'host-version-mismatch') throw unavailable('host-version-mismatch', `${bin} ${verb}: ${line.message}`);
     if (line.code === 'usage') throw new HolderLockError('lock-route-usage', `${bin} ${verb}: ${line.message}`, { argv: verb });
-    throw new HolderLockError('lock-route-error', `${bin} ${verb}: ${line.message}`, { routeCode: line.code, status });
+    throw new HolderLockError('lock-route-error', `${bin} ${verb}: ${line.message}. ${ROUTE_NEXT_STEP}`, { routeCode: line.code, status });
   }
   return line;
 }
@@ -214,7 +217,7 @@ export function guaranteeFor(lockPath, { fgosDir } = {}) {
     throw unavailable(line.reason, `${dir}: ${line.detail}`, { lockDir: dir });
   }
   if (line.result !== 'guarantee' || !line.guarantee || typeof line.guarantee !== 'object') {
-    throw new HolderLockError('lock-route-bad-output', `${bin} --guarantee answered ${JSON.stringify(line.result)}`, { lockDir: dir });
+    throw new HolderLockError('lock-route-bad-output', `${bin} --guarantee answered ${JSON.stringify(line.result)}. ${ROUTE_NEXT_STEP}`, { lockDir: dir });
   }
   // This actual Rust observation precedes every acquired open using the cache.
   // Keep the older floor: caching must never advance a live handle's reach.
@@ -258,10 +261,10 @@ export function runStateRootRoute({ fgosDir, env = process.env } = {}) {
   const line = interpretRoute(res, bin, 'state-root');
   // A killed helper is a route that hung, not a lock result: nothing to keep.
   if (line.result === 'killed') {
-    throw new HolderLockError('lock-route-error', `${bin} state-root did not answer within ${ROUTE_CALL_TIMEOUT_MS} ms and was killed`);
+    throw new HolderLockError('lock-route-error', `${bin} state-root did not answer within ${ROUTE_CALL_TIMEOUT_MS} ms and was killed. ${ROUTE_NEXT_STEP}`);
   }
   if (typeof line.stateRoot !== 'string' || typeof line.lockRoot !== 'string' || typeof line.source !== 'string') {
-    throw new HolderLockError('lock-route-bad-output', `${bin} state-root answered without stateRoot/lockRoot/source: ${String(res.stdout ?? '').slice(0, 200)}`);
+    throw new HolderLockError('lock-route-bad-output', `${bin} state-root answered without stateRoot/lockRoot/source: ${String(res.stdout ?? '').slice(0, 200)}. ${ROUTE_NEXT_STEP}`);
   }
   return { stateRoot: line.stateRoot, lockRoot: line.lockRoot, source: line.source };
 }

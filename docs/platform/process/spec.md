@@ -5,12 +5,12 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: Define the single authority for "is this process tuple alive, dead or unknown" and for signalling a process by identity
 Design status: Accepted
-Implementation status: In progress (judge vectors landed; crate, Node leaf alignment and the domain primitives land in parallel phases)
+Implementation status: Implemented (judge vectors, the crate, the domain primitives and the Node door)
 Canonical: Yes
 Owner: Process component (facts + control, L0)
-Source: packages/process/rust (crate fgos-process); Node leaf src/runner/dispatch/process-identity.mjs
+Source: packages/process/rust (crate fgos-process); Node door src/native/door.mjs and thin client src/runner/dispatch/process-identity.mjs
 Contracts: packages/process/contracts/
-Last reviewed: 2026-10-18
+Last reviewed: 2026-10-21
 Related:
 - docs/platform/holder-lock/spec.md
 - docs/platform/run-supervisor/spec.md
@@ -19,6 +19,7 @@ Related:
 - docs/specs/runner.md
 - plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md
 - plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md
+- plans/reports/council-261021-1507-harden-t0-arbitration.md
 ```
 
 ## 1. Purpose
@@ -41,7 +42,7 @@ Facts are almost never on the lock decision path any more (the kernel decides); 
 | `domain_is_empty`, `domain_kill_all` for a declared domain | The attempt, envelope and lock that use the containment port (run supervisor); the port itself is section 10 |
 | The OS-neutral `ProcessPlatform` trait and one driver per OS | mtime of anything; a boot time derived from a clock |
 
-The reconcile planner keeps importing only the `facts` module (the existing import-graph rule of `src/runner/dispatch/process-identity.mjs`). The component-boundary entry is [Process Facts & Control (L0)](../component-boundary.md#4-current-high-level-components).
+The reconcile planner imports only the thin client `src/runner/dispatch/process-identity.mjs` and, through it, the door; the import-graph test (`test/runner/dispatch-reconciliation-import-graph.test.mjs`) pins that closure. The component-boundary entry is [Process Facts & Control (L0)](../component-boundary.md#4-current-high-level-components).
 
 ## 3. Facts: the judge table
 
@@ -51,7 +52,7 @@ The tuple is `{host, bootId, pidNs, pid, startTime}`. A record written before th
 |---|---|
 | Other host, or other pid namespace without a decisive anchor | unknown |
 | Same host, recorded boot id differs from the running kernel's | dead |
-| No pid in the record (missing, corrupt, not a positive integer) | unknown (the Node leaf answered `dead` here before; a record without a pid proves nothing) |
+| No pid in the record (missing, corrupt, not a positive integer) | unknown (the former Node judge answered `dead` here; a record without a pid proves nothing) |
 | pid does not exist (`ESRCH`) | dead |
 | pid exists in state `Z` or `X` in `/proc/<pid>/stat` | dead (`kill(pid, 0)` still succeeds for a zombie; the stat state decides) |
 | pid exists, start time matches | alive |
@@ -68,9 +69,22 @@ A process inside an attempt's PID namespace has no pid the host can read, and th
 
 Consequence: a holder inside an attempt that dies while holding a hot lock keeps it until the attempt ends (bounded by the hard ceiling), never for ever; a process inside a namespace never steals a host process's lock.
 
-Authoritative boot id: Linux `/proc/sys/kernel/random/boot_id`; macOS `sysctl kern.bootsessionuuid`; Windows has no boot id and uses the process creation time (`FILETIME`), which does not repeat when a pid is reused. Boot is never inferred from a clock minus uptime, and mtime is never used. The leaf reader never spawns: the macOS Node driver does not call `ps`, and a missing start time is `unknown`.
+Authoritative boot id: Linux `/proc/sys/kernel/random/boot_id`; macOS `sysctl kern.bootsessionuuid`; Windows has no boot id and uses the process creation time (`FILETIME`), which does not repeat when a pid is reused. Boot is never inferred from a clock minus uptime, and mtime is never used. The reader never spawns, and a missing start time is `unknown`. Boot id and pid namespace are read once per process (`platform/linux.rs`); no fgOS process that judges ever unshares its pid namespace after it starts, so the cached values stay true.
 
-The same vectors are run by cargo and by the Node leaf, so there is no second judge table. `resolveHolderLiveness` in the Node leaf becomes an adapter of `judge` (`dead → 'dead'`, `alive | unknown → 'held'`); the one behaviour change is that a record without a pid now reads `held` and a zombie reads `dead`. `pidExists(pid)` (`process.kill(pid, 0)`, `EPERM` counts as existing) is the one helper the cutover phases use in place of every private `isPidAlive` copy, which they delete in the same commit.
+Node does not judge. It reaches the judge through one in-process door: `src/runner/dispatch/process-identity.mjs` is a thin client of six exports (`judge`, `observe`, `selfRecord`, `signalByIdentity`, `scan`, `resolveHolderLiveness`), at most 60 lines, with no `/proc` read and no `process.kill`. It calls the combined native addon through the loader leaf `src/native/door.mjs`, which Git also uses; the addon is the same crate cargo runs, so the vectors have one table and one runner. Calls are synchronous and never throw on a judgement: an unjudgeable record answers `unknown` (`judge`) or `unreadable` (`observe`), and a process that is gone answers `dead` or `absent`.
+
+Two caller policies, both from the verdict and nothing else:
+
+- **P1, reclaim only on `dead`.** `resolveHolderLiveness(record)` is the one adapter: `dead → 'dead'`, `alive | unknown → 'held'`. A record this observer cannot disprove is never reclaimed, cleaned or overwritten.
+- **P2, signal only on `sent`.** `signalByIdentity(record, signal)` signals only while the process still matches the record, and answers `sent`, `identity-mismatch`, `identity-unknown`, `not-found`, `unsupported`, `denied` or `failed`. A caller counts a process as stopped only after it judges `dead`; `identity-mismatch` and `not-found` are re-judged, `identity-unknown` signals nothing, `unsupported` escalates to the next signal, `denied` and `failed` are errors. No site signals a bare pid.
+
+`unknown` maps the same way everywhere: hold the record, signal nothing, and say what could not be read (the gateway refuses to stop with `gateway-stop-identity-unknown`, a lock fence refuses with `lock-fence-identity-unknown`).
+
+Loader errors are named and fail closed, each with its next step: `process-door-unavailable` (the addon is missing, a symlink, of another target or ABI, or fails its digest; restage the active release with `fgctl init`) and `process-door-not-shipped` (this channel carries no addon, as the npm install does not: onboard the project with `fgctl init`). There is no JavaScript fallback.
+
+Verification of the addon is per process: the loader hashes the `.node` file once per file identity (digest key of the manifest and addon, `dev`, `ino`, size, `mtimeNs`, `ctimeNs`), loads it lazily on the first door call, refuses a symlinked addon, and refuses a second, different file in one process (`git-addon-second-load`). Nothing is recorded across processes: `activation.json` has no addon field, and the cross-process verification of the original request stays open as a hand-off to the Host & Surface plan.
+
+The Node budget is 60 lines of client; the Node judge, its `/proc` and `ps` readers and every private liveness copy are deleted. The internal host route that once answered a single pid is deleted too: no route answers a process question, and the exports of the door are the only Node surface.
 
 ## 4. Control
 
@@ -102,8 +116,9 @@ The containment port (`create`, `spawn_in`, `is_empty`, `kill_all`, `guarantee`)
 - **2026-10-15 — Thiết kế nền bản 3: facts rời khỏi đường quyết định lock.** Kernel lock quyết ai giữ; facts chỉ còn cho binding supervisor/gate, fast path nóng tạm thời và hiển thị. Tuple chuẩn `{host, bootId, pidNs, pid, startTime}`; boot id từ nguồn có thẩm quyền, không từ đồng hồ, không mtime. [Design r6](../../../plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md) §5.1.
 - **2026-10-16 — Phản biện vòng 1 (gemini R3-3): zombie và record thiếu pid.** `kill(pid, 0)` thành công với zombie nên zombie bị coi là sống; record thiếu pid bị `process-identity.mjs` coi là chết. Sửa: trạng thái `Z`/`X` → dead; thiếu pid → unknown (giữ). Design §14 vòng 1.
 - **2026-10-16 — Phản biện vòng 2 (Argon R4-1) và vòng 3 (kongming N3, N4): PID namespace.** pid trong namespace không có nghĩa với host; gate đặt `FGOS_PIDNS_ANCHOR`, record trong namespace mang anchor; anchor chết → dead, còn lại → unknown; người phán ngoài init namespace gặp record không `pidNs` → unknown (agent trong sandbox không dọn record của holder host). "Miền rỗng" của attempt là `judge(gate) == dead`, quét inode namespace chỉ để chẩn đoán. Design §5.1, §14.
-- **2026-10-16 — Plan 4.2 (Lead D3, D8): phạm vi của crate trong track này.** Không có primitive cho gate (subreaper, PDEATHSIG, PID namespace, tty) vì 4.2 không có consumer; chỉ hai primitive miền `domain_is_empty`/`domain_kill_all` với `linux-gate` cài thật, `windows-job`/`macos-tree` trả `Unknown`/`Refused` tới khi driver tương ứng có. Leaf Node `process-identity.mjs` đọc cùng vector, `resolveHolderLiveness` thành adapter của `judge`, thêm `pidExists` để các phase cutover thay mọi bản chép `isPidAlive`. [Plan](../../../plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md).
+- **2026-10-16 — Plan 4.2 (Lead D3, D8): phạm vi của crate trong track này.** Không có primitive cho gate (subreaper, PDEATHSIG, PID namespace, tty) vì 4.2 không có consumer; chỉ hai primitive miền `domain_is_empty`/`domain_kill_all` với `linux-gate` cài thật, `windows-job`/`macos-tree` trả `Unknown`/`Refused` tới khi driver tương ứng có. Leaf Node `process-identity.mjs` đọc cùng vector, `resolveHolderLiveness` thành adapter của `judge`, thêm `pidExists` để các phase cutover thay mọi bản chép `isPidAlive` (leaf và `pidExists` đã bị thay thế bởi mục 2026-10-21 bên dưới). [Plan](../../../plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md).
 - **2026-10-19 — `arm_parent_death_signal` và đọc `/proc/locks` tới EOF.** Primitive PDEATHSIG cho gate terminal nằm ở crate này (gate gọi trước HELLO; run supervisor đóng cửa sổ monitor chết trước khi cài, xem [run-supervisor spec](../run-supervisor/spec.md) mục 16). `lock_table_entries` đọc hết một seq_file mở tới EOF thay vì một prefix: bảng không atomic, nên vắng mặt vẫn chỉ là lý do chạy probe shared-lock, không phải bằng chứng đã nhả.
+- **2026-10-21 — T0 hội đồng: Node vào cửa in-process, bỏ leaf và route.** Thay thế mục **2026-10-16 — Plan 4.2 (Lead D3, D8)** ở trên theo tên: leaf Node `process-identity.mjs` đọc cùng vector và `pidExists` bị gỡ; Node không còn phán, chỉ gọi judge Rust qua cửa `src/native/door.mjs` (client mỏng sáu export), route nội bộ quan sát một pid bị xoá, các bản `isPidAlive`/`kill(pid, 0)` và `signalByIdentity` thứ hai của lock fence bị xoá. Chính sách P1 (chỉ thu hồi khi `dead`) và P2 (chỉ coi là dừng khi đã `sent` rồi judge `dead`); `unknown` luôn là giữ. Xác minh addon giữ theo từng process (không thêm trường `activation.json`, không kênh npm: chỉ `fgctl init` được hỗ trợ), theo quyết định của anh ngày 2026-10-21 (12:05, 17:43). Containment: `linux-pgroup` không đặt subreaper lên caller, `is_empty` trả `unknown` khi bất kỳ thành viên nào không phán hoặc không đọc được. [Phân xử](../../../plans/reports/council-261021-1507-harden-t0-arbitration.md), [plan](../../../plans/261021-1547-harden-t0-process-facts-door/plan.md).
 
 ## 9. Related files
 
@@ -113,7 +128,7 @@ The containment port (`create`, `spawn_in`, `is_empty`, `kill_all`, `guarantee`)
 | consumed by | [holder-lock/spec.md](../holder-lock/spec.md) |
 | sibling L0/L1 authority | [session-identity/spec.md](../session-identity/spec.md) |
 | boundary | [component-boundary.md](../component-boundary.md) |
-| Node leaf and its callers | [runner.md](../../specs/runner.md) |
+| Node door and its callers | [door.mjs](../../../src/native/door.mjs), [process-identity.mjs](../../../src/runner/dispatch/process-identity.mjs), [runner.md](../../specs/runner.md) |
 | plan | [plan.md](../../../plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md) |
 | design and evidence | [design r6](../../../plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md) |
 
@@ -134,7 +149,7 @@ Driver selection: Linux uses `bwrap-pidns` when bwrap with user and PID namespac
 | Driver | Mechanism | `is_empty` | Level | Named escapes |
 |---|---|---|---|---|
 | `bwrap-pidns` (Linux) | `bwrap --unshare-pid --as-pid-1 --proc /proc`; the gate is pid 1 of the namespace. `--die-with-parent` only in terminal mode, refused in direct mode | `judge(gate host tuple) == dead`: the kernel kills and reaps every task of the namespace before its init becomes a zombie. No `ns/pid` inode scan (doctor diagnostics only) | `kernel` | Processes created by a daemon outside the namespace on the agent's request (herdr, systemd, docker) |
-| `linux-pgroup` (Linux, no user namespace) | Own session and process group for the gate; `kill_all` is `killpg` by identity of the root plus a descendant scan | No process left in the group and `judge(root) == dead`; descendants seen by an earlier scan are still counted while they live | `best-effort` | `setsid` descendants leave the group; a group scan after the leader died can meet a reused pgid; daemons outside the domain |
+| `linux-pgroup` (Linux, no user namespace) | Own session and process group for the gate; `kill_all` is `killpg` by identity of the root plus a descendant scan. The driver sets no subreaper on its caller (the run supervisor owns that, section 2) | `judge(root) == dead`, no process in the `/proc` row scan of the group, and no descendant seen by an earlier scan still alive. `unknown`, never `empty`, when any seen or listed member cannot be judged or read, or the table cannot be listed | `best-effort` | `setsid` descendants leave the group; a group scan after the leader died can meet a reused pgid; daemons outside the domain |
 | `windows-job` | A named Job Object (`KILL_ON_JOB_CLOSE`, no breakaway); the gate is a member from its first instruction. The job functions belong to the Windows domain code of this crate (`windows_job.rs`) | The job view and contender view of the predecessor contract; never `ActiveProcesses == 0` alone, never an unopenable job read as empty | `kernel` | Processes created outside the job by a service or COM server on the agent's request |
 | `macos-tree` (`pgroup-tree`) | Own session and group for the agent; `killpg` plus a scan of the descendant tree (`proc_listchildpids`) | No process in the group and none in the scanned tree; judged from the record alone, a second scan runs after 500 ms | `best-effort` | `setsid` plus a double fork reparents a descendant to launchd, out of the group and the tree (measured: it survives `killpg`); a group or tree scan after the root died can meet a reused pgid; launchd or XPC services |
 

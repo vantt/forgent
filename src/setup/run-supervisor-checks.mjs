@@ -116,11 +116,11 @@ export function checkProcessContainment(repoRoot, { platform = process.platform,
   if (level === 'kernel') return { passed: true, message: `${driver}, level kernel${escapeText}` };
   if (level === 'best-effort') {
     if (platform === 'linux') {
-      return { passed: true, message: warn(`${driver}, level best-effort: bwrap with a user namespace is unavailable here (no bwrap, or user namespaces are disabled), so agents run in a process group${escapeText}`) };
+      return { passed: true, message: warn(`${driver}, level best-effort: bwrap with a user namespace is unavailable here (no bwrap, or user namespaces are disabled), so agents run in a process group${escapeText}. Install bwrap and enable unprivileged user namespaces for kernel containment`) };
     }
     return { passed: true, message: info(`${driver}, level best-effort${escapeText}`) };
   }
-  return { passed: false, message: `no containment driver on this machine (${driverError ?? 'unsupported'}); fgos run cannot start an agent` };
+  return { passed: false, message: `no containment driver on this machine (${driverError ?? 'unsupported'}); fgos run cannot start an agent. Rebuild the host from this checkout (\`npm run fgos:dev\`) or restage the active release, then run \`fgos doctor\`` };
 }
 
 // ---------------------------------------------------------------------

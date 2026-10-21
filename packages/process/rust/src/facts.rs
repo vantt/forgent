@@ -249,15 +249,6 @@ pub fn boot_id() -> Option<String> {
     platform::current().boot_id()
 }
 
-/// Start time of `pid` as the OS reports it; `None` when the pid is absent,
-/// a zombie, or unreadable. Use [`observe`] to tell those apart.
-pub fn start_time(pid: ProcId) -> Option<String> {
-    match platform::current().observe(pid) {
-        Observed::Live { start_time } => Some(start_time),
-        _ => None,
-    }
-}
-
 /// One look at `pid` on this platform.
 pub fn observe(pid: ProcId) -> Observed {
     platform::current().observe(pid)
@@ -546,7 +537,7 @@ pub fn parse_proc_stat(line: &str) -> Option<(char, String)> {
 
 // Linux kernel lock facts belong to process, not a lock policy adapter.
 #[cfg(target_os = "linux")]
-pub use crate::platform::linux::{kcmp_same_file, lock_table_entries, locked_fds, own_lock_token, proc_self_pid, LockEntry, LockedFd};
+pub use crate::platform::linux::{lock_table_entries, locked_fds, own_lock_token, proc_self_pid, LockEntry, LockedFd};
 
 #[cfg(test)]
 mod tests {
