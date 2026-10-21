@@ -1,0 +1,83 @@
+{
+  "contract": {
+    "id": "step-06-evidence-receipt",
+    "version": 1
+  },
+  "timestamp": "2026-10-21T18:00:00.000Z",
+  "sourceCommit": "916116b0419d04637bab19c3a16cd5aac3205229",
+  "manifestPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-06-evidence-relocation-manifest.json",
+  "commands": [
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-evidence-relocation.mjs --manifest plans/260925-documentation-authority-unification/reports/phase-08/step-06-evidence-relocation-manifest.json --before",
+      "exit": 0,
+      "summary": "PASS: before mode verified (867 entries, 0 violations)"
+    },
+    {
+      "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/check-evidence-relocation.test.mjs",
+      "exit": 0,
+      "summary": "9 tests passed, 0 failed, 0 skipped"
+    }
+  ],
+  "counts": {
+    "trackedArchitectFiles": 981,
+    "trackedPlatformFiles": 1189,
+    "architectPayloadFiles": 867,
+    "platformPayloadFiles": 867,
+    "identicalMirrorCount": 867,
+    "mirrorMismatches": 0,
+    "collectionsCount": 17,
+    "executableModeFiles": 12,
+    "markdownPayloads": 302,
+    "otherPayloads": 565,
+    "totalPayloadBytes": 17176516,
+    "consumerMeasurements": {
+      "command": "git ls-files scanning for agent-coordination/verification outside payload trees and plan directory",
+      "totalConsumerFiles": 214,
+      "legacyFormHits": 196,
+      "fullPathHits": 184,
+      "platformFormHits": 21,
+      "groupBreakdown": {
+        "archive": 114,
+        "docs/platform": 37,
+        "docs/architect": 24,
+        "test": 14,
+        "docs/how-to": 9,
+        "plans": 6,
+        "src": 3,
+        ".fgos": 2,
+        "docs/history": 2,
+        "CHANGELOG.md": 1,
+        "docs/knowledge": 1,
+        "scripts": 1
+      }
+    }
+  },
+  "exceptionalConsumers": {
+    "runtimeReaders": [],
+    "unclassifiedConsumers": [],
+    "mirrorDigestModeMismatches": []
+  },
+  "reusedPrimitives": [
+    {
+      "symbol": "computeSha256",
+      "location": "scripts/check-legacy-docs-ratchet.mjs:112",
+      "purpose": "Deterministic SHA-256 calculation for file contents"
+    },
+    {
+      "symbol": "normalizePosix",
+      "location": "scripts/check-legacy-docs-ratchet.mjs:43",
+      "purpose": "POSIX path normalization across platforms"
+    },
+    {
+      "symbol": "isEvidenceMirrorPath",
+      "location": "scripts/check-doc-inventory-gates.mjs:1009",
+      "purpose": "Classification of evidence payload paths nested below verification"
+    },
+    {
+      "symbol": "classifyPath",
+      "location": "scripts/check-doc-constitution.mjs:170",
+      "purpose": "Placement and constitution document kind classification"
+    }
+  ],
+  "blockers": []
+}
