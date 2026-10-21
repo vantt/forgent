@@ -90,6 +90,10 @@ Node shrank by 382. The owner decides whether this is accepted (owner ask 2).
   - phase 2: cargo ran per selected test run; the scratch worktree used another checkout's release;
   - phase 3: the dev launcher built inside the fixture checkout, and the dev-host addon load failed.
 
+## 5b. Missed in verification (found by TEST, 23:55)
+
+Every full `npm test` on main since T0 exits 1 because of the `.fgos` store leak check: `scripts/run-rust-dev-host.mjs` `stageLauncherDoor` (added in phase 3, `ab5a5fdf6`) rewrites `.fgos/runtime/git-addon/<hash>/manifest.json` on every call, even with identical bytes. The leak check compares mtime and size. The big lead's close run shows the same ERROR line (`npm.log:12052`), but the big lead attributed `npm exit 1` to the two load-sensitive reds and did not read it. The fix (write only when the bytes differ) is on branch `harden/t0-fix-manifest-rewrite`, with the owning test `test/scripts/run-rust-dev-host-staging.test.mjs` extended to assert the manifest mtime is unchanged on a second staging. It lands after the GIT E3 window. **Lesson for every later layer:** the verify step reads the run-tests ERROR lines, not only the failing-test list.
+
 ## 6. Behaviour and format changes (previous release compatibility)
 
 - Gateway registry entries gain the process tuple. The previous release reads `pid` and `port` and ignores the rest. An old pid-only entry reads as `IdentityUnknown` and is never signalled (`gateway-stop-identity-unknown`).
