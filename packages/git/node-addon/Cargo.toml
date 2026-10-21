@@ -16,6 +16,9 @@ libc.workspace = true
 fgos-git = { path = "../rust" }
 fgos-event-store = { path = "../../event-store/rust" }
 fgos-holder-lock = { path = "../../holder-lock/rust" }
+fgos-process = { path = "../../process/rust" }
+fgos-durable-file = { path = "../../durable-file/rust" }
+fgos-canonical-json = { path = "../../canonical-json/rust" }
 
 [build-dependencies]
 napi-build = "=2.2.4"

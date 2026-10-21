@@ -147,6 +147,8 @@ export function buildTestEnv(env = process.env) {
     if (hostBin) {
       childEnv.FGOS_HOST_BIN = hostBin;
     }
+    // The staged release manifest the in-process door needs; `target/debug/fgos` alone has none.
+    ensureGitAddon(childEnv, REPO_ROOT);
   } catch (err) {
     // If cargo is missing or build fails, let tests that require host fail with clear diagnostic
     console.error(`run-tests: warning: failed to ensure host binary: ${err.message}`);

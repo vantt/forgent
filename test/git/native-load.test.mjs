@@ -8,7 +8,9 @@ import { createRequire } from 'node:module';
 import { execFileSync } from 'node:child_process';
 import { Worker } from 'node:worker_threads';
 import { ensureGitAddon, root } from '../../scripts/git-addon.mjs';
+import { createHash } from 'node:crypto';
 import { loadNativeAddon } from '../../src/git/native.mjs';
+import { loadNativeAddon as loadThroughDoor, nativeHelperExe, canonicalJson, replaceDurably, installOnce } from '../../src/native/door.mjs';
 import { createGitPublication } from '../../src/git/index.mjs';
 import { openStore } from '../../src/event-store/index.mjs';
 import { withStateTx } from '../../src/state/hot-lock.mjs';
@@ -20,7 +22,7 @@ const options = { descriptor };
 const addon = loadNativeAddon(options);
 
 test('one combined load reports both crate versions and Node-API line', () => {
-  assert.deepEqual(addon.versions(), { addon: '0.2.0', git: '0.2.0', eventStore: '0.2.0', napi: 8, contracts: { gitPort: 1, receipt: 1, walRecord: 1, eventStore: 4 } });
+  assert.deepEqual(addon.versions(), { addon: '0.2.0', git: '0.2.0', eventStore: '0.2.0', napi: 8, process: 1, durableFile: '0.2.0', canonicalJson: 1, contracts: { gitPort: 1, receipt: 1, walRecord: 1, eventStore: 4 } });
   assert.equal(loadNativeAddon(options), addon);
 });
 test('a second physical addon copy refuses at load, while a child owns its own marker', () => {
@@ -44,6 +46,43 @@ test('resolver refuses absent, unsafe, wrong-target and changed bytes before exp
   }
   assert.throws(() => loadNativeAddon({ descriptor: { releaseRoot: root, manifest: {} } }), /git-addon-unavailable/);
 });
+test('the door and Git share one addon, one helper and one memo; a different file is refused by name before it is required', () => {
+  assert.equal(loadThroughDoor(options), addon);
+  assert.equal(nativeHelperExe(addon), fs.realpathSync(path.join(root, manifest.entries.fgos)));
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-addon-other-'));
+  try {
+    // Not an addon at all: only a refusal that precedes `require` can name the second load.
+    fs.writeFileSync(path.join(temp, 'second.node'), 'not an addon');
+    const other = { releaseRoot: temp, manifest: { components: { nativeAddon: { ...manifest.components.nativeAddon, path: 'second.node', digest: createHash('sha256').update('not an addon').digest('hex') } } } };
+    for (const load of [loadThroughDoor, loadNativeAddon]) assert.throws(() => load({ descriptor: other }), { code: 'git-addon-second-load' });
+  } finally { fs.rmSync(temp, { recursive: true, force: true }); }
+});
+test('Git sees its helper and handover when the door loaded the addon first', () => {
+  const script = `import {loadNativeAddon as door, nativeHelperExe as helper} from ${JSON.stringify(new URL('../../src/native/door.mjs', import.meta.url).href)};
+    import {loadNativeAddon as git, nativeHelperExe} from ${JSON.stringify(new URL('../../src/git/native.mjs', import.meta.url).href)};
+    const descriptor = JSON.parse(process.env.DESCRIPTOR); const first = door({descriptor}); const second = git({descriptor});
+    console.log(JSON.stringify({same: first === second, helper: nativeHelperExe(second) === helper(first) && helper(first) !== null}));`;
+  const out = execFileSync(process.execPath, ['--input-type=module', '-e', script], { encoding: 'utf8', env: { ...process.env, DESCRIPTOR: JSON.stringify(descriptor) } });
+  assert.deepEqual(JSON.parse(out), { same: true, helper: true });
+});
+test('the door refuses a symlinked addon and a value that is not JSON, and writes files with the mode it is given', () => {
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-door-'));
+  try {
+    fs.symlinkSync(built.addon, path.join(temp, 'link.node'));
+    assert.throws(() => loadThroughDoor({ descriptor: { releaseRoot: temp, manifest: { components: { nativeAddon: { ...manifest.components.nativeAddon, path: 'link.node' } } } } }), /addon is a symlink/);
+    assert.equal(canonicalJson({ b: [1], a: undefined }), '{"b":[1]}');
+    for (const bad of [undefined, 10n, [1, undefined], NaN, () => 1]) assert.throws(() => canonicalJson(bad), { code: 'canonical-json-not-json' });
+    const cycle = {}; cycle.self = cycle;
+    assert.throws(() => canonicalJson(cycle), { code: 'canonical-json-not-json' });
+    assert.equal(installOnce(temp, 'once', 'a', 0o640), 'created');
+    assert.equal(installOnce(temp, 'once', 'b', 0o640), 'already-exists');
+    assert.equal(replaceDurably(temp, 'once', Buffer.from('c'), 0o640), 'created');
+    assert.equal(fs.readFileSync(path.join(temp, 'once'), 'utf8'), 'c');
+    assert.equal(fs.statSync(path.join(temp, 'once')).mode & 0o777, 0o640 & ~process.umask());
+    assert.throws(() => replaceDurably(path.join(temp, 'missing'), 'x', 'c', 0o600), (e) => e.installed === 'none' && /durable-file-replaceDurably/.test(e.message));
+  } finally { fs.rmSync(temp, { recursive: true, force: true }); }
+});
+
 test('real append and read run in a hot section without a child process; Git refuses there', () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-addon-store-'));
   const repo = path.join(temp, 'repo');
@@ -122,12 +161,16 @@ test('staged release and npm-relative manifests resolve their own addon without 
       if (channel === 'npm') {
         const descriptorPath = path.join(payload, 'native-addon.json');
         const probe = `import {loadNativeAddon} from ${JSON.stringify(new URL(`file://${path.join(payload, 'src/git/native.mjs')}`).href)}; try { loadNativeAddon({hostBin:null}); } catch(e) { console.log(e.code); }`;
+        // The door never loads the release another payload's host names (FGOS_HOST_BIN is the staged checkout's here).
+        const door = `import {selfRecord} from ${JSON.stringify(new URL(`file://${path.join(payload, 'src/runner/dispatch/process-identity.mjs')}`).href)}; try { console.log(typeof selfRecord().pid); } catch(e) { console.log(e.code + ': ' + e.message); }`;
+        assert.equal(execFileSync(process.execPath, ['--input-type=module', '-e', door], { cwd: os.tmpdir(), encoding: 'utf8' }).trim(), 'number');
         for (const value of ['{}', '{broken']) {
           fs.writeFileSync(descriptorPath, value);
           assert.equal(execFileSync(process.execPath, ['--input-type=module', '-e', probe], { encoding: 'utf8' }).trim(), 'git-addon-unavailable');
         }
         fs.rmSync(descriptorPath);
         assert.equal(execFileSync(process.execPath, ['--input-type=module', '-e', probe], { encoding: 'utf8' }).trim(), 'git-addon-not-shipped');
+        assert.equal(execFileSync(process.execPath, ['--input-type=module', '-e', door], { cwd: os.tmpdir(), encoding: 'utf8' }).trim(), 'process-door-not-shipped: process-door-not-shipped: onboard this project with fgctl init');
       }
     }
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
