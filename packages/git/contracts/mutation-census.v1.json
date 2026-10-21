@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "a08dcfbd21b4dd47786b8f8ef5cb0ac490029277ce300226badf0c4e5fb3c718",
+  "payloadDigest": "039566196e2775ebe08eac7375afa3ccabfc7f8a0b96953c1c39a5c4118518a0",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -576,7 +576,7 @@
     "scripts/lib/git-addon-stage.mjs": "3112f05d71365bcd379405db58fb4b48de7c809b2b097eb3faeb6ea616c0adcb",
     "scripts/lib/git-dir-layout.mjs": "710ff2406bed4faa4a35ff3ccd2910e97d693112b64cd82802efc2f99027232f",
     "scripts/lib/git-ports.mjs": "119f38a44c2eb068dc2f7f1236f83d44cb1a1f2c10827e2aebf5efd9c7f6b24b",
-    "scripts/lib/git-spawn-match.mjs": "f18f85e7107bcacdde3ebe864f13bfc0eb7e3199927824cae8e64f39853037ad",
+    "scripts/lib/git-spawn-match.mjs": "ab974ef3282b087a925074d2552fcbaee68236559446c604b17244b4b2ed3400",
     "scripts/lib/is-main-module.mjs": "e39f98fb73a497be73b7d92f0335d9f0c88eb627a77f2ab964f9c7034f711a45",
     "scripts/lib/js-source-lexer.mjs": "3effa44590fde482bbc593d49fa46fac7f5519198232fe56c704f09508a071a4",
     "scripts/lib/sandbox-git.mjs": "c45bc75afc8e5666e13d70f9ea65c6ff4e79243aeca7bae5046d4ea3e914088f",
