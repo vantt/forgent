@@ -23,7 +23,7 @@ net_size: "Node −155 / Rust −47 / tests −215 (estimate)"
 - The `pidExists` sentence and the Node-leaf sentences in the docs (below), so that `rg -n "pidExists|process-observe|observeViaHost" docs src packages apps test` returns nothing after this phase.
 
 **Spec updates (the approved Part A shapes, written as they stand in arbitration §2)**
-- `docs/platform/process/spec.md`: §2 ownership table unchanged except that the Node leaf sentence goes; §3 `:71-73` replaced by the door paragraph: Node reaches the judge through one in-process door (`src/runner/dispatch/process-identity.mjs`, six exports, ≤ 60 lines, no `/proc`, no `process.kill`), loaded by the T0 leaf `src/native/door.mjs`; the two caller policies (reclaim only on `dead`; signal only on `sent`); the named loader errors with their next steps; the H8 verification rule as OQ-1 decided; S1's invariant (boot id and pid namespace read once per process; no fgOS process that judges ever unshares after start). §8 gains one entry dated 2026-10-21 that **supersedes the 2026-10-16 Plan 4.2 entry (`:105`) by name**: the Node leaf and `pidExists` are retired, the owner's 12:05 decision and the T0 council (link the arbitration). §9 "Node leaf and its callers" row points at the door. §10: the containment table's `linux-pgroup` row says the leader is the subreaper (RT-M1) and `is_empty` answers `unknown` when any seen member cannot be judged (RT-M2).
+- `docs/platform/process/spec.md`: §2 ownership table unchanged except that the Node leaf sentence goes; §3 `:71-73` replaced by the door paragraph: Node reaches the judge through one in-process door (`src/runner/dispatch/process-identity.mjs`, six exports, ≤ 60 lines, no `/proc`, no `process.kill`), loaded by the T0 leaf `src/native/door.mjs`; the two caller policies (reclaim only on `dead`; signal only on `sent`); the named loader errors with their next steps; the H8 verification rule as OQ-1 decided; S1's invariant (boot id and pid namespace read once per process; no fgOS process that judges ever unshares after start). §8 gains one entry dated 2026-10-21 that **supersedes the 2026-10-16 Plan 4.2 entry (`:105`) by name**: the Node leaf and `pidExists` are retired, the owner's 12:05 decision and the T0 council (link the arbitration). §9 "Node leaf and its callers" row points at the door. §10: the containment table's `linux-pgroup` row says `is_empty` answers `unknown` when any seen or listed member cannot be judged or read (RT-M2) and that the driver sets no subreaper (RT-M1; §2 `:40` stays as it is, the run supervisor owns the subreaper).
 - `docs/platform/component-boundary.md:78`: the sentence "the Node leaf `src/runner/dispatch/process-identity.mjs` reads the same vectors, and reconcile imports only `facts`" becomes "Node reaches it only through the in-process door (`src/native/door.mjs` → `src/runner/dispatch/process-identity.mjs`, six exports); reconcile imports the thin client". Two **new rows** for `canonical-json` and `durable-file` with the Part A authority sentence, ports, Rust/Node boundary and Node budget, the delete list outcome, and (durable-file) the accepted duplication of the four private no-fsync Rust helpers (D5) and why (a heartbeat fsync per tick). These rows are the specs of the two leaf crates until a spec file exists; link them from `docs/specs/reading-map.md` beside `:61`.
 - `docs/platform/holder-lock/spec.md:229` (fix the `{v: 1, protocol: 1}` sentence to the protocol the routes answer), `:238` (drop the `process-observe` row), `:312` (the cleanup paragraph names the door, not the route).
 - `docs/specs/reading-map.md:57` (route list without `process-observe`), `:59` (hot-lock line: "on Windows the holder's creation time is read in-process through the door"), `:61` (process spec line: "Node through the door `src/native/door.mjs`; thin client `src/runner/dispatch/process-identity.mjs`"), plus the two new boundary rows.
@@ -41,10 +41,10 @@ net_size: "Node −155 / Rust −47 / tests −215 (estimate)"
 
 ## Steps
 
-1. Doctor row deletion (code, test lines, three docs, `checks.test.mjs`, backlog), one commit; `node scripts/run-tests.mjs test/setup/doctor-coordination-checks.test.mjs test/setup/checks.test.mjs test/setup/registrations.test.mjs`.
+1. Doctor row deletion (code, test lines, three docs, `checks.test.mjs`, backlog), one commit; one-file runs (phase 1's one-liner) of `test/setup/doctor-coordination-checks.test.mjs test/setup/checks.test.mjs test/setup/registrations.test.mjs`.
 2. Route deletion (Rust arm, contract, Rust test, Node test file), one commit; `cargo test -p fgos-holder-lock && cargo test -p fgos --test internal_lock_routes`.
 3. Crate deletions (`start_time`, `kcmp_same_file`) with the test updates; `cargo test -p fgos-process`.
-4. Contract lines (S-F2) and the two named-error next steps (S-G1); `node scripts/run-tests.mjs test/setup/run-supervisor-checks.test.mjs test/rust-host/internal-routes.test.mjs`.
+4. Contract lines (S-F2) and the two named-error next steps (S-G1); one-file runs of `test/setup/run-supervisor-checks.test.mjs test/rust-host/internal-routes.test.mjs`.
 5. Spec and boundary and reading-map edits, with the §8 supersession entry; verify every link and every `file:line` the new text cites against the tree (`rg` each symbol); `fgos decision-index` if the §8 entry carries a decision id.
 6. Flip `test/process/one-door.test.mjs` green by removing the now-empty allowlist entries; census; `npm test` once. Message DOC (`forgentx-5f`) with the list of changed doc files (H12) and SEAT about `registrations.mjs` and the three docs.
 
@@ -54,8 +54,8 @@ net_size: "Node −155 / Rust −47 / tests −215 (estimate)"
 - `rg -n "process-observe|runProcessObserveRoute|observeViaHost|hot-lock-host-judge" src test docs packages apps` → nothing.
 - `rg -n "pidExists|isPidAlive|Node leaf" docs/platform/process/spec.md docs/platform/component-boundary.md docs/specs/reading-map.md` → nothing (except the superseded §8 entry's own historical wording, which stays as history).
 - `rg -n "start_time\(|kcmp_same_file" packages apps --glob '*.rs'` → only `identity_of`/`self_identity` call sites.
-- `node scripts/run-tests.mjs test/process/one-door.test.mjs` → green.
-- `cargo test --workspace`; `node scripts/run-tests.mjs test/setup test/state test/rust-host/internal-routes.test.mjs`.
+- `test/process/one-door.test.mjs` (one-file run) → green.
+- `cargo test --workspace`; `npm test` once in the worktree.
 - `fgos doctor --json | rg -c '"id"'` on this workspace: one row fewer than the baseline's 145.
 
 ## Net size
