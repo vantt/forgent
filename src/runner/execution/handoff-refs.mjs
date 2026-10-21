@@ -10,7 +10,7 @@
 //
 // One input depends on the role that receives it: `unit-run:<unitRunId>/{seat}` stands for the
 // report the receiving role's own seat left in that earlier run (the panelist playing
-// `panelist-2` gets the result of `panelist-2`). It is resolved here too, once per role, when that
+// `member-2` gets the result of `member-2`). It is resolved here too, once per role, when that
 // role is dispatched (`resolveUnitInputs` with `seat`), and handed over as a copy in the role's
 // own directory under a name that says it is the role's own earlier result.
 
