@@ -51,10 +51,12 @@ cleanup() {
   for l in "${LOOPS[@]}"; do losetup -d "$l"; done
 }
 trap cleanup EXIT
-loop() { truncate -s "$2" "$WORK/$1.img"; local l; l="$(losetup --show -f "$WORK/$1.img")"; LOOPS+=("$l"); echo "$l"; }
-[ -n "$DATA" ] || DATA="$(loop data "${SIZE_MIB}M")"
-[ -n "$LOG" ] || LOG="$(loop log "$((SIZE_MIB * 4))M")"
-REPLAY="$(loop replay "${SIZE_MIB}M")"; COW="$(loop cow "${SIZE_MIB}M")"
+# Sets LOOP_DEV in this shell (not a command substitution), so cleanup sees every loop device.
+loop() { truncate -s "$2" "$WORK/$1.img"; LOOP_DEV="$(losetup --show -f "$WORK/$1.img")"; LOOPS+=("$LOOP_DEV"); }
+[ -n "$DATA" ] || { loop data "${SIZE_MIB}M"; DATA="$LOOP_DEV"; }
+[ -n "$LOG" ] || { loop log "$((SIZE_MIB * 4))M"; LOG="$LOOP_DEV"; }
+loop replay "${SIZE_MIB}M"; REPLAY="$LOOP_DEV"
+loop cow "${SIZE_MIB}M"; COW="$LOOP_DEV"
 SECTORS="$(blockdev --getsz "$DATA")"
 # sudo leaves HOME at root's; the owner's Git state, cargo and node need the owner's own.
 RUN_HOME="$(getent passwd "$RUN_AS" | cut -d: -f6)"
