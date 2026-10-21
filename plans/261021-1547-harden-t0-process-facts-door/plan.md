@@ -48,7 +48,7 @@ When T0 closes, Rust decides every process, durable-write and canonical-JSON que
 | # | Phase | Runs | Depends on | Δ Node / Rust / tests (estimate) |
 |---|---|---|---|---|
 | 1 | [Red tests for the seven Highs](phase-01-red-tests.md) | first; parallel with 2 (disjoint files) | — | 0 / 0 / +160 |
-| 2 | [The door: loader leaf, addon namespaces, npm descriptor, H8](phase-02-the-door.md) | parallel with 1 and 4 | 1 committed before merge; 2c waits on OQ-1 | −30 / +160 / −180 |
+| 2 | [The door: loader leaf, addon namespaces, npm descriptor, H8](phase-02-the-door.md) | parallel with 1 and 4 | 1 committed before merge; 2c implements OQ-1 (a) | −30 / +160 / −180 |
 | 3 | [Process sites onto the door](phase-03-process-sites.md) | parallel with 4 | 1, 2 | −155 / 0 / +40 |
 | 4 | [Containment and crate fixes](phase-04-containment-and-crate-fixes.md) | parallel with 2 and 3 | 1 | 0 / −175 / 0 |
 | 5 | [Durable and canonical sites](phase-05-durable-and-canonical-sites.md) | sequential | 2, 3 | −160 / +10 / +20 |
@@ -63,6 +63,8 @@ When T0 closes, Rust decides every process, durable-write and canonical-JSON que
 ## Owner questions
 
 ### OQ-1. H8: cross-process addon verification needs a recorded file identity; where may it live?
+
+**Answered 2026-10-21 16:20, owner: "có (a) cho phép đúng một trường tùy chọn trong activation.json".** Option (a), exactly one optional field (`nativeAddonIdentity`) in `activation.json`, its writer in `init.rs` and the loader trust rule; no cache file, no doctor row, no manifest change. Phase 2 step 2c is unblocked.
 
 **What is happening.** Every Node process that loads the addon hashes it before `dlopen` (8.1 ms on the 11.4 MB release addon, 75 ms on the 86 MB debug addon in the suite; speed seat §0). The owner asked that this become cross-process (H8, moved from GIT to T0 at 15:55). GIT's acceptance criteria are: fail closed on any digest mismatch; any change of dev, ino, size, mtime or ctime of the `.node` invalidates; a verification is never trusted across a different manifest digest.
 
@@ -98,7 +100,7 @@ When T0 closes, Rust decides every process, durable-write and canonical-JSON que
 | Risk | L × I | Mitigation |
 |---|---|---|
 | The door fails closed in a channel the suite or a workspace uses, and every liveness judge with it | M × H | Phase 2 channel matrix proven by `test/git/native-load.test.mjs:102` extended to the three namespaces; `npm test` stages the addon for every child (`run-tests.mjs:586-590`); named errors carry the next step. |
-| OQ-1 unanswered blocks phase 2c but nothing else | H × L | 2c is a separate step; 2a/2b and phases 3–8 do not depend on it. |
+| OQ-1 answered (a) 16:20 | — | — |
 | A red test cannot be made to fail on main (the defect is Windows-only or a race) | M × M | Phase 1 marks each test as red-on-Linux or pin-only, with the reason; a pin-only test is still the owning proof of the fixed behaviour. |
 | Canonical corpus is not byte-equal for a twin | M × H | Phase 5 deletes only twins whose corpus run is byte-equal; a differing twin is a contract change handed to phase 07 of the parent plan (H11). |
 | SEAT lands mid-way and the carry list collides | M × M | Phase 7 is a separate lead after SEAT; the re-exports keep the carry-list callers working until then. |
@@ -106,7 +108,7 @@ When T0 closes, Rust decides every process, durable-write and canonical-JSON que
 
 ## Rollback
 
-Per the parent plan: before the next layer merges, revert the T0 merge commit on main and re-activate the previous release on all three workspaces of the owner machine and on the second machine; record the revert SHA on the board. On-disk formats this plan changes, and whether the previous release still reads them: the gateway registry entry gains a `record` tuple (the previous release reads `pid` and `port` and ignores the rest; an entry written by the previous release reads as `IdentityUnknown` and is never signalled); `activation.json` gains an optional field only under OQ-1 (a) (ignored by the previous release); the `coordination-abandoned-claims` row disappears (no data); the `process-observe` route disappears (a previous-release Node payload running against a new host would get `usage` from the route: the stop-everything landing rule makes that pairing impossible). Durable-file error text changes (log readers only). Phase 8 records the exact list after measurement.
+Per the parent plan: before the next layer merges, revert the T0 merge commit on main and re-activate the previous release on all three workspaces of the owner machine and on the second machine; record the revert SHA on the board. On-disk formats this plan changes, and whether the previous release still reads them: the gateway registry entry gains a `record` tuple (the previous release reads `pid` and `port` and ignores the rest; an entry written by the previous release reads as `IdentityUnknown` and is never signalled); `activation.json` gains the optional field `nativeAddonIdentity` (OQ-1 (a), owner 16:20; ignored by the previous release); the `coordination-abandoned-claims` row disappears (no data); the `process-observe` route disappears (a previous-release Node payload running against a new host would get `usage` from the route: the stop-everything landing rule makes that pairing impossible). Durable-file error text changes (log readers only). Phase 8 records the exact list after measurement.
 
 ## Done when
 

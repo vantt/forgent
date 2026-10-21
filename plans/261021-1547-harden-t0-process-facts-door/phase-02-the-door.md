@@ -3,7 +3,7 @@ phase: 02
 title: "The door: T0 loader leaf, addon namespaces, versions, npm descriptor, H8"
 status: pending
 depends_on: [01]
-parallel: "may run in parallel with phase 01 and phase 04 (disjoint files); phase 03 and 05 start after this phase merges; step 2c waits on owner question OQ-1"
+parallel: "may run in parallel with phase 01 and phase 04 (disjoint files); phase 03 and 05 start after this phase merges; step 2c implements OQ-1 (a), owner 16:20"
 effort: ~1.5d
 net_size: "Node −30 / Rust +160 / tests −180 (estimate)"
 ---
@@ -61,7 +61,7 @@ net_size: "Node −30 / Rust +160 / tests −180 (estimate)"
 2. **2a, Node.** Create `src/native/door.mjs` by moving `native.mjs:27-63` and generalising the `versions()` check to the five fields; `nativeDoor()` memoises the own-release addon (`releasePayloadManifest(process.env.FGOS_HOST_BIN)` then `native-addon.json`), loaded on first call. Rewrite `native.mjs` as the wrapper. Rewrite `process-identity.mjs`. Run `node scripts/run-tests.mjs test/git/native-load.test.mjs test/process/process-facts-vectors.test.mjs test/runner/run-lock-identity.test.mjs test/runner/dispatch-reconciliation-import-graph.test.mjs test/architecture.test.mjs`.
 3. **2a, guards.** Commit the import-graph and manifest edits separately with the reason in the message ("the door loads the addon through node:module; the leaf and payload-root join the reconcile closure").
 4. **2b, npm descriptor.** Add `--npm-descriptor`, the `files` entries, and a `native-load.test.mjs:102` extension that builds the descriptor into a temp payload root and loads the three namespaces through it. Message Packaging/T9 and GIT on the board before merge.
-5. **2c, H8.** Blocked on OQ-1. On (a): add the optional field writer in `packages/distribution/rust/src/init.rs` (`publish_activation_file`, :518-530; field `nativeAddonIdentity: {artifactDigest, dev, ino, size, mtimeNs, ctimeNs}`), its reader in the leaf via `hostBinFromActivation`'s path (`src/util/host-bin-path.mjs:41`), and the trust rule; prove with one `native-load.test.mjs` case "a recorded identity skips the hash; a changed ctime hashes again; a changed digest refuses". On (b) or (c): implement as answered. Record the decision in the process spec (phase 6).
+5. **2c, H8.** OQ-1 answered (a) by the owner 16:20 ("đúng một trường tùy chọn trong activation.json"): add the optional field writer in `packages/distribution/rust/src/init.rs` (`publish_activation_file`, :518-530; field `nativeAddonIdentity: {artifactDigest, dev, ino, size, mtimeNs, ctimeNs}`), its reader in the leaf via `hostBinFromActivation`'s path (`src/util/host-bin-path.mjs:41`), and the trust rule; prove with one `native-load.test.mjs` case "a recorded identity skips the hash; a changed ctime hashes again; a changed digest refuses". On (b) or (c): implement as answered. Record the decision in the process spec (phase 6).
 6. Regenerate the census; run the focused tests, then `npm test` once in the worktree; write the lead report with Δ-lines.
 
 ## Verification (exact)
