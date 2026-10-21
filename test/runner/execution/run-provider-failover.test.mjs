@@ -27,6 +27,7 @@ test('a dead login moves the seat to another account of the same provider, not t
   const attempts = attemptsOf(fx.repoRoot, res);
   assert.deepEqual(attempts.map((a) => [a.binding.executor, a.outcome]), [['alpha', 'provider-limit'], ['alpha', 'pass']], 'the same executor runs again');
   assert.equal(attempts[1].assignmentId, `${res.unitRunId}/producer/1-fb1`);
+  assert.equal(attempts[1].leaseReceipt.accountId, 'live1', 'a taken lease leaves the receipt the provider record agrees with');
   assert.deepEqual(attempts.map((a) => a.binding.pool), ['alpha', 'alpha']);
   assert.deepEqual(attempts.map((a) => a.binding.model), ['fake', 'fake']);
   assert.equal(attempts[1].binding.invocation, attempts[0].binding.invocation);

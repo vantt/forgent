@@ -690,6 +690,18 @@ export function acquireNamedAccountLease({
   }, { waitMs: lockWaitMs });
 }
 
+/**
+ * Audit a lease receipt against the provider's own record of the lease it granted. The receipt is read
+ * from the attempt directory, which a worker can reach; the record in the provider state is not. Returns
+ * null when they agree, and what differs when they do not (including a receipt the provider never granted).
+ */
+export function auditLeaseReceipt(receipt, { assignmentId, runtimeDir } = {}) {
+  const { statePath } = providerCapacityStatePaths(runtimeDir);
+  const held = readState(statePath).assignments?.[`${receipt?.provider}:${assignmentId}`];
+  if (held?.accountId === receipt?.accountId && held?.selectedAt === receipt?.acquiredAt) return null;
+  return `the receipt names ${receipt?.provider}/${receipt?.accountId} acquired ${receipt?.acquiredAt}, the provider record names ${held ? `${held.accountId} selected ${held.selectedAt}` : 'no lease for this assignment'}`;
+}
+
 export function releaseProviderAccountLease({ provider, accountId, runId, runtimeDir } = {}) {
   if (!provider || !accountId || !runId) return false;
   const { statePath } = providerCapacityStatePaths(runtimeDir);

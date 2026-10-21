@@ -11,6 +11,7 @@ import path from 'node:path';
 
 import {
   acquireNamedAccountLease,
+  auditLeaseReceipt,
   LEASE_CONFLICT_REASON,
   inspectProviderCapacity,
   providerAccountInventory,
@@ -131,6 +132,18 @@ test('a store no invocation declares files for leaves that CLI out of the accoun
 
   const inspected = inspectProviderCapacity({ runnerConfig: runner, runtimeDir });
   assert.equal(inspected.providers.openrouter.accounts['or-a'].unusableFor[0].cli, 'agy');
+});
+
+test('a lease receipt is audited against the provider record: the lease it granted agrees, any other account, time or assignment differs', () => {
+  const runner = config({ openrouter: { ...openrouter } });
+  const runtimeDir = mkRuntimeDir();
+  const selected = acquireNamedAccountLease({ runnerConfig: runner, provider: 'openrouter', accountId: 'or-b', assignmentId: 'unit-run-1/producer/1', runId: 'run1', runtimeDir, cli: 'pi' });
+  const audit = (receipt, assignmentId = 'unit-run-1/producer/1') => auditLeaseReceipt(receipt, { assignmentId, runtimeDir });
+
+  assert.equal(audit(selected.leaseReceipt), null);
+  assert.match(audit({ ...selected.leaseReceipt, accountId: 'or-a' }), /receipt names openrouter\/or-a .* record names or-b selected /);
+  assert.match(audit({ ...selected.leaseReceipt, acquiredAt: '2026-01-01T00:00:00.000Z' }), /record names or-b selected /);
+  assert.match(audit(selected.leaseReceipt, 'unit-run-1/producer/2'), /no lease for this assignment/);
 });
 
 test('a disabled account is refused by the lease and shown by inspect', () => {

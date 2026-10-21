@@ -29,7 +29,7 @@ import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { resolveMutatingCwdPosture } from '../dispatch/execution-contract.mjs';
 import { declaredOperationFields } from '../dispatch/assignment.mjs';
 import { createCredentialProbe } from '../dispatch/provider-credential-probe.mjs';
-import { accountInventoryConfigOf } from '../dispatch/provider-capacity.mjs';
+import { accountInventoryConfigOf, auditLeaseReceipt } from '../dispatch/provider-capacity.mjs';
 import { LEASE_CONFLICT_FAILURE_CODE } from '../dispatch/run-result.mjs';
 import { ensureRunnerConfigForDir, RunnerConfigError, assertRunTimeoutMs, stripConfigComments } from '../dispatch/config.mjs';
 import { commitOnBranch, commitUnitWork, foreignIndexDetail, preflightUnitWorktree } from './commit-unit-work.mjs';
@@ -1259,6 +1259,15 @@ async function runUnitBody(options, scope) {
       const result = await dispatchBound({ bound, seat, round, readOnly, assignmentId, assignmentDir, session, inputs, objective, admission });
       lastResult = result;
 
+      // The receipt is read from a directory the worker can reach. A pass is only a pass when the provider
+      // record agrees the lease it names was granted, so nothing is committed on a receipt it never gave.
+      const receipt = readLeaseReceipt(assignmentsDir, assignmentId);
+      const receiptDiffers = receipt && result.outcome === 'pass' ? auditLeaseReceipt(receipt, { assignmentId, runtimeDir: options.providerCapacityRuntimeDir }) : null;
+      if (receiptDiffers) {
+        result.outcome = 'policy-refusal';
+        result.refused = { reason: 'lease-receipt-mismatch', detail: receiptDiffers };
+      }
+
       // The worker only writes files; this trusted code, outside the confinement, commits the
       // ones inside the write scope. No change is recorded as such, and a commit that cannot be
       // made fails the round. Paths changed outside the scope are reported, never committed.
@@ -1279,8 +1288,7 @@ async function runUnitBody(options, scope) {
 
       attempts[attemptNo].outcome = result.outcome;
       attempts[attemptNo].runId = result.runResult?.runId ?? null;
-      const receipt = readLeaseReceipt(assignmentsDir, assignmentId);
-      if (receipt) attempts[attemptNo].leaseReceipt = receipt;
+      if (receipt && !receiptDiffers) attempts[attemptNo].leaseReceipt = receipt;
       const credentialFault = result.outcome === 'provider-limit' && result.runResult?.classification?.failure?.cause === 'credential';
       if (credentialFault) attempts[attemptNo].failureCause = 'credential';
       persistUnitRecord();
