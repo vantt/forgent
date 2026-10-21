@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "da2c92165f96dfd95e101073139a5b0bdbb377218d95bcda4f2b4578fd7cbf0a",
+  "payloadDigest": "264877b42e11466d88c2e21a9e37c9c610256522b9e0744ea38b1bbd4894b212",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -600,13 +600,13 @@
     "scripts/regenerate-observe-fixtures.mjs": "07c5b42795e22c36d75363e2265cf59b6f6244d63f7413d9dacf9fe0e3071631",
     "scripts/run-rust-dev-host.mjs": "bae6761acce9ccc479b9d30134a76ea8fd20993937e8d2b78d1c69a87a0f3741",
     "scripts/run-test-canary.mjs": "ef25e2f8237ffefddbf707c68289c0fe00ee95bd10da6a51a80fd965b30c42ba",
-    "scripts/run-tests.mjs": "3b7ff1d037d6cbffa563c6fa14afda5dc77f21a214bb3f471624470197ccca54",
+    "scripts/run-tests.mjs": "23a60b3a7d2057764270e40eeb5d981a24df8bc62e5a333fd550aab02bbfbab7",
     "scripts/stress-test-files.mjs": "c3ccd385982e8e1865b54e02abef044ae3e85a4547f34c9efd2fcbcc66d37240",
     "scripts/test-ownership-lint.mjs": "1917bcc0ec0387e43d4e09dc3bc1e6a5923e30b4c3848cf480df9eb0c2c042e2",
     "scripts/test-proof-inventory.mjs": "cbd3324b5fc76b680253283001e9d310bdd782e64148e2f03234b5a75e05904f",
     "scripts/test-select-compare.mjs": "45ec5c8f1b192430431127a06133376cd5e5d2a50f8e6865472c1ae341ae1329",
     "scripts/test-select-coverage-map.mjs": "8e4fbb903bb3c9e3680c946cbaeb8f5116a474c2bb873e96589bee1b4c56a431",
-    "scripts/test-select-mutate.mjs": "72a8338aa3fdce409f7d531f2c010208b19a90907b86b59e4ec6360922232822",
+    "scripts/test-select-mutate.mjs": "49cb3f6157c175d56539cf2c4f3f637a8225395c30750627bb80dbfa736d21ec",
     "scripts/test-select-promote-report.mjs": "d5bb99bbe7a6c02ccafe29b2fa632471a424eeef454e17003631021445c81bd0",
     "scripts/test-select-promote.mjs": "a0da23143e4dfb674a89f419b87a70b84af33f874507e635467f2bc5dbc6b2fe",
     "scripts/test-select-run-plan.mjs": "94789b3167a55ee33a18ea3a3abd4ac87fa1c06601356d6ae0fe9f864fa49984",
@@ -2445,8 +2445,8 @@
     },
     {
       "path": "scripts/run-tests.mjs",
-      "line": 566,
-      "spawn": "hostSpeaksLockProtocol -> scripts/run-tests.mjs:579",
+      "line": 577,
+      "spawn": "hostSpeaksLockProtocol -> scripts/run-tests.mjs:590",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
