@@ -597,7 +597,7 @@ Setup/init registers every default/path/dependency/config in existing config-mer
 | git-operation-journal | Chain/version/readability, pending intent, pins vs actual ref; read-only; backlog/bytes/oldest unresolved |
 | git-native-locks | Ownership uncertainty/native files; **no deletion** |
 | git-worktree-recovery | Orphan registration, dirty/stale checkout, custody/pending operations |
-| git-land-recovery | Finished Land operations whose candidate worktree and pins are still retained (Recovery `listRetainedLand`: operation id, candidate path, candidate pin, WAL age); read-only; warns, never fails |
+| git-land-recovery | Finished Land operations whose candidate worktree and pins are still retained (Recovery `listRetainedLand`: operation id, candidate path, the pins actually present, WAL age); read-only; warns, never fails |
 | git-publication-refspecs | Correct mirror mapping, no own overwrite or default push change |
 | git-durability-capability | Explicit measured process/power-loss/fsync guarantee |
 | git-mutation-one-door | Zero undeclared product writers, one matcher |

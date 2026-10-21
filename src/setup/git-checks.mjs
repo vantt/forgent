@@ -153,7 +153,7 @@ export function checkLandRetainedCandidates(cwd, loaderOptions, portOptions, now
     if (!candidates.length) return { passed: true, message: complete ? 'no retained Land candidate' : 'warning: Land candidate scan incomplete' };
     const rows = candidates.map(c => {
       const age = c.updatedAtMs == null ? 'age unknown' : `${Math.max(0, Math.round((now - c.updatedAtMs) / 60000))} min old`;
-      return `${c.operationId} (${c.worktreePresent ? c.worktree : `${c.worktree} already gone`}; pin ${c.candidateRef}; ${age})`;
+      return `${c.operationId} (${c.worktreePresent ? c.worktree : `${c.worktree} already gone`}; pins ${c.pins.join(', ') || 'none'}; ${age})`;
     });
     return { passed: true, message: `warning: retained Land candidates: ${rows.join('; ')}. No manual release command exists today; the release sweep arrives with the Work lane, which supplies the acknowledgement it needs. Never delete the worktree or pins by hand.` };
   } catch (err) {

@@ -51,7 +51,7 @@ test('doctor warns, never fails, about a finished Land whose candidate is still 
     const row = checkLandRetainedCandidates(f.repo,f.loader,f.options);
     assert.equal(row.passed,true);
     assert.match(row.message,/^warning: retained Land candidates: retained-land \(/);
-    assert.match(row.message,/pin refs\/fgos\/git-operations\/retained-land\/candidate/);
+    assert.match(row.message,/pins refs\/fgos\/git-operations\/retained-land\/candidate, refs\/fgos\/git-operations\/retained-land\/source\/candidate, refs\/fgos\/git-operations\/retained-land\/target\/candidate/);
     assert.match(row.message,/No manual release command exists today/);
   } finally { f.close(); }
 });

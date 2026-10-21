@@ -120,10 +120,31 @@ impl GitDriver {
             if !e.terminal || wal.compacted(&e.operation_id).map_err(failure)?.is_some() {
                 continue;
             }
+            // A chain with no intent record never created a candidate.
+            if !wal.known_id(&e.operation_id).map_err(failure)? {
+                continue;
+            }
             let chain = wal.inspect(&e.operation_id).map_err(failure)?;
             let OperationKind::Land(land) = &chain.intent().kind else {
                 continue;
             };
+            // Land holds up to three pins; report those actually present, and
+            // skip a chain whose worktree and pins are all already gone.
+            let mut pins = vec![];
+            for suffix in ["", "/source", "/target"] {
+                let name = format!(
+                    "refs/fgos/git-operations/{}{suffix}/candidate",
+                    e.operation_id
+                );
+                let pin = RefName::parse(&name).map_err(failure)?;
+                if matches!(crate::refs::direct(self, repo, &pin)?, ExpectedTip::Oid(_)) {
+                    pins.push(name);
+                }
+            }
+            let worktree_present = land.candidate.worktree.exists();
+            if !worktree_present && pins.is_empty() {
+                continue;
+            }
             let updated_at_ms = wal
                 .last_change(&e.operation_id)
                 .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
@@ -131,8 +152,8 @@ impl GitDriver {
             candidates.push(json!({
                 "operationId": e.operation_id,
                 "worktree": land.candidate.worktree,
-                "worktreePresent": land.candidate.worktree.exists(),
-                "candidateRef": format!("refs/fgos/git-operations/{}/candidate", e.operation_id),
+                "worktreePresent": worktree_present,
+                "pins": pins,
                 "updatedAtMs": updated_at_ms,
             }));
         }

@@ -28,3 +28,11 @@ Date 2026-10-21, branch `git/followups`. Supersedes the earlier NEEDS_CONTEXT ve
 - Compaction of an interrupted release is outside this read; such a chain still lists until Land resumes it.
 
 Status: DONE
+
+## Review fixes
+
+- Pins: Land holds three pins, `refs/fgos/git-operations/<id>/candidate`, `<id>/source/candidate`, `<id>/target/candidate` (land.rs install loop and the publish check). The read now resolves each and returns `pins` with only those present; doctor prints them.
+- False positives: a Land chain with no intent record (refusal before the candidate exists) is terminal in the scan, so it is now skipped via `known_id` (it would also have errored in `inspect`). A chain whose worktree and all pins are already gone is skipped too. The Rust test asserts the three pins; the Node test asserts the pins text.
+- Gates: clippy clean, `cargo test -p fgos-git` ok, `test/git/recovery.test.mjs` 4/4, census regenerated.
+
+Status: DONE

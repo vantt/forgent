@@ -516,7 +516,14 @@ fn current_target_is_pinned_after_destination_acquisition_and_replays_after_clea
     assert_eq!(kept["operationId"], "current");
     assert_eq!(kept["worktree"], candidate.worktree.to_string_lossy().as_ref());
     assert_eq!(kept["worktreePresent"], true);
-    assert_eq!(kept["candidateRef"], "refs/fgos/git-operations/current/candidate");
+    assert_eq!(
+        kept["pins"],
+        serde_json::json!([
+            "refs/fgos/git-operations/current/candidate",
+            "refs/fgos/git-operations/current/source/candidate",
+            "refs/fgos/git-operations/current/target/candidate"
+        ])
+    );
     assert!(kept["updatedAtMs"].as_u64().unwrap() > 0);
     assert!(f.driver.acknowledge_land(&f.repo, "fixture", "current", "durable-consumer-ack").unwrap().is_empty());
     assert!(f.driver.list_retained_land(&f.repo, 100).unwrap()["candidates"].as_array().unwrap().is_empty());
