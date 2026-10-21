@@ -1,0 +1,29 @@
+# Step 5 seam 8 — runtime defaults and dynamic constructions (Doer brief, parallel worktree)
+
+Status: Lead brief for the next Doer turn (records only).
+
+You are Doer for Phase 8 of plan 260925-documentation-authority-unification in the fgOS repo. Seams 1–5 are authored and reviewed. Author seam 8 (step-05-authoring-batches.json seam runtime-defaults-dynamic, 451 files in parts 22–29) applying from the FIRST pass every ruling the seam 1–5 reviews established: owner-answers L12-58, L12-60, L12-62, L12-69, L12-71, L12-72 (R1–R9), L12-74 (R10–R16), L12-76 (R17–R19), L12-77 (R20), L12-78 (R21–R23), L12-80, L12-81, L12-82 (R25), L12-83 (R26); plus the current Step 5 checker rules. Read step-05-authoring-request.md (seam 8 row, seam table, cutover-spec field list and the "Seam 8 carry — L12-81" section), step-05-preparation.md, step-05-population-*.jsonl and the seam 5 records/checker as the schema and convention reference.
+
+This turn runs under fgos run: you only write files; the runner commits them; never run a git write. RECORDS ONLY (L12-58): never edit code, docs/**, README.md, AGENTS.md, CLAUDE.md, core/**, domains/**, .agents/**, plugins/**, .claude/**, apps/**, src/**, bin/**, packages/**, test/**, scripts/**, skills, the switchboard, gates, generators, tests or baselines; no build, no process start, no cargo. Do not read the secrets env file, do not touch the .fgos directory. Never run the fgos CLI. PYTHONDONTWRITEBYTECODE=1, python -B. Scratch /tmp/fgos-work/. Tests with env -u CLAUDE_CODE_SESSION_ID.
+
+## Parallel-worktree write scope (strict)
+
+A second Doer authors seams 6 and 7 at the same time on the main plan branch; your work is merged afterwards. To keep the merge clean you write ONLY these files, all under plans/260925-documentation-authority-unification/reports/phase-08/:
+- step-05-records/runtime-*.jsonl (your record files, one per sub-batch);
+- step-05-seam8-*.json and step-05-seam8-*.md (continuation, review list, closure, progress notes, rulings);
+- step-05-seam8-check.py only if you need a seam-8 checker extension (prefer none).
+Do NOT edit progress.md, owner-answers.md, step-05-proposed-move-read-units.json or any other existing file. Record your progress in step-05-seam8-progress.md and any ruling you had to apply in step-05-seam8-rulings.md (the Lead folds them into owner-answers). The full Step 5 checker rewrites step-05-full-check-result.json and step-05-head-drift.json: run it with --output /tmp/fgos-work/seam8-check.json, and if it still rewrites step-05-head-drift.json, copy that file aside to /tmp/fgos-work first and restore its original bytes afterwards so it is not in your diff. R26 units you find go into step-05-seam8-proposed-move-read-units.json in the same shape.
+
+## Seam 8 rules
+
+Two new Lead rulings (being recorded as L12-85 by the parallel turn; apply them now): R27 — every cutover move-set path is under docs/, so a read of a non-docs markdown (core/skills/**, root README.md/AGENTS.md) is cutover-neutral; label it nonDocumentUse non-census-document-read naming the path, never root-only. R28 — under R26, an emitted message or result field whose value IS a proposed-move path joins that path's unit as an output slot; comments, header comments and fixture directory creations naming the path are listed individually in the unit as co-change slots (preserve now, patch with the unit if the move is confirmed); a bare basename with no root stays outside the census (REJECT); a scalar pass-through of a caller-supplied path is REJECT (R5), owned where the path is built.
+
+Triage every remaining census site by its real role (reader, writer, default, message, fixture, history); split bounded concrete target families. No generic docs/specs to docs/platform conversion. Per-owner pinned complete diff with the exact construction rule and concrete old/new roots; all callers migrate atomically; no fallback, dual write or extra resolver. Each unresolved concrete writer target parks only its affected rewrite. Route actual messages to the CLI receipt and schema/file reads to their owner seam (join, do not duplicate). State and external populations stay explicit parks until authorized exports exist. Mandatory carries: src/runner/merge.mjs L536 nextFreeDecisionId docs/decisions scan and the L638/L640 docs/decisions reads (distinct from reference-003771; keep the quoted-path fixture in test/runner/merge-quoted-paths.test.mjs:100-108 coupled); bin/fgos.mjs remaining docs references (L224 and the doc-registry reads L1758/L1759 at the pinned bytes) — check whether a prior seam already owns each id and join it, else author it here. Also (batch 7 review): src/state/store.mjs L615 reader of docs/history/<id>/plan.md has no Step 5 owner — own it here and list test/cli/fgos-approve-6.test.mjs and the state-cutover / fgos-coding-knowledge fixtures that build that path as coupled tests; and scripts/generate-doc-inventory.mjs hard-coded docs/specs and docs/architect prefixes — confirm the owning record (join if seam 4 owns it) and list the test/scripts/check-doc-constitution.test.mjs docs/specs/fixture.md fixture as co-cut.
+
+## Work
+
+1. Apply R19/R20/R21 mechanical and neutrality closures first, then judgment records, in the existing part order; as many files as fit (target all 451; R23 throughput). Write step-05-seam8-continuation.json with what remains.
+2. Run the full Step 5 checker (0 failures, output to scratch as above) and every probe (all reject).
+3. Write step-05-seam8-review-list.json in the shape of step-05-seam5-review-list.json (addedThisTurn, packingInstructions naming your record files) and, if the seam is complete, step-05-seam8-closure.json with totals and park/patch unit lists.
+
+Final message: FIRST line a conventional commit subject (at most 100 chars, no plan ids, phase or finding labels), then a short Vietnamese summary (anh/em): files closed (mechanical/neutral/judgment), remaining, totals, checker/probes.
