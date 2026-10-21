@@ -100,8 +100,10 @@ async function check(args) {
   const violations = [];
   const git = sandboxGit(root);
   const run = (argv) => { try { return { ok: true, out: git(argv, { stdio: ['ignore', 'pipe', 'pipe'] }) }; } catch (e) { return { ok: false, out: `${e.stdout ?? ''}${e.stderr ?? ''}` }; } };
-  if (!fs.existsSync(repo)) {
-    if (acked > 0) violations.push('repository missing after acknowledged operations');
+  // Before the first acknowledgement the repository may be absent or half-initialised (its
+  // creation is not an acknowledged operation); after it, it must be a readable repository.
+  if (!fs.existsSync(repo) || !run(['--git-dir', repo, 'rev-parse', '--git-dir']).ok) {
+    if (acked > 0) violations.push('repository missing or unreadable after acknowledged operations');
     return finish({ acked, violations });
   }
   const fsck = run(['--git-dir', repo, 'fsck', '--full', '--no-dangling']);
@@ -121,7 +123,11 @@ async function check(args) {
   // Every acknowledged operation's WAL chain must still be readable and terminal; an
   // unacknowledged one may be pending or absent, never corrupt.
   const { index, loader } = await loaders(args.descriptor);
-  const recovery = index.createGitRecovery({ stateRoot: state, repoPath: repo, trustedMain: repo, writer: WRITER }, loader);
+  let recovery;
+  try { recovery = index.createGitRecovery({ stateRoot: state, repoPath: repo, trustedMain: repo, writer: WRITER }, loader); } catch (e) {
+    violations.push(`WAL open: ${e.message.slice(0, 400)}`);
+    return finish({ acked, violations });
+  }
   let pending;
   try { pending = recovery.listPending({}); } catch (e) { violations.push(`WAL scan: ${e.message.slice(0, 400)}`); }
   for (const p of plan.filter((q) => q.kind === 'ack' && q.i < acked)) {
