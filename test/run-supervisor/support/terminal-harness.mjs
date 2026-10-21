@@ -119,6 +119,8 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
       }
       return {
         kind: 'agent',
+        // The agent serves the claude family, whatever program the fixture runs: its cells are the claude ones.
+        providerModel: 'claude',
         command,
         args,
         adapter: 'herdr-spawn',

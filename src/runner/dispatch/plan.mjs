@@ -126,8 +126,9 @@ export function effectiveDispatchPolicy({ assignment, runnerConfig, cliOverride 
   // or the caller is one too, and with no pin the capability's pool decides.
   // The executor the caller names, else the runner's default executor, reaches the crate as a pin.
   const namedExecutor = cliOverride.preferExecutor ?? opPolicy.preferExecutor;
+  // The default is registered under its command and under `claude` (withDefaultExecutor): pin the one the registry has.
   const defaultExecutor = runnerConfig?.executor
-    ? (runnerConfig.executor.command ?? runnerConfig.executor.invocations?.[0]?.command ?? runnerConfig.executor.invocations?.[0]?.id ?? 'claude')
+    ? [runnerConfig.executor.command, 'claude'].find((id) => id && (!runnerConfig.executors || runnerConfig.executors[id]))
     : undefined;
   const pinnedExecutor = namedExecutor ?? defaultExecutor;
   const explicitTier = cliOverride.tier ?? opPolicy.tier;
