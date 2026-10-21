@@ -43,7 +43,7 @@ test('doctor --fix recovers an interrupted Land through the Recovery door and th
 test('doctor warns, never fails, about a finished Land whose candidate is still retained', () => {
   const f = fixture();
   try {
-    assert.deepEqual(checkLandRetainedCandidates(f.repo,f.loader,f.options),{passed:true,message:'no retained Land candidate'});
+    assert.deepEqual(checkLandRetainedCandidates(f.repo,f.loader),{passed:true,message:'no retained Land candidate'});
     const land = f.port();
     land.prepare({operationId:'retained-land',request:f.request});
     land.close();
