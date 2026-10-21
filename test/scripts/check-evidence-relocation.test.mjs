@@ -106,6 +106,12 @@ function expectViolation(result, type, target = null) {
   assert.ok(result.violations.some((entry) => entry.type === type && (!target || entry.target === target)), JSON.stringify(result.violations, null, 2));
 }
 
+function classifiedConsumer(state, rel, classification) {
+  const hit = scanConsumerTable(state.root, ['collection1']).hits.find((row) => row.path === rel);
+  assert.ok(hit, `expected consumer scan hit for ${rel}`);
+  return { path: rel, classification, matches: hit.matches, matchLinesSha256: hit.matchLinesSha256 };
+}
+
 test('--before passes a consistent tracked fixture', () => {
   const state = fixture();
   try {
@@ -184,7 +190,7 @@ test('--before regenerates and enforces the classified consumer table', async (t
       const rel = 'src/runtime-reader.mjs';
       write(state.root, rel, `// ${LEGACY_ROOT}/\n`);
       add(state.root, rel);
-      const consumerTable = { version: 1, consumers: [{ path: rel, classification: 'runtime-reader', matches: ['legacy-root'] }] };
+      const consumerTable = { version: 1, consumers: [classifiedConsumer(state, rel, 'runtime-reader')] };
       expectViolation(check(state, 'before', { consumerTable }), 'runtime-reader');
     } finally { cleanup(state); }
   });
@@ -194,9 +200,30 @@ test('--before regenerates and enforces the classified consumer table', async (t
       const rel = 'test/consumer.test.mjs';
       write(state.root, rel, '// collection1\n');
       add(state.root, rel);
-      const consumerTable = { version: 1, consumers: [{ path: rel, classification: 'synthetic-test', matches: ['legacy-root'] }] };
+      const row = classifiedConsumer(state, rel, 'synthetic-test');
+      const consumerTable = { version: 1, consumers: [{ ...row, matches: ['legacy-root'] }] };
       expectViolation(check(state, 'before', { consumerTable }), 'consumer-drift');
       assert.deepEqual(scanConsumerTable(state.root, ['collection1']).hits.find((row) => row.path === rel)?.matches, ['collection:collection1']);
+    } finally { cleanup(state); }
+  });
+  await t.test('matching-line drift without match-set drift', () => {
+    const state = fixture();
+    try {
+      const rel = 'src/classified-comment.mjs';
+      write(state.root, rel, `// ${LEGACY_ROOT}/proof.md\n`);
+      add(state.root, rel);
+      const row = classifiedConsumer(state, rel, 'code-comment');
+      const invalidRow = { ...row };
+      delete invalidRow.matchLinesSha256;
+      assert.throws(
+        () => check(state, 'before', { consumerTable: { version: 1, consumers: [invalidRow] } }),
+        /consumer table/i,
+      );
+      assert.equal(check(state, 'before', { consumerTable: { version: 1, consumers: [row] } }).ok, true);
+      fs.appendFileSync(path.join(state.root, rel), `fs.readFileSync("${LEGACY_ROOT}/proof.md");\n`);
+      const result = check(state, 'before', { consumerTable: { version: 1, consumers: [row] } });
+      expectViolation(result, 'consumer-drift');
+      assert.deepEqual(scanConsumerTable(state.root, ['collection1']).hits.find((hit) => hit.path === rel)?.matches, row.matches);
     } finally { cleanup(state); }
   });
 });
@@ -263,7 +290,7 @@ test('--after passes after deletion and excludes only classified history, fixtur
     write(state.root, synthetic, mention);
     add(state.root, ...excluded);
     add(state.root, synthetic);
-    const consumerTable = { version: 1, consumers: [{ path: synthetic, classification: 'synthetic-test', matches: ['legacy-root'] }] };
+    const consumerTable = { version: 1, consumers: [classifiedConsumer(state, synthetic, 'synthetic-test')] };
     assert.equal(check(state, 'after', { consumerTable }).ok, true);
   } finally { cleanup(state); }
 });

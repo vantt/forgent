@@ -25,7 +25,8 @@
         "collection:team-dispatch-v1",
         "collection:visibility-herdr",
         "legacy-root"
-      ]
+      ],
+      "matchLinesSha256": "4d051855e021785a228ec43c9ab1b9bc6c7c000053cf8fd96e3407de79d86d00"
     },
     {
       "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
@@ -33,35 +34,40 @@
       "matches": [
         "collection:architecture-advisory-panel",
         "collection:runtime-recovery"
-      ]
+      ],
+      "matchLinesSha256": "4412b837e5aa5738b934fe9760ba4ba107cc452069cea18594aee1aad5d12219"
     },
     {
       "path": "scripts/measure-p08-performance.mjs",
       "classification": "code-comment",
       "matches": [
         "collection:rust-host-r1-kernel"
-      ]
+      ],
+      "matchLinesSha256": "9df5a444ce20d5076e0e5be41f1423403353a22e3bad8491fdb71843d3c6f6ee"
     },
     {
       "path": "src/runner/dispatch/assignment-policy.mjs",
       "classification": "identifier-or-code-comment",
       "matches": [
         "collection:executor-policy-dispatch-seams"
-      ]
+      ],
+      "matchLinesSha256": "e4f491896ab4cedbf6e0ffee628cb2f88d7964cd2f24fce4ea53494d50700ce6"
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
       "classification": "identifier-or-code-comment",
       "matches": [
         "collection:executor-policy-dispatch-seams"
-      ]
+      ],
+      "matchLinesSha256": "27f75c198404f1439e87faa33d6de82253df10724f9f83f63bd3523719c04c3c"
     },
     {
       "path": "src/runner/dispatch/assignment.mjs",
       "classification": "identifier-or-code-comment",
       "matches": [
         "collection:executor-policy-dispatch-seams"
-      ]
+      ],
+      "matchLinesSha256": "8628694700e22b13c7d00462d5c1623956aeb0dcbe3ec6b89633b36e097c9c06"
     },
     {
       "path": "src/runner/dispatch/config.mjs",
@@ -70,35 +76,40 @@
         "collection:executor-policy-dispatch-seams",
         "collection:visibility-herdr",
         "legacy-root"
-      ]
+      ],
+      "matchLinesSha256": "3de1623b4448afd8a0a9943c4434334f8a97b167f52add66aae36a392deb7497"
     },
     {
       "path": "src/runner/dispatch/operation-prompt-templates.mjs",
       "classification": "identifier-or-code-comment",
       "matches": [
         "collection:architecture-advisory-panel"
-      ]
+      ],
+      "matchLinesSha256": "03c0ff697f77335af8e66c19cb47f646cd348ebaee30d4684d4aaf51e0808ea7"
     },
     {
       "path": "src/runner/dispatch/provider-capacity.mjs",
       "classification": "identifier-or-code-comment",
       "matches": [
         "collection:executor-policy-dispatch-seams"
-      ]
+      ],
+      "matchLinesSha256": "04bd33bc5fd52b5406af381e7d50a0f3607ab0e9da8510af4e46d27b04fbe7c8"
     },
     {
       "path": "src/runner/dispatch/recovery.mjs",
       "classification": "identifier-or-code-comment",
       "matches": [
         "collection:runtime-recovery"
-      ]
+      ],
+      "matchLinesSha256": "12dd13640d5af09aa7dcb275b58e0eeb00e64387f813881e4c072fa07b977c52"
     },
     {
       "path": "src/runner/dispatch/run-lock.mjs",
       "classification": "identifier-or-code-comment",
       "matches": [
         "collection:runtime-recovery"
-      ]
+      ],
+      "matchLinesSha256": "4e65169bc3fdb4b0ffa5a037f1de8553f96417dbc07e1968ce54778930e38359"
     },
     {
       "path": "src/runner/dispatch/trust-store.mjs",
@@ -106,7 +117,8 @@
       "matches": [
         "collection:visibility-herdr",
         "legacy-root"
-      ]
+      ],
+      "matchLinesSha256": "04afe99f1decae56b924a7f67c71874e275cddb3746b5e87f746f8190975bf95"
     },
     {
       "path": "src/runner/dispatch/worker-home.mjs",
@@ -114,28 +126,32 @@
       "matches": [
         "collection:visibility-herdr",
         "legacy-root"
-      ]
+      ],
+      "matchLinesSha256": "427c4e36f00ed37eca08b8b2abd5930ac6cc45f4cbd01144d5ffc4fd78b67f89"
     },
     {
       "path": "src/setup/executor-profile-warnings.mjs",
       "classification": "identifier-or-code-comment",
       "matches": [
         "collection:executor-policy-dispatch-seams"
-      ]
+      ],
+      "matchLinesSha256": "8c2757ffd2cbe225cccc395aa469a92c1748452ab52b7dccf2c6c9f2c49cab7c"
     },
     {
       "path": "src/setup/registrations.mjs",
       "classification": "identifier-or-code-comment",
       "matches": [
         "collection:executor-policy-dispatch-seams"
-      ]
+      ],
+      "matchLinesSha256": "f28e5ed1fe33699ac8d61d8ecfc7bc3d50baeb24af0cda4c7e98367fe63d4cb5"
     },
     {
       "path": "test/fixtures/.fgos/coordination/sessions/architecture-advisory-panel--p00-1/events.jsonl",
       "classification": "recorded-fixture",
       "matches": [
         "collection:architecture-advisory-panel"
-      ]
+      ],
+      "matchLinesSha256": "32d0ba1e87c7d750014a4034c7a7f50ab1121fa9f32dace61d4ca3805af23c7d"
     },
     {
       "path": "test/fixtures/run-outcome/legacy-derivation.json",
@@ -145,7 +161,8 @@
         "collection:dispatch-operability-implementation",
         "collection:executor-policy-dispatch-seams",
         "legacy-root"
-      ]
+      ],
+      "matchLinesSha256": "491ede2067a23d5ba98afe1fd77cfc6bb3d79d666233194c22cc6d90384c941a"
     },
     {
       "path": "test/fixtures/run-result/real-shapes/03-v1-done-inferred.json",
@@ -154,14 +171,16 @@
         "collection:code-panel-multicell-facade",
         "collection:executor-policy-dispatch-seams",
         "legacy-root"
-      ]
+      ],
+      "matchLinesSha256": "43a820e7e3c963bcc6a0bfafcedcb9e300d62222c3a07dd5a3e74dbce5cb877d"
     },
     {
       "path": "test/fixtures/run-result/real-shapes/04-v1-done-verified.json",
       "classification": "recorded-fixture",
       "matches": [
         "collection:code-panel-multicell-facade"
-      ]
+      ],
+      "matchLinesSha256": "3d079e6b383fec10b4a107e801fda9bbc2c15e1782e165cf4d8f2f1bad78eb81"
     },
     {
       "path": "test/fixtures/run-result/real-shapes/05-v1-done-reported.json",
@@ -170,42 +189,48 @@
         "collection:code-panel-multicell-facade",
         "collection:dispatch-operability-implementation",
         "legacy-root"
-      ]
+      ],
+      "matchLinesSha256": "a155f87aeb2072efedfc0b45fde98c85a63ae677f32816af411b91adac6f9832"
     },
     {
       "path": "test/fixtures/run-result/real-shapes/14-v2-completed-blocked-reported.json",
       "classification": "recorded-fixture",
       "matches": [
         "legacy-root"
-      ]
+      ],
+      "matchLinesSha256": "cc45fb7c77f43cb9f5d0e20bcf11df45bd0db604a1a465a6d4895b8e9e41a7ad"
     },
     {
       "path": "test/fixtures/run-result/real-shapes/15-v2-completed-not-applicable-failed.json",
       "classification": "recorded-fixture",
       "matches": [
         "legacy-root"
-      ]
+      ],
+      "matchLinesSha256": "115adbf0453e79580f8290c28f36958bf0327f95f8d8cccc083758c02fcdb230"
     },
     {
       "path": "test/fixtures/usage/codex-cli-grep-tokens-used.stderr.log",
       "classification": "recorded-fixture",
       "matches": [
         "collection:dispatch-operability-implementation"
-      ]
+      ],
+      "matchLinesSha256": "8213665bcd7d04e3d45abe07fdce4a7f5d0cd8e7e4d58fa6aefea2ce72e68686"
     },
     {
       "path": "test/fixtures/usage/codex-cli-nested-tokens-used.stderr.log",
       "classification": "recorded-fixture",
       "matches": [
         "collection:architecture-advisory-panel"
-      ]
+      ],
+      "matchLinesSha256": "9a3146e4ad1b9728038e0e44d441fe861a9d59b4dbb10a66d45c394b860cae9b"
     },
     {
       "path": "test/fixtures/usage/pi-multiturn-no-agent-end.jsonl",
       "classification": "recorded-fixture",
       "matches": [
         "legacy-root"
-      ]
+      ],
+      "matchLinesSha256": "2d12ca0052f2d9ce9b7f5373772c764dc8e36fdd9a1622d99e9d8f989647749d"
     },
     {
       "path": "test/fixtures/usage/pi-multiturn-normal.jsonl",
@@ -223,7 +248,8 @@
         "collection:step-09-mvp3-to-mvp5",
         "collection:step-09-mvp6-to-mvp9",
         "legacy-root"
-      ]
+      ],
+      "matchLinesSha256": "672985e152d99b0abec66eec73c14d4c91a13911a38bb663416006fbe6236098"
     },
     {
       "path": "test/runner/assignment-dispatch.test.mjs",
@@ -231,28 +257,32 @@
       "matches": [
         "collection:executor-policy-dispatch-seams",
         "collection:runtime-recovery"
-      ]
+      ],
+      "matchLinesSha256": "06534a2abaa77c00c901147504fd3851b980d99057c5ed34dc369de7d192cbae"
     },
     {
       "path": "test/runner/assignment.test.mjs",
       "classification": "test-reference",
       "matches": [
         "collection:executor-policy-dispatch-seams"
-      ]
+      ],
+      "matchLinesSha256": "b1b7ec361a57c945ce8ae241d8dd0d1e00a8e1a396a4eb736f9ac7366cd106af"
     },
     {
       "path": "test/runner/dispatch-assignment-id-claim-concurrency.test.mjs",
       "classification": "test-reference",
       "matches": [
         "collection:executor-policy-dispatch-seams"
-      ]
+      ],
+      "matchLinesSha256": "2015fcf37408e2e75f053065a7d84d7d58bda266aa31c23532176561cd7a6e7f"
     },
     {
       "path": "test/runner/dispatch-confinement-authority.test.mjs",
       "classification": "test-reference",
       "matches": [
         "collection:confinement-authority-implementation"
-      ]
+      ],
+      "matchLinesSha256": "c96d03c0bedacb59a21538d78e60564e634361d766bec2583896b4bd6b72fa50"
     },
     {
       "path": "test/runner/dispatch-executor-profile.test.mjs",
@@ -260,14 +290,16 @@
       "matches": [
         "collection:visibility-herdr",
         "legacy-root"
-      ]
+      ],
+      "matchLinesSha256": "700991724a0a10ed59be3bbb9ca2e346539703d85fbc8bdc6e142cae7107fcdf"
     },
     {
       "path": "test/runner/dispatch-policy-baseline-snapshot.test.mjs",
       "classification": "test-reference",
       "matches": [
         "collection:executor-policy-dispatch-seams"
-      ]
+      ],
+      "matchLinesSha256": "71e501e15cd4477724cca031a8ffd4a328dadf9540436571d7f34f3593ca8e87"
     },
     {
       "path": "test/runner/dispatch-worker-home.test.mjs",
@@ -275,7 +307,8 @@
       "matches": [
         "collection:visibility-herdr",
         "legacy-root"
-      ]
+      ],
+      "matchLinesSha256": "700991724a0a10ed59be3bbb9ca2e346539703d85fbc8bdc6e142cae7107fcdf"
     },
     {
       "path": "test/runner/dispatch-worker-session.test.mjs",
@@ -283,63 +316,72 @@
       "matches": [
         "collection:visibility-herdr",
         "legacy-root"
-      ]
+      ],
+      "matchLinesSha256": "594e1d8eb48557e397163fc5eaa3b7e219e0794379a3142209d231fd0cf7fe17"
     },
     {
       "path": "test/runner/operation-prompt-templates.test.mjs",
       "classification": "test-reference",
       "matches": [
         "collection:architecture-advisory-panel"
-      ]
+      ],
+      "matchLinesSha256": "a0ffcb1985e0403916452fe56db507b0017a87528dedfe893784f661a620345d"
     },
     {
       "path": "test/runner/provider-capacity.test.mjs",
       "classification": "test-reference",
       "matches": [
         "collection:executor-policy-dispatch-seams"
-      ]
+      ],
+      "matchLinesSha256": "e4c6a924a3fa6ab4f660607e16aa7f4584d4d4e91cf487d403799c6b3e056d21"
     },
     {
       "path": "test/runner/run-result-v2.test.mjs",
       "classification": "test-reference",
       "matches": [
         "collection:executor-policy-dispatch-seams"
-      ]
+      ],
+      "matchLinesSha256": "09a48376f805436a68bdbfa9f67157b06a8506f2d65807777e0a5fd557ddca50"
     },
     {
       "path": "test/scripts/check-doc-conservation.test.mjs",
       "classification": "synthetic-test",
       "matches": [
         "legacy-root"
-      ]
+      ],
+      "matchLinesSha256": "ce79562c0325466e198793ad55f1ed77cd68638d17967ac29492d35b785eaecd"
     },
     {
       "path": "test/scripts/check-doc-retirement.test.mjs",
       "classification": "synthetic-test",
       "matches": [
         "legacy-root"
-      ]
+      ],
+      "matchLinesSha256": "f2da91c2bc844b81a337c620b0e145f5912340f686f981cbbf75e89920bdcff9"
     },
     {
       "path": "test/scripts/check-evidence-relocation.test.mjs",
       "classification": "synthetic-test",
       "matches": [
         "legacy-root"
-      ]
+      ],
+      "matchLinesSha256": "556728f56307d84afa205d2608a31229aecae7339ba0ccde42295902d539492b"
     },
     {
       "path": "test/scripts/doc-candidate-conservation.test.mjs",
       "classification": "synthetic-test",
       "matches": [
         "legacy-root"
-      ]
+      ],
+      "matchLinesSha256": "02b129a76e76e07381d4228caf4f9869300554986b5bc2738f5cfc4945107faa"
     },
     {
       "path": "test/scripts/generate-shipped-path-inventory.test.mjs",
       "classification": "test-reference",
       "matches": [
         "collection:architecture-advisory-panel"
-      ]
+      ],
+      "matchLinesSha256": "f47601d42a236ffbce204f6e2769853c2e33391a1169d800f983a8122a33dc86"
     },
     {
       "path": "test/setup/checks.test.mjs",
@@ -347,7 +389,8 @@
       "matches": [
         "collection:executor-policy-dispatch-seams",
         "collection:rust-host-r1-kernel"
-      ]
+      ],
+      "matchLinesSha256": "ff4ae3730bcf680d4a554e2f92ff432f46284619636a88fcf4c649f42e31a37d"
     },
     {
       "path": "test/setup/skill-wrappers.test.mjs",
@@ -355,7 +398,8 @@
       "matches": [
         "collection:code-panel-multicell-facade",
         "collection:dispatch-operability-implementation"
-      ]
+      ],
+      "matchLinesSha256": "547b084c0e33450cdb17fd8d0f63bc49853c40fa1f9b57bceaccdcd675a3ecb6"
     }
   ]
 }

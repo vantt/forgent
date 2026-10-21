@@ -15,6 +15,7 @@ export const DEFAULT_CONSUMER_TABLE_PATH =
 
 const MANIFEST_KEYS = ['entries', 'generatedBy', 'sourceCommit', 'version'];
 const ENTRY_KEYS = ['after', 'before', 'bytes', 'collection', 'gitBlob', 'mode', 'relation', 'sha256'];
+const CONSUMER_ROW_KEYS = ['classification', 'matches', 'matchLinesSha256', 'path'];
 const CONSUMER_ROOTS = [
   '.agents/', '.claude/', '.githooks/', 'apps/', 'bin/', 'core/', 'domains/',
   'packages/', 'plugins/', 'scripts/', 'src/', 'test/',
@@ -147,10 +148,11 @@ function validateConsumerTable(table) {
   }
   const seen = new Set();
   for (const [index, row] of table.consumers.entries()) {
-    if (!row || typeof row !== 'object' || !isSafeRepoPath(row.path) ||
+    if (!sameKeys(row, CONSUMER_ROW_KEYS) || !isSafeRepoPath(row.path) ||
         typeof row.classification !== 'string' || row.classification.length === 0 ||
         !Array.isArray(row.matches) || row.matches.length === 0 ||
-        row.matches.some((match) => typeof match !== 'string' || match.length === 0)) {
+        row.matches.some((match) => typeof match !== 'string' || match.length === 0) ||
+        !HEX_64.test(row.matchLinesSha256)) {
       throw new Error(`Malformed consumer table: consumers[${index}] is invalid`);
     }
     if (seen.has(row.path)) throw new Error(`Malformed consumer table: duplicate path ${row.path}`);
@@ -177,6 +179,15 @@ function consumerMatches(content, collections) {
   return matches.sort(codepointCompare);
 }
 
+function consumerMatchLinesSha256(content, collections) {
+  const legacyConsumerRoot = ['docs', 'architect', 'agent-coordination', 'verification'].join('/');
+  const tokens = [legacyConsumerRoot, legacyConsumerRoot.slice(5), ...collections];
+  const matchingLines = content.split('\n')
+    .filter((line) => tokens.some((token) => line.includes(token)))
+    .sort(codepointCompare);
+  return computeSha256(Buffer.from(matchingLines.join('\n'), 'utf8'));
+}
+
 export function scanConsumerTable(repoRoot, collections) {
   const hits = [];
   const readErrors = [];
@@ -185,7 +196,9 @@ export function scanConsumerTable(repoRoot, collections) {
     try {
       const content = fs.readFileSync(path.resolve(repoRoot, rel), 'utf8');
       const matches = consumerMatches(content, collections);
-      if (matches.length > 0) hits.push({ path: rel, matches });
+      if (matches.length > 0) {
+        hits.push({ path: rel, matches, matchLinesSha256: consumerMatchLinesSha256(content, collections) });
+      }
     } catch (error) {
       readErrors.push({ path: rel, error: error.message });
     }
@@ -213,6 +226,8 @@ function verifyConsumers(repoRoot, manifest, consumerTable) {
     }
     if (row.matches.length !== hit.matches.length || row.matches.some((value, i) => value !== hit.matches[i])) {
       violations.push({ type: 'consumer-drift', phase: 'before', path: hit.path, message: `${hit.path}: consumer matches changed (expected ${row.matches.join(', ')}, got ${hit.matches.join(', ')})` });
+    } else if (row.matchLinesSha256 !== hit.matchLinesSha256) {
+      violations.push({ type: 'consumer-drift', phase: 'before', path: hit.path, message: `${hit.path}: matching consumer lines changed (expected ${row.matchLinesSha256}, got ${hit.matchLinesSha256})` });
     }
   }
   for (const row of expected.values()) {
