@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- A brief is never typed into a herdr pane's shell any more: terminal-control refuses a `send` (prompt door included) unless a program other than the pane's shell holds the foreground, and the run ends as a failed attempt with reason `terminal:foreground-not-agent`; the gate also drops tty input its agent never read before the pane's shell gets the tty back, so a brief typed at an agent that never started can no longer run as shell commands (backtick spans included).
 - Git (branch `git/p07-switch` fixes from the host gate):
   - A commit hook may print up to 64 MiB again (Git sends hook output to stderr); a borrowed Git run no longer fails at 64 KiB.
   - A hook or filter child that drops the lock descriptor and leaves its process group now turns a commit, Sync or Land into `containment-unproven` (`recovery-required`) on every machine, also where bwrap can make a PID namespace; before, only machines without it were watched.

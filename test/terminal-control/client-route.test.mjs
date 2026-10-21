@@ -67,8 +67,11 @@ test('every operation of the port answers through the route', () => {
   assert.equal(attached.origin, 'attached');
 
   assert.deepEqual(tc.label({ key: 'k-one', display: { label: 'renamed' } }), { result: 'ok' });
-  assert.deepEqual(tc.send({ key: 'k-one', text: 'hello', submit: true }), { result: 'ok' });
-  assert.deepEqual(tc.send({ key: 'k-one', keys: ['Enter'] }), { result: 'ok' });
+  // Only the pane's shell holds the foreground: nothing is typed, and the route names why.
+  const refused = tc.send({ key: 'k-one', text: 'hello', submit: true });
+  assert.equal(refused.result, 'foreground-not-agent');
+  assert.match(refused.reason, /shell/);
+  assert.ok(!calls().some((c) => c.startsWith('pane send-text') || c.startsWith('agent prompt')), 'nothing reached the pane');
   assert.equal(tc.read({ key: 'k-one', lines: 5 }).screen, 'line one\nline two\n');
 
   const inspection = tc.inspect({ key: 'k-one' });
