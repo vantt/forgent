@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-21 17:50 (GIT/ES điều phối, owner 17:45): M3 đổi thành "chỉ cho doctor thấy": không có lệnh gỡ tay nên thêm phần đọc Rust + cảnh báo; GIT duyệt phase 2 HARDEN T0 (`src/git/native.mjs`, node-addon) với 5 điều kiện gửi `forgent-a8`.
+
 - 2026-10-21 17:45 (GIT/ES điều phối, máy thứ hai): ScopedCommit fsync blob/tree đã stage trước `git commit` (không thêm tiến trình Git), recovery tip không đọc được → `commit-objects-unreadable`, kiểm E1 scoped chặt hơn + luật thứ tự mới (binary cũ 96 vi phạm, mới 0); `npm test` 0 fail, p95 ấm ~156 ms ≤ 250 ms. Tiếp: owner chạy E1 cả hai loại, doctor M3, E3 sạch, land.
 
 - 2026-10-21 17:45 (forgentx-95): **SEAT 09–11 xong** (lead), nhưng đo lại cả đợt so với main: Node src ròng **+821**, test ròng +2.560, fixture +2.181, crate +2.370 (+3.036 golden JSON) — mốc "Node −594" sau 08 chỉ so với 06, sai cho cả đợt. Soát độ phình (Opus, [báo cáo](../reports/review-261021-1726-seat-wave-growth.md)): phần lớn là code chuyển đổi một lần + test chứng minh lại golden; logic trùng crate chỉ ở đường Work. Quyết: **sửa trước merge** D1 (dry-bind bỏ persona/blind/prefer so với run) và đường Work (`plan.mjs` tự chọn rigor/executor/model — phase 06 chưa làm đủ) + gọt an toàn; phần còn lại thành **SEAT-TRIM** (held tới khi merge). Merge main của SEAT lùi khoảng 1–2 giờ. Đảo lại nếu lượt sửa đường Work lớn hơn ~1 phase: merge trước, đường Work vào SEAT-TRIM (báo owner).
