@@ -101,6 +101,7 @@ flowchart LR
 | D5 | ~~Duyệt plan 4.4b~~: đã duyệt 13:53, gồm D3 | — | — |
 | D6 | Luật instruction: khoá 7 nguyên tắc thành luật hay giữ `procedure` (Q4); xử lý ngưỡng 32 KiB của codex (Q5); nguồn sinh danh sách luật (Q6); quyết định 10-06 "không sửa đồ của ak/ck" còn hiệu lực không (Q7) | owner | INS nhóm A, dọn khối AGENTKIT trong `AGENTS.md` |
 | D7 | Pin `.fgos/distribution.json` khi nhiều máy tự build release: mỗi `fgctl upgrade` ghi digest của máy mình vào cùng một file (máy owner `79ead131…`, máy thứ hai `2895ff70…`), nên các máy thay nhau ghi đè. Chọn: pin theo máy (file không commit), hay chỉ một máy build release và các máy khác cài đúng digest đó. Tạm thời [hướng dẫn](../reports/guide-261017-1828-sync-a-machine-after-model-pool-and-rust-callers.md) bảo `git restore` file sau upgrade | owner | mọi landing có activate |
+| D8 | Holder-lock cho đợt cutover tài liệu (DOC, L12-92): thêm dòng registry `documentation-cutover` (rank 10, khác rank của MAIL V2) **và** thêm giá trị cho enum `owner` ở `packages/holder-lock/contracts/lock-registry.schema.v1.json:52` (hiện `4.2, 4.3, 4.4, 6.2, event-store, git`; chưa có giá trị cho DOC) = đổi contract holder-lock | **HARDEN (`forgent-a8`, T1 holder-lock) đồng ý**, ghi trả lời vào log; DOC (`forgentx-5f`) làm | DOC lease build (chỉ phần holder-lock; DOC không land gì trước SEAT trên main) |
 
 ## File chung dễ va
 
