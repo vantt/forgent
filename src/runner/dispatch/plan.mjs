@@ -124,7 +124,12 @@ export function effectiveDispatchPolicy({ assignment, runnerConfig, cliOverride 
   // the model and they are taken as given. Every other caller asks Seat Binding through `bind()`: a pinned
   // executor (the caller's, else the operation's) is an override, a tier or effort stated by the assignment
   // or the caller is one too, and with no pin the capability's pool decides.
-  const pinnedExecutor = cliOverride.preferExecutor ?? opPolicy.preferExecutor;
+  // The executor the caller names, else the runner's default executor, reaches the crate as a pin.
+  const namedExecutor = cliOverride.preferExecutor ?? opPolicy.preferExecutor;
+  const defaultExecutor = runnerConfig?.executor
+    ? (runnerConfig.executor.command ?? runnerConfig.executor.invocations?.[0]?.command ?? runnerConfig.executor.invocations?.[0]?.id ?? 'claude')
+    : undefined;
+  const pinnedExecutor = namedExecutor ?? defaultExecutor;
   const explicitTier = cliOverride.tier ?? opPolicy.tier;
   if (explicitTier !== undefined && !MODEL_POLICY_TIERS.includes(explicitTier)) {
     throw new RunnerConfigError(`invalid explicit tier "${explicitTier}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
@@ -156,14 +161,10 @@ export function effectiveDispatchPolicy({ assignment, runnerConfig, cliOverride 
   if (bound && pinnedExecutor && bound.executor !== pinnedExecutor) {
     throw new RunnerConfigError(`pin-unsatisfiable: preferExecutor "${pinnedExecutor}" is not registered or cannot serve this seat; Seat Binding chose "${bound.executor}"`, { code: 'pin-unsatisfiable' });
   }
-  const primaryExecutor = bound?.executor
-    ?? pinnedExecutor
-    ?? runnerConfig?.executor?.command
-    ?? (runnerConfig?.executor?.invocations?.[0]?.command ?? runnerConfig?.executor?.invocations?.[0]?.id)
-    ?? 'claude';
-  const executorSource = pinnedExecutor
+  const primaryExecutor = bound?.executor ?? pinnedExecutor ?? 'claude';
+  const executorSource = namedExecutor
     ? (cliOverride.preferExecutor ? (cliOverride.policyProvenance?.executor ?? { scope: 'cliOverride' }) : { scope: 'opPolicy', id: opId })
-    : bound ? { scope: 'seat-binding', id: bound.provenance.executor.source } : { scope: 'default' };
+    : { scope: 'default' };
   const { resolvedProvider, registeredExecutorEntry } = resolveExecutorProvider({ runnerConfig, primaryExecutor, options });
   const providerSource = registeredExecutorEntry
     ? { scope: 'registeredExecutor', id: primaryExecutor }

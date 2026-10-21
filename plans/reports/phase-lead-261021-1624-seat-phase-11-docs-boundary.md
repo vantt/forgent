@@ -59,6 +59,7 @@ Base: `84d12f2ca` (seat-p09 plus latest main, fast-forwarded).
 
 - `effectiveDispatchPolicy` (`plan.mjs`) now binds through `bind()` via `bindWorkSeat` (`bind.mjs`): a pinned executor (the caller's, else the operation's) is a hard override plus a `prefer`, a stated tier or effort is an override, rigor is `effectiveRigorOf` over the strongest explicit demand, and executor, tier, model and effort come from the binding. A caller that already bound the seat (tier and model given) is taken as given, as before. Deleted: the `claude` and global-executor default, `cells[family][0]` (`modelOfCell`), the no-config tier decision, the second rigor composition, `executorPreference`, and the `tierCellMissingDetail` use here.
 - `executeExecutorCli` (`cli.mjs`) no longer picks tier or model: both come from the caller that bound the seat (the assignment runner does) or from the executor entry, else `seat-not-bound`. The raw door has no policy left, so I did not route it through `bind` (the lead's "do exactly that" cannot apply to a door that is only handed a bound seat).
+- The executor reaches the crate as a pin: the caller's or the operation's, else the runner's default executor (`executor.command`). The crate validates it and decides tier, model and effort; if it refuses the pin, the Work path refuses by name (`pin-unsatisfiable`, or the crate's own refusal), never a Node fallback. The `claude` default survives only for a caller that bound tier and model itself and named no executor (the unit runner always names one).
 - Refusals, named: no runner config and no bound tier and model (`runner-config-missing`), a pin the pool does not take (`pin-unsatisfiable`), a capability with no pool (`headless-no-executor`, as `fgos run`).
 - Decision, flagged: a Work seat is bound with `session.postureAtLaunch`, so bind does not require a bwrap-capable invocation to admit an executor (the confinement authority judges posture when the assignment launches), and an executor with no invocation counts its own command as the one invocation whose effort levels are judged. Without it every fixture executor and every workspace using a plain default executor would be refused `posture-unavailable`. Unit-run seats do not use it.
 - Behaviour a reviewer must know: the global default executor still runs, but only when a pool names its family (`tierFallback` or `prefer`). Unit-run seats and the `fgos run` path are unchanged, since they pass tier and model.
@@ -87,3 +88,15 @@ By commit: D1 src +31/-35 tests +40; trims src +2/-7 tests +4/-781; Work path sr
 ### Verification
 
 393 test files (runner, runner/execution, cli, e2e, direct, verbs, workflow, setup, seat-binding, parity, intake, scripts, docs, architecture) each run alone: all pass except `active-release-drift-check` (needs a release build; red on the base). `test/run-supervisor/terminal-cutover` fails the same way on the track checkout without these changes (checked), and `terminal-crash-matrix` uses the same harness (not checked); both need a real release host and a fake herdr. `npm test` and cargo not run.
+
+### Work path divergence
+
+Where the Work path (`effectiveDispatchPolicy`) still differs from `fgos run`:
+- It pins the runner's global default executor when nothing names one; `fgos run` lets the capability's pool choose. A capability with no `prefer` therefore still works here (the pinned default serves it) and is refused by `fgos run` (`headless-no-executor`).
+- It binds with `session.postureAtLaunch` (posture judged at launch, an executor with no invocation counts its own command); `fgos run` requires a posture-capable invocation at bind time.
+- It always binds one headless producer seat (or the assignment's role) and never takes herdr or lead state from the session.
+Unifying these means dropping the default-executor pin and the posture assumption. Test count that option A (no default pin, posture checked at bind) would have needed: about 130 tests in 22 files given a pool and posture-capable invocations (what the first version of this pass migrated), plus the confined launches those fixtures would start. Left as the SEAT-TRIM unification item; no doctor row.
+
+### One-door fix for the drain row
+
+`checkSeatBindingDrain` no longer lists the assignments tree: it takes unit runs from `listAssignmentRuns` (the layout owner), as `units-awaiting-resume` does, so the enumerator guard needs no allow-list entry (the entry added earlier is removed). A unit directory with no attempt directory yet is not seen; the drain predicate concerns units that have started attempts.

@@ -67,7 +67,7 @@ test('the config row passes a converted runner, a project with no runner yet, an
 
 function writeUnit(dir, unitRunId, record, { summary } = {}) {
   const unitDir = path.join(dir, '.fgos', 'assignments', unitRunId);
-  fs.mkdirSync(unitDir, { recursive: true });
+  fs.mkdirSync(path.join(unitDir, 'producer', '1', 'runs', '01'), { recursive: true });
   fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify({ createdAt: new Date().toISOString(), ...record }));
   if (summary) fs.writeFileSync(path.join(unitDir, 'unit-summary.json'), JSON.stringify(summary));
   return unitDir;

@@ -12,6 +12,7 @@ import { isSeatRecord } from '../runner/execution/legacy-seat-read.mjs';
 import { unitControlDir } from '../runner/execution/unit-control.mjs';
 import { inspectRunControl } from '../runner/dispatch/run-lock.mjs';
 import { readWorkflowEvents, projectWorkflowState } from '../workflow/store.mjs';
+import { listAssignmentRuns } from '../runner/dispatch/assignment-layout.mjs';
 import { ladderCommentLines } from './seat-binding-conversion.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
 import { loadWorkflowDefinitions, withUnreadableDefinitions, workflowRoots, workflowUnitContract } from './workflow-definition-files.mjs';
@@ -80,8 +81,9 @@ export function checkSeatBindingDrain(cwd, { now = Date.now() } = {}) {
   const assignmentsDir = path.join(cwd, '.fgos', 'assignments');
   const live = [];
   const dead = [];
-  let unitDirs = [];
-  try { unitDirs = fs.readdirSync(assignmentsDir).filter((name) => fs.existsSync(path.join(assignmentsDir, name, 'unit.json'))).sort(); } catch { /* no assignments yet */ }
+  // Unit runs are found through the assignment layout owner: a unit run is the first segment of its assignment ids.
+  const unitDirs = [...new Set([...listAssignmentRuns(path.join(cwd, '.fgos'))].map(({ assignmentId }) => assignmentId.split('/')[0]))]
+    .filter((name) => fs.existsSync(path.join(assignmentsDir, name, 'unit.json'))).sort();
   for (const unitRunId of unitDirs) {
     const unitDir = path.join(assignmentsDir, unitRunId);
     const record = readJson(path.join(unitDir, 'unit.json'));
