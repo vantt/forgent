@@ -151,22 +151,6 @@ test('a units file runs through startWorkflow, and a unit\'s prefer and persona 
   assert.deepEqual(record.overrides, []);
 });
 
-test('a unit\'s timeoutMs in a units file reaches the Unit and its dispatch; one out of range is refused before any run exists', async () => {
-  const tmp = setupRepo();
-  const file = unitsFile(tmp, [{ id: 'heavy', objective: 'Read the readme', capability: 'docs:write', timeoutMs: 5400000 }]);
-  const state = await startWorkflow({ unitsPath: file, ...opts(tmp) });
-  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
-  const unitRunId = state.steps.heavy.units.heavy.unitRunId;
-  assert.equal(unitRecordOf(tmp, unitRunId).unit.timeoutMs, 5400000);
-  assert.deepEqual(producerAssignment(tmp, unitRunId).binding.provenance.timeoutMs, { value: 5400000, source: 'unit' });
-  assert.equal(JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', unitRunId, 'producer', '1', 'runs', '01', 'run.json'), 'utf8')).timeoutMs, 5400000);
-
-  assert.throws(() => validateWorkflow({
-    id: 'too-long',
-    steps: [{ id: 's', units: [{ id: 'u', template: { capability: 'docs:write', objective: 'Read', writes: [], timeoutMs: 99 * 3600000 } }] }],
-  }), /timeoutMs must be at most 4h/);
-});
-
 test('--effort becomes a reasoningEffort override on every unit, with no origin that claims a person typed it, kept in the run for resume', async () => {
   const tmp = setupRepo({ effortCli: true });
   const workflow = validateWorkflow({
@@ -430,7 +414,7 @@ test('--timeout gives every unit of the workflow run its own timeoutMs, kept for
   assert.equal(producerAssignment(tmp, unitRunId).binding.timeoutMs, 5400000);
 });
 
-test('a unit with its own timeoutMs wins over workflow start --timeout', async () => {
+test('a unit\'s timeoutMs in a units file reaches the Unit and its dispatch and wins over workflow start --timeout; one out of range is refused', async () => {
   const tmp = setupRepo();
   const file = unitsFile(tmp, [
     { id: 'u-default', objective: 'Read', capability: 'docs:write' },
@@ -448,6 +432,13 @@ test('a unit with its own timeoutMs wins over workflow start --timeout', async (
 
   assert.deepEqual(producerAssignment(tmp, runB).binding.provenance.timeoutMs, { value: 120000, source: 'unit' });
   assert.equal(producerAssignment(tmp, runB).binding.timeoutMs, 120000);
+  assert.equal(unitRecordOf(tmp, runB).unit.timeoutMs, 120000);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', runB, 'producer', '1', 'runs', '01', 'run.json'), 'utf8')).timeoutMs, 120000);
+
+  assert.throws(() => validateWorkflow({
+    id: 'too-long',
+    steps: [{ id: 's', units: [{ id: 'u', template: { capability: 'docs:write', objective: 'Read', writes: [], timeoutMs: 99 * 3600000 } }] }],
+  }), /timeoutMs must be at most 4h/);
 });
 
 test('--account pins provider account on every unit of the workflow run, kept for resume', async () => {

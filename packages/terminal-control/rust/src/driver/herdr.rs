@@ -120,10 +120,13 @@ pub fn parse_split(result: &Value) -> Option<CreatedPane> {
 /// `pane process-info`.
 pub fn parse_process_info(result: &Value) -> Option<ProcessInfo> {
     let info = result.get("process_info")?;
+    // herdr leaves `argv` out for a process with no command line, which is a
+    // zombie waiting to be reaped: it holds nothing, so it is not listed.
     let foreground = info
         .get("foreground_processes")?
         .as_array()?
         .iter()
+        .filter(|p| p.get("argv").is_some())
         .map(|p| {
             let argv = p.get("argv")?.as_array()?.iter().map(|a| a.as_str().map(str::to_string)).collect::<Option<Vec<_>>>()?;
             Some(ForegroundProcess { pid: number(p, "pid")?, argv })

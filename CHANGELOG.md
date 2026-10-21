@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- A run no longer stops with `terminal:foreground-not-agent` while its agent is working: a zombie child in the pane's foreground (herdr lists it without a command line) used to make the whole foreground unreadable, so the brief was refused. Zombies are now left out of the foreground.
 - Removed the `fgos doctor` row `coordination-abandoned-claims`: nothing writes the coordination claim files it looked for any more, so it could only report on a mechanism that no longer exists. `fgos doctor --fix` no longer removes such entries.
 - Removed the host route `fgos internal process-observe`: Node judges processes in-process through the native door, so nothing calls it. The doctor row `process-containment` and the lock route errors now end with the step to take.
 - Durable writes now share one door: the case ledger's runtime files, gate answers, worktree bindings, run-control generations and release markers, immutable proofs, the provider capacity ledger, the credential copy and the gateway registry are written and fsynced (file and directory) by the durable-file crate, and a failed write names the step it failed at and whether the name was installed (`durable install failed at name-installed (installed: none)`) and leaves no retained temporary file. A create-only write that loses to an existing name no longer fsyncs a directory. Confinement attestation temporary names no longer collide across processes in the same millisecond.
