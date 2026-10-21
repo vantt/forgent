@@ -17,7 +17,7 @@
     "gitConfigPrefix": ["-c", "gc.auto=0", "-c", "maintenance.auto=false"]
   },
   "borrowerCheck": {
-    "route": "fgos internal lock-fd --protocol 1 --borrowed-check <main-checkout lock path> (internal-route.lock-fd.v1.json)",
+    "route": "fgos internal lock-fd --protocol 2 --borrowed-check <main-checkout lock path> (internal-route.lock-fd.v1.json)",
     "allOf": [
       "FGOS_LOCK_FD names main-checkout and the slot",
       "fstat(slot) has the same dev:ino as the main-checkout lock file",

@@ -7,6 +7,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync, execFileSync } from 'node:child_process';
 import { initStore, addWork } from '../../src/state/store.mjs';
+import { activateGitFixture } from '../helpers/git-fixture.mjs';
 
 // `dispatch execute` (prompt, --contract, --assignment) and `dispatch log` are gone: one task
 // runs through `fgos run`, planned work through a Workflow. Calling a removed door is a
@@ -22,6 +23,7 @@ function mkStore() {
   const fgosDir = path.join(root, '.fgos');
   fs.mkdirSync(fgosDir);
   initStore(fgosDir);
+  activateGitFixture(root);
   addWork(fgosDir, {
     id: 'cand1', title: 'x', kind: 'task', status: 'todo', domain: 'coding',
     workflowStep: 'executing', deps: [], refs: [], risk: 'light', verify: 'true',

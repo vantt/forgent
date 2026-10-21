@@ -56,11 +56,22 @@ fn inspect_real_repositories_byte_paths_pages_and_optional_locks() {
         };
         let first = Oid::parse(&first_text, repo.object_format()).unwrap();
         let second = Oid::parse(&second_text, repo.object_format()).unwrap();
+        let comparison = driver.compare_commits(&repo, &first, &second).unwrap();
+        assert_eq!(comparison["mergeBase"], first_text);
+        assert_eq!(comparison["right"], 1);
+        assert_eq!(comparison["commits"], serde_json::json!([second_text]));
+        assert_eq!(
+            driver.list_branches(&repo, "refs/heads/trunk").unwrap(),
+            vec!["refs/heads/trunk"]
+        );
+        let checkout = driver.checkout_facts(&repo, &second).unwrap();
+        assert_eq!(checkout["lastSynced"], second_text);
+        assert_eq!(checkout["delta"], serde_json::json!([]));
         assert!(driver.ancestry(&repo, &first, &second).unwrap());
         assert!(!driver.ancestry(&repo, &second, &first).unwrap());
         assert!(!driver.compare_content(&repo, &first, &second).unwrap());
         assert!(driver.compare_content(&repo, &first, &first).unwrap());
-        let diff = driver.diff(&repo, &first, &second, None, 10).unwrap();
+        let diff = driver.diff(&repo, DiffSides::Objects(&first, &second), &DiffScope::default(), None, 10).unwrap();
         assert_eq!(diff.entries[0].path, b"new");
         let absent = RefName::parse("refs/heads/absent").unwrap();
         assert!(matches!(
@@ -83,14 +94,14 @@ fn inspect_real_repositories_byte_paths_pages_and_optional_locks() {
         )
         .unwrap();
         fs::write(repo_path.join("untracked"), "new").unwrap();
-        let status = driver.status(&repo, Untracked::All, None, 1).unwrap();
+        let status = driver.status(&repo, Untracked::All, Submodules::Configured, Ignored::Excluded, None, 1).unwrap();
         assert!(!status.complete);
         let last = driver
-            .status(&repo, Untracked::All, status.next_cursor, 1)
+            .status(&repo, Untracked::All, Submodules::Configured, Ignored::Excluded, status.next_cursor, 1)
             .unwrap();
         assert!(last.complete);
         assert!(last.entries.iter().any(|e| e.untracked));
-        let status = driver.status(&repo, Untracked::None, None, 10).unwrap();
+        let status = driver.status(&repo, Untracked::None, Submodules::Configured, Ignored::Excluded, None, 10).unwrap();
         assert_eq!(status.entries[0].path, weird);
         assert_eq!(fs::read(repo.git_dir().join("index")).unwrap(), index);
         assert_eq!(
@@ -118,13 +129,13 @@ fn inspect_real_repositories_byte_paths_pages_and_optional_locks() {
         assert!(snapshot.files.iter().any(|f| f.path == b"link"
             && matches!(&f.fingerprint,PathFingerprint::Link {target} if target == b"new")));
         let stale = driver
-            .status(&repo, Untracked::All, None, 1)
+            .status(&repo, Untracked::All, Submodules::Configured, Ignored::Excluded, None, 1)
             .unwrap()
             .next_cursor;
         fs::write(repo_path.join("another-untracked"), "third").unwrap();
         assert_eq!(
             driver
-                .status(&repo, Untracked::All, stale, 1)
+                .status(&repo, Untracked::All, Submodules::Configured, Ignored::Excluded, stale, 1)
                 .unwrap_err()
                 .cause,
             "inspect-cursor-stale"
@@ -277,7 +288,7 @@ fn every_non_separator_filename_byte_round_trips_and_snapshots_never_follow_pare
         ResolveRepo::Repository(r) => r,
         _ => panic!(),
     };
-    let status = driver.status(&repo, Untracked::All, None, 4096).unwrap();
+    let status = driver.status(&repo, Untracked::All, Submodules::Configured, Ignored::Excluded, None, 4096).unwrap();
     assert!(status.complete);
     assert_eq!(
         status
@@ -306,4 +317,238 @@ fn every_non_separator_filename_byte_round_trips_and_snapshots_never_follow_pare
         "snapshot-parent-unreadable"
     );
     fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
+fn inspect_merge_facts_for_land_consumers() {
+    use std::os::unix::fs::PermissionsExt;
+    let root = std::env::temp_dir().join(format!("fgos-p07-merge-facts-{}", std::process::id()));
+    let _ = fs::remove_dir_all(&root);
+    fs::create_dir(&root).unwrap();
+    fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+    git(&root, &["init", "-q", "--initial-branch=trunk", "repo"]);
+    let repo_path = root.join("repo");
+    git(&repo_path, &["config", "user.name", "Fixture"]);
+    git(&repo_path, &["config", "user.email", "fixture@example.invalid"]);
+    fs::create_dir_all(repo_path.join("docs/decisions")).unwrap();
+    fs::create_dir_all(repo_path.join(".fgos")).unwrap();
+    fs::write(repo_path.join(".gitattributes"), ".fgos/events.jsonl merge=union\n").unwrap();
+    fs::write(repo_path.join("docs/decisions/0001-a [x].md"), "a").unwrap();
+    fs::write(repo_path.join("docs/other.md"), "o").unwrap();
+    fs::write(repo_path.join(".fgos/events.jsonl"), "base\n").unwrap();
+    fs::write(repo_path.join("shared"), "base\n").unwrap();
+    fs::write(repo_path.join("moved"), "a long enough body to be detected as one rename\n").unwrap();
+    git(&repo_path, &["add", "."]);
+    git(&repo_path, &["commit", "-qm", "base"]);
+    let base_text = git(&repo_path, &["rev-parse", "HEAD"]);
+    git(&repo_path, &["switch", "-qc", "topic"]);
+    fs::write(repo_path.join("shared"), "topic\n").unwrap();
+    git(&repo_path, &["mv", "moved", "renamed"]);
+    git(&repo_path, &["commit", "-qam", "topic"]);
+    let topic_text = git(&repo_path, &["rev-parse", "HEAD"]);
+    git(&repo_path, &["switch", "-q", "trunk"]);
+    fs::write(repo_path.join("shared"), "trunk\n").unwrap();
+    fs::write(repo_path.join(".fgos/events.jsonl"), "base\ntrunk\n").unwrap();
+    git(&repo_path, &["commit", "-qam", "trunk"]);
+    let trunk_text = git(&repo_path, &["rev-parse", "HEAD"]);
+    let driver = GitDriver::new(&root).unwrap();
+    let repo = match driver.resolve_repo(&repo_path, &repo_path).unwrap() {
+        ResolveRepo::Repository(r) => r,
+        _ => panic!(),
+    };
+    let parse = |t: &str| Oid::parse(t, repo.object_format()).unwrap();
+    let (base, topic, trunk) = (parse(&base_text), parse(&topic_text), parse(&trunk_text));
+
+    let conflicted = driver.merge_tree(&repo, &trunk, &topic).unwrap();
+    assert_eq!(conflicted.conflicted_paths, vec![b"shared".to_vec()]);
+    let clean = driver.merge_tree(&repo, &base, &topic).unwrap();
+    assert!(clean.conflicted_paths.is_empty());
+    assert_eq!(clean.tree.as_str(), git(&repo_path, &["rev-parse", &format!("{topic_text}^{{tree}}")]));
+
+    // A transport resumes a tree listing from the last path it returned.
+    let first_page = driver.list_tree(&repo, &trunk, b"docs/", None, 1).unwrap();
+    assert!(!first_page.complete);
+    let after = first_page.next_cursor.unwrap().after().to_vec();
+    assert!(driver.list_tree(&repo, &base, b"docs/", Some(TreeCursor::resume(&trunk, b"docs/", after.clone())), 10).is_err());
+    let resumed = driver
+        .list_tree(&repo, &trunk, b"docs/", Some(TreeCursor::resume(&trunk, b"docs/", after)), 10)
+        .unwrap();
+    assert!(resumed.complete);
+    assert_eq!(
+        resumed.entries.iter().map(|e| e.path.clone()).collect::<Vec<_>>(),
+        vec![b"docs/decisions/0001-a [x].md".to_vec(), b"docs/other.md".to_vec()]
+    );
+
+    let attrs = driver
+        .attributes(&repo, &trunk, "merge", &[b".fgos/events.jsonl".to_vec(), b"shared".to_vec()])
+        .unwrap();
+    assert_eq!(attrs[0].value, "union");
+    assert_eq!(attrs[1].value, "unspecified");
+    assert!(driver.attributes(&repo, &trunk, "-merge", &[b"shared".to_vec()]).is_err());
+
+    let store = driver
+        .diff(&repo, DiffSides::Objects(&base, &clean.tree), &DiffScope { prefix: Some(".fgos"), renames: false }, None, 10)
+        .unwrap();
+    assert!(store.entries.is_empty());
+    let store = driver
+        .diff(&repo, DiffSides::Objects(&base, &trunk), &DiffScope { prefix: Some(".fgos"), renames: false }, None, 10)
+        .unwrap();
+    assert_eq!(store.entries.iter().map(|e| e.path.clone()).collect::<Vec<_>>(), vec![b".fgos/events.jsonl".to_vec()]);
+    let split = driver.diff(&repo, DiffSides::Objects(&base, &topic), &DiffScope::default(), None, 10).unwrap();
+    assert_eq!(split.entries.len(), 3);
+    let folded = driver
+        .diff(&repo, DiffSides::Objects(&base, &topic), &DiffScope { prefix: None, renames: true }, None, 10)
+        .unwrap();
+    let rename = folded.entries.iter().find(|e| e.change == b'R').unwrap();
+    assert_eq!((rename.path.as_slice(), rename.from.as_deref()), (&b"renamed"[..], Some(&b"moved"[..])));
+    assert_eq!(folded.entries.len(), 2);
+
+    assert!(driver.first_ancestry_merge(&repo, &topic, &trunk).unwrap().is_none());
+    git(&repo_path, &["merge", "-q", "--no-ff", "-s", "ours", "-m", "merge topic", "topic"]);
+    let merge_text = git(&repo_path, &["rev-parse", "HEAD"]);
+    fs::write(repo_path.join("later"), "x").unwrap();
+    git(&repo_path, &["add", "later"]);
+    git(&repo_path, &["commit", "-qm", "later"]);
+    let tip = parse(&git(&repo_path, &["rev-parse", "HEAD"]));
+    assert_eq!(driver.first_ancestry_merge(&repo, &topic, &tip).unwrap().unwrap().as_str(), merge_text);
+    let _ = fs::remove_dir_all(&root);
+}
+
+#[test]
+fn inspect_checkout_diffs_counts_index_listing_and_an_absent_state_root() {
+    use std::os::unix::fs::PermissionsExt;
+    let root = std::env::temp_dir().join(format!("fgos-p07-checkout-facts-{}", std::process::id()));
+    let _ = fs::remove_dir_all(&root);
+    fs::create_dir(&root).unwrap();
+    fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+    git(&root, &["init", "-q", "--initial-branch=trunk", "repo"]);
+    let repo_path = root.join("repo");
+    git(&repo_path, &["config", "user.name", "Fixture"]);
+    git(&repo_path, &["config", "user.email", "fixture@example.invalid"]);
+    git(&repo_path, &["remote", "add", "origin", "https://example.invalid/fixture.git"]);
+    fs::write(repo_path.join("kept"), "one\ntwo\n").unwrap();
+    fs::write(repo_path.join("moved"), "a long enough body to be detected as one rename\n").unwrap();
+    git(&repo_path, &["add", "."]);
+    git(&repo_path, &["commit", "-qm", "base"]);
+    let base_text = git(&repo_path, &["rev-parse", "HEAD"]);
+    git(&repo_path, &["switch", "-qc", "topic"]);
+    fs::write(repo_path.join("picked"), "picked\n").unwrap();
+    git(&repo_path, &["add", "picked"]);
+    git(&repo_path, &["commit", "-qm", "picked"]);
+    let picked_text = git(&repo_path, &["rev-parse", "HEAD"]);
+    fs::write(repo_path.join("unique"), "unique\n").unwrap();
+    git(&repo_path, &["add", "unique"]);
+    git(&repo_path, &["commit", "-qm", "unique"]);
+    let topic_text = git(&repo_path, &["rev-parse", "HEAD"]);
+    git(&repo_path, &["switch", "-q", "trunk"]);
+    git(&repo_path, &["cherry-pick", &picked_text]);
+    let trunk_text = git(&repo_path, &["rev-parse", "HEAD"]);
+    // A staged rename and a new file, an unstaged edit, and a submodule whose
+    // own content is dirty.
+    git(&repo_path, &["mv", "moved", "renamed"]);
+    fs::write(repo_path.join("staged"), "staged\n").unwrap();
+    git(&repo_path, &["add", "staged"]);
+    fs::write(repo_path.join("kept"), "one\ntwo\nadded\n").unwrap();
+    git(&repo_path, &["init", "-q", "--initial-branch=trunk", "sub"]);
+    let sub = repo_path.join("sub");
+    fs::write(sub.join("inner"), "inner\n").unwrap();
+    git(&sub, &["add", "."]);
+    git(&sub, &["-c", "user.name=F", "-c", "user.email=f@example.invalid", "commit", "-qm", "inner"]);
+    git(&repo_path, &["add", "sub"]);
+    git(&repo_path, &["commit", "-qm", "sub", "--", "sub"]);
+    let head_text = git(&repo_path, &["rev-parse", "HEAD"]);
+    fs::write(sub.join("inner"), "dirty\n").unwrap();
+
+    // The driver creates an absent state root as setup would, owner-only.
+    let state = root.join("state/fgos");
+    let driver = GitDriver::new(&state).unwrap();
+    assert_eq!(fs::metadata(&state).unwrap().permissions().mode() & 0o777, 0o700);
+    assert_eq!(fs::metadata(state.join("git-empty-hooks")).unwrap().permissions().mode() & 0o777, 0o500);
+    let repo = match driver.resolve_repo(&repo_path, &repo_path).unwrap() {
+        ResolveRepo::Repository(r) => r,
+        _ => panic!(),
+    };
+    let parse = |t: &str| Oid::parse(t, repo.object_format()).unwrap();
+    let (base, topic, trunk, head) = (parse(&base_text), parse(&topic_text), parse(&trunk_text), parse(&head_text));
+    let renames = DiffScope { prefix: None, renames: true };
+    let names = |sides| {
+        let page = driver.diff(&repo, sides, &renames, None, 10).unwrap();
+        page.entries.iter().map(|e| (e.change, String::from_utf8(e.path.clone()).unwrap(), e.from.clone())).collect::<Vec<_>>()
+    };
+    assert_eq!(names(DiffSides::IndexAgainst(&head)), vec![(b'R', "renamed".into(), Some(b"moved".to_vec())), (b'A', "staged".into(), None)]);
+    assert_eq!(names(DiffSides::WorktreeAgainstIndex), vec![(b'M', "kept".into(), None), (b'M', "sub".into(), None)]);
+    let since_trunk = names(DiffSides::IndexAgainst(&trunk));
+    assert!(since_trunk.contains(&(b'A', "sub".into(), None)), "{since_trunk:?}");
+    assert!(!since_trunk.iter().any(|(_, path, _)| path == "kept"), "the unstaged edit is not in the index");
+    assert!(names(DiffSides::WorktreeAgainst(&trunk)).iter().any(|(c, path, _)| *c == b'M' && path == "kept"));
+    assert!(driver.diff(&repo, DiffSides::IndexAgainst(&parse(&git(&repo_path, &["rev-parse", "HEAD^{tree}"]))), &renames, None, 10).is_err(), "a checkout side needs a commit");
+
+    let patch = String::from_utf8(driver.diff_text(&repo, DiffSides::WorktreeAgainst(&head), &["kept".into()], Some(0), 1 << 20).unwrap()).unwrap();
+    assert!(patch.contains("@@ -2,0 +3 @@") && patch.contains("\n+added\n"), "{patch}");
+    assert!(!patch.contains("renamed") && !patch.contains("staged"), "only the named path: {patch}");
+    assert!(driver.diff_text(&repo, DiffSides::WorktreeAgainst(&head), &["*".into()], None, 1 << 20).is_err());
+
+    let status = |submodules| {
+        driver.status(&repo, Untracked::None, submodules, Ignored::Excluded, None, 10).unwrap().entries.iter()
+            .map(|e| String::from_utf8(e.path.clone()).unwrap()).collect::<Vec<_>>()
+    };
+    assert!(status(Submodules::Configured).contains(&"sub".to_string()));
+    assert_eq!(status(Submodules::IgnoreDirty), ["kept", "moved", "renamed", "staged"].map(String::from), "the submodule's own dirt is left out");
+
+    assert_eq!(driver.commit_time(&repo, &topic).unwrap().to_string(), git(&repo_path, &["log", "-1", "--format=%ct", &topic_text]));
+    assert_eq!(driver.count_commits(&repo, &topic, Some(&base)).unwrap(), 2);
+    assert_eq!(driver.count_commits(&repo, &topic, None).unwrap(), 3);
+    assert_eq!(driver.unmatched_commit_count(&repo, &trunk, &topic).unwrap(), 1, "the cherry-picked commit is matched");
+    assert_eq!(driver.unmatched_commit_count(&repo, &topic, &topic).unwrap(), 0);
+
+    let mut tracked = vec![];
+    let mut cursor = None;
+    loop {
+        let page = driver.tracked_paths(&repo, cursor, 2).unwrap();
+        tracked.extend(page.entries);
+        if page.complete { break; }
+        cursor = page.next_cursor;
+    }
+    assert_eq!(tracked, ["kept", "picked", "renamed", "staged", "sub"].map(|p| p.as_bytes().to_vec()));
+    assert_eq!(driver.remote_url(&repo, "origin").unwrap(), "https://example.invalid/fixture.git");
+    let _ = fs::remove_dir_all(&root);
+}
+
+// Provisioning (`fgos worktree create`) records what it placed, ignored bytes included; no other
+// status reader asks for ignored paths, so this is their only proof.
+#[test]
+fn status_lists_ignored_paths_collapsed_only_when_asked() {
+    use std::os::unix::fs::PermissionsExt;
+    let root = std::env::temp_dir().join(format!("fgos-inspect-ignored-{}", std::process::id()));
+    let _ = fs::remove_dir_all(&root);
+    fs::create_dir(&root).unwrap();
+    fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+    git(&root, &["init", "-q", "repo"]);
+    let repo_path = root.join("repo");
+    fs::write(repo_path.join(".gitignore"), "node_modules/\n*.log\n").unwrap();
+    git(&repo_path, &["add", "."]);
+    git(&repo_path, &["-c", "user.name=F", "-c", "user.email=f@example.invalid", "commit", "-qm", "init"]);
+    for (rel, bytes) in [("node_modules/x/i.js", "n"), ("mixed/u.txt", "u"), ("mixed/x.log", "l"), ("root.log", "r"), ("new.js", "u")] {
+        let file = repo_path.join(rel);
+        fs::create_dir_all(file.parent().unwrap()).unwrap();
+        fs::write(file, bytes).unwrap();
+    }
+    let driver = GitDriver::new(&root).unwrap();
+    let repo = match driver.resolve_repo(&repo_path, &repo_path).unwrap() {
+        ResolveRepo::Repository(r) => r,
+        _ => panic!(),
+    };
+    let listed = |ignored| {
+        let mut entries = driver.status(&repo, Untracked::Normal, Submodules::Configured, ignored, None, 100).unwrap().entries
+            .into_iter().map(|e| (String::from_utf8(e.path).unwrap(), e.untracked, e.ignored)).collect::<Vec<_>>();
+        entries.sort();
+        entries
+    };
+    let untracked = vec![("mixed/".to_string(), true, false), ("new.js".to_string(), true, false)];
+    assert_eq!(listed(Ignored::Excluded), untracked, "ignored paths are left out unless asked for");
+    let mut all = untracked;
+    all.extend([("mixed/x.log".to_string(), false, true), ("node_modules/".to_string(), false, true), ("root.log".to_string(), false, true)]);
+    all.sort();
+    assert_eq!(listed(Ignored::Listed), all, "a wholly ignored directory is collapsed; an ignored file in an untracked one is named");
+    let _ = fs::remove_dir_all(&root);
 }

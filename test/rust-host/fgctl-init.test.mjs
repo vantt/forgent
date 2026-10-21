@@ -8,7 +8,7 @@ import { spawnSync, spawn, execFileSync } from 'node:child_process';
 import { REPO_ROOT, releaseOutputDir } from '../../scripts/build-rust-distribution.mjs';
 import { releaseBinaryPath } from '../../src/util/release-binary-path.mjs';
 import { holdLock } from './fgctl-lock-holder.mjs';
-import { useReleaseFixture, FGCTL_BIN, fixture, runFgctl, runShim, waitForProcess } from './fgctl-init-fixture.mjs';
+import { useReleaseFixture, FGCTL_BIN, fixture, runFgctl, runShim, waitForProcess, withoutActiveRelease } from './fgctl-init-fixture.mjs';
 
 useReleaseFixture();
 
@@ -94,7 +94,7 @@ test('R11 & R1-R8, R10: fgctl init in a fresh git project publishes shims, root.
     // 8. version --runtime-json through the shim reports R10 fields with host: "rust"
     const versionRes = runShim(shimFgos, ['version', '--runtime-json'], {
       cwd: tempProj,
-      env: { ...process.env, FGOS_STATE_HOME: tempState, HOME: tempHome },
+      env: { ...withoutActiveRelease(process.env), FGOS_STATE_HOME: tempState, HOME: tempHome },
       encoding: 'utf8',
     });
     assert.equal(versionRes.status, 0, `version --runtime-json must exit 0: ${versionRes.stderr}`);
@@ -117,14 +117,14 @@ test('R11 & R1-R8, R10: fgctl init in a fresh git project publishes shims, root.
     // 9. ready --json through the shim matches node bin/fgos.mjs ready --json
     const shimReadyRes = runShim(shimFgos, ['ready', '--json'], {
       cwd: tempProj,
-      env: { ...process.env, FGOS_STATE_HOME: tempState, HOME: tempHome },
+      env: { ...withoutActiveRelease(process.env), FGOS_STATE_HOME: tempState, HOME: tempHome },
       encoding: 'utf8',
     });
     assert.equal(shimReadyRes.status, 0, `shim ready --json must exit 0: ${shimReadyRes.stderr}`);
 
     const nodeReadyRes = spawnSync('node', [path.resolve(REPO_ROOT, 'bin/fgos.mjs'), 'ready', '--json'], {
       cwd: tempProj,
-      env: { ...process.env, FGOS_STATE_HOME: tempState, HOME: tempHome },
+      env: { ...withoutActiveRelease(process.env), FGOS_STATE_HOME: tempState, HOME: tempHome },
       encoding: 'utf8',
     });
     assert.equal(nodeReadyRes.status, 0, `node ready --json must exit 0: ${nodeReadyRes.stderr}`);
@@ -338,7 +338,7 @@ test('Item 1: Concurrent fgctl init invocations against pre-staged pinned worksp
     const procs = Array.from({ length: procCount }, () =>
       spawn(FGCTL_BIN, ['init'], {
         cwd: tempProj,
-        env: { ...process.env, FGOS_STATE_HOME: tempState, HOME: tempHome },
+        env: { ...withoutActiveRelease(process.env), FGOS_STATE_HOME: tempState, HOME: tempHome },
         stdio: ['ignore', 'pipe', 'pipe'],
       })
     );

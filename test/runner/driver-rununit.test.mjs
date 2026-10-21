@@ -16,6 +16,7 @@ import { operationsForStep, getDomain } from '../../src/state/domain-registry.mj
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+import { activateGitFixture } from '../helpers/git-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -67,6 +68,7 @@ function setupRepo({ capabilities } = {}) {
   fs.writeFileSync(path.join(repo, '.gitignore'), '.fgos/\n');
   git(repo, ['add', '.']);
   git(repo, ['commit', '-m', 'initial']);
+  activateGitFixture(repo);
 
   const scriptDir = makeFixtureDir('fgos-driver-rununit-bin-');
   const script = path.join(scriptDir, 'worker.mjs');

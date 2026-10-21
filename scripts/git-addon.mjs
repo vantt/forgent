@@ -2,16 +2,24 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { ensureGitAddon as buildGitAddon, gitAddonSourceDigest, REPO_ROOT } from './run-tests.mjs';
-export { REPO_ROOT as root } from './run-tests.mjs';
+import { ensureGitAddon as buildGitAddon, gitAddonSourceDigest, gitAddonDirectory, GIT_ADDON_SOURCE_DIGEST_FILE, REPO_ROOT } from './lib/git-addon-stage.mjs';
+export { REPO_ROOT as root } from './lib/git-addon-stage.mjs';
+import { devHostEnv } from './lib/dev-host-manifest.mjs';
+import { hashFile } from './build-rust-distribution.mjs';
 import { loadNativeAddon } from '../src/git/native.mjs';
 export function ensureGitAddon(env = process.env, cwd = REPO_ROOT, locked = true) {
-  const manifest = path.join(cwd, '.fgos/runtime/git-addon/native-addon.json');
+  const directory = gitAddonDirectory(cwd);
+  const manifest = path.join(directory, 'manifest.json');
   try {
-    const value = JSON.parse(fs.readFileSync(manifest, 'utf8'));
-    if (value.sourceDigest === gitAddonSourceDigest(cwd)) {
+    if (fs.readFileSync(path.join(directory, GIT_ADDON_SOURCE_DIGEST_FILE), 'utf8') === gitAddonSourceDigest(cwd)) {
+      const value = JSON.parse(fs.readFileSync(manifest, 'utf8'));
       loadNativeAddon({ descriptor: { manifest: value, releaseRoot: cwd } });
-      return { manifest, addon: path.join(cwd, value.components.nativeAddon.path) };
+      const hostBin = path.join(cwd, value.entries.fgos);
+      if (!fs.existsSync(hostBin)) throw new Error('staged host missing');
+      // bin/fgos.mjs is part of the manifest; a stale digest rebuilds it below.
+      if (value.components.legacyNode.digest !== hashFile(path.join(cwd, 'bin/fgos.mjs'))) throw new Error('legacy payload changed');
+      Object.assign(env, devHostEnv({}, { fgosBin: hostBin, checkoutRoot: cwd, manifestPath: manifest }));
+      return { manifest, hostBin, addon: path.join(cwd, value.components.nativeAddon.path) };
     }
   } catch {}
   return buildGitAddon(env, cwd, locked);

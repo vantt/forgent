@@ -7,7 +7,7 @@ import path from 'node:path';
 import { spawnSync, execFileSync } from 'node:child_process';
 import { computeArtifactDigest, hashFile } from '../../scripts/build-rust-distribution.mjs';
 import { holdLock } from './fgctl-lock-holder.mjs';
-import { useReleaseFixture, releaseDirName, fixture, runFgctl, runShim, pathWithGcLeakingGit, processesUnder } from './fgctl-init-fixture.mjs';
+import { useReleaseFixture, releaseDirName, fixture, runFgctl, runShim, pathWithGcLeakingGit, processesUnder, withoutActiveRelease } from './fgctl-init-fixture.mjs';
 
 useReleaseFixture();
 
@@ -285,7 +285,7 @@ test('P7: Local runtime tail failure leaves workspace in diagnosable state with 
     const shimFgos = path.join(tempProj, '.fgos', 'installation', 'bin', 'fgos');
     const versionRes = runShim(shimFgos, ['version', '--runtime-json'], {
       cwd: tempProj,
-      env: { ...process.env, FGOS_STATE_HOME: tempState, HOME: tempHome },
+      env: { ...withoutActiveRelease(process.env), FGOS_STATE_HOME: tempState, HOME: tempHome },
       encoding: 'utf8',
     });
     assert.equal(versionRes.status, 0, `version --runtime-json must work: ${versionRes.stderr}`);
@@ -309,7 +309,7 @@ test('holder-lock gate: a git that leaves a background gc while it borrows a loc
   // The borrow vectors build their throwaway repository under TMPDIR: pin it so the escaped gc can be looked for.
   const tempTmp = path.join(root, 'tmp');
   try {
-    for (const dir of [tempHome, tempState, tempProj, tempTmp]) fs.mkdirSync(dir);
+    for (const dir of [tempHome, tempState, tempProj, tempTmp]) fs.mkdirSync(dir, { mode: 0o700 });
     execFileSync('git', ['init'], { cwd: tempProj });
 
     const res = runFgctl(['init', '--from', fixture.releaseDir], {
@@ -335,7 +335,7 @@ test('holder-lock gate: init with the real git passes the gate and checks both l
   const tempState = path.join(root, 'state');
   const tempProj = path.join(root, 'proj');
   try {
-    for (const dir of [tempHome, tempState, tempProj]) fs.mkdirSync(dir);
+    for (const dir of [tempHome, tempState, tempProj]) fs.mkdirSync(dir, { mode: 0o700 });
     execFileSync('git', ['init'], { cwd: tempProj });
 
     const res = runFgctl(['init', '--from', fixture.releaseDir], { cwd: tempProj, stateHome: tempState, env: { HOME: tempHome } });

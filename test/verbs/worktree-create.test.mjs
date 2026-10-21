@@ -28,7 +28,7 @@ test('public worktree create use case returns path and branch through the native
 
 test('CLI adapter creates the checkout and emits the public JSON envelope', {skip:process.platform==='win32'},async()=>{
   const { execFileSync }=await import('node:child_process');
-  const { ensureHostBin, REPO_ROOT }=await import('../../scripts/run-tests.mjs');
+  const { ensureHostBin, REPO_ROOT }=await import('../../scripts/lib/git-addon-stage.mjs');
   const f=fixture('files',true);
   try {
     // The payload manifest resolves its host inside the checkout; a host built under an

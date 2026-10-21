@@ -1,4 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
+import { activateGitFixture } from './worktree-native-fixture.helper.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -7,7 +8,8 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import {
   createClaimWorktree,
-  withMergeEphemeralWorktree,
+  createVerifyCheckout,
+  removeWorktree,
   createDispatchWorktree,
   removeDispatchWorktree,
   branchNameFor,
@@ -25,6 +27,7 @@ function initTempRepo() {
   fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
   return repoRoot;
 }
 
@@ -48,55 +51,30 @@ test('createClaimWorktree is a passthrough to createWorktree (branch, path, base
   assert.ok(fs.existsSync(wt.path));
 });
 
-// --- merge-ephemeral -----------------------------------------------------
+// --- verification checkout ---------------------------------------------
 
-test('withMergeEphemeralWorktree creates a worktree, runs fn, and removes the checkout on success', async () => {
+test('createVerifyCheckout checks out the exact commit detached, and removeWorktree removes only the checkout', () => {
   const repoRoot = initTempRepo();
-  // Merge-ephemeral always targets an existing branch — create it first,
-  // the same shape approve/catchup rely on.
-  execFileSync('git', ['branch', branchNameFor('merge-item'), 'HEAD'], { cwd: repoRoot });
-  const startCommit = execFileSync('git', ['rev-parse', branchNameFor('merge-item')], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  execFileSync('git', ['branch', branchNameFor('verify-item'), 'HEAD'], { cwd: repoRoot });
+  const tip = execFileSync('git', ['rev-parse', branchNameFor('verify-item')], { cwd: repoRoot, encoding: 'utf8' }).trim();
 
-  let seenPath;
-  const result = await withMergeEphemeralWorktree(repoRoot, 'merge-item', async (worktree) => {
-    seenPath = worktree.path;
-    assert.equal(worktree.branch, 'fgw/merge-item');
-    // Detached at the branch's tip commit, not a checkout of the branch
-    // ref itself — see createDetachedMergeWorktree's own docstring.
-    assert.equal(worktree.startCommit, startCommit);
-    assert.ok(fs.existsSync(worktree.path));
-    return { outcome: 'merged' };
-  });
+  const checkout = createVerifyCheckout(repoRoot, tip);
+  assert.equal(execFileSync('git', ['rev-parse', 'HEAD'], { cwd: checkout, encoding: 'utf8' }).trim(), tip);
+  assert.throws(() => execFileSync('git', ['symbolic-ref', '-q', 'HEAD'], { cwd: checkout, stdio: 'pipe' }), 'detached at the commit, never a checkout of the branch ref');
 
-  assert.deepEqual(result, { outcome: 'merged' });
-  assert.equal(fs.existsSync(seenPath), false);
-  // the branch itself survives teardown — only the checkout is ephemeral.
-  const branches = execFileSync('git', ['branch', '--list', 'fgw/merge-item'], { cwd: repoRoot, encoding: 'utf8' });
-  assert.match(branches, /fgw\/merge-item/);
-});
-
-test('withMergeEphemeralWorktree still removes the checkout when fn throws, and propagates the error', async () => {
-  const repoRoot = initTempRepo();
-  execFileSync('git', ['branch', branchNameFor('merge-item-fail'), 'HEAD'], { cwd: repoRoot });
-
-  let seenPath;
-  await assert.rejects(
-    withMergeEphemeralWorktree(repoRoot, 'merge-item-fail', async (worktree) => {
-      seenPath = worktree.path;
-      throw new Error('boom');
-    }),
-    /boom/,
-  );
-
-  assert.equal(fs.existsSync(seenPath), false);
+  removeWorktree(repoRoot, checkout, { force: true });
+  assert.equal(fs.existsSync(checkout), false);
+  // the branch itself survives teardown — only the checkout is disposable.
+  const branches = execFileSync('git', ['branch', '--list', 'fgw/verify-item'], { cwd: repoRoot, encoding: 'utf8' });
+  assert.match(branches, /fgw\/verify-item/);
 });
 
 // tsk-5yp repro: a person keeps a worktree open on the root branch
-// (ExitWorktree "keep") while a child item is approved/merged into that
-// same branch. withMergeEphemeralWorktree must never move or remove that
-// kept-open checkout, even though it is clean — docs/history/
+// (ExitWorktree "keep") while a child item's landed tree is verified.
+// The verification checkout must never move or remove that kept-open
+// checkout, even though it is clean — docs/history/
 // merge-worktree-reclaim-clobbers-kept-checkout/CONTEXT.md D1.
-test('withMergeEphemeralWorktree never touches a separate, kept-open checkout of the same branch', async () => {
+test('createVerifyCheckout never touches a separate, kept-open checkout of the same branch', () => {
   const repoRoot = initTempRepo();
   const rootBranch = branchNameFor('root-item');
   execFileSync('git', ['branch', rootBranch, 'HEAD'], { cwd: repoRoot });
@@ -106,28 +84,18 @@ test('withMergeEphemeralWorktree never touches a separate, kept-open checkout of
   const keptPath = mkWorktreeDir();
   fs.rmdirSync(keptPath);
   execFileSync('git', ['worktree', 'add', keptPath, rootBranch], { cwd: repoRoot });
+  const rootTip = execFileSync('git', ['rev-parse', rootBranch], { cwd: repoRoot, encoding: 'utf8' }).trim();
 
-  const result = await withMergeEphemeralWorktree(repoRoot, 'root-item', async (worktree) => {
-    fs.writeFileSync(path.join(worktree.path, 'merged.txt'), 'from child merge\n');
-    execFileSync('git', ['add', 'merged.txt'], { cwd: worktree.path });
-    execFileSync('git', ['commit', '-q', '-m', 'merge child into root'], { cwd: worktree.path });
-    return { outcome: 'merged' };
-  });
-
-  assert.deepEqual(result, { outcome: 'merged' });
+  const checkout = createVerifyCheckout(repoRoot, rootTip);
+  removeWorktree(repoRoot, checkout, { force: true });
 
   // The kept-open checkout is completely untouched: still on disk, still
-  // registered in `git worktree list`, still readable.
-  assert.ok(fs.existsSync(keptPath), 'kept-open worktree directory must survive the merge');
+  // registered in `git worktree list`, still on the branch's same tip.
+  assert.ok(fs.existsSync(keptPath), 'kept-open worktree directory must survive');
   const listing = execFileSync('git', ['worktree', 'list', '--porcelain'], { cwd: repoRoot, encoding: 'utf8' }).replaceAll('\\', '/');
   const normalizedKeptPath = keptPath.replaceAll('\\', '/');
   assert.match(listing, new RegExp(`worktree ${normalizedKeptPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
-
-  // The merge's own commit landed on the real branch (fast-forwarded), not
-  // just on the disposable ephemeral checkout.
-  const rootTip = execFileSync('git', ['rev-parse', rootBranch], { cwd: repoRoot, encoding: 'utf8' }).trim();
-  const rootLog = execFileSync('git', ['log', '-1', '--format=%s', rootTip], { cwd: repoRoot, encoding: 'utf8' }).trim();
-  assert.equal(rootLog, 'merge child into root');
+  assert.equal(execFileSync('git', ['rev-parse', 'HEAD'], { cwd: keptPath, encoding: 'utf8' }).trim(), rootTip);
 });
 
 // --- runner-dispatch -----------------------------------------------------
@@ -140,6 +108,7 @@ test('createDispatchWorktree is a passthrough to createWorktree (worktreeDir/bas
   execFileSync('git', ['checkout', 'root-branch'], { cwd: repoRoot });
   fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed on root\n');
   execFileSync('git', ['commit', '-aq', '-m', 'root-only commit'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
   execFileSync('git', ['checkout', initialBranch], { cwd: repoRoot });
 
   const wt = createDispatchWorktree(repoRoot, 'leaf-item', { worktreeDir, baseRef: 'root-branch' });

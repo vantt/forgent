@@ -57,3 +57,10 @@ test('a dirty file that cannot be read is recorded, not a crash', { skip: proces
     fs.chmodSync(file, 0o600);
   }
 });
+
+test('a partial-write snapshot preserves the path-list ceiling beyond one native page', () => {
+  const { repoRoot, worktree } = repoWithWorktree();
+  const dir = path.join(worktree, 'many');fs.mkdirSync(dir);
+  for(let i=0;i<4100;i++)fs.writeFileSync(path.join(dir,`${i}`),'x');
+  assert.equal(Object.keys(worktreeSnapshot({worktree,repoRoot}).files).length,4100);
+});

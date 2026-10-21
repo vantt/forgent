@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import {
   RESPONSIBILITIES,
   scanRunInitSites,
@@ -211,7 +212,7 @@ test('checkAdmission does not flag a marker on the line immediately above the vi
 });
 
 test('addedLinesFromGitDiff returns [] for an empty scope without touching git at all', () => {
-  const rows = addedLinesFromGitDiff([], { exec: () => { throw new Error('must not be called'); } });
+  const rows = addedLinesFromGitDiff([], { readPatch: () => { throw new Error('must not be called'); } });
   assert.deepEqual(rows, []);
 });
 
@@ -227,12 +228,32 @@ test('addedLinesFromGitDiff extracts only added lines with correct new-file line
     '+another added line',
     '',
   ].join('\n');
-  const rows = addedLinesFromGitDiff(['test/x.test.mjs'], { exec: () => diff });
+  const rows = addedLinesFromGitDiff(['test/x.test.mjs'], { readPatch: () => diff });
   assert.equal(rows.length, 2);
   assert.equal(rows[0].file, 'test/x.test.mjs');
   assert.equal(rows[0].line, 5);
   assert.equal(rows[0].text, "run(cwd, ['init']);");
   assert.equal(rows[1].line, 6);
+});
+
+test('addedLinesFromGitDiff reads the work tree against the base commit for the scoped files only', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'proof-inventory-diff-'));
+  const git = (...args) => execFileSync('git', args, { cwd: root, encoding: 'utf8' });
+  git('init', '-q', '-b', 'main');
+  git('config', 'user.email', 'test@example.com');
+  git('config', 'user.name', 'Test');
+  fs.mkdirSync(path.join(root, 'test'));
+  fs.writeFileSync(path.join(root, 'test/x.test.mjs'), 'one\ntwo\n');
+  fs.writeFileSync(path.join(root, 'test/other.test.mjs'), 'a\n');
+  git('add', '-A');
+  git('commit', '-qm', 'seed');
+  fs.writeFileSync(path.join(root, 'test/x.test.mjs'), 'one\nadded\nnext\ntwo\n');
+  fs.writeFileSync(path.join(root, 'test/other.test.mjs'), 'a\nout of scope\n');
+
+  assert.deepEqual(addedLinesFromGitDiff(['test/x.test.mjs'], { cwd: root }), [
+    { file: 'test/x.test.mjs', line: 2, text: 'added', prevText: null },
+    { file: 'test/x.test.mjs', line: 3, text: 'next', prevText: 'added' },
+  ]);
 });
 
 test('scanTestCalls splits title from body and is not fooled by parens inside strings, templates, regexes or comments', () => {

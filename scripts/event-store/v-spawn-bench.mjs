@@ -7,6 +7,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFileSync, spawn } from 'node:child_process';
 import { performance } from 'node:perf_hooks';
 import { resolveActiveHostBin } from '../../src/util/host-bin-path.mjs';
+import { inspectRepo } from '../lib/git-ports.mjs';
+import { sandboxGit } from '../lib/sandbox-git.mjs';
 
 export function percentile(values, fraction) {
   const sorted = [...values].sort((a, b) => a - b);
@@ -42,8 +44,11 @@ export async function benchmark({ root, out, samples = 40, sessions = [1, 10, 15
   // A private native state root prevents fixture locks/config from sharing the checkout's state.
   env.FGOS_STATE_ROOT = path.join(root, '.machine-state');
   fs.mkdirSync(root);
-  const git = (...args) => execFileSync('git', args, { cwd: root, env, encoding: 'utf8' }).trim();
-  git('init', '-q'); git('-c', 'user.name=Benchmark', '-c', 'user.email=benchmark@fgos.invalid', 'commit', '--allow-empty', '-qm', 'benchmark fixture');
+  const git = sandboxGit(root, { env });
+  git(['init', '-q'], { cwd: root }); git(['-c', 'user.name=Benchmark', '-c', 'user.email=benchmark@fgos.invalid', 'commit', '--allow-empty', '-qm', 'benchmark fixture'], { cwd: root });
+  const inspect = inspectRepo(checkout, env);
+  const head = inspect.resolveCommit({ name: 'HEAD' });
+  const fix = inspect.resolveCommit({ name: 'a4b1278ae' });
   let active = 0; let peak = 0;
   const call = (args, writer) => new Promise(resolve => {
     const start = performance.now();
@@ -58,7 +63,7 @@ export async function benchmark({ root, out, samples = 40, sessions = [1, 10, 15
   const seed = `import {initStore,addWork} from ${JSON.stringify(pathToFileURL(path.join(checkout, 'src/state/store.mjs')).href)};
 const dir=process.argv[1]; initStore(dir); for(const id of JSON.parse(process.argv[2])) addWork(dir,{id,title:id,kind:'task',status:'todo',workflowStep:'executing',deps:[],risk:'light',refs:[],verify:'true'});`;
   const rows = [];
-  const result = { contract: 'v-spawn-benchmark.v1', entry, command: entry === 'host' ? 'fgos (PATH shim, activated release)' : 'node bin/fgos.mjs (working-tree payload)', generatedAt: new Date().toISOString(), checkout, commit: execFileSync('git', ['rev-parse', 'HEAD'], {cwd: checkout, encoding: 'utf8'}).trim(), containsReadClaimsFix: (() => { try {execFileSync('git', ['merge-base', '--is-ancestor', 'a4b1278ae', 'HEAD'], {cwd: checkout}); return true;} catch {return false;} })(), filesystem, mount: execFileSync('findmnt', ['-T', parent, '-n', '-o', 'SOURCE,FSTYPE'], {encoding:'utf8'}).trim(), root, hostBin, node: process.version, cpu: os.cpus()[0].model, logicalCpus: os.cpus().length, samples, sessions, rows };
+  const result = { contract: 'v-spawn-benchmark.v1', entry, command: entry === 'host' ? 'fgos (PATH shim, activated release)' : 'node bin/fgos.mjs (working-tree payload)', generatedAt: new Date().toISOString(), checkout, commit: head, containsReadClaimsFix: fix !== null && inspect.ancestry({ ancestor: fix, descendant: head }).answer === 'yes', filesystem, mount: execFileSync('findmnt', ['-T', parent, '-n', '-o', 'SOURCE,FSTYPE'], {encoding:'utf8'}).trim(), root, hostBin, node: process.version, cpu: os.cpus()[0].model, logicalCpus: os.cpus().length, samples, sessions, rows };
   for (const mutation of ['claim', 'move', 'settle']) for (const concurrency of sessions) {
     const ids = Array.from({length: samples}, (_, i) => `bench-${mutation}-${concurrency}-${i}`);
     execFileSync(process.execPath, ['--input-type=module', '-e', seed, path.join(root, '.fgos'), JSON.stringify(ids)], {cwd: root, env: {...env, FGOS_SESSION_ID:'bench-seed'}, stdio:'pipe'});
@@ -90,13 +95,13 @@ async function storeIncrementBenchmark({root,out,sessions,filesystem,checkout,st
   fs.mkdirSync(root);
   const stateRoot=path.join(root,'state');fs.mkdirSync(stateRoot,{mode:0o700});
   const result={contract:'v-spawn-store-increment.v1',filesystem,checkout,
-    commit:execFileSync('git',['rev-parse','HEAD'],{cwd:checkout,encoding:'utf8'}).trim(),
+    commit:inspectRepo(checkout).resolveCommit({name:'HEAD'}),
     node:process.version,cpu:os.cpus()[0].model,rows:[],verdict:'FAIL'};
   const env={...process.env};for(const k of Object.keys(env))if(k.startsWith('GIT_'))delete env[k];
+  const git=sandboxGit(root,{env});
   for(const concurrency of sessions){
     const repo=path.join(root,`sessions-${concurrency}`);fs.mkdirSync(repo);
-    const git=(...args)=>execFileSync('git',['-C',repo,...args],{env,stdio:'pipe'});
-    git('init','-q');git('config','fgos.machineId','spawn-benchmark');
+    git(['-C',repo,'init','-q'],{stdio:'pipe'});git(['-C',repo,'config','fgos.machineId','spawn-benchmark'],{stdio:'pipe'});
     fs.mkdirSync(path.join(repo,'.git/fgos/events/locks'),{recursive:true,mode:0o700});
     const hot=path.join(repo,'.fgos');fs.mkdirSync(hot);
     const fence=path.join(hot,'locks/activation.lock');fs.mkdirSync(fence,{recursive:true});

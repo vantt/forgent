@@ -52,9 +52,12 @@ done
 node=$(command -v node)
 modprobe dm-flakey 2>/dev/null || true
 dmsetup targets | grep -q '^flakey' || die "dm-flakey target unavailable (modprobe dm-flakey)"
-[ -f "$checkout/.fgos/runtime/git-addon/native-addon.json" ] || die "build the addon first as yourself: node scripts/git-addon.mjs"
+# The staged addon's manifest, where scripts/git-addon.mjs puts it for this checkout.
+manifest=$(cd "$checkout" && "$node" --input-type=module -e "const [{ gitAddonDirectory }, path] = await Promise.all([import('./scripts/lib/git-addon-stage.mjs'), import('node:path')]); process.stdout.write(path.join(gitAddonDirectory(process.cwd()), 'manifest.json'))") || die "cannot locate the staged addon"
+[ -f "$manifest" ] || die "build the addon first as yourself: node scripts/git-addon.mjs"
 
-as_user() { setpriv --reuid="$SUDO_UID" --regid="$SUDO_GID" --init-groups env HOME="$(getent passwd "$SUDO_UID" | cut -d: -f6)" "$@"; }
+user_home=$(getent passwd "$SUDO_UID" | cut -d: -f6)
+as_user() { setpriv --reuid="$SUDO_UID" --regid="$SUDO_GID" --init-groups env HOME="$user_home" "$@"; }
 as_user mkdir -p "$image_dir"
 image_dir=$(cd "$image_dir" && pwd)
 [ "$(findmnt -n -o FSTYPE -T "$image_dir")" = ext4 ] || die "$image_dir is not on ext4"
@@ -93,7 +96,7 @@ for run in $(seq 1 "$runs"); do
   rm -f "$ack"; as_user touch "$ack"
   (cd "$checkout" && as_user "$node" scripts/event-store/power-loss-driver.mjs init "$mnt/store")
   sync
-  (cd "$checkout" && exec setpriv --reuid="$SUDO_UID" --regid="$SUDO_GID" --init-groups "$node" scripts/event-store/power-loss-driver.mjs write "$mnt/store" "$ack" "$seal_every") &
+  (cd "$checkout" && exec setpriv --reuid="$SUDO_UID" --regid="$SUDO_GID" --init-groups env HOME="$user_home" "$node" scripts/event-store/power-loss-driver.mjs write "$mnt/store" "$ack" "$seal_every") &
   writer=$!
   sleep "$((2 + RANDOM % 5)).$((RANDOM % 10))"
   # Power cut: freeze the writer, drop every later write, kill, unmount.

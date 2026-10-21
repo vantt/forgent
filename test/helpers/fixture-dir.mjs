@@ -19,7 +19,7 @@ let exitHookInstalled = false;
 function removeCreated() {
   if (process.env.FGOS_KEEP_TEST_FIXTURES) return;
   for (const dir of created) {
-    try { fs.rmSync(dir, { recursive: true, force: true }); } catch { /* best effort at exit */ }
+    try { fs.rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 }); } catch { /* best effort at exit */ }
   }
 }
 

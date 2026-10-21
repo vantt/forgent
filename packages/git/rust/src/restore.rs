@@ -1,4 +1,4 @@
-//! Dormant destructive checkout port. Snapshot and WAL always precede reset.
+//! Snapshot-backed checkout restore. Retained bytes and WAL precede reset.
 use crate::{
     refs::{failure, recovery, Authority},
     scoped_commit::{self as checkout, SavedPath},
@@ -23,6 +23,18 @@ pub struct RestoreRequest {
     pub reapply_local_delta: bool,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub allowed_replacements: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub checkout_baseline: Option<String>,
+    #[serde(default)]
+    pub discard_local_delta: bool,
+    #[serde(default)]
+    pub require_clean_baseline: bool,
+    #[serde(default)]
+    pub require_staged_only: bool,
+    /// Operator confirmation naming who approved discarding the main checkout's
+    /// local delta; valid only together with `discard_local_delta` on main.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub confirmed_by: Option<String>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -66,6 +78,36 @@ struct Snapshot {
     intent_to_add: Vec<String>,
     #[serde(default)]
     clean_modes: BTreeMap<String, u32>,
+    /// Stopped merge/cherry-pick/revert files a confirmed main discard clears.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    native_state: BTreeMap<String, SavedPath>,
+}
+/// Files of a stopped merge, cherry-pick or revert that `reset --hard` clears.
+const STOPPED_OPERATION_FILES: [&str; 6] = [
+    "MERGE_HEAD",
+    "MERGE_MSG",
+    "MERGE_MODE",
+    "AUTO_MERGE",
+    "CHERRY_PICK_HEAD",
+    "REVERT_HEAD",
+];
+/// Only a main-checkout discard carrying an operator confirmation may cover
+/// tracked `.fgos` paths, any target commit and stopped-operation residue.
+fn confirmed_main_discard(repo: &RepoHandle, request: &RestoreRequest) -> bool {
+    request.discard_local_delta
+        && repo.work_tree() == Some(repo.trusted_main_root())
+        && request
+            .confirmed_by
+            .as_deref()
+            .is_some_and(|who| !who.trim().is_empty())
+}
+/// Pathspec tail for diffs: `.fgos` is excluded unless the request covers it.
+fn pathspec(mut args: Vec<&str>, fgos_data: bool) -> Vec<&str> {
+    args.push("--");
+    if !fgos_data {
+        args.push(":!.fgos");
+    }
+    args
 }
 fn safe_path(root: &Path, name: &str) -> Result<()> {
     fgos_scope_literal(name)?;
@@ -101,6 +143,91 @@ fn data_path(name: &str) -> bool {
     name != ".fgos" && !name.starts_with(".fgos/")
 }
 impl GitDriver {
+    /// Whether tracked `.fgos` paths take part in this restore as data paths: a
+    /// confirmed main discard always covers them; an unconfirmed main-checkout
+    /// restore covers them only while Git sees every one equal to HEAD (index and
+    /// work tree, deletions and type changes included). A linked checkout never does.
+    fn fgos_data(&self, repo: &RepoHandle, scope: &LockScope<'_>, confirmed: bool) -> Result<bool> {
+        if confirmed {
+            return Ok(true);
+        }
+        if repo.work_tree() != Some(repo.trusted_main_root()) {
+            return Ok(false);
+        }
+        for args in [
+            &[
+                "diff",
+                "--name-only",
+                "--no-renames",
+                "--no-ext-diff",
+                "--no-textconv",
+                "-z",
+                "--",
+                ".fgos",
+            ][..],
+            &[
+                "diff",
+                "--cached",
+                "--name-only",
+                "--no-renames",
+                "--no-ext-diff",
+                "--no-textconv",
+                "--ita-visible-in-index",
+                "-z",
+                "HEAD",
+                "--",
+                ".fgos",
+            ][..],
+        ] {
+            if !self.checkout_bytes(repo, scope, args)?.is_empty() {
+                return Ok(false);
+            }
+        }
+        Ok(true)
+    }
+    pub(crate) fn restore_patch_paths(&self, repo: &RepoHandle) -> Result<Vec<std::path::PathBuf>> {
+        let HeadFact::Attached { target, .. } = self.resolve_head(repo)? else {
+            return Ok(vec![]);
+        };
+        let prefix = format!(
+            "{}-",
+            target
+                .as_str()
+                .trim_start_matches("refs/heads/")
+                .replace('/', "-")
+        );
+        let dir = repo.common_dir().join("fgos-resync-patches");
+        match fs::symlink_metadata(&dir) {
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(vec![]),
+            Ok(m) if m.is_dir() && !m.file_type().is_symlink() => (),
+            _ => return Err(failure("restore-patch-directory-unsafe")),
+        }
+        let mut paths = vec![];
+        for (i, entry) in fs::read_dir(dir).map_err(failure)?.enumerate() {
+            if i >= 4096 {
+                return Err(failure("restore-patch-list-capacity"));
+            }
+            let entry = entry.map_err(failure)?;
+            let name = entry.file_name();
+            if name
+                .to_str()
+                .is_some_and(|n| n.starts_with(&prefix) && n.ends_with(".patch"))
+            {
+                paths.push(entry.path());
+            }
+        }
+        paths.sort();
+        Ok(paths)
+    }
+    fn restore_patch_gate(&self, repo: &RepoHandle) -> Result<()> {
+        let paths = self.restore_patch_paths(repo)?;
+        if paths.is_empty() {
+            return Ok(());
+        }
+        let mut error = failure("restore-orphaned-patch: an interrupted restore left the patches in orphanedPaths; apply what is still wanted from each, then delete the patch files and restore again");
+        error.detail = Some(Box::new(serde_json::json!({"orphanedPaths":paths})));
+        Err(error)
+    }
     fn restore_checks(
         &self,
         repo: &RepoHandle,
@@ -120,12 +247,52 @@ impl GitDriver {
         if self.checkout_text(repo, scope, &["rev-parse", "HEAD"])? != head.as_str() {
             return Err(failure("restore-head-mismatch"));
         }
-        let reference = self.checkout_text(repo, scope, &["symbolic-ref", "-q", "HEAD"])?;
-        RefName::parse(&reference).map_err(failure)?;
-        if !self.ancestry(repo, &head, &target)? {
+        let reference = match self.resolve_head(repo)? {
+            HeadFact::Attached { target, .. } => target.as_str().to_owned(),
+            HeadFact::Detached { .. } => "HEAD".into(),
+            HeadFact::Unborn { .. } => return Err(failure("restore-unborn-head")),
+        };
+        let confirmed = confirmed_main_discard(repo, request);
+        if request.discard_local_delta
+            && repo.work_tree() == Some(repo.trusted_main_root())
+            && !confirmed
+        {
+            return Err(failure("restore-discard-requires-producer"));
+        }
+        if request.confirmed_by.is_some() && !confirmed {
+            return Err(failure("restore-confirmation-unexpected"));
+        }
+        if request.discard_local_delta && request.reapply_local_delta {
+            return Err(failure("restore-discard-reapply-conflict"));
+        }
+        let baseline = if let Some(baseline) = &request.checkout_baseline {
+            let requested = Oid::parse(baseline, repo.object_format())
+                .map_err(|_| failure("restore-baseline-mismatch"))?;
+            if !self
+                .ancestry(repo, &requested, &target)
+                .map_err(|_| failure("restore-baseline-mismatch"))?
+            {
+                return Err(failure("restore-baseline-mismatch"));
+            }
+            let reflog = self.checkout_text(
+                repo,
+                scope,
+                &["reflog", "show", "HEAD", "-n", "1", "--format=%H"],
+            )?;
+            if &reflog != baseline && reflog != request.target {
+                return Err(failure("restore-baseline-mismatch"));
+            }
+            Oid::parse(&reflog, repo.object_format()).map_err(failure)?
+        } else {
+            head.clone()
+        };
+        if !self.ancestry(repo, &baseline, &target)?
+            && !(request.discard_local_delta && self.ancestry(repo, &target, &head)?)
+            && !confirmed
+        {
             return Err(failure("restore-target-not-descendant"));
         }
-        self.restore_native_gate(repo, scope)?;
+        self.restore_native_gate(repo, scope, confirmed)?;
         let status = self.checkout_bytes(
             repo,
             scope,
@@ -140,13 +307,22 @@ impl GitDriver {
         let entries =
             checkout::paths(&self.checkout_bytes(repo, scope, &["ls-files", "--stage", "-z"])?)?;
         if entries.iter().any(|e| {
-            e.starts_with("160000 ") || !e.split('\t').next().is_some_and(|h| h.ends_with(" 0"))
+            e.starts_with("160000 ")
+                || (!confirmed && !e.split('\t').next().is_some_and(|h| h.ends_with(" 0")))
         }) {
             return Err(failure("restore-unsupported-index"));
         }
         let flags =
             checkout::paths(&self.checkout_bytes(repo, scope, &["ls-files", "-v", "-z"])?)?;
-        if flags.iter().any(|p| !p.starts_with("H ")) {
+        let linked = repo.work_tree() != Some(repo.trusted_main_root());
+        if linked && fs::symlink_metadata(checkout::root(repo)?.join(".fgos")).is_ok() {
+            return Err(failure("restore-worker-state-preserved"));
+        }
+        if flags.iter().any(|p| {
+            !p.starts_with("H ")
+                && !(linked && p.starts_with("S .fgos/"))
+                && !(confirmed && p.starts_with("M "))
+        }) {
             return Err(failure("restore-index-flags-unsupported"));
         }
         let tracked: BTreeSet<_> =
@@ -158,13 +334,18 @@ impl GitDriver {
             scope,
             &["ls-tree", "-r", "--name-only", "-z", target.as_str()],
         )?)?;
-        if tracked
-            .iter()
-            .chain(target_paths.iter())
-            .any(|p| !data_path(p))
-        {
+        let fgos_data = self.fgos_data(repo, scope, confirmed)?;
+        if !linked && !fgos_data {
             return Err(failure("restore-protected-fgos-path"));
         }
+        let tracked: BTreeSet<_> = tracked
+            .into_iter()
+            .filter(|p| fgos_data || data_path(p))
+            .collect();
+        let target_paths: Vec<_> = target_paths
+            .into_iter()
+            .filter(|p| fgos_data || data_path(p))
+            .collect();
         let target_entries =
             self.checkout_bytes(repo, scope, &["ls-tree", "-r", "-z", target.as_str()])?;
         if target_entries
@@ -266,14 +447,19 @@ impl GitDriver {
             safe_path(checkout::root(repo)?, p)?;
         }
         Ok(RestorePreview {
-            head: head.as_str().into(),
+            head: baseline.as_str().into(),
             reference,
             target: target.as_str().into(),
             status,
             paths: paths.into_iter().collect(),
         })
     }
-    fn restore_native_gate(&self, repo: &RepoHandle, scope: &LockScope<'_>) -> Result<()> {
+    fn restore_native_gate(
+        &self,
+        repo: &RepoHandle,
+        scope: &LockScope<'_>,
+        tolerate_stopped_operation: bool,
+    ) -> Result<()> {
         fgos_holder_lock::validate_quiescent(checkout::handle(scope, repo)?).map_err(failure)?;
         for name in [
             "index.lock",
@@ -285,6 +471,11 @@ impl GitDriver {
             "rebase-apply",
             "sequencer",
         ] {
+            if tolerate_stopped_operation
+                && matches!(name, "MERGE_HEAD" | "CHERRY_PICK_HEAD" | "REVERT_HEAD")
+            {
+                continue;
+            }
             match fs::symlink_metadata(repo.git_dir.join(name)) {
                 Ok(_) if name == "index.lock" => return Err(recovery(crate::native_lock::UNOWNED_INDEX_LOCK)),
                 Ok(_) => return Err(recovery(format!("restore-native-state: {name}"))),
@@ -300,10 +491,57 @@ impl GitDriver {
         scope: &LockScope<'_>,
         preview: &RestorePreview,
         operation_id: &str,
+        confirmed: bool,
     ) -> Result<Snapshot> {
         let mut remaining = 32 * 1024 * 1024;
-        let mut local_paths = self.dirty_paths(repo, scope)?;
-        local_paths.extend(self.staged(repo, scope)?);
+        let fgos_data = self.fgos_data(repo, scope, confirmed)?;
+        let mut local_paths = checkout::paths(&self.checkout_bytes(
+            repo,
+            scope,
+            &pathspec(
+                vec![
+                    "diff",
+                    "--name-only",
+                    "--no-renames",
+                    "--no-ext-diff",
+                    "--no-textconv",
+                    "-z",
+                    &preview.head,
+                ],
+                fgos_data,
+            ),
+        )?)?;
+        local_paths.extend(checkout::paths(&self.checkout_bytes(
+            repo,
+            scope,
+            &pathspec(
+                vec![
+                    "diff",
+                    "--cached",
+                    "--name-only",
+                    "--no-renames",
+                    "--no-ext-diff",
+                    "--no-textconv",
+                    "-z",
+                    &preview.head,
+                ],
+                fgos_data,
+            ),
+        )?)?);
+        // Untracked `.fgos` runtime state is never part of a restore.
+        local_paths.extend(checkout::paths(&self.checkout_bytes(
+            repo,
+            scope,
+            &[
+                "ls-files",
+                "--others",
+                "--exclude-standard",
+                "-z",
+                "--",
+                ":!.fgos",
+            ],
+        )?)?);
+        local_paths.retain(|p| fgos_data || data_path(p));
         local_paths.sort();
         local_paths.dedup();
         let head_paths: BTreeSet<_> = checkout::paths(&self.checkout_bytes(
@@ -334,26 +572,32 @@ impl GitDriver {
         let visible = checkout::paths(&self.checkout_bytes(
             repo,
             scope,
-            &[
-                "diff",
-                "--cached",
-                "--name-only",
-                "-z",
-                "--ita-visible-in-index",
-                &preview.head,
-            ],
+            &pathspec(
+                vec![
+                    "diff",
+                    "--cached",
+                    "--name-only",
+                    "-z",
+                    "--ita-visible-in-index",
+                    &preview.head,
+                ],
+                fgos_data,
+            ),
         )?)?;
         let hidden = checkout::paths(&self.checkout_bytes(
             repo,
             scope,
-            &[
-                "diff",
-                "--cached",
-                "--name-only",
-                "-z",
-                "--ita-invisible-in-index",
-                &preview.head,
-            ],
+            &pathspec(
+                vec![
+                    "diff",
+                    "--cached",
+                    "--name-only",
+                    "-z",
+                    "--ita-invisible-in-index",
+                    &preview.head,
+                ],
+                fgos_data,
+            ),
         )?)?;
         let intent_to_add = visible
             .into_iter()
@@ -363,39 +607,48 @@ impl GitDriver {
         let staged_patch = self.checkout_bytes(
             repo,
             scope,
-            &[
-                "diff",
-                "--cached",
-                "--binary",
-                "--full-index",
-                "--no-ext-diff",
-                "--no-textconv",
-                &preview.head,
-            ],
+            &pathspec(
+                vec![
+                    "diff",
+                    "--cached",
+                    "--binary",
+                    "--full-index",
+                    "--no-ext-diff",
+                    "--no-textconv",
+                    &preview.head,
+                ],
+                fgos_data,
+            ),
         )?;
         let worktree_patch = self.checkout_bytes(
             repo,
             scope,
-            &[
-                "diff",
-                "--binary",
-                "--full-index",
-                "--no-ext-diff",
-                "--no-textconv",
-            ],
+            &pathspec(
+                vec![
+                    "diff",
+                    "--binary",
+                    "--full-index",
+                    "--no-ext-diff",
+                    "--no-textconv",
+                ],
+                fgos_data,
+            ),
         )?;
         let raw = self.checkout_bytes(
             repo,
             scope,
-            &[
-                "diff",
-                "--raw",
-                "--no-abbrev",
-                "--no-renames",
-                "-z",
-                &preview.head,
-                &preview.target,
-            ],
+            &pathspec(
+                vec![
+                    "diff",
+                    "--raw",
+                    "--no-abbrev",
+                    "--no-renames",
+                    "-z",
+                    &preview.head,
+                    &preview.target,
+                ],
+                fgos_data,
+            ),
         )?;
         let fields: Vec<_> = raw.split(|b| *b == 0).filter(|b| !b.is_empty()).collect();
         let mut mode_changes = vec![];
@@ -417,6 +670,20 @@ impl GitDriver {
                 mode_changes.push(std::str::from_utf8(pair[1]).map_err(failure)?.to_owned());
             }
         }
+        let mut native_state = BTreeMap::new();
+        if confirmed {
+            for name in STOPPED_OPERATION_FILES {
+                let path = repo.git_dir.join(name);
+                match fs::symlink_metadata(&path) {
+                    Ok(m) if m.is_file() => {
+                        native_state.insert(name.to_owned(), capture(&path, &mut remaining)?);
+                    }
+                    Ok(_) => return Err(failure(format!("restore-native-state: {name}"))),
+                    Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
+                    Err(e) => return Err(failure(e)),
+                }
+            }
+        }
         Ok(Snapshot {
             operation_id: operation_id.into(),
             paths,
@@ -428,6 +695,7 @@ impl GitDriver {
             content_changes,
             intent_to_add,
             clean_modes,
+            native_state,
         })
     }
     pub fn preview_restore(
@@ -438,6 +706,7 @@ impl GitDriver {
     ) -> Result<RestorePreview> {
         let repo = self.checkout_repository(repo)?;
         let scope = checkout::scope(&repo, held)?;
+        self.restore_patch_gate(&repo)?;
         self.restore_checks(&repo, &scope, request)
     }
     pub fn apply_restore(
@@ -463,6 +732,7 @@ impl GitDriver {
             return Err(failure("invalid-operation-id"));
         }
         let repo = self.checkout_repository(repo)?;
+        let confirmed = confirmed_main_discard(&repo, request);
         let scope = checkout::scope(&repo, held)?;
         wal::require_activation_fence(&repo).map_err(failure)?;
         let wal = Wal::with_filesystem(repo.common_dir(), filesystem).map_err(failure)?;
@@ -479,15 +749,49 @@ impl GitDriver {
             }
             return self.restore_observe(&repo, &scope, &wal, &chain, writer);
         }
+        self.restore_patch_gate(&repo)?;
         crate::refs::admission(&wal, id, &checkout::checkout_resources(&repo)?)?;
         let preview = self.restore_checks(&repo, &scope, request)?;
-        let snapshot = self.restore_capture(&repo, &scope, &preview, id)?;
+        let snapshot = self.restore_capture(&repo, &scope, &preview, id, confirmed)?;
+        if request.require_clean_baseline && !snapshot.local_paths.is_empty() {
+            return Err(failure("restore-baseline-dirty"));
+        }
+        if request.require_staged_only
+            && (!snapshot.worktree_patch.is_empty()
+                || !self
+                    .checkout_bytes(
+                        &repo,
+                        &scope,
+                        &[
+                            "ls-files",
+                            "--others",
+                            "--exclude-standard",
+                            "-z",
+                            "--",
+                            ":!.fgos",
+                        ],
+                    )?
+                    .is_empty())
+        {
+            return Err(failure("restore-stray-dirt"));
+        }
         if request.reapply_local_delta {
             for p in &snapshot.local_paths {
                 if snapshot.content_changes.contains(p) {
-                    return Err(failure(format!(
-                        "restore-reapply-required: restore-overlapping-content: {p}"
-                    )));
+                    let digest = wal.store_restore_snapshot(&snapshot).map_err(failure)?;
+                    let mut error = failure(format!("restore-reapply-required: restore-overlapping-content: {p}; snapshot:{digest}"));
+                    let patch_path = if request.checkout_baseline.is_some() {
+                        Some(
+                            wal.store_restore_patch(&preview.reference, id, &snapshot.staged_patch)
+                                .map_err(failure)?,
+                        )
+                    } else {
+                        None
+                    };
+                    error.detail = Some(Box::new(
+                        serde_json::json!({"snapshot":digest,"patchPath":patch_path}),
+                    ));
+                    return Err(error);
                 }
                 if snapshot.mode_changes.contains(p) {
                     let raw = self.checkout_bytes(
@@ -534,19 +838,39 @@ impl GitDriver {
             _ => return Err(recovery("restore-operation-already-started")),
         };
         filesystem.checkpoint("restore-intent").map_err(failure)?;
+        if request.discard_local_delta {
+            crate::refs::install_pin(
+                self,
+                &repo,
+                checkout::handle(&scope, &repo)?,
+                id,
+                &Oid::parse(&request.expected_head, repo.object_format()).map_err(failure)?,
+            )?;
+        }
         chain = wal.append(&chain, Phase::Prepared).map_err(failure)?;
         filesystem.checkpoint("restore-prepared").map_err(failure)?;
         // Re-read full facts and snapshot through the same config/custody door.
         let now = self.restore_checks(&repo, &scope, request)?;
         if now.status != preview.status
             || now.reference != preview.reference
-            || wal::canonical_digest(&self.restore_capture(&repo, &scope, &now, id)?)
+            || wal::canonical_digest(&self.restore_capture(&repo, &scope, &now, id, confirmed)?)
                 .map_err(failure)?
                 != digest
         {
             return Err(recovery("restore-snapshot-drift"));
         }
         let _: Snapshot = wal.read_restore_snapshot(&digest).map_err(failure)?;
+        let patch_path = if request.checkout_baseline.is_some()
+            && request.reapply_local_delta
+            && !snapshot.staged_patch.is_empty()
+        {
+            Some(
+                wal.store_restore_patch(&preview.reference, id, &snapshot.staged_patch)
+                    .map_err(failure)?,
+            )
+        } else {
+            None
+        };
         chain = wal
             .append(
                 &chain,
@@ -562,6 +886,49 @@ impl GitDriver {
             .map_err(failure)?;
         self.checkout_bytes(&repo, &scope, &["reset", "--hard", &request.target])
             .map_err(|_| recovery(format!("restore-effect-unknown; snapshot:{digest}")))?;
+        if repo.work_tree() != Some(repo.trusted_main_root()) {
+            let paths = self.checkout_bytes(&repo, &scope, &["ls-files", "-z", "--", ".fgos"])?;
+            for p in checkout::paths(&paths)? {
+                self.checkout_bytes(
+                    &repo,
+                    &scope,
+                    &["update-index", "--skip-worktree", "--", &p],
+                )?;
+            }
+            let state = checkout::root(&repo)?.join(".fgos");
+            match fs::symlink_metadata(&state) {
+                Ok(m) if m.is_dir() && !m.file_type().is_symlink() => {
+                    fs::remove_dir_all(state).map_err(failure)?
+                }
+                Ok(_) => fs::remove_file(state).map_err(failure)?,
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
+                Err(e) => return Err(failure(e)),
+            }
+        }
+        // A confirmed main discard leaves untracked files in place, as `reset --hard` does;
+        // their bytes stay in the snapshot.
+        if request.discard_local_delta && !confirmed {
+            for (name, saved) in &snapshot.paths {
+                if data_path(name) && !matches!(saved, SavedPath::Absent) {
+                    safe_path(checkout::root(&repo)?, name)?;
+                    let path = checkout::root(&repo)?.join(name);
+                    // Reset already replaced tracked paths; remove only captured paths absent from target.
+                    if !self
+                        .paths_at_revision(
+                            &repo,
+                            &Oid::parse(&request.target, repo.object_format()).map_err(failure)?,
+                            &[name.as_bytes().to_vec()],
+                            1,
+                        )?
+                        .iter()
+                        .any(|p| !matches!(p.value, PathValue::Absent))
+                        && fs::symlink_metadata(&path).is_ok()
+                    {
+                        fs::remove_file(path).map_err(failure)?;
+                    }
+                }
+            }
+        }
         filesystem
             .checkpoint("restore-after-reset")
             .map_err(failure)?;
@@ -642,7 +1009,7 @@ impl GitDriver {
                 },
             )?;
             let post = wal
-                .store_restore_snapshot(&self.restore_capture(&repo, &scope, &after, id)?)
+                .store_restore_snapshot(&self.restore_capture(&repo, &scope, &after, id, confirmed)?)
                 .map_err(failure)?;
             Ok(post)
         })();
@@ -662,6 +1029,13 @@ impl GitDriver {
         wal.append(&chain, Phase::Outcome(outcome.clone()))
             .map_err(failure)?;
         filesystem.checkpoint("restore-receipt").map_err(failure)?;
+        if patch_path.is_some() {
+            match wal.clear_restore_patch(&preview.reference, id, &snapshot.staged_patch) {
+                Ok(true) => (),
+                Ok(false) => warnings.push("restore-patch-changed-preserved".into()),
+                Err(error) => warnings.push(format!("restore-patch-retained: {error}")),
+            }
+        }
         Ok(RestoreResult {
             operation_id: id.into(),
             snapshot: digest,
@@ -831,6 +1205,14 @@ impl GitDriver {
         if chain.outcome().is_none() {
             return Err(failure("restore-acknowledgement-requires-terminal-outcome"));
         }
+        let chain = if p.request.discard_local_delta
+            && !matches!(chain.last_state(), Phase::RestoreAcknowledged)
+        {
+            crate::refs::release_pin(self, &repo, checkout::handle(&scope, &repo)?, &wal, &chain)?;
+            wal.inspect(id).map_err(failure)?
+        } else {
+            chain
+        };
         let chain = if matches!(chain.last_state(), Phase::RestoreAcknowledged) {
             chain
         } else {
@@ -880,6 +1262,7 @@ impl GitDriver {
         writer: &str,
     ) -> Result<RestoreResult> {
         let p = self.restore_evidence_authority(repo, scope, chain, writer)?;
+        let confirmed = confirmed_main_discard(repo, &p.request);
         let authority = Authority {
             scope,
             binding: chain.intent().authority_binding.clone(),
@@ -914,7 +1297,7 @@ impl GitDriver {
         let outcome = if let Some(o) = chain.outcome() {
             o.clone()
         } else if matches!(chain.last_state(), Phase::Intent(_) | Phase::Prepared) {
-            self.restore_native_gate(repo, scope)?;
+            self.restore_native_gate(repo, scope, confirmed)?;
             wal.append(chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
                 .map_err(failure)?
                 .outcome()
@@ -922,9 +1305,13 @@ impl GitDriver {
                 .clone()
         } else {
             // No replay, reset or rollback. Even expected HEAD can conceal ABA.
-            self.restore_native_gate(repo, scope)?;
+            self.restore_native_gate(repo, scope, confirmed)?;
             let head = self.checkout_text(repo, scope, &["rev-parse", "HEAD"])?;
-            let reference = self.checkout_text(repo, scope, &["symbolic-ref", "-q", "HEAD"])?;
+            let reference = match self.resolve_head(repo)? {
+                HeadFact::Attached { target, .. } => target.as_str().to_owned(),
+                HeadFact::Detached { .. } => "HEAD".into(),
+                HeadFact::Unborn { .. } => return Err(recovery("restore-unborn-head")),
+            };
             let mut state = "recoveryRequired";
             if let Phase::RestoreApplied { snapshot } = chain.last_state() {
                 match wal.read_restore_snapshot::<Snapshot>(snapshot) {
@@ -939,6 +1326,7 @@ impl GitDriver {
                                 scope,
                                 &preview,
                                 &chain.last().operation_id,
+                                confirmed,
                             ) {
                                 if wal::canonical_digest(&current).map_err(failure)? == *snapshot {
                                     state = "effectObservedOnly";

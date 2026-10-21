@@ -14,60 +14,64 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { REPO_ROOT } from './run-tests.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
+import { inspectRepo, statusEntries } from './lib/git-ports.mjs';
 
 // Untracked build-artifact directories this track's worktrees deliberately
 // symlink in from the main checkout for fast dependency/binary reuse
 // (node_modules, and a Rust `target/` symlink so rust-host tests find a
 // prebuilt binary without a from-scratch cargo build per worktree). Both
 // have a repo `.gitignore` entry, but only as a directory pattern (e.g.
-// `/target/`), which does not match a SYMLINK to a directory -- `git
-// status --porcelain` reports it as a bare untracked entry (`?? target`,
-// no trailing slash, unlike `?? target/` for a genuinely untracked real
-// directory with content). Excluded here by exact match only, so a real
-// dirty file nested under either name (which always shows as its own
-// distinct porcelain line, never collapsed into this bare form) still
-// fails the clean check.
-const SYMLINKED_BUILD_ARTIFACT_ENTRIES = new Set(['?? node_modules', '?? target']);
+// `/target/`), which does not match a SYMLINK to a directory -- status
+// reports it as a bare untracked entry (`target`, no trailing slash,
+// unlike `target/` for a genuinely untracked real directory with
+// content). Excluded here by exact match only, so a real dirty file
+// nested under either name (which always shows as its own distinct
+// entry, never collapsed into this bare form) still fails the clean
+// check.
+const SYMLINKED_BUILD_ARTIFACT_ENTRIES = new Set(['node_modules', 'target']);
 
-export function isGitClean(cwd = REPO_ROOT, exec = execFileSync, { allowedPrefixes = [] } = {}) {
-  const lines = exec('git', ['status', '--porcelain'], { cwd, encoding: 'utf8' })
-    .split('\n')
-    .filter((line) => {
-      const trimmed = line.trim();
-      if (trimmed === '') return false;
-      if (SYMLINKED_BUILD_ARTIFACT_ENTRIES.has(trimmed)) return false;
-      if (trimmed.startsWith('?? ')) {
-        const untracked = trimmed.slice(3).trim();
-        const cleanUntracked = untracked.replace(/\/+$/, '');
-        for (const prefix of allowedPrefixes) {
-          const cleanPrefix = prefix.replace(/\/+$/, '');
-          if (cleanPrefix === cleanUntracked || cleanPrefix.startsWith(cleanUntracked + '/') || cleanUntracked.startsWith(cleanPrefix + '/')) {
-            return false;
-          }
-        }
+/** This checkout's `status`, untracked directories collapsed exactly as porcelain v1 shows them. */
+export function readStatus(cwd = REPO_ROOT) {
+  return statusEntries(inspectRepo(cwd), 'normal');
+}
+
+export function isGitClean(cwd = REPO_ROOT, read = readStatus, { allowedPrefixes = [] } = {}) {
+  const dirty = read(cwd).filter(({ path: entryPath, untracked }) => {
+    if (!untracked) return true;
+    if (SYMLINKED_BUILD_ARTIFACT_ENTRIES.has(entryPath)) return false;
+    const cleanUntracked = entryPath.replace(/\/+$/, '');
+    for (const prefix of allowedPrefixes) {
+      const cleanPrefix = prefix.replace(/\/+$/, '');
+      if (cleanPrefix === cleanUntracked || cleanPrefix.startsWith(cleanUntracked + '/') || cleanUntracked.startsWith(cleanPrefix + '/')) {
+        return false;
       }
-      return true;
-    });
-  return lines.length === 0;
+    }
+    return true;
+  });
+  return dirty.length === 0;
 }
 
-export function gitHead(cwd = REPO_ROOT, exec = execFileSync) {
-  return exec('git', ['rev-parse', 'HEAD'], { cwd, encoding: 'utf8' }).trim();
+const headOf = (cwd) => inspectRepo(cwd).resolveCommit({ name: 'HEAD' });
+
+export function gitHead(cwd = REPO_ROOT, resolveHead = headOf) {
+  return resolveHead(cwd);
 }
 
-export function hasGnuTimeV(binary = '/usr/bin/time', exists = fs.existsSync, spawn = spawnSync) {
+const TIME_BINARY = '/usr/bin/time';
+
+export function hasGnuTimeV(binary = TIME_BINARY, exists = fs.existsSync, spawn = spawnSync) {
   if (!exists(binary)) return false;
   const result = spawn(binary, ['-v', 'true'], { encoding: 'utf8' });
   return result.status === 0 && /Maximum resident set size/.test(result.stderr ?? '');
 }
 
-export function gatherEnvironment({ cwd = REPO_ROOT, loadavg = os.loadavg, cpus = os.cpus, exec = execFileSync } = {}) {
+export function gatherEnvironment({ cwd = REPO_ROOT, loadavg = os.loadavg, cpus = os.cpus, resolveHead } = {}) {
   return {
-    sha: gitHead(cwd, exec),
+    sha: gitHead(cwd, resolveHead),
     node: process.version,
     platform: process.platform,
     arch: process.arch,
@@ -141,7 +145,7 @@ export function minMax(numbers) {
 // to real file descriptors instead: stdout becomes a retained log
 // artifact, and stderr (GNU time -v's own small ~20-line block) is read
 // back afterward for parsing.
-export function defaultTimedSpawn({ execPath, scriptPath, forwardedArgs, cwd, env, timeBinary, logDir }) {
+export function defaultTimedSpawn({ execPath, scriptPath, forwardedArgs, cwd, env, logDir }) {
   const dir = logDir ?? fs.mkdtempSync(path.join(os.tmpdir(), 'test-timing-'));
   fs.mkdirSync(dir, { recursive: true });
   const stdoutPath = path.join(dir, 'stdout.log');
@@ -150,7 +154,7 @@ export function defaultTimedSpawn({ execPath, scriptPath, forwardedArgs, cwd, en
   const stderrFd = fs.openSync(stderrPath, 'w');
   let result;
   try {
-    result = spawnSync(timeBinary, ['-v', execPath, scriptPath, ...forwardedArgs], { cwd, env, stdio: ['ignore', stdoutFd, stderrFd] });
+    result = spawnSync(TIME_BINARY, ['-v', execPath, scriptPath, ...forwardedArgs], { cwd, env, stdio: ['ignore', stdoutFd, stderrFd] });
   } finally {
     fs.closeSync(stdoutFd);
     fs.closeSync(stderrFd);
@@ -172,7 +176,6 @@ export function runOneSample({
   spawn = spawnSync,
   timedSpawn = defaultTimedSpawn,
   hasTime = hasGnuTimeV(),
-  timeBinary = '/usr/bin/time',
   env = process.env,
   checkClean,
   environment = () => gatherEnvironment({ cwd }),
@@ -183,7 +186,7 @@ export function runOneSample({
   const parentArtifactsDir = isInternalLogDir ? path.dirname(relLogDir).replaceAll('\\', '/') : null;
   const logDirPrefixes = isInternalLogDir ? [relLogDir, parentArtifactsDir].filter(Boolean) : [];
 
-  const defaultCheck = (opts = {}) => isGitClean(cwd, execFileSync, opts);
+  const defaultCheck = (opts = {}) => isGitClean(cwd, readStatus, opts);
   const checkSnapshot = checkClean ?? defaultCheck;
 
   const before = { clean: checkSnapshot({ allowedPrefixes: logDirPrefixes }), env: environment() };
@@ -198,7 +201,6 @@ export function runOneSample({
       forwardedArgs,
       cwd,
       env,
-      timeBinary,
       logDir,
     });
     gnuTime = parseGnuTimeV(result.stderr ?? '');

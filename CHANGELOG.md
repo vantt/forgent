@@ -15,6 +15,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - A persona file that names a model `tier` or `prefer` is now refused with `persona-model-taste-not-allowed` (model taste belongs to the seat, at `capabilities.<cap>.personas.<name>`), a packaged workflow (`<name>/wf.<name>.yaml`) can keep its own personas beside it (`agent.<name>.yaml`), and a domain persona is visible only to workflows of that domain.
 
+- Git (branch `git/p07-switch` fixes from the host gate):
+  - A commit hook may print up to 64 MiB again (Git sends hook output to stderr); a borrowed Git run no longer fails at 64 KiB.
+  - A hook or filter child that drops the lock descriptor and leaves its process group now turns a commit, Sync or Land into `containment-unproven` (`recovery-required`) on every machine, also where bwrap can make a PID namespace; before, only machines without it were watched.
+  - The runner commits and syncs when the session has no env id (the writer is then a process id): every Git port now gets the writer as text.
+  - A Workflow whose units declare no `writes` (for example `business-discussion`) now runs in a directory that is not a git repository, which becomes its project root; a unit with `writes` or a sync ref is still refused there before any unit run exists.
+  - On the npm/GitHub install channel, `fgos init` in a project that `fgctl init` has not activated now refuses with `git-addon-unavailable: addon not shipped on this channel: onboard this project with fgctl init` (it said "until M10") and changes nothing; onboard new projects with `fgctl init`.
+  - `scripts/build-rust-distribution.mjs` loads the addon it just built from the staged `libexec/native/fgos.node` (Node read the `.so` name as JavaScript) and reads the checkout with it in a child process, since a process holds one addon.
+
+- `fgos doctor` check `git-mutation-one-door` reads the release's `packages/git/contracts/mutation-census.v1.json`, which the release build writes from `scripts/git-one-door-scan.mjs`. The check fails when the census lists any `git` or hook spawn outside the fgos-git driver, or was not built from the payload it ships in. `npm test` also fails when product code (`src`, `bin`, `scripts`) starts `git` or a hook while the suite runs, and names the call site.
+  - Commands from operator configuration or from a Work item's declared verify command count as configured binaries, not sites.
+  - Executor commands are traced to the runner config files and their defaults. The holder-lock borrow vectors, which run `git` only in a temp repository they create, count as the production sandbox probe; that class now needs the repository's own data flow to a `temp_dir()` path, never `temp_dir()` and `init` merely appearing in the same function.
+  - The scan lists every file of the checkout through Inspect and skips no directory by its name. It judges what the checkout declares as product (the payload `package.json` ships, every crate the Cargo workspace names, the installed hooks); the census counts the other files (tests, fixtures, records, `tools/`) per top-level directory. Built from this tree it lists two sites: the same `git mv` sentence in `domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md` and its `.agents/skills` render, until that sentence is reworded.
+  - The scan also follows `promisify(execFile)` across modules, a `shell: true` held in an options variable, and a computed member on `child_process` (an unreadable one is a site). A hook's `reflog` and `symbolic-ref` count as reads only in their read forms.
+  - Scripts of a skill that declares `metadata.oneDoor: standalone` in its SKILL.md (`distill`, `instruction-audit`) are counted as `standalone-skill-script`, not as sites; the test spy now watches `core/skills/` too.
+  - The scan now follows functions passed around as values and methods of returned objects. The phase 07 unit 22 report names each open site.
+
+- `fgos main-checkout-reset` resets through the Git SafeRestore port instead of a raw `git reset --hard`.
+  - With `--confirm` it keeps the old HEAD pinned and snapshots the discarded local changes, and its result carries an `operationId` and a `snapshot`.
+  - `--confirm` is an operator flag, not proof that a human confirmed: any caller that can run the verb, an agent included, can pass it. A confirmed reset may move to any commit, sideways or backward. The old HEAD stays pinned at `refs/fgos/git-operations/<operationId>/candidate` with its snapshot until the SafeRestore `acknowledge` operation releases them; no verb calls it yet, so the pin and snapshot stay.
+  - It also clears a stopped merge, cherry-pick or revert.
+  - The list of commits it would drop no longer shows `--stat` and stops at 50 lines.
+  - An unknown `--sha` is refused before anything runs.
+
+- The gateway and the herdr dashboard find the main checkout through fgos-git instead of running `git rev-parse`.
+
+- `fgos return` verifies a branch in a checkout made and removed through the Worktree port. A checkout that still holds bytes after verify is kept and named instead of force-removed. The verify checkout is now provisioned like a Land candidate (dependency install, then the project's `worktreeSetup.commands`), and what that placed is recorded and set aside on removal, so the checkout no longer stays behind with its `node_modules`. Dispatch worktrees and the already-merged verification checkout of `approve` are torn down the same way. `fgos preflight`, `resync-worktree`, `compound --doc-path` and `knowledge attest` read Git through Inspect. `resync-worktree` run where no branch is checked out now asks for `--branch`.
+
+- `scripts/install-git-hooks.mjs` reports a RepositoryConfig refusal (for example `git-fence-missing` in a checkout that was never activated) as one line with exit 1, not a stack trace. The shell integration's `fgos` and `fgos-runner` functions find the main checkout from the `.git` layout on disk instead of running `git`.
+
+- The activation gate (`fgctl`) and `fgos events migrate` stop check also scan processes working in the workspace's linked worktrees.
+
+- Workflow integration merges through Land and skips work the target already has.
+
+- `fgos approve` retried after a refusal that came before Land started (a held merge slot under `--no-wait`, a busy main checkout, a stopped merge, a conflict found before the candidate) reuses the Land operation it recorded and delivers, instead of failing on a journal that was never written. The decision log gains one engine decision for each Land operation approve starts, and one for each blocked `sync-root` result.
+  - An approve whose earlier Land was interrupted mid-publication refuses and names `fgos doctor --fix`. Its new `git-land-recovery` fix recovers interrupted Land operations under Land's own locks: one that never attempted its publication closes as abandoned; an attempted one only by the writer that started it, and the fix names that writer otherwise. `fgos setup` runs the same fix.
+  - A failure while publishing that Land cannot classify is reported as an unknown effect (`land-effect-unknown`, naming `fgos doctor --fix`), no longer as a failed merge that parks the item `blocked`. A failure of the drift report after a land is reported beside the land in `postLand.error`.
+
+- A SafeRestore (`resync-worktree`, `main-checkout-reset` and every other restore) refuses with `restore-orphaned-patch` while an interrupted restore's patch for that branch is left under the Git directory's `fgos-resync-patches/`. The refusal names the patches; apply what is still wanted from each, then delete them and restore again.
+
+- `fgos uninstall` leaves a `core.hooksPath` that fgOS did not record setting.
+
+- The quiesce scan takes `--dir` for each linked worktree.
+
+- Commands that make many Git reads reuse the repository's checked config and storage format across them within one process, re-reading only when a config file changes: `approve --no-wait` refusing a held merge slot went from about 0.7 s to 0.4 s (79 to 21 Git processes) and `doctor --json` from about 3.8 s to 2.4 s (332 to 62).
 - New skill `fgos-cook`: delivers a plan written by `ak:plan` by opening a conductor case on the coding guide with an owner-approved frame, then dispatching one slice at a time through `fgos run` and `fgos workflow` naming the case, checking each result itself and handing the branch to the owner (it never merges). Slices run serially in one worktree until the Git land operation exists; the route table waits for Seat Binding.
 - A conductor Workflow case now moves past its entry milestones: when a Unit settles with `pass` (or `findings`), its activity's `produces` milestones are proposed as achieved with the digest of their subject (the Unit's reports, or for a delivery milestone the paths it wrote, backed by a verify receipt for that digest). Before, the settle recorded nothing, so `fgos run --case C --activity implement-item` stayed refused with `entry-milestone-unmet` after `validate-plan` passed.
 - A panel or debate unit must now declare its `seats:` (ids, roles, optional persona), and `workflow start --seats` re-seats generic member seats; a reviewed unit may declare its seats too, if its checker roles match what its rigor requires. Resuming a unit run recorded before seat binding is refused with `record-predates-seat-binding` (it stays readable in summaries, history and metrics).
@@ -43,6 +87,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `fgos worktree create` now provisions the new checkout after the Git port returns: dependency install, then the project's `worktreeSetup.commands`. This repo's setup also copies the untracked `ak-*` skill directories from the main checkout, so a worker in that worktree can use `ak:cook`. The setup no longer builds the Rust workspace in each new worktree (a run that needs a binary builds it with its own Cargo target). `fgos setup` no longer deletes skills other tools installed into `.agents/skills` (only entries fgOS itself assembled are pruned). The claude executor declares `ak:cook` in `supports.skills`, and `fgos doctor` check `executor-skills-installed` fails when a declared skill is missing from the runtime's skill directory. `core/skills/_shared/ak-cook-worker-contract.md` is the brief for an `ak:cook` worker.
 - Add the `debate` collaboration pattern: a thesis side and an antithesis side argue blind in parallel, answer each other's round-1 argument (`params.rebuttal: false` skips it), and a read-only judge on a provider family different from both sides rules; a pool that cannot seat such a judge is refused by name. `group-cognition`'s dialectical step now runs `debate` instead of `reviewed`, and its action synthesis builds on the judge's ruling.
+
+- `fgos version` (and the `cli-version-visible` doctor row) shows the first 12 hex digits of the checkout's full commit id instead of Git's variable-length short id. `fgos init` and every other Git read now work on a machine where the fgOS state root does not exist yet: it is created owner-only, as `fgos doctor --fix` would.
+
+- `approve`, `sync-root` and `merge next` with `--no-wait` refuse a held merge slot of the target before reading anything else, so the refusal comes at once.
+
+- `scripts/knowledge-migration.mjs` commits each document move as its own commit instead of leaving staged renames. The nightly mutation run no longer force-removes its checkouts: one that still holds run bytes is kept and reported. The `distill` skill pulls only the reference clones under its own `upstreams/` directory.
+
+- `catchup` (and the inline catchup in leaf `approve` and `sync-root`) keeps the target's `.fgos` bytes the way Land does: a branch that deleted an event shard the target grew no longer fails as `merge-refused`, a leaf whose root branch was never created approves instead of parking `fgos-write-rejected`, a conflict is reported without leaving a catch-up checkout behind, and a refused merge reports Git's own message. `cleanup` deletes the merged branch only at the tip it verified.
+
+- Leaf `approve`, `sync-root` and `promote-to-component` now land through Git Land like root-into-main `approve`: the target branch's merge slot is Land's (`lock fence merge-slot --param ref=` now takes the URL-encoded full ref, e.g. `refs%2Fheads%2Fmain`), the item's verify runs in Land's candidate, a root branch checked out in another worktree is refused instead of moved behind it, and `.fgos` event files due for a checkpoint are committed before the merge rather than inside it. After `approve` or `sync-root` records the result, Land's published candidate is removed.
+
+- Root-into-main `approve` through Land again refuses a branch that writes under `.fgos/`, self-resolves decision-id collisions on the decision index and `merge=union` `.fgos` conflicts, and runs the repo-invariant checks on the candidate before publishing.
+
+- `approve`/`merge` `--wait` now also bounds Land's wait for the main checkout at publication (previously a fixed 5 s), and a waiting Land no longer stalls its own process, so a release by another holder in the same process is seen.
+
+- Git Land can pin the current destination under its own slot, wait for admission without retrying publication, and freeze exact consumer-declared conflict resolutions before verification. Merge review patches, changed-path lists, ancestry and clean-tree reads now use Git Inspect; the legacy publication callers have not yet been switched.
+
+- Forced session cleanup retains detached commits with a named recovery ref and snapshot, and preserves dirty sessions. Missing checkout registrations are pruned only with inspected ownership evidence. Work event checkpoints and verified archive publication use declared native Git transactions.
+
+- Mutating Units refuse the main checkout before native Git preflight; resuming under a live worktree holder reports `dispatch-in-flight`.
+
+- Scoped Unit commits exclude tracked and untracked `.fgos` paths under broad scopes; legacy event commits require main-checkout authority. ScopedCommit and Sync classify owned hook refusals consistently, and unknown recovery ids fail explicitly.
+
+- Unit commits and syncs use the native Git component with persisted baselines, custody-backed recovery and literal filenames. Original hook failure output is preserved; foreign hooks are never replayed. Legacy Work event checkpoints use an explicit, main-only temporary declaration.
 
 - Add `fgos worktree remove <path> --delivered-to <ref>`: removes a worktree through the Worktree port, which refuses a dirty checkout, one a process stands in, preserved worker state, or a tip not contained in the delivery target (branch name, full ref or object id). No force flag; the delivery statement is recorded as the operation's evidence digest.
 
@@ -337,10 +405,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A Unit's `persona` is resolved and its text pinned when the unit run starts, so a persona defined only in the workspace (`fgos/agents/`) is rendered with its definition instead of its bare name.
 - A help token never runs the verb: `fgos init --json -h` created a store and `fgos session start --json -h` created a worktree, because the help token was read as the previous flag's value; through the Rust host, `fgos version --help` ran `version` and `fgos metrics runs --help` ran `runs`.
 - Manifest entries now match what the CLI reads: `merge next` lists the flags it forwards to approve/sync-root, `workflow start --stance-options`, `workflow operations --step` (was `--stage`), `tool --config`, `tool check --name` (was a positional), `dispatch decide --assignment`, `run record --result`. AGENTS.md and the dispatch fallback skill say `decide --work <id> [--stage <stage>]` (was `--step`).
+- `fgos main-checkout-reset` without `--confirm` moves forward again in a repository that tracks `.fgos` files: tracked `.fgos` paths that match HEAD are updated with the rest of the tree, and the reset refuses `restore-protected-fgos-path` only while a tracked `.fgos` path differs from HEAD.
+- On a host without user namespaces (`linux-pgroup`), a ScopedCommit, Sync or Land whose hook or filter left a `setsid` or double-fork child alive after the borrow now returns `containment-unproven` as `recovery-required` instead of plain success; operations without hooks or filters are unchanged.
 
 ### Security
 
 - The runner commit no longer trusts a worktree's `.git` file, a relative hooks path or fsmonitor: its git runs against the main repository's gitdir with the caller's `GIT_*` variables dropped, and a worktree outside the main repository is refused.
+- The holder-lock routes (`lock-fd`, `lock-hold`, `state-root`, `process-observe`, `lock-borrow-vectors`) now speak internal protocol 2. A stale global npm `fgos` whose Node payload still sends `--protocol 1` is refused by the new host with `host-version-mismatch` before any lock is taken; reinstall or upgrade the npm package to match the active release. `quiesce-scan` stays on protocol 1.
 
 ## [v0.2.0-rc.5] - 2026-10-14
 

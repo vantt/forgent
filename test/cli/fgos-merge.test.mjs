@@ -1113,7 +1113,7 @@ test('merge next --no-wait fails immediately while another process holds the tru
   const cwd = initGitCwdMainFast();
   makeRunnerProposedItem(cwd, 'wait-merge-next-no-wait', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'wait-merge-next-no-wait');
-  const holder = await holdLockInChild('merge-slot', { fgosDir: path.join(cwd, '.fgos'), ref: 'main' });
+  const holder = await holdLockInChild('merge-slot', { fgosDir: path.join(cwd, '.fgos'), ref: encodeURIComponent('refs/heads/main') });
   try {
     const result = run(cwd, ['merge', 'next', '--no-wait']);
 
@@ -1121,7 +1121,7 @@ test('merge next --no-wait fails immediately while another process holds the tru
     // `sub === 'next'` case) -- any other error from the inner `runVerb('approve', ...)`
     // rethrows as-is, so this fails exactly like a direct `approve` call does.
     assert.equal(result.status, 9, result.stderr);
-    assert.match(result.stderr, /merge slot of "main" is held by another process \(pid \d+/);
+    assert.match(result.stderr, /merge slot of "refs\/heads\/main" is held by another process \(pid \d+/);
     // A run that waited would tag the final error with the time it waited; none appears when the
     // flag was forwarded. The holder never releases, so a waiting run could not have succeeded either.
     assert.doesNotMatch(result.stderr, /after waiting \d+ ms/, '--no-wait forwarded through merge next must not wait before giving up');
@@ -1131,13 +1131,13 @@ test('merge next --no-wait fails immediately while another process holds the tru
   }
 });
 
-test('sync-root never reports outcome "synced" when mergeRunnerItem returns an outcome it does not explicitly handle -- proves the defensive guard closes the false-success gap D4 found', () => {
+test('sync-root never reports outcome "synced" when landRunnerItem returns an outcome it does not explicitly handle -- proves the defensive guard closes the false-success gap D4 found', () => {
   const cwd = initGitCwdMainFast();
   makeDriftedRoot(cwd, 'sync-root-blocked-other', { verify: 'true' });
 
   // Simulate another item's in-progress/abandoned merge already staged on
   // the main checkout -- a real, unrelated branch, staged but never
-  // committed or aborted, which makes mergeRunnerItem return
+  // committed or aborted, which makes landRunnerItem return
   // 'merge-blocked-other-item' for THIS sync-root call (tsk-4hj D1).
   gitAtCwd(cwd, ['checkout', '-b', 'fgw/sync-root-other-blocker']);
   fs.writeFileSync(path.join(cwd, 'sync-root-other-blocker-produced.txt'), 'other\n');
@@ -1167,7 +1167,7 @@ test('sync-root never reports outcome "synced" when mergeRunnerItem returns an o
   assert.equal(mergedDecisions.length, 0, 'must never record a "merged" decision for a merge that never actually completed');
 });
 
-test('sync-root outcome guard catches merge-failed-unclassified and records unhandled-outcome friction (tsk-12o)', () => {
+test('sync-root outcome guard catches a publication Land refuses over an untracked collision and records unhandled-outcome friction (tsk-12o)', () => {
   const cwd = initGitCwdMainFast();
   makeDriftedRoot(cwd, 'sync-root-merge-failed', { verify: 'true' });
 
@@ -1181,7 +1181,7 @@ test('sync-root outcome guard catches merge-failed-unclassified and records unha
   // dirty-tree refusal the 'sync-root-dirty' test above already covers
   // (isMainTreeClean's ownFileSet only ever contains leaf paths from
   // `git diff --name-only trunk...branch`, never their parent
-  // directories), so this reaches mergeRunnerItem itself rather than
+  // directories), so this reaches landRunnerItem itself rather than
   // being refused before it.
   gitAtCwd(cwd, ['checkout', 'fgw/sync-root-merge-failed']);
   fs.mkdirSync(path.join(cwd, 'sync-root-merge-failed-dir'), { recursive: true });
@@ -1191,9 +1191,9 @@ test('sync-root outcome guard catches merge-failed-unclassified and records unha
   gitAtCwd(cwd, ['checkout', 'main']);
 
   // A stray untracked file already sitting at the exact directory path the
-  // branch needs to create -- the real-world shape test/runner/merge.test.mjs
-  // (mergeRunnerItem unit level) already proves reports 'merge-failed-unclassified',
-  // never 'conflict', for exactly this git failure mode.
+  // branch needs to create. Land never writes over it: its publication gate
+  // refuses before the ref moves (Git spec §9 step 4), an outcome sync-root
+  // does not handle by name, never 'conflict'.
   fs.writeFileSync(path.join(cwd, 'sync-root-merge-failed-dir'), 'stray-untracked\n');
 
   const headBefore = gitHead(cwd);
@@ -1202,8 +1202,7 @@ test('sync-root outcome guard catches merge-failed-unclassified and records unha
   const data = envelopeData(result.stdout);
   assert.notEqual(data.outcome, 'synced', 'must never report success for an outcome it does not recognize');
   assert.equal(data.outcome, 'blocked');
-  assert.equal(data.reason, 'merge-failed-unclassified');
-  assert.ok(data.error?.stderr || data.error?.message, 'CLI response must carry real git error details (tsk-3tv)');
+  assert.equal(data.reason, 'main-checkout-dirty-mid-merge');
 
   assert.equal(gitHead(cwd), headBefore, 'main must be unchanged');
   assert.throws(
@@ -1220,10 +1219,7 @@ test('sync-root outcome guard catches merge-failed-unclassified and records unha
     'frictions must contain an entry with errorClass === "sync-root-unhandled-outcome"',
   );
   const unhandledFriction = frictions.find((f) => f.errorClass === 'sync-root-unhandled-outcome');
-  assert.ok(
-    unhandledFriction.detail.includes(data.error.stderr || data.error.message),
-    'friction detail must carry real git error text/stderr (tsk-3tv)',
-  );
+  assert.match(unhandledFriction.detail, /unrecognized outcome "main-checkout-dirty-mid-merge"/, 'friction detail names the outcome it refused to report as success');
 
   const lines = eventLines(cwd);
   const mergedDecisions = lines.map((l) => JSON.parse(l)).filter((e) => e.type === 'decision' && e.payload?.id === 'sync-root-merge-failed' && /merged/.test(e.payload?.text ?? ''));

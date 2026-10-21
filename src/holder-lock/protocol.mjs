@@ -11,7 +11,9 @@
 import { readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
 import { mergeWithGlobalConfig } from '../config/global-config.mjs';
 
-export const PROTOCOL = 1;
+// 2 refuses a payload of the first release (`--protocol 1`) on every lock route; `quiesce-scan` keeps its own
+// protocol (SCAN_PROTOCOL in fences.mjs) because its callers pin it separately from this facade.
+export const PROTOCOL = 2;
 
 /** The stdio slot a borrowed description is handed to, and the env variable
  * that names it (`<lock name>:<slot>`). */

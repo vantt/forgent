@@ -6,6 +6,7 @@ import os from 'node:os';
 import { eventStoreFacts } from '../../event-store/index.mjs';
 import { isDeepStrictEqual } from 'node:util';
 import { checkStopped } from '../../holder-lock/fences.mjs';
+import { workspaceListing } from '../../setup/holder-lock-checks.mjs';
 import { fixEventStoreLockDirs, fixEventStoreMachineId, fixEventStoreRefspec } from '../../setup/event-store-fixes.mjs';
 import { foldEvents, readAllEventsFromDir, buildSnapshotFromDir, serializeView } from '../../state/replay.mjs';
 import { listPorting } from '../../state/porting-store.mjs';
@@ -66,7 +67,7 @@ export async function migrateUseCase(ctx, options = {}) {
   const base = { stateRoot: ctx.stateRoot, trustedMain: ctx.trustedMain ?? cwd, loaderOptions: ctx.loaderOptions };
   const initialFacts = eventStoreFacts(cwd, base);
   if (path.resolve(initialFacts.trustedMain) !== cwd) refuse('event-store-migration-main-required', 'run migrate in the main checkout root');
-  const stopped = checkStopped({ workspaces: [cwd], hostBin: ctx.hostBin });
+  const stopped = checkStopped({ workspaces: [{ root: cwd, worktrees: workspaceListing(cwd).worktrees }], hostBin: ctx.hostBin });
   if (stopped.status !== 'clean') refuse('event-store-writers-active', JSON.stringify(stopped));
   fixEventStoreLockDirs(cwd, base); fixEventStoreMachineId(cwd, base); fixEventStoreRefspec(cwd, base);
   const { store, heldRanks } = eventsContext(ctx, options);

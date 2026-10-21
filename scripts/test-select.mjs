@@ -10,91 +10,69 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 import { REPO_ROOT, DEFAULT_TEST_ROOT, discoverTestFiles, runSelectedTests, runTests } from './run-tests.mjs';
 import { MANIFEST, FULL_TRIGGERS } from '../test/test-ownership.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
+import { inspectRepo } from './lib/git-ports.mjs';
+import { inspectEntries } from '../src/util/git-paths.mjs';
 
 const KNOWN_RULE_FIELDS = new Set(['id', 'pattern', 'directTests', 'boundaryTests', 'allowMissing', 'status', 'quarantinedHash']);
 
 // Same worktree-shared-dependency symlink entries scripts/test-timing.mjs
 // already excludes (its own SYMLINKED_BUILD_ARTIFACT_ENTRIES): a worktree
 // that symlinks in node_modules/target for fast dependency reuse reports
-// them via `git ls-files --others` as a bare untracked path (no trailing
-// slash, unlike a genuinely untracked real directory) -- without this
-// exclusion, EVERY selector run in ANY such worktree would see a spurious
-// "unknown" changed path and escalate to full every single time, silently
-// defeating the selector's whole purpose in exactly the worktree setup
-// this repo's own tooling encourages. Found via P05 shadow evaluation.
+// them as a bare untracked path (no trailing slash, unlike a genuinely
+// untracked real directory) -- without this exclusion, EVERY selector run in
+// ANY such worktree would see a spurious "unknown" changed path and escalate
+// to full every single time, silently defeating the selector's whole purpose
+// in exactly the worktree setup this repo's own tooling encourages. Found via
+// P05 shadow evaluation.
 const SYMLINKED_BUILD_ARTIFACT_PATHS = new Set(['node_modules', 'target']);
 
-// -- git plumbing -------------------------------------------------------
+// -- git reads ------------------------------------------------------------
 
-/**
- * Parses `git diff --name-status -z` (or `git ls-files -z`) output into
- * `{status, path, oldPath}` rows. NUL-separated, never quote/escape-parsed
- * -- the one representation that survives spaces, backslashes and any
- * other byte in a path unscathed. A rename/copy status ("R100", "C100")
- * carries oldPath THEN path as two consecutive NUL-separated fields.
- */
-export function parseNameStatusZ(raw) {
-  const fields = raw.split('\0').filter((f) => f !== '');
-  const rows = [];
-  let i = 0;
-  while (i < fields.length) {
-    const status = fields[i];
-    if (status[0] === 'R' || status[0] === 'C') {
-      rows.push({ status, oldPath: fields[i + 1], path: fields[i + 2] });
-      i += 3;
-    } else {
-      rows.push({ status, path: fields[i + 1] });
-      i += 2;
-    }
-  }
-  return rows;
-}
-
-/**
- * Parses `git ls-files -z` (plain NUL-separated path list, no status
- * column) into `{status: 'A', path}` rows for untracked files.
- */
-export function parsePathListZ(raw) {
-  return raw
-    .split('\0')
-    .filter((p) => p !== '' && !SYMLINKED_BUILD_ARTIFACT_PATHS.has(p))
-    .map((p) => ({ status: 'A', path: p }));
-}
+const text = (bytes) => Buffer.from(bytes).toString('utf8');
 
 /**
  * Collects every changed path since `base` (default `main`), from four
  * independent sources, each tagged so `--explain` can show provenance:
- * committed (merge-base..HEAD), staged, unstaged, untracked. Renames keep
- * BOTH old and new paths (the old path as its own row, `renameOf` pointing
- * forward); a rename's old path is never silently dropped. Returns
- * `{ error }` (never throws) when the base cannot be resolved -- a missing
- * or invalid `--base` is a selection-time condition, not a crash.
+ * committed (merge-base..HEAD), staged, unstaged, untracked. Renames are
+ * detected on every diff and keep BOTH old and new paths (the old path as
+ * its own row, `renameOf` pointing forward); a rename's old path is never
+ * silently dropped. Returns `{ error }` (never throws) when the base cannot
+ * be resolved -- a missing or invalid `--base` is a selection-time
+ * condition, not a crash.
  */
-export function collectChangedPaths({ cwd = REPO_ROOT, exec = execFileSync, base = 'main' } = {}) {
+export function collectChangedPaths({ cwd = REPO_ROOT, base = 'main' } = {}) {
+  let inspect;
+  let head;
   let mergeBase;
   try {
-    mergeBase = exec('git', ['merge-base', 'HEAD', base], { cwd, encoding: 'utf8' }).trim();
+    inspect = inspectRepo(cwd);
+    head = inspect.resolveCommit({ name: 'HEAD' });
+    const baseCommit = inspect.resolveCommit({ name: base });
+    if (typeof head !== 'string' || typeof baseCommit !== 'string') throw new Error('unresolved');
+    mergeBase = inspect.compareCommits({ left: baseCommit, right: head }).mergeBase;
+    if (!mergeBase) throw new Error('no merge base');
   } catch {
     return { error: `invalid or unresolvable base "${base}"` };
   }
 
   const rows = [];
   const tag = (list, source) => list.forEach((r) => rows.push({ ...r, source }));
+  const diff = (sides) => inspectEntries((page) => inspect.diff({ ...page, ...sides, renames: true }))
+    .map((e) => ({ status: String.fromCharCode(e.change), path: text(e.path), ...(e.from && { oldPath: text(e.from) }) }));
 
   try {
-    // --find-renames pinned explicitly: relying on the ambient diff.renames
-    // config default would make rename detection (and therefore which
-    // paths this selector sees) depend on the invoking environment.
-    tag(parseNameStatusZ(exec('git', ['diff', '--name-status', '--find-renames', '-z', `${mergeBase}..HEAD`], { cwd, encoding: 'utf8' })), 'committed');
-    tag(parseNameStatusZ(exec('git', ['diff', '--name-status', '--find-renames', '-z', '--cached'], { cwd, encoding: 'utf8' })), 'staged');
-    tag(parseNameStatusZ(exec('git', ['diff', '--name-status', '--find-renames', '-z'], { cwd, encoding: 'utf8' })), 'unstaged');
-    tag(parsePathListZ(exec('git', ['ls-files', '--others', '--exclude-standard', '-z'], { cwd, encoding: 'utf8' })), 'untracked');
+    tag(diff({ before: mergeBase, after: head }), 'committed');
+    tag(diff({ before: head, index: true }), 'staged');
+    tag(diff({ index: true, worktree: true }), 'unstaged');
+    tag(inspectEntries((page) => inspect.status({ ...page, untracked: 'all' }))
+      .filter((e) => e.untracked)
+      .map((e) => ({ status: 'A', path: text(e.path) }))
+      .filter((r) => !SYMLINKED_BUILD_ARTIFACT_PATHS.has(r.path)), 'untracked');
   } catch (err) {
-    return { error: `git plumbing failed: ${err.message}` };
+    return { error: `git read failed: ${err.message}` };
   }
 
   // Flatten renames into two independent path entries (old + new) so
@@ -322,7 +300,6 @@ export function runSelected({
   repoRoot = REPO_ROOT,
   testRoot = DEFAULT_TEST_ROOT,
   breakerState = { version: 1, quarantined: [], global: false },
-  exec = execFileSync,
   spawn,
   execPath = process.execPath,
   env = process.env,
@@ -331,7 +308,7 @@ export function runSelected({
   fullTriggers = FULL_TRIGGERS,
   staticGraphTests = [],
 } = {}) {
-  const collected = collectChangedPaths({ cwd, exec, base });
+  const collected = collectChangedPaths({ cwd, base });
   if (collected.error) {
     return { status: 1, decision: 'full', reason: `invalid-base: ${collected.error}`, explain: { base, error: collected.error }, ran: false };
   }
@@ -384,7 +361,6 @@ export function runShadow({
   repoRoot = REPO_ROOT,
   testRoot = DEFAULT_TEST_ROOT,
   breakerState = { version: 1, quarantined: [], global: false },
-  exec = execFileSync,
   spawn,
   execPath = process.execPath,
   env = process.env,
@@ -394,7 +370,7 @@ export function runShadow({
   staticGraphTests = [],
   now = () => Date.now(),
 } = {}) {
-  const collected = collectChangedPaths({ cwd, exec, base });
+  const collected = collectChangedPaths({ cwd, base });
   if (collected.error) {
     return { status: 1, comparison: null, explain: { base, error: collected.error } };
   }

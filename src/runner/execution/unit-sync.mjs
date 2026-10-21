@@ -3,12 +3,12 @@
 // The worker never runs git (its gitdir is read-only), so the merge is the runner's, through the
 // trusted git of commit-unit-work.mjs. The record lives in unit.json#sync:
 //   { ref, sha, status: 'pending'|'up-to-date'|'merged'|'conflicted'|'failed', head?, conflicts?,
-//     mergeStaged?, commit?, reason?, error? }
+//     operationId?, nextOperationId?, mergeStaged?, commit?, reason?, error? }
 // `sha` is resolved once, before the unit run exists, and a resume merges that sha, never the ref
 // again. A conflicted merge stays open for the worker; the open MERGE_HEAD equal to `sha` over
-// `head` is how the runner tells its own merge from anyone else's.
+// `head` and the native operation id identify the owned merge under verified custody.
 
-import fs from 'node:fs';
+import crypto from 'node:crypto';
 
 import { RunnerConfigError } from '../dispatch/config.mjs';
 import { matchesWriteScope } from '../dispatch/write-scope.mjs';
@@ -16,14 +16,11 @@ import { SYNC_SEAT } from './seat-resolver.mjs';
 import { commitOnBranch, finishSyncMerge, resolveSyncBase, startSyncMerge, syncMergeState } from './commit-unit-work.mjs';
 
 /**
- * The sync record of a new unit run, checked before the run exists: the unit must run in a linked
- * worktree (a merge never lands in the main checkout) and its ref must name a commit.
+ * The sync record of a new unit run, checked before the run exists: its ref must name a commit.
+ * A sync unit always writes, so runUnit has already refused the main checkout before this runs.
  */
 export function seedSync(unit, { worktree, mainRoot }) {
   if (unit.syncBase === undefined) return null;
-  if (fs.realpathSync(worktree) === fs.realpathSync(mainRoot)) {
-    throw new RunnerConfigError(`unit.syncBase "${unit.syncBase}" needs a linked worktree: the runner never merges into the main checkout`);
-  }
   const sha = resolveSyncBase({ worktree, repoRoot: mainRoot, ref: unit.syncBase });
   if (!sha) throw new RunnerConfigError(`unit.syncBase "${unit.syncBase}" names no commit in this repository`);
   return { ref: unit.syncBase, sha, status: 'pending' };
@@ -33,7 +30,7 @@ export function seedSync(unit, { worktree, mainRoot }) {
  * Before a resume: a merge the run left open must still be open (or concluded, by hand or by an
  * earlier round), never silently restarted over what a person did to it.
  */
-export function assertSyncResumable(unitRunId, unitRecord, mainRoot) {
+export function assertSyncResumable(unitRunId, unitRecord, mainRoot, custody) {
   const sync = unitRecord.sync;
   // A clean merge commit that holds more than the merge stays on the branch; a person takes it off.
   if (sync?.status === 'failed' && sync.reason === 'committed-set-mismatch' && sync.commit?.sha
@@ -41,11 +38,15 @@ export function assertSyncResumable(unitRunId, unitRecord, mainRoot) {
     throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": ${sync.error} (unexpected: ${(sync.unexpected ?? []).join(', ') || 'none'}; missing: ${(sync.missing ?? []).join(', ') || 'none'}); inspect it and take it off the branch by hand (git reset --hard ${sync.head} drops it with its files), then resume`);
   }
   if (sync?.status !== 'conflicted') return;
-  const { state, mergeHead, head } = syncMergeState({ worktree: unitRecord.worktree, repoRoot: mainRoot, sync });
-  if (state === 'in-progress') return;
+  const { state, mergeHead, head, rejected } = syncMergeState({ worktree: unitRecord.worktree, repoRoot: mainRoot, sync, custody, writer: unitRecord.gitWriter });
+  if (state === 'in-progress') {
+    if (rejected) sync.nextOperationId ??= crypto.randomUUID();
+    return;
+  }
   if (state === 'done') {
     sync.status = 'merged';
     sync.commit = { by: 'outside' };
+    sync.nativeHead = head;
     return;
   }
   const what = state === 'not-started'
@@ -76,12 +77,13 @@ export function runPendingSync(unitRecord, mainRoot, persist, custody) {
     const done = sync?.status === 'merged' || sync?.status === 'up-to-date';
     return done && unitRecord.unit.syncOnly && !unitRecord.bindings?.['producer/1'] ? syncOnlyPass(sync) : null;
   }
-  // Only a run that already marked this sync as started (and died before recording its result)
-  // may find its own merge open; a first start never takes over a merge someone else opened.
-  const adoptOpenMerge = sync.status === 'pending' && sync.started === true;
+  // A durable native operation id, not a matching MERGE_HEAD alone, owns resume.
+  // A known terminal clean-start failure gets a new id for the next explicit try.
+  if (sync.status === 'failed') sync.operationId = crypto.randomUUID();
+  sync.operationId ??= crypto.randomUUID();
   sync.started = true;
   persist();
-  const result = startSyncMerge({ worktree: unitRecord.worktree, repoRoot: mainRoot, ref: sync.ref, sha: sync.sha, adoptOpenMerge, custody });
+  const result = startSyncMerge({ worktree: unitRecord.worktree, repoRoot: mainRoot, ref: sync.ref, sha: sync.sha, operationId: sync.operationId, custody, writer: unitRecord.gitWriter });
   result.warnings = [...(sync.warnings ?? []), ...(result.warnings ?? [])];
   unitRecord.sync = result;
   persist();
@@ -131,7 +133,8 @@ export function syncBrief(sync) {
 export function commitRoundWithSync(unitRecord, mainRoot, commitWork, excludePaths, custody) {
   const sync = unitRecord.sync;
   if (sync?.status !== 'conflicted') return commitWork();
-  const merge = finishSyncMerge({ worktree: unitRecord.worktree, repoRoot: mainRoot, sync, custody });
+  const merge = finishSyncMerge({ worktree: unitRecord.worktree, repoRoot: mainRoot, sync, custody, writer: unitRecord.gitWriter });
+  if (merge.operationId) { sync.operationId = merge.operationId; delete sync.nextOperationId; }
   if (merge.status === 'failed') {
     merge.warnings = [...(sync.warnings ?? []), ...(merge.warnings ?? [])];
     const { status, reason, error, ...detail } = merge;
@@ -139,8 +142,9 @@ export function commitRoundWithSync(unitRecord, mainRoot, commitWork, excludePat
   }
   sync.warnings = [...(sync.warnings ?? []), ...(merge.warnings ?? [])];
   sync.status = 'merged';
+  sync.nativeHead = merge.sha;
   sync.commit = merge.status === 'committed' ? { sha: merge.sha, subject: merge.subject, files: merge.files } : { by: 'outside' };
-  const commit = commitWork();
+  const commit = commitWork(merge);
   const warnings = [...(commit.warnings ?? []), ...(sync.warnings ?? [])];
   return { ...commit, ...(warnings.length ? { warnings } : {}), sync: merge };
 }
@@ -148,6 +152,6 @@ export function commitRoundWithSync(unitRecord, mainRoot, commitWork, excludePat
 /** The sync part of runUnit's result. */
 export function syncSummary(sync) {
   if (!sync) return undefined;
-  const { started: _started, mergeStaged: _staged, ...rest } = sync;
+  const { started: _started, mergeStaged: _staged, nativeHead: _nativeHead, nextOperationId: _retry, ...rest } = sync;
   return rest;
 }

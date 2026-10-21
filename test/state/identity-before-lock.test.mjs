@@ -8,17 +8,24 @@
 // write paths against a real git repo reached through a symlinked path, so
 // lexical and canonical forms of the same .fgos dir both occur.
 import '../helpers/process-tmp-root.mjs';
-import { test } from 'node:test';
+import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
+import { devHostEnv, devHostManifest } from '../../scripts/lib/dev-host-manifest.mjs';
 import { initStore, addWork } from '../../src/state/store.mjs';
 import { IDENTITY_ENV_KEYS } from '../../src/util/session-identity.mjs';
 
 const HOST = process.env.FGOS_HOST_BIN;
+const CHECKOUT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+// The stand-in hosts, staged inside the checkout: the addon loader accepts a dev host only when
+// its manifest names it relative to the payload root.
+const stagedHosts = [];
+after(() => { for (const dir of stagedHosts) fs.rmSync(dir, { recursive: true, force: true }); });
 const UNIX = process.platform !== 'win32';
 const STORE_URL = new URL('../../src/state/store.mjs', import.meta.url).href;
 const EVENTS_URL = new URL('../../src/state/events.mjs', import.meta.url).href;
@@ -53,7 +60,10 @@ function setup({ store = 'main' } = {}) {
   initStore(dir);
   addWork(dir, { id: 'item-a', title: 'Item A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
 
-  const wrapper = path.join(base, 'host');
+  fs.mkdirSync(path.join(CHECKOUT, '.fgos/runtime'), { recursive: true });
+  const staged = fs.mkdtempSync(path.join(CHECKOUT, '.fgos/runtime/identity-lock-'));
+  stagedHosts.push(staged);
+  const wrapper = path.join(staged, 'host');
   fs.writeFileSync(wrapper, `#!/bin/sh
 caller=""; prev=""
 for a in "$@"; do [ "$prev" = "--pid" ] && caller="$a"; prev="$a"; done
@@ -65,11 +75,15 @@ for f in $(find "${path.join(base, 'real')}" -name state.hot -o -name porting-ev
 done
 exec "${HOST}" "$@"
 `, { mode: 0o755 });
-  return { base, repoRoot, dir, wrapper };
+  // The suite's own manifest, with the stand-in as the host: the addon is the one the suite staged.
+  const suite = JSON.parse(fs.readFileSync(process.env.FGOS_ACTIVE_MANIFEST_PATH, 'utf8'));
+  const manifestPath = path.join(staged, 'manifest.json');
+  fs.writeFileSync(manifestPath, JSON.stringify(devHostManifest({ checkoutRoot: CHECKOUT, fgosBin: wrapper, addonFile: path.join(CHECKOUT, suite.components.nativeAddon.path) })));
+  return { base, repoRoot, dir, wrapper, manifestPath };
 }
 
-function childEnv(wrapper, extra = {}) {
-  const env = { ...process.env, FGOS_HOST_BIN: wrapper, ...extra };
+function childEnv({ wrapper, manifestPath }, extra = {}) {
+  const env = { ...process.env, ...devHostEnv({}, { fgosBin: wrapper, checkoutRoot: CHECKOUT, manifestPath }), ...extra };
   for (const key of IDENTITY_ENV_KEYS) if (!(key in extra)) delete env[key];
   return env;
 }
@@ -92,10 +106,11 @@ porting.addPorting(dir, { id: 'p1', title: 'Widget' });
 porting.movePorting(dir, { id: 'p1', to: 'planned', expectedStatus: 'candidate' });
 `;
 
-function runWritePaths({ dir, repoRoot, wrapper }, extraEnv) {
+function runWritePaths(fixture, extraEnv) {
+  const { dir, repoRoot } = fixture;
   return spawnSync(process.execPath, ['--input-type=module', '-e', WRITE_PATHS, JSON.stringify({ dir, repoRoot })], {
     cwd: path.join(path.dirname(repoRoot), 'wt'),
-    env: childEnv(wrapper, extraEnv),
+    env: childEnv(fixture, extraEnv),
     encoding: 'utf8',
   });
 }
@@ -137,7 +152,7 @@ withStateTx(${JSON.stringify(fixture.dir)}, () => {
   while (!fs.existsSync(${JSON.stringify(release)})) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 10);
 });`;
   const holder = spawn(process.execPath, ['--input-type=module', '-e', holderScript], {
-    env: childEnv(fixture.wrapper, { FGOS_SESSION_ID: 'holder-process' }),
+    env: childEnv(fixture, { FGOS_SESSION_ID: 'holder-process' }),
     stdio: 'ignore',
   });
   const holderExit = new Promise((resolve) => holder.on('exit', resolve));
@@ -147,7 +162,7 @@ withStateTx(${JSON.stringify(fixture.dir)}, () => {
   const script = `const facade = await import(${JSON.stringify(FACADE_URL)});
 process.stdout.write(JSON.stringify(facade.resolveWriterIdentity(${JSON.stringify(fixture.dir)})));`;
   const resolved = spawnSync(process.execPath, ['--input-type=module', '-e', script], {
-    env: childEnv(fixture.wrapper, { FGOS_SESSION_ID: 'other-process' }),
+    env: childEnv(fixture, { FGOS_SESSION_ID: 'other-process' }),
     encoding: 'utf8',
   });
   fs.writeFileSync(release, 'go');

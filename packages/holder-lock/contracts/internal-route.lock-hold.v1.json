@@ -4,7 +4,7 @@
   "description": "Windows cold-path helper for Node, which cannot call LockFileEx. One helper process per held lock: it takes the lock in its own process, keeps it until Node terminates it, and runs borrowed children on request. Node and the helper talk through files in a private work directory, never through stdin, so synchronous Node code can wait without a turning event loop.",
   "platform": "windows",
   "argv": {
-    "required": ["--protocol 1", "--path <lockFile>", "--mode ex|sh", "--work <dir>"],
+    "required": ["--protocol 2", "--path <lockFile>", "--mode ex|sh", "--work <dir>"],
     "wait": {
       "exactlyOne": [
         { "flag": "--try", "meaning": "one non-blocking attempt" },
@@ -42,7 +42,7 @@
   "exitCodes": {
     "0": "ended by parent death after a clean release of the domain",
     "2": "usage error (result error, code usage)",
-    "3": "protocol mismatch (result error, code host-version-mismatch; --protocol absent or != 1)",
+    "3": "protocol mismatch (result error, code host-version-mismatch; --protocol absent or != 2)",
     "10": "held",
     "11": "timeout",
     "12": "unavailable",

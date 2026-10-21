@@ -1,6 +1,7 @@
-// repo-locks.mjs — the one door to the three repo locks of the runner: the
-// main checkout mutex (rank 50), the per-target merge slot (rank 20) and the
-// worktree-admin mutex (rank 40). Each is a kernel lock on an open file
+// repo-locks.mjs — the one door to the runner's repo locks: the main
+// checkout mutex (rank 50) and the worktree-admin mutex (rank 40). The
+// per-target merge slot (rank 20) belongs to Land's own session (Git spec
+// §9). Each is a kernel lock on an open file
 // description taken through the holder-lock facade: no TTL, no heartbeat, no
 // pid self-recognition. A holder that dies releases by dying.
 //
@@ -8,11 +9,13 @@
 // separate adapter (main-fgos-checkpoint.mjs) that attaches to the handle
 // `withMainCheckout` gives its callback.
 
-import { spawnSync } from 'node:child_process';
+import fs from 'node:fs';
+import crypto from 'node:crypto';
+import { gitPortOptions } from '../git/inspect.mjs';
+import { createGitWorktree } from '../git/worktree.mjs';
 import { acquire, acquireSync, lockHolders, HolderLockError } from '../holder-lock/index.mjs';
 
 const MAIN_CHECKOUT = 'main-checkout';
-const MERGE_SLOT = 'merge-slot';
 const WORKTREE_ADMIN = 'worktree-admin';
 
 // `git worktree add` is short; the synchronous creation helpers wait for the
@@ -53,26 +56,16 @@ async function withRepoLock(scope, name, params, label, fn, { waitMs } = {}) {
 /**
  * withMainCheckout(scope, purpose, fn, { fgosDir, waitMs }) — `fn(mainHandle)`
  * runs while this process holds the main checkout mutex. `purpose` only
- * names the operation in the error and in `lock-status`. A git child that
- * must write the main checkout runs through `runBorrowed(mainHandle, ...)`.
+ * names the operation in the error and in `lock-status`. Git writes use a
+ * typed port with this verified main handle.
  */
 export function withMainCheckout(scope, purpose, fn, { fgosDir, waitMs } = {}) {
   return withRepoLock(scope, MAIN_CHECKOUT, { fgosDir }, `main checkout (${purpose})`, fn, { waitMs });
 }
 
-/**
- * withMergeTargetSlot(scope, lockRoot, targetRef, fn, { waitMs }) — the
- * per-target-ref merge slot. Distinct refs never contend. Must be taken
- * before anything reads the target's tip.
- */
-export function withMergeTargetSlot(scope, lockRoot, targetRef, fn, { waitMs } = {}) {
-  const fgosDir = `${lockRoot}/.fgos`;
-  return withRepoLock(scope, MERGE_SLOT, { fgosDir, ref: encodeURIComponent(targetRef) }, `merge slot of "${targetRef}"`, () => fn(), { waitMs });
-}
-
 /** withWorktreeAdmin(scope, fgosDir, fn, { waitMs }) — serializes `git worktree add`. */
 export function withWorktreeAdmin(scope, fgosDir, fn, { waitMs } = {}) {
-  return withRepoLock(scope, WORKTREE_ADMIN, { fgosDir }, 'worktree admin', () => fn(), { waitMs });
+  return withRepoLock(scope, WORKTREE_ADMIN, { fgosDir }, 'worktree admin', fn, { waitMs });
 }
 
 function lockHeldError(res, label, fgosDir) {
@@ -85,31 +78,48 @@ function lockHeldError(res, label, fgosDir) {
   );
 }
 
-function runWorktreeAdd(repoRoot, args) {
-  const res = spawnSync('git', ['worktree', 'add', ...args], { cwd: repoRoot, encoding: 'utf8' });
-  if (res.error) throw res.error;
-  if (res.status !== 0) {
-    throw new Error(`git worktree add ${args.join(' ')} failed (exit ${res.status}): ${String(res.stderr).trim()}`);
-  }
-  return res.stdout;
-}
-
-/** addWorktree(scope, repoRoot, args) — `git worktree add <args>` under the
- * worktree-admin mutex; returns git's stdout, throws on a non-zero exit. */
-export function addWorktree(scope, repoRoot, args, { waitMs } = {}) {
-  return withWorktreeAdmin(scope, `${repoRoot}/.fgos`, () => runWorktreeAdd(repoRoot, args), { waitMs });
-}
-
-/** addWorktreeSync(scope, repoRoot, args) — the same, for callers that are
- * synchronous end to end (worktree creation helpers). Blocks the process for
- * at most `waitMs` while another process holds worktree-admin. */
-export function addWorktreeSync(scope, repoRoot, args, { waitMs = DEFAULT_WORKTREE_ADMIN_WAIT_MS } = {}) {
-  const fgosDir = `${repoRoot}/.fgos`;
+/** Typed creation; the same holder spans native inspection and registration. */
+export function createWorktreeCheckoutSync(scope, repoRoot, request, { waitMs = DEFAULT_WORKTREE_ADMIN_WAIT_MS } = {}) {
+  scope.assertCanAcquire(WORKTREE_ADMIN, 40);
+  const options = gitPortOptions(repoRoot, { mutation: true });
+  const fgosDir = `${options.trustedMain}/.fgos`;
   const res = acquireSync(scope, WORKTREE_ADMIN, { fgosDir }, { waitMs });
   if (res.result !== 'acquired') throw lockHeldError(res, 'worktree admin', fgosDir);
   try {
-    return runWorktreeAdd(repoRoot, args);
-  } finally {
-    res.handle.release();
+    // The caller allocated this empty placeholder; native creation requires an absent destination.
+    if (fs.existsSync(request.path) && fs.readdirSync(request.path).length === 0) fs.rmdirSync(request.path);
+    const port = createGitWorktree(options);
+    return port[request.branch ? 'create' : 'createDetached']({ ...request, operationId: request.operationId ?? crypto.randomUUID() }, [res.handle]);
+  } finally { res.handle.release(); }
+}
+
+// Compatibility translation for remaining Land callers; remove with the last importer.
+function creationRequest(args) {
+  const words = [...args];
+  const detached = words[0] === '--detach';
+  let branch;
+  if (words[0] === '-b') { words.shift(); branch = words.shift(); }
+  else if (detached) words.shift();
+  const target = words.shift();
+  const base = words.shift();
+  return { path: target, ...(detached ? {} : { branch: branch ?? base }), ...(branch || detached ? { base: base ?? 'HEAD' } : { base }) };
+}
+export function addWorktreeSync(scope, repoRoot, args, options) {
+  try { createWorktreeCheckoutSync(scope, repoRoot, creationRequest(args), options); return ''; }
+  catch (err) {
+    if (err instanceof HolderLockError) throw err;
+    throw new Error(`git worktree add ${args.join(' ')} failed: ${err.message}`, { cause: err });
   }
+}
+export async function addWorktree(scope, repoRoot, args, options = {}) {
+  scope.assertCanAcquire(WORKTREE_ADMIN, 40);
+  const context = gitPortOptions(repoRoot, { mutation: true });
+  const request = creationRequest(args);
+  return withWorktreeAdmin(scope, `${context.trustedMain}/.fgos`, handle => {
+    try {
+      if (fs.existsSync(request.path) && fs.readdirSync(request.path).length === 0) fs.rmdirSync(request.path);
+      createGitWorktree(context)[request.branch ? 'create' : 'createDetached']({ ...request, operationId: crypto.randomUUID() }, [handle]);
+      return '';
+    } catch (err) { throw new Error(`git worktree add ${args.join(' ')} failed: ${err.message}`, { cause: err }); }
+  }, options);
 }

@@ -20,7 +20,7 @@ pub(crate) mod macos;
 mod windows;
 
 #[cfg(target_os = "linux")]
-pub use linux::{BwrapPidns, LinuxPgroup};
+pub use linux::{environment_marked, BwrapPidns, LinuxPgroup};
 #[cfg(target_os = "macos")]
 pub use macos::MacosTree;
 #[cfg(windows)]

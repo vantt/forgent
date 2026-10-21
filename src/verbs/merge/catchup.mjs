@@ -9,11 +9,11 @@
 // resolved parent's branch for a leaf) into the item's OWN branch,
 // re-verifying, and either landing the merge (blocked -> awaiting-approval, D18's
 // edge, mechanical/uncounted per D11) or aborting clean and leaving the
-// item blocked for a human. Deliberately does NOT call mergeRunnerItem
-// (merge.mjs) — that merges the item's branch INTO the caller's checkout,
-// the opposite direction catchup needs, and its source ref is hardcoded
-// to the item's own branch (main as a *source* cannot be expressed
-// through it) — so the git sequence lives in `performCatchUp`
+// item blocked for a human. Deliberately does NOT call landRunnerItem
+// (merge.mjs) — that lands the item's branch INTO its target,
+// the opposite direction catchup needs (catchup merges the target INTO the
+// item's own branch, under that branch's checkout custody) — so the git
+// sequence lives in `performCatchUp`
 // (runner/merge.mjs) instead, mirroring the spike's proven shape (merge
 // --no-commit --no-ff -> verify -> commit-or-abort, verify strictly before
 // any commit).

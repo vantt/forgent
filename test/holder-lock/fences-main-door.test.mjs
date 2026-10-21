@@ -14,6 +14,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { REPO_ROOT, DEFAULT_V1_BASE } from './fixtures/extract-v1.mjs';
 import { extractV1Source, probeV1 } from './fixtures/extract-v1.mjs';
 import { placeFences, fenceStatus, fenceTargets, fenceBy, TOMBSTONE_FILE, V1_LOCK_PRESENT } from '../../src/holder-lock/fences.mjs';
+import { workspaceListing } from '../../src/setup/holder-lock-checks.mjs';
 
 const PROBE_TIMEOUT_MS = 15_000;
 const GIT_ENV = { ...process.env, GIT_AUTHOR_NAME: 'fences', GIT_AUTHOR_EMAIL: 'fences@test', GIT_COMMITTER_NAME: 'fences', GIT_COMMITTER_EMAIL: 'fences@test' };
@@ -44,7 +45,7 @@ function makeWorkspace(name) {
   return { root, fgosDir: path.join(root, '.fgos'), providerRuntimeDir };
 }
 
-const options = (ws) => ({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir });
+const options = (ws) => ({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, ...workspaceListing(ws.root), providerRuntimeDir: ws.providerRuntimeDir });
 const mainDoorTargets = (ws) => fenceTargets(options(ws)).filter((t) => ['main-checkout', 'merge-slot'].includes(t.lock));
 
 test('the main checkout lock, one merge slot per local branch and the three old state store locks are tombstoned', () => {

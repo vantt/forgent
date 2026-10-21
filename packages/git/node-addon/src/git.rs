@@ -25,7 +25,7 @@ use serde_json::{json, Value};
 use std::path::Path;
 
 fn operation(e: OperationError) -> Error {
-    Error::from_reason(json!({"code": e.code, "cause": e.cause, "retryable": e.retryable, "operationId": e.operation_id, "receipt": e.receipt, "exitCode": e.exit_code, "signal": e.signal, "stderr": e.stderr}).to_string())
+    Error::from_reason(json!({"code": e.code, "cause": e.cause, "retryable": e.retryable, "operationId": e.operation_id, "receipt": e.receipt, "exitCode": e.exit_code, "signal": e.signal, "stderr": e.stderr, "detail": e.detail}).to_string())
 }
 fn text<'a>(v: &'a Value, key: &str) -> Result<&'a str> {
     v.get(key)

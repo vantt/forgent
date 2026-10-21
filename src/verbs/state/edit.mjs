@@ -1,6 +1,6 @@
-import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { listWork, editWork, addDecision, StoreError } from '../../state/store.mjs';
+import { resolveMainCheckoutRoot } from '../../runner/paths.mjs';
 
 export const EDIT_EMPTY_PATCH_MESSAGE =
   'edit requires at least one field to change: --title/--description/--kind/--risk/--verify/--tier/--refs/--deps/--footprint/--acceptance/--priority/--intent/--docs-ref/--parent/--urgent/--impact/--effort/--merge-after/--superseded-by/--duplicates/--domain-fields/--verify-from-children/--verify-from-targets.';
@@ -64,18 +64,9 @@ export function generateVerifyFromChildren(dir, id, { cwd = process.cwd(), repoR
       `edit --verify-from-children: no item has parent === "${id}" -- refusing to write a verify that would vacuously pass (jq's "all()" on an empty list is always true).`,
     );
   }
-  let root = repoRoot;
+  const root = repoRoot || resolveMainCheckoutRoot(cwd);
   if (!root) {
-    try {
-      const gitCommonDir = execFileSync(
-        'git',
-        ['rev-parse', '--path-format=absolute', '--git-common-dir'],
-        { cwd, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'ignore'] },
-      ).trim();
-      root = path.resolve(path.dirname(gitCommonDir));
-    } catch (err) {
-      throw new StoreError('validation', `edit --verify-from-children: could not resolve the repo root via git (${err.message}).`);
-    }
+    throw new StoreError('validation', `edit --verify-from-children: could not resolve the repo root via git ("${cwd}" is not inside a git checkout).`);
   }
   return formatJqVerifyCommand(root, ids);
 }
@@ -93,18 +84,9 @@ export function generateVerifyFromTargets(dir, id, { cwd = process.cwd(), repoRo
       `edit --verify-from-targets: "${id}" has no targets -- refusing to write a verify that would vacuously pass (jq's "all()" on an empty list is always true).`,
     );
   }
-  let root = repoRoot;
+  const root = repoRoot || resolveMainCheckoutRoot(cwd);
   if (!root) {
-    try {
-      const gitCommonDir = execFileSync(
-        'git',
-        ['rev-parse', '--path-format=absolute', '--git-common-dir'],
-        { cwd, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'ignore'] },
-      ).trim();
-      root = path.resolve(path.dirname(gitCommonDir));
-    } catch (err) {
-      throw new StoreError('validation', `edit --verify-from-targets: could not resolve the repo root via git (${err.message}).`);
-    }
+    throw new StoreError('validation', `edit --verify-from-targets: could not resolve the repo root via git ("${cwd}" is not inside a git checkout).`);
   }
   return formatJqVerifyCommand(root, ids);
 }

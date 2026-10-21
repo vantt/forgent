@@ -24,7 +24,10 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import crypto from 'node:crypto';
+import { gitPortOptions } from '../git/inspect.mjs';
+import { createGitScopedCommit } from '../git/scoped-commit.mjs';
+import { commitLegacyEventFiles } from './legacy-event-git-adapter.mjs';
 import { readEvents } from './events.mjs';
 import { withMainState } from './runtime-coordination.mjs';
 import { foldEvents } from './replay.mjs';
@@ -174,23 +177,6 @@ function readConfigThreshold(repoRoot) {
   }
 }
 
-/** Stage a finished move (`git add` the new path, drop the old one from the
- * index); best-effort -- the files are already moved on disk and nothing is
- * ever deleted, so a repo that cannot stage them loses only the staging. Runs
- * after the state lock is released: it starts git. */
-function stageArchiveMoves(moves, repoRoot) {
-  for (const { src, dest } of moves) {
-    const relSrc = path.relative(repoRoot, src);
-    const relDest = path.relative(repoRoot, dest);
-    try {
-      execFileSync('git', ['add', '-A', '--', relDest], { cwd: repoRoot, stdio: ['ignore', 'pipe', 'pipe'] });
-      execFileSync('git', ['rm', '--cached', '--ignore-unmatch', '-q', '--', relSrc], { cwd: repoRoot, stdio: ['ignore', 'pipe', 'pipe'] });
-    } catch {
-      // best-effort, see above
-    }
-  }
-}
-
 /**
  * The main entry (TA-D5/TA-D6/TA-D13). `dir` is the `.fgos` directory
  * (same convention `store.mjs`'s own `paths(dir)` uses). Runs entirely
@@ -211,7 +197,15 @@ export function compactColdWriterFiles(dir, { nowMs = Date.now(), idleThresholdM
   const archiveDirPath = path.join(eventsDirPath, 'archive');
   const realRepoRoot = repoRoot || path.dirname(dir);
 
-  const moves = [];
+  // Capture Git baseline before state60. File moves and verification remain
+  // Work's state transaction; declared publication happens after it returns.
+  let publication;
+  let publicationError;
+  try {
+    const options = gitPortOptions(realRepoRoot, { mutation: true });
+    publication = { options, baseline: createGitScopedCommit(options).preflight() };
+  } catch (error) { publicationError = error; /* Compaction retains files even without a Git publication. */ }
+  const files = [];
   const outcome = withMainState(dir, (tx) => {
     const coldFiles = findColdWriterFiles(eventsDirPath, { nowMs, idleThresholdMs });
     if (coldFiles.length === 0) {
@@ -230,6 +224,7 @@ export function compactColdWriterFiles(dir, { nowMs = Date.now(), idleThresholdM
     const compactTs = formatCompactTs(new Date(nowMs));
     const baselineName = `baseline-${compactTs}.jsonl`;
     const baselinePath = path.join(eventsDirPath, baselineName);
+    files.push(baselinePath);
     fs.writeFileSync(baselinePath, merged.map((ev) => `${JSON.stringify(ev)}\n`).join(''), 'utf8');
 
     const verify = verifyCompactionCandidate(entries, readEvents(baselinePath));
@@ -246,7 +241,7 @@ export function compactColdWriterFiles(dir, { nowMs = Date.now(), idleThresholdM
     for (const { name, path: filePath } of coldFiles) {
       const dest = path.join(archiveDirPath, name);
       tx.rename(filePath, dest);
-      moves.push({ src: filePath, dest });
+      files.push(filePath, dest);
       archivedNames.push(name);
     }
 
@@ -254,10 +249,23 @@ export function compactColdWriterFiles(dir, { nowMs = Date.now(), idleThresholdM
     // past compaction retroactively -- see events-compaction-verified in
     // src/setup/registrations.mjs).
     const manifestPath = path.join(archiveDirPath, `${compactTs}.manifest.json`);
+    files.push(manifestPath);
     tx.writeText(manifestPath, `${JSON.stringify({ baseline: baselineName, originals: archivedNames })}\n`);
 
     return { compacted: true, baseline: baselineName, archived: archivedNames, totalEvents: verify.totalEvents };
   });
-  if (moves.length > 0) stageArchiveMoves(moves, realRepoRoot);
+  if (outcome.compacted && publication) {
+    try {
+      const committed = commitLegacyEventFiles(publication.options, {
+        files: files.map(file => path.relative(realRepoRoot, file).replaceAll('\\', '/')),
+        baseline: publication.baseline, operationId: crypto.randomUUID(),
+        message: 'chore(.fgos): archive verified event shards',
+      });
+      outcome.commit = committed;
+    } catch (error) {
+      outcome.warnings = [`Event archive preserved; Git publication deferred: ${error.message}`];
+    }
+  }
+  if (outcome.compacted && publicationError) outcome.warnings = [`Event archive preserved; Git publication unavailable: ${publicationError.message}`];
   return outcome;
 }

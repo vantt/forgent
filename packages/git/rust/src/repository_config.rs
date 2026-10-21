@@ -33,6 +33,7 @@ fn error(cause: impl std::fmt::Display) -> OperationError {
         exit_code: None,
         signal: None,
         stderr: vec![],
+        detail: None,
     }
 }
 struct Authority<'a> {
@@ -603,7 +604,7 @@ pub struct HooksReport {
     pub provenance: Option<String>,
 }
 impl GitDriver {
-    fn hooks_value(&self, repo: &RepoHandle) -> Result<Option<String>> {
+    pub(crate) fn hooks_value(&self, repo: &RepoHandle) -> Result<Option<String>> {
         // This read-only config query must report included hooks rather than
         // apply checkout/transport admission (which refuses include.path).
         // Reading config executes no configured command; mutation still uses
@@ -684,6 +685,9 @@ impl GitDriver {
         let mut latest = None;
         let mut ambiguous = false;
         for entry in scan.entries {
+            // scan includes the terminal ledger; those operation directories
+            // have already been removed. Config ownership chains stay retained.
+            if wal.compacted(&entry.operation_id).map_err(error)?.is_some() { continue; }
             let chain = wal.inspect(&entry.operation_id).map_err(error)?;
             if matches!(
                 chain.outcome(),

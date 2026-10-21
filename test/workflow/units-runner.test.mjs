@@ -6,6 +6,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { execFileSync } from 'node:child_process';
 
 import { startWorkflow, resumeWorkflow, statusWorkflow, validateWorkflow, readWorkflowEvents } from '../../src/workflow/index.mjs';
@@ -62,6 +63,7 @@ function setupRepo({ effortCli = false } = {}) {
   fs.writeFileSync(path.join(tmp, '.gitignore'), '.fgos/\nworker.mjs\n*-bin\n');
   execFileSync('git', ['add', 'README.md', '.gitignore'], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['commit', '-m', 'initial'], { cwd: tmp, stdio: 'ignore' });
+  activateGitFixture(tmp);
 
   const worker = path.join(tmp, 'worker.mjs');
   fs.writeFileSync(worker, WORKER);

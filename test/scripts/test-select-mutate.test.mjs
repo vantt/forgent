@@ -4,8 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
-import { classifyMutant, classifyOneMutant, relatedFilesForRule, runNightlyMutations, runRelatedCaptured as realRunRelated, symlinkSharedDirs } from '../../scripts/test-select-mutate.mjs';
+import { classifyMutant, classifyOneMutant, relatedFilesForRule, runNightlyMutations, runRelatedCaptured as realRunRelated, symlinkSharedDirs, headCheckouts } from '../../scripts/test-select-mutate.mjs';
 
 test('symlinkSharedDirs: symlinks node_modules always, target only when the repo root has one', () => {
   const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'symlink-shared-repo-'));
@@ -281,10 +280,7 @@ test('integration: a real mutant (m-edit-1) is applied and classified inside a r
   assert.ok(rule, 'rule for m-edit-1 must exist in the manifest');
 
   const repoRoot = process.cwd();
-  const baseDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mutate-integration-'));
-  createdDirs.push(baseDir);
-  const worktreePath = fs.mkdtempSync(path.join(baseDir, 'wt-'));
-  execFileSync('git', ['worktree', 'add', '--detach', worktreePath, 'HEAD'], { cwd: repoRoot, encoding: 'utf8' });
+  const worktreePath = headCheckouts.create();
   try {
     fs.symlinkSync(path.join(repoRoot, 'node_modules'), path.join(worktreePath, 'node_modules'), 'dir');
     // The related runs are real processes in a real worktree. The full-suite
@@ -304,9 +300,11 @@ test('integration: a real mutant (m-edit-1) is applied and classified inside a r
       ['caught', 'confirmed-miss', 'equivalent-or-missing-test'].includes(classification),
       `expected a real classification outcome, got "${classification}"`,
     );
+    assert.equal(fs.readFileSync(path.join(worktreePath, mutant.file), 'utf8'), fs.readFileSync(path.join(repoRoot, mutant.file), 'utf8'), 'the mutated file is restored after classification');
   } finally {
-    execFileSync('git', ['worktree', 'remove', '-f', worktreePath], { cwd: repoRoot, encoding: 'utf8' });
+    headCheckouts.remove(worktreePath);
   }
+  assert.equal(fs.existsSync(worktreePath), false, 'the guarded removal took the restored checkout away');
 });
 
 
@@ -316,15 +314,17 @@ test('runNightlyMutations: the full-suite baseline runs once on a clean HEAD and
     id, ruleId: 'fake-rule', file: 'src/fake.mjs', boundary: 'b', find: 'ORIGINAL', replace: 'MUTATED',
   }));
   const worktreesAdded = [];
-  // Fake git: "worktree add" materialises the one source file a mutant edits.
-  const execFileFn = (cmd, args) => {
-    if (cmd === 'git' && args[0] === 'worktree' && args[1] === 'add') {
-      const wt = args[3];
+  // Fake checkouts: each one materialises the one source file a mutant edits.
+  const checkoutsRoot = tmpWorktree();
+  const checkouts = {
+    create: (label) => {
+      const wt = fs.mkdtempSync(path.join(checkoutsRoot, `${label}-`));
       worktreesAdded.push(path.basename(wt));
       fs.mkdirSync(path.join(wt, 'src'), { recursive: true });
       fs.writeFileSync(path.join(wt, 'src/fake.mjs'), 'const x = "ORIGINAL";\n');
-    }
-    return '';
+      return wt;
+    },
+    remove: () => {},
   };
   const fullRunDirs = [];
   const runFull = ({ cwd }) => {
@@ -337,7 +337,7 @@ test('runNightlyMutations: the full-suite baseline runs once on a clean HEAD and
   };
   const ledgerOut = path.join(tmpWorktree(), 'ledger.json');
   const ledger = runNightlyMutations({
-    manifest, mutants: fakeMutants, ledgerOut, execFileFn,
+    manifest, mutants: fakeMutants, ledgerOut, checkouts,
     runRelated: () => ({ status: 0, signal: null, stderr: '' }),
     runFull,
   });

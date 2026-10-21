@@ -3,7 +3,9 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import crypto from 'node:crypto';
+import { nativeError } from '../src/git/native.mjs';
+import { scopedCommitRepo } from './lib/git-ports.mjs';
 import { rebuild, moveDocPathStore, demoteDocStore } from '../src/state/store.mjs';
 import { parseFrontmatter, renderFrontmatter } from '../src/report/frontmatter.mjs';
 import { computeKnowledgeProjection } from '../src/report/knowledge-projection.mjs';
@@ -19,7 +21,7 @@ import { isLiveDocLifecycle } from '../src/state/knowledge-registry.mjs';
 // Also preflights the registry event apply itself would need to write, not
 // just the filesystem move: a doc that isn't registered yet (or whose
 // registry identity no longer matches what was planned) would previously
-// only be discovered by actually running `git mv` first and having
+// only be discovered by actually moving the file first and having
 // moveDocPathStore throw AFTER the file already moved -- a real partial
 // apply (file relocated, registry never updated). Checking it here, before
 // any mutation, is what makes apply's "nothing partially applied" promise
@@ -255,9 +257,9 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true, fgosRoot = repo
     //   - a throw here (parseFrontmatter/renderFrontmatter/writeFileSync):
     //     the file never moved, no registry event recorded -- srcAbs is
     //     the only thing possibly touched, and it's still at oldPath.
-    //   - a throw during the git mv/rename below: same as above, the
-    //     frontmatter update already succeeded but nothing was recorded
-    //     as moved either.
+    //   - a throw during the move or its scoped commit below: the path
+    //     and the content are both rolled back, nothing recorded as
+    //     moved.
     //   - a throw from moveDocPathStore/demoteDocStore after a successful
     //     move: the file has already reached its final, correctly-
     //     rendered content at newPath -- the ONLY residual gap is the
@@ -277,44 +279,36 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true, fgosRoot = repo
       mode: move.quadrant,
     };
     const updated = renderFrontmatter(newMeta, parsed.body);
-    fs.writeFileSync(srcAbs, updated, 'utf8');
 
-    fs.mkdirSync(path.dirname(destAbs), { recursive: true });
+    // One ScopedCommit per move, naming both literal paths (old deleted,
+    // new added; Git spec §3). The baseline is taken before any byte of
+    // this move changes. move.oldPath/move.newPath come from the migration
+    // inventory, untrusted input: they reach Git only as literal paths,
+    // never through a shell.
+    //
+    // On any failure ScopedCommit has already put both paths back to their
+    // pre-commit state (frontmatter written, file at newPath); this script
+    // then restores the pre-attempt path AND content, before the registry
+    // is touched, so a rerun sees exactly the state it planned from and
+    // never the "missing source file" / "target already exists" deadlock.
     try {
-      // execFileSync (argv array, no shell) rather than a shell string --
-      // move.oldPath/move.newPath come from the migration inventory file,
-      // untrusted input; a path containing a quote or shell metacharacter
-      // must never be interpreted by a shell.
-      execFileSync('git', ['mv', move.oldPath, move.newPath], { cwd: repoRoot, stdio: 'ignore' });
-    } catch {
+      const scoped = scopedCommitRepo(repoRoot);
+      const baseline = scoped.preflight();
+      fs.writeFileSync(srcAbs, updated, 'utf8');
+      fs.mkdirSync(path.dirname(destAbs), { recursive: true });
       fs.renameSync(srcAbs, destAbs);
-      try {
-        execFileSync('git', ['add', move.newPath, move.oldPath], { cwd: repoRoot, stdio: 'ignore' });
-      } catch (err) {
-        // Never swallow this, and never leave the filesystem stuck either.
-        // If `git add` fails (a locked index, a permission error, a
-        // corrupted index), the file has already been physically renamed
-        // on disk but git's index does not know it -- `git status` would
-        // show a deletion at oldPath and an untracked file at newPath.
-        // Just throwing here (the previous fix) stops the registry from
-        // recording a move git never actually tracked, but leaves oldPath
-        // missing and newPath occupied on disk -- a rerun would then see
-        // "missing source file" AND "target already exists," a state that
-        // no longer self-heals by rerunning migration alone. Rolling the
-        // rename back here restores the pre-attempt PATH (this
-        // fs.renameSync is a plain filesystem op, independent of whatever
-        // git problem caused the failure above) -- but the frontmatter
-        // update above already wrote transformed CONTENT to srcAbs before
-        // any of this ran, so path rollback alone still leaves a doc edit
-        // sitting uncommitted at oldPath if the operator aborts here.
-        // Restoring `raw` (captured before the transform) makes "unchanged
-        // on disk" literally true, not just true for the path.
-        fs.renameSync(destAbs, srcAbs);
-        fs.writeFileSync(srcAbs, raw, 'utf8');
-        throw new Error(
-          `knowledge-migration: attempted to rename '${move.oldPath}' to '${move.newPath}', but "git add" failed to stage it (${err.message}) -- rolled the rename back, '${move.oldPath}' is unchanged on disk. Resolve the underlying git problem (e.g. a locked index) and rerun; the registry was NOT updated for this move.`
-        );
-      }
+      const result = scoped.commit({
+        operationId: `knowledge-migration-${crypto.randomUUID()}`,
+        baseline,
+        request: { writes: [move.oldPath, move.newPath], message: `docs(knowledge): move ${move.oldPath} to ${move.newPath}`, cutoverGrant: null },
+      });
+      if (result.status !== 'committed') throw new Error(`ScopedCommit returned ${result.status}${result.oid ? ` (${result.oid})` : ''}`);
+    } catch (err) {
+      if (fs.existsSync(destAbs) && !fs.existsSync(srcAbs)) fs.renameSync(destAbs, srcAbs);
+      fs.writeFileSync(srcAbs, raw, 'utf8');
+      throw new Error(
+        `knowledge-migration: attempted to move '${move.oldPath}' to '${move.newPath}', but the scoped commit failed to record it (${nativeError(err).cause ?? err.message}) -- rolled the move back, '${move.oldPath}' is unchanged on disk. Resolve the underlying git problem (e.g. a locked index) and rerun; the registry was NOT updated for this move.`
+      );
     }
 
     // Record moveDocPathStore event

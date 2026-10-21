@@ -412,10 +412,17 @@ pub fn run(git: &Path, helper: &HelperExe, only: &[String], keep_repo: bool) -> 
     if !crate::driver::current().supported() {
         return Err(RunError::Unavailable(crate::driver::current().unsupported_detail().to_string()));
     }
-    let mut version = Command::new(git);
-    version.arg("--version").stdin(Stdio::null());
-    let git_version = run_plain(version, "git --version").map_err(RunError::Unavailable)?;
+    // Every git child of the vectors runs inside the run's own temp directory, the version check too.
     let dir = temp_dir().map_err(|e| RunError::Unavailable(format!("temp dir: {e}")))?;
+    let mut version = Command::new(git);
+    version.arg("--version").current_dir(&dir).stdin(Stdio::null());
+    let git_version = match run_plain(version, "git --version") {
+        Ok(version) => version,
+        Err(e) => {
+            let _ = fs::remove_dir_all(&dir);
+            return Err(RunError::Unavailable(e));
+        }
+    };
     let vectors = VECTORS
         .iter()
         .filter(|name| only.is_empty() || only.iter().any(|o| o == *name))

@@ -11,6 +11,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { withProviderFamilies } from './provider-families.mjs';
 import { makeFixtureDir } from './fixture-dir.mjs';
+import { activateGitFixture } from './git-fixture.mjs';
 
 /**
  * @param {object} options
@@ -41,6 +42,7 @@ export function setupWorkflowFixtureRepo({
   fs.writeFileSync(path.join(tmp, 'README.md'), `${readme}\n`);
   execFileSync('git', ['add', 'README.md'], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['commit', '-m', 'initial commit'], { cwd: tmp, stdio: 'ignore' });
+  activateGitFixture(tmp);
 
   const echoScript = path.join(tmp, 'echo-worker.mjs');
   fs.writeFileSync(

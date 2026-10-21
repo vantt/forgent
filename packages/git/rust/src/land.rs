@@ -13,6 +13,8 @@ use std::{collections::BTreeMap, path::PathBuf};
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct LandRequest {
     pub source: String,
+    /// Omitted target pins the destination under slot 20. Persisted intents always contain an OID.
+    #[serde(default)]
     pub target: String,
     pub destination: String,
     pub message: String,
@@ -29,6 +31,49 @@ pub struct LandRequest {
 pub struct LandFile {
     pub path: String,
     pub bytes: Option<Vec<u8>>,
+}
+/// Consumer-declared paths are literal, relative and outside `.git`; `kind`
+/// names the refusal (`invalid-land-file`, `invalid-sync-file`).
+pub(crate) fn validate_declared_files(files: &[LandFile], kind: &str) -> Result<()> {
+    for file in files {
+        let path = std::path::Path::new(&file.path);
+        if path.is_absolute()
+            || file.path.is_empty()
+            || path
+                .components()
+                .any(|c| !matches!(c, std::path::Component::Normal(_)))
+            || file.path.split('/').any(|s| s == ".git")
+        {
+            return Err(failure(format!("invalid-{kind}-file")));
+        }
+    }
+    Ok(())
+}
+/// Write one declared file's literal bytes under `root`, or remove it when it
+/// declares an absence. Git never interprets them. Symlink ancestors and
+/// targets are refused rather than written through.
+pub(crate) fn write_declared_file(root: &std::path::Path, file: &LandFile, kind: &str) -> Result<()> {
+    let path = std::path::Path::new(&file.path);
+    let full = root.join(path);
+    let mut at = root.to_path_buf();
+    for part in path.components() {
+        at.push(part);
+        if std::fs::symlink_metadata(&at).is_ok_and(|m| m.file_type().is_symlink()) {
+            return Err(failure(format!("{kind}-file-symlink")));
+        }
+    }
+    if let Some(bytes) = &file.bytes {
+        if let Some(p) = full.parent() {
+            std::fs::create_dir_all(p).map_err(failure)?;
+        }
+        std::fs::write(full, bytes).map_err(failure)
+    } else {
+        match std::fs::remove_file(full) {
+            Ok(()) => Ok(()),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
+            Err(e) => Err(failure(e)),
+        }
+    }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -207,7 +252,7 @@ impl GitDriver {
         let mut cursor = None;
         let mut dirty = false;
         loop {
-            let page = self.status(repo, Untracked::All, cursor, 4096)?;
+            let page = self.status(repo, Untracked::All, Submodules::Configured, Ignored::Excluded, cursor, 4096)?;
             for entry in page.entries {
                 let p = fgos_write_scope::path_text(&entry.path).map_err(failure)?;
                 if p == ".fgos" || p.starts_with(".fgos/") {
@@ -265,6 +310,31 @@ impl GitDriver {
         id: &str,
         filesystem: &F,
     ) -> Result<LandSession> {
+        self.prepare_land_with_wait(repo, held_locks, req, writer, id, filesystem, 0)
+    }
+    /// Wait only for resource acquisition; never retry candidate construction or publication.
+    pub fn prepare_land_wait(
+        &self,
+        repo: &RepoHandle,
+        held_locks: Vec<BorrowedHandle<'_>>,
+        req: &LandRequest,
+        writer: &str,
+        id: &str,
+        wait_ms: u64,
+    ) -> Result<LandSession> {
+        self.prepare_land_with_wait(repo, held_locks, req, writer, id, &wal::OsFileSystem, wait_ms)
+    }
+    #[allow(clippy::too_many_arguments)]
+    fn prepare_land_with_wait<F: wal::FileSystem>(
+        &self,
+        repo: &RepoHandle,
+        held_locks: Vec<BorrowedHandle<'_>>,
+        req: &LandRequest,
+        writer: &str,
+        id: &str,
+        filesystem: &F,
+        wait_ms: u64,
+    ) -> Result<LandSession> {
         require_lock_scope_platform()?;
         let caller = LockScope::seeded(held_locks).map_err(failure)?;
         if caller
@@ -293,9 +363,11 @@ impl GitDriver {
             return Err(failure("land-main-handle-required"));
         }
         let source = Oid::parse(&req.source, repo.object_format()).map_err(failure)?;
-        let target = Oid::parse(&req.target, repo.object_format()).map_err(failure)?;
-        if source == target {
-            return Err(failure("land-identical-tips"));
+        if !req.target.is_empty() {
+            let target = Oid::parse(&req.target, repo.object_format()).map_err(failure)?;
+            if source == target {
+                return Err(failure("land-identical-tips"));
+            }
         }
         if let Some(p) = &req.subtree {
             crate::fgos_scope_literal(p)?;
@@ -303,24 +375,14 @@ impl GitDriver {
         if let Some(p) = &req.footprint {
             fgos_write_scope::canonicalize_all(p).map_err(failure)?;
         }
-        for file in &req.files {
-            let path = std::path::Path::new(&file.path);
-            if path.is_absolute()
-                || file.path.is_empty()
-                || path
-                    .components()
-                    .any(|c| !matches!(c, std::path::Component::Normal(_)))
-                || file.path.split('/').any(|s| s == ".git")
-            {
-                return Err(failure("invalid-land-file"));
-            }
-        }
+        validate_declared_files(&req.files, "land")?;
         let slot = LockScope::seeded(vec![]).map_err(failure)?;
         let mut p = params(repo);
         p.insert("ref".into(), slot_key(&req.destination));
         let operation_repo = self.checkout_repository(repo)?;
         let repo = &operation_repo;
         let wal = Wal::with_filesystem(repo.common_dir(), filesystem).map_err(failure)?;
+        let request_digest = wal::canonical_digest(&(req, writer)).map_err(failure)?;
         let mut session = LandSession {
             slot,
             candidate: None,
@@ -329,7 +391,7 @@ impl GitDriver {
             id: id.into(),
         };
         if let Some(compact) = wal.compacted(id).map_err(failure)? {
-            if compact.request != wal::canonical_digest(&(req, writer)).map_err(failure)? {
+            if compact.request != request_digest {
                 return Err(failure("operation-id-reused"));
             }
             let intent = compact_land_intent(&wal, &compact, repo, writer)?;
@@ -348,7 +410,9 @@ impl GitDriver {
             let OperationKind::Land(payload) = &chain.intent().kind else {
                 return Err(failure("operation-id-reused"));
             };
-            if payload.request != *req || chain.intent().writer_identity != writer {
+            if chain.intent().request_digest != request_digest
+                || chain.intent().writer_identity != writer
+            {
                 return Err(failure("operation-id-reused"));
             }
             session.candidate = Some(payload.candidate.clone());
@@ -359,9 +423,23 @@ impl GitDriver {
         }
         session
             .slot
-            .acquire("merge-slot", &p, Wait::Ms(0))
+            .acquire("merge-slot", &p, Wait::Ms(wait_ms))
             .map_err(failure)?;
-        if crate::refs::direct(self, repo, &destination)? != ExpectedTip::Oid(target.clone()) {
+        let observed = crate::refs::direct(self, repo, &destination)?;
+        let mut pinned_request = req.clone();
+        if pinned_request.target.is_empty() {
+            pinned_request.target = match &observed {
+                ExpectedTip::Oid(oid) => oid.as_str().into(),
+                ExpectedTip::Absent => return Err(failure("land-target-absent")),
+            };
+        }
+        let req = &pinned_request;
+        session.request = req.clone();
+        let target = Oid::parse(&req.target, repo.object_format()).map_err(failure)?;
+        if source == target {
+            return Err(failure("land-identical-tips"));
+        }
+        if observed != ExpectedTip::Oid(target.clone()) {
             return Err(crate::refs::stale("land-target-changed"));
         }
         for oid in [&source, &target] {
@@ -485,35 +563,39 @@ impl GitDriver {
             self.refresh_checkout_facts(&candidate_repo)?;
             let merged = merged?;
             if !merged.success {
-                if candidate_repo.git_dir().join("MERGE_HEAD").exists() {
-                    self.land_text(&candidate_repo, &session.slot, &["merge", "--abort"], &[])?;
+                let has_merge = candidate_repo.git_dir().join("MERGE_HEAD").exists();
+                let unresolved = self.land_call(
+                    &candidate_repo,
+                    &session.slot,
+                    &[
+                        "diff",
+                        "--name-only",
+                        "--no-relative",
+                        "--diff-filter=U",
+                        "-z",
+                    ],
+                    &[],
+                )?;
+                // Only exact consumer-declared bytes may resolve a conflicted path.
+                // Git does not interpret decision rows, event files or either side.
+                let covered = has_merge
+                    && unresolved.success
+                    && !unresolved.stdout.is_empty()
+                    && unresolved
+                        .stdout
+                        .split(|b| *b == 0)
+                        .filter(|p| !p.is_empty())
+                        .all(|p| req.files.iter().any(|f| f.path.as_bytes() == p));
+                if !covered {
+                    if has_merge {
+                        self.land_text(&candidate_repo, &session.slot, &["merge", "--abort"], &[])?;
+                    }
+                    return Err(merged.error("land-conflict-aborted"));
                 }
-                return Err(merged.error("land-conflict-aborted"));
             }
             // Consumer transformations are literal bytes; no business-state interpretation.
             for file in &req.files {
-                let path = std::path::Path::new(&file.path);
-                let full = worktree.path.join(path);
-                // Refuse symlink ancestors/targets rather than writing outside the candidate.
-                let mut at = worktree.path.clone();
-                for part in path.components() {
-                    at.push(part);
-                    if std::fs::symlink_metadata(&at).is_ok_and(|m| m.file_type().is_symlink()) {
-                        return Err(failure("land-file-symlink"));
-                    }
-                }
-                if let Some(bytes) = &file.bytes {
-                    if let Some(p) = full.parent() {
-                        std::fs::create_dir_all(p).map_err(failure)?;
-                    }
-                    std::fs::write(full, bytes).map_err(failure)?;
-                } else {
-                    match std::fs::remove_file(full) {
-                        Ok(()) => (),
-                        Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
-                        Err(e) => return Err(failure(e)),
-                    }
-                }
+                write_declared_file(&worktree.path, file, "land")?;
                 let input = format!("{}\0", file.path);
                 self.land_text(
                     &candidate_repo,
@@ -569,7 +651,7 @@ impl GitDriver {
                 wal::canonical_digest(&(wal.repository_identity(), "land", &req.destination))
                     .map_err(failure)?;
             let intent = Intent {
-                request_digest: wal::canonical_digest(&(req, writer)).map_err(failure)?,
+                request_digest,
                 kind,
                 repo_identity: wal.repository_identity().into(),
                 resource_set: resources,
@@ -635,12 +717,32 @@ impl GitDriver {
     ) -> Result<Receipt> {
         self.publish_land_with_filesystem(repo, session, evidence, &wal::OsFileSystem)
     }
+    /// Wait at most `wait_ms` for the main checkout; publication itself is never retried.
+    pub fn publish_land_wait(
+        &self,
+        repo: &RepoHandle,
+        session: &mut LandSession,
+        evidence: &LandEvidence,
+        wait_ms: u64,
+    ) -> Result<Receipt> {
+        self.publish_land_with_wait(repo, session, evidence, &wal::OsFileSystem, wait_ms)
+    }
     pub fn publish_land_with_filesystem<F: wal::FileSystem>(
         &self,
         repo: &RepoHandle,
         session: &mut LandSession,
         evidence: &LandEvidence,
         filesystem: &F,
+    ) -> Result<Receipt> {
+        self.publish_land_with_wait(repo, session, evidence, filesystem, 0)
+    }
+    fn publish_land_with_wait<F: wal::FileSystem>(
+        &self,
+        repo: &RepoHandle,
+        session: &mut LandSession,
+        evidence: &LandEvidence,
+        filesystem: &F,
+        wait_ms: u64,
     ) -> Result<Receipt> {
         if let Some(receipt) = &session.receipt {
             replay_land_receipt(receipt)?;
@@ -668,19 +770,21 @@ impl GitDriver {
         }
         let mut scope = crate::refs::acquire_worktree_admin(repo, held(&session.slot)?)?;
         scope
-            .acquire("main-checkout", &params(repo), Wait::Ms(5000))
+            .acquire("main-checkout", &params(repo), Wait::Ms(wait_ms))
             .map_err(failure)?;
         let candidate_repo = match self.resolve_repo(&c.worktree, repo.trusted_main_root())? {
             ResolveRepo::Repository(r) => self.checkout_repository(&r)?,
             _ => return Err(recovery("land-candidate-missing")),
         };
+        // Publication commits the frozen candidate, never worktree bytes: untracked
+        // verification/setup output cannot enter the tree, tracked or staged change can.
         if self.land_text(&candidate_repo, &scope, &["rev-parse", "HEAD"], &[])? != c.candidate
             || self.land_text(&candidate_repo, &scope, &["write-tree"], &[])? != c.tree
             || !self
                 .land_text(
                     &candidate_repo,
                     &scope,
-                    &["status", "--porcelain=v1", "-z", "--untracked-files=all"],
+                    &["status", "--porcelain=v1", "-z", "--untracked-files=no"],
                     &[],
                 )?
                 .is_empty()
@@ -1418,7 +1522,7 @@ impl GitDriver {
             let mut cursor = None;
             let mut dirty = false;
             loop {
-                let page = self.status(repo, Untracked::All, cursor, 4096)?;
+                let page = self.status(repo, Untracked::All, Submodules::Configured, Ignored::Excluded, cursor, 4096)?;
                 dirty |= page
                     .entries
                     .iter()

@@ -81,8 +81,10 @@ fn dirty_nonoverlap_is_preserved_and_reported_lagging() {
         .prepare_land(&f.repo, vec![], &f.request, "fixture", "dirty")
         .unwrap();
     let e = evidence(&s);
+    let candidate = s.candidate().unwrap().candidate.clone();
     let r = f.driver.publish_land(&f.repo, &mut s, &e).unwrap();
     assert!(matches!(r.checkout, Checkout::Pending));
+    assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), candidate, "the ref moves; only the checkout lags");
     assert_eq!(
         fs::read_to_string(f.main.join("b")).unwrap(),
         "keep local\n"
@@ -90,21 +92,32 @@ fn dirty_nonoverlap_is_preserved_and_reported_lagging() {
 }
 #[test]
 fn dirty_own_paths_block_before_cas() {
-    let f = Fixture::new();
-    let mut s = f
-        .driver
-        .prepare_land(&f.repo, vec![], &f.request, "fixture", "own")
-        .unwrap();
-    fs::write(f.main.join("a"), "keep local\n").unwrap();
-    let e = evidence(&s);
-    assert_eq!(
-        f.driver
-            .publish_land(&f.repo, &mut s, &e)
-            .unwrap_err()
-            .cause,
-        "main-checkout-dirty-mid-merge"
-    );
-    assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), f.request.target);
+    // An own path edited, and a declared footprint path renamed away (the rename source counts).
+    for renamed in [false, true] {
+        let f = Fixture::new();
+        let mut request = f.request.clone();
+        if renamed {
+            request.footprint = Some(vec!["b".into()]);
+        }
+        let mut s = f
+            .driver
+            .prepare_land(&f.repo, vec![], &request, "fixture", "own")
+            .unwrap();
+        if renamed {
+            git(&f.main, &["mv", "b", "renamed"]);
+        } else {
+            fs::write(f.main.join("a"), "keep local\n").unwrap();
+        }
+        let e = evidence(&s);
+        assert_eq!(
+            f.driver
+                .publish_land(&f.repo, &mut s, &e)
+                .unwrap_err()
+                .cause,
+            "main-checkout-dirty-mid-merge"
+        );
+        assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), request.target);
+    }
 }
 #[test]
 fn slot_excludes_same_destination_through_verification() {
@@ -477,4 +490,54 @@ fn recovery_candidate_parent_check_ignores_signature_display() {
     drop(session);
     let receipt = f.driver.recover_land(&f.repo, vec![], "fixture", "signed").unwrap();
     assert!(matches!(receipt.checkout, Checkout::Pending));
+}
+
+#[test]
+fn current_target_is_pinned_after_destination_acquisition_and_replays_after_cleanup() {
+    let f = Fixture::new();
+    fs::write(f.main.join("b"), "sibling\n").unwrap();
+    git(&f.main, &["commit", "-qam", "sibling"]);
+    let target = git(&f.main, &["rev-parse", "HEAD"]);
+    let mut request = f.request.clone();
+    request.target.clear();
+    let mut session = f.driver.prepare_land(&f.repo, vec![], &request, "fixture", "current").unwrap();
+    let candidate = session.candidate().unwrap().clone();
+    assert_eq!(candidate.target, target);
+    assert_eq!(git(&candidate.worktree, &["show", "-s", "--format=%P"]), format!("{} {}", target, request.source));
+    assert_eq!(fs::read_to_string(candidate.worktree.join("b")).unwrap(), "sibling\n");
+    assert_eq!(fs::read_to_string(candidate.worktree.join("a")).unwrap(), "incoming\n");
+    let verification = evidence(&session);
+    let receipt = f.driver.publish_land(&f.repo, &mut session, &verification).unwrap();
+    drop(session);
+    assert!(f.driver.acknowledge_land(&f.repo, "fixture", "current", "durable-consumer-ack").unwrap().is_empty());
+    assert!(!candidate.worktree.exists());
+    git(&f.main, &["update-ref", "refs/heads/trunk", &f.request.target]);
+    let replay = f.driver.prepare_land(&f.repo, vec![], &request, "fixture", "current").unwrap();
+    assert_eq!(serde_json::to_value(replay.receipt().unwrap()).unwrap(), serde_json::to_value(receipt).unwrap());
+    assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), f.request.target);
+    let mut changed = request.clone();
+    changed.message = "different request".into();
+    assert_eq!(f.driver.prepare_land(&f.repo, vec![], &changed, "fixture", "current").err().unwrap().cause, "operation-id-reused");
+}
+
+#[test]
+fn declared_resolution_bytes_are_frozen_before_consumer_verification() {
+    let f = Fixture::new();
+    fs::write(f.main.join("a"), "target disagrees\n").unwrap();
+    git(&f.main, &["commit", "-qam", "target disagreement"]);
+    let mut request = f.request.clone();
+    request.target = git(&f.main, &["rev-parse", "HEAD"]);
+    request.files = vec![LandFile { path: "a".into(), bytes: Some(b"consumer resolution\n".to_vec()) }];
+    let mut session = f.driver.prepare_land(&f.repo, vec![], &request, "fixture", "resolved").unwrap();
+    let candidate = session.candidate().unwrap();
+    assert_eq!(fs::read_to_string(candidate.worktree.join("a")).unwrap(), "consumer resolution\n");
+    assert_eq!(git(&candidate.worktree, &["diff", "--name-only", "--diff-filter=U"]), "");
+    assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), request.target);
+    assert!(!f.main.join(".git/MERGE_HEAD").exists(), "the conflict never reaches the main checkout");
+    assert_eq!(git(&f.main, &["rev-parse", "source"]), request.source);
+    let published = candidate.candidate.clone();
+    let verification = evidence(&session);
+    let receipt = f.driver.publish_land(&f.repo, &mut session, &verification).unwrap();
+    assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), published, "{receipt:?}");
+    assert_eq!(fs::read_to_string(f.main.join("a")).unwrap(), "consumer resolution\n");
 }

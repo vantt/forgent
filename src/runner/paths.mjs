@@ -10,13 +10,19 @@
 // git so it works correctly from inside a worktree. Both are preserved
 // exactly; `strict` is the switch between them.
 
-import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { branchNameFor, findCheckoutPath, realpathOrSelf } from './worktree.mjs';
+import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
+import { branchNameFor, checkoutPathForBranch, realpathOrSelf } from './worktree.mjs';
 
-/** Resolve the repo root. Default (git) mode shells out to `git
- * rev-parse --show-toplevel` — never `__dirname`, since fgos-runner's
+function validationError(message) {
+  const error = new Error(message);
+  error.category = 'validation';
+  return error;
+}
+
+/** Resolve the repo root. Default (git) mode asks Git Inspect for the
+ * checkout `cwd` sits in — never `__dirname`, since fgos-runner's
  * binary may live in a different repo than the one it runs on — and
  * throws with category 'validation' when `cwd` is not inside a git repo,
  * or the repo has no resolvable HEAD (no commits yet). `strict: true`
@@ -27,63 +33,52 @@ import { branchNameFor, findCheckoutPath, realpathOrSelf } from './worktree.mjs'
 export function resolveRepoRoot(cwd = process.cwd(), { strict = false } = {}) {
   if (strict) return cwd;
 
+  let inspect;
   let repoRoot;
   try {
-    repoRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], {
-      cwd,
-      encoding: 'utf8',
-      shell: false,
-      stdio: ['ignore', 'pipe', 'pipe'],
-    }).trim();
+    inspect = createGitInspect(gitPortOptions(cwd));
+    const facts = inspect.resolveRepo();
+    if (facts.notARepository || !facts.worktreeRoot) throw new Error('not a git checkout');
+    repoRoot = facts.worktreeRoot;
   } catch (err) {
-    const error = new Error(`fgos-runner must run inside a git repository (cwd: ${cwd}): ${err.message}`);
-    error.category = 'validation';
-    throw error;
+    throw validationError(`fgos-runner must run inside a git repository (cwd: ${cwd}): ${err.message}`);
   }
+  let head = null;
   try {
-    execFileSync('git', ['rev-parse', '--verify', '--quiet', 'HEAD'], {
-      cwd: repoRoot,
-      encoding: 'utf8',
-      shell: false,
-      stdio: ['ignore', 'pipe', 'pipe'],
-    });
+    head = inspect.resolveCommit({ name: 'HEAD' });
   } catch {
-    const error = new Error(
+    // unreadable HEAD reads as no commit
+  }
+  if (typeof head !== 'string') {
+    throw validationError(
       `fgos-runner requires at least one commit in ${repoRoot} (HEAD does not resolve) -- run "git commit" (e.g. an initial commit) before running fgos-runner`,
     );
-    error.category = 'validation';
-    throw error;
   }
   return realpathOrSelf(repoRoot);
 }
 
 /** Resolve the MAIN CHECKOUT root — never a linked worktree's own root,
- * unlike `resolveRepoRoot` above (`--show-toplevel`, which returns
- * whichever checkout `cwd` sits in). Via `--git-common-dir`, which always
- * points at the main checkout's `.git` regardless of which worktree `cwd`
- * is inside (same resolution `scripts/fgos-shell-integration.sh`'s `fgos`
- * shell function already uses). Returns `null`, never throws, when `cwd`
+ * unlike `resolveRepoRoot` above (which returns whichever checkout `cwd`
+ * sits in). Via Git Inspect's trusted main root, the checkout that owns the
+ * common `.git` regardless of which worktree `cwd` is inside (same
+ * resolution `scripts/fgos-shell-integration.sh`'s `fgos` shell function
+ * reaches through `--git-common-dir`). Returns `null`, never throws, when `cwd`
  * is not inside a git checkout at all — the one real caller of this
  * distinction (tsk-5hv, extracted from `src/setup/registrations.mjs`'s
  * own `resolveMainCheckout`, now delegating here instead of duplicating
- * the git shell-out) needs a graceful "nothing to resolve" path, not a
+ * the git read) needs a graceful "nothing to resolve" path, not a
  * thrown validation error. `.fgos/` is unconditionally wiped from every
  * freshly-created worktree (ADR0020) — any caller that needs the real
  * `.fgos/config.json` (not a worktree-local phantom) must resolve through
  * this function, never `resolveRepoRoot`. */
 export function resolveMainCheckoutRoot(cwd = process.cwd()) {
-  let commonDir;
+  let facts;
   try {
-    commonDir = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], {
-      cwd,
-      encoding: 'utf8',
-      shell: false,
-      stdio: ['ignore', 'pipe', 'pipe'],
-    }).trim();
+    facts = createGitInspect(gitPortOptions(cwd)).resolveRepo();
   } catch {
     return null;
   }
-  return commonDir ? realpathOrSelf(path.dirname(commonDir)) : null;
+  return facts.notARepository || !facts.trustedMainRoot ? null : realpathOrSelf(facts.trustedMainRoot);
 }
 
 /** Join an already-resolved repo root onto `.fgos` — the single place that
@@ -206,9 +201,9 @@ export function resolveTaskSpecPath(domain, specId, options = {}) {
 //    `fgos discover`/`fgos plan` from inside the worktree it just
 //    committed to (fgos-coding-exploring's/fgos-coding-planning's own hard rule: commit
 //    before calling either verb). Zero extra cost.
-// 2) the item's own fgw/<id> worktree via `git worktree list --porcelain`
-//    (`findCheckoutPath`, the exact parse `promote-preflight.mjs` already
-//    reuses for the same "is this branch checked out somewhere" question)
+// 2) the item's own fgw/<id> worktree from Git Inspect's worktree list
+//    (`checkoutPathForBranch`, the same "is this branch checked out
+//    somewhere" read `promote-preflight.mjs` uses)
 //    -- covers the crashed-mid-session case tsk-ozl D3 named as the
 //    reason a sweep should trust a committed CONTEXT.md even with no live
 //    session attached: the worktree still exists on disk after the
@@ -223,12 +218,7 @@ export function resolveTaskSpecPath(domain, specId, options = {}) {
 export function resolveContentRoot(stateRoot, id, docsRef) {
   const candidates = [process.cwd()];
   try {
-    const listing = execFileSync('git', ['worktree', 'list', '--porcelain'], {
-      cwd: stateRoot,
-      encoding: 'utf8',
-      shell: false,
-    });
-    const worktreePath = findCheckoutPath(listing, branchNameFor(id));
+    const worktreePath = checkoutPathForBranch(stateRoot, branchNameFor(id));
     if (worktreePath) candidates.push(worktreePath);
   } catch {
     // no git, or worktree list failed -- fall through to stateRoot
@@ -244,7 +234,7 @@ export function resolveContentRoot(stateRoot, id, docsRef) {
 // Well-known FILE paths under `.fgos/` (state.json, tool-status.local.json,
 // the truncation-guard mark, diagnostic logs...) moved to
 // src/state/fgos-file-registry.mjs (kernel layer, tsk phase-03): this
-// module (infra) shells out to git, so a domain/kernel-layer caller
+// module (infra) reads git, so a domain/kernel-layer caller
 // importing FGOS_FILE/resolveFgosFile from here would violate the
 // one-directional-layer rule (test/architecture.test.mjs). Import from
 // there instead.

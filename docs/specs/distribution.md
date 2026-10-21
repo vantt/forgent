@@ -33,9 +33,13 @@ of it).
 
 - `npm install -g github:vantt/forgent` (run anywhere) → resolves and installs
   the `fgos` command globally from the forgent GitHub repository.
-- After install, `fgos init` (run inside the target project) → the existing
-  init/doctrine/marker-detection behavior, unchanged and owned by the
-  coexistence area — see `docs/coexistence.md`.
+- After install, `fgos init` (run inside the target project) → on the npm
+  channel it refuses (`git-addon-unavailable: addon not shipped on this
+  channel: onboard this project with fgctl init`) and changes nothing: this
+  channel ships no native Git addon and Git has one door, so a project is
+  onboarded with `fgctl init`, whose activated release carries the addon. The
+  init/doctrine/marker-detection behavior itself (owned by the coexistence
+  area, see `docs/coexistence.md`) runs from that activated release.
 - Sourcing the dev checkout's shell helper file from a contributor's own
   shell profile → makes `fgos` and `fgos-runner` available directly from any
   location inside a checkout of the forgent source repository itself
@@ -343,6 +347,8 @@ of it).
   - **Windows.** The Windows holder-lock driver (`LockFileEx`) takes these locks like the other platforms; there is no fallback to the old lock files, and a platform with no driver refuses.
 
 ## Lịch sử quyết định
+
+- **2026-10-21 — The npm channel's `fgos init` points to `fgctl init`.** Before this, a project onboarded with `npm install -g github:vantt/forgent` plus `fgos init`; that route needs Git through the native addon, which only an activated release ships ("until M10" in the old message). Git keeps one door, so the npm channel gets no addon-less Git read path: in a project no `fgctl init` has activated, `fgos init` refuses with `git-addon-unavailable: addon not shipped on this channel: onboard this project with fgctl init` and writes nothing. `test/setup/doctor-fresh-run.test.mjs` and `test/install-packaging.test.mjs` prove that refusal; the doctor state of an onboarded project is proven by the `fgctl init` tests (real runtime tail).
 
 - **2026-10-18 — Terminal-control enters setup and doctor.** `fgos setup` adds the `terminal` config section and creates `<stateRoot>/terminal` (0700); `fgos doctor` replaces `herdr-available` with `terminal-control`, `terminal-config` and `terminal-allocations`. Reasons: the herdr check now asks the port what the driver can do instead of running `herdr --version` on its own (one door); the new settings must be visible to doctor with their source or they are guesses (L5). Prior art read: the `herdr-available` check and `FGOS_HERDR_ANCHOR_PANE` diagnosis are kept inside `terminal-control`; `lock` is the precedent for a top-level section registered by a component. Decisions: (1) a missing herdr is a warning, not a failure, because direct mode does not use a terminal; (2) the doctor floor of 40x8 for `minCols`/`minRows` is the measured one from the measurement report; (3) the setting names reach the route and the failed-pane retention through `src/terminal-control/config.mjs`, so a value doctor accepts is the value a round uses; explicit values only are sent, the Rust core keeps its defaults.
 

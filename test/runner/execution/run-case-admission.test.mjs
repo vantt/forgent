@@ -17,6 +17,7 @@ import { createCaseAdmissionPort } from '../../../src/workflow/case-admission-po
 import { createPendingBinding, commitBinding } from '../../../src/workflow/case-bindings.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
+import { activateGitFixture } from '../../helpers/git-fixture.mjs';
 import { holdLockInChild } from '../../helpers/hold-lock-in-child.mjs';
 
 seedFileLocalBwrapRegistry();
@@ -54,6 +55,7 @@ function setup(families = ['okay']) {
   fs.writeFileSync(path.join(repoRoot, 'README.md'), '# Admission\n');
   git(['add', 'README.md']);
   git(['commit', '-m', 'initial']);
+  activateGitFixture(repoRoot);
   const worktreeDir = makeFixtureDir('fgos-admit-wt-');
   git(['worktree', 'add', '-b', 'wt-branch', worktreeDir]);
   const script = path.join(repoRoot, 'worker.mjs');

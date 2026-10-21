@@ -50,8 +50,10 @@ whether the lock is free afterwards.
    is the registry name; a lock with a path parameter takes `--param`):
    ```bash
    fgos lock fence main-checkout
-   fgos lock fence merge-slot --param ref=main
+   fgos lock fence merge-slot --param ref=refs%2Fheads%2Fmain
    ```
+   A merge slot belongs to its target's full ref, URL-encoded as the lock
+   file name carries it (`refs/heads/fgw/tsk-1` is `refs%2Fheads%2Ffgw%2Ftsk-1`).
    Without a terminal the verb lists the holders and signals nothing; pass
    `--yes` only after you decided in step 3 that these holders are wedged.
 4. Read the result:

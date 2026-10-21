@@ -24,9 +24,9 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { inspectRepo } from './lib/git-ports.mjs';
 
 // Not imported from run-tests.mjs: that module imports this one for the summary it prints.
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -283,14 +283,22 @@ export function checkAdmission(changedLines, baseline = []) {
   return violations;
 }
 
+/** The zero-context patch of the work tree against `baseRef`, limited to `files`, read through Git Inspect. */
+function worktreePatch(files, { baseRef, cwd }) {
+  const inspect = inspectRepo(cwd);
+  const before = inspect.resolveCommit({ name: baseRef });
+  if (typeof before !== 'string') throw new Error(`unknown revision ${baseRef}`);
+  return inspect.diffText({ before, worktree: true, paths: files, context: 0 });
+}
+
 /**
- * Builds `{ file, line, text, prevText }` rows for every added line in
- * `git diff <baseRef> -- <scope>` restricted to onboarded files. Only
+ * Builds `{ file, line, text, prevText }` rows for every added line in the
+ * work tree's diff against `baseRef`, restricted to onboarded files. Only
  * additions are checked (never pre-existing debt).
  */
-export function addedLinesFromGitDiff(scopeFiles, { baseRef = 'HEAD', exec = execFileSync, cwd = REPO_ROOT } = {}) {
+export function addedLinesFromGitDiff(scopeFiles, { baseRef = 'HEAD', cwd = REPO_ROOT, readPatch = worktreePatch } = {}) {
   if (scopeFiles.length === 0) return [];
-  const raw = exec('git', ['diff', '--unified=0', baseRef, '--', ...scopeFiles], { cwd, encoding: 'utf8' });
+  const raw = readPatch(scopeFiles, { baseRef, cwd });
   const rows = [];
   let currentFile = null;
   let nextLine = null;
@@ -446,13 +454,14 @@ export function readSuiteBaseline(baselinePath = SUITE_BASELINE_PATH) {
 }
 
 /** The ref new admission-rule violations are measured against: where this branch left main. */
-export function admissionBaseRef({ exec = execFileSync, cwd = REPO_ROOT } = {}) {
+export function admissionBaseRef({ cwd = REPO_ROOT } = {}) {
+  const inspect = inspectRepo(cwd);
+  const head = inspect.resolveCommit({ name: 'HEAD' });
   for (const ref of ['origin/main', 'main']) {
-    try {
-      return exec('git', ['merge-base', 'HEAD', ref], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-    } catch {
-      // ref absent in this clone; try the next one
-    }
+    // A ref absent in this clone resolves to null; try the next one.
+    const tip = head && inspect.resolveCommit({ name: ref });
+    const base = tip && inspect.compareCommits({ left: head, right: tip }).mergeBase;
+    if (base) return base;
   }
   return 'HEAD';
 }
@@ -526,7 +535,7 @@ if (process.argv[1] === __filename) {
   const { discoverTestFiles } = await import('./run-tests.mjs');
   if (args[0] === '--write-baseline') {
     const wallIdx = args.indexOf('--wall-seconds');
-    const sha = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: REPO_ROOT, encoding: 'utf8' }).trim();
+    const sha = inspectRepo(REPO_ROOT).resolveCommit({ name: 'HEAD' });
     const baseline = buildSuiteBaseline({
       files: discoverTestFiles(),
       sha,

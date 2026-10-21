@@ -4,7 +4,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 
 // Set by a detached advance for the process it spawns; that process carries the decision made
 // by the caller that spawned it, so it does not warn a second time.
@@ -21,9 +21,10 @@ function realOrResolved(p) {
 /** The checkout's own root and the root shared by all its linked worktrees; null outside a repository. */
 function gitRoots(dir) {
   try {
-    const git = (args) => execFileSync('git', args, { cwd: dir, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-    const toplevel = realOrResolved(git(['rev-parse', '--show-toplevel']));
-    const common = realOrResolved(path.resolve(toplevel, git(['rev-parse', '--git-common-dir'])));
+    const facts = createGitInspect(gitPortOptions(dir)).resolveRepo();
+    if (facts.notARepository) return null;
+    const toplevel = realOrResolved(facts.worktreeRoot);
+    const common = realOrResolved(facts.commonDir);
     return { toplevel, common };
   } catch {
     return null;

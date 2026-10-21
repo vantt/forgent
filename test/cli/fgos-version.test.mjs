@@ -49,9 +49,9 @@ test('fgos version reports this checkout\'s own real git commit, not the tmp cwd
   const cwd = tmpCwd();
   const result = run(cwd, ['version']);
   const { data } = JSON.parse(result.stdout);
-  const realHead = execFileSync('git', ['rev-parse', '--short', 'HEAD'], {
+  const realHead = execFileSync('git', ['rev-parse', 'HEAD'], {
     cwd: REAL_REPO_ROOT,
     encoding: 'utf8',
   }).trim();
-  assert.equal(data.gitCommit, realHead);
+  assert.equal(data.gitCommit, realHead.slice(0, 12), 'the first 12 hex digits of the full commit id');
 });

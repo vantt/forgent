@@ -7,6 +7,7 @@
 
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
+import { initFixtureRepo } from '../helpers/git-fixture.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -34,12 +35,7 @@ function tmpCwd() {
 }
 
 function gitInit(cwd) {
-  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
-  fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
-  execFileSync('git', ['add', 'seed.txt'], { cwd });
-  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });
+  initFixtureRepo(cwd, { branch: 'main', ignore: '.fgos/locks/\n' });
 }
 
 // A store that is also a git repo — the shape most real faults happen in.

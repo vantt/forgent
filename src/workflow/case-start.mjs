@@ -12,7 +12,7 @@ import { normalizeContextRefs } from './definition.mjs';
 import { loadWorkflow, workflowPersonaScope } from './loader.mjs';
 import { createWorkflowRun, appendWorkflowEvent, readWorkflowEvents, projectWorkflowState } from './store.mjs';
 import { translateUnitsToWorkflow } from './units-source.mjs';
-import { snapshotRunnerConfig, resolveGitRoots, detectHerdrPresent } from '../runner/execution/run.mjs';
+import { snapshotRunnerConfig, resolveGitRoots, assertRepositoryForWrites, detectHerdrPresent } from '../runner/execution/run.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
 import { expandWorkflowSeats, normalizeSeats, personaNameOf, seatedPanelUnits } from './seats.mjs';
 import { digestContextRefs, digestText } from './ref-digests.mjs';
@@ -23,7 +23,7 @@ import { legacyStateKey } from '../runner/dispatch/llm-accounts.mjs';
 import { parseAccountPin } from '../runner/execution/account-pin.mjs';
 import { normalizeStanceOptions } from '../runner/execution/unit.mjs';
 import { ADVANCE_DETACHED_ENV } from './case-lock.mjs';
-import { assertWriteChains, gitOut } from './unit-handoff.mjs';
+import { assertWriteChains, workflowCheckout } from './unit-handoff.mjs';
 import { RIGOR_ORDER } from './case-projection.mjs';
 import { bindWorktree } from './case-bindings.mjs';
 import { nestedStartRefusal } from './case-admission-port.mjs';
@@ -100,8 +100,7 @@ export function openCaseOnLedger({ mainRoot, workflowRunId, workflow, guide = wo
       hold,
       caseId: workflowRunId,
       worktree: worktreePath,
-      commonDir: gitOut(worktreePath, ['rev-parse', '--git-common-dir'])?.trim() ?? null,
-      ref: gitOut(worktreePath, ['rev-parse', '--abbrev-ref', 'HEAD'])?.trim() ?? null,
+      ...workflowCheckout(worktreePath),
     });
     if (!bound.ok) {
       append({ type: 'case.closed', payload: { closedAt: new Date().toISOString(), reason: bound.answer } });
@@ -151,7 +150,7 @@ export function detachedResult({ mainRoot, workflowRunId, detached }) {
  */
 function resolveStart(params) {
   const cwd = params.cwd ?? process.cwd();
-  const roots = resolveGitRoots(cwd);
+  const roots = resolveGitRoots(cwd, { allowNoRepository: true });
   const mainRoot = params.repoRoot ? path.resolve(params.repoRoot) : roots.mainCheckoutRoot;
   const worktreePath = params.worktree ? path.resolve(params.worktree) : roots.worktreeRoot;
 
@@ -174,6 +173,8 @@ function resolveStart(params) {
     if (params.seats !== undefined) throw new RunnerConfigError('--seats rebuilds a registered panel preset; it cannot be used with a units file');
     assertWriteChains(workflow);
   }
+  // Only a read-only workflow runs outside a repository: a unit that declares writes still needs one.
+  assertRepositoryForWrites(roots, cwd, { writes: workflow.steps.some((step) => step.units.some((unit) => unit.template.writes?.length)) });
   const effort = params.effort === undefined || params.effort === null ? null : assertReasoningEffort(params.effort);
 
   let timeoutMs = null;

@@ -1,4 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
+import { activateGitFixture } from './worktree-native-fixture.helper.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -73,6 +74,7 @@ function initTempRepo() {
   fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
   return repoRoot;
 }
 
@@ -2270,6 +2272,7 @@ test('tsk-34o5: startupReap parks a stale doing item with attestation-mismatch w
   fs.writeFileSync(path.join(repoRoot, 'stale.txt'), 'stale content');
   execFileSync('git', ['add', 'stale.txt'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-m', 'stale commit'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
   execFileSync('git', ['checkout', 'main'], { cwd: repoRoot });
 
   appendEvent(path.join(dir, 'events.jsonl'), {
@@ -2299,6 +2302,7 @@ test('tsk-34o5: startupReap does NOT halt a legitimate retry on a branch with pr
   fs.writeFileSync(path.join(repoRoot, 'attempt1.txt'), 'failed attempt');
   execFileSync('git', ['add', 'attempt1.txt'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-m', 'attempt 1'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
 
   appendEvent(path.join(dir, 'events.jsonl'), {
     type: 'executor.dispatch',
@@ -2308,6 +2312,7 @@ test('tsk-34o5: startupReap does NOT halt a legitimate retry on a branch with pr
   fs.writeFileSync(path.join(repoRoot, 'attempt2.txt'), 'successful attempt');
   execFileSync('git', ['add', 'attempt2.txt'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-m', 'attempt 2'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
   execFileSync('git', ['checkout', 'main'], { cwd: repoRoot });
 
   appendEvent(path.join(dir, 'events.jsonl'), {
@@ -2442,6 +2447,7 @@ test('driver loop routes done review findings with REJECT to fix-verify-red inst
   fs.writeFileSync(path.join(repoRoot, 'candidate.txt'), 'candidate impl\n');
   execFileSync('git', ['add', 'candidate.txt'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-m', 'feat: candidate implementation'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
   execFileSync('git', ['checkout', 'main'], { cwd: repoRoot });
 
   const executorScript = path.join(scriptDir, 'fake-reject-executor.mjs');
@@ -2516,6 +2522,7 @@ test('driver loop runOnce: executing review-item with APPROVED verdict and passi
   fs.writeFileSync(path.join(repoRoot, 'candidate.txt'), 'candidate impl\n');
   execFileSync('git', ['add', 'candidate.txt'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-m', 'feat: candidate implementation'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
   execFileSync('git', ['checkout', 'main'], { cwd: repoRoot });
 
   const executorScript = path.join(scriptDir, 'fake-approve-executor.mjs');
@@ -2586,6 +2593,7 @@ test('driver loop runOnce: executing review-item with APPROVED verdict but faili
   fs.writeFileSync(path.join(repoRoot, 'candidate.txt'), 'candidate impl\n');
   execFileSync('git', ['add', 'candidate.txt'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-m', 'feat: candidate implementation'], { cwd: repoRoot });
+  activateGitFixture(repoRoot);
   execFileSync('git', ['checkout', 'main'], { cwd: repoRoot });
 
   const executorScript = path.join(scriptDir, 'fake-approve-executor.mjs');

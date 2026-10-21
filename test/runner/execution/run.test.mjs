@@ -10,7 +10,7 @@ import { execFileSync } from 'node:child_process';
 
 import { resolveSeats } from '../../../src/runner/execution/seat-resolver.mjs';
 import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
-import { recordInlineRun, resolveGitRoots, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
+import { runUnit as coreRunUnit, recordInlineRun, resolveGitRoots, assertRepositoryForWrites, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
 import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
 import { writeUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
@@ -118,6 +118,26 @@ test('resolveGitRoots resolves main checkout root and linked worktree', () => {
   assert.equal(fs.realpathSync(roots.mainCheckoutRoot), fs.realpathSync(repoRoot));
   assert.equal(fs.realpathSync(roots.worktreeRoot), fs.realpathSync(worktreeDir));
   assert.equal(roots.isLinkedWorktree, true);
+});
+
+test('outside a repository resolveGitRoots refuses unless the caller is read-only, and a unit that writes is refused there', () => {
+  const dir = fs.realpathSync(makeFixtureDir('fgos-run-norepo-'));
+  assert.throws(() => resolveGitRoots(dir), (err) => err instanceof RunnerConfigError && /must run inside a git repository/.test(err.message));
+  const roots = resolveGitRoots(dir, { allowNoRepository: true });
+  assert.deepEqual(roots, { worktreeRoot: dir, mainCheckoutRoot: dir, isLinkedWorktree: false, notARepository: true });
+  assert.doesNotThrow(() => assertRepositoryForWrites(roots, dir, { writes: false }));
+  assert.throws(() => assertRepositoryForWrites(roots, dir, { writes: true }), (err) => err instanceof RunnerConfigError && /must run inside a git repository/.test(err.message));
+  const { repoRoot } = setupGitRepo();
+  assert.doesNotThrow(() => assertRepositoryForWrites(resolveGitRoots(repoRoot, { allowNoRepository: true }), repoRoot, { writes: true }), 'inside a repository nothing is refused');
+});
+
+test('runUnit refuses a unit that writes in a directory that is no repository, before any unit run exists', async () => {
+  const dir = fs.realpathSync(makeFixtureDir('fgos-run-norepo-write-'));
+  await assert.rejects(
+    () => coreRunUnit({ unitData: { id: 'u-norepo', objective: 'Write a file', capability: 'docs:write', writes: ['docs'] }, cwd: dir, repoRoot: dir }),
+    (err) => err instanceof RunnerConfigError && /must run inside a git repository/.test(err.message),
+  );
+  assert.equal(fs.existsSync(path.join(dir, '.fgos', 'assignments')) && fs.readdirSync(path.join(dir, '.fgos', 'assignments')).some((name) => name.startsWith('unit-run-')), false);
 });
 
 test('snapshotRunnerConfig captures hash and filtered runner config from main checkout', () => {
@@ -1530,7 +1550,7 @@ test('a resume is refused while a live process holds the dispatch lock of the un
   // A mutating dispatch in another process holds the worktree's dispatch-cwd lock while its worker runs.
   const { child, exited } = await holdLockInChild('dispatch-cwd', { fgosDir: path.join(repoRoot, '.fgos'), cwd: worktreeDir });
   try {
-    await assert.rejects(resume, new RegExp(`another process \\(PID ${child.pid}\\) holds lock`));
+    await assert.rejects(resume, { name: 'DispatchError', code: 'dispatch-in-flight', holderPid: child.pid, cwd: worktreeDir });
   } finally {
     child.kill('SIGKILL');
     await exited;
@@ -2031,4 +2051,60 @@ test('an in-process caller keeps its own signal handling: runUnit installs no SI
   assert.equal(res.outcome, 'policy-refusal');
   assert.deepEqual(during, before);
   assert.deepEqual(counts(), before);
+});
+
+test('resume settles a pending runner record after the native commit completed', { skip: process.platform === 'win32', timeout: 90000 }, async () => {
+  const { repoRoot: main, worktreeDir: tree } = setupGitRepo();
+  writeScopedWorker(main, { files: { 'docs/new': 'new' } });
+  const marker = path.join(main, 'commit-returned.json');
+  const idFile = path.join(main, 'unit-id');
+  try {
+    // Observe the existing adapter seam, call the real native commit, and kill the
+    // controller before runUnit can settle its pending record. No unit state is seeded.
+    assert.throws(() => execFileSync(process.execPath, ['--experimental-test-module-mocks', '--input-type=module', '-'], {
+      cwd: new URL('../../../', import.meta.url), encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], timeout: 60000,
+      input: `
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import { mock } from 'node:test';
+import * as commits from './src/runner/execution/commit-unit-work.mjs';
+mock.module('./src/runner/execution/commit-unit-work.mjs', { namedExports: {
+  ...commits,
+  commitUnitWork(...args) {
+    const committed = commits.commitUnitWork(...args);
+    assert.equal(committed.status, 'committed', JSON.stringify(committed));
+    fs.writeFileSync(${JSON.stringify(marker)}, JSON.stringify(committed));
+    process.kill(process.pid, 'SIGKILL');
+  },
+}});
+const { runUnitWithPort: runUnit } = await import('./test/helpers/run-unit-with-port.mjs');
+await runUnit({repoRoot:${JSON.stringify(main)},cwd:${JSON.stringify(tree)},worktree:${JSON.stringify(tree)},pattern:'solo',
+  unitData:{id:'crash',objective:'Write docs',capability:'docs:write',writes:['docs']},
+  onUnitRunCreated:id => fs.writeFileSync(${JSON.stringify(idFile)},id)});
+throw new Error('controller never reached the native commit');
+`,
+    }), error => error.signal === 'SIGKILL');
+    const id = fs.readFileSync(idFile, 'utf8');
+    const landed = JSON.parse(fs.readFileSync(marker, 'utf8')).sha;
+    const file = path.join(main, '.fgos/assignments', id, 'unit.json');
+    const pending = JSON.parse(fs.readFileSync(file, 'utf8'));
+    assert.equal(pending.bindings['producer/1'][0].commitOperation.state, 'pending');
+    assert.equal(pending.bindings['producer/1'][0].commit, undefined);
+    assert.equal(producerSpawns(main, id), 1);
+    assert.equal(headOf(tree), landed);
+    const resumed = await runUnit({ repoRoot: main, cwd: tree, resumeUnitRunId: id });
+    assert.equal(resumed.outcome, 'pass', JSON.stringify(resumed));
+    assert.equal(resumed.results[0].commit.status, 'committed');
+    assert.equal(resumed.results[0].commit.sha, landed);
+    assert.deepEqual(resumed.results[0].commit.files, ['docs/new']);
+    assert.equal(headOf(tree), landed);
+    assert.equal(producerSpawns(main, id), 1, 'resume never launches the producer again');
+    const settled = JSON.parse(fs.readFileSync(file, 'utf8'));
+    assert.equal(settled.bindings['producer/1'][0].commitOperation.state, 'settled');
+    assert.equal(settled.bindings['producer/1'][0].commit.status, 'committed');
+    assert.equal(settled.settlement.outcome, 'pass');
+  } finally {
+    fs.rmSync(tree, { recursive: true, force: true });
+    fs.rmSync(main, { recursive: true, force: true });
+  }
 });

@@ -42,7 +42,6 @@ use std::collections::HashSet;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
-use std::process::Command;
 
 pub struct ClaudeTranscriptsSource;
 
@@ -70,30 +69,48 @@ fn get_valid_cwds(root: &Path) -> Vec<PathBuf> {
         cwds.push(root.to_path_buf());
     }
 
-    // Run git worktree list --porcelain to discover other worktrees
-    if let Ok(output) = Command::new("git")
-        .arg("-C")
-        .arg(root)
-        .args(["worktree", "list", "--porcelain"])
-        .output()
-    {
-        if output.status.success() {
-            let text = String::from_utf8_lossy(&output.stdout);
-            for line in text.lines() {
-                if let Some(worktree_path) = line.strip_prefix("worktree ") {
-                    let p = PathBuf::from(worktree_path.trim());
-                    if let Ok(canon) = p.canonicalize() {
-                        if !cwds.contains(&canon) {
-                            cwds.push(canon);
-                        }
-                    } else if !cwds.contains(&p) {
-                        cwds.push(p);
-                    }
-                }
+    // The other worktrees of this repository, as the Git component lists them.
+    for path in listed_worktrees(root) {
+        if let Ok(canon) = path.canonicalize() {
+            if !cwds.contains(&canon) {
+                cwds.push(canon);
             }
+        } else if !cwds.contains(&path) {
+            cwds.push(path);
         }
     }
     cwds
+}
+
+/// Every worktree path the repository at `root` registers; empty when it is
+/// not a repository or the listing is refused.
+fn listed_worktrees(root: &Path) -> Vec<PathBuf> {
+    let Some((driver, repo)) = crate::sources::repo::open_repository(root) else {
+        return Vec::new();
+    };
+    let mut paths = Vec::new();
+    let mut cursor = None;
+    loop {
+        let Ok(page) = driver.list_worktrees(&repo, cursor, 4096) else {
+            return paths;
+        };
+        paths.extend(page.entries.into_iter().map(|row| path_from_bytes(row.path)));
+        match page.next_cursor {
+            Some(next) => cursor = Some(next),
+            None => return paths,
+        }
+    }
+}
+
+#[cfg(unix)]
+fn path_from_bytes(bytes: Vec<u8>) -> PathBuf {
+    use std::os::unix::ffi::OsStringExt;
+    PathBuf::from(std::ffi::OsString::from_vec(bytes))
+}
+
+#[cfg(not(unix))]
+fn path_from_bytes(bytes: Vec<u8>) -> PathBuf {
+    PathBuf::from(String::from_utf8_lossy(&bytes).into_owned())
 }
 
 /// Encodes project dir replacing '/' and '.' with '-'
@@ -311,6 +328,7 @@ impl ObservationSource for ClaudeTranscriptsSource {
 mod tests {
     use super::*;
     use std::fs;
+    use std::process::Command;
 
     #[test]
     fn test_encode_project_dir() {

@@ -21,7 +21,7 @@ use std::time::Duration;
 
 use serde_json::{json, Value};
 
-use super::{line, EXIT_INTERNAL, EXIT_NEGATIVE, EXIT_OK, EXIT_TIMEOUT, EXIT_UNAVAILABLE};
+use super::{line, PROTOCOL, EXIT_INTERNAL, EXIT_NEGATIVE, EXIT_OK, EXIT_TIMEOUT, EXIT_UNAVAILABLE};
 use crate::port::{self, Acquire, Mode, Resource, Wait};
 
 /// How often the helper looks for requests and for its parent's death.
@@ -48,7 +48,7 @@ fn write_atomic(dir: &Path, name: &str, text: &str) -> io::Result<()> {
 fn write_ready(work: &Path, result: &str, fields: Value) -> io::Result<()> {
     let mut fields = fields;
     fields["helperPid"] = json!(std::process::id());
-    write_atomic(work, "ready.json", &line(Some(result), fields))
+    write_atomic(work, "ready.json", &line(PROTOCOL, Some(result), fields))
 }
 
 /// The helper could not open its parent: answer `unavailable` and hold
@@ -494,7 +494,7 @@ mod tests {
         }
         let answer = ready(&work);
         assert_eq!(answer["result"], "acquired");
-        assert_eq!(answer["protocol"], 1);
+        assert_eq!(answer["protocol"], 2);
         assert_eq!(answer["helperPid"], std::process::id());
         assert_eq!(probe(&Resource::new("hold", &path)).unwrap(), Probe::Held);
 

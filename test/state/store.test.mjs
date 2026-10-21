@@ -1342,3 +1342,21 @@ test('editWork still refuses a patch containing "id"/"status"/"stage"/"domain" â
     );
   }
 });
+
+test('a Land delivery whose append acknowledgement was lost reuses its durable settlement identity', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'land-delivery', { status: 'awaiting-approval' });
+  const args = {
+    id: 'land-delivery', to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human',
+    mergedSha: 'candidate-oid', mergedInto: 'main',
+    landSettlement: { repoIdentity: 'repository', operationId: 'land-operation', settlementKind: 'delivered' },
+  };
+  const first = moveWork(dir, args);
+  // The append happened, but its caller did not receive the acknowledgement.
+  const retry = moveWork(dir, args);
+  assert.equal(retry.event.seq, first.event.seq);
+  assert.deepEqual(retry.event.payload.landSettlement, args.landSettlement);
+  assert.deepEqual(rebuild(dir).work['land-delivery'].landSettlement, args.landSettlement);
+  assert.equal(readRawEvents(dir).filter(event => event.payload?.landSettlement?.operationId === 'land-operation').length, 1);
+  assert.throws(() => moveWork(dir, { ...args, mergedSha: 'different-candidate' }), /already bound to a different delivery/);
+});

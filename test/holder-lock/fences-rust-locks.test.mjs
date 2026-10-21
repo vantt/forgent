@@ -10,7 +10,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawn, spawnSync, execFileSync } from 'node:child_process';
 import { placeFences, fenceStatus, TOMBSTONE_FILE, V1_LOCK_PRESENT } from '../../src/holder-lock/fences.mjs';
-import { useReleaseFixture, fixture, runFgctl } from '../rust-host/fgctl-init-fixture.mjs';
+import { workspaceListing } from '../../src/setup/holder-lock-checks.mjs';
+import { useReleaseFixture, fixture, runFgctl, withoutActiveRelease } from '../rust-host/fgctl-init-fixture.mjs';
 
 const HOST = process.env.FGOS_HOST_BIN;
 const HAS_FLOCK = spawnSync('flock', ['--version'], { stdio: 'ignore' }).status === 0;
@@ -23,7 +24,7 @@ before(() => {
   assert.ok(HOST, 'set FGOS_HOST_BIN to a host built from this checkout');
   scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-fences-rust-'));
   stateHome = path.join(scratch, 'state');
-  fs.mkdirSync(stateHome);
+  fs.mkdirSync(stateHome, { mode: 0o700 });
   // Node asks the host for the state root (one formula, in Rust): the same one fgctl uses below.
   delete process.env.FGOS_STATE_ROOT;
   process.env.FGOS_STATE_HOME = stateHome;
@@ -45,7 +46,7 @@ function workspace(name) {
   return { root, fgosDir: path.join(root, '.fgos'), providerRuntimeDir: path.join(scratch, `${name}-no-provider-capacity`) };
 }
 
-const options = (ws, extra = {}) => ({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, ...extra });
+const options = (ws, extra = {}) => ({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, ...workspaceListing(ws.root), providerRuntimeDir: ws.providerRuntimeDir, ...extra });
 
 function rustLockPaths(ws, root = stateHome) {
   return {
@@ -60,7 +61,7 @@ function tombstoneRecord(lockPath) {
 }
 
 function cleanEnv(extra = {}) {
-  const env = { ...process.env, FGOS_STATE_HOME: stateHome, ...extra };
+  const env = { ...withoutActiveRelease(process.env), FGOS_STATE_HOME: stateHome, ...extra };
   for (const key of ['CLAUDE_CODE_SESSION_ID', 'CODEX_THREAD_ID', 'FGOS_SESSION_ID', 'FGOS_STATE_ROOT']) delete env[key];
   return env;
 }
@@ -131,7 +132,7 @@ test('behind the fences the new fgctl activates the workspace and the Observe CL
 test('doctor names the three locks: lock-fences before the fences, lock-holders while a foreign process holds observe', { skip: !HAS_FLOCK }, async () => {
   const ws = workspace('doctor');
   const ownState = path.join(scratch, 'doctor-state');
-  fs.mkdirSync(ownState);
+  fs.mkdirSync(ownState, { mode: 0o700 });
   const ownHome = path.join(scratch, 'doctor-home');
   const init = runFgctl(['init', '--from', fixture.releaseDir], { cwd: ws.root, stateHome: ownState, env: { HOME: ownHome } });
   assert.equal(init.status, 0, `fgctl init: ${init.stderr}`);

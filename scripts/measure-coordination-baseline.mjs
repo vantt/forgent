@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { execSync } from 'node:child_process';
+import { inspectRepo, statusEntries } from './lib/git-ports.mjs';
 import { fileURLToPath } from 'node:url';
 import { replaySession } from '../src/runner/coordination/replay.mjs';
 
@@ -316,11 +316,14 @@ export function measureSkills(repoRoot) {
   return results;
 }
 
+/** Every status entry (untracked files listed one by one) with the current bytes' digest, or null when the path is gone. */
 export function getDirtyFingerprint(repoRoot) {
   try {
-    const status = execSync('git status --porcelain=v2 --untracked-files=all -z', { cwd: repoRoot }).toString();
-    const diff = execSync('git diff -p', { cwd: repoRoot }).toString();
-    return 'sha256:' + sha256(status + '\n---\n' + diff);
+    const entries = statusEntries(inspectRepo(repoRoot), 'all').map((entry) => {
+      const file = path.join(repoRoot, entry.path);
+      return { ...entry, content: fs.existsSync(file) && fs.lstatSync(file).isFile() ? sha256(fs.readFileSync(file)) : null };
+    });
+    return 'sha256:' + sha256(JSON.stringify(entries));
   } catch {
     return 'sha256:unknown';
   }
@@ -328,7 +331,7 @@ export function getDirtyFingerprint(repoRoot) {
 
 export function getCommit(repoRoot) {
   try {
-    return execSync('git rev-parse HEAD', { cwd: repoRoot }).toString().trim();
+    return inspectRepo(repoRoot).resolveCommit({ name: 'HEAD' }) ?? 'unknown';
   } catch {
     return 'unknown';
   }

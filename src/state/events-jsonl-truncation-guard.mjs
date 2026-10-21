@@ -30,7 +30,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
-import { execFileSync } from "node:child_process";
+import { createGitInspect, gitPortOptions } from "../git/inspect.mjs";
 import { recordMainCheckoutGuardWarning } from "./main-checkout-guard-warnings.mjs";
 import { resolveFgosFile, FGOS_FILE } from "./fgos-file-registry.mjs";
 /**
@@ -308,15 +308,14 @@ function getUncommittedEventCountForFile(logPath, repoRoot) {
   }
 
   let committedLines = 0;
-  try {
-    const rawCommitted = execFileSync("git", ["show", `HEAD:${relPath}`], {
-      cwd: repoRoot,
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "ignore"],
-    });
-    committedLines = rawCommitted.split("\n").filter((l) => l.trim() !== "").length;
-  } catch {
-    committedLines = 0;
+  {
+    const port = createGitInspect(gitPortOptions(repoRoot));
+    const revision = port.resolveCommit({ name: 'HEAD' });
+    if (revision) {
+      const [{ value }] = port.pathsAtRevision({ revision, paths: [[...Buffer.from(relPath)]], maxBlobBytes: 32 * 1024 * 1024 });
+      if (value.kind === 'present') committedLines = Buffer.from(value.bytes).toString('utf8').split("\n").filter(l => l.trim() !== "").length;
+      else if (value.kind !== 'absent') throw new Error(`event blob read failed: ${value.kind}`);
+    }
   }
 
   return Math.max(0, diskLines - committedLines);
@@ -339,7 +338,7 @@ export function getUncommittedEventCount(fgosDir, repoRoot) {
 }
 
 /**
- * Runs opportunistic checks immediately after main checkout lock acquisition:
+ * Runs Work policy before entering Git locks:
  * D1: Advance truncation guard and record warning on break; refuse mark advancement & fallback commit on break (never throws/blocks).
  * D2: Fallback auto-commit of .fgos/events.jsonl and .fgos/events/ if dirty after fallbackIntervalSec (default 3600s, never throws/blocks).
  *
@@ -399,8 +398,9 @@ export function runOpportunisticMainCheckoutChecks(
         }
       }
     }
-  } catch {
-    // Non-blocking: swallow error
+  } catch (error) {
+    breakFlagged = true;
+    recordMainCheckoutGuardWarning(fgosDir, { reason: "truncation-check-failed", message: error.message });
   }
 
   // D1 Fail-closed: refuse fallback auto-commit when an unacknowledged break is flagged
@@ -418,29 +418,22 @@ export function runOpportunisticMainCheckoutChecks(
       pathspecs.push(path.relative(realRepoRoot, eventsDirPath).replaceAll("\\", "/"));
     }
     if (pathspecs.length > 0) {
-      const statusOut = execFileSync("git", ["status", "--porcelain", "--", ...pathspecs], {
-        cwd: realRepoRoot,
-        encoding: "utf8",
-        stdio: ["ignore", "pipe", "ignore"],
-      }).trim();
+      const port = createGitInspect(gitPortOptions(realRepoRoot));
+      const dirty = [];
+      let cursor;
+      do {
+        const page = port.status({ untracked: 'all', maxEntries: 4096, cursor });
+        dirty.push(...page.entries.filter(entry => {
+          const file = Buffer.from(entry.path).toString('utf8');
+          return pathspecs.some(spec => file === spec || file.startsWith(spec + '/'));
+        }));
+        cursor = page.nextCursor;
+      } while (cursor);
 
-      if (statusOut.length > 0) {
+      if (dirty.length > 0) {
         let lastCommitSec = null;
-        try {
-          const logOut = execFileSync("git", ["log", "-1", "--format=%ct", "--", ...pathspecs], {
-            cwd: realRepoRoot,
-            encoding: "utf8",
-            stdio: ["ignore", "pipe", "ignore"],
-          }).trim();
-          if (logOut) {
-            const parsed = parseInt(logOut, 10);
-            if (!Number.isNaN(parsed)) {
-              lastCommitSec = parsed;
-            }
-          }
-        } catch {
-          lastCommitSec = null;
-        }
+        try { lastCommitSec = port.lastPathCommitTime({ files: pathspecs }); }
+        catch { /* An unborn history falls back to dirty-file mtime. */ }
 
         let oldestDirtySec = null;
         for (const spec of pathspecs) {
@@ -512,8 +505,8 @@ export function runOpportunisticMainCheckoutChecks(
         }
       }
     }
-  } catch {
-    // Non-blocking: swallow error
+  } catch (error) {
+    recordMainCheckoutGuardWarning(fgosDir, { reason: "checkpoint-failed", message: error.message });
   }
 }
 

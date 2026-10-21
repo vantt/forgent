@@ -20,8 +20,8 @@ import { adoptRun, resolveRouteHostBin, RunSupervisorError } from './client.mjs'
 import { readGateKillGraceMs } from './gate-kill-grace.mjs';
 import { ensureRuntimeSocketDir } from './runtime-dir.mjs';
 import { OWN_PAYLOAD_ROOT, realpathOrNull, releasePayloadRoot } from './payload-root.mjs';
+import { RUN_SUPERVISOR_PROTOCOL as PROTOCOL } from './protocol.mjs';
 
-const PROTOCOL = 1;
 const BINDING_WAIT_MS = 30_000;
 const POLL_MS = 25;
 const CLOSE_WAIT_MS = 60_000;

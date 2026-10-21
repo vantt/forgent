@@ -478,8 +478,12 @@ dependencies = [
 name = "fgos-distribution"
 version = "0.2.0"
 dependencies = [
+ "fgos-git",
+ "fgos-holder-lock",
  "fgos-host-runtime",
  "flate2",
+ "libc",
+ "semver",
  "serde",
  "serde_json",
  "sha2 0.10.9",
@@ -490,6 +494,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "fgos-durable-file"
+version = "0.2.0"
+dependencies = [
+ "libc",
+ "windows-sys 0.61.2",
+]
+
+[[package]]
 name = "fgos-gateway"
 version = "0.2.0"
 dependencies = [
@@ -497,6 +509,7 @@ dependencies = [
  "axum-embed",
  "base64 0.23.1",
  "fgos-distribution",
+ "fgos-git",
  "fgos-host-runtime",
  "herdr-fgos-common",
  "jsonwebtoken",
@@ -513,6 +526,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "fgos-git"
+version = "0.2.0"
+dependencies = [
+ "fgos-durable-file",
+ "fgos-holder-lock",
+ "fgos-process",
+ "fgos-write-scope",
+ "libc",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+]
+
+[[package]]
+name = "fgos-holder-lock"
+version = "0.2.0"
+dependencies = [
+ "fgos-process",
+ "libc",
+ "serde_json",
+ "windows-sys 0.61.2",
+]
+
+[[package]]
 name = "fgos-host-runtime"
 version = "0.2.0"
 dependencies = [
@@ -523,6 +560,19 @@ dependencies = [
  "thiserror",
  "tokio",
 ]
+
+[[package]]
+name = "fgos-process"
+version = "0.2.0"
+dependencies = [
+ "libc",
+ "serde_json",
+ "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "fgos-write-scope"
+version = "0.2.0"
 
 [[package]]
 name = "filetime"

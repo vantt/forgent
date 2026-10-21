@@ -68,6 +68,7 @@ const listDir = (dir, re) => {
 };
 const approxTokens = (bytes) => Math.round(bytes / 4);
 
+// Read of the user's project (check-ignore writes nothing); a shipped skill script has no Inspect door.
 function gitIgnored(file) {
   try {
     execFileSync("git", ["-C", ROOT, "check-ignore", "-q", file], { stdio: "ignore" });

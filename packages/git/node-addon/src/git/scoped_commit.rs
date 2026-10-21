@@ -33,6 +33,9 @@ impl GitScopedCommit {
             ResolveRepo::Repository(r) => r,
             _ => return Err(error("not-a-repository")),
         };
+        if std::fs::canonicalize(&trusted_main).map_err(error)? != repo.trusted_main_root() {
+            return Err(error("untrusted-worktree: explicit main checkout required"));
+        }
         Ok(Self {
             driver,
             repo,
@@ -44,9 +47,10 @@ impl GitScopedCommit {
         check()?;
         let held = consume(loans)?;
         match method.as_str() {
+            "worktreeState" => Ok(json!(self.driver.checkout_state(&self.repo, held).map_err(operation)?)),
             "preflight" => Ok(json!(self
                 .driver
-                .preflight_commit(&self.repo, held)
+                .preflight_commit_for_sync(&self.repo, held, args.get("syncOperationId").and_then(Value::as_str).map(|id| (self.writer.as_str(), id)))
                 .map_err(operation)?)),
             "recover" => Ok(json!(self
                 .driver
@@ -74,8 +78,11 @@ impl GitScopedCommit {
                 .checkpoint_tracked_files(
                     &self.repo,
                     held,
-                    strings(&args, "files")?,
-                    text(&args, "message")?.into(),
+                    CheckpointRequest {
+                        files: strings(&args, "files")?,
+                        message: text(&args, "message")?.into(),
+                        legacy_events: args.get("legacyEvents").filter(|v| !v.is_null()).map(|v| serde_json::from_value(v.clone()).map_err(error)).transpose()?,
+                    },
                     &self.writer,
                     text(&args, "operationId")?
                 )

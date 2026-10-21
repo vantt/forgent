@@ -7,6 +7,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { prepareActivatedGitFixture } from '../helpers/run-unit-with-port.mjs';
 
 const execGit = (cwd, args) => execFileSync('git', args, { cwd, encoding: 'utf8' });
 
@@ -39,6 +40,7 @@ test('approve gate: aborts cleanly on test failure without modifying main', asyn
   addTestWork(fgosDir, 'tsk-test', { status: 'awaiting-approval' });
   execGit(cwd, ['add', '.fgos']);
   execGit(cwd, ['commit', '-m', 'add work']);
+  prepareActivatedGitFixture(cwd);
   
   execGit(cwd, ['branch', 'fgw/tsk-test', 'HEAD']);
   
@@ -83,7 +85,7 @@ test('approve gate: aborts cleanly on test failure without modifying main', asyn
 });
 
 test('root-into-main merge gate: verify sees the merged tree\'s own declared dependencies installed', async () => {
-  const { mergeRootIntoMainCas } = await import('../../src/runner/merge.mjs');
+  const { landRunnerItem } = await import('../../src/runner/merge.mjs');
   const os = await import('node:os');
   // A local `file:` dependency resolves entirely offline, so provisioning
   // stays fast and never hits the registry.
@@ -99,6 +101,7 @@ test('root-into-main merge gate: verify sees the merged tree\'s own declared dep
   execGit(cwd, ['add', 'package.json']);
   execGit(cwd, ['commit', '-m', 'declare dependency']);
   fs.mkdirSync(path.join(cwd, '.fgos'));
+  prepareActivatedGitFixture(cwd);
 
   execGit(cwd, ['branch', 'fgw/tsk-dep', 'HEAD']);
   execGit(cwd, ['checkout', 'fgw/tsk-dep']);
@@ -109,14 +112,14 @@ test('root-into-main merge gate: verify sees the merged tree\'s own declared dep
   const mainBefore = execGit(cwd, ['rev-parse', 'HEAD']).trim();
 
   const item = { id: 'tsk-dep', verify: `node -e "require('fgos-merge-gate-localdep')"` };
-  const result = await mergeRootIntoMainCas(cwd, item, 'fgw/tsk-dep', { timeoutMs: 60000 });
+  const result = await landRunnerItem(cwd, item, { branch: 'fgw/tsk-dep', timeoutMs: 60000 });
 
   assert.equal(result.outcome, 'merged', `expected merged, got ${result.outcome}: ${result.check?.output ?? ''}`);
   assert.notEqual(execGit(cwd, ['rev-parse', 'main']).trim(), mainBefore, 'main should advance to the merge commit');
 });
 
 test('root-into-main merge gate: verify runs under the trunk\'s merge slot but without the main checkout mutex, so other fgos commands are not refused meanwhile', async () => {
-  const { mergeRootIntoMainCas } = await import('../../src/runner/merge.mjs');
+  const { landRunnerItem } = await import('../../src/runner/merge.mjs');
   const { withMainCheckout } = await import('../../src/runner/repo-locks.mjs');
   const { createLockScope, probe } = await import('../../src/holder-lock/index.mjs');
   const os = await import('node:os');
@@ -126,6 +129,7 @@ test('root-into-main merge gate: verify runs under the trunk\'s merge slot but w
   execGit(cwd, ['config', 'user.email', 'test@example.com']);
   execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
   fs.mkdirSync(path.join(cwd, '.fgos'));
+  prepareActivatedGitFixture(cwd);
   execGit(cwd, ['branch', 'fgw/tsk-lock', 'HEAD']);
   execGit(cwd, ['checkout', 'fgw/tsk-lock']);
   fs.writeFileSync(path.join(cwd, 'feature.txt'), 'feature\n');
@@ -135,7 +139,7 @@ test('root-into-main merge gate: verify runs under the trunk\'s merge slot but w
 
   const marker = path.join(cwd, '.fgos', 'verify-started').replaceAll('\\', '/');
   const item = { id: 'tsk-lock', verify: `node -e "require('fs').writeFileSync('${marker}','1');setTimeout(()=>{},1500)"` };
-  const merging = mergeRootIntoMainCas(cwd, item, 'fgw/tsk-lock', { timeoutMs: 60000 });
+  const merging = landRunnerItem(cwd, item, { branch: 'fgw/tsk-lock', timeoutMs: 60000 });
   const deadline = Date.now() + 20000;
   while (!fs.existsSync(marker)) {
     assert.ok(Date.now() < deadline, 'verify never started');
@@ -143,19 +147,19 @@ test('root-into-main merge gate: verify runs under the trunk\'s merge slot but w
   }
 
   const fgosDir = path.join(cwd, '.fgos');
-  assert.equal(probe('merge-slot', { fgosDir, ref: 'main' }).result, 'held', 'the trunk\'s slot is held while the merge verifies');
+  assert.equal(probe('merge-slot', { fgosDir, ref: encodeURIComponent('refs/heads/main') }).result, 'held', 'the trunk\'s slot is held while the merge verifies');
   const entered = await withMainCheckout(createLockScope('concurrent'), 'concurrent', () => 'in', { fgosDir });
   assert.equal(entered, 'in', 'the main mutex is free while verify runs');
 
   const result = await merging;
   assert.equal(result.outcome, 'merged', `expected merged, got ${result.outcome}: ${result.check?.output ?? ''}`);
   assert.equal(probe('main-checkout', { fgosDir }).result, 'free', 'the main mutex is released after landing');
-  assert.equal(probe('merge-slot', { fgosDir, ref: 'main' }).result, 'free', 'the slot is released after landing');
+  assert.equal(probe('merge-slot', { fgosDir, ref: encodeURIComponent('refs/heads/main') }).result, 'free', 'the slot is released after landing');
   assert.ok(fs.existsSync(path.join(cwd, 'feature.txt')), 'main checkout working tree synced to the merge');
 });
 
 test('root-into-main merge gate: a second merge into the same trunk is refused at once (lockWaitMs 0) while the first holds the slot, and before any verify', async () => {
-  const { mergeRootIntoMainCas, MergeError } = await import('../../src/runner/merge.mjs');
+  const { landRunnerItem, MergeError } = await import('../../src/runner/merge.mjs');
   const { holdLockInChild } = await import('../helpers/hold-lock-in-child.mjs');
   const os = await import('node:os');
   const cwd = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-slot-held-')));
@@ -164,15 +168,16 @@ test('root-into-main merge gate: a second merge into the same trunk is refused a
   execGit(cwd, ['config', 'user.email', 'test@example.com']);
   execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
   fs.mkdirSync(path.join(cwd, '.fgos'));
+  prepareActivatedGitFixture(cwd);
   execGit(cwd, ['branch', 'fgw/tsk-slot', 'HEAD']);
   const mainBefore = execGit(cwd, ['rev-parse', 'main']).trim();
 
-  const holder = await holdLockInChild('merge-slot', { fgosDir: path.join(cwd, '.fgos'), ref: 'main' });
+  const holder = await holdLockInChild('merge-slot', { fgosDir: path.join(cwd, '.fgos'), ref: encodeURIComponent('refs/heads/main') });
   try {
-    const err = await mergeRootIntoMainCas(cwd, { id: 'tsk-slot', verify: 'true' }, 'fgw/tsk-slot', { timeoutMs: 60000, lockWaitMs: 0 }).then(() => null, (e) => e);
+    const err = await landRunnerItem(cwd, { id: 'tsk-slot', verify: 'true' }, { branch: 'fgw/tsk-slot', timeoutMs: 60000, lockWaitMs: 0 }).then(() => null, (e) => e);
     assert.ok(err instanceof MergeError, `expected MergeError, got ${err}`);
     assert.equal(err.code, 'lock-held');
-    assert.match(err.message, /merge slot of "main" is held by another process/);
+    assert.match(err.message, /merge slot of "refs\/heads\/main" is held by another process/);
     assert.ok(err.holders.includes(holder.child.pid));
     assert.equal(execGit(cwd, ['rev-parse', 'main']).trim(), mainBefore);
   } finally {
@@ -182,7 +187,7 @@ test('root-into-main merge gate: a second merge into the same trunk is refused a
 });
 
 test('root-into-main merge gate: with lockWaitMs 0 a busy main checkout refuses the merge before the verify run', async () => {
-  const { mergeRootIntoMainCas } = await import('../../src/runner/merge.mjs');
+  const { landRunnerItem } = await import('../../src/runner/merge.mjs');
   const { holdLockInChild } = await import('../helpers/hold-lock-in-child.mjs');
   const os = await import('node:os');
   const cwd = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-main-held-')));
@@ -191,12 +196,13 @@ test('root-into-main merge gate: with lockWaitMs 0 a busy main checkout refuses 
   execGit(cwd, ['config', 'user.email', 'test@example.com']);
   execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
   fs.mkdirSync(path.join(cwd, '.fgos'));
+  prepareActivatedGitFixture(cwd);
   execGit(cwd, ['branch', 'fgw/tsk-busy', 'HEAD']);
   const verifyRan = path.join(cwd, '.fgos', 'verify-ran').replaceAll('\\', '/');
 
   const holder = await holdLockInChild('main-checkout', { fgosDir: path.join(cwd, '.fgos') });
   try {
-    const err = await mergeRootIntoMainCas(cwd, { id: 'tsk-busy', verify: `node -e "require('fs').writeFileSync('${verifyRan}','1')"` }, 'fgw/tsk-busy', { timeoutMs: 60000, lockWaitMs: 0 }).then(() => null, (e) => e);
+    const err = await landRunnerItem(cwd, { id: 'tsk-busy', verify: `node -e "require('fs').writeFileSync('${verifyRan}','1')"` }, { branch: 'fgw/tsk-busy', timeoutMs: 60000, lockWaitMs: 0 }).then(() => null, (e) => e);
     assert.equal(err?.code, 'lock-held');
     assert.match(err.message, /main checkout \(precheck\) is held by another process/);
     assert.equal(fs.existsSync(verifyRan), false, 'refused before any verify ran');
@@ -214,6 +220,7 @@ async function casRepoWithSetup(commands) {
   execGit(cwd, ['config', 'user.email', 'test@example.com']);
   execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
   fs.mkdirSync(path.join(cwd, '.fgos'));
+  prepareActivatedGitFixture(cwd);
   fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ worktreeSetup: { commands } }));
   execGit(cwd, ['branch', 'fgw/tsk-setup', 'HEAD']);
   execGit(cwd, ['checkout', 'fgw/tsk-setup']);
@@ -225,25 +232,25 @@ async function casRepoWithSetup(commands) {
 }
 
 test('root-into-main merge gate: runs the project\'s worktreeSetup commands before verify (e.g. building an artifact the suite needs)', async () => {
-  const { mergeRootIntoMainCas } = await import('../../src/runner/merge.mjs');
+  const { landRunnerItem } = await import('../../src/runner/merge.mjs');
   const cwd = await casRepoWithSetup(['echo built > build-artifact.txt']);
   const item = { id: 'tsk-setup', verify: `node -e "process.exit(require('fs').existsSync('build-artifact.txt') ? 0 : 1)"` };
-  const result = await mergeRootIntoMainCas(cwd, item, 'fgw/tsk-setup', { timeoutMs: 60000 });
+  const result = await landRunnerItem(cwd, item, { branch: 'fgw/tsk-setup', timeoutMs: 60000 });
   assert.equal(result.outcome, 'merged', `expected merged, got ${result.outcome}: ${result.check?.output ?? ''}`);
 });
 
 test('root-into-main merge gate: a failing worktreeSetup command is a verify-fail naming the command, main untouched', async () => {
-  const { mergeRootIntoMainCas } = await import('../../src/runner/merge.mjs');
+  const { landRunnerItem } = await import('../../src/runner/merge.mjs');
   const cwd = await casRepoWithSetup(['node -e "console.error(\'setup-broke\'); process.exit(2)"']);
   const mainBefore = execGit(cwd, ['rev-parse', 'main']).trim();
-  const result = await mergeRootIntoMainCas(cwd, { id: 'tsk-setup', verify: 'true' }, 'fgw/tsk-setup', { timeoutMs: 60000 });
+  const result = await landRunnerItem(cwd, { id: 'tsk-setup', verify: 'true' }, { branch: 'fgw/tsk-setup', timeoutMs: 60000 });
   assert.equal(result.outcome, 'verify-fail');
   assert.match(result.check.output, /setup-broke/);
   assert.equal(execGit(cwd, ['rev-parse', 'main']).trim(), mainBefore);
 });
 
 test('root-into-main merge gate: a path in ownFileSet dirtied on repoRoot AFTER the merge+verify started (but before the land step) is caught under the lock, not raced past', async () => {
-  const { mergeRootIntoMainCas } = await import('../../src/runner/merge.mjs');
+  const { landRunnerItem } = await import('../../src/runner/merge.mjs');
   const os = await import('node:os');
   const cwd = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-race-')));
   execGit(cwd, ['init', '--initial-branch=main']);
@@ -253,6 +260,7 @@ test('root-into-main merge gate: a path in ownFileSet dirtied on repoRoot AFTER 
   execGit(cwd, ['add', 'owned.txt']);
   execGit(cwd, ['commit', '-m', 'initial']);
   fs.mkdirSync(path.join(cwd, '.fgos'));
+  prepareActivatedGitFixture(cwd);
   execGit(cwd, ['branch', 'fgw/tsk-race', 'HEAD']);
   execGit(cwd, ['checkout', 'fgw/tsk-race']);
   fs.writeFileSync(path.join(cwd, 'owned.txt'), 'from the item\n');
@@ -265,10 +273,8 @@ test('root-into-main merge gate: a path in ownFileSet dirtied on repoRoot AFTER 
   // before the CAS merge+verify (git worktree add, merge, goal-check) can
   // possibly finish and reach the land step.
   const item = { id: 'tsk-race', verify: 'node -e "setTimeout(() => process.exit(0), 400)"' };
-  const racePromise = mergeRootIntoMainCas(cwd, item, 'fgw/tsk-race', {
-    timeoutMs: 60000,
-    ownFileSet: new Set(['owned.txt']),
-  });
+  const racePromise = landRunnerItem(cwd, item, { branch: 'fgw/tsk-race', timeoutMs: 60000,
+    ownFileSet: new Set(['owned.txt']), });
   // Fires on the next tick -- long before the 400ms verify sleep ends, so
   // this is genuinely mid-merge, not a pre-check the function hasn't
   // reached yet.
@@ -281,7 +287,7 @@ test('root-into-main merge gate: a path in ownFileSet dirtied on repoRoot AFTER 
 });
 
 test('root-into-main merge gate: an UNRELATED path dirtied mid-merge (outside ownFileSet) does not trip the second check', async () => {
-  const { mergeRootIntoMainCas } = await import('../../src/runner/merge.mjs');
+  const { landRunnerItem } = await import('../../src/runner/merge.mjs');
   const os = await import('node:os');
   const cwd = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-race-unrelated-')));
   execGit(cwd, ['init', '--initial-branch=main']);
@@ -289,6 +295,7 @@ test('root-into-main merge gate: an UNRELATED path dirtied mid-merge (outside ow
   execGit(cwd, ['config', 'user.email', 'test@example.com']);
   execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
   fs.mkdirSync(path.join(cwd, '.fgos'));
+  prepareActivatedGitFixture(cwd);
   execGit(cwd, ['branch', 'fgw/tsk-race-ok', 'HEAD']);
   execGit(cwd, ['checkout', 'fgw/tsk-race-ok']);
   fs.writeFileSync(path.join(cwd, 'feature.txt'), 'feature\n');
@@ -297,10 +304,8 @@ test('root-into-main merge gate: an UNRELATED path dirtied mid-merge (outside ow
   execGit(cwd, ['checkout', 'main']);
 
   const item = { id: 'tsk-race-ok', verify: 'node -e "setTimeout(() => process.exit(0), 400)"' };
-  const racePromise = mergeRootIntoMainCas(cwd, item, 'fgw/tsk-race-ok', {
-    timeoutMs: 60000,
-    ownFileSet: new Set(['feature.txt']),
-  });
+  const racePromise = landRunnerItem(cwd, item, { branch: 'fgw/tsk-race-ok', timeoutMs: 60000,
+    ownFileSet: new Set(['feature.txt']), });
   setTimeout(() => fs.writeFileSync(path.join(cwd, 'unrelated-scratch.txt'), 'another session\'s work\n'), 10);
   const result = await racePromise;
 
@@ -310,7 +315,7 @@ test('root-into-main merge gate: an UNRELATED path dirtied mid-merge (outside ow
 
 // approve's --no-wait / --wait against a held merge slot, through the use case
 // itself on a real repo and a real other process holding the slot.
-async function approvableRootRepo(id) {
+async function approvableRootRepo(id, { verify = 'true' } = {}) {
   const cwd = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-approve-wait-')));
   execGit(cwd, ['init', '--initial-branch=main']);
   execGit(cwd, ['config', 'user.name', 'Test']);
@@ -318,9 +323,10 @@ async function approvableRootRepo(id) {
   execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
   const fgosDir = path.join(cwd, '.fgos');
   fs.mkdirSync(fgosDir);
-  addTestWork(fgosDir, id, { status: 'awaiting-approval', verify: 'true' });
+  addTestWork(fgosDir, id, { status: 'awaiting-approval', verify });
   execGit(cwd, ['add', '.fgos']);
   execGit(cwd, ['commit', '-m', 'add work']);
+  prepareActivatedGitFixture(cwd);
   execGit(cwd, ['branch', `fgw/${id}`, 'HEAD']);
   execGit(cwd, ['checkout', `fgw/${id}`]);
   fs.writeFileSync(path.join(cwd, 'produced.txt'), 'ok\n');
@@ -339,18 +345,18 @@ const approveOptions = (id, waitFlags) => ({
   acknowledgeDrift: () => {},
 });
 
-test('approve --no-wait with the trunk\'s merge slot held fails at once naming the slot, and the item stays awaiting-approval', async () => {
+test('approve --no-wait with the trunk\'s merge slot held fails at once naming the slot, the item stays awaiting-approval, and a retry once the slot is free delivers under the same recorded operation', async () => {
   const { holdLockInChild } = await import('../helpers/hold-lock-in-child.mjs');
   const { listWork } = await import('../../src/state/store.mjs');
   const { cwd, fgosDir } = await approvableRootRepo('tsk-nowait');
-  const holder = await holdLockInChild('merge-slot', { fgosDir, ref: 'main' });
+  const holder = await holdLockInChild('merge-slot', { fgosDir, ref: encodeURIComponent('refs/heads/main') });
   try {
     const started = Date.now();
     await assert.rejects(
       () => approveUseCase({ dir: fgosDir, repoRoot: cwd }, approveOptions('tsk-nowait', { noWait: true })),
       (err) => {
         assert.equal(err.code, 'lock-held');
-        assert.match(err.message, /merge slot of "main" is held by another process/);
+        assert.match(err.message, /merge slot of "refs\/heads\/main" is held by another process/);
         assert.ok(err.holders.includes(holder.child.pid));
         return true;
       },
@@ -361,13 +367,21 @@ test('approve --no-wait with the trunk\'s merge slot held fails at once naming t
     holder.child.kill('SIGKILL');
     await holder.exited;
   }
+  // The refusal came before Land journalled anything, so the recorded id is
+  // no prior attempt: the retry reuses it instead of failing on the journal.
+  const result = await approveUseCase({ dir: fgosDir, repoRoot: cwd }, approveOptions('tsk-nowait', { noWait: true }));
+  assert.equal(result.to, 'delivered', JSON.stringify(result));
+  const view = listWork(fgosDir);
+  const recorded = view.decisions.filter((d) => d.id === 'tsk-nowait' && d.landOperation);
+  assert.equal(recorded.length, 1, 'a retry records no second Land operation');
+  assert.equal(view.work['tsk-nowait'].landSettlement.operationId, recorded[0].landOperation.operationId);
 });
 
 test('approve --wait <ms> waits for the held merge slot and lands once the holder releases', async () => {
   const { holdLockInChild } = await import('../helpers/hold-lock-in-child.mjs');
   const { listWork } = await import('../../src/state/store.mjs');
   const { cwd, fgosDir } = await approvableRootRepo('tsk-wait');
-  const holder = await holdLockInChild('merge-slot', { fgosDir, ref: 'main' });
+  const holder = await holdLockInChild('merge-slot', { fgosDir, ref: encodeURIComponent('refs/heads/main') });
   setTimeout(() => holder.child.kill('SIGKILL'), 600);
   const result = await approveUseCase({ dir: fgosDir, repoRoot: cwd }, approveOptions('tsk-wait', { noWait: false, waitMs: 15000 }));
   await holder.exited;
@@ -381,11 +395,11 @@ test('sync-root --no-wait with the trunk\'s merge slot held fails at once naming
   const { syncRootUseCase } = await import('../../src/verbs/merge/sync-root.mjs');
   const { cwd, fgosDir } = await approvableRootRepo('tsk-sync');
   const options = (waitFlags) => ({ id: 'tsk-sync', resolveTimeoutMs: () => 60000, resolveWaitFlags: () => waitFlags, acknowledgeIronLaw: true });
-  const holder = await holdLockInChild('merge-slot', { fgosDir, ref: 'main' });
+  const holder = await holdLockInChild('merge-slot', { fgosDir, ref: encodeURIComponent('refs/heads/main') });
   try {
     await assert.rejects(
       () => syncRootUseCase({ dir: fgosDir, repoRoot: cwd }, options({ noWait: true })),
-      (err) => err.code === 'lock-held' && /merge slot of "main" is held by another process/.test(err.message),
+      (err) => err.code === 'lock-held' && /merge slot of "refs\/heads\/main" is held by another process/.test(err.message),
     );
     assert.equal(fs.existsSync(path.join(cwd, 'produced.txt')), false, 'nothing merged while refused');
     setTimeout(() => holder.child.kill('SIGKILL'), 600);
@@ -396,4 +410,145 @@ test('sync-root --no-wait with the trunk\'s merge slot held fails at once naming
     holder.child.kill('SIGKILL');
     await holder.exited;
   }
+});
+
+test('a failing post-land drift detection is reported beside a landed merge, never as a failed merge', async () => {
+  const { landRunnerItem } = await import('../../src/runner/merge.mjs');
+  const { cwd, fgosDir } = await approvableRootRepo('tsk-drift-broken');
+  // The verify breaks the session registry drift detection reads, after
+  // approve's own guards have read it and before Land publishes.
+  const registry = path.join(fgosDir, 'sessions.json');
+  const item = { id: 'tsk-drift-broken', verify: `node -e "require('fs').writeFileSync('${registry}','not json')"` };
+  const result = await landRunnerItem(cwd, item, { branch: 'fgw/tsk-drift-broken', timeoutMs: 60000 });
+  assert.equal(result.outcome, 'merged', JSON.stringify(result));
+  assert.equal(result.landSettlement.settlementKind, 'delivered');
+  assert.match(result.postLand.error, /post-land drift detection failed: .*sessions\.json/);
+  assert.equal(execGit(cwd, ['show', 'main:produced.txt']), 'ok\n', 'the branch landed on main');
+});
+
+test('an unclassified failure while publishing claims no abandoned result: the land reports its effect unknown and doctor --fix settles it through Land recovery', async () => {
+  const { landRunnerItem } = await import('../../src/runner/merge.mjs');
+  const { fixLandRecovery } = await import('../../src/setup/git-checks.mjs');
+  const { cwd } = await approvableRootRepo('tsk-publish-unknown');
+  const mainBefore = execGit(cwd, ['rev-parse', 'main']).trim();
+  // The verify edits a tracked file of the candidate, so publication refuses.
+  const item = { id: 'tsk-publish-unknown', verify: `node -e "require('fs').writeFileSync('produced.txt','edited by verify')"` };
+  const err = await landRunnerItem(cwd, item, { branch: 'fgw/tsk-publish-unknown', timeoutMs: 60000 }).then(() => null, (e) => e);
+  assert.equal(err?.code, 'land-effect-unknown', String(err?.stack ?? err));
+  assert.match(err.message, /fgos doctor --fix/);
+  assert.equal(execGit(cwd, ['rev-parse', 'main']).trim(), mainBefore);
+  const fixed = fixLandRecovery(cwd);
+  assert.equal(fixed.changed, true, fixed.message);
+  assert.match(fixed.message, new RegExp(`recovered interrupted Land operations: ${err.operationId}`));
+});
+
+test('approve releases the published Land candidate once Work has recorded the delivery', async () => {
+  const { listWork } = await import('../../src/state/store.mjs');
+  const { cwd, fgosDir } = await approvableRootRepo('tsk-release');
+  const result = await approveUseCase({ dir: fgosDir, repoRoot: cwd }, approveOptions('tsk-release', { noWait: false, waitMs: 15000 }));
+  assert.equal(result.to, 'delivered', JSON.stringify(result));
+  const item = listWork(fgosDir).work['tsk-release'];
+  const { landOperation } = listWork(fgosDir).decisions.find((d) => d.id === 'tsk-release' && d.landOperation);
+  assert.equal(item.landSettlement.operationId, landOperation.operationId, 'delivery is settled under the recorded Land operation');
+  const candidates = path.join(cwd, '.fgos/runtime/git-candidates');
+  assert.deepEqual(fs.existsSync(candidates) ? fs.readdirSync(candidates) : [], [], 'no candidate is left once the delivery is acknowledged');
+  assert.ok(fs.existsSync(path.join(cwd, 'produced.txt')), 'the branch landed on main');
+});
+
+test('approve lands a leaf on its root branch through Land, with the delivery settled by that operation and the main checkout untouched', async () => {
+  const { listWork } = await import('../../src/state/store.mjs');
+  const cwd = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-approve-leaf-')));
+  execGit(cwd, ['init', '--initial-branch=main']);
+  execGit(cwd, ['config', 'user.name', 'Test']);
+  execGit(cwd, ['config', 'user.email', 'test@example.com']);
+  execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
+  const fgosDir = path.join(cwd, '.fgos');
+  fs.mkdirSync(fgosDir);
+  addTestWork(fgosDir, 'tsk-root', { status: 'todo', verify: 'true' });
+  addTestWork(fgosDir, 'tsk-leaf', { status: 'awaiting-approval', verify: 'test -f leaf.txt', parent: 'tsk-root' });
+  execGit(cwd, ['add', '.fgos']);
+  execGit(cwd, ['commit', '-m', 'add work']);
+  prepareActivatedGitFixture(cwd);
+  execGit(cwd, ['branch', 'fgw/tsk-root', 'HEAD']);
+  execGit(cwd, ['branch', 'fgw/tsk-leaf', 'HEAD']);
+  execGit(cwd, ['checkout', 'fgw/tsk-leaf']);
+  fs.writeFileSync(path.join(cwd, 'leaf.txt'), 'leaf\n');
+  execGit(cwd, ['add', 'leaf.txt']);
+  execGit(cwd, ['commit', '-m', 'leaf work']);
+  execGit(cwd, ['checkout', 'main']);
+  const mainBefore = execGit(cwd, ['rev-parse', 'main']).trim();
+
+  const result = await approveUseCase({ dir: fgosDir, repoRoot: cwd }, approveOptions('tsk-leaf', { noWait: false, waitMs: 15000 }));
+  assert.equal(result.to, 'delivered', JSON.stringify(result));
+  assert.equal(result.target, 'fgw/tsk-root');
+  const rootTip = execGit(cwd, ['rev-parse', 'fgw/tsk-root']).trim();
+  assert.equal(execGit(cwd, ['show', 'fgw/tsk-root:leaf.txt']), 'leaf\n', 'the leaf landed on its root branch');
+  assert.equal(execGit(cwd, ['rev-parse', 'main']).trim(), mainBefore, 'main never moved');
+  assert.equal(fs.existsSync(path.join(cwd, 'leaf.txt')), false, 'the main checkout was never written');
+  const item = listWork(fgosDir).work['tsk-leaf'];
+  assert.equal(item.mergedSha, rootTip);
+  const { landOperation } = listWork(fgosDir).decisions.find((d) => d.id === 'tsk-leaf' && d.landOperation);
+  assert.equal(landOperation.destination, 'refs/heads/fgw/tsk-root');
+  assert.equal(item.landSettlement.operationId, landOperation.operationId);
+});
+
+// Land keeps a candidate, its pins and its journal until Work durably records
+// the result; a result that published nothing is released the same way.
+function assertNoLandCandidate(cwd) {
+  const candidates = path.join(cwd, '.fgos/runtime/git-candidates');
+  assert.deepEqual(fs.existsSync(candidates) ? fs.readdirSync(candidates) : [], [], 'no candidate is left once the result is acknowledged');
+  assert.equal(execGit(cwd, ['for-each-ref', 'refs/fgos/git-operations']), '', 'no candidate pin is left');
+}
+
+test('approve releases a red Land candidate once Work has recorded the block', async () => {
+  const { listWork } = await import('../../src/state/store.mjs');
+  const { cwd, fgosDir } = await approvableRootRepo('tsk-red', { verify: 'false' });
+  const mainBefore = execGit(cwd, ['rev-parse', 'main']).trim();
+  const result = await approveUseCase({ dir: fgosDir, repoRoot: cwd }, approveOptions('tsk-red', { noWait: false, waitMs: 15000 }));
+  assert.equal(result.to, 'blocked', JSON.stringify(result));
+  assert.equal(listWork(fgosDir).work['tsk-red'].status, 'blocked');
+  assert.equal(execGit(cwd, ['rev-parse', 'main']).trim(), mainBefore, 'nothing was published');
+  assertNoLandCandidate(cwd);
+});
+
+test('sync-root records a red Land result as a decision and releases its candidate', async () => {
+  const { listWork } = await import('../../src/state/store.mjs');
+  const { syncRootUseCase } = await import('../../src/verbs/merge/sync-root.mjs');
+  const { cwd, fgosDir } = await approvableRootRepo('tsk-sync-red', { verify: 'false' });
+  const mainBefore = execGit(cwd, ['rev-parse', 'main']).trim();
+  const result = await syncRootUseCase({ dir: fgosDir, repoRoot: cwd }, { id: 'tsk-sync-red', resolveTimeoutMs: () => 60000, resolveWaitFlags: () => ({ noWait: false, waitMs: 15000 }), acknowledgeIronLaw: true });
+  assert.equal(result.outcome, 'blocked', JSON.stringify(result));
+  assert.equal(result.reason, 'verify-fail');
+  assert.equal(execGit(cwd, ['rev-parse', 'main']).trim(), mainBefore, 'nothing was published');
+  assert.ok(listWork(fgosDir).decisions.some((d) => d.id === 'tsk-sync-red' && d.kind === 'engine' && /published nothing \(verify-fail\)/.test(d.text)),
+    'Work records the unpublished result before the candidate is released');
+  assertNoLandCandidate(cwd);
+});
+
+test('promote-to-component releases every member\'s Land candidate, merged or red, once its decision is recorded', async () => {
+  const { promoteToComponentUseCase } = await import('../../src/verbs/merge/promote-to-component.mjs');
+  const cwd = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-promote-')));
+  execGit(cwd, ['init', '--initial-branch=main']);
+  execGit(cwd, ['config', 'user.name', 'Test']);
+  execGit(cwd, ['config', 'user.email', 'test@example.com']);
+  execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
+  const fgosDir = path.join(cwd, '.fgos');
+  fs.mkdirSync(fgosDir);
+  addTestWork(fgosDir, 'ptc-green', { status: 'awaiting-approval', verify: 'true' });
+  addTestWork(fgosDir, 'ptc-red', { status: 'awaiting-approval', verify: 'false', deps: ['ptc-green'] });
+  execGit(cwd, ['add', '.fgos']);
+  execGit(cwd, ['commit', '-m', 'add work']);
+  prepareActivatedGitFixture(cwd);
+  for (const id of ['ptc-green', 'ptc-red']) {
+    execGit(cwd, ['branch', `fgw/${id}`, 'HEAD']);
+    execGit(cwd, ['checkout', `fgw/${id}`]);
+    fs.writeFileSync(path.join(cwd, `${id}.txt`), `${id}\n`);
+    execGit(cwd, ['add', `${id}.txt`]);
+    execGit(cwd, ['commit', '-m', id]);
+    execGit(cwd, ['checkout', 'main']);
+  }
+  const result = await promoteToComponentUseCase({ dir: fgosDir, repoRoot: cwd }, { ids: ['ptc-green', 'ptc-red'], rootTitle: 'Promoted component', timeoutMs: 60000 });
+  assert.deepEqual(result.results.map((r) => [r.id, r.outcome]), [['ptc-green', 'merged'], ['ptc-red', 'blocked']]);
+  assert.ok(result.results.every((r) => !('landSettlement' in r)), 'settlement identities stay internal to the verb');
+  assertNoLandCandidate(cwd);
 });

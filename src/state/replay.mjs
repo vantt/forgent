@@ -111,7 +111,7 @@ function applyEvent(view, event) {
       break;
     }
     case 'work.move': {
-      const { id, from, to, ask, answer, role, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, mergedSha, mergedInto, reason, parentSnapshotAtAsk, claimTrigger, statusAtAsk, durableStatusAtAsk, writer, statusCategory, parkReason, rationale, alternatives, source, askSource, approved } = event.payload ?? {};
+      const { id, from, to, ask, answer, role, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, mergedSha, mergedInto, landSettlement, reason, parentSnapshotAtAsk, claimTrigger, statusAtAsk, durableStatusAtAsk, writer, statusCategory, parkReason, rationale, alternatives, source, askSource, approved } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.status = to;
@@ -246,6 +246,7 @@ function applyEvent(view, event) {
       if (item && to === 'delivered' && mergedInto !== undefined) {
         item.mergedInto = mergedInto;
       }
+      if (item && to === 'delivered' && landSettlement !== undefined) item.landSettlement = landSettlement;
       // Human-gate ask/answer (per async-human-gate D2/D5), mirroring the
       // work.outcome lazy-key/merge-by-id precedent above: the ask (entry
       // move into awaiting-human) and answer (exit move back to todo) ride

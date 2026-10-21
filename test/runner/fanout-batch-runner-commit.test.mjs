@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { fanoutBatchExecutorCli } from '../../src/runner/fanout-batch.mjs';
@@ -36,6 +37,7 @@ function mkRepo() {
   const fgosDir = path.join(repoRoot, '.fgos');
   fs.mkdirSync(fgosDir);
   initStore(fgosDir);
+  activateGitFixture(repoRoot);
   return { repoRoot, fgosDir };
 }
 

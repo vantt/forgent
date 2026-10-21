@@ -16,7 +16,7 @@ import { isResolvedStatus, resolveRoot } from '../state/frontier.mjs';
 import { getDomain, stepForPhase, effectiveStep } from '../state/domain-registry.mjs';
 import { visitCount } from './anti-loop.mjs';
 import { withMainCheckout } from './repo-locks.mjs';
-import { checkpointMainFgos } from './main-fgos-checkpoint.mjs';
+import { checkpointMainFgos, prepareMainFgosCheckpoint } from './main-fgos-checkpoint.mjs';
 import { LockScope, HolderLockError } from '../holder-lock/index.mjs';
 import { createClaimWorktree, branchNameFor, branchExists, currentHead, resolveRefSha } from './worktree.mjs';
 import { lastActivityAt, isReclaimEligible } from './claim-liveness.mjs';
@@ -102,11 +102,15 @@ export async function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoo
   const head = currentHead(repoRoot);
   const scope = new LockScope('claim');
 
+  // Work truncation/timing policy runs before any Git lock. The native
+  // checkpoint borrows main 50 without releasing the caller's authority.
+  const preparedCheckpoint = prepareMainFgosCheckpoint(dir, repoRoot);
+
   // The main checkout mutex (rank 50) is held only for the `.fgos` checkpoint.
   // The ceiling check below no longer leans on it: it runs inside the `state`
   // transaction, so two claims for the last slot still cannot both pass.
   try {
-    await withMainCheckout(scope, 'claim', (mainHandle) => checkpointMainFgos(mainHandle, dir, repoRoot), { fgosDir: dir, waitMs });
+    await withMainCheckout(scope, 'claim', (mainHandle) => checkpointMainFgos(mainHandle, dir, repoRoot, { prepared: preparedCheckpoint }), { fgosDir: dir, waitMs });
   } catch (err) {
     if (err instanceof HolderLockError && err.code === 'lock-held') {
       throw new ClaimError('lock-held', `claimWork: ${err.message}`, { holders: err.holders, lock: err.lock, timedOut: err.timedOut });

@@ -1,0 +1,2993 @@
+{
+  "schema": "mutation-census.v1",
+  "payloadDigest": "72d7218b7f4e97f074c64f4f8f83429825ac578b57fd9e6853ad74399c0b5999",
+  "files": {
+    ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
+    ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
+    ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
+    ".agents/skills/_shared/catchup-self-recovery.md": "575cbf6b4a7b1ab056895575b53848d8fcd0c8174f10c050c412a8e753552a4c",
+    ".agents/skills/_shared/citation-format.md": "e29ae596afe793f09450c0a4e8bd16deb715212489b2d865f7af2a0565ddcae8",
+    ".agents/skills/_shared/coding-cell-policy.md": "a40741fb21ae5c0ee158fc5bc1d0810943b4b5b18c285f223125fd8ea89381ca",
+    ".agents/skills/_shared/coding-worker-contract.md": "8693dea64c22d19a0c09791d77910435cfeecba56eea387aff4854000eedafad",
+    ".agents/skills/_shared/coordination-driver.md": "ef2a69889415d05f9c5578ac1f5e5dae0c2a1f6797d76572afc67b64ce6ec142",
+    ".agents/skills/_shared/decision-question.md": "59e905ab0e06d35299aed5420de2edafbe83bfb1030bc200dad423db38950393",
+    ".agents/skills/_shared/executor-dispatch-fallback.md": "678291e7b79e17ce8a82845ededfbb2ec0612700cf0f7297a26f03245f3241ed",
+    ".agents/skills/_shared/fgos-cli-fallback.md": "de0c928316be7ec03cee52d43974e249bbaae9fe3d90ac3fa2c175705eefc587",
+    ".agents/skills/_shared/planning-capability-awareness.md": "e799613dc8784e1ad83a2d101fcf1ee048b96ac93f3071fd16299d12c319ceec",
+    ".agents/skills/_shared/private-cell-worktree.md": "923953e396b4c7e77ae3d8d94ecfb3572ec8224a063721ac1082f714711dcb8d",
+    ".agents/skills/distill/CREATION-LOG.md": "60afdb5c524fa528f6771c9d9a7d4e3ef2bdb1364ff6abf1bdd3210fb5c9d9d9",
+    ".agents/skills/distill/SKILL.md": "f77023f445a8ceaa8c64cea237504712aa76b9f0f8c07cd8843d991c93ea4bec",
+    ".agents/skills/distill/references/consult-protocol.md": "7ec5aa4089421501593c89f9a9b0bb48acc5941f3c8dc1f1094bd25887977503",
+    ".agents/skills/distill/references/deep-dive-protocol.md": "68b6d315bae45d3710dd2b3be685d8f1db11fe7369fdcdfa778e1ad72ab80536",
+    ".agents/skills/distill/references/extract-rules.md": "0274798f6e0e24c576bf5f721ebd1a74559f1a044536902748aa6df7fa3122a8",
+    ".agents/skills/distill/scripts/distill.mjs": "8b75131722e4b9308fb6874f0317fe9f587330b55feead59d6a1a2e001d0b5ff",
+    ".agents/skills/distill/scripts/migrate-porting-state-backfill.mjs": "c523725488e427c51ec7544007d6a38f143d116daf55b23eced002c2c081ac6a",
+    ".agents/skills/fgos-advise/SKILL.md": "37b42d396cc54d8d57f66188aa95738e45ca3bee30aa2c159e77d6baaf6fe4e4",
+    ".agents/skills/fgos-advise/references/request-kinds-and-routes.md": "b6a5fe324e636686e11c6b9e618bd9594e4972d4016bb7b8669aa532d7dbbd4f",
+    ".agents/skills/fgos-architecture-panel/SKILL.md": "0e73e2b90921338641519e55d65edfa3869b1e66acd09420e614fd3cf7f24dfd",
+    ".agents/skills/fgos-clarifying/SKILL.md": "a3850c3acab72f5bc422c17b0a6f1a03b0e884872e65fe66c5b3caf22a226bf9",
+    ".agents/skills/fgos-coding-discovering/SKILL.md": "1ca9a909f183948bb4e38e094d49814bb74152414b44f265346417e31ad28b7d",
+    ".agents/skills/fgos-coding-driving/SKILL.md": "07066c5f3789392655f000f60883a8d8d432a0a9f39f1ca8f5971f3c5befa0ba",
+    ".agents/skills/fgos-coding-driving/references/caller-contract.md": "dcf13fe93461eedc708bc65b496eee323c7fca421b597f296f5d4dbeb28eca6c",
+    ".agents/skills/fgos-coding-driving/references/loop-mechanics.md": "c8afa92336735847e4f2486c272098898ec6017efa0a6588c274004588b307e1",
+    ".agents/skills/fgos-coding-driving/references/reclaim-and-role-graph.md": "a61b76a44bfc046808e494629a298e34535861e2af676b0c370ba030855b645c",
+    ".agents/skills/fgos-coding-exploring/SKILL.md": "d42b22ebdfa6017b435556206ea0349e4f35d6a3650f409b09e77986e1263cd1",
+    ".agents/skills/fgos-coding-exploring/references/gate-mechanics.md": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
+    ".agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md": "e7caf73166da95c4ce73957418e0ddcca533a71cb0bdf0e5ebae288259b77277",
+    ".agents/skills/fgos-coding-exploring/references/re-entry-from-planning.md": "53bdbc198a36a11d4c4b8b29dea4a15254602c80c278651b6c7f865edcee6ed4",
+    ".agents/skills/fgos-coding-exploring/references/scope-and-reclaim.md": "0e110141b2c45f175b117d6c8c68b46a5a2bb463883cacc0971611dc45e0c7f2",
+    ".agents/skills/fgos-coding-implement/SKILL.md": "9a20fc209673928ce5fb414af91940e9760ced0f264dd5e4673078cc070cfcdd",
+    ".agents/skills/fgos-coding-implement/references/implement-and-collaboration.md": "8b595ac32f219313bdc7e824803fdb2be32692dea986326f376dc20acd4966f2",
+    ".agents/skills/fgos-coding-implement/references/return-mechanics.md": "ba349aaaa33f3ddc317ed468f6abde8acd41df307e58b30ff75d83fef04cdfb2",
+    ".agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md": "67a43a6daaa2d3a2a199cfbcbf7058b7c4a1bfe3440b43fe6297de68b5860588",
+    ".agents/skills/fgos-coding-implement/references/worker-contract-and-orient.md": "a0bea7587575b68bfd6f78c0e563d239ef9489450bc04573d0f390679d71a8c0",
+    ".agents/skills/fgos-coding-knowledge/SKILL.md": "175d01cc7e6ca027ba704eac796f1e41a03c929977da0f03c8d993b6f47af94f",
+    ".agents/skills/fgos-coding-planning/SKILL.md": "9e32ee92eb6ddd89efc84bfc3c463a2458248cdbf33582d8a7817663ee1f6b57",
+    ".agents/skills/fgos-coding-planning/references/approach-and-shape.md": "8b264db72fb94bd59c8bd3e5b1ebb939f3a7b0776645bcda7fa54b5577004f9b",
+    ".agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md": "dbaa105f50a448ddbd91a74516da636fcecf95316136dc2eefc6a026cf1624c8",
+    ".agents/skills/fgos-coding-planning/references/split-and-child-specs.md": "d15bbb0c0b52d6bca57ede0d785dce5a4682db90912a499f9ee164b457e25c77",
+    ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
+    ".agents/skills/fgos-coding-shaping/SKILL.md": "2faa2da065e638c09210d0515d0550d13b26605afa018a496f0eb1819438ecf3",
+    ".agents/skills/fgos-coding-validating/SKILL.md": "6b6a05363ba7ae231470c409a813aac4b759086dc16a87124d9ad0e88d8e744f",
+    ".agents/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md": "32e5a682446c224ddae84205c8034aa4a908d1ec17a11477ada888ea87a4e52f",
+    ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
+    ".agents/skills/fgos-coding-validating/references/gate-tier-a-b-triggers.md": "1b0496bcdc6e22ab650325b363dae7eb225b7b61cd154d0b1b7489f449622b30",
+    ".agents/skills/fgos-cook/SKILL.md": "1b2541eeb1ea461dc1ce167fb119d96dfb57f2def28cf89e3db6466b13f902b6",
+    ".agents/skills/fgos-cook/references/case-and-doors.md": "f8e0ffdc072be485bf06051994faf2ff53853c7ad8eb7d2b81521668c063aa79",
+    ".agents/skills/fgos-cook/references/reading-ak-plans.md": "9fc45c2989fc5ba39848b96ecd2f8751360143fcc26cbd5fdbaa2f0ea2868d54",
+    ".agents/skills/fgos-cook/references/route-table-pending.md": "afd1a6bff07bec0ebe2bb74f0e2e8f68a4888f5263399ab11470e1c248c93f0b",
+    ".agents/skills/fgos-fanout/SKILL.md": "2d3c472e1bdf901d31ee54dff6e444f737650f73175cbd597732d2f4742ebb79",
+    ".agents/skills/fgos-fanout/references/wave-dispatch-mechanics.md": "a0fe69420b35473170e16047369fb3ce6d9dff9c33de08d9b84e00ef46a6f885",
+    ".agents/skills/fgos-group-thinking/SKILL.md": "3992738511dbd7eb4c512a9b6da86aa59539064390c08474bb1ccf6913919146",
+    ".agents/skills/fgos-indexing/SKILL.md": "8a9b3e7a4610124e763ec3440a87b6b3bd18d07f3fc178e1e19cf7d531eb3e96",
+    ".agents/skills/fgos-lock-fence/SKILL.md": "d3d2feb9dd0152b1e7bb3a7b2359846643d47ed630c3e303f87fec5e550653cb",
+    ".agents/skills/fgos-researching/SKILL.md": "6d05b64859a57d3363f8ae9b391db7cecf19e481bc06b9abc8748ed128ac2213",
+    ".agents/skills/fgos-routing/SKILL.md": "8a215975394d282772c768e69a0767aabbf1a2ca30e0fe7959252f7fcdba3a8e",
+    ".agents/skills/fgos-run/SKILL.md": "5d709f70a2c5c735e0374a54f40e66251e037c721e35e2ae8cda4aba3f1473b4",
+    ".githooks/pre-commit": "53c4ce05726ed6372d34f15f41d32c563d208204142b1459f4ec1b8d8d58cab2",
+    "apps/fgctl/src/main.rs": "3f59cfc17cfd6c8268d15dcbeb0649b8cead1d18c387c7b20e14ce55ab26b9ff",
+    "apps/fgctl/tests/git_wal_activation_gate.rs": "bfea8f7ae0cf3efc8ca60adba26fa645613ccf1b1196dc2d220b69562401b8c6",
+    "apps/fgctl/tests/windows_holder_lock_gate.rs": "c8a6cb7619d9578e02479069fbb0f43a5206583b53a7c6d65373d285d69ca331",
+    "apps/fgos-gateway/build.rs": "0109e37c64e9474009c71bb3f3220496fad07dfd77b28c796f1f828c9d2d5671",
+    "apps/fgos-gateway/src/cf_access.rs": "be105b105b492ce1fe89a11282dd480e2daf4e5fe179d1166b03148df937feca",
+    "apps/fgos-gateway/src/gateway.rs": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
+    "apps/fgos-gateway/src/lib.rs": "32d594b18ae0c15f09c3b06c69d82bb142f1370e6fffb6b95d104378b0ffa3fd",
+    "apps/fgos-gateway/src/main.rs": "41e1922dd426ca7d9c26aa17ef72ba70f03e3a627d8fa9599666582cc475c928",
+    "apps/fgos-gateway/src/mcp.rs": "b60e289295c3daad726e988d63674e7f344d554577864b34e470d89ccad90df3",
+    "apps/fgos-gateway/src/ports.rs": "f639e87f4a9119eedf765fa10de38dc0a68315a9482b041543a5f294ca0d1999",
+    "apps/fgos-gateway/src/remote_invocation.rs": "b0f0ad004ce73d737c7e09b22e5e1d445db64abbca77425b4d282f4859b1388a",
+    "apps/fgos/src/cli_presenter.rs": "8ee7cd9f4963cf930557b20fba2acefd10f5a679759f6f4e727a93a299568698",
+    "apps/fgos/src/cli_projector.rs": "5fc75dfcedd08bea98c6d0f2da950a081fbdc80517e78e60f74dc4ba02d0af56",
+    "apps/fgos/src/legacy_exec.rs": "6aa96ac09b3c577b03317d3b9292104c8af977b2890eb7e5ef45a13598770a22",
+    "apps/fgos/src/main.rs": "63287fb1c09a11fb2efcee9443a1994ed2867ccd875d8b986d75e9c283f4d9b9",
+    "apps/fgos/src/wiring/friction_sources.rs": "dca5bc341cda23cc93b050e76de6851289b2a2e6be721bc6d669c4a498c1f440",
+    "apps/fgos/src/wiring/metrics_sources.rs": "92b08ef96478699952332d937ab2e4c121bcf48f671b648098190dc3abe120df",
+    "apps/fgos/src/wiring/mod.rs": "fe91da3081b555d716f8defadb72e9fe9ed81669e946b4017b0d87f28faa06d1",
+    "apps/fgos/tests/cli_tests.rs": "cc3034cf1b16f674f29cccf2fd28208c0e190e038f3b684830f4b6f6200de055",
+    "apps/fgos/tests/internal_lock_routes.rs": "e755a47db40a873853b9cd2742890794bb8f090860115dca9f9ad0f664a2fdfd",
+    "apps/fgos/tests/windows_borrow.rs": "59258d09ea0b2420b7cecfe73fd9b67d61f83bb3a4d97feaa770aa6d26a05521",
+    "apps/fgos/tests/windows_lock_hold_route.rs": "78fa00f135d13dea9a0ea97317e4bc3fe96aac7a2cb3989178b14142e219e62b",
+    "apps/fgos/tests/windows_predecessor_stress.rs": "0bf5b06644fdb212a693fb2a12979c8e3fb1c88800ae96a7494c00434e01c6c0",
+    "apps/fgos/tests/windows_semantics_probe.rs": "61a083e9653794e4e95ca76b9a3b0fcafcf942dc76bb122db121c7423a144655",
+    "apps/fgos/tests/windows_support/mod.rs": "9a28ecd4ed0adcdba4c3a21f8d214795c0d27aa1ebe54b202db635ea1fbdf2f0",
+    "bin/fgos-runner.mjs": "dca3d8b530f20aaf8d9d8d424f12ec1c5d9670812566ab4d6c51583f3bb7b573",
+    "bin/fgos.mjs": "5cd9cf9dbc717b577859e1c344ba32121c8c6cd2707cfc7e337910cb3fdefd8b",
+    "core/skills/_shared/ak-cook-worker-contract.md": "1fc127fcd70dc9232146771063dea6f729909277a98e3bcc1cdf2a4183aa03d0",
+    "core/skills/_shared/capability-catalog.md": "3ccd086bc1c45fa7ce778d0963f879db18d8ab94c7468e5791baff8fbb3b49e0",
+    "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
+    "core/skills/_shared/catchup-self-recovery.md": "47260927356224b244adab9dfe2318f3817c5b182ea69f3def67935281bee370",
+    "core/skills/_shared/citation-format.md": "b12b2a792ba0d6af9fa831519ac9c773cc3ad61858f7d17c9cac6d28f02fe00a",
+    "core/skills/_shared/coding-worker-contract.md": "e76250e9dc79a8c161f6e7e4c22e85069461e4c4b29d919b10bbff6059185185",
+    "core/skills/_shared/coordination-driver.md": "62c02847e71c9009ea5764c1e78ca549bfda84b55767e2070074528bbc4c861b",
+    "core/skills/_shared/decision-question.md": "b53bfbc91ef5fbe5833c2dec5c7181df1d1b5d276248d795722095d2f1d2c8b7",
+    "core/skills/_shared/executor-dispatch-fallback.md": "49e1fc021d5aa79b882ec8beb1669bf0a6b4a1ff1b15ee592a566483d10fb2c4",
+    "core/skills/_shared/fgos-cli-fallback.md": "923bc223a8cd0b81bc2cd5785083e9650f304f87b40f595645f227a383797dd5",
+    "core/skills/_shared/planning-capability-awareness.md": "4b4862f70896950a94951ebe0c1bfcdda842bc4d13536f870de58b64eb3deb94",
+    "core/skills/_shared/private-cell-worktree.md": "a846db9792ee622dfab1380a71004f6a9db343d937d892e1715efbd500e4e5e9",
+    "core/skills/distill/CREATION-LOG.md": "15a662efd1f47e8ba07be655d4f3397e45901f9666676584c264c43511943486",
+    "core/skills/distill/SKILL.md": "0f474b897fcf2d45dedd6798805c03a324738803cd91fca790eb391d0c0e6bf8",
+    "core/skills/distill/references/consult-protocol.md": "f435be045fea0a10a367d0dac428a512444694041877cff9a57991dada0a73e4",
+    "core/skills/distill/references/deep-dive-protocol.md": "dc6c43de2ffdb23e581b19f2d46a72affbc2279d92f7ccb971fd567c5e7d9961",
+    "core/skills/distill/references/extract-rules.md": "bd27a5dde54a78556fb4e7603dd7930217d2e6972b049bc99ea8e33402d316de",
+    "core/skills/distill/scripts/distill.mjs": "8b75131722e4b9308fb6874f0317fe9f587330b55feead59d6a1a2e001d0b5ff",
+    "core/skills/distill/scripts/migrate-porting-state-backfill.mjs": "c523725488e427c51ec7544007d6a38f143d116daf55b23eced002c2c081ac6a",
+    "core/skills/fgos-advise/SKILL.md": "fc3dcbf9953bcc16ca71d77a8d09ed4a34c32b1eebc07a5c7448832eccaad88d",
+    "core/skills/fgos-advise/references/request-kinds-and-routes.md": "dacf826724674d3dc92a6638c0e806be4a613792d889b7b42c41632711fdc1d9",
+    "core/skills/fgos-architecture-panel/SKILL.md": "b82218093ebe293c00c47d59a7dea6802da7bf5d9bd27a18fe7038a24da42a47",
+    "core/skills/fgos-clarifying/SKILL.md": "1eb6fe9cc19fa2e311b9f0a2a6eeb3810c12834f3c8bb59671b44b423be34bee",
+    "core/skills/fgos-cook/SKILL.md": "1f4b715c6a9702ffc33696a8b02727ca70591ec510f2f57f2f0db3fc780f828d",
+    "core/skills/fgos-cook/references/case-and-doors.md": "bff2fdc178c0adce973da6e81f5cbdd8d7e36bf06b7fc508fda0370e5cb19e94",
+    "core/skills/fgos-cook/references/reading-ak-plans.md": "c118c7df4a069b50fb03ea75c41f2453fe24b86f7e7c669656f2bd6c52cb3224",
+    "core/skills/fgos-cook/references/route-table-pending.md": "ca336ff30ba1b443882a956c52e33c98498b8d3ee4bd9f35ae64febe115e38fd",
+    "core/skills/fgos-fanout/SKILL.md": "03dc71d49ddb0ecc44d05f3ef8377d2473531e5dc94684802623851a3197624a",
+    "core/skills/fgos-fanout/references/wave-dispatch-mechanics.md": "6aaaa2f8c3704b7c36dbcbf9f9603880c3704cf2b878ace806607c4202f19925",
+    "core/skills/fgos-group-thinking/SKILL.md": "17fc268485be03314fc525ffa8110c9e863372921ea424a28f2123179b4caa7e",
+    "core/skills/fgos-indexing/SKILL.md": "7356ec97cdc0532e3deb260faade56da41ea919cf704d2326e596a0f1f1c969e",
+    "core/skills/fgos-lock-fence/SKILL.md": "472613ae3d73f7c20eb77ef4e27ecbd7944682a641b497a3788560fe0d228430",
+    "core/skills/fgos-researching/SKILL.md": "a08b3797131892f339e15b18aba9792ff3fc5d448261cafd59264b2d5ce2f9c8",
+    "core/skills/fgos-routing/SKILL.md": "b1e259da39eee39c9b213f3ae156ec1680ffd816ff40a8a51e78379ccb3b05ce",
+    "core/skills/fgos-run/SKILL.md": "ab69e6c03570b3ee282d27ec2d0856de17eb4e63cc7c3a81d55b4152aab8e549",
+    "core/skills/instruction-audit/SKILL.md": "79448c61fd11621ea5dcd6d76f533a715b275378e0c476d982be4f56a8fc55b6",
+    "core/skills/instruction-audit/references/lane-prompts.md": "7768d7562c9d45d2c40fb5602ed542c7711df2d31978351c1751f801ac6de112",
+    "core/skills/instruction-audit/references/report-template.md": "c1f2f637b2ba40ec03b3a6a99c65a9ca851283d20e03140b3bec45f08f222b24",
+    "core/skills/instruction-audit/scripts/instruction-audit.mjs": "d634de90f1b9835d00d13c059c2a439c18b4aa6fbd3a97fcc4763435845df490",
+    "domains/coding/harness/enrich-and-validate-contract.mjs": "f88bd4866af0cb12fe2d07967056e1baf214e27a45939de9ea56be76851e923b",
+    "domains/coding/skills/_shared/coding-cell-policy.md": "c8bb7df8a38059cc8bbe70adc524acf2838f0c7d5e785b894f0c6a17724aa0b7",
+    "domains/coding/skills/fgos-coding-discovering/SKILL.md": "d4a473140d8dd360e446e288101fca3052a2e7aca6809fe1981b95947c7a7516",
+    "domains/coding/skills/fgos-coding-driving/SKILL.md": "e241360f3670b6c54d8c730ff6028f4455174c6019b426338e93312cae2d71bd",
+    "domains/coding/skills/fgos-coding-driving/references/caller-contract.md": "e24b2edec6a8c260be7be810537e324c9dcf2a8be322f42531644a719c7cc418",
+    "domains/coding/skills/fgos-coding-driving/references/loop-mechanics.md": "fa1d4c0f277f05e5213486db2709fda6caec91f6c4ff0e0c67028cee21275713",
+    "domains/coding/skills/fgos-coding-driving/references/reclaim-and-role-graph.md": "47e1ad800ea1f15ed59e81ef3f12149015a218fe496c2909331fa25064e7dc16",
+    "domains/coding/skills/fgos-coding-exploring/SKILL.md": "9427b9e7d3bfe654519419ec2ec8632b66b69bca11218c2279238cc4f3289d3f",
+    "domains/coding/skills/fgos-coding-exploring/references/gate-mechanics.md": "b0bc2aeacea29dbe5f4ea8d46a684ca9f907453f8813f02accf226f1549463bc",
+    "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md": "8dc34fb566efe56f5adb0b460baa7c5d4cabee9bfd3bb5c491cc2f0ed6285218",
+    "domains/coding/skills/fgos-coding-exploring/references/re-entry-from-planning.md": "bf05e294c104a9c413c6bdb41c3ce0443dcf90d3bf180239dc0a187e8bd58d8c",
+    "domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md": "6b188d5ee25ba155e7988e694d7a0dafef07589cbdbd51b304d6c54449564042",
+    "domains/coding/skills/fgos-coding-implement/SKILL.md": "ab60f67d8f8dffefdebc9152f42e788ce0a3895ec8605e9ff39544af1811ffae",
+    "domains/coding/skills/fgos-coding-implement/references/implement-and-collaboration.md": "1be49dfb43f958ffd5d54aa73ba8a4e29f4591332f3f46316970f1dcab34ad37",
+    "domains/coding/skills/fgos-coding-implement/references/return-mechanics.md": "ef6e11b880c3b1e55f42d0963f17b9127e530aaad576ff034a0afe98cdc09067",
+    "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md": "f0006cf1f33ab0c3e1dc40f6501e5da3825d1a8c2dcd67339dc4a29427fb1b59",
+    "domains/coding/skills/fgos-coding-implement/references/worker-contract-and-orient.md": "ea2d3891915949c1e9764240b81af748393713f00685ac173eb5c64ed1df9043",
+    "domains/coding/skills/fgos-coding-knowledge/SKILL.md": "c92a685759d8af23f375bfac6c89268d794c66aca11f2586fab0388f44ca1c43",
+    "domains/coding/skills/fgos-coding-planning/SKILL.md": "fd2ea486b4b913e7e3f15f6f161f159cd350bfe8b26376042819d7b31c675d4c",
+    "domains/coding/skills/fgos-coding-planning/references/approach-and-shape.md": "f6d79063ae11e9e48db33b5876ea414292f9023c1da4b2adc70478e4785ce576",
+    "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md": "3d105acc669252ba60d02244b944b77812ddbd65d3087035cc5fcf4e95bd98bd",
+    "domains/coding/skills/fgos-coding-planning/references/split-and-child-specs.md": "5d48fdf43978474a8339f75bf2b1bc9e215e02545a2cbda4019845d6feb42297",
+    "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
+    "domains/coding/skills/fgos-coding-shaping/SKILL.md": "04d749a7f036cf4f29caa8c82c5bd79426046508ef3cf8d71e47e0b5c72ea432",
+    "domains/coding/skills/fgos-coding-validating/SKILL.md": "fa831842240da6d8b77ad4193a09c1ccf8ea7972608ec31fc3966c2511b06d0c",
+    "domains/coding/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md": "7e448dffd744f14eec929b42849e7c6567743a257ee3950e7f559ba2c78a3183",
+    "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md": "a6309b897ca51eed64c361807c084c32e03a33e8da26d89b5932513fe985dfc7",
+    "domains/coding/skills/fgos-coding-validating/references/gate-tier-a-b-triggers.md": "186f7bb8f6fce1dc830dd9037f672dc41a06dff4806232a294e43d3c7bba4a55",
+    "herdr-dashboard/src/app.rs": "bb8c95fa65a18cebe52413eda1fbae4e1ddbea52dd0dc669ac187ace699a9144",
+    "herdr-dashboard/src/layout.rs": "3368fb8cf97ee8a752a4098bdefcaec286e50f8a663d90209fd089056926dc4a",
+    "herdr-dashboard/src/lib.rs": "229f88b132cd3f09c678e6fae506611e4f79f03797bfbd054c18f1781eaded91",
+    "herdr-dashboard/src/main.rs": "6e9dfd22d7b97abc3c62af20ece3080671731c52f5863d48e450656f57186371",
+    "herdr-dashboard/src/pane_scan.rs": "4e71fa33d2081c4e36bee7c0d90c5c85cbb7a203bce86117e9a43e408ad0ec10",
+    "herdr-dashboard/src/pick.rs": "47e41bfc684fbcebb488f85b3a1a9948a911d8c01e207b37c92bf78320b42770",
+    "herdr-dashboard/src/ports.rs": "db6dfc823d3697b6f35fd8632fba6ea0b8c5e256d4bdd38487fa87a935faa179",
+    "herdr-dashboard/src/ui.rs": "c112cef4793c0be65d8e48143e8575df8954436c972f7f3aec185cf222460b64",
+    "herdr-dashboard/tests/render_smoke.rs": "068febb6148d9a441f9cd98cc7983b403a0232942866d932efb1336aec6c5d6b",
+    "packages/agent-protocol/rust/src/direct/agy.rs": "1eaf215ff0b4efa4bb581f41ca2a98d86773ce9e087926ef92abd657eed13f91",
+    "packages/agent-protocol/rust/src/direct/claude.rs": "34c80434bfac9de112d8dd76b6c67d44f7f51f944437e095e6e27ac59ed39864",
+    "packages/agent-protocol/rust/src/direct/codex.rs": "73bffec03c56a22c01f286fe1897125a59b07e58540eb86c67dc16f5f088bfb3",
+    "packages/agent-protocol/rust/src/direct/generic.rs": "2e6a16832ccf6240afba63f37427b4fdaff0d22bc4e2fe757dbe6bb8c071ecb6",
+    "packages/agent-protocol/rust/src/direct/mod.rs": "5b2edc5205760652a7617f808430b569e1a781c509e3168373fb361a7c764b40",
+    "packages/agent-protocol/rust/src/direct/omp.rs": "ee6000f6cf2cd2055692dc89c2ad83c94ca974d5c6ca10f24201e8d1bc950443",
+    "packages/agent-protocol/rust/src/direct/pi.rs": "a36c65302417eb13162d67e9c300a1b645d1c88951b14cf0d365c69419695b4d",
+    "packages/agent-protocol/rust/src/lib.rs": "abd83c8bfd99d762901e114a87edc35cd1cf8c49d5eae017e0ebf803b9801dd9",
+    "packages/agent-protocol/rust/src/outcome.rs": "53c7477ff468fd43bd541060c69cc8ff1b3054362d413e2642d1be42570e3be5",
+    "packages/agent-protocol/rust/src/port.rs": "8dfc9471124de5a1f4ae2733620e89cd41f98efcfe3410e14c81698d5c1294ca",
+    "packages/agent-protocol/rust/src/terminal/agy.rs": "974553c77a644e9de5c21eae8146f6bccec9242b6658190f547ab81a411e2b92",
+    "packages/agent-protocol/rust/src/terminal/claude.rs": "71a9d3717d3fa31f32cb40add651b55585f133393f865adbf0cf35ad70a9be8a",
+    "packages/agent-protocol/rust/src/terminal/codex.rs": "6a2afc4a961fc4345a7ef95716a348d10319a43c079506117288accd0c297514",
+    "packages/agent-protocol/rust/src/terminal/common.rs": "7c2769f7206ae44d734585b1fbb8776189329d136d510bd4ae72309b67387ce5",
+    "packages/agent-protocol/rust/src/terminal/mod.rs": "a8bcbddcb16733601bca7f76c6531b21d0f3ea2495e8ab174a457e2fbe1ebcd7",
+    "packages/agent-protocol/rust/src/terminal/omp.rs": "703b7352b006ffbde089ab6d132ecb62401db38639a4d373c9adb892702c05e0",
+    "packages/agent-protocol/rust/src/terminal/pi.rs": "5fc360741574da169d9189da28901aac30e54b3576b804018ea5b63ffae1c5c0",
+    "packages/agent-protocol/rust/tests/direct_vectors.rs": "287adbd0bb43ffed9ec20c81085d33d4b9423266eeda4098ea6ce71548d324ba",
+    "packages/agent-protocol/rust/tests/terminal_vectors.rs": "4ce5222b93e3a657220a83a652d6d51de83bfbd9b6eb2a1a71ecd24a5937a91c",
+    "packages/canonical-json/rust/src/lib.rs": "e390b41a00319d727bd0f0d44ad7f6fda85218a53bae914186699f91a27b7944",
+    "packages/convention/rust/src/lib.rs": "659d829be33a7eceff3e2e1e0a804740b58374e9d5a4b9eefca4c2b9f014496b",
+    "packages/convention/rust/src/operations.rs": "cb2cb56e25a81f5475fc6120353fcf1e5483ebce9d0df80de16bfb3b69919d30",
+    "packages/convention/rust/src/provider.rs": "9c7421733033e3355e94f94b6ba64d38801032cd8c53357206c161bde1b997c1",
+    "packages/convention/rust/src/rules.rs": "38b383a3932bba43b3bca151a8b3ebad2d1d489602bf6d55c10d5eb45bee2ade",
+    "packages/convention/rust/tests/golden.rs": "e084b8cc30931780a5e05f04f289cd0a95c8f791496a5a788a88162797866027",
+    "packages/distribution/rust/src/canonical.rs": "15ea0f48882aa65ed613554dea8a708618d84e94771deb1af2949fedfe682379",
+    "packages/distribution/rust/src/extract.rs": "101e822a4d17774deba3585f7afd3a6718f847e6e2a392c980fa3dfd85b843a6",
+    "packages/distribution/rust/src/fetch.rs": "ae1a26554583e297ea2f52bab45be9fe115952203e0413eaec933d71b301fa00",
+    "packages/distribution/rust/src/git_gate.rs": "1c1a45615797d8aadd22bbe51601bd75b41ffe07e668f8b11d2086c89439a5af",
+    "packages/distribution/rust/src/git_grant.rs": "f815308e39bf4eee770bdb47073fba60f05aba2cc1f423e165a98a5f035dd38e",
+    "packages/distribution/rust/src/init.rs": "1cfecbbe025a6485495b6e76bf5076d1fa3238ae27a01cf755c83c085a4ebf1c",
+    "packages/distribution/rust/src/lib.rs": "f5c75abd8e6178076826eb9baefa6936f97785b5b9f1f50bcb91e354f59f17e0",
+    "packages/distribution/rust/src/lock.rs": "e79b03663013f69e83f509bfa2745825ee3a796f979746e419241b54823094b0",
+    "packages/distribution/rust/src/manifest.rs": "cc45d293313bf2de2b912293a52dc1f76214eb4c06b56b28f90ab52d640d274a",
+    "packages/distribution/rust/src/shim.rs": "514621d5e1db91ec89b368d9644a28cd64eb8d797734c8b29ef9418ad559ab80",
+    "packages/distribution/rust/src/store.rs": "1ef04ef8c51a9830b614bab0d211d68a7facc3f7588458bb24f55bf2796f7c8a",
+    "packages/distribution/rust/src/verify.rs": "45abf2dc964ec6fe1687d1cac3bc46654a6b32552ffe8d12d0f1c5753f42b800",
+    "packages/distribution/rust/src/workspace.rs": "a1ed550bb846d8a256048134a8a631afa2801f78163ba6f39b73c4ecb19e1f3f",
+    "packages/distribution/rust/tests/activation_lock_multiprocess.rs": "13b49506f7c45415429a6f1161577b9d33b3c819067777dfa0708332c1c96236",
+    "packages/distribution/rust/tests/fetch_download.rs": "d44e41924790a7bd2cf5829d4948e7046e033fee9fd2e265bdc2b175ff4de858",
+    "packages/distribution/rust/tests/install_lock_multiprocess.rs": "f2a8f086e6da5de67b39ebc9ce56e7ac80f2b467dc1e3a49e0fb441028506d66",
+    "packages/distribution/rust/tests/native_addon.rs": "b9f51eccdd5c7ee7873eacadd6d96f90413ea4183a9faeb06c7b3fc9370d07e7",
+    "packages/distribution/rust/tests/schema_golden.rs": "4376948b1c76af9f8b899d0705efb6a913ce0d6fe57121d77be7c00bc87e2d62",
+    "packages/durable-file/rust/src/lib.rs": "3d48c741c558e976054e9d62d93a033b83588045d452fa2bd41ad30215a95ddd",
+    "packages/durable-file/rust/tests/creation_modes.rs": "eaa469ec9d3091c882e3801243b4c7901878ec0243bfb101ea8d42ba9e97e4a7",
+    "packages/durable-file/rust/tests/install.rs": "b6afa024dda90a25b242d6fbf74ccedbe433bcce7c8b713dc690c07389295a98",
+    "packages/event-store/rust/build.rs": "38ef607f803934266807e0cc329f9b6796904a9f86199e8c9e4efb6c5dfe337f",
+    "packages/event-store/rust/examples/distribution_digest_audit.rs": "3793a8a4d92cfc469eb3b6220d15b709b662990c801d082870ad1c7fc289f089",
+    "packages/event-store/rust/src/append.rs": "1a1ab2a90a0ab67abafef8a3932b05760d3c95dd9efbbafdd0df7f507d2115cf",
+    "packages/event-store/rust/src/cursor.rs": "7589fddf99e0a99de8d4a3d044f34d823e55b037eeddb3f325bb53ccb9cbcee5",
+    "packages/event-store/rust/src/diagnostics.rs": "549b41f2df121f2166aeb001bfed319a497873c1d12fcca4831c0f1cc708c9f8",
+    "packages/event-store/rust/src/envelope.rs": "a2793680f9278af58d73c13147bdbd597221f2b995f334a45bc9c133820f7ee5",
+    "packages/event-store/rust/src/errors.rs": "12bff9d1a6836e02a876263a92517eb8641dcee02baf051b8f24ea224a17bd5f",
+    "packages/event-store/rust/src/export.rs": "1fc749a9d0c86066caa0a9b75a735fd82fdc0132e7ad8aafad12f39305d367f2",
+    "packages/event-store/rust/src/fence.rs": "460cd3149ca00fc866beb4c2253a3b41124fab8a8b0998bd7c52e09c1ee045b6",
+    "packages/event-store/rust/src/fsio.rs": "a55012db39b1173ced4bb544de964b88e8f3db194927e5e6405100201a3ccdd8",
+    "packages/event-store/rust/src/identity.rs": "d0d9f2dd9b289d00109ca19e268c13c4fe9dcd0874d38a7e1060d9e7c2ebc7a8",
+    "packages/event-store/rust/src/layout.rs": "9f9b752e0b53596c19ade9447c5770785a0d477e8fae7b3ccdd4d62cb90498a8",
+    "packages/event-store/rust/src/legacy.rs": "acd6ea10650e7f962a3f008ba313e3f9c48fb761a96ed40d575839c3cdc68e83",
+    "packages/event-store/rust/src/legacy_import.rs": "bdd70492ca765073da2bb3048e8f507486733868c8b8751afdc392be8e7a36e7",
+    "packages/event-store/rust/src/lib.rs": "366f7809e1ff12828c80b52323c0d9555eb5ce8f42d69b1a0ef00922ef6fab8b",
+    "packages/event-store/rust/src/locks.rs": "ef5bb97e8af4ef96867885657aa5c3e06d4de99e8d4406944fcdb9d0123917e3",
+    "packages/event-store/rust/src/open_read.rs": "0f348c1d2aad6e2fcbcbf2a36c5c37a1f255ff843a563b53aa773427c45d0102",
+    "packages/event-store/rust/src/order.rs": "3f474bd2d008e33692e0a3064ce169a4b4ec0797ebb99664a809e644b73a022c",
+    "packages/event-store/rust/src/promote.rs": "c530fda469ece1c9b3bbf0e8692c3587b7ae1a53dda6f886906ea1344831d6d8",
+    "packages/event-store/rust/src/publish.rs": "0071535631226889304e0229a6551885d82af835f37657924eb940276ca71ef3",
+    "packages/event-store/rust/src/read.rs": "103e27d6c42b0ec40e96b5bab058e0718b8dcdc3dd398e159f847a98fcd55328",
+    "packages/event-store/rust/src/receipt.rs": "5512dfc3f72101a7e3cea200977bd45ac9cceffd71f3d8647e35acfd9ccd2a2c",
+    "packages/event-store/rust/src/reconcile.rs": "31016bcb05e3d8bd85ab849a43602027a1a988f2052132c5ea8c35e0c0984a2f",
+    "packages/event-store/rust/src/refs.rs": "3e0002a446d5b6c3f2e0bfc8ebc91e20fb6690523b3b83890a6815c71e9dbe00",
+    "packages/event-store/rust/src/refspec.rs": "39f9137ebd39caab2fca02d5aaa05ed55262311a9171c69051d93ac5c60605de",
+    "packages/event-store/rust/src/registry.rs": "18b9030411bc40c5761a213ca407b0053aacfc3e920c022be364a21ab37b99f9",
+    "packages/event-store/rust/src/rotate.rs": "6daf009b38713e7083eccae22dc88a2d609d3a6b74aa93791718d64f89bb9de9",
+    "packages/event-store/rust/src/seal.rs": "566a360522e2239e1600aa89630188db55e27cba1e7e29028c0b2b4920204570",
+    "packages/event-store/rust/src/sync.rs": "db07e69cf55870a93b2532c3afc4aefeb928cc2cd88d652ffda316b51c715b6f",
+    "packages/event-store/rust/src/validation.rs": "9410d9665f97aeadff6eafe8855a92a36f189f3ae5523e39c8e4ece57a266390",
+    "packages/event-store/rust/src/walk.rs": "77a5cb4b920ecfadab7eb8318f374a6da16571b6ea8eb520eb40ef50f99466e1",
+    "packages/event-store/rust/tests/append_recovery.rs": "3885a9356c15bf29ba56273baf15e44bd09623213a9b08f5817dbbb41c1e8964",
+    "packages/event-store/rust/tests/branch_local_refs.rs": "51dad4f4f7f228c363cf5f7076f61fd5a8528adb31419fed8cb202fce712e862",
+    "packages/event-store/rust/tests/common/mod.rs": "e624f9a261ae17eb1fbcba629523ad971c7124891525e7040e2aedca8efdf9ab",
+    "packages/event-store/rust/tests/cursor_incremental.rs": "9429430246c625debce0c8e221cbe84fdd7d1d0088159ce2d62a80292f158744",
+    "packages/event-store/rust/tests/distribution_compatibility.rs": "27a73fa86d90395fb62b98bc7dbc5779538cccae607023ee9e1675235d8b6ac9",
+    "packages/event-store/rust/tests/framing_prefixes.rs": "f55b6b0377994d8f71841d666d3f84eae63f4655d001f0e3fe4e0e1b688f98ff",
+    "packages/event-store/rust/tests/kill_append.rs": "e569f3337c68909f41ac7bc9fcb4963f0d5b724987bb43171fcbfe2910f22c58",
+    "packages/event-store/rust/tests/legacy_import.rs": "2e3ae350cd45c99f39b5462e8a81221d9e8c4dc3b95f8cbea5a73a2ea6e5e932",
+    "packages/event-store/rust/tests/legacy_reader.rs": "d6c30655d5e1d7ec4b12dcfb7e8f9daf6af35dae34552601bac2a94d26f6f801",
+    "packages/event-store/rust/tests/offline_sync.rs": "e0de26319f8a93b01a6c2c120e50126859ee12a7ff15778d40bed9001add67d2",
+    "packages/event-store/rust/tests/order_kahn.rs": "c2b1004b8772de30aace61b1f8279c2131b1678a3be45f64b15b171c1728b6e1",
+    "packages/event-store/rust/tests/p02_review.rs": "5a560dd163330beb32cac8881bc37b3cd558471d1aa7ffead138b7b686e23fe3",
+    "packages/event-store/rust/tests/reader_review_regressions.rs": "0920884230e567d12b45d4ea6f49a1182c7495a93533ac888ea57a2aeba2283c",
+    "packages/event-store/rust/tests/reader_seal_stress.rs": "f721a995073a7d466a35914f58aa06448433e2bce6383809f6abee93bf9fc34e",
+    "packages/event-store/rust/tests/reader_support/mod.rs": "a41def84de7fdb964513c347b4b881625b31688344457f30ae31f3924c6d4e0f",
+    "packages/event-store/rust/tests/registry_identity_layout.rs": "f1e00dee91522804214ac83666c224c05cd682ebb6d1ea2b5e2e268ad4ba8e45",
+    "packages/event-store/rust/tests/registry_rows.rs": "922d064baa83664ac4bd48fd132f4764d708be5827b90aca98ba6ab463e74134",
+    "packages/event-store/rust/tests/review_fixes.rs": "d3aa5b3493b5f55d8fe3cd8809d63e9abe69598a5d26166addabd63bd1b617bb",
+    "packages/event-store/rust/tests/seal_cas_race.rs": "ec575e833a1a35a026d46fbb26e46d3088d56ff9a2857cc2f309016c849d814d",
+    "packages/event-store/rust/tests/seal_publication.rs": "8f17ad89117a8f49d73c8c54fec30e401971be0b1f34b56da2d8f8a0767aafba",
+    "packages/event-store/rust/tests/setup_identity.rs": "6c08f71d0cd2942d79088de6cf2a211db2b427f4576a1b3f47a2426d662fa0d6",
+    "packages/event-store/rust/tests/shared_machine_id.rs": "4a3bfe836d5839534366ece1b816dde85791f27023caadc9d74bed8019dbac37",
+    "packages/event-store/rust/tests/support/driver.rs": "332409b5aebcf0f0ab5eca2d280c890b8b8100c55f297a89a5fa8c07a8d8b60a",
+    "packages/event-store/rust/tests/sync_review.rs": "7c754adb6104c2b21fc21f920136fb89ba1261caabc1489a4f9c36d47cd7d715",
+    "packages/event-store/rust/tests/sync_support/mod.rs": "0d81275c28700bed37d9f587f3df0cbbd770632b23724dd9cf0b4a8da9d8ba86",
+    "packages/event-store/rust/tests/three_clones.rs": "d518c9d8c893190d17ce67c7554a3e3561c3ff3458651fb480ecd792809c1728",
+    "packages/event-store/rust/tests/v_event.rs": "e3fd04cb6aa92d33095ce5b0b6899b7cf3532b502dded534336bb910b49b9cb4",
+    "packages/event-store/rust/tests/vectors.rs": "aaa5d2f5828aad45706d1bf0ef1a8747d44065d85dd3c22437a7e7d8eb07dd67",
+    "packages/event-store/rust/tests/walk_certified.rs": "0ae2d9f7f3fc96b748167c0a3f9b5de4d3ad7a3e57d6a65ced896f93b9a2db55",
+    "packages/git/node-addon/build.rs": "fcbd1ff3f627a7553fa1704dc6f558998daff8bc256015c37aace62cc49ce584",
+    "packages/git/node-addon/examples/e3_fixture.rs": "f3a98f5c8de968be2109b9958a5a7d0efeca7fa5000493278277d7bba035a75a",
+    "packages/git/node-addon/src/event_store.rs": "4db4794487da76c656b1812924e1b499bf8dbe6c807d8b3a3ea18857cfed60da",
+    "packages/git/node-addon/src/git.rs": "a036de1b76a9f2b8aa69af65a155256df1d1230d50b282832ea7a9dc50e088ea",
+    "packages/git/node-addon/src/git/config.rs": "521afa249294ebd96b038d99d60b5f4ff6119c7d6d6bb930ae41ea709f72515d",
+    "packages/git/node-addon/src/git/handover.rs": "91aada4bcdb5aef8b7ab11c0512a1f7cd940dcb2089d42523538ced9e8421d37",
+    "packages/git/node-addon/src/git/inspect.rs": "427a4ba1dcb473f293b242cecf4fbaad794cc2deec5b8a76bbf6027f29fa5b74",
+    "packages/git/node-addon/src/git/land.rs": "c0ed6e7d9aa8006e8d5f3cff76439ed8cc1531f868baa2c93ed5f09c27807a84",
+    "packages/git/node-addon/src/git/native_lock.rs": "a8ce95784f1a4f5db1f58980dda6fce26d235eae5e0fd2c315f9a17182dc5f2a",
+    "packages/git/node-addon/src/git/recovery.rs": "e18ebd59aaeaa912e883efe253a31c541bdee79e94b5ce4ac5d943150873248a",
+    "packages/git/node-addon/src/git/refs.rs": "d1e1413d7a99cd3d9422927e188ee1a68dbb34ad38df9dec09e3e2d5f6cfcb0b",
+    "packages/git/node-addon/src/git/remote.rs": "fac13d0b12aa97cbe0b2abb9b95a042f9ae8f840f440ab7435375fbc7cc30d87",
+    "packages/git/node-addon/src/git/restore.rs": "aae7895522db76e1bf0092d5b5b84baea215a8868956d24ed84774b2cc6cd323",
+    "packages/git/node-addon/src/git/scoped_commit.rs": "daf55ab59289ea8cf48d33c2ad99f14816bba55264fb59b803a2fa51dc625500",
+    "packages/git/node-addon/src/git/sync.rs": "a541edc814725b495011e78e0647062bf7567669d0247a12c05d6f265a38f05a",
+    "packages/git/node-addon/src/git/worktree.rs": "4d15190574dcba294db6214c818039ef754fce829a415ba204a43acf10678c30",
+    "packages/git/node-addon/src/git/write_scope.rs": "657f168ae337fac9315cd39fc8681bc069c16b5ff7ce2dd607dfef39dc9ce5ee",
+    "packages/git/node-addon/src/lib.rs": "af997302edde095dfe15244213cfcb0d76dcdfc48f29c6ac8699b5ac394d2e57",
+    "packages/git/node-addon/src/single_load.rs": "91190bfaa1e0476b3e65559318f7fd3475844070afaca38d72d0c3018da6d825",
+    "packages/git/rust/src/driver.rs": "65606ab90c38d31fca240a9e813eab363de27b23de2bd8894645efd018324b75",
+    "packages/git/rust/src/grant.rs": "d4f47e49d85994778dc093098b47584e3f73c3cec5f501af82a1c5cd787446f2",
+    "packages/git/rust/src/inspect.rs": "64abeda97e9455664051ac7a304a5d3152a5fde88338d95f141b1b77e1196e1c",
+    "packages/git/rust/src/land.rs": "76c80e56dc2b9b8e579c25673b11feeb3a1fd3bc8a4f2f567a4c112b96d22882",
+    "packages/git/rust/src/lib.rs": "b311d1d392a1c795aa2ee791ffe076bb1becbc5077d6c2f7015695112a6eaf84",
+    "packages/git/rust/src/native_lock.rs": "a90c68aba9a82cc3154815e47edba2230edbd9b641675c5da0eabf2ce6c17beb",
+    "packages/git/rust/src/publication.rs": "a09e00aab211c6e3c299160a1eabef8bc77248287fb0469e593135e06470157e",
+    "packages/git/rust/src/recovery.rs": "63789a96393fc12e897aa098bbe617c96fd6301e40c185a5385471b36f45c6b6",
+    "packages/git/rust/src/refs.rs": "50aa5b9639f8bebc933cb0ceaebf5759c3df8d1ef95cda50fb0702444eac3521",
+    "packages/git/rust/src/remote.rs": "5d4be338ec334daf9270869bfd7ae7a392a74a80636666206a9e0744734873e4",
+    "packages/git/rust/src/repository_config.rs": "fee7b1369e589ad300f19174d8464b3eaef005b49d77d39b98b2be0c3ae58b2e",
+    "packages/git/rust/src/restore.rs": "83be51119cf4ca3611fc04bcbef1c6a789ddd81dc370f60f28a4b8980d5c88d5",
+    "packages/git/rust/src/scoped_commit.rs": "aa8e543cedf224e676fef9327342de176c650693c7c52b9a52fade1a671320e6",
+    "packages/git/rust/src/sync.rs": "103096ec5cc98194be1acb9987e9cd71d0edc5f0a885ccd1929f31f0bff73f4e",
+    "packages/git/rust/src/wal.rs": "d795a14faac0bcfea6d76c4cde6edadc0f82cc292353cbf974037aba42bb54ae",
+    "packages/git/rust/src/worktree.rs": "d16e0d490cbe40fce04b654e43ffbbfd62d2395fd326acdf52181582f561b181",
+    "packages/git/rust/tests/borrow_deadline.rs": "6a0db6afad96b62ded1253324e862a29a88129e115bd133292ee30ac5482fa07",
+    "packages/git/rust/tests/contracts.rs": "1c7b7e1ff100cf61f3ef40953fa6b7c71b20fbe155febeab2e724d2fb9466f59",
+    "packages/git/rust/tests/head_tree.rs": "8d97e1c8768e17ff462df7739aaa089a80a5e99efbc249ae993b48e060ae7d97",
+    "packages/git/rust/tests/inspect.rs": "765fe5ec0c1e162ad09762c9200099de6842ae00c48e4a0ffb4726d4ebcb6ef7",
+    "packages/git/rust/tests/land.rs": "29de076859bb0fe31956dee57d4f3dd469b6281cd4e80c6a242550550f207d4c",
+    "packages/git/rust/tests/land_crash_matrix.rs": "3e63d7c4cd185a08e0acf3c99be37c66a2baf3f730683df2acb4c075e78a7ded",
+    "packages/git/rust/tests/publication.rs": "d57ce44d4ecf31c94a78ee5d5cd405bfebec0ecdf1b0d7db88f4db3983526161",
+    "packages/git/rust/tests/recovery_matrix.rs": "ec83b3020498821602e7e8d66f0836837c8f72ae7c0bb3943b2aa221429cbaec",
+    "packages/git/rust/tests/refs_remote.rs": "4965eaea84acdcfee9d30cefcc46ffc06026c68f47f95f6b9ecd6b5812ce64a5",
+    "packages/git/rust/tests/repository_config.rs": "da1b379e0b3e4cd1ee53de499462673720c1a84234054ff7f030b94c66c68758",
+    "packages/git/rust/tests/safe_restore.rs": "ad8c5d0dabd9e7076a4d26fb706523fd293ce713bcc805b21600e5ee4a56f7e5",
+    "packages/git/rust/tests/scoped_commit_sync.rs": "0d799729611746c65000e6a64d00ef069a2b56f4ac6e32a32b158e4f320e1af5",
+    "packages/git/rust/tests/support/land.rs": "46bec8c0928eb4b53d6db71204661638b626b6dfe199d39f4890444c1b14ac07",
+    "packages/git/rust/tests/support/signing.rs": "a083733ad39ab4d35f12a600b5cd90ac08c53ae35686ce66f22147b933bf634c",
+    "packages/git/rust/tests/worktree.rs": "3eb8248c732e4f9ec4b53304b4aee768720497c9ffed168ac10711d5cd9078e9",
+    "packages/git/write-scope/src/lib.rs": "8421603ec0e38f418bd241d0db1dc83dd7b3756d994eefa3d29c2e43a8abf9f2",
+    "packages/herdr-fgos-common/rust/src/fgos.rs": "b25d732a432dbbfb144c23652cd48204cbf211b4389237dccd0ec46bbd24faf3",
+    "packages/herdr-fgos-common/rust/src/lib.rs": "a27bb70798915e8f27a33500b384aea536cc43554bcedba01e67623a5bbe54d1",
+    "packages/herdr-fgos-common/rust/src/ports.rs": "45c92b4f8a06e62a79a09655fe9c484a85dc9745049cfea6849245b886f4913f",
+    "packages/herdr-fgos-common/rust/src/settings.rs": "656623292616ca598ebd64dde89c343bdc5fc0ae8d78a7f91b809b959ec3f11b",
+    "packages/holder-lock/rust/src/borrow_vectors.rs": "564243e258853156023e35dbad8c09498a0af1cbfd1b7fb832f8f1d1cef99f7e",
+    "packages/holder-lock/rust/src/borrow_windows.rs": "4c56123e70e6c3519eb74ba4866fe6470f9bd428bbf5743957ee6925f9f067e4",
+    "packages/holder-lock/rust/src/driver/flock.rs": "bfcc9c74db6eb5212fb77a306fc2358c69b3306c8ea6f4a2237dae3e322dd8f1",
+    "packages/holder-lock/rust/src/driver/mod.rs": "9186ee0c26277887bd02cc45c06c88e3121447c3910e917a7ad5eb86f2ce13f0",
+    "packages/holder-lock/rust/src/driver/windows.rs": "547a69f0c5d1e25ec3f2bd818a76dde4654651ed5c29101797a66e27b80eade7",
+    "packages/holder-lock/rust/src/helper.rs": "f4f626f0a45b7d99c5bfbe95f4c791b782ee9ba1f9fecbf930f8618ee405ac6d",
+    "packages/holder-lock/rust/src/lib.rs": "2e0cffb3a9efb1092ad6e75978c8a2e338aff7c56cacb6d960b239248e52e9f9",
+    "packages/holder-lock/rust/src/port.rs": "c5835ad5d6dfb58190c9b5a25cca5ea46fc209436bd2d9488b74add9e1ae387c",
+    "packages/holder-lock/rust/src/predecessor.rs": "c6ef266690f04f19f145c8726093d0dff1fa171645e5d7d89bb0eb62773ca9ce",
+    "packages/holder-lock/rust/src/route.rs": "50c33c59d3d0b3b99892abe9eb9505c932dfed81bc84add10b979236ce17bae3",
+    "packages/holder-lock/rust/src/route/hold.rs": "48336f85b1025d1c289f4a560dcd8d60c32c3680403b745a21521a0ec1bb6e13",
+    "packages/holder-lock/rust/src/scope.rs": "9dd5a7e31c4e8d38940ca752700fc9ef8cf80e47624441d6f028033c20dde312",
+    "packages/holder-lock/rust/src/semantics.rs": "c6b4f1425da2dd0d1d9ce972aa2b65bd86c36b3e38478c6be3fe5c4b1553553e",
+    "packages/holder-lock/rust/src/state_root.rs": "b4546fc6ab97448e08374436cb1c7e56489751a0132240f59bc2261016295768",
+    "packages/holder-lock/rust/src/tombstone.rs": "c83051cd8c7d405264deb827fb09997060edabeeee57ef6c1347bfc27b7ecd21",
+    "packages/holder-lock/rust/tests/borrow_git.rs": "02d95563daa017ec091c0f99e1aac818240328a9e21e8459f7f35e9e7277cb0c",
+    "packages/holder-lock/rust/tests/borrow_io.rs": "b808123b754461d01be2a971a49b7827f127684dcd1d8fc9d9b11d41abdfbef7",
+    "packages/holder-lock/rust/tests/common/mod.rs": "945f6e13f6aa3b7ec84205d8d20d509ea5e6c1c1c1c4f6ff586aaacc2851ff36",
+    "packages/holder-lock/rust/tests/multiprocess.rs": "ef2e45ef48b96993f98363647df577947c9968dc98f5d8688ad177e554c1657a",
+    "packages/holder-lock/rust/tests/predecessor_record_shape.rs": "183d257a473fca2e0f5b151cc07e43b3b78c80ae382bafdeff0abe265734f48e",
+    "packages/holder-lock/rust/tests/scope_rank.rs": "ae88fb69b51774c515338db7c856306d97394df657bb3143a19b5db4425670d1",
+    "packages/holder-lock/rust/tests/state_root_vectors.rs": "2d4569ac9a291682a6de94c18250df766a05e070be94823d8a502e3dccb229c6",
+    "packages/holder-lock/rust/tests/stress.rs": "b1e4875e967a853c9247db8ef8f7e31c7f37786ccec4682d377486503fd723df",
+    "packages/holder-lock/rust/tests/windows_lockfileex.rs": "79e5688336e2a2968f72a65802e8cd722f2c614334e8494eeb2c2b452bfc4273",
+    "packages/host-runtime/rust/src/authority_gate.rs": "ad3c0a21cc5b98ec3d8d321d0b700d1378a35fe3a8531b7ed32ccabbf2e4fe17",
+    "packages/host-runtime/rust/src/catalog.rs": "ab8f38aacc5ebf813585fdd54bafd7ef7bceba68e25d4c2808bb1464722a47c9",
+    "packages/host-runtime/rust/src/civil_time.rs": "a081fa34dd0cc596dba8d072490e28ee4a941f8e8a6068568ed12783a0be33ac",
+    "packages/host-runtime/rust/src/contracts.rs": "da9000674648a399cd32f628213a8d16cd1ce220eacb4e4896d9fad05c0af5cf",
+    "packages/host-runtime/rust/src/invocation_service.rs": "bd9602d7ae4849bb434d2fe92aaa098c28ce9225ab6ef30b61fbbdb1a197bd55",
+    "packages/host-runtime/rust/src/lib.rs": "1f25c007b30a9638c5c7571b040f80520a7a8a7277240ad4cd77e7c4ade73a3b",
+    "packages/host-runtime/rust/src/operation_provider_router.rs": "9302b28935144076ca5d07b0d57f6031edfd36e14746f4a23b81c465295692d3",
+    "packages/host-runtime/rust/src/providers/builtin.rs": "d3dfc03eb1583f47a3a9c52d9c7b4ac1134a2fb31fabaa3904d81958d0110b70",
+    "packages/host-runtime/rust/src/providers/external_process/adapter.rs": "d6aa6de61305b9838f0accd2f02085170ead85e858b39f143956c4c4e831f78f",
+    "packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs": "6deabc793f7f5ac9fc5ae5c91e1a18d466e1cca573b40988a75c44bd5fa794b0",
+    "packages/host-runtime/rust/src/providers/external_process/frame_codec.rs": "931e4260e28f56ff74aa6376fb369b5128a4f01491a341c3dbda063a09a15387",
+    "packages/host-runtime/rust/src/providers/external_process/manifest.rs": "3aa99f3c4f64fc94ea917ddac35da0c9932f0904d3fa30fb43d1d0935f0c83a4",
+    "packages/host-runtime/rust/src/providers/external_process/mod.rs": "646f73a577747b01f271b38ca74aa85965ff69aef855103d0c155fd455849978",
+    "packages/host-runtime/rust/src/providers/external_process/registry.rs": "f13b20474e0fe846313eb0597035b8c9d5dd3cd7462e3a26535fe87a5cac0d9f",
+    "packages/host-runtime/rust/src/providers/mod.rs": "cf494ae89fc65b9f6d8d2800f833ee6c29539a63d553376e3b82e791abcffbe0",
+    "packages/host-runtime/rust/src/registry.rs": "a08a033692d0dda8d702a1cdc8fbe44ec8239e43c452e0ab1761a3e6dda80070",
+    "packages/host-runtime/rust/tests/external_process_router_integration.rs": "b148036009fcdec18da2fe1dabc95b78783c7e22ef39e68e455e4202e02c5841",
+    "packages/host-runtime/rust/tests/external_process_tests.rs": "81b734850beb225a00f68489ec7c8ca9134dfe493d490c0b8678e197dc7f6be6",
+    "packages/host-runtime/rust/tests/external_provider_manifest_and_registry.rs": "ffa583b9b802ab706ec905a8ac02991108a9de0331db29180b9f6ab765b5c8df",
+    "packages/host-runtime/rust/tests/fixtures/external-provider/echo_process.rs": "fffe07e53575edbc812ebba86e3b3fe86a466be48cd7e76c1b9a02c78e44a02a",
+    "packages/host-runtime/rust/tests/module_graph.rs": "5983813aa0fe08d9d6c9d28af9e20ae0f8ba55079586ac98d31745609dd0db32",
+    "packages/host-runtime/rust/tests/two_projectors.rs": "66b488f34d6e1d41b614840287105d02bf214f2eb754ff3876a87f85b05204ed",
+    "packages/observe/rust/src/case_journal.rs": "cde5b3da1389ced2c58ffc486ed5bda893e22fd8fdcbc706e1247d5f4cdc315d",
+    "packages/observe/rust/src/contract.rs": "6c768d1908c4363045e30ec11a6ad9ffa0aea59d391d3e6c04701b8128ac4cfb",
+    "packages/observe/rust/src/eval_journal.rs": "378b89c5d666b11cbb6e71b6d42dcd178d327b9067ea1e63417c060b707b98d0",
+    "packages/observe/rust/src/friction.rs": "894101ef765c70373ee0aff9025d7e4484358063a0f8951c0c6ea26c4249f913",
+    "packages/observe/rust/src/friction_cli.rs": "6c51271bcf248b793a8f047d315f6626bdbb0b56a2c6c6a7f93fcb1922c7dc6f",
+    "packages/observe/rust/src/lib.rs": "b02ac799e3cdb7418cf2add58861c8663f720f780d4380250f5c12550cec2f07",
+    "packages/observe/rust/src/metrics_cli/case.rs": "366c101e61b4d99914b8b27705e84d3540a7b76b881abd1f6134d43f428ab753",
+    "packages/observe/rust/src/metrics_cli/coverage.rs": "a3c08592a20977c8095a1601c9c6f7cc981f1a572b0efbe1de0e3f0869c34949",
+    "packages/observe/rust/src/metrics_cli/discussions.rs": "bb631eb15e6eb81c5b6c911f2efab56d5a001bba184b0329bbf855acc9734880",
+    "packages/observe/rust/src/metrics_cli/entropy.rs": "6ede7c1f576eaa302de55925c270c3f9a7d8e5e38c2035fb6c259594ea2a0616",
+    "packages/observe/rust/src/metrics_cli/eval.rs": "58a174705159597fab72da4e37608aeb15bd2d2369d9a53f111ef075108a9203",
+    "packages/observe/rust/src/metrics_cli/faults.rs": "93fcfbb63f92d4a47b33759964d22e640083f2ac5b8d47f8dcbce1dc4701c481",
+    "packages/observe/rust/src/metrics_cli/harness.rs": "8db36fd38e7a6ebd3bcd418b477a6826a70891aa3aeaa7943cfcd2c989c84366",
+    "packages/observe/rust/src/metrics_cli/mod.rs": "435b95622c40b9ea6af55e8ad7f1a797b7222fddff229915a26d04ed2b8efa4e",
+    "packages/observe/rust/src/metrics_cli/outcomes.rs": "b681c67eeb9c13a95eb7b234e13c9f26347f692ad3448ae1d1c81be046c0bcea",
+    "packages/observe/rust/src/metrics_cli/runs.rs": "777c57cd36840f7a1bbf1ac0354a68c43fad985b93ef02a0d462a397781da092",
+    "packages/observe/rust/src/metrics_cli/snapshot.rs": "6e62c5b3531ca52a8e608ff9121859b13a091ec69b502f1801aca0f2903e8594",
+    "packages/observe/rust/src/provider.rs": "7d6ee1861c239c3b15ddcaa28cbe7f3ac174ff352adf299b7fbd4de901571b34",
+    "packages/observe/rust/src/scorecard.rs": "d67d81685a08d08aaee730e9288ab032b8f991d21e16da0e781342bdcd6e8558",
+    "packages/observe/rust/src/shard.rs": "bac9107f5732c4f643c7a791c10c5533255e0a0ae5c78e6512b5e248010a8926",
+    "packages/observe/rust/src/sources/claude_transcripts.rs": "620fdbdfb943e801a2825068eb7ffd2730122a28d446ce50fede9ea816090155",
+    "packages/observe/rust/src/sources/invocation_faults.rs": "5238a96cc7dda31f1b1df8dab7282937b12a3f78159a1664f5ee3009e3e0bb2f",
+    "packages/observe/rust/src/sources/mod.rs": "5c0fc4344ce4ede07cc8a8725d6333858099755c84c9ae923c22f3e5e9f3df30",
+    "packages/observe/rust/src/sources/repo.rs": "72a2862078fe6814395037bb50f5d18c20f445ecf034e4e207f19a269738a141",
+    "packages/observe/rust/src/store_lock.rs": "4292e07e27d5b7ac437e7ce26fd5b65fe8dfbdd347581ff07951d97ca9d03efa",
+    "packages/observe/rust/src/time.rs": "38598dc927efffa4500e5f4ae2f29adf70d80f96155a5aa1cb9a9ffdee9f34b3",
+    "packages/observe/rust/tests/boundary_test.rs": "7663188dd74ff374410773595e52d1ba2541c2a136636d654b9640e7f97242bf",
+    "packages/observe/rust/tests/eval_journal_test.rs": "c3fa4372c1bd292bf356d9185cabef3b7ae35726b550baa97afee3840df0ca12",
+    "packages/observe/rust/tests/fixture_test.rs": "1eadd8be1d535b05899e299f6a7a3a4d9a718d9311502e881b76a78f30985677",
+    "packages/observe/rust/tests/harness_protocols_test.rs": "6dbd5029eddedc023ac9862b7cce8fb1da97a85440362f2d8bf35e6641f5dac2",
+    "packages/observe/rust/tests/store_lock_multiprocess.rs": "d6b92d856d2dd22fd3679154f9f517a17a2333e91d3077ffab7d5b872c8c9bdb",
+    "packages/process/rust/src/containment/linux.rs": "72ee52c2d98fc368e1d0bc15919e0c814e6d8946665802f2784abe3da99c65ae",
+    "packages/process/rust/src/containment/macos.rs": "ae212c1fd8f00726d87ce07e4a86ff2ef6c6b65b01c372d6c04a3dc2457de5c1",
+    "packages/process/rust/src/containment/mod.rs": "bc9ade42fb18ba1e53170f385c94f6c92e2979f2a219aad84fba9db90fa1f8e4",
+    "packages/process/rust/src/containment/windows.rs": "8c94f9ed9492ca95ecf36ab0030f2fc6dec1086505ca95d19dd33c9f6d2c3618",
+    "packages/process/rust/src/control.rs": "cc7d3b6da3ea0b6d618e0cbfcf87d2eab06cdb455b77bb1a1c442f2df8642a05",
+    "packages/process/rust/src/facts.rs": "84e9cb396264f2d4881c6f65a1a54f16d548c14729f9f44fdb28b919b358dae2",
+    "packages/process/rust/src/lib.rs": "3660c9f3bd967f0cdd3dbc181e921d305ee597199e48e487e40013f8d4e9ae9b",
+    "packages/process/rust/src/mapped.rs": "db7e1e11a4ae4d1b20e34fb2e0e14472f5cdf32f11723cbdb8ff8b1176759dc9",
+    "packages/process/rust/src/platform/linux.rs": "5294c64541088e68f2276b0796c00142da058d2e3a0ed8354b6718f6cb11411b",
+    "packages/process/rust/src/platform/macos.rs": "8224a406882097afea071ce4750c7d3f02ff05109662a1366415a3b9d48af455",
+    "packages/process/rust/src/platform/mod.rs": "b3670dba078206b05b152d2a59373c2056620f32f53c4145369a580626a5a7f2",
+    "packages/process/rust/src/platform/windows.rs": "b0230ed4e6a61a6a112f2d3201d69234a97b376c2cf2620851f2c90f644d18d6",
+    "packages/process/rust/src/platform/windows_job.rs": "0b4c5b1d99cf6764b23efbddcab454357eb963965b2ca2dbe8f9cd2591fca3bc",
+    "packages/process/rust/src/platform/windows_spawn.rs": "ac4c098d7fb0249c83354d87b4ba772746af7dfadd16e3014c0c359470516e45",
+    "packages/process/rust/tests/containment_bwrap.rs": "b82f52e22171c9f423619e0bc823a9a01c9cb5ebd73e9c6df9a4ab005afb46b1",
+    "packages/process/rust/tests/containment_macos.rs": "7a4f9d9cccd7dd6b353b5df6f330085885d53c53649c4c83633650cd90ece8e7",
+    "packages/process/rust/tests/containment_pgroup.rs": "f10adf47f6e610a1c70da871dd2f0595e99b13eb056163be6a40693b9d893da9",
+    "packages/process/rust/tests/containment_spawn_timeout.rs": "d97c290dd403f9e883ab5c72107cc7abb13b9fc716740623d90b6a9fe6247d16",
+    "packages/process/rust/tests/containment_windows.rs": "6eae384469fca3d9b9291709f1eb144eb0c56351a246311f255f545df1ba755e",
+    "packages/process/rust/tests/file_users.rs": "6dfa7e15e0641b32ca730e0c9fdb0c1f3deca30e4f3c2bd3db056d107085aca6",
+    "packages/process/rust/tests/fixtures/bwrap-without-info-fd.sh": "111366f74ac4efc4497524d5181754ad8e4c50837bf4caa26777ff1f3bc6a69c",
+    "packages/process/rust/tests/fixtures/heartbeat-grandchild.sh": "71c6568f2f95b3e59883ddbd45e1527bead193017594b6b2f0dc767ab4d9fd22",
+    "packages/process/rust/tests/holders_multiprocess.rs": "5acbbcb82b2a3fd77e177592785ae4579c50c0612fd4a9fe0424928fa116b03f",
+    "packages/process/rust/tests/judge_vectors.rs": "b1633fd4092114d469cba250fbbb8f01724cc5e3a66d85e046b373ed259ef401",
+    "packages/process/rust/tests/signal_identity.rs": "7048cb36bffbf0fe9700e4d27460416b908f8169b57843c6c79d69920cfa9c4e",
+    "packages/process/rust/tests/spawn_fds_leak.rs": "c6fefe723951b53ad2704a174b6c430a74fabbaf6ba13f7e00ce8aab9dea585f",
+    "packages/process/rust/tests/spawn_mapped.rs": "659cb1f70d99b2f7592600485d575b0176ef7192e62d8036a75b70cb21564610",
+    "packages/process/rust/tests/windows_job_domain.rs": "ef43f9d374fb9254ea75dca253c0bd82c8eb3fee5e676d1d14d14da1657b54ba",
+    "packages/process/rust/tests/windows_spawn.rs": "5c8eb632a466203a847a2f6f5a57b401ebda7906509bfc62aece0124fee77e54",
+    "packages/run-result/rust/src/lib.rs": "daca8cfaf844a31c9841d731f821d5dbd555eb0aba1c8d53bcad27bf5d5f7f67",
+    "packages/run-result/rust/src/unit_summary.rs": "fcb14e45a0d24bea87b850971025452114e53dcbfe9c3de05805445e006619d6",
+    "packages/run-result/rust/tests/layout_fixture.rs": "96b4a21bbaae60f8fb72c42811f695fb86207ea091f8e5e0d6a05fd63ed3aa9a",
+    "packages/run-result/rust/tests/unit_summary.rs": "c079b8799456e803667b8c4fa64ae698dcef92f9555b440e954a6e74185dc35c",
+    "packages/run-supervisor/rust/examples/gate_agent.rs": "ef78a263c92889e7f6146ca4fb9f7e61cd0a8ae81f73dba9b4dd30d826f1f84a",
+    "packages/run-supervisor/rust/examples/gate_harness.rs": "7412bfe67e635bdc37b2c100b0498670209bd54faa2714830929ce346b603742",
+    "packages/run-supervisor/rust/examples/internal_harness.rs": "8801bb6f1b52e89a113be1b1392b577d7db603c407e903038a4199a9fdf0e76e",
+    "packages/run-supervisor/rust/src/adopt.rs": "fcc542da6bc755d6480f12404db59e07f5d6288b1b93919992ddcead85aad1fe",
+    "packages/run-supervisor/rust/src/attempt_step.rs": "7fc6f8f380e41261ab4ef06bdf76e14609626d51f447b41e330ba3c56404f99c",
+    "packages/run-supervisor/rust/src/envelope.rs": "8d22c89806e0aec6a278ab44bd450b909e0407a9bd1ae9839c3ada3db5c6a356",
+    "packages/run-supervisor/rust/src/gate.rs": "0c526123b2a107d2c00fc6ff6a7c06c0abb294873b1851bbeefad99e34873120",
+    "packages/run-supervisor/rust/src/gate/unix.rs": "8fcf595ee133bd29d48c7cfdaf98a3076d0ead2a06fd55feee4f3ec04e6ff31a",
+    "packages/run-supervisor/rust/src/gate/windows.rs": "9ccb6b2f3542a0a9a0c8057fcb476c744d0c84c123fef2a85004a6f589ddff65",
+    "packages/run-supervisor/rust/src/go_channel.rs": "ac8abba20a50014ba985da57e86580c7456d1eb17bb4d47857abd7238d71e40d",
+    "packages/run-supervisor/rust/src/go_pipe.rs": "c9acb88b7ebc79ca08187eb0b1b7e0ce700b6b225da4aa8547e62cf685fc7b46",
+    "packages/run-supervisor/rust/src/lib.rs": "0e23de96a451f96352d8395ed1a3745dd1154c9046006d0ef835fc58ae9486e9",
+    "packages/run-supervisor/rust/src/publish.rs": "c6abb1a9808d9d0774307279a37630c020165fc0e7a6a7e0e20e54a817219f3c",
+    "packages/run-supervisor/rust/src/route.rs": "fdac6b485591ca182afc2cf3110761b5597354b078aa8ea3d2ead4335ac37d01",
+    "packages/run-supervisor/rust/src/steps.rs": "55892a633e62ff2605b98f4afc57f281704a35e912edc63550206d93e03295ae",
+    "packages/run-supervisor/rust/src/supervise.rs": "1eaee62f4709ac7b135302ed40068905fb50f5ba42d845228fa84d9407d091de",
+    "packages/run-supervisor/rust/src/supervise/terminal.rs": "40db457a237ae133ce00b6ba3304af34d88fcd7f129afbc43dc6d8052a6c6cd3",
+    "packages/run-supervisor/rust/src/supervise/unix.rs": "90da8b30403bdb2ab47ab2f26665adcd70ee89758c8cedac43e6a563a119d408",
+    "packages/run-supervisor/rust/src/supervise/windows.rs": "e2b04b6d2499d769206aa1c8121eada6ab248351e25ad81ab90befa7c81d7205",
+    "packages/run-supervisor/rust/src/terminal_slot.rs": "830e9565e41c9787f775c291390f8669e069cecc6759f43859b680354b7ea757",
+    "packages/run-supervisor/rust/tests/adopt_concurrency.rs": "3b91e8508642d7a18429a0ce1e43569c42a9e9be882eaa99caa325e1e3fb1938",
+    "packages/run-supervisor/rust/tests/adopt_matrix.rs": "d6453cbfa5736d0707bfc00660153de2adf9e55122cb81c834399ecc1f82f52c",
+    "packages/run-supervisor/rust/tests/adopt_scan_perf.rs": "c774c90084882596fb6b2c05bfbe90772c8233e553d7869c2fe5ffab30dc9610",
+    "packages/run-supervisor/rust/tests/envelope_digest_vectors.rs": "593eacf90542d07acb74ce2917ece2c9f82e6e63a205045aeb2a022106fee153",
+    "packages/run-supervisor/rust/tests/fixtures/ignore-sigterm.sh": "5e83e7c47f0c6dd3ee7c21e7aa6c3854b39535fe7593d1becd6a89e806419d0a",
+    "packages/run-supervisor/rust/tests/fixtures/noisy-agent.mjs": "d384bd401ebc75cc0dbdaf2700614f9fea03a1db79567ebd0f0c846f959771ac",
+    "packages/run-supervisor/rust/tests/gate_ceiling.rs": "9ad2b5a80ef1007870044ffec3ee38d141aa705b2d7796d342fd7da777d2b3fd",
+    "packages/run-supervisor/rust/tests/gate_go.rs": "54bbdda764f20e9055bf99f77e38a763026476813348edc4b8c298edc84fd889",
+    "packages/run-supervisor/rust/tests/gate_orphan.rs": "ee7cb384c3ff2914c8e3c03eab3887ec068218952d29b9a769fa726dd6727519",
+    "packages/run-supervisor/rust/tests/gate_pid1.rs": "a4d26f3798723bead0c100763b1d50ff6fbd15b29b88a7e790671e0cd20d8172",
+    "packages/run-supervisor/rust/tests/gate_portable.rs": "62575f6cbe32bb2ec8b30b19c1ec40ec5fdb9dfd33fe5816ece441ef0a1fe0df",
+    "packages/run-supervisor/rust/tests/gate_terminal_socket.rs": "5846388415297ccca5f9ca5adde0f801c813bcf0cb9e6e3fd902afa22e0c1c7a",
+    "packages/run-supervisor/rust/tests/portable/mod.rs": "0fec848daa697fa5d625dd39dc5eefbcb21f071a36dd9a2163e46de899d17de8",
+    "packages/run-supervisor/rust/tests/portable/supervisor.rs": "f0a736ba7f6ba37fbd1951ae53f89e78ee9f783b2a8bed5eb6d1c89277bc38f1",
+    "packages/run-supervisor/rust/tests/release_slot_step.rs": "03d1fd52cda11cf2b2148de0d41b417a9f76973410473651e01c8028f8ff6252",
+    "packages/run-supervisor/rust/tests/steps_portable.rs": "5075773f7acaa5f08233095269ed064dff3f9f39f453c796ed0eb48968c7ad7f",
+    "packages/run-supervisor/rust/tests/steps_runner.rs": "a9003fcf0b4bccf34bc689b3a06708d51dcfc7c419bbdaecce2b2fa98d79a551",
+    "packages/run-supervisor/rust/tests/supervise_crash.rs": "09472ab66bc48120ab81774d7a05fcfaa4ff0bd7a0f0d433226d3113b7044896",
+    "packages/run-supervisor/rust/tests/supervise_guard.rs": "238d1180379434a4de3dd38d104d3d618809ccf178bc5535d991c0fc3e226163",
+    "packages/run-supervisor/rust/tests/supervise_lifecycle.rs": "f565fb1d727af6f73080519ab303b3b40260c7deeea2d3319cad411c60cfa3ed",
+    "packages/run-supervisor/rust/tests/supervise_portable.rs": "de0c450933c70bda74cfb7076547863b0c7a71573bd5ca3335c0923eb2827cfa",
+    "packages/run-supervisor/rust/tests/supervise_terminal_fake_herdr.rs": "4e5a99938eefa472405b95a8a0b315ce49825ea22cc7c64a6cfe575793a35771",
+    "packages/run-supervisor/rust/tests/support/adopt_fixture.rs": "0b871e409fd7c3249ee70bc7729c1da1aa1fb3c5a3a12d35615958a2f08d1b02",
+    "packages/run-supervisor/rust/tests/support/herdr.rs": "63153e6e755184ae1b4f0074580a7505522914970b6b00bb880a9b366b40b8d3",
+    "packages/run-supervisor/rust/tests/support/mod.rs": "7042ae4b7561f0d6f4ff01c80747510a7dfa09bd958e140dcc61815f33be6bd0",
+    "packages/run-supervisor/rust/tests/support/supervisor.rs": "00b9446ce5c2556ce6e94277080c37498b43b518dcd34baedd0a78b128ca3bbe",
+    "packages/run-supervisor/rust/tests/support/terminal.rs": "c463d2ac0ad1f63e2e0689c9160df2759e53a573f27f8c6b2dee163147b178d1",
+    "packages/run-supervisor/rust/tests/unix_lease_record.rs": "2a80d57a405ff987cf984077bb1c1a529345e75f60d705fde5fd91bf51d9910c",
+    "packages/secrets/rust/src/declaration.rs": "cb491b78ab3b8d337740747e03abce6e6c6be8190f898ef45f7e5e9f541c7d64",
+    "packages/secrets/rust/src/expand.rs": "ed6ac70abe6110ae802416ce70ac9938175c5564675879ea2fc92bcf942a1a40",
+    "packages/secrets/rust/src/file_source.rs": "8309dd8a5e3f7658a56b1074f465690442a082a1acd24ac3894e859aeea3641a",
+    "packages/secrets/rust/src/lib.rs": "6a480f5400fb451c3eeb74973fe22609d47c6ab4318486b6246cd49218351563",
+    "packages/secrets/rust/src/redaction.rs": "2244b4a0f51f449b02d9a0bf9068ca14f15d45ba06b7b8cc6f739dd0da19fc8c",
+    "packages/secrets/rust/src/resolver.rs": "ef6ed6528e1aa8402f1c28fef4f1dc74b8cdb2dbd4f1372323d6a579f3f0d682",
+    "packages/secrets/rust/src/source.rs": "aecee3fc5accb164b0a13fb1ef48cc81d24b58fefe7f24cbb7765290e2637dc9",
+    "packages/secrets/rust/tests/common/mod.rs": "2dcf2b3374edf1c462eda2ce40ba5bfc7cafa5e39d534a452e4333cb337a9867",
+    "packages/secrets/rust/tests/declaration_contract.rs": "9e0bf3aee5f6513ab050d82c30ee8367ad5fb4c55729ed579e04ac63a488a7c7",
+    "packages/secrets/rust/tests/file_source.rs": "e429f988918a71caeb39381404febb51d076cd43f24c8b19e9c060611c92c290",
+    "packages/secrets/rust/tests/no_stdin.rs": "d69c7ddeafbaabe151b3f58211ff00fdb3d6e8347b348c45c4e142a60a71fb8f",
+    "packages/secrets/rust/tests/resolver.rs": "bfa7437b4749119b415a7cce89cb36321f98831aa6c4b0a3e17f0933a445e1a2",
+    "packages/session-identity/rust/src/attempt.rs": "09930ab5e9b2920dddb2ff15e361a2dda67fdef9bcfc0b51678f252392e4db24",
+    "packages/session-identity/rust/src/launcher.rs": "dc386bb743b941d390e64b2dbb3fd0c36994415ce6f46ec0876cdd249e57b969",
+    "packages/session-identity/rust/src/lib.rs": "2ae1b7e963a526a62d1ed2358b4288bd3ee69f6c8bd479a52899ad21663eeff8",
+    "packages/session-identity/rust/src/proc_tree.rs": "8f85d27341e6f793f75f45350eea559db9be9c59c86269318880dcdb2fb2cb3a",
+    "packages/session-identity/rust/src/provider.rs": "346037f1fd9369d02cc72f04db1746e7cbed66bfaf5c114b5be47bb521879671",
+    "packages/session-identity/rust/src/resolve.rs": "13a6a3a9d2dbd2cd7844b1c1502a5a742c7710cb2c4f343cd74bf52b6fec1123",
+    "packages/session-identity/rust/src/route.rs": "1fa2fbd1d0b983cb36381166e38ce9c2a9527ac4048f1462fef6ef7e7c0af514",
+    "packages/session-identity/rust/tests/attempt_writer_id.rs": "1a5d81d68a072e29f3751f969815ed7d49489e87144de8a7e8821335005616c8",
+    "packages/session-identity/rust/tests/golden.rs": "e10691f2741b7e0bdc60569269dae2a060b07b6c389f7ec3c90f5068ddaa8302",
+    "packages/terminal-control/rust/src/core.rs": "5a7926154f68ffe752494e1ed4e55bc1e77d69777aad3c885509624ee7fd3c0c",
+    "packages/terminal-control/rust/src/driver/herdr.rs": "d6ab429d90d281c2371c45a0d96ea886378158eb0db31cd8134ca357e437d598",
+    "packages/terminal-control/rust/src/driver/mod.rs": "b91485514211ef7863daab5fead7d4b3d79556351098eca1a4a1d3df57e61956",
+    "packages/terminal-control/rust/src/identity.rs": "ff668e3b7070fadc567a2d2331dc0316fa759471f060e5901c594a67a3e2b090",
+    "packages/terminal-control/rust/src/lib.rs": "f420d65492eb50bf458a3ab331d5483707ee4326db490ab440a6aab0fb9ba263",
+    "packages/terminal-control/rust/src/policy/measured_split.rs": "e85e54b4b4f5ca70790a63b353baff9ea6571994574863d4d4f9632b26bf5364",
+    "packages/terminal-control/rust/src/policy/mod.rs": "ca5cd13ede6082f30444181540ee1fad258af09cce183d55d52ac49235b2f067",
+    "packages/terminal-control/rust/src/port.rs": "5d6c3b741673f48b144e8fcb34b31ccf292419b628aac53cc073e32ed626b3c8",
+    "packages/terminal-control/rust/src/record.rs": "1f1273e1b1b89bc5970c7073d74145c5700272fad5803e8571474d2987a1b3a2",
+    "packages/terminal-control/rust/src/route.rs": "ea9d3f1111922e95442bf37e149d6f3f2d488ed2de920f8884c00bb86156d640",
+    "packages/terminal-control/rust/src/store.rs": "7d3d8f0d47623a70ad9b7a545d3c5069528d5e2532792d79e5ee20ebfc104d18",
+    "packages/terminal-control/rust/tests/common/mod.rs": "2efd1236e7220b349466e3bec19cfcb09ec686986b3e447c2e9cb2fd24bf20aa",
+    "packages/terminal-control/rust/tests/core_failures.rs": "5cacc9d82c3b8e69b988f276c696910591531a59cd72df2cf6acb79b8054044d",
+    "packages/terminal-control/rust/tests/core_rules.rs": "d6a67efee12ea914ed47b52168e14710d2e613081120af182e8803edf1e1fce4",
+    "packages/terminal-control/rust/tests/fixtures/herdr/fake-herdr.sh": "99f68a80b5b4c7d20b515abd06a85af9f5601d24691711feb988d9d98ce36ae1",
+    "packages/terminal-control/rust/tests/herdr_driver_fake.rs": "5d9b276c54539299d45710b7737b3fe17059a48495c54bd8d69ae2586d8ebe25",
+    "packages/terminal-control/rust/tests/herdr_driver_fixtures.rs": "833c56ae001bf3b5fd99a11c75ac3b73e8383467c32a6adf3047b36403c5b94e",
+    "packages/terminal-control/rust/tests/herdr_driver_live.rs": "3d2f2bc0b66db1fb4cccab5098256835782985ed7b901822f85cc6f459503534",
+    "packages/terminal-control/rust/tests/policy_fixtures.rs": "88909d80eca0f638b71a33c02d9b8c6f0346c378776a2885afcc9fd2e26c2f9f",
+    "packages/terminal-control/rust/tests/store_publish.rs": "7ba66079f7e59ccbc86582b96b5cecd05a0bbc6569ab99f8eaee2faa31e0de87",
+    "packages/work-state/rust/src/legacy_friction.rs": "4fc646bb8bac02b8670ff8a2c5eb40bbd3d52c7d80c6b3c1e79aaa68423e512e",
+    "packages/work-state/rust/src/lib.rs": "11f49bcb01e30b7ad8d466114292e0b4efe5ccbb03ca3100e18b72bbad687ffb",
+    "packages/work-state/rust/src/work_source.rs": "0222f9d33ca3db5200588ed6662530218cb9717f0a9ed322a5d58a54536b94dd",
+    "scripts/backfill-status-category.mjs": "bff22a3805f8a38f1c7d93b7cee3b53ee5b6dde0d978b4fdbfb760c1cc3622d6",
+    "scripts/backfill-unit-summaries.mjs": "a11d12e63191bc31bf7a27b2c7279ac5ea8403730045dbbaa8f8ce2738b275e5",
+    "scripts/build-domain-registry.mjs": "ad239f74764832366c3c3bd43c674012904a78944bd6d6b9d2c8eb481c1a62c0",
+    "scripts/build-rust-distribution.mjs": "7ca44bee191ae7fafadbc3d3e5572aa5ebf3e7a2a1ecdab0b3d8320db208db03",
+    "scripts/build-skill-wrappers.mjs": "ca8b0121333b29830a35553e7360f14c19254d0a157cb5f79c217ad749038242",
+    "scripts/check-backlog-reconciliation.mjs": "5e7fa8b9548c34479e270ec666bbf8132f7fc7c38177dbac71f8d74848f9baad",
+    "scripts/check-decision-citation-drift.mjs": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
+    "scripts/check-decision-codes.mjs": "14737563df573c4d1181129cadb8b432f0492f8025c57ce1a485effc0fb39bb5",
+    "scripts/check-decision-supersession.mjs": "1fc95bddf36b4485338125d5f902e69b95d66b6e34e5e60dc06cc822096a8f90",
+    "scripts/check-glibc-ceiling.sh": "6ce52ee1a3197104aded910b937b593153f51915001a5946e2c822702df07e99",
+    "scripts/check-hook-registrations-guarded.mjs": "eb287ab7bec0368418f04d650e20cb4a3c6ce348844152a9e6112f9643e551ae",
+    "scripts/check-locked-decisions-heading-drift.mjs": "fa87a9f833b12c43cf60322aac482a8bd5e5e7cb889868ed4592816efc80b7f8",
+    "scripts/ci-asset-server.mjs": "2de382cc02067014690b358d4c939149bf0c1b7977071896d9b12137526ff32a",
+    "scripts/ci-external-consumer.sh": "d097aeeacae5d35e7e2163e8d4fcc859df69efe57c05c22ca940e83beb6ab954",
+    "scripts/decision-question-hook.mjs": "5f4d242754bea6fa460288e790a4354d6780d847305ef3779c4547137d6872d1",
+    "scripts/dispatch-decide-hook.mjs": "c3385557ec6c469ea6709d30dcbcd704a1a74d1c7f5011109bfc0f999dec08af",
+    "scripts/event-store/forge-probe.sh": "2abada27150b00189e60a0eb5689a36aff5733b27c100631b618c4b7adb983dc",
+    "scripts/event-store/power-loss-driver.mjs": "11bcd49139d549cdb198f616c3297447cae7f2829774a9ff831c6fa261dd2df3",
+    "scripts/event-store/power-loss.sh": "157295589c47f6d3bc6b740b0754a1b5c6cf08fb98593353eb9c4763ca4cb15c",
+    "scripts/event-store/store-increment-worker.mjs": "677424f7dae51f0566c9eb61cd96171347084ef2d93f5da1fc8133cea2f5af2a",
+    "scripts/event-store/v-spawn-bench.mjs": "a9f2da47d5410ef6baef1200d9d5261c2bf3fed24cfe7450ce4d6913712a1890",
+    "scripts/events-jsonl-truncation-guard.mjs": "772467fc1de75f0ecb39efecd08b607bb593c4f0b38b3586c82e2c4a4f710654",
+    "scripts/explain-command-route.mjs": "db546d74676a1c91c3309241dcb618dc438fbae79448f4e2253319657dbbee24",
+    "scripts/export-command-selectors.mjs": "8ef578e5f5c2bfbe350a941b5d3896b0684c4030958505f941365e3f6456cdbd",
+    "scripts/fgos-session-start-hook.mjs": "6ec944bb42698570cb5cb860d24bde1229d884f968ce0f6771c05b9c11a93af6",
+    "scripts/fgos-shell-integration.sh": "89d74fd3352594dccc46c85174725a7095714ed436a599342ef87c78a60b732c",
+    "scripts/git-addon.mjs": "67532c2006d74a97cbc40814e82882da1de5d48b5d072670444489e2ed963d71",
+    "scripts/git/e1-power-cut.mjs": "1a0a4293e5e8f61a2a678a2b9545284138c06c45c87da810b53457611262fdb2",
+    "scripts/git/e1-power-cut.sh": "a1eef806c023252b426cc818767b22d1b050de9237c75f96d505ef51f04247a7",
+    "scripts/git/e3-bench.mjs": "324b205b6ac185b7d1f1d5e1c10070de9d6261714bb5c4ae334a35307d68e003",
+    "scripts/git/p-release-checks.sh": "08bb9b3c32e7915b27f645f7aa68d42cba0dbddd2a7dc9adc45d43a75b4d0056",
+    "scripts/git/p-space-resource.mjs": "2e8dda349394e47f57633274905a5fb63b008d952c8ca7cb594b0ed48dce0328",
+    "scripts/git/p-space.sh": "0fc4ca8d1b3d5f20e4897b100fc13e40f655d0ba90ab0a99a7e525d230241f59",
+    "scripts/herdr-cockpit-notify.mjs": "f3e1cd7e31438e75a113b2cc2481ca6472c1fadaf94a16ed781204d50ed2ac0e",
+    "scripts/herdr-cockpit.sh": "486b87ae6e1ffd877971dd21b0fec7d375c8b83d0e83f1972cfa4b700720eddd",
+    "scripts/install-git-hooks.mjs": "5d37cb2d1596d02d89df9e52bc0773ccbb33cdee58c8d692215e88474d69ffce",
+    "scripts/knowledge-bootstrap.mjs": "6ffd1b84d5ebf773b52806cd9d47007e60f4999a0f36b43bca4cc50d0f649543",
+    "scripts/knowledge-canary.mjs": "3a3cb3dafc17a9128a19ec49e33ebf46f0f157bd3a254e783a693aebe4f5845a",
+    "scripts/knowledge-classifier.mjs": "a6560aa2eb34a1245ebd83ee781f033253ff7652df5896dcc205e327d18ef5f4",
+    "scripts/knowledge-migration.mjs": "10193fda8ea6a58e3727847031f372309786ec05f181c4b79a67692791f0ac51",
+    "scripts/lib/dev-host-manifest.mjs": "9928ceb97e807bcb02a7fed73153cf21de09d6cc9b6d56492166cb94e48c44bb",
+    "scripts/lib/full-suite-queue.mjs": "fa7c31d57af4626de9acb5c5298d618f285c3f7e139c0ac0772a0bc9210e9d06",
+    "scripts/lib/git-addon-stage.mjs": "3112f05d71365bcd379405db58fb4b48de7c809b2b097eb3faeb6ea616c0adcb",
+    "scripts/lib/git-dir-layout.mjs": "710ff2406bed4faa4a35ff3ccd2910e97d693112b64cd82802efc2f99027232f",
+    "scripts/lib/git-ports.mjs": "119f38a44c2eb068dc2f7f1236f83d44cb1a1f2c10827e2aebf5efd9c7f6b24b",
+    "scripts/lib/git-spawn-match.mjs": "f18f85e7107bcacdde3ebe864f13bfc0eb7e3199927824cae8e64f39853037ad",
+    "scripts/lib/is-main-module.mjs": "e39f98fb73a497be73b7d92f0335d9f0c88eb627a77f2ab964f9c7034f711a45",
+    "scripts/lib/js-source-lexer.mjs": "3effa44590fde482bbc593d49fa46fac7f5519198232fe56c704f09508a071a4",
+    "scripts/lib/sandbox-git.mjs": "c45bc75afc8e5666e13d70f9ea65c6ff4e79243aeca7bae5046d4ea3e914088f",
+    "scripts/lib/test-file-watchdog.mjs": "ed39439477ee26003c50fba1df7511317882727704518a3a9cb96952b96fbfa8",
+    "scripts/lib/test-git-config-guard.mjs": "e9bc333d889985d94b847fd80fbfed7e6dcfa1e9b2ffffc97a14e7be326153d1",
+    "scripts/measure-coordination-baseline.mjs": "4134e19613354c8ec2a3c53f903efdcdccf86181bf6872d2c145d4a337c44790",
+    "scripts/measure-p08-performance.mjs": "2ab686e2e3f880f584a2f9278a6bbb27a49d71effcdb65215f1cbd3865099e3e",
+    "scripts/measure-verify-cost.mjs": "76c5bc7fe1894af9eb5c7bf6de2177797bfb3ff4ff05b0826c3c7c6e765e5895",
+    "scripts/migrate-actor-to-role.mjs": "4501c681a7a0399e0e57d1cf48b43ba650934b49b84acac8a446cdd99db44a48",
+    "scripts/migrate-status-proposed-to-awaiting-approval.mjs": "ac3fd799390ee06d504b49f497f41f117526b961d4ebaf3883fca91b63cf2546",
+    "scripts/migration-proof-2a.mjs": "c8097ce5bb23d816e31280eaafdb56a2b8ccc3fc3e13c763375255ef46705c80",
+    "scripts/next-doc-id.mjs": "7e88c69cf6c78b4cce5240d3fcc34a1182fc963933435827a58974df5458bc9d",
+    "scripts/package-release-assets.mjs": "088b9a0ad108920363ba5b4f540fb0c93b45b2960990981ab4e7558cff5fc59e",
+    "scripts/prepare-release.mjs": "f896378a498bd154408b5116a7172e0c3c3f8c73ffd2ccee7a4930200d9e8ade",
+    "scripts/probe-storytelling-material.mjs": "c697fb57bee9fd1e4d2464edd31312e41e9f661e540b159f86d7573ff83e9b5c",
+    "scripts/project-agents.mjs": "8af93fe4d0c75957a82da98b5c4dfa5aabba78fd4e60338b8cac861996b0e468",
+    "scripts/regenerate-observe-fixtures.mjs": "07c5b42795e22c36d75363e2265cf59b6f6244d63f7413d9dacf9fe0e3071631",
+    "scripts/run-rust-dev-host.mjs": "bae6761acce9ccc479b9d30134a76ea8fd20993937e8d2b78d1c69a87a0f3741",
+    "scripts/run-test-canary.mjs": "ef25e2f8237ffefddbf707c68289c0fe00ee95bd10da6a51a80fd965b30c42ba",
+    "scripts/run-tests.mjs": "709d73239f1e5b0aaa91a2efdb90f695cacc84a8dc317d83f7f615013efbd1be",
+    "scripts/stress-test-files.mjs": "c3ccd385982e8e1865b54e02abef044ae3e85a4547f34c9efd2fcbcc66d37240",
+    "scripts/test-ownership-lint.mjs": "1917bcc0ec0387e43d4e09dc3bc1e6a5923e30b4c3848cf480df9eb0c2c042e2",
+    "scripts/test-proof-inventory.mjs": "cbd3324b5fc76b680253283001e9d310bdd782e64148e2f03234b5a75e05904f",
+    "scripts/test-select-compare.mjs": "45ec5c8f1b192430431127a06133376cd5e5d2a50f8e6865472c1ae341ae1329",
+    "scripts/test-select-coverage-map.mjs": "8e4fbb903bb3c9e3680c946cbaeb8f5116a474c2bb873e96589bee1b4c56a431",
+    "scripts/test-select-mutate.mjs": "72a8338aa3fdce409f7d531f2c010208b19a90907b86b59e4ec6360922232822",
+    "scripts/test-select-promote-report.mjs": "d5bb99bbe7a6c02ccafe29b2fa632471a424eeef454e17003631021445c81bd0",
+    "scripts/test-select-promote.mjs": "a0da23143e4dfb674a89f419b87a70b84af33f874507e635467f2bc5dbc6b2fe",
+    "scripts/test-select-run-plan.mjs": "94789b3167a55ee33a18ea3a3abd4ac87fa1c06601356d6ae0fe9f864fa49984",
+    "scripts/test-select.mjs": "8f10398be7ebbd1c782e005218925b84f6757b554b67b827f0d42e0a5686dd8b",
+    "scripts/test-timing.mjs": "9b9dd13f78f4aaeaf60d43909e3224c465a4e34270032bf9845c23529bc243c1",
+    "scripts/verify-fanout-overlap.mjs": "3f96381f4ea858b09f8103987f83d712a368ebaf9f8297ef223a7190f1d29fd6",
+    "scripts/write-test-marker.mjs": "d1faead7d8efbdcce888100b89f5cd2cc6546ddc3f2647118255f82f6c8e4171",
+    "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
+    "src/cli/approve-fault-log.mjs": "e362c6b4a676839f6010c08d1df648f5973c2d9ec7a13acf97e40f93b57b42ab",
+    "src/cli/command-registry.mjs": "7a201ac10c3cc54d91279c2e58051e9bf01111693e154aa3aec904eeb4b6983a",
+    "src/cli/deprecation.mjs": "45e7d11ad8681fc89e4c99f4ef53b7c93a477f6b5fdd6708eddcf0b579dd3985",
+    "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
+    "src/cli/invocation-fault-log.mjs": "c36b79eb7fa658c6c685d1dc99204ddf9de96b29e10eb5d03f82141cf9ab2fa9",
+    "src/cli/version.mjs": "ccccc691aa2e9a844d7724cf38da60fe05b7cac96134e01e825ef2392a353146",
+    "src/config/global-config.mjs": "128596fa9a107741cb126d67c9932ae91b8430d4bed5abaa64f16c72af59815d",
+    "src/config/shared-config-file.mjs": "c2239950f9a6dcf64d140ca9208ea013104b81c82599b0754c268f760ee44d5c",
+    "src/convention/convention-client.mjs": "b1b4a89e4f28f0c67a7e62f0b1f5ac760fff238b5a84dd9e01634f7b517b60da",
+    "src/event-store/config.mjs": "1fb91ecac937bae541d93e91ec5b4b24bb0d547ad4981f61930f11c36f423835",
+    "src/event-store/consumers.mjs": "211dee946e024e09b138f938293d641f2be1fff624e14e2f505d5bcd3344bd74",
+    "src/event-store/index.mjs": "138c73140a65e29fe55a08b003ae107b8aec217ba3a96daf4587fc2c1f15ae24",
+    "src/event-store/native.mjs": "43899fbb698c2b6d698efe018cfbbeb1fe34e67d623243f96d44dcd2d81b10f8",
+    "src/evolve/iron-law.mjs": "c3dce0c23705a8fd1ec463a782fba000ee67f21889f47e7ff350043f7a7ff8d7",
+    "src/git/config.mjs": "18bdab21173350229a189c2b815351f26031389f356a2879befd46960bf26a95",
+    "src/git/index.mjs": "8553e54d46431f3e458978dd3d577901ce10fcdb806b8df288a03562113f3ad5",
+    "src/git/inspect.mjs": "33f3f72ad93c01f08b74a2da9709b5f2406958ce010283773ffc65d0938aa31c",
+    "src/git/land.mjs": "0c8a1c878a46ac19343040b6c85fc11dd0e59ac6d18b7a1490b85a06940524da",
+    "src/git/native-lock.mjs": "b75f10cf57a5bc07f916b45c2ef241ab62eff89f1cf6f67505a3cb3a7ad6d515",
+    "src/git/native.mjs": "5ee8484514af1658682894a487c87896c94714d9790578447e5eac25fb25e280",
+    "src/git/recovery.mjs": "9b0baba9cc59665d700d1269c5f35dd5f7750b918d1dbf0273a8c651e03e4941",
+    "src/git/refs.mjs": "eb8dfa75531652a19f0c524357d8e1c57d54bf281548f3d0e3a7657a4ee18502",
+    "src/git/remote.mjs": "58aafc6f9ff17488427f515268cba52271696f1005ff44e6863977c9859ece4e",
+    "src/git/restore.mjs": "cf45149647d6278e9c5f977a857640b34e64ffd4e2b30c5b20fd70e986a65ae8",
+    "src/git/scoped-commit.mjs": "db173261ee00a062fbc98c0650d77093a5d877153f3d5fcaade7ec6c55ddb6e5",
+    "src/git/sync.mjs": "c434a1a92d2f1fe3c10bd81b3e2830a4e28765bb4dc53e35ffa166b9b3c534e2",
+    "src/git/worktree.mjs": "75e467d3cd210a54c2ef0c83714ec57ab362507dae18a268efd9a5833e1c746d",
+    "src/holder-lock/driver.mjs": "dfddcded2694893dce17033af1b25fa695e072ac916faa13c3ce2c86779e708c",
+    "src/holder-lock/fences.mjs": "1641ae343821fb9e088cf325bc3e94ef7198df20591c81649a7a2b7630c44da1",
+    "src/holder-lock/hold-transport.mjs": "d5f5ea675576c887b13fc16f9055aafdc27b675db3e726e2a63d2d041b38dc24",
+    "src/holder-lock/hot-guard.mjs": "0cb873f2422fe1567e0265ffabd705cae3e526fa1573ec4854acdde5190c44c7",
+    "src/holder-lock/index.mjs": "1d39837d0423557b7ca52f92ff532d2513ce6d374bc27f3739de95d2d330b486",
+    "src/holder-lock/lock-scope.mjs": "5b891b58de3cd9047889d768e0b46b38556a2d27cb59052696560ba63837fc24",
+    "src/holder-lock/native-handover.mjs": "aa3a1fbe4c5753e7f7c3f82dc3be6c4516c37a78a4545165c57a06d9a9a5142c",
+    "src/holder-lock/protocol.mjs": "973b2373ee23f0662a2d4ea751977a077a1c3857da11a89b3efa5f9318dfedff",
+    "src/holder-lock/registry.mjs": "7e8dd7dcd83b7a168a62070c0ab101270f8a29509060234c1f05556f11c2806f",
+    "src/holder-lock/state-root.mjs": "0e675170f350824f7960dd2798c6fc02c1ac304919bd1bee9eefe601728f0698",
+    "src/install/coexist.mjs": "099cfd22d3f84d221507697bfb0c84f336e4c85305433117e2390ebaad632a03",
+    "src/intake/classify.mjs": "e12aeddcc50ede2c469f21a8c71ad32401f23cdad3eead7f164bc11c7dcde7f1",
+    "src/intake/discovery.mjs": "6da596afa6d305cd8431a7f79659c04449bfe7ecd793bc5600fd11cd2cff9c1b",
+    "src/intake/plan-verdict-from-plan-md.mjs": "1472684acd2398d71885e73ee5b365a42e9a263f5581ce5ce0518c857fb71f09",
+    "src/intake/plan.mjs": "c3c72be35468420d9f42bcf23a0bdec9e48a11c1f4d8dd6bb4b9be09f4c60dc6",
+    "src/intake/risk-keywords.mjs": "b71f9c07e58ad759538ac3a287027273d08b9a65a397be2f39b2716595f14445",
+    "src/intake/verify-pattern-check.mjs": "1cfe3feb6375b999c4b851f6e9ef8fce7b1fb1209a81c29dd0a043939cb69e0c",
+    "src/observe/friction-client.mjs": "fa010f78de11c002da7ed01141a38ef5e65c072e937a1589642f0ed3ced8229d",
+    "src/report/authoritative-match.mjs": "385fd87aaaab0441c290d0203f5903a9b1edc614e7bead7e0970dc6aabd6b596",
+    "src/report/capability-plan-lint.mjs": "7dab2f9aaa2d97fcb33ed9d0ddc378aec9ee314f2f4e960808514ce96797c212",
+    "src/report/context-render.mjs": "21f0d004ecc62a6be3d059f2c4911dd9dd9fcd3c646d348625e8277efb750fdb",
+    "src/report/decision-index.mjs": "5ad753196470debd2f502b3c00994c1d75a9ed0c576c5cf8188eb8600f0a09a2",
+    "src/report/enduser-index-generate.mjs": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15",
+    "src/report/enduser-index.mjs": "373da334b9cd862b2c3a0fbf4fffb3fe010f244872702dbfceb25eada5c5e650",
+    "src/report/frontmatter.mjs": "bd3032562a173541285f241d5b05818717b0dc53c086be4075f880e861ecd7da",
+    "src/report/item-trace.mjs": "bb91d0d9635d0794ed9a979cc4fa6721d26db18905637d465be8ce6d831e7155",
+    "src/report/knowledge-projection.mjs": "6e3e4dbacf4da735924b5cc705d9c805a6d8af362c6182298550e708f698d832",
+    "src/report/knowledge-resolver.mjs": "eab342bb4296e20fdbc6742cec084be0924e80cfa6d3f7e525395959b6bd0751",
+    "src/run-supervisor/attempt-step.mjs": "cabe99992da3c5157035f3320abd4a184191297989fe973ae3dbd4f0fc8fb273",
+    "src/run-supervisor/cancel-opt-in.mjs": "f5b9a2eadc709918201ed01620098886bd108e8445c2b2304b845b4e73981403",
+    "src/run-supervisor/cancel-registry.mjs": "52e79f2a45db7310d1bfbd09168e4e595d38faef3e5b74bfbca9030de85f9d34",
+    "src/run-supervisor/client.mjs": "64b632a38eb54f44f97f0020dd46cf362c7837d693a2667aac42209f50a540ec",
+    "src/run-supervisor/direct-launch.mjs": "27cd8e85e0f744d2fa90235698f5fdfbaf91b08080aeb244879016815352a8bf",
+    "src/run-supervisor/gate-kill-grace.mjs": "378ca3875bde61e5229cdfd5738854b5ed727b05496ec308b10682c3c0cf6c03",
+    "src/run-supervisor/legacy-sweep.mjs": "63d49b8910513337ae01810361b02fdcc2a4c8ab5ab17fcf5c52de1f9474d51a",
+    "src/run-supervisor/payload-root.mjs": "b1ad1d5402b921254d06aecf20a7bc1fe322845c0ab72f028c5fb7047402bdd9",
+    "src/run-supervisor/protocol.mjs": "84c0eaa3c8a94429c4c207d2a80d9e7851914cd64985e82f8507ffcbead63b7c",
+    "src/run-supervisor/runtime-dir.mjs": "321bbaf39f909ae909face6daa40c0a187e165fd0faebd743a74895b9a3840fc",
+    "src/run-supervisor/step-support.mjs": "40c78da932dafd643762ff5c32e1f8a3844d5a7f9cd7ec64055b8b1343f614f9",
+    "src/run-supervisor/steps/cleanup-trust.mjs": "4427bcd94a9469eb2063403207866ef1d28ae2941987bc8f31853c2fb4b2f0b6",
+    "src/run-supervisor/steps/finalize-home.mjs": "a44414ab2ddc7e8056bbf042069983bca4b98143628e748ddc594d0cbff312b8",
+    "src/run-supervisor/steps/settle-attempt.mjs": "69c874bbe2c4ebc3abcb0861be89d9ec3de63a96031812c5b21afe91b9144e9a",
+    "src/run-supervisor/sweep.mjs": "6e4fdf218c53bfd85c2b89d47623a9457d73f05bbdad064547a6db4bc15d6fe6",
+    "src/runner/agent-definitions.mjs": "9e9cbc8d758ddb8b8aee27830606543eac7cecb7ca9ef104ea9cf4890f25dd47",
+    "src/runner/agent-listing.mjs": "8c6bfd84c26fb939cc22bf511c7e5a328d7cfa91bb9c2ba0574b94f6d48b6c4d",
+    "src/runner/agent-roster.mjs": "bddc69ef02c932c8a05d8486a29c02c4188a3cb7e31f8706cf3ce360cc42ed31",
+    "src/runner/anti-loop.mjs": "d996232d9518a8fcf6f7017f781716f513eb3c0c9f80e17741b9507bda48ae49",
+    "src/runner/attestation-guard.mjs": "efbd469199ce339e9298df842270de509875a2ae1d907d091f8a28674ffc3e54",
+    "src/runner/claim-liveness.mjs": "81343f229916449e5ec0b4531cb3d9414a90b6b75c738e9fc10586f8adbee567",
+    "src/runner/claim-port.mjs": "4c86f2ac4a5a85a6c3487e05f0fed08f93e3e769be6008dc5332a8d9d0ab2da7",
+    "src/runner/dispatch.mjs": "7c9026fdc32a564d4f82e61dd86cc381564705f2f9a7095b904b4632a334d70e",
+    "src/runner/dispatch/adapters.mjs": "8a2a68cae8240c4f1d501f6718361368689d89eecf03d65aba44e14f3c1987c9",
+    "src/runner/dispatch/agent-result-claim-contract.mjs": "8deafc9c4f1109801444e6047724818d0db58f6ad9038e1b32e5837bd41bd92a",
+    "src/runner/dispatch/assignment-layout.mjs": "afc5f5c4c742892ca2418fbe2f7ec0f0ca801784f6aec1408e4a4aa4de21b791",
+    "src/runner/dispatch/assignment-normalizer.mjs": "6b35618fbb2349be178c672a52f05de765939d0eb68f1a1fa4a7535e291828f1",
+    "src/runner/dispatch/assignment-policy.mjs": "c0cff9ec45634a9a8164c10dd9cc944145776cbe51d04ccb0a5676419fdf667a",
+    "src/runner/dispatch/assignment-runner.mjs": "e104a1c65643cf0365412e3a3102922627aafa59e648afe29500bbff066d4adb",
+    "src/runner/dispatch/assignment.mjs": "c0ba04fb09fd5d80e076fa33062c462c2283a181446872a5c0d320bd650c9fbb",
+    "src/runner/dispatch/brief.mjs": "7ec9287da887ff7022b0d1085dcac6e44847aef6bc81e533bed2595ecb02522b",
+    "src/runner/dispatch/cli.mjs": "f87f801077619893579bcebeb1643cdff9a32bd09652619e43d81599c2119969",
+    "src/runner/dispatch/config.mjs": "6d32edc9d13ab80dbab237e71deb8beb971e7a94ac1bea547d1eb6c8ac2c6b2f",
+    "src/runner/dispatch/confinement/attestation-store.mjs": "0167018a138984705ee9b89cbae3c48e3f76179548120f8d7a9fbbafd7c40537",
+    "src/runner/dispatch/confinement/authority.mjs": "e618d5997f85e200c50f6459c43f08f31852bbd6cefb6c27c128c4e845c78709",
+    "src/runner/dispatch/confinement/backend-registry.mjs": "8c07146b675d4ad1086c88685de4a521c7004bc00de39e20d2dbb99d96bfa1ff",
+    "src/runner/dispatch/confinement/bypass-pairing.mjs": "0414c5c19c96bbdd2a53dfbbdefd0eae0fd69d02abd09d37e69e03981f472f62",
+    "src/runner/dispatch/confinement/cleanup.mjs": "efc5ef0b193453af160652a1adae71c374d6c61b718c7f3d7af43d9432965785",
+    "src/runner/dispatch/confinement/drivers/bwrap.mjs": "19ada70d9f28e5a1d08a4eb742eca7724d5e5efc77f5e7c16b27f8165a37f0c3",
+    "src/runner/dispatch/confinement/policies.mjs": "cc531111c8fc233ca9557d5ba89ab119ad3c4870145dc9ffcc865fcd87599d1f",
+    "src/runner/dispatch/confinement/probes/harness.mjs": "59d42d3ef5afea0f581efdb99bfc61d095b75e7c06dd3ed3921abdf296bbee57",
+    "src/runner/dispatch/confinement/request.mjs": "aba50726b489db9763742539c462cf269461943576472c71e84d2d7fe248f185",
+    "src/runner/dispatch/confinement/resources.mjs": "e2d0810db054711130f9e382e19bb5e4758865cd93cdddc711aa2c1dd2255994",
+    "src/runner/dispatch/cwd-lock.mjs": "570937fa60eacf0ed2cff8738b9b72026f2b3e4417870249969636e809f24675",
+    "src/runner/dispatch/dispatch-error.mjs": "a23e9b79cd73a43eb1e0b9d9afc5710e9210514079515007d36fbbce089e4cbd",
+    "src/runner/dispatch/effective-execution-contract.mjs": "d86e39bc33c8fc70228efb62963e8658dca3ebaf616be8dfe30585598a52298f",
+    "src/runner/dispatch/evidence-attribution.mjs": "e286beb61bc988049d44645db9a7a0900ba2431132ce694861ac7c43390b229f",
+    "src/runner/dispatch/execution-contract.mjs": "fcc21d444c42d171838107a577de7487daf8a920c08a779a21fa0d7e2f22e4b6",
+    "src/runner/dispatch/herdr-agent.mjs": "3e430e05371693c32d3c55a970a8e1a1e6e92cee2efbc3630017590b4f9be819",
+    "src/runner/dispatch/herdr-deadlines.mjs": "61050a5bdcc1084e91fa1ccab4075d31fbd41e489f9396c444405acc4b4e1acd",
+    "src/runner/dispatch/herdr-round.mjs": "d964dcab21c72000fa01f4c37bc0a70f0124cc0812e4a94742f355f5b2fb0a20",
+    "src/runner/dispatch/llm-accounts.mjs": "5f2f1d65bb08827ecef1761f2c8bb1b7776839483ada4a9758856d63d572926d",
+    "src/runner/dispatch/mechanism.mjs": "964be5b92c651b0e5cd0cfef5e51b6f9e90e1e172b0ccba7c58c19fe42d32709",
+    "src/runner/dispatch/operation-prompt-templates.mjs": "932f932d239ccec0ef3debd919576d25ab068c50cb990d1f15afd03ff30f46af",
+    "src/runner/dispatch/plan.mjs": "bc57319f904c8856b070a01bdfe76506a17166e4ace244d5f2b917bf5a406598",
+    "src/runner/dispatch/prepare.mjs": "d2bc4e5bccce5db31c8a56a364d06d88916b4c108cb0191957e8989b44ff90ce",
+    "src/runner/dispatch/process-identity.mjs": "1ad61ab28aaebe81701c27792f849207b610ccb72f900c9e4e37babf9347e08a",
+    "src/runner/dispatch/proof-helpers.mjs": "3a55905afa70300caa94eae077d46399b65ea2a172544c9fd96c80d4011c66fc",
+    "src/runner/dispatch/provider-account-probe.mjs": "377886cac36ec401c2804b8e288883b3b7e3b6a24514d4bfe8c8a1286980d27c",
+    "src/runner/dispatch/provider-adapter.mjs": "2e768fc4af7a4f33348f8d5ff21558adfa0591466c793d796bd06ad7d1755288",
+    "src/runner/dispatch/provider-auth-failure.mjs": "d87918a5cabbad7eed60876bd02c976ef1f680c45e28d379338f59effb892dda",
+    "src/runner/dispatch/provider-capacity.mjs": "0e1dc634fbe908256bf6eb1cbb5d82e19a95a1d40df575821333b60f5c3a879e",
+    "src/runner/dispatch/provider-credential-probe.mjs": "b1773175ff065ce80e9bb2b5123de15cc4d9b04a9bc0f249d9a1c971653bae74",
+    "src/runner/dispatch/provider-credential-renewal.mjs": "349df4a7c4cb0ced10d01f0093b036aa0c77ce58acf40037a1526ab23163deb0",
+    "src/runner/dispatch/reconciliation-planner.mjs": "c5c56003552d1758b29579373f4f4d6265fb921e37938287d4b53ede39313a00",
+    "src/runner/dispatch/recovery-planner.mjs": "247a1cad51c09519cd9d250ac60a34c9b4e997fa968fcc54a955d5a842111fd3",
+    "src/runner/dispatch/recovery.mjs": "4352202289cec32067d035296655c286a7bd871b5db4796f61c6886ae7ee2373",
+    "src/runner/dispatch/resolve.mjs": "2b4ef017b414383b5a0360b98f9eb420d709ee15d3b8acf83769fa1aec675375",
+    "src/runner/dispatch/result-ladder.mjs": "32f5c419991c663b2b7165951a5d79c5a1f556a70972fea3e511ed530574e9c3",
+    "src/runner/dispatch/run-lock.mjs": "4fe905899159baa52755203570a56efd376deb5262cbd6d0ee0a88cfd1c287e6",
+    "src/runner/dispatch/run-result.mjs": "7ccde0c4f7d1fdfb389a57f8a810eded79ddb5b274732ce1ff92455d52666a86",
+    "src/runner/dispatch/run-timeout.mjs": "9d0bb5adca999cf689b8a0c6dce0cfc28f122de1393785fcb620f6f669086d40",
+    "src/runner/dispatch/runtime-inspection.mjs": "e3f115ea6367dc266ae8d92dda03005af458ffaa99c54bb997689563006ab0fd",
+    "src/runner/dispatch/settlement.mjs": "a26b7233689c6b837b06224768cf1bdb8eb2e5f2be0833d427198e62ad63e02f",
+    "src/runner/dispatch/stop-processes-inside.mjs": "b5d585654968879ec2f65d33e8677fe9d1bc25383c361f556e7dee1455bea92e",
+    "src/runner/dispatch/stray-writes.mjs": "8ab287ef44a7e731d4c22fb50e820017645d707e9b41b63a75b7fb4bc028f2ff",
+    "src/runner/dispatch/terminal-slot.mjs": "d099d710de771a07335e54c23b433b8f87f374e48c28f6d35e4d356e63b84fdc",
+    "src/runner/dispatch/tier-cell.mjs": "6e75c76225232a9b0060598865f86437dbba4dd8125014ccf262aacd814e76b3",
+    "src/runner/dispatch/transport.mjs": "10e62b5eb4514e169bb1b96b4db4198ec21179797ddbe0f642a37b56372dc134",
+    "src/runner/dispatch/trust-store.mjs": "f73e7594fab7554513d8f1ae1954a17bda49599c53be6c2c9f7d43dec64f8ee1",
+    "src/runner/dispatch/usage-parsers.mjs": "18e1755935c8b7c769e7775a2c28964f3c2e87d689e730db2baf8ca0cbc4515d",
+    "src/runner/dispatch/visibility-session.mjs": "e5888a16d99087ddb12e534f30b4085181c380e58d2a62423263bce31ec0dfe8",
+    "src/runner/dispatch/worker-artifacts.mjs": "2df63327a80ce692096c1563cbea09699cccfb1f6153400aa9f2a6581328e20d",
+    "src/runner/dispatch/worker-home.mjs": "88c48ce8a3d68f126ebaf6e98ef696e7a365e07f4a0b2b9b62ed0cf94b479b5a",
+    "src/runner/dispatch/worker-session-boot.mjs": "4b9ab1d22466839c51a8ce0c34d973018cf365e3992e6556c8bc15a9aa110e10",
+    "src/runner/dispatch/worker-session.mjs": "35e0cfe18540bad339abbf93a2ecdb99b1924249f637ae5f54b48c532892c3b0",
+    "src/runner/dispatch/write-scope.mjs": "b926332413077cfb8246da969373de205ecf003b3a263baf6c08177a27d3885a",
+    "src/runner/execution/account-pin.mjs": "1e2eb0f3b07370b1632f85386f7443cd297e64d7f114a5adb4bbc5125155efed",
+    "src/runner/execution/account-rotation.mjs": "8a74cf158b971ac1c38e63cfd064ba1ac50393de02efeedcae303243250b3368",
+    "src/runner/execution/bind.mjs": "a307c58ccd1eb3e1618d3a339ac61fc3f4fa9af916144a36638a5b69988ae281",
+    "src/runner/execution/case-admission-port.mjs": "d77c063bf236b9a1b726eeb24de14b6f6bfebdf56e6843dc0ef872e993a872b9",
+    "src/runner/execution/commit-unit-work.mjs": "a2c0ba962257c38dc3f2b9f50749d71f9be11c356f6f435267d4530e11c43793",
+    "src/runner/execution/dry-bind.mjs": "652299296d9584a703d1f28c44c184daecd3cfac508f2dbc54cc5e29fec17f20",
+    "src/runner/execution/explain.mjs": "8c8ad1839ee97854ae1392cae792c97b5f50cd3ae5a833153ac97b28532c9024",
+    "src/runner/execution/handoff-refs.mjs": "e0fafc8ab6e2d4b9192221e3867563b06856e8c744a680ba1682700ce37ec8c4",
+    "src/runner/execution/partial-writes.mjs": "04313fc2f4901e7f8ec373c999c731df9498cde44a548d4675d2106e3cbc6940",
+    "src/runner/execution/patterns/debate.mjs": "7205d712ada34b1eef36850304462efa1ad2b5c4e7b9cac591e8c3299f78b59c",
+    "src/runner/execution/patterns/index.mjs": "8a79519b9febe82e17dd3491d70d0fee0ca3473cfd0c9a95aa2a71e443a82e33",
+    "src/runner/execution/patterns/panel.mjs": "98ada7515c42528809070a1b752927dd05595b33ce4cef064a0433644a1dc85a",
+    "src/runner/execution/patterns/presets.mjs": "f9be98f718882e0e8548366060ef20ccf92904831cd15588d84a1f1fdc98e207",
+    "src/runner/execution/patterns/reviewed.mjs": "119bfaebb5f3e18f441fcd92d3dd46d34d7cd35973eb587aa98d98a35f83770e",
+    "src/runner/execution/patterns/role-tasks.mjs": "0fe9b6ac4898c658cfc051766a29f848d72b6960b3a1cfd16053e72b703d8ecc",
+    "src/runner/execution/patterns/solo.mjs": "d439ed457e517936f2d7f1e2c2ac076876dee2d8b19d8325017047309e45c490",
+    "src/runner/execution/role-ledger.mjs": "5b244127187be94fa7175c3bb32feb0fb0e9daf4ef2e3f25030ab2f9b2d0fa14",
+    "src/runner/execution/run.mjs": "85f638763e938ba710e65bb1154d3a31b20986958784a59dcfd8b6daae190f64",
+    "src/runner/execution/unit-control.mjs": "7758226c1321bda3cd53e5018c7030b714adf138ba8e3fccbeb8a4f5337f9022",
+    "src/runner/execution/unit-run-history.mjs": "ca16c5a4f62b82ad43910874919e0f4603c285c8dafed3e401c35ce32f73c5fb",
+    "src/runner/execution/unit-state.mjs": "21bace2f8debba43bc794fda037c62590da3fe644f7cc07a2f3a728548eb5db6",
+    "src/runner/execution/unit-summary.mjs": "3957a40251d2d2189662e8505c98c7870830af162b2af704d6775217f7c9975c",
+    "src/runner/execution/unit-sync.mjs": "28c171b1ffab50fa761f8e18b3560347b9a54f440637f8d8f8f0fb1add06e1d0",
+    "src/runner/execution/unit.mjs": "5e68ae339a8ea6786da2296d6605a9e8f71c647670ea6b5435bc8fde26ee5d57",
+    "src/runner/fanout-batch.mjs": "0c16bbf812cdd27fad3c9ab344e936b4a5844615847fb1b858b22042450508db",
+    "src/runner/frozen-judge.mjs": "96265fab86a2a57ae4b191c83a864a4f285942f2c35318fbdae435a832bb75ed",
+    "src/runner/gateway-control.mjs": "868a5cdc6d276d6db8f9323ab08f2bb2402825f6a014a0e9f6fe0cb25a9abd43",
+    "src/runner/github-adapter.mjs": "162d7b2064b9b311ea88afba25567601420626743dff6b72b0aba78f42220c00",
+    "src/runner/goal-check.mjs": "f21520e58727a016945c052c2b04f72ec9120192c4cdfaaaf34526ea0bb090e0",
+    "src/runner/iron-law-gate.mjs": "37e253ef40240e535e6587d41b393e6ddecc7cb174104760d0f48ba168203d43",
+    "src/runner/lock-fence.mjs": "ba418eede1504624baee12dfe8d22e87afa1057926cf1f6ce2d2a0f9a32afce1",
+    "src/runner/lock-status.mjs": "c9a1521a142a1e2ffc794aab608a62b7cd7bd1c06967d17e7de648fd5d37fbdd",
+    "src/runner/lock-wait.mjs": "833e0a3bf2d71d66358d4f230c7325ebedcba34444cdaa60324a4e4be2140301",
+    "src/runner/loop.mjs": "e5cde588341c406b73b0c30ffdf3465f89e528db6f4dc8a140d31163dbff74ab",
+    "src/runner/main-checkout-activity.mjs": "84cd9b95e28c0c1004322b6edba0d2b4b45f9445eddc30613abd53314f13c071",
+    "src/runner/main-checkout-reset-guard.mjs": "446d216c411dd5f59d512b5baf52b3a46eeb8ae03320f1d40be85e9447072d0c",
+    "src/runner/main-fgos-checkpoint.mjs": "7bcdab7f2b887e149170b50180f97eae0ce666abff0aca88b9477357ed4d8e52",
+    "src/runner/merge.mjs": "12702a023dcba3133a005c3acb3c9cf3ef7a1a8589c3ebac4dc1fd4083a88577",
+    "src/runner/operation-capability.mjs": "6683b7da84274722aa5d464ccc8ec9d9e34b110f779e8ea5b6f6c1d0b3c820f5",
+    "src/runner/operation-choice.mjs": "c2aa1ce12a3da54a0c67544bc1b6e7860b672b9eb3cb1ea8600851dc2dc59229",
+    "src/runner/paths.mjs": "bfbb13456f940e02d77b5ad8515b015ec6c1f8a83ee6015086138eeaed96339f",
+    "src/runner/promote-engine.mjs": "b8ad77d7c24b211189e6ca42df658303328eb6c24c77b6b2e8026d986279089b",
+    "src/runner/promote-preflight.mjs": "26db2c2670fc445a4c170af18880ead88e13c4ff1545846b5c8cf760fbd34e54",
+    "src/runner/prompt-templates.mjs": "fd027de3376fbdfe654f2a2b8599a384d88f9b5383a0161b0b9df7bca9de39b9",
+    "src/runner/recovery.mjs": "9457be6fbac75013e4273ebd5bb08a981552b5dda594ef34437d56c3d563aa1a",
+    "src/runner/repo-locks.mjs": "17dfd17dae00b587103f16b7beb11a411ad18de7baba0486559a5ad8f216d554",
+    "src/runner/rigor.mjs": "f85eabe784dd24de1e2431f16cccecd6634da8a6ca6be128dc9a87a3c91258c0",
+    "src/runner/root-affinity.mjs": "0e074df4c61d29f60a2ce43fb62830ec2a2eaebe0e1998fec0cbacb4cd15e871",
+    "src/runner/session.mjs": "fc45d64c2ac7541cc4692c636eb641e1797d85de3c9399fb0ce782d63eb03fb3",
+    "src/runner/work-compat.mjs": "a804010f1992b05a28e07e11681c06919b1bc4a72fd1ab3e77bd2590bb020d25",
+    "src/runner/work-dispatch.mjs": "7cc4e2cb1c99d5025b435acb3a3c68a9260fcaa4e7bc05415de83e2c0615145f",
+    "src/runner/worker-log.mjs": "b33f235b50765aff48b4dfd5ad15ea09fccacea4b7ea4ca52dc4df8dd3226ba1",
+    "src/runner/worktree.mjs": "76add3322777d6c33699e07b13566b17c90516ce5f53d35983cf3af755a4af0d",
+    "src/runner/write-queue.mjs": "a816a82d6c4499cca921f2b105eaaafe646f1413ff202ce3f132c4b84ed7a2b3",
+    "src/setup/agent-cli-trust.mjs": "6a70801d94f369a216d626b240022c5291ab8efdf742d0e1ce63721ac1669537",
+    "src/setup/agent-hooks.mjs": "0109366e1a1a117b0128a729d4753dc8de14d92ac1c5ba5893959d01a62c1088",
+    "src/setup/agy-permissions.mjs": "0dd7e2fc1297acf09f0e04236ab69f2c88dcfdc04cb9a0d7f14468973195d97f",
+    "src/setup/ansi.mjs": "02c0e971ac01c71fb7db8d6506debd3c35d55feedceeb93eac7843b83fa0d430",
+    "src/setup/bin-discovery.mjs": "fbbe06965041a25c07ca954efb9d3f82b327bed894bbc19221315b703b10f8c5",
+    "src/setup/blind-steps-proven-pools.mjs": "6e9d199ed44d58f59e3a98fa1b9ff3c3a30fdfb1d2c4abfaefa1ade3e0d14d12",
+    "src/setup/checks.mjs": "b5280315dd8712ff69e6e2f85a2db87d9e0ddd21c828bfb648d63bfb4e1bfaa4",
+    "src/setup/claude-code-hooks.mjs": "d9f4cdbe8c4cec4cb3ea7c67798d24b49e3c86a0d97a041b202dec8def2332fe",
+    "src/setup/config-merge.mjs": "2780e5fb05bb3a10aecff0f21eca4394738489960c2dbd9d86dff9f6c74cc176",
+    "src/setup/event-store-checks.mjs": "2af5215a4933ea47638121c0997e8684fe9afb5eb6a616bf8bab8757cd24f645",
+    "src/setup/event-store-fixes.mjs": "4f3a95add8dee1f08c1dd2d38fdb0cf7b5ee7101909faf965c0b2e6ebdaa142e",
+    "src/setup/executor-posture-coverage.mjs": "fb5f81c62e01aa7ca3f229a4f2e440f14eb0ac96e73469f942ce418f7854a043",
+    "src/setup/executor-profile-warnings.mjs": "7edcf8b4ddb7030651b4607e364b7a2e4a78e9166c967893c25880a949ea37be",
+    "src/setup/git-checks.mjs": "4e4a70076ed3ccbfdd1c331d376c6c2ef6d5127cfeb1a4f1497ac14a68bdcef1",
+    "src/setup/git-hooks.mjs": "7c35308129bc8032a436107c561cefa0637cceb72b295eab1ecd2e163c0d0f66",
+    "src/setup/holder-lock-checks.mjs": "b51860bfe681104ab3ec462333150ea39d183e707162af4319d90e18040791f6",
+    "src/setup/instruction-composition.mjs": "6cbefb439141620eccfc990088849627e95577a28688d51b324a4b3dfdf36331",
+    "src/setup/instruction-projections.mjs": "9d239c9f1d139f07cbc6bfc02701a7f138b38aad9fa2ac3f5061a34ccd357c8f",
+    "src/setup/instruction-registry.mjs": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+    "src/setup/lock-record-checks.mjs": "d72db4c75a047cf55437b661e42ec7e0cb38b6370e98bfb9f8942f9eef7bb278",
+    "src/setup/model-pool-checks.mjs": "9a5f4c2319d630932b4c1ef3bf97ba90c41a2147271725fa1c87e64b472b1ec1",
+    "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
+    "src/setup/registrations.mjs": "eac44ceb1bd5bb132964989720ea5b0fde09137aaa0ef0f6e22a70c53aeacdb5",
+    "src/setup/run-supervisor-checks.mjs": "4e8a05f500564f67fbfa7684cd71d160281c4cc345ec1bbecd74505994a9f1fb",
+    "src/setup/shell-rc.mjs": "36c0eb600e6943d5c6ed94918d5d6a294d447fa8a6491076faaf525aa80807c0",
+    "src/setup/skill-wrappers.mjs": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
+    "src/setup/terminal-control-checks.mjs": "ce1e85c2d622611d2c6e6b47bfadc49ebb4a0f801c80bfcc7a91d3e8d0139656",
+    "src/setup/workflow-case-checks.mjs": "de600986a2325b0a3653835bed153a11ffc447aa31212db8cd4e9d90dd67ed59",
+    "src/setup/workflow-pool-independence.mjs": "855b284457a112c3fdb8c21c6f423d6d47d85bb9e9b03c841e0bee2191bb93a2",
+    "src/state/awaiting-context.mjs": "dda0f698b6b0cad343fdc39738f98e19975463ff4e1457a3d9390dd0b36576ea",
+    "src/state/cleanup-harness.mjs": "95f39a0712c2a921cfc92c83e4dfaf7f3e6e2da074d5ed77dca3bc3a5f3a0e9a",
+    "src/state/cleanup-pool.mjs": "46ce8b7bbd04d3da091cd9cb6a905c7d9149019028698587009b81d7d9444927",
+    "src/state/cursor.mjs": "c6b015bad57c66dd7e5654ab4753b0d87c9ff653328dc2c6be59beedd6e37c50",
+    "src/state/decision-question.mjs": "163b7b307e55ba29065de64cb9bfc48aeb5e5f1d3eda0687e38b37fca02babce",
+    "src/state/dep-graph.mjs": "75f51cf42ac18bd405651145ee188ea5abee47f6161e72f3a75475f9694fa2fb",
+    "src/state/discover-pool.mjs": "c19e8e7ac889a873d0a065a254abebbf1e1ad29a70e068d9219e7bf5b1bb517b",
+    "src/state/domain-registry.mjs": "afbac9ca5e143a188a44648d0910e7108a1bace06d378bcd46289ccb53aede51",
+    "src/state/drift-status.mjs": "06f3f9c4e100043af574a11e4cf967281e49c960b77a5477ca024b816611fd65",
+    "src/state/envelope.mjs": "faf5419c15516ea0a3c2862a149708ce3df17cca40101dae71bf99eeaf93868e",
+    "src/state/event-log.mjs": "48c1a19e68d1bb2b6260c0740880f55911cb2c9c4c46607b878b261f6d741fa3",
+    "src/state/events-compaction.mjs": "c7d412962166229dd671f06d98aaee7349b9f091a7c4018869171b384fbe3447",
+    "src/state/events-jsonl-truncation-guard.mjs": "93bb6efa390d3e8a58b84399dc90c0b50298c96d6bc4876620deb37d08068965",
+    "src/state/events.mjs": "32de79321db43ec33ebe6c0b88b17f7df75d75ed41a680202b2d481faf9f799d",
+    "src/state/fgos-file-registry.mjs": "917764c062d297227d969a3349e7d0a76dc721c3a97d0241f04c4af5ce5bd3e9",
+    "src/state/frontier.mjs": "dca56e29f4928eb025fb2bf085c75a7d1969d59b3b645754b3dc6b44e3db47d7",
+    "src/state/gate-bypass.mjs": "723e40beb662fb094a4ee832fa0755cfc554d01c7623cf411eeda1092e9247b8",
+    "src/state/graph-harness.mjs": "6d93e939f7d13ec8f24957eca8b02bc66aad00573c4369175bcb426915ac789b",
+    "src/state/graph-metrics.mjs": "ce0c9112f0a22ae408a442773fc91628eb225ef103bc9024a16ce926c1f0f167",
+    "src/state/handoff.mjs": "352dbce5f607f2ad478bf0119fbf875bf640142f3438a745ebcead4804dd4d38",
+    "src/state/hot-lock.mjs": "2eff81fce147f31b637e2d4491640ccb0405713439f7e8648a89e0d351c6a14d",
+    "src/state/impact.mjs": "5baf4a1efb7cb4e7b7b8c307e16a9671b925efe103246515b49f29710a8ddb4c",
+    "src/state/knowledge-registry.mjs": "33f75d6c36e859364f221972dfabc02e8c0fac48876a87c5ad134b07712046ff",
+    "src/state/legacy-event-git-adapter.mjs": "8b65b55aacf9a3b321e51847e4c5f8c4829c0d2fd6f5de2ad52046c0ac1bf7e9",
+    "src/state/main-checkout-guard-warnings.mjs": "7075e5a06ee1664c953880fded940832c46533ccefda4a81801dd0c03584ab64",
+    "src/state/plan-pool.mjs": "20c667909048853fa2dddf239b27467c29dbe8551cd7c90fef88c241143483ad",
+    "src/state/porting-store.mjs": "ee409980f27d11a0b67c55ae18b2510fa98183103035a4c9202737e0dc90d519",
+    "src/state/porting.mjs": "4191acd3af3ca878dd7ae10bab67d859d545ca870722b3276cd39aeba9d173f3",
+    "src/state/postland-drift.mjs": "66bba6e35a60cfa81a7b430a51a816f142b0cc3e9307d7c7b421be111152299b",
+    "src/state/priority-formula.mjs": "5a1767b93f0155567472eb059899aa993a147ecc0e0aaf75dafe8e93da72d6fe",
+    "src/state/replay.mjs": "258dd5a97b47007efba895b45cac5fb000695cab25d6e4e68cb2925f99463032",
+    "src/state/retro-pool.mjs": "bed4fe7e4a09ee49d3ae019e30dc21b73bc00bbbc8a20be3eec4cdf6352140ae",
+    "src/state/retrospective-doors.mjs": "e4b1c857f14acbd11168902e102f98f3d0f6b44b247588e580c123ff5f8765d3",
+    "src/state/runtime-coordination.mjs": "e2f560c6871fbaa7cf0346fa3fd96825260527649112e7c8949c4d68aea6d800",
+    "src/state/status-fsm.mjs": "6853485189d2e25e6ee2a5997d11f0b2ae4e608cf5ed6332df010b2e703b76b0",
+    "src/state/step-fsm.mjs": "bf1e935a355d2fbb7b8a5f0927138dea21b21c6226fe5a442c22bd1875445625",
+    "src/state/store.mjs": "5e4ca3b762ab0a131a7da08db18c2cee2216258d38f6fb5bffd678ee6fbd5343",
+    "src/state/tool-registry.mjs": "9a84242aeb83fe6e53822ef67f146ed383f1670e81ed4fb4c76f75d1ca5c0cc0",
+    "src/state/work.mjs": "ae5f1599cf36963602efd1e8b13ee2ac883997ea747cd99877364d0162c05059",
+    "src/state/worker-slots.mjs": "bc37bb0d995fe7339925c209c4e79232bdc5e3c079668f89c8f52313312dbf95",
+    "src/terminal-control/client.mjs": "344249684fa950cf6caf984b1d9ae9f9a21b1c542bcf7110d3a7edd351d9076f",
+    "src/terminal-control/config.mjs": "7160cced361f72be8a8c33baf7769bca8d8e6f24295fdae141695a64061c9341",
+    "src/util/format-bytes.mjs": "786e381e7581ddd1923305d3bb25e193aba99b84118728574c84280d5290966d",
+    "src/util/format-duration.mjs": "aa3d4629659f6b635267965013716b45e71120cce5282f6b2a4503148c616ce9",
+    "src/util/format-lock-duration.mjs": "87e069a71d25348768de8fe5116d2ac3759a2c1e775433a6511750491f874b3e",
+    "src/util/git-paths.mjs": "fbb0b5af5b149853b9d5279062d417cee88a24ce161f782b5ae6dec3d10f1941",
+    "src/util/host-bin-path.mjs": "c9ba4f74f5969a42d3aca4a1583f4c3ecb2eba871f1fcf025ed7d38621f4353d",
+    "src/util/host-bin.mjs": "f70cad1f07c7eb0f47bdafc0c766e2351e2310f48232b76ab4d29bab1fbcb826",
+    "src/util/normalize-path.mjs": "e1519327a67834d6309a0e92e69d5fb46bb671a7ddfbe9ef5c36acc22fc3062a",
+    "src/util/release-binary-path.mjs": "f74aefea9a51b750049a9d32b62c2dbd9fb9782f944535b293e9cc352b466f76",
+    "src/util/release-targets.mjs": "52157efccc71fa4bc260a47717ab48047792a7057329ab29d9bd6333c322029c",
+    "src/util/session-identity.mjs": "0753de64db3f85fe87dbbca4a20344f63c02600a715d49fb43cd26b96113ee23",
+    "src/util/third-party/js-yaml.mjs": "6f3620e6ddb211552d9cbbfec2ac923d3b6b64819bf054f426525e9227c8217b",
+    "src/util/unique-tmp-tag.mjs": "712eb59d8753224dc3197af5739a3a01fa4188f0b60e6e8ed22a1854d8b68dde",
+    "src/util/yaml.mjs": "96392b4286e67f309f4720ab0f2b4a75f515f4819546ed7727425f2fd732c466",
+    "src/verbs/dispatch/inspect.mjs": "483baa61ee6800a9229594c2bb63b284c47c34605ce8af7bb741629b7d0def21",
+    "src/verbs/dispatch/reconcile.mjs": "737e973d5936cde15fea93474ca9c25bfa6285b30293416524a401c656b718e6",
+    "src/verbs/dispatch/recover.mjs": "421bb94bebb9f5b417743382ac28e31a41c2ec5ba34a49b300f584f815bc21f2",
+    "src/verbs/dispatch/show-run.mjs": "6ed836d83f8fc71863fc2ce04115b7d0d63f2fb1f42e8bccabc94b812cb179c9",
+    "src/verbs/dispatch/watch.mjs": "e82fb8d94c5d76bc64b006bab2742e777f50785a4c4b12c91f15723864e457a3",
+    "src/verbs/events/context.mjs": "5a47ea5bc1a590619f137cef40455898d99595e6bb8ba5a2b6d75570b101557b",
+    "src/verbs/events/export.mjs": "3c163c4704f7a2054af09c4af5e69c0f3394f880319b890e8337dc2049b9f50d",
+    "src/verbs/events/migrate.mjs": "66cb5bd2b417d35f67c0ed0069136aeb6de8e6f34bf2604198bfd24ec1e7079f",
+    "src/verbs/events/parity.mjs": "6431bfc150b5876ec83bf6ff63023aeee9fe3c0b33d2e8ed54114b443e088ed7",
+    "src/verbs/events/rebuild.mjs": "d60b26c628b4375b9ab4b0cb59feebd4b16cbae53cc339b549868663246c7cfa",
+    "src/verbs/events/status.mjs": "6fb73280f473c45dc2de55c1ad4514235a0f5e9563ebf7e2801d7b4c072ffc6f",
+    "src/verbs/events/sync.mjs": "d83b18e084460987b49d3c811c18851368d217efb2d2f354cb675231692030f8",
+    "src/verbs/merge/approve.mjs": "17e31ab88a2e358f3cda75501e36ff470f9243734c73bb1325c79e516e455195",
+    "src/verbs/merge/catchup.mjs": "3c73bf052a078cbe1ef40a271c32e7772da918637abf7cd2bbb7065dbd2be245",
+    "src/verbs/merge/iron-law-level.mjs": "28037a676ec6f8533c2c8b0bcd66be0ec8dff1acfca0d656de7c5baa02043b73",
+    "src/verbs/merge/merge.mjs": "0a453f93896685a77cf5494ff5d2f6f8106ff638e1b17079a368801fdb064f89",
+    "src/verbs/merge/promote-to-component.mjs": "da6e9b2efd3c5bdde96e04114b69e6d8b34511e88453bb91b505ca8d2ccfaa85",
+    "src/verbs/merge/reject.mjs": "04fc387317e04a787917ea12a447a217928a1410e3439b422e76cf46638af7e6",
+    "src/verbs/merge/review.mjs": "538e8087eed7befd51b7ef78a93d1b12fa13f0fff260ec40e50e7f8e019ac49a",
+    "src/verbs/merge/sync-root.mjs": "c5e4e309c77ff490b1cf53b92f53c250b835cab6c41f1456c4facd0195df1ba1",
+    "src/verbs/state/edit.mjs": "734029f844bf8eb4b9c50ff7698c59dda48bd2a6b3ec3ffe8b601f0a31571223",
+    "src/verbs/state/move.mjs": "cf664d41737edd1a6a7eab5d7b9cce83e7fe407dda3d31560ab3beb97c048c39",
+    "src/verbs/state/read.mjs": "a49ff63f71318e7b6066059078273a6c224ad7ec10c8790f25fabd13cae5cd93",
+    "src/verbs/state/step.mjs": "ddebfcb5b53edfd67086ead35d886b86a1f49ad0ce18b98d7b637df239b059fb",
+    "src/verbs/worktree/create.mjs": "b09413339c4594efa3261433f827ee1d8dd7080d270fc1cf28e9d68e2b4ed261",
+    "src/verbs/worktree/remove.mjs": "5fb637c87b16cacb0caa20dbc7023cf22a6e261c06505050048cb6190b906dc5",
+    "src/workflow/case-admission-port.mjs": "a9712f4f891357286ea0d42aab46a10689a038d68b5623371f39a48820cad972",
+    "src/workflow/case-admission.mjs": "92b13d3a089e77f46fd1de5331ddb45d594d146c34225bcf9657804c4dbb5a42",
+    "src/workflow/case-bindings.mjs": "d553c2bfef7a52bfed32c7674685f0b56b1473235d74a260c9b54274bf78e8fc",
+    "src/workflow/case-close.mjs": "8c92c160e4cc7d704420e2f6e7888298942a3fea9358ee8ae5a7d2ef0a81d6c3",
+    "src/workflow/case-frame.mjs": "2a04c4b7e12046ec6bd5696157a86b973371ac51355f62374033657bcd88f527",
+    "src/workflow/case-lock.mjs": "0b2c0cd79a19e61e647797d6cad0f7d051acc3ed368385722ec88b8ae1aca9bb",
+    "src/workflow/case-projection.mjs": "ffdedea5e3965db7da955edea3bdcb3f275cba64b0cd794d89f552d23dd6c096",
+    "src/workflow/case-runtime.mjs": "fc5ba759e5816c9f1962c811e4856d27bd5aadd29b4d9ab46f67ab4c98355364",
+    "src/workflow/case-start.mjs": "ad13c549b64df63b606a93caf7ae9828c1f63252fa21558d43d10257e8f1d5bf",
+    "src/workflow/case-verbs.mjs": "ad292230aeefbe7da7ae107e14a6aaf024b0a68317f5f2152a0f0c4f781123d2",
+    "src/workflow/checked.mjs": "8167deced120cc0b655b3992de09df0269c6189cc268a70b504f28b5e84439f0",
+    "src/workflow/definition.mjs": "fb4db65eb9f655fe676433587274caeba19f3416c1979310fd59e3f41b289a9b",
+    "src/workflow/dir-guard.mjs": "2999283b51f2d4e25d7d1428dd37b886b1d2826fa78eb02170328a35ac14ff03",
+    "src/workflow/guide-schema.mjs": "2d0b2613f4b1dd591511d5c1eb76c9cfbb1a09acbb92c9729f8001ee20881101",
+    "src/workflow/index.mjs": "a09af900e3a8efc32b1409879b485fec1b38f6edc4797cc47fa6197b6bc89b24",
+    "src/workflow/loader.mjs": "740756cb2bdc97546950e2fae145422caec3d0ee8f7ff7026facbe435f7ae135",
+    "src/workflow/ref-digests.mjs": "992659af6255c7bbc8fc98fd1685c88b69ed9d5d5dfcd727d37e61a9fe5a7b12",
+    "src/workflow/runner.mjs": "5d494a60f17d91b733239fc2aeb07a878487e3bf93a1015ab638d6d86a16c245",
+    "src/workflow/seat-providers.mjs": "879ee3c91ba547229250658be96a2f816551f70b3486d5d4d7466397896a1cc4",
+    "src/workflow/seats.mjs": "c1e3cdfb9e8e2f8587b77d5728b8bd43a58b9b552b78eee89369e9b3e8f2f73c",
+    "src/workflow/steps.mjs": "8e55ec99437c9a17cbbbad01cd78605f39bc06f45251eacf39340bfce06f36ba",
+    "src/workflow/store.mjs": "1ffea57e5d5afb57f8558107d253d80982e780ea7649d5e950cb1874e2f90da7",
+    "src/workflow/unit-handoff.mjs": "76f4be618c5202f829311d0c161d144ef0fb1b4ddcf08425eef43afee78991bd",
+    "src/workflow/units-source.mjs": "4e7c37fd0b0cced310b968154d579b8dc0c1949e27493f8ca68bb92421e91745"
+  },
+  "outsideProduct": {
+    ".agentkit": 2,
+    ".claude-plugin": 1,
+    ".claude": 113,
+    ".fgos": 104,
+    ".gitattributes": 1,
+    ".github": 9,
+    ".gitignore": 1,
+    "AGENTS.md": 1,
+    "CHANGELOG.md": 1,
+    "CLAUDE.md": 1,
+    "Cargo.lock": 1,
+    "Cargo.toml": 1,
+    "archive": 756,
+    "clippy.toml": 1,
+    "components": 1,
+    "docs": 4151,
+    "dogfood-fixture": 16,
+    "examples": 8,
+    "install.sh": 1,
+    "package-lock.json": 1,
+    "packages": 135,
+    "plans": 1743,
+    "plugins": 101,
+    "rustfmt.toml": 1,
+    "test": 756,
+    "tools": 13
+  },
+  "sites": [],
+  "classes": [
+    {
+      "path": ".agents/skills/distill/scripts/distill.mjs",
+      "line": 49,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".agents/skills/distill/scripts/distill.mjs:299",
+        ".agents/skills/distill/scripts/distill.mjs:301",
+        ".agents/skills/distill/scripts/distill.mjs:304",
+        ".agents/skills/distill/scripts/distill.mjs:307",
+        ".agents/skills/distill/scripts/distill.mjs:309",
+        ".agents/skills/distill/scripts/distill.mjs:313",
+        ".agents/skills/distill/scripts/distill.mjs:314",
+        ".agents/skills/distill/scripts/distill.mjs:346",
+        ".agents/skills/distill/scripts/distill.mjs:384",
+        ".agents/skills/distill/scripts/distill.mjs:388",
+        ".agents/skills/distill/scripts/distill.mjs:458"
+      ],
+      "class": "standalone-skill-script",
+      "skill": "distill"
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 47,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:51",
+        ".githooks/pre-commit:53",
+        ".githooks/pre-commit:58",
+        ".githooks/pre-commit:63",
+        ".githooks/pre-commit:68"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "rev-parse",
+        "diff",
+        "diff",
+        "show",
+        "diff"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 211,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:484"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "diff"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 228,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:490"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "symbolic-ref read"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 238,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:490"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "diff"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 258,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:511"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "rev-parse"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 259,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:511"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "rev-parse"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 264,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:511"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "symbolic-ref read"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 286,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:517"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "symbolic-ref read"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 298,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:517"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "diff"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 327,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:517"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "show"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 328,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:517"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "show"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 346,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:472"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "ls-files"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 348,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:472"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "ls-tree"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 350,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:472"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "diff"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 377,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:478"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "symbolic-ref read"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 385,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:478"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "reflog show"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 395,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:478"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "rev-parse"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 408,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:478"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "merge-base"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 424,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:502"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "diff"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 462,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:485"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "config --get"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 466,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 476,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:580"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "rev-parse"
+      ]
+    },
+    {
+      "path": "apps/fgctl/tests/git_wal_activation_gate.rs",
+      "line": 66,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgctl/tests/git_wal_activation_gate.rs",
+      "line": 76,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgctl/tests/git_wal_activation_gate.rs",
+      "line": 302,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgctl/tests/git_wal_activation_gate.rs",
+      "line": 345,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 108,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 129,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 190,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 220,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 296,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 335,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 397,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 431,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 467,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 523,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 571,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 629,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 662,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 718,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 777,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 831,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 912,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 989,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 1071,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 1148,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 1190,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 1303,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 1364,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 1405,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/internal_lock_routes.rs",
+      "line": 199,
+      "spawn": "Command::new",
+      "binary": "sh",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/internal_lock_routes.rs",
+      "line": 405,
+      "spawn": "Command::new",
+      "binary": "sh",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/windows_borrow.rs",
+      "line": 104,
+      "spawn": "Command::new",
+      "binary": "? fgos()",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/windows_borrow.rs",
+      "line": 171,
+      "spawn": "Command::new",
+      "binary": "? fgos()",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/windows_lock_hold_route.rs",
+      "line": 53,
+      "spawn": "Command::new",
+      "binary": "powershell",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/windows_support/mod.rs",
+      "line": 143,
+      "spawn": "Command::new",
+      "binary": "? exe of start_with",
+      "class": "rust-test"
+    },
+    {
+      "path": "bin/fgos.mjs",
+      "line": 3473,
+      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "bin/fgos.mjs",
+      "line": 3617,
+      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "core/skills/distill/scripts/distill.mjs",
+      "line": 49,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "core/skills/distill/scripts/distill.mjs:299",
+        "core/skills/distill/scripts/distill.mjs:301",
+        "core/skills/distill/scripts/distill.mjs:304",
+        "core/skills/distill/scripts/distill.mjs:307",
+        "core/skills/distill/scripts/distill.mjs:309",
+        "core/skills/distill/scripts/distill.mjs:313",
+        "core/skills/distill/scripts/distill.mjs:314",
+        "core/skills/distill/scripts/distill.mjs:346",
+        "core/skills/distill/scripts/distill.mjs:384",
+        "core/skills/distill/scripts/distill.mjs:388",
+        "core/skills/distill/scripts/distill.mjs:458"
+      ],
+      "class": "standalone-skill-script",
+      "skill": "distill"
+    },
+    {
+      "path": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+      "line": 74,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "core/skills/instruction-audit/scripts/instruction-audit.mjs:335"
+      ],
+      "class": "standalone-skill-script",
+      "skill": "instruction-audit"
+    },
+    {
+      "path": "herdr-dashboard/src/main.rs",
+      "line": 53,
+      "spawn": "Command::new <- herdr-dashboard/src/layout.rs:184",
+      "binary": "(env HERDR_BIN_PATH)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "herdr-dashboard/src/main.rs",
+      "line": 63,
+      "spawn": "Command::new <- herdr-dashboard/src/layout.rs:184",
+      "binary": "(env HERDR_BIN_PATH)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "herdr-dashboard/src/main.rs",
+      "line": 99,
+      "spawn": "Command::new <- herdr-dashboard/src/pick.rs:377",
+      "binary": "(env HERDR_BIN_PATH)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "herdr-dashboard/src/main.rs",
+      "line": 111,
+      "spawn": "Command::new <- herdr-dashboard/src/pane_scan.rs:178",
+      "binary": "(env HERDR_BIN_PATH)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "packages/distribution/rust/src/init.rs",
+      "line": 571,
+      "spawn": "Command::new",
+      "binary": "bin",
+      "class": "argv-runner",
+      "resolvedAt": "packages/distribution/rust/src/init.rs:1526"
+    },
+    {
+      "path": "packages/distribution/rust/src/init.rs",
+      "line": 571,
+      "spawn": "Command::new",
+      "binary": "fgos",
+      "class": "argv-runner",
+      "resolvedAt": "packages/distribution/rust/src/init.rs:1526"
+    },
+    {
+      "path": "packages/distribution/rust/src/init.rs",
+      "line": 1115,
+      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:146",
+      "binary": "git",
+      "class": "production-sandbox-probe",
+      "function": "run",
+      "repository": "self.repo.to_string_lossy().into_owned()"
+    },
+    {
+      "path": "packages/distribution/rust/src/init.rs",
+      "line": 2080,
+      "spawn": "Command::new",
+      "binary": "sh",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/common/mod.rs",
+      "line": 34,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/legacy_import.rs",
+      "line": 13,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/reader_review_regressions.rs",
+      "line": 312,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/reader_review_regressions.rs",
+      "line": 657,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/reader_support/mod.rs",
+      "line": 32,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/reader_support/mod.rs",
+      "line": 61,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/reader_support/mod.rs",
+      "line": 299,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/registry_identity_layout.rs",
+      "line": 15,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/seal_publication.rs",
+      "line": 265,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/seal_publication.rs",
+      "line": 380,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/seal_publication.rs",
+      "line": 730,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/seal_publication.rs",
+      "line": 899,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/sync_support/mod.rs",
+      "line": 23,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/src/driver.rs",
+      "line": 1172,
+      "spawn": "Command::new <- packages/process/rust/src/containment/windows.rs:86",
+      "binary": "? path.to_str() .map(str::to_owned) .ok_or_else(|| refusal(\"non-utf8-authority-pat",
+      "class": "git-driver"
+    },
+    {
+      "path": "packages/git/rust/src/driver.rs",
+      "line": 2650,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/src/driver.rs",
+      "line": 2801,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/src/wal.rs",
+      "line": 3034,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/src/worktree.rs",
+      "line": 1657,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/borrow_deadline.rs",
+      "line": 21,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/contracts.rs",
+      "line": 20,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/contracts.rs",
+      "line": 40,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/head_tree.rs",
+      "line": 5,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/inspect.rs",
+      "line": 5,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/publication.rs",
+      "line": 30,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/publication.rs",
+      "line": 44,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/publication.rs",
+      "line": 1013,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/publication.rs",
+      "line": 1255,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/publication.rs",
+      "line": 2204,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/recovery_matrix.rs",
+      "line": 487,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/recovery_matrix.rs",
+      "line": 502,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/refs_remote.rs",
+      "line": 23,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/refs_remote.rs",
+      "line": 369,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/safe_restore.rs",
+      "line": 80,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/safe_restore.rs",
+      "line": 1000,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/scoped_commit_sync.rs",
+      "line": 13,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/support/land.rs",
+      "line": 10,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/worktree.rs",
+      "line": 27,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/worktree.rs",
+      "line": 215,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/worktree.rs",
+      "line": 480,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/holder-lock/rust/src/borrow_vectors.rs",
+      "line": 78,
+      "spawn": "Command::new",
+      "binary": "? git of git_plain",
+      "class": "production-sandbox-probe",
+      "function": "git_plain",
+      "repository": "repo"
+    },
+    {
+      "path": "packages/holder-lock/rust/src/borrow_vectors.rs",
+      "line": 417,
+      "spawn": "Command::new",
+      "binary": "? git of run",
+      "class": "production-sandbox-probe",
+      "function": "run",
+      "repository": "&dir"
+    },
+    {
+      "path": "packages/holder-lock/rust/src/route.rs",
+      "line": 514,
+      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:146",
+      "binary": "git",
+      "class": "production-sandbox-probe",
+      "function": "run",
+      "repository": "self.repo.to_string_lossy().into_owned()"
+    },
+    {
+      "path": "packages/holder-lock/rust/src/route/hold.rs",
+      "line": 193,
+      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:146",
+      "binary": "(parsed configuration (request .get(\"argv\") .and_then(Value::as_array) .ok_or(\"argv))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "packages/holder-lock/rust/src/semantics.rs",
+      "line": 118,
+      "spawn": "Command::new",
+      "binary": "(self)",
+      "class": "argv-runner",
+      "resolvedAt": "packages/holder-lock/rust/src/port.rs:70"
+    },
+    {
+      "path": "packages/holder-lock/rust/tests/borrow_git.rs",
+      "line": 89,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/holder-lock/rust/tests/borrow_git.rs",
+      "line": 99,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/holder-lock/rust/tests/borrow_io.rs",
+      "line": 105,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/holder-lock/rust/tests/borrow_io.rs",
+      "line": 131,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/holder-lock/rust/tests/borrow_io.rs",
+      "line": 762,
+      "spawn": "Command::new",
+      "binary": "sh",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/holder-lock/rust/tests/common/mod.rs",
+      "line": 116,
+      "spawn": "Command::new",
+      "binary": "sh",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/host-runtime/rust/src/providers/external_process/adapter.rs",
+      "line": 176,
+      "spawn": "Command::new <- packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs:210",
+      "binary": "(uncalled for_fixture)",
+      "class": "uncalled-wrapper"
+    },
+    {
+      "path": "packages/observe/rust/src/sources/claude_transcripts.rs",
+      "line": 398,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/observe/rust/src/sources/claude_transcripts.rs",
+      "line": 399,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/observe/rust/src/sources/claude_transcripts.rs",
+      "line": 404,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/observe/rust/src/sources/claude_transcripts.rs",
+      "line": 410,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/observe/rust/src/sources/claude_transcripts.rs",
+      "line": 415,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/observe/rust/src/sources/claude_transcripts.rs",
+      "line": 422,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 50,
+      "spawn": "Command::new",
+      "binary": "/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:28"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 50,
+      "spawn": "Command::new",
+      "binary": "/usr/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:28"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 50,
+      "spawn": "Command::new",
+      "binary": "/usr/local/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:28"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 128,
+      "spawn": "Command::new",
+      "binary": "/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:29"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 128,
+      "spawn": "Command::new",
+      "binary": "/usr/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:29"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 128,
+      "spawn": "Command::new",
+      "binary": "/usr/local/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:29"
+    },
+    {
+      "path": "packages/process/rust/tests/containment_bwrap.rs",
+      "line": 125,
+      "spawn": "Command::new",
+      "binary": "sh",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/run-supervisor/rust/src/gate.rs",
+      "line": 225,
+      "spawn": "Command::new <- packages/run-supervisor/rust/src/gate/unix.rs:524",
+      "binary": "(parsed configuration (text_of(&launch[\"command\"], \"launch.command\")))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "packages/run-supervisor/rust/src/steps.rs",
+      "line": 153,
+      "spawn": "Command::new <- packages/run-supervisor/rust/src/steps.rs:223",
+      "binary": "(parsed configuration (step[\"hostBin\"].as_str().ok_or_else(|| fail(\"step has no hos))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "packages/run-supervisor/rust/src/supervise.rs",
+      "line": 415,
+      "spawn": "Command::new <- packages/process/rust/src/containment/linux.rs:128",
+      "binary": "(parsed configuration (envelope[\"containment\"][\"bwrapPrefix\"].as_array().and_then(|))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "packages/run-supervisor/rust/src/supervise/unix.rs",
+      "line": 184,
+      "spawn": "Command::new <- packages/process/rust/src/containment/linux.rs:128",
+      "binary": "(parsed configuration (envelope[\"containment\"][\"bwrapPrefix\"].as_array().map(|items))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "packages/run-supervisor/rust/src/supervise/unix.rs",
+      "line": 184,
+      "spawn": "Command::new <- packages/process/rust/src/containment/windows.rs:86",
+      "binary": "(parsed configuration (envelope[\"hostBin\"].as_str().ok_or(\"hostBin missing\")))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "packages/run-supervisor/rust/src/supervise/windows.rs",
+      "line": 225,
+      "spawn": "Command::new <- packages/process/rust/src/containment/windows.rs:86",
+      "binary": "(parsed configuration (envelope[\"hostBin\"].as_str().ok_or(\"hostBin missing\")))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "packages/run-supervisor/rust/src/terminal_slot.rs",
+      "line": 49,
+      "spawn": "Command::new <- packages/terminal-control/rust/src/driver/herdr.rs:227",
+      "binary": "(env *)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "packages/run-supervisor/rust/tests/gate_pid1.rs",
+      "line": 238,
+      "spawn": "Command::new",
+      "binary": "? harness()",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/run-supervisor/rust/tests/portable/mod.rs",
+      "line": 176,
+      "spawn": "Command::new",
+      "binary": "? exe.parent().unwrap().parent().unwrap().join(\"examples\").join(format!(\"{name}{EX",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/run-supervisor/rust/tests/portable/supervisor.rs",
+      "line": 172,
+      "spawn": "Command::new",
+      "binary": "? example(\"internal_harness\")",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/run-supervisor/rust/tests/portable/supervisor.rs",
+      "line": 226,
+      "spawn": "Command::new",
+      "binary": "? example(\"internal_harness\")",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/run-supervisor/rust/tests/supervise_guard.rs",
+      "line": 32,
+      "spawn": "Command::new",
+      "binary": "? internal_harness()",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/run-supervisor/rust/tests/supervise_terminal_fake_herdr.rs",
+      "line": 264,
+      "spawn": "Command::new",
+      "binary": "? internal_harness()",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/run-supervisor/rust/tests/support/adopt_fixture.rs",
+      "line": 191,
+      "spawn": "Command::new",
+      "binary": "? internal_harness()",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/terminal-control/rust/src/driver/herdr.rs",
+      "line": 227,
+      "spawn": "Command::new",
+      "binary": "herdr",
+      "class": "argv-runner",
+      "resolvedAt": "packages/terminal-control/rust/src/driver/herdr.rs:48"
+    },
+    {
+      "path": "packages/terminal-control/rust/src/route.rs",
+      "line": 149,
+      "spawn": "Command::new <- packages/terminal-control/rust/src/driver/herdr.rs:227",
+      "binary": "(parsed configuration (match envelope.get(\"herdrBin\") { None | Some(Value::Null) =>))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/event-store/power-loss-driver.mjs",
+      "line": 24,
+      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/event-store/power-loss-driver.mjs",
+      "line": 25,
+      "spawn": "openStore -> src/event-store/native.mjs:71",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/event-store/store-increment-worker.mjs",
+      "line": 12,
+      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/event-store/store-increment-worker.mjs",
+      "line": 15,
+      "spawn": "openStore -> src/event-store/native.mjs:71",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git-addon.mjs",
+      "line": 16,
+      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e1-power-cut.mjs",
+      "line": 72,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e1-power-cut.mjs",
+      "line": 121,
+      "spawn": "createGitRecovery -> src/git/recovery.mjs:7",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 104,
+      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 106,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 116,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 148,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 286,
+      "spawn": "typedOperationRows -> scripts/git/e3-bench.mjs:298",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 461,
+      "spawn": "checkoutInspect -> scripts/git/e3-bench.mjs:48",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 463,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 465,
+      "spawn": "typedOperationRows -> scripts/git/e3-bench.mjs:298",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 479,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 496,
+      "spawn": "createGitScopedCommit -> src/git/scoped-commit.mjs:7",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 600,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 666,
+      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 679,
+      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 697,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:770",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 697,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:740",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 795,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:770",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 803,
+      "spawn": "rollbackOnly -> scripts/git/e3-bench.mjs:795",
+      "binary": "(command-line arguments)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/p-space-resource.mjs",
+      "line": 61,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/p-space-resource.mjs",
+      "line": 96,
+      "spawn": "createGitRecovery -> src/git/recovery.mjs:7",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/herdr-cockpit-notify.mjs",
+      "line": 53,
+      "spawn": "spawnSync",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/lib/git-addon-stage.mjs",
+      "line": 82,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/lib/sandbox-git.mjs",
+      "line": 49,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "shell",
+      "class": "sandbox-door"
+    },
+    {
+      "path": "scripts/lib/sandbox-git.mjs",
+      "line": 57,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        "scripts/git/e3-bench.mjs:442"
+      ],
+      "class": "sandbox-door"
+    },
+    {
+      "path": "scripts/run-tests.mjs",
+      "line": 564,
+      "spawn": "hostSpeaksLockProtocol -> scripts/run-tests.mjs:577",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/event-store/native.mjs",
+      "line": 176,
+      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "binary": "param loaderOptions",
+      "class": "uncalled-wrapper",
+      "function": "decodeLegacyFiles"
+    },
+    {
+      "path": "src/event-store/native.mjs",
+      "line": 182,
+      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "binary": "param loaderOptions",
+      "class": "uncalled-wrapper",
+      "function": "branchKey"
+    },
+    {
+      "path": "src/git/index.mjs",
+      "line": 10,
+      "spawn": "Command::new <- packages/holder-lock/rust/src/semantics.rs:118",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/git/index.mjs",
+      "line": 17,
+      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "binary": "param loaderOptions",
+      "class": "uncalled-wrapper",
+      "function": "versions"
+    },
+    {
+      "path": "src/git/native-lock.mjs",
+      "line": 7,
+      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "binary": "param loaderOptions",
+      "class": "uncalled-wrapper",
+      "function": "createGitNativeLockRepair"
+    },
+    {
+      "path": "src/holder-lock/driver.mjs",
+      "line": 212,
+      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:136",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/holder-lock/driver.mjs",
+      "line": 249,
+      "spawn": "spawnSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/holder-lock/driver.mjs",
+      "line": 275,
+      "spawn": "spawnSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/holder-lock/fences.mjs",
+      "line": 489,
+      "spawn": "scanWorkspace -> src/holder-lock/fences.mjs:445",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/holder-lock/index.mjs",
+      "line": 105,
+      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:136",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/holder-lock/index.mjs",
+      "line": 248,
+      "spawn": "acquireHoldSync -> src/holder-lock/index.mjs:275",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/holder-lock/index.mjs",
+      "line": 254,
+      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:136",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/holder-lock/index.mjs",
+      "line": 298,
+      "spawn": "acquireLoop -> src/holder-lock/index.mjs:344",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/holder-lock/index.mjs",
+      "line": 372,
+      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:136",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/holder-lock/index.mjs",
+      "line": 376,
+      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:136",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/holder-lock/index.mjs",
+      "line": 441,
+      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:136",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/holder-lock/index.mjs",
+      "line": 447,
+      "spawn": "runLockRoute -> src/holder-lock/driver.mjs:164",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/holder-lock/index.mjs",
+      "line": 656,
+      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:136",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/holder-lock/index.mjs",
+      "line": 680,
+      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:136",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/holder-lock/index.mjs",
+      "line": 686,
+      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:136",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/run-supervisor/attempt-step.mjs",
+      "line": 72,
+      "spawn": "settleAttempt -> src/run-supervisor/steps/settle-attempt.mjs:196",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/run-supervisor/client.mjs",
+      "line": 38,
+      "spawn": "spawnSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/dispatch/assignment-runner.mjs",
+      "line": 2255,
+      "spawn": "mintAttemptWriterId -> src/util/session-identity.mjs:224",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/dispatch/assignment-runner.mjs",
+      "line": 2363,
+      "spawn": "prepareTerminalAttempt -> src/runner/dispatch/herdr-round.mjs:383",
+      "binary": "(env FGOS_HERDR_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/dispatch/assignment-runner.mjs",
+      "line": 2470,
+      "spawn": "startSupervisor -> src/run-supervisor/direct-launch.mjs:275",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/dispatch/assignment-runner.mjs",
+      "line": 2544,
+      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:735",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/dispatch/cli.mjs",
+      "line": 735,
+      "spawn": "executeThroughConfinement -> src/runner/dispatch/confinement/authority.mjs:1142",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/authority.mjs",
+      "line": 823,
+      "spawn": "verifyRequiredProbe -> src/runner/dispatch/confinement/authority.mjs:168",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/authority.mjs",
+      "line": 1142,
+      "spawn": "cliSpawnAdapter -> src/runner/dispatch/transport.mjs:408",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/dispatch/confinement/authority.mjs",
+      "line": 1142,
+      "spawn": "cliSpawnAdapter -> src/runner/dispatch/transport.mjs:408",
+      "binary": "param driver",
+      "class": "uncalled-wrapper",
+      "function": "registerBackendDriver"
+    },
+    {
+      "path": "src/runner/dispatch/worker-session-boot.mjs",
+      "line": 90,
+      "spawn": "spawnFn",
+      "binary": "(env FGOS_HERDR_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/execution/commit-unit-work.mjs",
+      "line": 29,
+      "spawn": "state -> src/runner/execution/commit-unit-work.mjs:27",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "changedPaths"
+    },
+    {
+      "path": "src/runner/execution/run.mjs",
+      "line": 1231,
+      "spawn": "runCommand -> src/runner/goal-check.mjs:61",
+      "binary": "(consumer verify command (cfg?.capabilities?.[unit?.capability]?.verify))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/execution/run.mjs",
+      "line": 1231,
+      "spawn": "runCommand -> src/runner/goal-check.mjs:61",
+      "binary": "(consumer verify command (unit?.verify))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/fanout-batch.mjs",
+      "line": 94,
+      "spawn": "execFileSync",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/github-adapter.mjs",
+      "line": 196,
+      "spawn": "viewGitHubPRStatus -> src/runner/github-adapter.mjs:145",
+      "binary": "param opts",
+      "class": "uncalled-wrapper",
+      "function": "mergeGitHubPR"
+    },
+    {
+      "path": "src/runner/github-adapter.mjs",
+      "line": 204,
+      "spawn": "gh -> src/runner/github-adapter.mjs:49",
+      "binary": "param opts",
+      "class": "uncalled-wrapper",
+      "function": "mergeGitHubPR"
+    },
+    {
+      "path": "src/runner/github-adapter.mjs",
+      "line": 209,
+      "spawn": "viewGitHubPRStatus -> src/runner/github-adapter.mjs:145",
+      "binary": "param opts",
+      "class": "uncalled-wrapper",
+      "function": "mergeGitHubPR"
+    },
+    {
+      "path": "src/runner/github-adapter.mjs",
+      "line": 215,
+      "spawn": "viewGitHubPRStatus -> src/runner/github-adapter.mjs:145",
+      "binary": "param opts",
+      "class": "uncalled-wrapper",
+      "function": "mergeGitHubPR"
+    },
+    {
+      "path": "src/runner/goal-check.mjs",
+      "line": 61,
+      "spawn": "runBorrowed",
+      "binary": "(env ComSpec)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/goal-check.mjs",
+      "line": 165,
+      "spawn": "runCommand -> src/runner/goal-check.mjs:61",
+      "binary": "(consumer verify command (item.verify))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/merge.mjs",
+      "line": 1216,
+      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/merge.mjs",
+      "line": 1246,
+      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/worktree.mjs",
+      "line": 146,
+      "spawn": "execFileSync",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/event-store-checks.mjs",
+      "line": 32,
+      "spawn": "checkEventStore -> src/setup/event-store-checks.mjs:56",
+      "binary": "param options",
+      "class": "uncalled-wrapper",
+      "function": "eventStoreDoctor"
+    },
+    {
+      "path": "src/setup/holder-lock-checks.mjs",
+      "line": 279,
+      "spawn": "twoProcessProbe -> src/setup/holder-lock-checks.mjs:137",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/holder-lock-checks.mjs",
+      "line": 307,
+      "spawn": "spawnSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/holder-lock-checks.mjs",
+      "line": 475,
+      "spawn": "spawnSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "line": 3232,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_CLAUDE_COMMAND)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "line": 3246,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_CLAUDE_COMMAND)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "line": 3300,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_CLAUDE_COMMAND)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "line": 3312,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_CLAUDE_COMMAND)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "line": 4596,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_HERDR_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "line": 5741,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1706",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "line": 5788,
+      "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:595",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "line": 5829,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1706",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "line": 5836,
+      "spawn": "probePeerRunHidden -> src/runner/dispatch/confinement/probes/harness.mjs:518",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "line": 6377,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "line": 6628,
+      "spawn": "probeIdentity -> src/util/session-identity.mjs:121",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/run-supervisor-checks.mjs",
+      "line": 90,
+      "spawn": "probeRoute -> src/setup/run-supervisor-checks.mjs:51",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/run-supervisor-checks.mjs",
+      "line": 112,
+      "spawn": "probeRoute -> src/setup/run-supervisor-checks.mjs:51",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/terminal-control-checks.mjs",
+      "line": 73,
+      "spawn": "checkAnchorPane -> src/setup/terminal-control-checks.mjs:34",
+      "binary": "(env FGOS_HERDR_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/terminal-control/client.mjs",
+      "line": 117,
+      "spawn": "spawnSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/terminal-control/client.mjs",
+      "line": 147,
+      "spawn": "spawn",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/util/host-bin.mjs",
+      "line": 94,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/util/session-identity.mjs",
+      "line": 180,
+      "spawn": "probeIdentity -> src/util/session-identity.mjs:121",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/util/session-identity.mjs",
+      "line": 224,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/verbs/events/export.mjs",
+      "line": 14,
+      "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "exportUseCase"
+    },
+    {
+      "path": "src/verbs/events/migrate.mjs",
+      "line": 68,
+      "spawn": "eventStoreFacts -> src/event-store/native.mjs:154",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "migrateUseCase"
+    },
+    {
+      "path": "src/verbs/events/migrate.mjs",
+      "line": 70,
+      "spawn": "checkStopped -> src/holder-lock/fences.mjs:489",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "migrateUseCase"
+    },
+    {
+      "path": "src/verbs/events/migrate.mjs",
+      "line": 73,
+      "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "migrateUseCase"
+    },
+    {
+      "path": "src/verbs/events/migrate.mjs",
+      "line": 95,
+      "spawn": "createGitScopedCommit -> src/git/scoped-commit.mjs:7",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "migrateUseCase"
+    },
+    {
+      "path": "src/verbs/events/rebuild.mjs",
+      "line": 8,
+      "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "rebuildStoreUseCase"
+    },
+    {
+      "path": "src/verbs/events/status.mjs",
+      "line": 3,
+      "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "statusUseCase"
+    },
+    {
+      "path": "src/verbs/events/sync.mjs",
+      "line": 3,
+      "spawn": "eventsContext -> src/verbs/events/context.mjs:11",
+      "binary": "param ctx",
+      "class": "uncalled-wrapper",
+      "function": "syncUseCase"
+    }
+  ]
+}

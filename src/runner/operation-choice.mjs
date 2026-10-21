@@ -12,7 +12,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { execFileSync } from 'node:child_process';
 import { DEFAULT_DOMAIN, resolveDomainName, getDomain, operationsForStep } from '../state/domain-registry.mjs';
 import { resolveContentRoot } from '../intake/plan.mjs';
 import { planVerdictFromPlanMd } from '../intake/plan-verdict-from-plan-md.mjs';
@@ -24,7 +23,7 @@ import { runUnit, snapshotRunnerConfig } from './execution/run.mjs';
 import { createCaseAdmissionPort } from '../workflow/case-admission-port.mjs';
 import { interpretRunResult, runOutcome } from './dispatch/run-result.mjs';
 import { stampDeclaredAssignment } from './dispatch/assignment-normalizer.mjs';
-import { detectTrunk } from './worktree.mjs';
+import { detectTrunk, compareCommits } from './worktree.mjs';
 import { assignmentDir, listAssignmentRuns } from './dispatch/assignment-layout.mjs';
 
 // Non-enumerable stamp the cross-pass scan attaches to a consumed runResult:
@@ -532,12 +531,7 @@ function onDiskArtifactForWork(p, work) {
 function candidateBranchAheadOfTrunk(repoRoot, workId) {
   try {
     const trunk = detectTrunk(repoRoot);
-    const count = execFileSync(
-      'git',
-      ['rev-list', '--count', `${trunk}..refs/heads/fgw/${workId}`],
-      { cwd: repoRoot, stdio: 'pipe' },
-    ).toString().trim();
-    return Number.parseInt(count, 10) > 0;
+    return compareCommits(repoRoot, trunk, `refs/heads/fgw/${workId}`).right > 0;
   } catch {
     return false;
   }

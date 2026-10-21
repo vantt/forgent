@@ -15,6 +15,7 @@ import {
   updatePackageLockText,
   prepareRelease,
 } from '../../scripts/prepare-release.mjs';
+import { initFixtureRepo } from '../helpers/git-fixture.mjs';
 
 function tmpRepo() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'prepare-release-'));
@@ -135,4 +136,15 @@ test('the repository Rust crate versions equal package.json (a missed release bu
   const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
   const { version } = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8'));
   assert.deepEqual(findRustVersionDrift(repoRoot, version), []);
+});
+
+test('prepareRelease refuses a repository whose status shows an untracked file', () => {
+  const root = tmpRepo();
+  initFixtureRepo(root, { ignore: '.fgos/locks/\npackage.json\npackage-lock.json\nCHANGELOG.md\n' });
+  assert.equal(prepareRelease({ repoRoot: root, version: 'v0.2.0', date: '2026-09-18', dryRun: true }).dryRun, true);
+  fs.writeFileSync(path.join(root, 'stray.txt'), 'x\n');
+  assert.throws(
+    () => prepareRelease({ repoRoot: root, version: 'v0.2.0', date: '2026-09-18', dryRun: true }),
+    /Refusing to prepare a release with a dirty working tree/,
+  );
 });

@@ -341,27 +341,6 @@ pub fn parse_merge_list(json: &str) -> Result<MergeListSummary, serde_json::Erro
     })
 }
 
-/// Resolve the main fgOS checkout root (never a linked worktree's own
-/// checkout — ADR0020) via `git rev-parse --git-common-dir`, the same
-/// resolution every fgOS skill in this repo uses.
-pub fn repo_root() -> io::Result<PathBuf> {
-    let output = Command::new("git")
-        .args(["rev-parse", "--path-format=absolute", "--git-common-dir"])
-        .output()?;
-    if !output.status.success() {
-        return Err(io::Error::other(format!(
-            "git rev-parse --git-common-dir failed: {}",
-            String::from_utf8_lossy(&output.stderr)
-        )));
-    }
-    let common_dir = String::from_utf8_lossy(&output.stdout).trim().to_string();
-    let common_dir_path = Path::new(&common_dir);
-    let root = common_dir_path
-        .parent()
-        .ok_or_else(|| io::Error::other("git-common-dir has no parent directory"))?;
-    Ok(root.to_path_buf())
-}
-
 #[cfg(unix)]
 fn is_executable(path: &Path) -> bool {
     use std::os::unix::fs::PermissionsExt;

@@ -1,6 +1,6 @@
 // github-adapter.mjs — the GitHub transport for the local approval gate
 // (github-adapter D1-D4). Wraps three `gh` CLI calls — create, status, merge —
-// behind an outcome family mirroring mergeRunnerItem's, so a later E3 wiring
+// behind an outcome family mirroring landRunnerItem's, so a later E3 wiring
 // slice can dispatch a runner-sourced item's diff-review + merge to GitHub
 // without forking the internal gate's FSM/failure contract (pr-lifecycle D1/D3).
 //
@@ -18,7 +18,7 @@
 //
 // FAILURE CONTRACT (D3): every `gh` CLI/API failure at any of the three wrapped
 // calls resolves a `blocked` outcome carrying a reason from classifyGhFailure —
-// it never throws for a defined gh-side failure (mirroring mergeRunnerItem's
+// it never throws for a defined gh-side failure (mirroring landRunnerItem's
 // never-throw-for-a-defined-outcome convention). A throw is reserved for a
 // caller programming error (missing required args). There is deliberately no
 // distinct merge-failure subclass in this slice: S1 never observed a real

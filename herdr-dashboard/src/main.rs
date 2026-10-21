@@ -20,11 +20,21 @@ use herdr_dashboard::ui::RatatuiTerminalUi;
 /// deferred cadence question, resolved here: no separate timer).
 const POLL_INTERVAL: Duration = Duration::from_secs(5);
 
+/// Main fgOS checkout (never a linked worktree's own checkout), resolved from
+/// the cwd through the Git component's Inspect topology.
+fn main_checkout_root() -> io::Result<std::path::PathBuf> {
+    let cwd = std::env::current_dir()?;
+    let (_, repo) = fgos_git::GitDriver::open_at(&cwd)
+        .map_err(|e| io::Error::other(format!("git repository read refused: {}", e.cause)))?
+        .ok_or_else(|| io::Error::other(format!("not a git repository: {}", cwd.display())))?;
+    Ok(repo.trusted_main_root().to_path_buf())
+}
+
 fn main() -> io::Result<()> {
     // tsk-45u D1: resolved once, up front, so the fixed `fg:operation`
     // tab this dashboard creates at startup (below) and every pane it
     // opens later both start in the same project root.
-    let root = fgos::repo_root();
+    let root = main_checkout_root();
 
     // tsk-3i3 D2/D3: before touching the terminal at all, check whether a
     // `fg:cockpit` tab already exists for this workspace. If so, hand off

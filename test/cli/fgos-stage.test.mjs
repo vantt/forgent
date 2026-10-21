@@ -88,6 +88,7 @@ import {
 } from './helpers/fgos-cli-harness.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+import { activateGitFixture } from '../helpers/git-fixture.mjs';
 
 // `fgos plan --validate` runs validate-plan as a confined Unit; posture checks consult the machine
 // backend registry, kept file-local here (the child CLI inherits the env that points at it).
@@ -116,6 +117,7 @@ test('fgos plan on a standard plan without caller verdict advances Work to execu
   for (const args of [['init', '-q', '-b', 'main'], ['config', 'user.name', 't'], ['config', 'user.email', 't@t'], ['commit', '-q', '--allow-empty', '-m', 'init']]) {
     execFileSync('git', args, { cwd });
   }
+  activateGitFixture(cwd);
   const id = JSON.parse(run(cwd, ['submit', 'Standard plan validation adoption test']).stdout).data.id;
 
   advanceThroughDiscoveryToPlanning(cwd, id);

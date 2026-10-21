@@ -2,7 +2,8 @@
 use crate::init::{ActivationLockGuard, InitError};
 use crate::manifest::ReleaseManifest;
 use fgos_git::wal::{OsFileSystem, Wal};
-use std::path::Path;
+use fgos_git::GitDriver;
+use std::path::{Path, PathBuf};
 
 fn refusal(code: &str, detail: impl std::fmt::Display) -> InitError {
     InitError::Custom(format!("{code}: {detail}"))
@@ -41,10 +42,63 @@ fn has_wal(manifest: &ReleaseManifest) -> bool {
     manifest.capabilities.iter().any(|c| c == "git-wal-v1")
 }
 
+/// Every worktree the workspace's repository registers, read through the Git
+/// component's Inspect listing; empty outside a repository. Only a direct
+/// `.git` directory makes the workspace a repository here, so an enclosing
+/// repository never widens the scan. A refused listing fails closed: an
+/// incomplete enumeration can never authorize activation.
+fn linked_worktrees(workspace: &Path) -> Result<Vec<PathBuf>, InitError> {
+    if !workspace.join(".git").is_dir() {
+        return Ok(Vec::new());
+    }
+    let unlisted = |e: fgos_git::OperationError| {
+        refusal(
+            "git-predecessor-writer-live",
+            format!("linked worktree listing unavailable: {}", e.cause),
+        )
+    };
+    let Some((driver, repo)) = GitDriver::open_at(workspace).map_err(unlisted)? else {
+        return Ok(Vec::new());
+    };
+    let mut dirs = Vec::new();
+    let mut cursor = None;
+    loop {
+        let page = driver
+            .list_worktrees(&repo, cursor, 4096)
+            .map_err(unlisted)?;
+        dirs.extend(
+            page.entries
+                .into_iter()
+                .filter(|row| !row.bare)
+                .map(|row| path_from_bytes(row.path)),
+        );
+        if page.complete {
+            return Ok(dirs);
+        }
+        cursor = page.next_cursor;
+    }
+}
+
+#[cfg(unix)]
+fn path_from_bytes(bytes: Vec<u8>) -> PathBuf {
+    use std::os::unix::ffi::OsStringExt;
+    PathBuf::from(std::ffi::OsString::from_vec(bytes))
+}
+
+#[cfg(not(unix))]
+fn path_from_bytes(bytes: Vec<u8>) -> PathBuf {
+    PathBuf::from(String::from_utf8_lossy(&bytes).into_owned())
+}
+
 fn predecessor_scan(workspace: &Path) -> Result<(), InitError> {
-    let output = std::process::Command::new(std::env::current_exe()?)
+    let mut command = std::process::Command::new(std::env::current_exe()?);
+    command
         .args(["internal", "quiesce-scan", "--protocol", "1", "--root"])
-        .arg(workspace)
+        .arg(workspace);
+    for dir in linked_worktrees(workspace)? {
+        command.arg("--dir").arg(dir);
+    }
+    let output = command
         .args([
             "--workspace-only",
             "--exclude-pid",

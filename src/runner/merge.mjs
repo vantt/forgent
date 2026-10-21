@@ -1,4 +1,4 @@
-import os from 'node:os';
+import crypto from 'node:crypto';
 // merge.mjs — the approval-gate merge engine (per pr-lifecycle D1-D5):
 // mechanics that turn an approved proposal into a merged, verified `done`
 // item — extracted from bin/fgos.mjs so the CLI stays a thin verb table,
@@ -13,18 +13,15 @@ import os from 'node:os';
 //                or whose branch/markers are gone. Approve/review never
 //                throw on this — every verb degrades honestly (must_haves).
 //
-// MERGE MECHANICS (spike-proven, .bee/spikes/pr-lifecycle, see
-// docs/history/pr-lifecycle/reports/validation-s1-gate.md): `git merge
-// --no-commit --no-ff <branch>` stages the merge without committing; a
-// conflict is reported by a nonzero exit and undone with `git merge
-// --abort`, restoring the tree byte-for-byte (spike "merge-abort-probe").
-// When the merge stages cleanly, the item's OWN verify runs on the now-
-// staged, still-uncommitted tree (goal-check.mjs, D3's "merge sạch" second
-// clause) BEFORE any commit is made (spike "nocommit-probe"); a red verify
-// is undone the exact same way, `git merge --abort` — main never holds a
-// broken merge commit, on any exit path. Only "pull"/"legacy" items skip the
-// merge step entirely: their code is already on main (D4), so approve only
-// re-runs their verify directly against the current tree.
+// MERGE MECHANICS (Git spec §9): every runner merge is one native Land
+// transaction. Land builds a candidate commit of the branch onto the pinned
+// target in its own detached worktree; the item's OWN verify and the
+// repo-invariant checks run in that candidate (goal-check.mjs, D3's "merge
+// sạch" second clause) BEFORE anything is published; a red verify or a
+// conflict leaves the target untouched, so no target ever holds a broken
+// merge commit. Only "pull"/"legacy" items skip the merge step entirely:
+// their code is already on main (D4), so approve only re-runs their verify
+// directly against the current tree.
 //
 // This module never writes to `.fgos/` — every state transition (proposed
 // -> done / -> blocked) stays in bin/fgos.mjs, the sole write door via
@@ -43,22 +40,28 @@ import os from 'node:os';
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
-import { branchNameFor, branchExists, reclaimOrphanedCheckout, detectTrunk, withMergeEphemeralWorktree } from './worktree.mjs';
+import { branchNameFor, branchExists, reclaimOrphanedCheckout, detectTrunk, inspectGit, resolveRefSha, checkoutPathForBranch, provisionDependencies, runWorktreeSetupCommands, createVerifyCheckout, removeWorktree, deleteBranchRef, gitWorktrees, realpathOrSelf } from './worktree.mjs';
 import { runGoalCheck, runInvariantChecks, invariantFailureAsCheck } from './goal-check.mjs';
 import { readInvariantCheckCommands } from '../config/shared-config-file.mjs';
 import { normalizePath } from '../util/normalize-path.mjs';
-import { nulPaths, statusPaths, nameStatusPaths, GIT_LIST_MAX_BUFFER } from '../util/git-paths.mjs';
 import { listSessions } from './session.mjs';
 import { listWork } from '../state/store.mjs';
 import { openLeavesSharingTarget, classifyPostLandDrift } from '../state/graph-harness.mjs';
-import { withMainCheckout, withMergeTargetSlot, addWorktree } from './repo-locks.mjs';
-import { checkpointMainFgos } from './main-fgos-checkpoint.mjs';
-import { LockScope, runBorrowed } from '../holder-lock/index.mjs';
+import { withMainCheckout } from './repo-locks.mjs';
+import { DEFAULT_LOCK_WAIT_MS } from './lock-wait.mjs';
+import { checkpointMainFgos, prepareMainFgosCheckpoint } from './main-fgos-checkpoint.mjs';
+import { LockScope, acquireSync, createLockScope, lockHolders, probe } from '../holder-lock/index.mjs';
+import { createGitLand } from '../git/land.mjs';
+import { createGitRecovery } from '../git/recovery.mjs';
+import { gitPortOptions } from '../git/inspect.mjs';
+import { createGitSync } from '../git/sync.mjs';
+import { nativeError } from '../git/native.mjs';
+import { createGitWorktree } from '../git/worktree.mjs';
 
-/** Raised only for a genuinely unexpected git failure (e.g. `git merge
- * --abort` itself failing) — never for a conflict or a red verify, which are
- * defined outcomes returned normally (see mergeRunnerItem below). */
+/** Raised only for a genuinely unexpected failure (a held lock, a target
+ * checked out elsewhere, an unreadable merge) — never for a conflict or a
+ * red verify, which are defined outcomes returned normally (see
+ * landRunnerItem below). */
 export class MergeError extends Error {
   constructor(message, details = {}) {
     super(message);
@@ -69,44 +72,34 @@ export class MergeError extends Error {
   }
 }
 
-// stdio: pipe (tsk-56t): explicit, not execFileSync's own default — without
-// it, a failing git call (e.g. "not a git repository" from a non-git cwd)
-// prints straight through to this process's real stderr in addition to
-// landing on the thrown error's own `.stderr`/`.message`, which every caller
-// here already reads instead. Found via isMainWorktree(process.cwd()) newly
-// reachable from a plain non-git dir (tsk-56t D2's read-verb warning) —
-// no caller's behavior changes, since none relied on the live leak.
-//
-// maxBuffer (tsk-648): optional, default undefined — Node's own 1 MiB
-// default applies exactly as before when omitted, so every existing call
-// site (none of which passes it) stays byte-identical. Only reviewDiff's
-// two full-diff calls below pass an explicit, larger value: a full `git
-// diff` (unlike every `--name-only` call in this file) can exceed 1 MiB
-// once a branch is hundreds of commits stale, which throws ENOBUFS.
-//
-// env (tsk-70l): optional, default undefined — every existing call site
-// (none of which passes it) stays byte-identical when omitted. When
-// given, merged onto a COPY of this process's own `process.env` and
-// passed only to this one child process — never a `process.env`
-// assignment, so it can never leak into any other subprocess this
-// session spawns later. Only the `git commit` call below passes it.
-function git(repoRoot, args, { maxBuffer, env } = {}) {
-  return execFileSync('git', args, {
-    cwd: repoRoot,
-    encoding: 'utf8',
-    shell: false,
-    stdio: ['ignore', 'pipe', 'pipe'],
-    ...(maxBuffer === undefined ? {} : { maxBuffer }),
-    ...(env === undefined ? {} : { env: { ...process.env, ...env } }),
-  });
+/** Every path Inspect `diff` reports between `before` and `after` (commits
+ * or trees), across all pages, as text. `scope` passes `prefix`/`renames`. */
+function diffPaths(port, before, after, scope = {}) {
+  const paths = [];
+  let cursor;
+  do {
+    const page = port.diff({ before, after, ...scope, maxEntries: 4096, cursor });
+    paths.push(...page.entries.map(entry => Buffer.from(entry.path).toString('utf8')));
+    cursor = page.nextCursor;
+  } while (cursor);
+  return paths;
 }
 
-// reviewDiff's own ceiling for a full (non-`--name-only`) diff — generous
-// on purpose: a local git subprocess call isn't memory-constrained the way
-// a network payload is, and a text diff this large from a normal repo is
-// already an outlier. Callers can still override it via opts.maxBuffer
-// (e.g. a test proving the ENOBUFS-diagnosis path deterministically,
-// without needing an actually-hundreds-of-commits-stale diff).
+/** Every file path starting with the literal `prefix` at the commit or tree
+ * `revision`. */
+function treePaths(port, revision, prefix) {
+  const paths = [];
+  let cursor;
+  do {
+    const page = port.listTree({ revision, prefix, maxEntries: 4096, cursor });
+    paths.push(...page.entries.filter(entry => entry.kind !== 'tree').map(entry => Buffer.from(entry.path).toString('utf8')));
+    cursor = page.nextCursor;
+  } while (cursor);
+  return paths;
+}
+
+// Review patches retain the existing 50 MiB ceiling and caller override.
+// Inspect enforces the bound before returning patch text to Node.
 const DIFF_MAX_BUFFER = 50 * 1024 * 1024;
 
 // tsk-648: raised once a diff still overflows maxBuffer above — names the
@@ -118,7 +111,9 @@ const DIFF_MAX_BUFFER = 50 * 1024 * 1024;
 // pre-formatted description (e.g. `diff for branch "${branch}"` or
 // `pull-door diff for range "${range}"`) — this helper never reformats it.
 function diffFailureMessage(label, err) {
-  if (err.code === 'ENOBUFS') {
+  let cause;
+  try { cause = JSON.parse(err.message).cause; } catch { /* native diagnostic is optional */ }
+  if (err.code === 'ENOBUFS' || cause === 'git-output-limit') {
     return (
       `${label} exceeds the ${DIFF_MAX_BUFFER}-byte diff limit — ` +
       'the branch is likely very stale relative to its merge target (many commits behind); ' +
@@ -128,8 +123,7 @@ function diffFailureMessage(label, err) {
   return `computing ${label} failed: ${err.message}`;
 }
 
-/** Whether one path `git status` reports (read by `statusPaths`: byte for
- * byte, a rename or copy as both halves) is ignorable by the clean-tree
+/** Whether one path Git Inspect reports (a rename or copy as both halves) is ignorable by the clean-tree
  * gate: it sits inside `.fgos/`, or outside `ownFileSet` when one is given.
  *
  * `git status --porcelain` always reports paths relative to the real git
@@ -203,12 +197,21 @@ export function buildOwnFileSet(committedDiffPaths, footprint) {
  * `isIgnorableStatusPath` — omitted (`null`, the default), every existing
  * caller keeps today's exact whole-tree-blocks-on-anything behavior. */
 export function isWorkingTreeClean(repoRoot, ownFileSet = null, { scope = 'whole-repo' } = {}) {
-  // Only the newline goes: a subdirectory name may itself start or end with a space.
-  const prefix = git(repoRoot, ['rev-parse', '--show-prefix']).replace(/\n$/, '');
-  // Untracked files one by one: a collapsed `dir/` would never match an own path inside it.
-  const statusArgs = ['status', '--porcelain=v1', '-z', '--untracked-files=all', ...(scope === 'subtree' ? ['--', '.'] : [])];
-  return statusPaths(git(repoRoot, statusArgs, { maxBuffer: GIT_LIST_MAX_BUFFER }))
-    .every((p) => isIgnorableStatusPath(p, prefix, ownFileSet));
+  const port = inspectGit(repoRoot);
+  const facts = port.resolveRepo();
+  const relative = path.relative(fs.realpathSync(facts.worktreeRoot), fs.realpathSync(repoRoot)).replaceAll('\\', '/');
+  const prefix = relative ? `${relative}/` : '';
+  let cursor;
+  do {
+    const page = port.status({ untracked: 'all', maxEntries: 4096, cursor });
+    for (const entry of page.entries) {
+      const file = Buffer.from(entry.path).toString('utf8');
+      if (scope === 'subtree' && prefix && !file.startsWith(prefix)) continue;
+      if (!isIgnorableStatusPath(file, prefix, ownFileSet)) return false;
+    }
+    cursor = page.nextCursor;
+  } while (cursor);
+  return true;
 }
 
 /**
@@ -268,7 +271,10 @@ export function reviewDiff(repoRoot, item, opts = {}) {
     const branch = branchNameFor(item.id);
     let diff;
     try {
-      diff = git(repoRoot, ['diff', `${trunk}...${branch}`], { maxBuffer });
+      const port = inspectGit(repoRoot);
+      const after = resolveRefSha(repoRoot, branch);
+      const before = port.compareCommits({ left: resolveRefSha(repoRoot, trunk), right: after }).mergeBase;
+      diff = port.diffText({ before, after, maxBytes: maxBuffer });
     } catch (err) {
       throw new MergeError(diffFailureMessage(`diff for branch "${branch}"`, err), { branch });
     }
@@ -281,8 +287,11 @@ export function reviewDiff(repoRoot, item, opts = {}) {
     let diff;
     let commitCount;
     try {
-      diff = git(repoRoot, ['diff', range], { maxBuffer });
-      commitCount = parseInt(git(repoRoot, ['rev-list', '--count', range]).trim(), 10) || 0;
+      const port = inspectGit(repoRoot);
+      const before = resolveRefSha(repoRoot, headAtTake);
+      const after = resolveRefSha(repoRoot, headAtReturn);
+      diff = port.diffText({ before, after, maxBytes: maxBuffer });
+      commitCount = port.compareCommits({ left: before, right: after }).right;
     } catch (err) {
       throw new MergeError(diffFailureMessage(`pull-door diff for range "${range}"`, err), { range });
     }
@@ -379,13 +388,14 @@ export function changedFiles(repoRoot, item, opts = {}) {
     return [];
   }
   const branch = branchNameFor(item.id);
-  let out;
   try {
-    out = git(repoRoot, ['diff', '--name-only', '--no-renames', '--no-relative', '-z', `${trunk}...${branch}`], { maxBuffer: GIT_LIST_MAX_BUFFER });
+    const port = inspectGit(repoRoot);
+    const after = resolveRefSha(repoRoot, branch);
+    const before = port.compareCommits({ left: resolveRefSha(repoRoot, trunk), right: after }).mergeBase;
+    return diffPaths(port, before, after);
   } catch (err) {
     throw new MergeError(`computing changed files for branch "${branch}" failed: ${err.message}`, { branch });
   }
-  return nulPaths(out);
 }
 
 // DECISION-ID COLLISION AUTO-RESOLVE (tsk-3mv-1, CONTEXT.md D1a): a
@@ -452,11 +462,11 @@ export function splitConflictSegments(text) {
 }
 
 /**
- * Classify whether `repoRoot`'s currently-conflicted merge (mid `git merge
- * --no-commit --no-ff`, called only from the conflict branch below) is a
- * self-resolvable decision-ID collision. Requires: the ONLY conflicted path
- * is `docs/decisions/0000-index.md` (any other conflicted path, or more
- * than one, is never this shape), and every conflict hunk in it is a pure
+ * Classify whether the conflicted text of `docs/decisions/0000-index.md`
+ * (as `git merge-tree --write-tree` leaves it in its merged tree, read by
+ * `declareLandFiles` only when that index is the ONLY conflicted path --
+ * any other conflicted path, or more than one, is never this shape) is a
+ * self-resolvable decision-ID collision. Requires every conflict hunk in it to be a pure
  * two-sided row INSERTION -- both `oursLines` and `theirsLines` are
  * non-empty, share no identical line (a same-row edit reads as one side
  * repeating what the other kept, which this never treats as a safe
@@ -466,12 +476,7 @@ export function splitConflictSegments(text) {
  * cannot confidently read as "two independent new rows" -- so the caller's
  * only choice on `null` is the pre-existing abort-and-report path.
  */
-export function classifyDecisionIndexCollision(repoRoot) {
-  const paths = nulPaths(git(repoRoot, ['diff', '--name-only', '--no-relative', '--diff-filter=U', '-z']));
-  if (paths.length !== 1 || paths[0] !== DECISION_INDEX_PATH) {
-    return null;
-  }
-  const raw = fs.readFileSync(path.join(repoRoot, DECISION_INDEX_PATH), 'utf8');
+function classifyDecisionIndexText(raw) {
   const segments = splitConflictSegments(raw);
   const conflicts = segments.filter((s) => s.type === 'conflict');
   if (conflicts.length === 0) {
@@ -520,7 +525,7 @@ export function classifyDecisionIndexCollision(repoRoot) {
 /** The next free 4-digit decision id after every id already present on
  * `refs` -- a single ref, or an array of refs when more than one tree's
  * decision files must be considered together (tsk-2iz: the auto-resolve
- * path below needs BOTH the target's own `HEAD` and the incoming `branch`'s
+ * resolution in `declareLandFiles` needs BOTH the target and the incoming source's
  * own new decision files, never `HEAD` alone -- a branch can carry new,
  * non-colliding decision files ABOVE `HEAD`'s own max that `HEAD`-only
  * would never see, minting an id that then collides with one of those
@@ -531,10 +536,10 @@ export function classifyDecisionIndexCollision(repoRoot) {
  * person reading just one tree by hand. */
 export function nextFreeDecisionId(repoRoot, refs) {
   const refList = Array.isArray(refs) ? refs : [refs];
+  const port = inspectGit(repoRoot);
   let max = 0;
   for (const ref of refList) {
-    const files = nulPaths(git(repoRoot, ['ls-tree', '-r', '--name-only', '-z', ref, '--', 'docs/decisions/']));
-    for (const f of files) {
+    for (const f of treePaths(port, resolveRefSha(repoRoot, ref), 'docs/decisions/')) {
       const m = f.match(DECISION_FILE_RE);
       if (m && m[1] !== '0000') {
         max = Math.max(max, parseInt(m[1], 10));
@@ -544,29 +549,17 @@ export function nextFreeDecisionId(repoRoot, refs) {
   return String(max + 1).padStart(4, '0');
 }
 
-/** Rename `branch`'s colliding decision file from `oldId` to `newId` on
- * disk (`git mv`, so the rename lands staged in the in-progress merge) and
- * rewrite its own frontmatter `title:` line and its `# NNNN — ...` heading
- * line to cite `newId` instead -- the two mechanical, always-present
- * self-references every decision doc carries (confirmed against this
- * repo's own decision docs' template). A `supersedes`/`superseded_by`
+/** A decision doc's own text with its title and heading lines citing
+ * `newId` instead of `oldId` -- the two mechanical, always-present
+ * self-references every decision doc carries. A `supersedes`/`superseded_by`
  * cross-reference to a DIFFERENT decision's id is deliberately left
- * untouched (it names another doc, not this one) -- and free-text prose
- * that happens to cite the doc's own old number by hand is a documented,
- * illustrative-not-exhaustive residual limitation here, the same honest
- * "MINH HỌA, không đóng khung" stance `iron-law.mjs`'s own module list
- * already takes, not a silent gap. */
-export function renumberDecisionFile(repoRoot, oldPath, newId) {
-  const m = oldPath.match(DECISION_FILE_RE);
-  if (!m) {
-    throw new MergeError(`renumberDecisionFile: "${oldPath}" is not a docs/decisions/NNNN-slug.md path`, { oldPath });
-  }
-  const [, oldId, slug] = m;
-  const newPath = `docs/decisions/${newId}-${slug}.md`;
-  git(repoRoot, ['mv', oldPath, newPath]);
-  const abs = path.join(repoRoot, newPath);
+ * untouched (it names another doc, not this one), and free-text prose that
+ * cites the doc's own old number by hand is a documented residual
+ * limitation, the same illustrative-not-exhaustive stance `iron-law.mjs`'s
+ * own module list takes. */
+function renumberDecisionText(text, oldId, newId) {
   const oldIdRe = new RegExp(`\\b${oldId}\\b`);
-  const lines = fs.readFileSync(abs, 'utf8').split('\n');
+  const lines = text.split('\n');
   let titleFixed = false;
   let headingFixed = false;
   for (let i = 0; i < lines.length; i++) {
@@ -580,9 +573,7 @@ export function renumberDecisionFile(repoRoot, oldPath, newId) {
       headingFixed = true;
     }
   }
-  fs.writeFileSync(abs, lines.join('\n'));
-  git(repoRoot, ['add', newPath]);
-  return { oldId, newId, oldPath, newPath };
+  return lines.join('\n');
 }
 
 /** Rebuild `docs/decisions/0000-index.md`'s conflicted text with every
@@ -590,9 +581,9 @@ export function renumberDecisionFile(repoRoot, oldPath, newId) {
  * numerically by decision id -- `idRenames` (a `Map<oldId, {newId,
  * newPath}>`, only ever populated for `theirs`-side ids that collided with
  * an `ours` id) rewrites a renamed row's `[oldId](oldPath)` link to
- * `[newId](newPath)` before sorting. Writes the file and stages it; never
- * touches any other path. */
-export function resolveDecisionIndexConflict(repoRoot, classification, idRenames) {
+ * `[newId](newPath)` before sorting. Returns the text; the caller declares
+ * it as candidate bytes. */
+function rebuildDecisionIndex(classification, idRenames) {
   const rewriteRow = (line) => {
     const m = line.match(DECISION_ROW_RE);
     const rename = idRenames.get(m[1]);
@@ -611,56 +602,7 @@ export function resolveDecisionIndexConflict(repoRoot, classification, idRenames
     rows.sort((a, b) => (rowSortKey(a) < rowSortKey(b) ? -1 : 1));
     return rows.join('\n');
   }).join('\n');
-
-  fs.writeFileSync(path.join(repoRoot, DECISION_INDEX_PATH), rebuilt);
-  git(repoRoot, ['add', DECISION_INDEX_PATH]);
-}
-
-/**
- * Attempt to auto-resolve a decision-ID-collision conflict already
- * classified by `classifyDecisionIndexCollision` (the caller passes its
- * non-null result). Renumbers every `branch`-side colliding decision file
- * to the next free id after `HEAD`'s own (never touching `HEAD`'s already-
- * landed numbering), then rewrites the index conflict with both sides'
- * rows unioned. Never throws on an ordinary "couldn't find the branch-side
- * file" mismatch -- returns `false` so the caller falls back to the
- * pre-existing abort-and-report path exactly like a `null` classification
- * would; only a real git-command failure inside the helpers above
- * propagates, the same "only a genuine bug throws" contract every other
- * git call in this module already keeps.
- */
-export function autoResolveDecisionIndexCollision(repoRoot, branch, classification) {
-  if (classification.collidingIds.length === 0) {
-    resolveDecisionIndexConflict(repoRoot, classification, new Map());
-    return true;
-  }
-  const headFiles = new Set(
-    nulPaths(git(repoRoot, ['ls-tree', '-r', '--name-only', '-z', 'HEAD', '--', 'docs/decisions/'])),
-  );
-  const branchFiles = nulPaths(git(repoRoot, ['ls-tree', '-r', '--name-only', '-z', branch, '--', 'docs/decisions/']));
-
-  const idRenames = new Map();
-  // tsk-2iz: HEAD alone is not enough -- a branch forked when HEAD's max
-  // was 0040, writing 0041 and 0042 of its own, still collides with a 0041
-  // HEAD independently landed. nextFreeDecisionId(HEAD) alone would return
-  // 0042 and rename the branch's colliding 0041 to 0042 -- straight into
-  // the branch's OWN already-clean, non-colliding 0042. Considering both
-  // trees is what actually finds a number neither side has used yet.
-  let nextId = nextFreeDecisionId(repoRoot, ['HEAD', branch]);
-  for (const oldId of classification.collidingIds) {
-    const theirsFile = branchFiles.find((f) => {
-      const m = f.match(DECISION_FILE_RE);
-      return m && m[1] === oldId && !headFiles.has(f);
-    });
-    if (!theirsFile) {
-      return false; // doesn't match the expected shape -- fall back safe
-    }
-    const renamed = renumberDecisionFile(repoRoot, theirsFile, nextId);
-    idRenames.set(oldId, renamed);
-    nextId = String(parseInt(nextId, 10) + 1).padStart(4, '0');
-  }
-  resolveDecisionIndexConflict(repoRoot, classification, idRenames);
-  return true;
+  return rebuilt;
 }
 
 // tsk-1lv-2: a "mirrors merge.mjs collision-resolve subsystem" auto-resolve
@@ -672,7 +614,7 @@ export function autoResolveDecisionIndexCollision(repoRoot, branch, classificati
 // because regenerating `docs/decisions/index.md` correctly requires
 // reading `.fgos/events.jsonl`, which a worktree never carries in the
 // first place (ADR0020) -- so no branch can produce a *meaningful*
-// regenerated version to collide over via `mergeRunnerItem` for a normal,
+// regenerated version to collide over in a runner merge for a normal,
 // well-formed regenerate. Cross-checked against `docs/how-to/fix-fgos-
 // write-rejected-merge-block.md`'s own documented precedent (tsk-n4i-1/
 // tsk-5vf/tsk-4eu/tsk-5ge/tsk-28o/tsk-3v2 -- six independent real
@@ -681,13 +623,13 @@ export function autoResolveDecisionIndexCollision(repoRoot, branch, classificati
 //
 // **This does NOT make a hostile or accidental regeneration impossible to
 // merge (tsk-1lv review-fix F12, corrected here)** -- `fgos-write-rejected`
-// (below, `fgosPaths.length > 0`) only rejects a diff that stages a change
+// (`declareLandFiles`) only rejects a merge that changes a path
 // under `.fgos/`; `docs/decisions/index.md` itself is an ordinary tracked
 // doc file, not a `.fgos/` path, so that wall never inspects it at all. A
 // worktree running `fgos decision-index` with no real store to read from
 // (the exact ADR0020 gap above) computes the "no decisions yet" placeholder
 // -- committing and merging THAT is a real, ordinary git merge
-// `mergeRunnerItem` would happily accept, silently blanking every platform
+// a runner merge would happily accept, silently blanking every platform
 // decision's projection. The actual fix is a guard at the write site, not
 // a merge-time collision-resolve: `generateDecisionIndex`
 // (`src/report/decision-index.mjs`) now refuses to overwrite an index that
@@ -697,30 +639,6 @@ export function autoResolveDecisionIndexCollision(repoRoot, branch, classificati
 // item's own branch legitimately creates as part of its real diff, never a
 // `.fgos/`-derived regeneration.
 
-/**
- * Attempt to merge a runner item's branch into `repoRoot`'s current checkout
- * (checked clean by the caller first). The git call itself is target-
- * agnostic — no trunk is hardcoded — so per D3 (fan-out-parallel) this
- * generalizes to whichever branch the caller has checked out: `main` for a
- * root->main merge, or `fgw/<root>` for a leaf->parent merge. Every path is
- * either "outcome: merged" (verify passed on the staged tree, merge
- * committed) or a defined non-throwing outcome — "conflict", "verify-fail",
- * or "fgos-write-rejected" — with the merge already cleanly aborted, the
- * checkout untouched. Only a failure to even run `git merge --abort` itself
- * throws (a real bug).
- *
- * FGOS-WRITE-REJECTED (ADR0020): a worker's `fgw/<id>` branch must never
- * carry a change under `.fgos/` — the store's single write door stays the
- * `fgos` CLI verbs run against `repoRoot`, never a worker's own commit
- * (`0005`). `worktree.mjs`'s `createWorktree` no longer checks out `.fgos/`
- * into a worker's worktree at all (same ADR), so this should never trigger
- * in practice — this check is the mechanical, trusted-side wall for the
- * residual case (a worker `mkdir`s a fresh `.fgos/` itself and commits it)
- * that a missing checkout alone can't prevent. Checked on the STAGED diff
- * after `--no-commit --no-ff` lands cleanly — the exact paths *this* merge
- * introduces relative to current HEAD, correct for both a root->main merge
- * and a leaf->parent merge without needing to know either branch's trunk.
- */
 /**
  * A lock-held answer from the repo-lock door as the MergeError every merge
  * caller already handles (`code: 'lock-held'`); any other error passes as is.
@@ -739,74 +657,6 @@ export function toMergeLockError(err, details = {}) {
   });
 }
 
-/**
- * withMergeSlot(scope, lockRoot, targetRef, fn, { waitMs }) — the per-target
- * merge slot of `repo-locks.mjs`, with a held slot reported as a MergeError.
- * Every merge into `targetRef` runs inside it: the slot is the one thing that
- * keeps two merges into one target apart, whether the merge runs in a
- * disposable worktree or on the main checkout. MUST be held around the call
- * that reads the target's tip (the ephemeral worktree reads it before its own
- * callback runs), so call sites wrap `withMergeEphemeralWorktree` in this,
- * never the reverse. `fn` runs with the scope that holds the slot.
- */
-export async function withMergeSlot(scope, lockRoot, targetRef, fn, { waitMs } = {}) {
-  try {
-    return await withMergeTargetSlot(scope, lockRoot, targetRef, () => fn(scope), { waitMs });
-  } catch (err) {
-    throw toMergeLockError(err, { targetRef });
-  }
-}
-
-/** Commit the `.fgos` event files of the main checkout under the main
- * mutex, so the merge below starts from a clean `.fgos`. */
-function checkpointUnderMainCheckout(scope, lockRoot, { waitMs } = {}) {
-  const fgosDir = path.join(lockRoot, '.fgos');
-  return withMainCheckout(scope, 'checkpoint', (mainHandle) => checkpointMainFgos(mainHandle, fgosDir, lockRoot), { fgosDir, waitMs });
-}
-
-/**
- * Merge `item`'s branch into its target. The caller already holds the
- * target's merge slot (`withMergeSlot`) and passes the scope that holds it:
- * this function takes the main checkout mutex itself, and only for the steps
- * that write the main checkout (the `.fgos` checkpoint, the merge commit when
- * `repoRoot` is the main checkout). The merge and its verify run under the
- * slot alone. `waitMs` is how long those main checkout steps wait for another
- * holder (omitted: one try that fails at once with lock-held).
- */
-export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = repoRoot, scope, waitMs } = {}) {
-  if (!(scope instanceof LockScope)) {
-    throw new TypeError('mergeRunnerItem needs the LockScope that holds the target merge slot');
-  }
-  const branch = branchNameFor(item.id);
-
-  // tsk-2ypd (D4): read the paths this branch brings BEFORE merging. Once it
-  // lands, `target` contains `branch`, so `git diff target...branch` is empty
-  // and this set can no longer be recovered.
-  const postLandTarget = item.parent ? branchNameFor(item.parent) : detectTrunk(repoRoot);
-  const postLandFiles = changedFiles(repoRoot, item, { trunk: postLandTarget });
-
-  try {
-    await checkpointUnderMainCheckout(scope, lockRoot, { waitMs });
-    const result = await mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRoot, scope, waitMs });
-    if (result.outcome !== 'merged') return result;
-    // Detection is read-only work and must never widen the critical section.
-    return {
-      ...result,
-      postLand: detectPostLandDrift(repoRoot, listWork(path.join(lockRoot, '.fgos')), item, {
-        target: postLandTarget,
-        landedFiles: postLandFiles,
-        // lockRoot, never repoRoot: a leaf->parent merge runs in an
-        // ephemeral worktree whose own `.fgos/` is stripped at setup
-        // (ADR0020, worktree.mjs's finishWorktreeSetup), so only lockRoot
-        // reaches the one real store.
-        sessions: listSessions(lockRoot),
-      }),
-    };
-  } catch (err) {
-    throw toMergeLockError(err, { branch });
-  }
-}
-
 // tsk-3yl D1: a prior `approve` run can already have landed this branch's
 // merge commit and died at a LATER step (any failure after merge-commit
 // but before the status-move to `done` — not just the compound-learn gap
@@ -817,14 +667,10 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = re
 // already happened. Checked BEFORE attempting the merge, not inferred
 // after the fact from an empty staged diff (fragile: commit-failure
 // wording is locale/git-version dependent, `is-ancestor` is not).
-function isAlreadyMerged(repoRoot, branch, ref) {
+export function isAlreadyMerged(repoRoot, branch, ref) {
   try {
-    git(repoRoot, ['merge-base', '--is-ancestor', branch, ref]);
-    return true;
+    return inspectGit(repoRoot).ancestry({ ancestor: resolveRefSha(repoRoot, branch), descendant: resolveRefSha(repoRoot, ref) }).answer === 'yes';
   } catch (err) {
-    if (err.status === 1) {
-      return false;
-    }
     throw new MergeError(`checking whether "${branch}" is already merged into ${ref} failed: ${err.message}`, { branch });
   }
 }
@@ -855,22 +701,25 @@ function isAlreadyMerged(repoRoot, branch, ref) {
  * A main-source return is never eligible — it records `headAtReturn`, not
  * `branchHeadAtReturn`, and this returns false for it.
  */
-function mergedTreeAlreadyVerified(repoRoot, item, branch) {
+function mergedTreeAlreadyVerified(repoRoot, item, branch, target = 'HEAD') {
   if (typeof item.branchHeadAtReturn !== 'string' || !item.branchHeadAtReturn) return false;
   let branchTip;
   try {
-    branchTip = git(repoRoot, ['rev-parse', branch]).trim();
+    branchTip = resolveRefSha(repoRoot, branch);
   } catch {
     return false;
   }
   if (branchTip !== item.branchHeadAtReturn) return false;
-  if (isAlreadyMerged(repoRoot, 'HEAD', branch)) return true;
+  if (isAlreadyMerged(repoRoot, target, branch)) return true;
 
   try {
-    const mergeBase = git(repoRoot, ['merge-base', branch, 'HEAD']).trim();
+    const port = inspectGit(repoRoot);
+    const head = resolveRefSha(repoRoot, target);
+    const mergeBase = port.compareCommits({ left: branchTip, right: head }).mergeBase;
     if (!mergeBase) return false;
-    const introducedPaths = nameStatusPaths(git(repoRoot, ['diff', '--name-status', '--no-relative', '-z', `${mergeBase}..${item.branchHeadAtReturn}`], { maxBuffer: GIT_LIST_MAX_BUFFER }));
-    const mainAdvancedPaths = nameStatusPaths(git(repoRoot, ['diff', '--name-status', '--no-relative', '-z', `${mergeBase}..HEAD`], { maxBuffer: GIT_LIST_MAX_BUFFER }));
+    const pathsSinceBase = (after) => new Set(diffPaths(port, mergeBase, after));
+    const introducedPaths = pathsSinceBase(branchTip);
+    const mainAdvancedPaths = pathsSinceBase(head);
     for (const path of introducedPaths) {
       if (mainAdvancedPaths.has(path)) {
         return false;
@@ -906,22 +755,24 @@ function mergedTreeAlreadyVerified(repoRoot, item, branch) {
 // `--no-ff` merges) means there was nothing to discard in the first place —
 // trusts ancestry unchanged, matching pre-existing behavior.
 function branchContentMismatch(repoRoot, branch, ref) {
-  const mergeCommits = git(repoRoot, ['log', '--merges', '--ancestry-path', '--reverse', '--format=%H', `${branch}..${ref}`])
-    .split('\n')
-    .filter((line) => line !== '');
-  if (mergeCommits.length === 0) {
+  const port = inspectGit(repoRoot);
+  const branchTip = resolveRefSha(repoRoot, branch);
+  const firstMerge = port.firstAncestryMerge({ ancestor: branchTip, descendant: resolveRefSha(repoRoot, ref) });
+  if (!firstMerge) {
     return [];
   }
-  const firstMerge = mergeCommits[0];
+  let mainline;
   let base;
   try {
-    base = git(repoRoot, ['merge-base', branch, `${firstMerge}^1`]).trim();
+    mainline = port.resolveCommit({ name: `${firstMerge}^1` });
+    base = mainline && port.compareCommits({ left: branchTip, right: mainline }).mergeBase;
   } catch {
-    return []; // no shared history to diff against — fail open, nothing to compare
+    base = null;
   }
-  // tsk-52p: exclude .fgos/ paths outright, never just gated by
-  // isMergeUnionPath like resolveFgosOnlyConflict's own exemption a few
-  // dozen lines below — ADR0020 guarantees a worker branch can NEVER
+  if (!base) return []; // no shared history to diff against — fail open, nothing to compare
+  // tsk-52p: exclude .fgos/ paths outright, never just gated by a
+  // `merge=union` attribute like declareLandFiles' own exemption below —
+  // ADR0020 guarantees a worker branch can NEVER
   // legitimately reflect main's live .fgos/ content, union-declared or
   // not, so a branch-side .fgos/ diff (e.g. the documented recovery in
   // docs/how-to/fix-fgos-write-rejected-merge-block.md: restoring .fgos/
@@ -929,8 +780,8 @@ function branchContentMismatch(repoRoot, branch, ref) {
   // discarded content, just an expected, permanent divergence from HEAD.
   // Rename detection stays on here (a rename names only its new path): a branch that renamed
   // `a -> b` after main already deleted `a` leaves the merge no change to make on `a`, and the
-  // source half would read as discarded content. Pathspecs are literal: a name may hold `*` or `[`.
-  const introducedPaths = nulPaths(git(repoRoot, ['diff', '--name-only', '--no-relative', '-z', `${base}..${branch}`], { maxBuffer: GIT_LIST_MAX_BUFFER }))
+  // source half would read as discarded content.
+  const introducedPaths = diffPaths(port, base, branchTip, { renames: true })
     .filter((p) => p !== '.fgos' && !p.startsWith('.fgos/'));
   if (introducedPaths.length === 0) {
     return [];
@@ -943,488 +794,19 @@ function branchContentMismatch(repoRoot, branch, ref) {
   // discard signature is narrower: the merge commit itself made no change to
   // that path relative to its own first parent, even though branch's diff
   // touched it.
-  const changedByMerge = new Set(
-    nulPaths(git(repoRoot, ['--literal-pathspecs', 'diff', '--name-only', '--no-relative', '-z', `${firstMerge}^1`, firstMerge, '--', ...introducedPaths], { maxBuffer: GIT_LIST_MAX_BUFFER })),
-  );
+  // Without rename folding a renamed path names both of its ends, so either
+  // end counts as changed by the merge.
+  const changedByMerge = new Set(diffPaths(port, mainline, firstMerge));
   return introducedPaths.filter((p) => !changedByMerge.has(p));
 }
 
-// tsk-2j9 D1/D2: a genuine `git merge --no-commit --no-ff branch` no-op
-// (branch already an ancestor of HEAD by the time this call runs -- the
-// TOCTOU window between `isAlreadyMerged`'s pre-check above and this call,
-// e.g. a main-checkout writer that bypasses the main checkout mutex)
-// exits 0 with "Already up to date." and creates no `MERGE_HEAD`. Every
-// abort call below used to run unconditionally on that path and crash with
-// "fatal: There is no merge to abort (MERGE_HEAD missing)" instead of
-// returning the outcome the code was already about to return. Guarding on
-// `MERGE_HEAD`'s existence closes that gap without changing any call
-// site's own error message or returned outcome on every already-covered
-// case -- this only ever changes behavior when there was nothing to abort.
+/** Whether the main checkout has a merge in progress (its `MERGE_HEAD`). */
 function mergeHeadExists(repoRoot) {
-  try {
-    git(repoRoot, ['rev-parse', '--verify', 'MERGE_HEAD']);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-export function abortMergeIfPossible(repoRoot) {
-  if (!mergeHeadExists(repoRoot)) {
-    return;
-  }
-  try {
-    git(repoRoot, ['merge', '--abort']);
-  } catch (err) {
-    // tsk-18a D2: a concurrent process resolving the SAME writer identity
-    // (two processes sharing one writer identity, real git ops racing on
-    // one shared checkout) can clear MERGE_HEAD in the window between the
-    // check above and this abort call -- empirically reproduced as "no
-    // merge to abort" on this exact line. If MERGE_HEAD is gone NOW, the abort's own goal -- no merge
-    // left in progress -- is already satisfied, whatever cleared it;
-    // treat this exactly like the up-front no-op case above, never as a
-    // fatal failure. Any OTHER abort failure (MERGE_HEAD still present)
-    // is a real one and still propagates unchanged.
-    if (!mergeHeadExists(repoRoot)) {
-      return;
-    }
-    throw err;
-  }
+  return inspectGit(repoRoot).resolveCommit({ name: 'MERGE_HEAD' }) !== null;
 }
 
 export function formatFgosWriteRejectedDetail(branch, paths, targetLabel) {
   return `${branch} staged a change under .fgos/ (${paths.join(', ')}); merge aborted, ${targetLabel} unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.`;
-}
-
-// tsk-4gi: `git checkout HEAD -- <path>` is oblivious to merge attributes --
-// it will happily discard ANY staged change for any path that already
-// exists on HEAD, not only ones a `merge=union` driver produced. Restoring
-// that broadly would silently drop a worker's real, non-append-only `.fgos/`
-// write (e.g. a hand-edited `.fgos/config.json` that happened to auto-merge
-// without a textual conflict because the two sides touched different
-// lines) instead of refusing it -- exactly the ADR0020 protection this
-// check exists to keep. Gate the restore-then-recheck path in
-// mergeRunnerItemLocked on this so only a path `.gitattributes` actually
-// declares `merge=union` for is ever silently discarded back to target's
-// own pre-merge content; every other staged `.fgos/` path is left alone and
-// still falls through to fgos-write-rejected.
-function isMergeUnionPath(repoRoot, relPath) {
-  const output = git(repoRoot, ['check-attr', 'merge', '--', relPath]);
-  return output.trim().endsWith(': union');
-}
-
-function isUnchangedSinceBranchHeadAtTake(repoRoot, branch, relPath, branchHeadAtTake) {
-  if (!branchHeadAtTake) return false;
-  try {
-    git(repoRoot, ['diff', '--quiet', branchHeadAtTake, branch, '--', relPath]);
-    return true;
-  } catch (err) {
-    return false;
-  }
-}
-
-// tsk-tr9: extends tsk-4gi's own restore-then-recheck protection (just
-// above, only ever reached when `git merge` stages the conflicting
-// `.fgos/` path CLEANLY via its `merge=union` driver) to the case `git
-// merge` itself THROWS a genuine conflict on that same kind of path. A
-// `merge=union` driver never resolves a MODIFY/DELETE — deletion is never
-// handled by a content-merge driver, union or otherwise, regardless of
-// attribute — so a `.fgos/` shard one side's own history happens to
-// record as deleted (a stale worker branch carrying an old manual
-// `git rm --cached` recovery from a PRIOR conflict, or any other cause)
-// raises a REAL git conflict against the other side's still-growing copy
-// of that same path — not a genuine content dispute, since a worker
-// branch has no legitimate claim over `.fgos/` state at all (ADR0020) and
-// `target`'s own copy is always the one to trust either merge direction
-// runs this against (`mergeRunnerItemLocked`'s branch-into-main, or
-// `performCatchUp`'s target-into-branch).
-//
-// Resolves every conflicted path by restoring it to `keepRef`'s own
-// committed version (or removing it if `keepRef` never had it at all,
-// e.g. a path only `target` ever introduced) — but ONLY when EVERY
-// conflicted path in this merge is under `.fgos/` AND actually declared
-// `merge=union` in `.gitattributes`; a single non-`.fgos/` conflicted
-// path, or a `.fgos/` path without that attribute, leaves the conflict
-// completely untouched and returns `false` — the caller must still treat
-// it as a genuine, unresolved conflict (identical restriction to
-// `isMergeUnionPath`'s own gate above, for the identical reason: never
-// silently discard a real, non-append-only `.fgos/` write).
-function resolveFgosOnlyConflict(repoRoot, keepRef) {
-  const conflictedPaths = nulPaths(git(repoRoot, ['diff', '--name-only', '--no-relative', '--diff-filter=U', '-z']));
-  if (conflictedPaths.length === 0) {
-    return false;
-  }
-  const allFgosUnion = conflictedPaths.every((p) => (p === '.fgos' || p.startsWith('.fgos/')) && isMergeUnionPath(repoRoot, p));
-  if (!allFgosUnion) {
-    return false;
-  }
-  for (const conflictedPath of conflictedPaths) {
-    try {
-      git(repoRoot, ['checkout', keepRef, '--', conflictedPath]);
-    } catch {
-      // `keepRef` never had this path — the resolved state is "absent".
-      try {
-        git(repoRoot, ['rm', '-f', '--', conflictedPath]);
-      } catch {
-        // Already gone from the index on this side of the conflict too
-        // (a DELETE/DELETE shape) — nothing left to do for this path.
-      }
-    }
-  }
-  const stillUnmerged = nulPaths(git(repoRoot, ['diff', '--name-only', '--no-relative', '--diff-filter=U', '-z']));
-  return stillUnmerged.length === 0;
-}
-
-async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRoot = repoRoot, scope, waitMs } = {}) {
-  // tsk-3yl D1: still run the real goal-check here, even though nothing
-  // will be staged/committed — every 'merged' outcome must carry a real,
-  // freshly-executed verify result (both callers in bin/fgos.mjs read
-  // `result.check.output` unconditionally on this path), and a HEAD that
-  // drifted since the original merge landed still deserves a real check
-  // before this is declared done again.
-  if (isAlreadyMerged(repoRoot, branch, 'HEAD')) {
-    // tsk-15k D1: bare ancestry is not proof the content is really there —
-    // see branchContentMismatch above. Checked before the goal-check so a
-    // discarded-content case never gets a chance to pass on a coincidentally
-    // weak verify command.
-    const mismatchedPaths = branchContentMismatch(repoRoot, branch, 'HEAD');
-    if (mismatchedPaths.length > 0) {
-      return {
-        outcome: 'verify-fail',
-        branch,
-        check: {
-          passed: false,
-          status: null,
-          output: `integrity check failed: "${branch}" is an ancestor of HEAD but its own content is not reflected there for: ${mismatchedPaths.join(', ')} — a prior merge likely discarded this branch's changes (e.g. a manually-resolved "git merge -s ours") while still recording it as a parent`,
-        },
-      };
-    }
-    const check = await runGoalCheck(item, repoRoot, timeoutMs);
-    if (!check.passed) {
-      return { outcome: 'verify-fail', branch, check };
-    }
-    // tsk-516 (CONTEXT.md D3/D4): this path already merged earlier, so the
-    // tree here IS main's own — a repo invariant broken by this branch is
-    // exactly what must not be declared 'merged' again. D5's skip never
-    // applies here: HEAD has already absorbed the branch, so the tree under
-    // test is not the branch tip's tree.
-    const invariant = await runInvariantChecks(readInvariantCheckCommands(repoRoot), repoRoot, timeoutMs);
-    if (!invariant.passed) {
-      return { outcome: 'verify-fail', branch, check: invariantFailureAsCheck(invariant) };
-    }
-    return { outcome: 'merged', branch, check };
-  }
-
-  // tsk-4hj D1/D2/D3: a MERGE_HEAD already on disk BEFORE this call ever
-  // runs belongs to a DIFFERENT item's in-progress or abandoned merge --
-  // git itself refuses ("You have not concluded your merge") whenever
-  // this is true, regardless of which branch it belongs to, so this call
-  // never gets a chance to attempt anything of its own. Must be checked
-  // here, before the git merge attempt below: the existing post-call
-  // `mergeHeadExists` read further down (tsk-18a D1) cannot tell "created
-  // BY this call" apart from "already there before it ran" -- both read
-  // the same boolean at the same post-failure moment. Must never call
-  // `abortMergeIfPossible` on this path -- that would discard the OTHER
-  // item's merge state, exactly the data-loss bug this decision exists
-  // to close.
-  if (mergeHeadExists(repoRoot)) {
-    return { outcome: 'merge-blocked-other-item', branch };
-  }
-
-  let selfResolved = false;
-  try {
-    git(repoRoot, ['merge', '--no-commit', '--no-ff', branch]);
-  } catch (err) {
-    // tsk-3mv-1 D1a: before giving up, check whether this is the one
-    // content-agnostic conflict shape proven self-resolvable (a
-    // decision-ID collision on docs/decisions/0000-index.md) -- never
-    // attempted for any other conflict shape, and never left half-resolved
-    // on any failure along this path (falls through to the exact same
-    // abort below).
-    //
-    // tsk-2iz: classifyDecisionIndexCollision/autoResolveDecisionIndexCollision
-    // both do real fs/git work (reads, `git mv`) that can throw on a genuine
-    // unexpected failure -- distinct from `autoResolveDecisionIndexCollision`
-    // RETURNING false, its own documented "doesn't match the expected shape,
-    // fall back safe" case. A throw here must never propagate straight out
-    // of this function: that would skip the abort below entirely, leaving
-    // MERGE_HEAD and any partial `git mv` renames staged in the shared main
-    // checkout for the caller to trip over later. Caught here so it falls
-    // through to the exact same abort-and-report path as every other exit.
-    let resolved = false;
-    let resolveErr = null;
-    try {
-      const classification = classifyDecisionIndexCollision(repoRoot);
-      resolved = Boolean(classification) && autoResolveDecisionIndexCollision(repoRoot, branch, classification);
-    } catch (thrown) {
-      resolveErr = thrown;
-    }
-    if (resolved) {
-      selfResolved = true;
-    } else if (!resolveErr && mergeHeadExists(repoRoot) && resolveFgosOnlyConflict(repoRoot, 'HEAD')) {
-      // tsk-tr9: every conflicted path was confined to a `.fgos/` shard
-      // this repo declares `merge=union` for, and has now been restored to
-      // HEAD's (target's) own committed version — fall through to the
-      // commit path below exactly like a clean merge=union auto-resolution
-      // already does; the staged-`.fgos/`-path recheck further down never
-      // finds anything left to reject, since every such path here was just
-      // restored to HEAD's own content (no diff from HEAD at all).
-    } else {
-      // tsk-18a D1: MERGE_HEAD only exists when git actually staged a real
-      // conflict -- captured BEFORE the abort below, which deletes it as a
-      // side effect of succeeding. Any OTHER failure of this merge call
-      // (e.g. an untracked file colliding with a path `branch` introduces)
-      // never creates MERGE_HEAD at all; blindly reporting 'conflict' on
-      // every failure would misclassify that case and discard the real
-      // git error entirely.
-      const genuineConflict = mergeHeadExists(repoRoot);
-      try {
-        abortMergeIfPossible(repoRoot);
-      } catch (abortErr) {
-        throw new MergeError(`merge of "${branch}" failed and "git merge --abort" itself failed: ${abortErr.message}`, { branch });
-      }
-      if (resolveErr) {
-        return {
-          outcome: 'merge-failed-unclassified',
-          branch,
-          error: { message: `decision-index auto-resolve failed: ${resolveErr.message}`, stderr: resolveErr.stderr ?? null, status: resolveErr.status ?? null },
-        };
-      }
-      if (genuineConflict) {
-        return { outcome: 'conflict', branch };
-      }
-      return {
-        outcome: 'merge-failed-unclassified',
-        branch,
-        error: { message: err.message, stderr: err.stderr ?? null, status: err.status ?? null },
-      };
-    }
-  }
-
-  // tsk-4gi D1: a successful merge (no exception above) can still leave
-  // `.fgos/` paths staged — most commonly a `.gitattributes` `merge=union`
-  // driver cleanly auto-resolving an append-only `.fgos/*.jsonl` file (e.g.
-  // events.jsonl, the sharded events/*.jsonl, or the tsk-2xg diagnostic
-  // logs) by combining both sides. That auto-resolution is not a conflict —
-  // git already succeeded — but the old staged-diff check below rejected it
-  // unconditionally anyway, tripping on nearly every approve for a
-  // long-lived branch since main's `.fgos/*.jsonl` copy keeps growing under
-  // concurrent write load. Fix (tsk-2xg option b, never implemented until
-  // now): for a path `.gitattributes` actually declares `merge=union` for,
-  // restore it to target's own pre-merge committed version first —
-  // discarding whatever the union driver staged for it — then re-check.
-  //
-  // Only `merge=union` paths get this treatment (isMergeUnionPath, above)
-  // because `git checkout HEAD -- <path>` is oblivious to WHY a path is
-  // staged: for a plain (non-union) `.fgos/` path that already exists on
-  // HEAD, two non-overlapping edits (one on `branch`, one on target since)
-  // auto-merge cleanly with no exception too, and blindly restoring THAT
-  // would silently discard a real, non-append-only `.fgos/` write instead
-  // of refusing it — exactly what ADR0020 exists to catch. Restricting the
-  // restore to genuinely `merge=union`-attributed paths keeps that
-  // protection intact for everything else.
-  //
-  // Each `merge=union` path is restored individually rather than in one
-  // batched `checkout HEAD -- <paths>` call: a path the branch introduced
-  // for the FIRST time (never committed on target's own HEAD at all) has
-  // no HEAD pathspec to check out, `git checkout` throws for it, AND aborts
-  // its ENTIRE batch on the first pathspec that fails to match — restoring
-  // nothing at all, not even the other paths that do exist in HEAD. Such a
-  // path is also never a `merge=union` auto-resolution to begin with (that
-  // driver only ever resolves a MODIFY/MODIFY conflict on a path both sides
-  // already know about) — left staged as-is on a failed checkout, it still
-  // falls through to the reject/abort path below exactly as before this
-  // fix.
-  let stagedPaths = nulPaths(git(repoRoot, ['diff', '--name-only', '--cached', '--no-renames', '--no-relative', '-z'], { maxBuffer: GIT_LIST_MAX_BUFFER }));
-  let fgosPaths = stagedPaths.filter((p) => p === '.fgos' || p.startsWith('.fgos/'));
-  if (fgosPaths.length > 0) {
-    // tsk-28x: prefer `item.lastAttempt.branchHeadAtTake` over the
-    // top-level `item.branchHeadAtTake` -- tsk-40m's own claim redesign
-    // (docs/architect/doing-coordination-redesign.md §7.2/§9.2) stopped
-    // writing a durable work.move(->doing) leg at claim time, so the
-    // top-level field is now frozen at whatever it last was (often the
-    // item's very first-ever claim, potentially weeks stale for an item
-    // re-picked multiple times) while `lastAttempt` is the one field
-    // every claim genuinely refreshes. Using the stale top-level value
-    // here made `isUnchangedSinceBranchHeadAtTake` compare against an
-    // ancient commit, so it (wrongly) found real, unrelated drift for
-    // every .fgos/ path and never restored any of them -- confirmed live
-    // on tsk-28x itself. Same fallback shape `checkMergeStillResolves`
-    // (cleanup-harness.mjs) already established for this exact migration
-    // gap, just prioritized the other way: THIS check specifically wants
-    // the freshest known take point, so `lastAttempt` (when present)
-    // always wins over the top-level field, never merely a fallback for
-    // when it's absent.
-    const effectiveBranchHeadAtTake = item.lastAttempt?.branchHeadAtTake ?? item.branchHeadAtTake;
-    for (const fgosPath of fgosPaths) {
-      const unchangedOnBranch = isUnchangedSinceBranchHeadAtTake(repoRoot, branch, fgosPath, effectiveBranchHeadAtTake);
-      if (!isMergeUnionPath(repoRoot, fgosPath) && !unchangedOnBranch) {
-        continue;
-      }
-      try {
-        git(repoRoot, ['checkout', 'HEAD', '--', fgosPath]);
-      } catch {
-        // `git checkout HEAD -- <path>` throws whenever HEAD has no such
-        // pathspec RIGHT NOW -- true both for a path the WORKER branch
-        // introduces for the first time (never on target's own history --
-        // a real new .fgos/ write, correctly left staged so the reject
-        // below catches it, per this block's own comment above) and for a
-        // path TARGET itself has since fully untracked/deleted (e.g. the
-        // fgos-logs-bucket migration moving 5 diagnostic logs out of
-        // .fgos/ root, tsk-p2q). `unchangedOnBranch` already proved the
-        // WORKER never touched this path since its own claim -- whatever
-        // it carries is inherited staleness from before the item even
-        // started, never new content the worker is trying to introduce --
-        // so `git rm --cached` (drop it from the staged merge tree,
-        // matching target's own "no longer tracked" state) is the correct
-        // trusted-side resolution here, same spirit as the checkout branch
-        // just above. Never attempted for the isMergeUnionPath-only case
-        // (a brand-new shard the WORKER itself just wrote) -- that stays
-        // exactly as before, falling through to reject.
-        if (unchangedOnBranch) {
-          try {
-            git(repoRoot, ['rm', '-f', '--', fgosPath]);
-          } catch {
-            // Still no way to resolve it -- leave staged; the recheck
-            // below will find it and this call will still refuse it.
-          }
-        }
-      }
-    }
-    stagedPaths = nulPaths(git(repoRoot, ['diff', '--name-only', '--cached', '--no-renames', '--no-relative', '-z'], { maxBuffer: GIT_LIST_MAX_BUFFER }));
-    fgosPaths = stagedPaths.filter((p) => p === '.fgos' || p.startsWith('.fgos/'));
-  }
-  if (fgosPaths.length > 0) {
-    try {
-      abortMergeIfPossible(repoRoot);
-    } catch (abortErr) {
-      throw new MergeError(
-        `merge of "${branch}" staged a change under ".fgos/" and "git merge --abort" itself failed: ${abortErr.message}`,
-        { branch, fgosPaths },
-      );
-    }
-    return { outcome: 'fgos-write-rejected', branch, paths: fgosPaths, ...(selfResolved && { selfResolved }) };
-  }
-
-  // tsk-516 (CONTEXT.md D1/D5): when the tree this merge produces is
-  // provably the tree `return` already verified, running the checks again
-  // is a duplicate of a result already known — the "no test thừa" half of
-  // this item. Both the item's own verify AND the repo-invariant checks are
-  // skipped together: same tree, same answer, and skipping one while
-  // re-running the other would be an arbitrary split.
-  //
-  // Read before the staged-tree checks below but AFTER the merge itself:
-  // both refs it reads (HEAD, the branch tip) are untouched by
-  // `git merge --no-commit`, so its answer is the same either side of it.
-  //
-  // A skipped check still returns a real, honest `check` object — both
-  // callers in bin/fgos.mjs read `result.check.output` unconditionally
-  // (see the header of the already-merged branch above), and a person
-  // reading a merge report deserves to see WHY nothing ran rather than a
-  // blank pass.
-  const skipRedundantChecks = mergedTreeAlreadyVerified(repoRoot, item, branch);
-  const check = skipRedundantChecks
-    ? {
-        passed: true,
-        status: 0,
-        timedOut: false,
-        skipped: true,
-        output: `verify skipped: the merged tree is identical to ${item.branchHeadAtReturn}, already verified green at return (HEAD is an ancestor of "${branch}" and the branch tip has not moved since)`,
-      }
-    : await runGoalCheck(item, repoRoot, timeoutMs);
-  if (!check.passed) {
-    try {
-      abortMergeIfPossible(repoRoot);
-    } catch (abortErr) {
-      throw new MergeError(`post-merge verify failed for "${branch}" and "git merge --abort" itself failed: ${abortErr.message}`, { branch });
-    }
-    return { outcome: 'verify-fail', branch, check, ...(selfResolved && { selfResolved }) };
-  }
-
-  // tsk-516 (CONTEXT.md D3/D4): the repo-invariant gate, on the tree that is
-  // actually about to land on main — the exact state that went red and STAYED
-  // red across later merges in the tsk-1m0 case this item exists for. Hard
-  // gate, not advisory: the checks are deterministic (no flake surface to
-  // absorb), and an advisory here is what already failed once.
-  if (!skipRedundantChecks) {
-    const invariant = await runInvariantChecks(readInvariantCheckCommands(repoRoot), repoRoot, timeoutMs);
-    if (!invariant.passed) {
-      try {
-        abortMergeIfPossible(repoRoot);
-      } catch (abortErr) {
-        throw new MergeError(`post-merge repo-invariant check failed for "${branch}" and "git merge --abort" itself failed: ${abortErr.message}`, { branch });
-      }
-      return { outcome: 'verify-fail', branch, check: invariantFailureAsCheck(invariant), ...(selfResolved && { selfResolved }) };
-    }
-  }
-
-  try {
-    // tsk-3tp (D2): sweep dirty/untracked files under .fgos/events/ and .fgos/events.jsonl into the staged merge commit
-    //
-    // tsk-3tp (fix, review r1): `.fgos` only ever exists under `lockRoot`
-    // (ADR0020 strips it from every ephemeral worktree — see
-    // `docs/explanation/why-mergerunneritem-takes-a-separate-lockroot-param.md`),
-    // so both the pathspec base AND the git-command cwd below must be
-    // `lockRoot`, not `repoRoot` — mirroring the checkpoint at the start of
-    // `mergeRunnerItem`, which already got this right. Resolving/running against `repoRoot` instead made this block
-    // a silent no-op (git refuses an out-of-repository pathspec, swallowed
-    // by the catch below) for every leaf->parent approve and promote-engine
-    // merge — i.e. every merge where `lockRoot !== repoRoot`. `lockRoot`
-    // defaults to `repoRoot`, so the root->main approve path (where the two
-    // are already the same) is unaffected by this change.
-    const sweepFgosDir = path.join(lockRoot, '.fgos');
-    const sweepLogPath = path.join(sweepFgosDir, 'events.jsonl');
-    const sweepEventsDirPath = path.join(sweepFgosDir, 'events');
-    const sweepPathspecs = [];
-    if (fs.existsSync(sweepLogPath)) {
-      sweepPathspecs.push(path.relative(lockRoot, sweepLogPath) || '.fgos/events.jsonl');
-    }
-    if (fs.existsSync(sweepEventsDirPath)) {
-      sweepPathspecs.push(path.relative(lockRoot, sweepEventsDirPath));
-    }
-    if (sweepPathspecs.length > 0) {
-      try {
-        const statusOut = git(lockRoot, ['status', '--porcelain', '--', ...sweepPathspecs]).trim();
-        if (statusOut.length > 0) {
-          git(lockRoot, ['add', ...sweepPathspecs]);
-        }
-      } catch {
-        // non-blocking
-      }
-    }
-
-    // On the main checkout the commit writes the shared index, so it runs
-    // under the main mutex and the pre-commit hook sees a borrower. In a
-    // disposable worktree it touches nothing shared and commits directly.
-    if (path.resolve(repoRoot) === path.resolve(lockRoot)) {
-      const fgosDir = path.join(lockRoot, '.fgos');
-      await withMainCheckout(scope, 'merge-commit', (mainHandle) => {
-        const res = runBorrowed(mainHandle, { command: 'git', args: ['commit', '--no-edit'], cwd: repoRoot });
-        if (res.exit !== 0) {
-          throw Object.assign(new Error(`git commit --no-edit failed (exit ${res.exit}${res.signal ? `, ${res.signal}` : ''}): ${String(res.stderr).trim()}`), { stderr: res.stderr, status: res.exit });
-        }
-      }, { fgosDir, waitMs });
-    } else {
-      git(repoRoot, ['commit', '--no-edit']);
-    }
-  } catch (err) {
-    try {
-      abortMergeIfPossible(repoRoot);
-    } catch (abortErr) {
-      throw new MergeError(
-        `verify passed for "${branch}" but "git commit" failed, and "git merge --abort" itself failed: ${abortErr.message} (commit error: ${err.message})`,
-        { branch, stderr: err.stderr ?? null, status: err.status ?? null },
-      );
-    }
-    // The main mutex stayed held past the wait: that is contention, not a git failure.
-    if (err?.code === 'lock-held') throw toMergeLockError(err, { branch });
-    throw new MergeError(`verify passed for "${branch}" but "git commit" failed: ${err.message}`, {
-      branch,
-      stderr: err.stderr ?? null,
-      status: err.status ?? null,
-    });
-  }
-  return { outcome: 'merged', branch, check, ...(selfResolved && { selfResolved }) };
 }
 
 /**
@@ -1439,7 +821,7 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRo
  * cleanup failure must never mask the merge/done result that already
  * happened; failures are returned as warnings for the caller to surface.
  *
- * FORCE DELETE (tsk-1p9 D8): `git branch -D`, not `-d`. By the time this
+ * FORCE DELETE (tsk-1p9 D8): an exact-old Refs delete, never `-d`'s merge check. By the time this
  * runs, D8's harness has ALREADY independently verified the branch's
  * commit resolves against the correct target (the root's branch for a
  * leaf, `HEAD` for a root/standalone item) — `-d`'s own local safety net
@@ -1450,28 +832,35 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRo
  */
 export function cleanupMergedBranch(repoRoot, branch) {
   const warnings = [];
+  // The tip the harness verified is the only one this deletes: a branch that
+  // moves meanwhile is left in place by the exact-old delete.
+  let tip;
+  try {
+    tip = resolveRefSha(repoRoot, branch);
+  } catch (err) {
+    return { warnings: [`branch delete failed for "${branch}" (left in place, harmless): ${err.message}`] };
+  }
   try {
     reclaimOrphanedCheckout(repoRoot, branch);
   } catch (err) {
     warnings.push(`worktree cleanup failed for "${branch}": ${err.message}`);
   }
   try {
-    git(repoRoot, ['branch', '-D', branch]);
+    deleteBranchRef(repoRoot, branch, tip);
   } catch (err) {
     warnings.push(`branch delete failed for "${branch}" (left in place, harmless): ${err.message}`);
   }
   return { warnings };
 }
 
-
 /**
  * tsk-4ax (D3): the git merge/verify/commit MECHANICS shared by the
  * `catchup` verb's manual-recovery path and `approve`'s own inbound
  * pre-check (`src/verbs/merge/approve.mjs`) — merges `target` into item
- * `id`'s own branch inside a throwaway ephemeral worktree, verifies, and
- * commits. Lives here rather than in `bin/fgos.mjs` (tsk-49i D3): it is
- * whole git mechanics with no CLI in it, the same tier as
- * `mergeRunnerItem` right above.
+ * `id`'s own branch through Sync under the source checkout's custody,
+ * verifies, and commits. Lives here rather than in `bin/fgos.mjs` (tsk-49i
+ * D3): it is whole git mechanics with no CLI in it, the same tier as
+ * `landRunnerItem` below.
  * Deliberately never touches `.fgos/` state itself (no moveWork, no dir
  * param at all) — the two callers have DIFFERENT bookkeeping needs around
  * this same mechanism (the verb moves `blocked -> awaiting-approval`;
@@ -1486,293 +875,474 @@ export function cleanupMergedBranch(repoRoot, branch) {
  *     already an ancestor of the branch; no merge/commit needed, but a
  *     fresh verify still ran (its own green run is what's being cashed in).
  *   - `{ outcome: 'merged', catchupHead, output }` — a real merge commit
- *     landed on the item's own branch (via a plain `git branch -f`, the
- *     same ref-update `withMergeEphemeralWorktree`'s CAS guard already
- *     protects).
+ *     landed on the item's own branch through Sync's continuation.
  *   - `{ outcome: 'verify-fail', timedOut, exitStatus, output }` — the
  *     merge (or the already-caught-up tree) staged cleanly but the item's
  *     own verify came back red; any merge started is aborted, the item's
  *     branch is left exactly as it was.
- *   - `{ outcome: 'conflict', conflictedFiles }` — a real textual conflict;
- *     aborted cleanly, branch untouched.
+ *   - `{ outcome: 'conflict', conflictedFiles }` — a real textual conflict
+ *     outside `.fgos`, read from the read-only merge before any checkout or
+ *     Sync exists; branch untouched.
  *   - `{ outcome: 'merge-refused', reason }` — git refused the merge attempt
  *     up front before staging anything (no MERGE_HEAD); aborted cleanly (nothing
  *     staged to abort), branch untouched.
  *
  * Never mutates `.fgos/` state and never throws for any of these defined
  * outcomes — only for a genuinely unexpected git failure (e.g. `git merge
- * --abort` itself failing), mirroring `mergeRunnerItem`'s own contract.
+ * --abort` itself failing), mirroring `landRunnerItem`'s own contract.
  */
 export async function performCatchUp(repoRoot, id, item, target, timeoutMs) {
   const ownBranch = branchNameFor(id);
-  return await withMergeEphemeralWorktree(repoRoot, id, async (ephemeral) => {
-    let alreadyCaughtUp = false;
-    try {
-      execFileSync('git', ['merge-base', '--is-ancestor', target, 'HEAD'], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
-      alreadyCaughtUp = true;
-    } catch (ancestorErr) {
-      if (ancestorErr.status !== 1) {
-        throw ancestorErr;
-      }
-    }
-
-    if (alreadyCaughtUp) {
-      const caughtUpCheck = await runGoalCheck(item, ephemeral.path, timeoutMs);
-      if (!caughtUpCheck.passed) {
-        return { outcome: 'verify-fail', timedOut: caughtUpCheck.timedOut, exitStatus: caughtUpCheck.status, output: caughtUpCheck.output };
-      }
-      const catchupHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ephemeral.path, encoding: 'utf8', shell: false }).trim();
-      return { outcome: 'already-caught-up', catchupHead, output: caughtUpCheck.output };
-    }
-
-    let conflicted = false;
-    try {
-      execFileSync('git', ['merge', '--no-commit', '--no-ff', target], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
-    } catch (err) {
-      if (!mergeHeadExists(ephemeral.path)) {
-        const reason = (err.stderr || err.message || '').trim();
-        return { outcome: 'merge-refused', reason };
-      }
-      // tsk-tr9: `target` (main) is always the side to trust for any
-      // `.fgos/` path — a worker branch has no legitimate claim over it at
-      // all (ADR0020). A conflict confined entirely to `.fgos/` paths
-      // `.gitattributes` declares `merge=union` for is resolved by taking
-      // `target`'s own committed version outright (see
-      // `resolveFgosOnlyConflict`'s own doc, just above `mergeRunnerItemLocked`) —
-      // never a genuine content dispute this call should abort and report.
-      conflicted = !resolveFgosOnlyConflict(ephemeral.path, target);
-    }
-
-    if (conflicted) {
-      let conflictedFiles = [];
-      try {
-        conflictedFiles = nulPaths(execFileSync('git', ['diff', '--name-only', '--no-relative', '--diff-filter=U', '-z'], { cwd: ephemeral.path, encoding: 'utf8', shell: false }));
-      } catch {
-        // best-effort — the outcome below still reports the conflict even
-        // if listing the conflicted files itself fails.
-      }
-      abortMergeIfPossible(ephemeral.path);
+  // The store rule Land applies, bound to the target pinned for this Sync:
+  // `.fgos` keeps the target's bytes, so a stale branch neither conflicts on
+  // nor carries forward store state it never owned (ADR0020). Sync on its
+  // own keeps the source's `.fgos`, which would make this merge commit read
+  // as the branch reverting the target's store changes; so every `.fgos`
+  // path the merge result changes against the source is declared with the
+  // merge's bytes. A branch's own store write is left to Land to refuse.
+  const pinned = resolveRefSha(repoRoot, target);
+  const source = resolveRefSha(repoRoot, ownBranch);
+  const files = new Map();
+  if (inspectGit(repoRoot).ancestry({ ancestor: pinned, descendant: source }).answer !== 'yes') {
+    const { tree, conflictedPaths } = readMergeTree(repoRoot, pinned, source);
+    // A real conflict is known from the read-only merge: report it before
+    // any checkout or Sync exists, so no merge bytes are left to preserve.
+    const conflictedFiles = conflictedPaths.filter((p) => !isFgosPath(p));
+    if (conflictedFiles.length > 0) return { outcome: 'conflict', conflictedFiles };
+    declareStoreFiles(repoRoot, item, { target: pinned, source, tree, conflictedPaths }, files);
+    const merged = changedStorePaths(repoRoot, source, tree).filter((p) => !files.has(p) && !conflictedPaths.includes(p));
+    const mergedBytes = readPathsAt(repoRoot, tree, merged);
+    for (const p of merged) files.set(p, { path: p, bytes: mergedBytes.get(p) === null ? null : [...mergedBytes.get(p)] });
+  }
+  const options = gitPortOptions(repoRoot, { mutation: true });
+  const worktrees = createGitWorktree(options);
+  let checkout = checkoutPathForBranch(repoRoot, ownBranch);
+  const created = !checkout;
+  if (!checkout) {
+    const parent = path.join(options.trustedMain, '.fgos/runtime/git-catchups');
+    fs.mkdirSync(parent, { recursive: true });
+    checkout = path.join(parent, crypto.randomUUID());
+    worktrees.create({ path: checkout, branch: ownBranch, base: resolveRefSha(repoRoot, ownBranch), operationId: crypto.randomUUID() });
+  }
+  const custody = acquireSync(createLockScope('catchup-source'), 'dispatch-cwd', {
+    fgosDir: path.join(options.trustedMain, '.fgos'), cwd: checkout,
+  });
+  if (custody.result !== 'acquired') {
+    throw new MergeError(`cannot catch up "${ownBranch}": source checkout custody is held`, { branch: ownBranch, code: 'lock-held', lock: 'dispatch-cwd' });
+  }
+  const held = [custody.handle];
+  const sync = createGitSync({ ...options, repoPath: checkout });
+  const operationId = crypto.randomUUID();
+  let prepared;
+  try {
+    // No destination slot is held here. Sync alone owns the source index/ref
+    // under its verified checkout custody, and pins the observed target OID.
+    prepared = sync.prepare({ operationId, target: pinned, message: `catch-up: merge ${target} into ${ownBranch}`, files: [...files.values()] }, held);
+    if (prepared.state === 'conflicted-open') {
+      const conflictedFiles = prepared.resolverGrant;
+      sync.abort({ operationId }, held);
       return { outcome: 'conflict', conflictedFiles };
     }
-
-    const check = await runGoalCheck(item, ephemeral.path, timeoutMs);
+    if (!['prepared', 'up-to-date'].includes(prepared.state)) {
+      return { outcome: 'merge-refused', reason: `Sync preparation returned ${prepared.state}` };
+    }
+    provisionDependencies(checkout);
+    runWorktreeSetupCommands(checkout, repoRoot);
+    const check = await runGoalCheck(item, checkout, timeoutMs);
     if (!check.passed) {
-      abortMergeIfPossible(ephemeral.path);
+      if (prepared.state === 'prepared') sync.abort({ operationId }, held);
       return { outcome: 'verify-fail', timedOut: check.timedOut, exitStatus: check.status, output: check.output };
     }
-
-    execFileSync('git', ['commit', '-m', `catch-up: merge ${target} into ${ownBranch}`], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
-    const catchupHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ephemeral.path, encoding: 'utf8', shell: false }).trim();
-    return { outcome: 'merged', catchupHead, output: check.output };
-  });
+    if (prepared.state === 'prepared') {
+      const finished = sync.continue({ operationId }, held);
+      if (finished.state !== 'done') return { outcome: 'merge-refused', reason: `Sync continuation returned ${finished.state}` };
+    }
+    return { outcome: prepared.state === 'up-to-date' ? 'already-caught-up' : 'merged', catchupHead: resolveRefSha(checkout, 'HEAD'), output: check.output };
+  } catch (err) {
+    // Abort only the recorded owned operation. Native Sync preserves foreign
+    // changes and refuses unknown effects; never fall through to raw abort.
+    if (prepared?.state === 'prepared' || prepared?.state === 'conflicted-open') {
+      try { sync.abort({ operationId }, held); }
+      catch (abortError) { err.abortError = abortError; throw err; }
+    }
+    // The reason is Git's own refusal text when Git refused (G-067).
+    const native = nativeError(err);
+    const stderr = Buffer.from(native.stderr ?? []).toString('utf8').trim();
+    return { outcome: 'merge-refused', reason: stderr || String(native.cause ?? err.message) };
+  } finally {
+    if (created) {
+      try {
+        const tip = resolveRefSha(checkout, 'HEAD');
+        worktrees.remove({ path: checkout, expectedTip: tip, deliveredTo: resolveRefSha(repoRoot, ownBranch), evidenceDigest: crypto.createHash('sha256').update(JSON.stringify({ operationId, tip })).digest('hex'), operationId: crypto.randomUUID() }, held);
+      } catch (err) {
+        process.stderr.write(`fgos: catchup checkout retained at "${checkout}": ${err.message}\n`);
+      }
+    }
+    custody.handle.release();
+  }
 }
 
+const isFgosPath = (p) => p === '.fgos' || p.startsWith('.fgos/');
+
+/** The bytes of each of `paths` at the commit or tree `revision`, or null
+ * where the path is absent there, read through Inspect in bounded batches.
+ * A path that cannot be read as a blob is an error, never an absence: a
+ * declared candidate file must carry the exact bytes or nothing. */
+function readPathsAt(repoRoot, revision, paths) {
+  const found = new Map();
+  for (let at = 0; at < paths.length; at += 4096) {
+    const batch = paths.slice(at, at + 4096);
+    const reads = inspectGit(repoRoot).pathsAtRevision({ revision, paths: batch.map((p) => [...Buffer.from(p)]), maxBlobBytes: 32 * 1024 * 1024 });
+    for (const { path: rawPath, value } of reads) {
+      const relPath = Buffer.from(rawPath).toString('utf8');
+      if (value.kind === 'present') found.set(relPath, Buffer.from(value.bytes));
+      else if (value.kind === 'absent') found.set(relPath, null);
+      else throw new MergeError(`reading "${relPath}" at ${revision} failed: ${value.kind}`);
+    }
+  }
+  return found;
+}
+
+/** Inspect's `mergeTree` of `source` onto `target` (two exact OIDs): the
+ * merged tree and the paths it left conflicted. */
+function readMergeTree(repoRoot, target, source) {
+  let fact;
+  try {
+    fact = inspectGit(repoRoot).mergeTree({ target, source });
+  } catch (err) {
+    throw new MergeError(`reading the merge of ${source} onto ${target} failed: ${err.message}`);
+  }
+  return { tree: fact.tree, conflictedPaths: fact.conflictedPaths.map(p => Buffer.from(p).toString('utf8')) };
+}
+
+/** The `.fgos` paths whose bytes differ between two trees (or commits). */
+const changedStorePaths = (repoRoot, before, after) => diffPaths(inspectGit(repoRoot), before, after, { prefix: '.fgos' });
+
+/** Which of `paths` carry `merge=union` in `target`'s attributes. */
+function unionPathsAt(repoRoot, target, paths) {
+  if (paths.length === 0) return new Set();
+  const facts = inspectGit(repoRoot).attributes({ revision: target, attribute: 'merge', paths: paths.map(p => [...Buffer.from(p)]) });
+  return new Set(facts.filter(f => f.value === 'union').map(f => Buffer.from(f.path).toString('utf8')));
+}
 
 /**
- * Runs under the target's merge slot (taken here, in its own scope).
- * `lockWaitMs`: how long the slot, the worktree-admin mutex and the final
- * land step each wait for another holder (0 = fail at once with lock-held,
- * checked before any work so a no-wait caller is refused in milliseconds
- * instead of after a full verify).
- * `ownFileSet`, when given, is re-checked against repoRoot's own working
- * tree right before the land step's ref move (see `landCasMergeUnderLock`)
- * -- the caller's own pre-check (same `ownFileSet`, same
- * `isWorkingTreeClean`) only proves the tree was clean BEFORE this whole
- * function's merge+verify ran, which can take minutes; without a second
- * check under the lock, a path dirtied in that window would still let
- * `update-ref` move the trunk while the working-tree sync then silently
- * failed (D-ADR0042), leaving repoRoot's index behind the new HEAD.
+ * The one fgOS store rule for a merge of `source` onto `target` (ADR0020: a
+ * worker branch never owns `.fgos`), shared by Land candidates and Sync
+ * catchup. Every conflicted `merge=union` `.fgos` path in `conflictedPaths`,
+ * and every `.fgos` path the merged `tree` changes against `target` that the
+ * branch did not write since its take point (or that is `merge=union`),
+ * keeps the target's bytes (or its absence), declared into `files`. Returns
+ * the conflicted `.fgos` paths it could not resolve and the changed ones the
+ * branch really wrote; the caller decides what those mean.
  */
-export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs, lockWaitMs = CAS_LAND_LOCK_WAIT_MS, ownFileSet = null } = {}) {
-  const { detectTrunk } = await import('./worktree.mjs');
-  const scope = new LockScope('merge-root-into-main');
-  const waitMs = lockWaitMs > 0 ? lockWaitMs : undefined;
-  // The target's slot is held across merge, verify and land: it is what keeps
-  // two merges into one target apart. The main checkout mutex is taken only
-  // for the land step below. `lockWaitMs: 0` (approve --no-wait) makes both
-  // acquires a single try that fails at once, naming the lock.
-  return withMergeSlot(scope, repoRoot, detectTrunk(repoRoot), async () => {
-    if (waitMs === undefined) {
-      // No-wait: refuse in milliseconds when the main checkout is busy,
-      // instead of after a full verify run that cannot land anyway.
-      try {
-        await withMainCheckout(scope, 'precheck', () => {}, { fgosDir: path.join(repoRoot, '.fgos') });
-      } catch (err) {
-        throw toMergeLockError(err, { branch });
-      }
+function declareStoreFiles(repoRoot, item, { target, source, tree, conflictedPaths }, files) {
+  const declare = (relPath, bytes) => files.set(relPath, { path: relPath, bytes: bytes === null ? null : [...bytes] });
+  const conflictedUnion = unionPathsAt(repoRoot, target, conflictedPaths.filter(isFgosPath));
+  const unresolved = conflictedPaths.filter((p) => !conflictedUnion.has(p));
+  const resolvable = conflictedPaths.filter((p) => !unresolved.includes(p));
+  const kept = readPathsAt(repoRoot, target, resolvable);
+  for (const p of resolvable) declare(p, kept.get(p));
+  const takenAt = item.lastAttempt?.branchHeadAtTake ?? item.branchHeadAtTake;
+  const changed = changedStorePaths(repoRoot, target, tree).filter((p) => !files.has(p) && !conflictedPaths.includes(p));
+  const keptBytes = readPathsAt(repoRoot, target, changed);
+  // A path the branch did not change since its take point is inherited
+  // staleness, never the worker's own write: same bytes (or absence) at both.
+  let atTake = null;
+  let atSource = null;
+  if (takenAt && changed.length > 0) {
+    try {
+      atTake = readPathsAt(repoRoot, takenAt, changed);
+      atSource = readPathsAt(repoRoot, source, changed);
+    } catch {
+      atTake = null; // an unreadable take point proves nothing unchanged
     }
-    return mergeRootIntoMainCasUnderSlot(scope, repoRoot, item, branch, { timeoutMs, waitMs, ownFileSet });
-  }, { waitMs });
+  }
+  const sameBytes = (a, b) => (a === null || b === null ? a === b : a.equals(b));
+  const union = unionPathsAt(repoRoot, target, changed);
+  const written = [];
+  for (const p of changed) {
+    const unchangedOnBranch = atTake !== null && sameBytes(atTake.get(p), atSource.get(p));
+    const kept = keptBytes.get(p);
+    if (kept !== null && (unchangedOnBranch || union.has(p))) declare(p, kept);
+    else if (kept === null && unchangedOnBranch) declare(p, null);
+    else written.push(p);
+  }
+  return { unresolved, written };
 }
 
-async function mergeRootIntoMainCasUnderSlot(scope, repoRoot, item, branch, { timeoutMs, waitMs, ownFileSet }) {
-  const { detectTrunk, resolveRefSha, provisionDependencies, runWorktreeSetupCommands } = await import('./worktree.mjs');
-  const { execFileSync } = await import('child_process');
-
-  if (mergeHeadExists(repoRoot)) {
-    return { outcome: 'merge-blocked-other-item', branch };
-  }
-
-  const targetBranch = detectTrunk(repoRoot);
-  const targetTip = resolveRefSha(repoRoot, targetBranch);
-  const branchTip = resolveRefSha(repoRoot, branch);
-
-  const baseDir = path.join(os.tmpdir(), 'fgos-worktrees');
-  fs.mkdirSync(baseDir, { recursive: true });
-  const worktreePath = fs.mkdtempSync(path.join(baseDir, 'cas-merge-'));
-
-  let check;
-  let commitSha;
-
-  // Merge + verify run entirely inside the disposable worktree and never
-  // touch the main checkout, so they run WITHOUT main-checkout.lock --
-  // holding it here would refuse every other lock-taking fgos command
-  // (claim, another approve) for the whole verify run. Only the final
-  // ref move + main-checkout sync below takes the lock.
-  try {
-    await addWorktree(scope, repoRoot, ['--detach', worktreePath, targetTip], { waitMs });
-    fs.rmSync(path.join(worktreePath, '.fgos'), { recursive: true, force: true });
-
-    try {
-      execFileSync('git', ['merge', '--no-commit', '--no-ff', branchTip], { cwd: worktreePath, encoding: 'utf8', shell: false, stdio: 'pipe' });
-    } catch (err) {
-      if (mergeHeadExists(worktreePath)) {
-        return { outcome: 'conflict', branch };
-      }
-      return {
-        outcome: 'merge-failed-unclassified',
-        branch,
-        error: { message: err.message, stderr: err.stderr ?? null, status: err.status ?? null }
-      };
+/**
+ * The trusted-side resolutions a Land candidate of `source` onto `target`
+ * needs, as declared candidate files, read from a read-only
+ * `git merge-tree` of the two exact OIDs: a decision-id collision on the
+ * decision index is renumbered and unioned, and the store rule
+ * (`declareStoreFiles`) keeps the target's `.fgos` bytes. Anything else
+ * returns the outcome the merge verbs already report: `conflict`, or
+ * `fgos-write-rejected` with the paths a branch tried to write under `.fgos`.
+ */
+export function declareLandFiles(repoRoot, item, target, source) {
+  const { tree, conflictedPaths } = readMergeTree(repoRoot, target, source);
+  const files = new Map();
+  const declare = (relPath, bytes) => files.set(relPath, { path: relPath, bytes: bytes === null ? null : [...bytes] });
+  let selfResolved = false;
+  if (conflictedPaths.length === 1 && conflictedPaths[0] === DECISION_INDEX_PATH) {
+    const classification = classifyDecisionIndexText(readPathsAt(repoRoot, tree, [DECISION_INDEX_PATH]).get(DECISION_INDEX_PATH)?.toString('utf8') ?? '');
+    if (!classification) return { outcome: 'conflict' };
+    const port = inspectGit(repoRoot);
+    const targetFiles = new Set(treePaths(port, target, 'docs/decisions/'));
+    const sourceFiles = treePaths(port, source, 'docs/decisions/');
+    const idRenames = new Map();
+    let nextId = nextFreeDecisionId(repoRoot, [target, source]);
+    for (const oldId of classification.collidingIds) {
+      const oldPath = sourceFiles.find((f) => f.match(DECISION_FILE_RE)?.[1] === oldId && !targetFiles.has(f));
+      if (!oldPath) return { outcome: 'conflict' };
+      const newPath = `docs/decisions/${nextId}-${oldPath.match(DECISION_FILE_RE)[2]}.md`;
+      declare(oldPath, null);
+      declare(newPath, Buffer.from(renumberDecisionText(readPathsAt(repoRoot, source, [oldPath]).get(oldPath).toString('utf8'), oldId, nextId)));
+      idRenames.set(oldId, { newId: nextId, newPath });
+      nextId = String(parseInt(nextId, 10) + 1).padStart(4, '0');
     }
+    declare(DECISION_INDEX_PATH, Buffer.from(rebuildDecisionIndex(classification, idRenames)));
+    selfResolved = true;
+  }
+  const { unresolved, written: rejected } = declareStoreFiles(repoRoot, item, {
+    target, source, tree, conflictedPaths: selfResolved ? [] : conflictedPaths,
+  }, files);
+  if (unresolved.length > 0) return { outcome: 'conflict' };
+  if (rejected.length > 0) return { outcome: 'fgos-write-rejected', paths: rejected, ...(selfResolved && { selfResolved }) };
+  return { files: [...files.values()], selfResolved };
+}
 
-    const skipRedundantChecks = mergedTreeAlreadyVerified(repoRoot, item, branch);
-    // A fresh `git worktree add` checks out tracked files only -- verify
-    // needs the MERGED tree's own declared dependencies installed and the
-    // project's worktreeSetup commands run, exactly like every other
-    // disposable checkout this runner stands up (finishWorktreeSetup,
-    // worktree.mjs). Done after the merge so anything the branch itself
-    // adds is covered too. A failed setup is reported as a failed verify:
-    // the merged tree could not be made verifiable, main stays untouched.
+/**
+ * Land `item`'s branch on its target through the native Land transaction,
+ * the one publisher of every runner merge: root into the trunk, leaf into
+ * `fgw/<root>`, a nested root into its parent, a promoted member into its
+ * integration branch. Land's session on the destination's full-ref slot,
+ * not a caller-held slot, excludes other merges into that target through
+ * candidate construction, verification and publication. Work's own event
+ * files are committed through its declared checkpoint before Land starts;
+ * nothing is swept into the land. A stale publication is returned once, and
+ * Work owns settlement; publication authorizes no candidate cleanup.
+ */
+export async function landRunnerItem(repoRoot, item, {
+  branch = branchNameFor(item.id),
+  target = item.parent ? branchNameFor(item.parent) : detectTrunk(repoRoot),
+  timeoutMs,
+  lockWaitMs = DEFAULT_LOCK_WAIT_MS,
+  ownFileSet = null,
+  operationId = crypto.randomUUID(),
+} = {}) {
+  const destination = `refs/heads/${target}`;
+  const fgosDir = path.join(repoRoot, '.fgos');
+  const mergeSlot = ['merge-slot', { fgosDir, ref: encodeURIComponent(destination) }, `merge slot of "${destination}"`];
+  const lockHeld = ([lock, params, label]) => {
+    const holders = lockHolders(lock, params).pids ?? [];
+    return new MergeError(`cannot merge "${branch}" into "${target}": ${label} is held by another process${holders.length ? ` (pid ${holders.join(', ')})` : ''}.`, {
+      branch, targetRef: target, code: 'lock-held', holders, lock,
+    });
+  };
+  // No-wait refuses a held slot before any read; Land's own try stays the decision.
+  if (lockWaitMs === 0 && probe(mergeSlot[0], mergeSlot[1]).result === 'held') throw lockHeld(mergeSlot);
+  // Only a destination the main checkout holds involves its index at all.
+  const onMain = checkedOutRef(repoRoot) === destination;
+  if (onMain && mergeHeadExists(repoRoot)) return { outcome: 'merge-blocked-other-item', branch };
+  // Work decides which event files are due outside every lock; the commit
+  // itself takes the main checkout only for its own duration. Without one,
+  // no-wait still refuses in milliseconds when the main checkout Land would
+  // publish into is busy, instead of after a full verify that cannot publish.
+  const checkpoint = prepareMainFgosCheckpoint(fgosDir, repoRoot);
+  if (checkpoint?.files.length || (onMain && lockWaitMs === 0)) {
+    try {
+      await withMainCheckout(new LockScope('land-runner-item'), checkpoint?.files.length ? 'checkpoint' : 'precheck', (mainHandle) => {
+        if (checkpoint?.files.length) checkpointMainFgos(mainHandle, fgosDir, repoRoot, { prepared: checkpoint });
+      }, { fgosDir, ...(lockWaitMs > 0 && { waitMs: lockWaitMs }) });
+    } catch (err) {
+      throw toMergeLockError(err, { branch });
+    }
+  }
+  // Trusted-side resolutions are bytes bound to the target they were read
+  // against; only then is that target pinned, otherwise Land pins its own.
+  const pinned = resolveRefSha(repoRoot, target);
+  const source = resolveRefSha(repoRoot, branch);
+  const declared = declareLandFiles(repoRoot, item, pinned, source);
+  if (declared.outcome) return { ...declared, branch };
+  const { files, selfResolved } = declared;
+  // Read the paths this branch brings before it lands: afterwards the target
+  // contains it and the diff that names them is empty (tsk-2ypd).
+  const landedFiles = changedFiles(repoRoot, item, { trunk: target });
+  const options = gitPortOptions(repoRoot, { mutation: true });
+  const port = createGitLand(options);
+  // A result that published nothing carries the `abandoned` settlement, so
+  // its candidate is released like a delivered one once Work durably records
+  // that result (Git spec §9, M4).
+  const settled = (result, settlementKind = 'abandoned') => {
+    const landSettlement = landSettlementFor(options, operationId, settlementKind);
+    return landSettlement ? { ...result, landSettlement } : result;
+  };
+  let phase = 'prepare';
+  const result = await (async () => { try {
+    const { candidate, receipt: previous } = await port.prepare({
+      operationId,
+      waitMs: lockWaitMs,
+      request: {
+        source,
+        ...(files.length > 0 && { target: pinned }),
+        destination,
+        message: `merge ${branch} into ${target}`,
+        squash: false,
+        footprint: ownFileSet ? [...ownFileSet] : null,
+        subtree: null,
+        files,
+      },
+    });
+    if (previous) {
+      return settled({ outcome: 'merged', branch,
+        check: { passed: true, status: 0, timedOut: false, skipped: true, output: `publication already verified and recorded by Land operation ${operationId}; awaiting Work settlement` },
+        receipt: previous }, 'delivered');
+    }
+    // Eligibility still belongs to Work, decided against the exact source and
+    // target Land pinned for this candidate, never a target read before it.
+    const skipRedundantChecks = mergedTreeAlreadyVerified(repoRoot, item, candidate.source, candidate.target);
+    let check;
     if (!skipRedundantChecks) {
       try {
-        provisionDependencies(worktreePath);
-        runWorktreeSetupCommands(worktreePath, repoRoot);
+        provisionDependencies(candidate.worktree);
+        runWorktreeSetupCommands(candidate.worktree, repoRoot);
       } catch (err) {
-        return { outcome: 'verify-fail', branch, check: { passed: false, status: 1, timedOut: false, output: err.message } };
+        return settled({ outcome: 'verify-fail', branch, check: { passed: false, status: 1, timedOut: false, output: err.message } });
       }
+      check = await runGoalCheck(item, candidate.worktree, timeoutMs);
+      if (check.passed) {
+        // The repo-invariant gate runs on the exact tree about to land.
+        const invariant = await runInvariantChecks(readInvariantCheckCommands(repoRoot), candidate.worktree, timeoutMs);
+        if (!invariant.passed) return settled({ outcome: 'verify-fail', branch, check: invariantFailureAsCheck(invariant), ...(selfResolved && { selfResolved }) });
+      }
+    } else {
+      check = {
+        passed: true, status: 0, timedOut: false, skipped: true,
+        output: `verify skipped: the merged tree is identical to ${item.branchHeadAtReturn}, already verified green at return (${target} is an ancestor of "${branch}" or advanced only on paths it never touched, and the branch tip has not moved since)`,
+      };
     }
-    check = skipRedundantChecks
-      ? {
-          passed: true,
-          status: 0,
-          timedOut: false,
-          skipped: true,
-          output: `verify skipped: the merged tree is identical to ${item.branchHeadAtReturn}, already verified green at return (HEAD is an ancestor of "${branch}" and the branch tip has not moved since)`,
-        }
-      : await runGoalCheck(item, worktreePath, timeoutMs);
-
-    if (!check.passed) {
-      return { outcome: 'verify-fail', branch, check };
+    if (!check.passed) return settled({ outcome: 'verify-fail', branch, check, ...(selfResolved && { selfResolved }) });
+    phase = 'publish';
+    const receipt = await port.publish({
+      source: candidate.source, target: candidate.target,
+      candidate: candidate.candidate, treeDigest: candidate.treeDigest,
+      evidenceDigest: crypto.createHash('sha256').update(JSON.stringify({ item: item.id, check })).digest('hex'),
+    }, { waitMs: lockWaitMs });
+    return settled({ outcome: 'merged', branch, check, receipt, ...(selfResolved && { selfResolved }) }, 'delivered');
+  } catch (err) {
+    let detail;
+    try { detail = JSON.parse(err.message); } catch { detail = {}; }
+    const cause = detail.cause;
+    if (cause === 'land-already-merged' || cause === 'land-identical-tips') {
+      // A prior run landed this branch and stopped before Work recorded it.
+      // Bare ancestry is not proof the content is there (tsk-15k), and every
+      // 'merged' outcome still carries a fresh verify of the target's tree.
+      const mismatchedPaths = branchContentMismatch(repoRoot, branch, target);
+      if (mismatchedPaths.length) return { outcome: 'verify-fail', branch, check: { passed: false, status: null, output: `integrity check failed: "${branch}" is an ancestor of ${target} but its own content is not reflected there for: ${mismatchedPaths.join(', ')} — a prior merge likely discarded this branch's changes (e.g. a manually-resolved "git merge -s ours") while still recording it as a parent` } };
+      const verified = await withTargetCheckout(repoRoot, target, onMain, async (tree) => {
+        const check = await runGoalCheck(item, tree, timeoutMs);
+        if (!check.passed) return { outcome: 'verify-fail', branch, check };
+        const invariant = await runInvariantChecks(readInvariantCheckCommands(repoRoot), tree, timeoutMs);
+        if (!invariant.passed) return { outcome: 'verify-fail', branch, check: invariantFailureAsCheck(invariant) };
+        return { outcome: 'merged', branch, check };
+      });
+      return verified;
     }
-
-    const treeSha = execFileSync('git', ['write-tree'], { cwd: worktreePath, encoding: 'utf8' }).trim();
-    const commitMsg = `merge ${branch} into ${targetBranch}`;
-    commitSha = execFileSync('git', ['commit-tree', treeSha, '-p', targetTip, '-p', branchTip, '-m', commitMsg], { cwd: repoRoot, encoding: 'utf8' }).trim();
+    if (cause === 'land-conflict-aborted') return settled({ outcome: 'conflict', branch });
+    if (cause === 'main-checkout-dirty-mid-merge') return settled({ outcome: cause, branch });
+    if (cause === 'foreign-target-checkout') {
+      throw new MergeError(`cannot merge "${branch}" into "${target}": "${target}" is checked out in another worktree, and Land never moves a branch behind another index. Finish or remove that checkout, then retry.`, {
+        branch, targetRef: target, code: cause,
+      });
+    }
+    if (typeof cause === 'string' && cause.startsWith('lock-acquire-unavailable')) {
+      // Land waits for its own full-ref slot at prepare and for main at publish.
+      throw lockHeld(phase === 'prepare' ? mergeSlot : ['main-checkout', { fgosDir }, 'main checkout (land)']);
+    }
+    // Preserve Land's stale result, including operation identity and recovery
+    // evidence. Never re-run verification or CAS against a different target.
+    if (detail.errorClass === 'stale' || cause === 'land-target-changed' || cause === 'land-cas-lost') throw err;
+    // A publication whose effect is unknown is never claimed abandoned: no
+    // Work result is recorded, the candidate stays, and Land recovery
+    // decides what happened before this id is published again.
+    if (phase === 'publish') {
+      throw new MergeError(`cannot tell whether "${branch}" was published into "${target}": Land operation ${operationId} failed during publication (${err.message}). Run \`fgos doctor --fix\` (git-land-recovery) to settle it, then approve again.`, {
+        branch, targetRef: target, code: 'land-effect-unknown', operationId,
+      });
+    }
+    return settled({
+      outcome: 'merge-failed-unclassified', branch,
+      error: { message: err.message, stderr: err.stderr ?? null, status: err.status ?? null },
+    });
   } finally {
-    try {
-      execFileSync('git', ['worktree', 'remove', '--force', worktreePath], { cwd: repoRoot });
-    } catch (e) {}
-    try {
-      execFileSync('git', ['worktree', 'prune'], { cwd: repoRoot });
-    } catch (e) {}
+    port.close();
+  } })();
+  if (result.outcome !== 'merged') return result;
+  // Drift detection is read-only reporting after publication, outside the
+  // publication's error handling: its failure never turns a land into a
+  // failed merge.
+  let postLand;
+  try {
+    postLand = detectPostLandDrift(repoRoot, listWork(fgosDir), item, { target, landedFiles, sessions: listSessions(repoRoot) });
+  } catch (err) {
+    postLand = { landed: item.id, target, landedFiles, error: `post-land drift detection failed: ${err.message}` };
   }
-
-  const landed = await landCasMergeUnderLock(scope, repoRoot, { branch, targetBranch, targetTip, commitSha, ownFileSet, waitMs });
-  if (landed) return landed;
-  return { outcome: 'merged', branch, check };
+  return { ...result, postLand };
 }
 
-// Budget for waiting on another holder of the main checkout mutex at the
-// steps that write it (land, merge commit). Other holders only keep it for
-// short git/index operations, so a brief wait beats throwing lock-held --
-// that would make approve's whole-call retry redo the entire verify run.
-const CAS_LAND_LOCK_WAIT_MS = 60 * 1000;
+/** Work's unique settlement identity `(repoIdentity, operationId,
+ * settlementKind)` for a Land operation (Git spec §9 step 6, M4), or null
+ * when Land journalled nothing under `operationId`: then there is no
+ * candidate to release, and an unreadable journal keeps whatever it holds. */
+function landSettlementFor(options, operationId, settlementKind) {
+  let operation;
+  try {
+    operation = createGitRecovery(options).inspectOperation({ operationId });
+  } catch {
+    return null;
+  }
+  return { repoIdentity: operation.repoIdentity, operationId, settlementKind };
+}
 
 /**
- * The only step of the root-into-main merge that touches the main checkout:
- * atomically moves the target ref (`git update-ref <ref> <new> <old>`
- * refuses if the trunk moved since the merge started) and syncs the main
- * checkout's working tree when it has the trunk checked out. Returns null
- * on success, or an outcome object when the ref move is refused. Throws
- * MergeError code lock-held when the main checkout mutex stays held past `waitMs`.
- *
- * `ownFileSet`, when given, is re-checked here -- under the lock, right
- * before `update-ref` -- against a fresh path this exact merge already
- * spent minutes proving clean once, before the lock was ever taken (the
- * caller's own pre-check). A dirty path re-appearing in that window is
- * reported as `main-checkout-dirty-mid-merge` instead of racing
- * `update-ref`/`read-tree`.
+ * Release a Land operation's candidate, pins and journal once Work has
+ * durably recorded its result, delivered or abandoned (Git spec §9 cleanup
+ * admission, M4): `acknowledgement` names that durable record. Cleanup
+ * never negates the result, so a failure comes back as a warning, and Land
+ * itself retains whatever it cannot prove safe to remove.
  */
-async function landCasMergeUnderLock(scope, repoRoot, { branch, targetBranch, targetTip, commitSha, ownFileSet = null, waitMs }) {
-  const { execFileSync } = await import('child_process');
-  const fgosDir = path.join(repoRoot, '.fgos');
+export function acknowledgeLand(repoRoot, operationId, acknowledgement) {
+  let port;
   try {
-    return await withMainCheckout(scope, 'land', () => {
-      if (ownFileSet && !isWorkingTreeClean(repoRoot, ownFileSet)) {
-        return { outcome: 'main-checkout-dirty-mid-merge', branch };
-      }
-      const currentBranch = execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
-      const syncsWorkingTree = currentBranch === targetBranch;
-      let stagedFgos = [];
-      const isFgosPath = (p) => p === '.fgos' || p.startsWith('.fgos/');
-      if (syncsWorkingTree) {
-        // The working-tree sync below resets the index to the new HEAD and
-        // removes staged additions from disk: a person's staged change must
-        // refuse the land, never be discarded by it.
-        const staged = nulPaths(execFileSync('git', ['diff', '--name-only', '--cached', '--no-renames', '--no-relative', '-z'], { cwd: repoRoot, encoding: 'utf8', maxBuffer: GIT_LIST_MAX_BUFFER }));
-        const stagedPaths = staged.filter((p) => !isFgosPath(p));
-        if (stagedPaths.length > 0) {
-          return { outcome: 'main-checkout-dirty-mid-merge', branch, stagedPaths };
-        }
-        // Staged `.fgos` event files are swept into main's index on purpose
-        // (see the sweep in mergeRunnerItemLocked) and are fgOS's own: keep
-        // them across the sync instead of refusing every land behind them.
-        stagedFgos = staged.filter(isFgosPath)
-          .filter((p) => fs.existsSync(path.join(repoRoot, p)))
-          .map((p) => ({ p, content: fs.readFileSync(path.join(repoRoot, p)) }));
-      }
-      try {
-        execFileSync('git', ['update-ref', `refs/heads/${targetBranch}`, commitSha, targetTip], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' });
-      } catch (err) {
-        return {
-          outcome: 'merge-failed-unclassified',
-          branch,
-          error: { message: `update-ref failed: ${err.message}`, stderr: err.stderr ?? null, status: err.status ?? null }
-        };
-      }
-      if (syncsWorkingTree) {
-        try {
-          execFileSync('git', ['read-tree', '-m', '-u', 'HEAD'], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' });
-        } catch (e) {
-          // Non-destructive sync aborted due to unstaged changes on non-intersecting paths.
-          // Leaving the working tree out of sync, which is acceptable under D-ADR0042.
-        }
-        for (const { p, content } of stagedFgos) {
-          fs.mkdirSync(path.dirname(path.join(repoRoot, p)), { recursive: true });
-          fs.writeFileSync(path.join(repoRoot, p), content);
-        }
-        if (stagedFgos.length > 0) {
-          try {
-            execFileSync('git', ['add', '--', ...stagedFgos.map(({ p }) => p)], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' });
-          } catch {
-            // The content is back on disk; restaging is best effort after the ref already moved.
-          }
-        }
-      }
-      return null;
-    }, { fgosDir, waitMs });
+    port = createGitLand(gitPortOptions(repoRoot, { mutation: true }));
+    return port.recover({ operationId, consumerAcknowledgement: acknowledgement }).warnings;
   } catch (err) {
-    throw toMergeLockError(err, { branch });
+    return [`land-cleanup-deferred: ${err.message}`];
+  } finally {
+    port?.close();
+  }
+}
+
+/** The ref the main checkout has checked out, or null when it is detached. */
+function checkedOutRef(repoRoot) {
+  const main = realpathOrSelf(repoRoot);
+  return gitWorktrees(repoRoot).find((row) => realpathOrSelf(Buffer.from(row.path).toString('utf8')) === main)?.branch ?? null;
+}
+
+/**
+ * Run `fn` on a tree holding `target`'s tip: the main checkout itself when it
+ * has the target checked out, otherwise a disposable detached checkout made
+ * (and provisioned like a Land candidate) and removed through the Worktree
+ * port.
+ */
+async function withTargetCheckout(repoRoot, target, onMain, fn) {
+  if (onMain) return fn(repoRoot);
+  const checkout = createVerifyCheckout(repoRoot, resolveRefSha(repoRoot, target));
+  try {
+    return await fn(checkout);
+  } finally {
+    try { removeWorktree(repoRoot, checkout, { force: true }); }
+    catch (err) { process.stderr.write(`fgos: verification checkout retained at "${checkout}": ${err.message}\n`); }
   }
 }

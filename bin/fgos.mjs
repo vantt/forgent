@@ -30,6 +30,7 @@ import path from 'node:path';
 import readline from 'node:readline';
 import { execFileSync, execSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { randomUUID } from 'node:crypto';
 import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, OUTCOME_EXIT_CODES, categoryOf, exitCodeForOutcome, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
 import { resolveDocPath } from '../src/report/knowledge-resolver.mjs';
 import { resolveDocId } from '../src/state/knowledge-registry.mjs';
@@ -81,7 +82,7 @@ import { frozenJudgeHits, footprintDiffHits } from '../src/runner/frozen-judge.m
 import { normalizePath } from '../src/util/normalize-path.mjs';
 import { collectOutcomeEntry } from '../src/report/item-trace.mjs';
 import { cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean, buildOwnFileSet } from '../src/runner/merge.mjs';
-import { nulPaths, GIT_LIST_MAX_BUFFER } from '../src/util/git-paths.mjs';
+import { inspectEntries, inspectPath } from '../src/util/git-paths.mjs';
 import { assertSafeMainCheckoutReset } from '../src/runner/main-checkout-reset-guard.mjs';
 import { rejectUseCase } from '../src/verbs/merge/reject.mjs';
 import { reviewUseCase } from '../src/verbs/merge/review.mjs';
@@ -100,12 +101,15 @@ import { invokeDispatchInspectOperation } from '../src/verbs/dispatch/inspect.mj
 import { invokeDispatchReconcileOperation } from '../src/verbs/dispatch/reconcile.mjs';
 import { watchRunUseCase } from '../src/verbs/dispatch/watch.mjs';
 import { recoverObserveUseCase, recoverApplyUseCase } from '../src/verbs/dispatch/recover.mjs';
-import { unreleasedHasEntries } from '../src/setup/registrations.mjs';
-import { branchNameFor, branchExists, provisionDependencies, resyncWorktree, detectTrunk, isMainWorktree, currentHead, realpathOrSelf as realpathOr } from '../src/runner/worktree.mjs';
+import { unreleasedHasEntries, pathExistsAt, commitAt } from '../src/setup/registrations.mjs';
+import { branchNameFor, branchExists, resyncWorktree, detectTrunk, isMainWorktree, currentHead, realpathOrSelf as realpathOr, inspectGit, resolveRefSha, gitWorktrees, createVerifyCheckout, removeWorktree } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
 import { isReclaimEligible } from '../src/runner/claim-liveness.mjs';
 import { withLockRetry } from '../src/runner/lock-wait.mjs';
-import { withMainCheckout, addWorktree } from '../src/runner/repo-locks.mjs';
+import { withMainCheckout } from '../src/runner/repo-locks.mjs';
+import { gitPortOptions, gitWriter } from '../src/git/inspect.mjs';
+import { nativeError } from '../src/git/native.mjs';
+import { createGitSafeRestore } from '../src/git/restore.mjs';
 import { HolderLockError, createLockScope } from '../src/holder-lock/index.mjs';
 import { collectLockStatus } from '../src/runner/lock-status.mjs';
 import { fenceLock, parseLockParams } from '../src/runner/lock-fence.mjs';
@@ -156,24 +160,44 @@ function dataDir(overrideDir) {
     return fgosDirFromRoot(overrideDir);
   }
   // strict: true — this CLI's `.fgos/` always lives under the caller's own
-  // cwd, never git-resolved upward (D5, matches the pull-door assumption
-  // in gitAt's own comment below).
+  // cwd, never git-resolved upward (D5: the pull door's `take`/`return`
+  // operate directly on `cwd`, never a worktree).
   return resolveFgosDir(process.cwd(), { strict: true });
 }
 
-// Host-repo git helpers for the pull door (`take`/`return`, stage-decompose
-// D1): both verbs operate directly on `cwd` — never a worktree, same
-// assumption `dataDir()` above already makes (this CLI's `.fgos/` always
-// lives under the caller's own cwd). A git failure here (not a repo, no
-// commits yet) is reported as `validation` rather than escaping as an
-// "unexpected" (exit 1) — every other error surface in this file already
-// follows the R4 exit-code contract.
-function gitAt(cwd, args, { maxBuffer } = {}) {
+// `main-checkout-reset` reads: the commits a reset would drop and the whole-repo status, both through
+// Inspect. Listing is advisory, so it is bounded and degrades instead of failing the verb.
+const RESET_LISTED_COMMITS = 50;
+function describeLostCommits(inspect, commits) {
+  const shown = commits.slice(0, RESET_LISTED_COMMITS);
+  let objects = [];
   try {
-    return execFileSync('git', args, { cwd, encoding: 'utf8', shell: false, ...(maxBuffer ? { maxBuffer } : {}) });
-  } catch (err) {
-    throw new StoreError('validation', `git ${args.join(' ')} failed in "${cwd}": ${err.message}`);
+    objects = inspect.readObjects({ oids: shown, maxBytes: 8 * 1024 * 1024 });
+  } catch (_err) {
+    // Details unavailable: the short ids below still name every listed commit.
   }
+  const lines = shown.map((oid, i) => {
+    const object = objects[i];
+    if (object?.kind !== 'present' || object.objectType !== 'commit') return `${oid.slice(0, 7)} (commit details unavailable)`;
+    const [header, ...body] = Buffer.from(object.bytes).toString('utf8').split('\n\n');
+    const author = /^author (.*) <([^>]*)> \d+ [+-]\d{4}$/m.exec(header);
+    return `${oid.slice(0, 7)} ${author ? `${author[1]} (${author[2]})` : '(unknown author)'}: ${body.join('\n\n').split('\n', 1)[0]}`;
+  });
+  if (commits.length > shown.length) lines.push(`... and ${commits.length - shown.length} more`);
+  return lines.join('\n');
+}
+function renderStatus(inspect) {
+  const lines = [];
+  let cursor;
+  do {
+    const page = inspect.status({ untracked: 'all', maxEntries: 4096, cursor });
+    for (const entry of page.entries) {
+      const xy = entry.untracked ? '??' : entry.ignored ? '!!' : String.fromCharCode(entry.index, entry.worktree).replaceAll('.', ' ');
+      lines.push(`${xy} ${Buffer.from(entry.path).toString('utf8')}`);
+    }
+    cursor = page.nextCursor;
+  } while (cursor);
+  return lines.join('\n');
 }
 
 // `currentHead`/`resolveRefSha` live in src/runner/worktree.mjs (tsk-49i
@@ -194,7 +218,7 @@ function isWorkingTreeClean(cwd, ownFileSet = null) {
 }
 
 function commitsSince(cwd, from, to) {
-  return parseInt(gitAt(cwd, ['rev-list', '--count', `${from}..${to}`]).trim(), 10) || 0;
+  return Number(inspectGit(cwd).countCommits({ include: resolveRefSha(cwd, to), exclude: resolveRefSha(cwd, from) })) || 0;
 }
 
 // STR63: the file paths `return` actually changed between `from` and `to` —
@@ -205,7 +229,15 @@ function commitsSince(cwd, from, to) {
 // Byte for byte and a rename as both halves, like the clean-tree gate's own
 // status read: a path moved out of the footprint still counts as touched.
 function changedFilesSince(cwd, from, to) {
-  return nulPaths(gitAt(cwd, ['diff', '--name-only', '--no-renames', '--no-relative', '-z', from, to], { maxBuffer: GIT_LIST_MAX_BUFFER }));
+  const inspect = inspectGit(cwd);
+  const sides = { before: resolveRefSha(cwd, from), after: resolveRefSha(cwd, to) };
+  return inspectEntries((page) => inspect.diff({ ...page, ...sides })).map((entry) => inspectPath(entry.path));
+}
+
+// Whether HEAD of `repoRoot` holds `relativePath` (a blob or a tree); false outside a repository or
+// before the first commit.
+function existsAtHead(repoRoot, relativePath) {
+  try { return pathExistsAt(repoRoot, commitAt(repoRoot, 'HEAD'), relativePath); } catch { return false; }
 }
 
 // tsk-4hl: an item's own docs/history/<id>/iron-law-evidence.md is a
@@ -1040,7 +1072,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // distinction worth making.
       let gitHeadless = false;
       try {
-        execFileSync('git', ['rev-parse', '--verify', '--quiet', 'HEAD'], { cwd: path.dirname(dir), encoding: 'utf8', shell: false });
+        gitHeadless = typeof inspectGit(path.dirname(dir)).resolveCommit({ name: 'HEAD' }) !== 'string';
       } catch {
         gitHeadless = true;
       }
@@ -1623,15 +1655,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         }
 
         const repoRoot = path.dirname(dir);
-        let existsAtHead = false;
-        try {
-          execFileSync('git', ['cat-file', '-e', `HEAD:${targetDoc.currentPath}`], { cwd: repoRoot, stdio: 'ignore' });
-          existsAtHead = true;
-        } catch {
-          existsAtHead = false;
-        }
-
-        if (!existsAtHead) {
+        if (!existsAtHead(repoRoot, targetDoc.currentPath)) {
           throw new StoreError(
             'validation',
             `doc promote: file '${targetDoc.currentPath}' is not committed at git HEAD. Remedy: commit file '${targetDoc.currentPath}' to git HEAD before promoting.`
@@ -1692,15 +1716,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const resolved = resolveDocPath(view, docPath);
 
         const repoRoot = path.dirname(dir);
-        let committedAtHead = false;
-        try {
-          execFileSync('git', ['cat-file', '-e', `HEAD:${docPath}`], { cwd: repoRoot, stdio: 'ignore' });
-          committedAtHead = true;
-        } catch {
-          committedAtHead = false;
-        }
-
-        if (!committedAtHead) {
+        if (!existsAtHead(repoRoot, docPath)) {
           throw new StoreError('validation', `knowledge attest: path '${docPath}' is not committed at git HEAD. Remedy: commit file '${docPath}' to git HEAD first.`);
         }
 
@@ -1795,9 +1811,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // while their tags still claimed they existed.
       if (docPath !== undefined) {
         const repoRoot = path.dirname(dir);
-        try {
-          execFileSync('git', ['cat-file', '-e', `HEAD:${docPath}`], { cwd: repoRoot, encoding: 'utf8', shell: false, stdio: ['ignore', 'ignore', 'pipe'] });
-        } catch {
+        if (!existsAtHead(repoRoot, docPath)) {
           throw new StoreError('validation', `compound: --doc-path "${docPath}" is not committed at the main checkout's HEAD ("${repoRoot}") — write and commit the document there before tagging it.`);
         }
         // docs/architect/knowledge-registry-redesign.md §8: "The new
@@ -3388,7 +3402,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const branch = branchNameFor(id);
         let branchHead;
         try {
-          branchHead = gitAt(repoRoot, ['rev-parse', branch]).trim();
+          branchHead = resolveRefSha(repoRoot, branch);
         } catch (err) {
           throw new StoreError('validation', `return: branch "${branch}" for "${id}" not found or unreadable: ${err.message}`);
         }
@@ -3439,41 +3453,21 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           // and never `reclaimOrphanedCheckout` (that would force-remove a
           // checkout the human is actively using — the exact BLOCKER the
           // validating gate caught).
-          const tmpWorktree = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-return-'));
+          // The verify-checkout door (Worktree port, worktree-admin 40 held) detaches it at the
+          // tip and strips the worker `.fgos`, like every other worker checkout.
+          const tmpWorktree = createVerifyCheckout(repoRoot, branchHead);
           try {
-            await addWorktree(createLockScope('return-verify'), repoRoot, ['--detach', tmpWorktree, branchHead]);
-            // `.fgos/` strip (ADR0020, tsk-26r): since `.fgos/` is
-            // git-tracked in this repo, the `worktree add` above just
-            // checked out a snapshot of it frozen at branchHead — stale the
-            // moment main gets another event, and (per createWorktree's own
-            // finishWorktreeSetup, src/runner/worktree.mjs) something this
-            // disposable verify worktree has no legitimate reason to read or
-            // write anyway. Strip it the same way createWorktree does, right
-            // after checkout and before verify runs, so this ephemeral
-            // worktree's tree looks like every other worker worktree instead
-            // of tripping fgos-return.test.mjs's main-checkout-cleanliness /
-            // `.fgos`-dirty-tree exemption checks on a checked-out copy
-            // nothing here ever needed.
-            try {
-              fs.rmSync(path.join(tmpWorktree, '.fgos'), { recursive: true, force: true });
-            } catch (err) {
-              throw new StoreError('validation', `return: removing checked-out .fgos in ephemeral verify worktree "${tmpWorktree}" failed: ${err.message}`);
-            }
             // tsk-5l2-1 finding (real, kept as evidence): tmpWorktree lives
             // under os.tmpdir(), outside the repo tree — Node's ESM loader
             // never consults NODE_PATH, so a bare-specifier import (e.g.
             // "yaml") can only resolve via a real node_modules directory
             // reachable by walking up from tmpWorktree itself. A symlink
-            // pointed at the nearest real install was considered here too
-            // (tsk-5l2-1) and rejected for the same reason tsk-2vd D2
-            // already rejected it for createWorktree: it only reflects
-            // whatever the symlink source already has installed, never the
-            // checked-out branch's own declared dependencies — exactly the
-            // scenario (a branch merging in a new dependency before that
-            // merge lands on the source's own default branch) that exposed
-            // this whole gap. provisionDependencies installs for THIS
-            // worktree's own package.json instead.
-            provisionDependencies(tmpWorktree);
+            // pointed at the nearest real install was rejected (tsk-2vd D2):
+            // it only reflects whatever the symlink source has installed,
+            // never the checked-out branch's own declared dependencies.
+            // createVerifyCheckout provisions THIS checkout's own
+            // package.json and records what it placed, so removeWorktree
+            // below takes it back.
             check = await runGoalCheck(item, tmpWorktree, timeoutMs);
             // tsk-516 (CONTEXT.md D3/D4): the repo-invariant checks run in the
             // SAME disposable worktree, while it still exists — the `finally`
@@ -3485,13 +3479,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
               if (!invariant.passed) check = invariantFailureAsCheck(invariant);
             }
           } finally {
-            try {
-              execFileSync('git', ['worktree', 'remove', tmpWorktree, '--force'], { cwd: repoRoot, encoding: 'utf8', shell: false });
-            } catch {
-              // best-effort — mirrors worktree.mjs's own removeWorktree/prune
-              // discipline; a cleanup failure must never mask the verify
-              // result already computed above.
-            }
+            // Guarded removal: a checkout still holding bytes is preserved and named, never forced;
+            // a cleanup failure must never mask the verify result already computed above.
+            try { removeWorktree(repoRoot, tmpWorktree, { force: true }); }
+            catch (err) { process.stderr.write(`fgos: return verify checkout retained at "${tmpWorktree}": ${err.message}\n`); }
           }
         }
 
@@ -3727,7 +3718,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // fgw/<parentId> for a nested root — WITHOUT touching the root item's
     // own status/stage (CONTEXT.md's locked contract: this replaces the
     // ad-hoc `git merge` tsk-3bn's own origin incident required by hand).
-    // Reuses `mergeRunnerItem`'s exact lock/verify path (constraint #1,
+    // Reuses `landRunnerItem`'s exact Land/verify path (constraint #1,
     // fgos-coding-validating's gate) — never a second bespoke merge mechanism.
     // Unlike `approve`'s root-into-main path, this never deletes fgw/<id>
     // afterward: the root stays open for further leaf merges.
@@ -3807,11 +3798,9 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // the item's own linked worktree (e.g. a session that just hit
       // verify-fail-post-merge and is still sitting inside its own picked
       // worktree) always passes --dir at the stable main checkout —
-      // deriving repoRoot from it keeps withMergeEphemeralWorktree's own
-      // `git branch -f` (src/runner/worktree.mjs) targeting that stable
-      // root instead of the worktree currently checked out on the same
-      // branch it is about to force-update, which git refuses ("Cannot
-      // force update the current branch"). Byte-identical to today when
+      // deriving repoRoot from it keeps catchup's Sync and its trusted
+      // main resolution on that stable root instead of the worktree
+      // currently checked out on the item's own branch. Byte-identical to today when
       // --dir is omitted (dataDir() resolves dir from process.cwd() too
       // in that case). This verb has no `--trust-dir` gate, unlike
       // approve/sync-root/promote-to-component — a real per-verb
@@ -3834,7 +3823,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const cwd = process.cwd();
         const repoRoot = resolveMainCheckoutRoot(cwd) ?? cwd;
         const stateRoot = worktreeStateRoot({ fgosDir: path.join(repoRoot, '.fgos') }).stateRoot;
-        const writer = String(resolveWriterIdentity(path.join(repoRoot, '.fgos')).id);
+        const writer = gitWriter(path.join(repoRoot, '.fgos'));
         return createWorktreeUseCase({ cwd, repoRoot, stateRoot, writer }, {
           path: positional[1], branch: optionalField(flags.branch, 'worktree create --branch requires a name'),
           detach: Boolean(flags.detach), base: optionalField(flags.base, 'worktree create --base requires a ref'),
@@ -3845,7 +3834,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const cwd = process.cwd();
         const repoRoot = resolveMainCheckoutRoot(cwd) ?? cwd;
         const stateRoot = worktreeStateRoot({ fgosDir: path.join(repoRoot, '.fgos') }).stateRoot;
-        const writer = String(resolveWriterIdentity(path.join(repoRoot, '.fgos')).id);
+        const writer = gitWriter(path.join(repoRoot, '.fgos'));
         return removeWorktreeUseCase({ cwd, repoRoot, stateRoot, writer }, {
           path: positional[1], deliveredTo: requireField(flags['delivered-to'], 'worktree remove requires --delivered-to <ref>'),
         });
@@ -4293,7 +4282,9 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
 
     case 'preflight': {
       const cwd = flags.dir !== undefined ? path.resolve(flags.dir) : process.cwd();
-      const repoRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], { cwd, encoding: 'utf8' }).trim();
+      const facts = inspectGit(cwd).resolveRepo();
+      if (facts.notARepository) throw new StoreError('validation', `preflight: "${cwd}" is not inside a Git repository`);
+      const repoRoot = facts.worktreeRoot;
 
       const checks = [];
 
@@ -4311,9 +4302,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           const msg = (buildRes.error?.message || buildRes.stderr || buildRes.stdout || 'npm run build:skills failed').trim();
           checks.push({ id, description, passed: false, message: msg });
         } else {
-          const diffRes = spawnSync('git', ['diff', '--exit-code', '--', '.claude/skills', 'plugins/fgOS/skills'], { cwd: repoRoot, encoding: 'utf8' });
-          if (diffRes.status !== 0) {
-            const msg = (diffRes.stdout || diffRes.stderr || 'uncommitted skill wrapper drift in .claude/skills or plugins/fgOS/skills').trim();
+          const inspect = inspectGit(repoRoot);
+          const drift = ['.claude/skills/', 'plugins/fgOS/skills/'].flatMap((prefix) =>
+            inspectEntries((page) => inspect.diff({ ...page, index: true, worktree: true, prefix })).map((entry) => inspectPath(entry.path)));
+          if (drift.length) {
+            const msg = `uncommitted skill wrapper drift in .claude/skills or plugins/fgOS/skills: ${drift.join(', ')}`;
             checks.push({ id, description, passed: false, message: msg });
           } else {
             checks.push({ id, description, passed: true, message: 'skill wrappers in .claude/skills and plugins/fgOS/skills are in sync' });
@@ -4421,7 +4414,9 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // the worktree itself.
     case 'resync-worktree': {
       const worktreePath = flags.path ? path.resolve(flags.path) : process.cwd();
-      const branch = flags.branch ?? gitAt(worktreePath, ['symbolic-ref', '--short', 'HEAD']).trim();
+      const checkedOut = gitWorktrees(worktreePath).find((row) => realpathOr(Buffer.from(row.path).toString('utf8')) === realpathOr(worktreePath))?.branch;
+      const branch = flags.branch ?? (checkedOut?.startsWith('refs/heads/') ? checkedOut.slice('refs/heads/'.length) : null);
+      if (!branch) throw new StoreError('validation', `resync-worktree: "${worktreePath}" has no branch checked out; pass --branch <name>`);
       const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(worktreePath) ?? path.dirname(dir));
       return resyncWorktree(repoRoot, worktreePath, branch);
     }
@@ -4458,39 +4453,44 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
             '`fgos main-checkout-reset --sha <sha> --dir "$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)"`.',
         );
       }
-      const reset = async () => {
+      const reset = async (handle) => {
         const confirmed = Boolean(flags.confirm);
+        const inspect = inspectGit(repoRoot);
+        const target = inspect.resolveCommit({ name: sha });
+        if (!target) throw new StoreError('validation', `main-checkout-reset: "${sha}" does not name a commit in "${repoRoot}"`);
+        const head = inspect.resolveCommit({ name: 'HEAD' });
+        if (!head) throw new StoreError('validation', `main-checkout-reset: "${repoRoot}" has no commit to reset from`);
         const dirty = !isMainTreeClean(repoRoot);
-        let lostCommitCount = 0;
-        let lostCommitsOutput = '';
-        try {
-          const revList = gitAt(repoRoot, ['rev-list', `${sha}..HEAD`]).trim();
-          if (revList) {
-            const commits = revList.split('\n').filter(Boolean);
-            lostCommitCount = commits.length;
-            if (lostCommitCount > 0) {
-              lostCommitsOutput = gitAt(repoRoot, ['log', `${sha}..HEAD`, '--format=%h %an (%ae): %s', '--stat']).trim();
-            }
-          }
-        } catch (_err) {
-          // If git rev-list fails (e.g. invalid SHA), reset --hard below will fail with git's error.
-        }
-
+        const lostCommitCount = inspect.countCommits({ include: head, exclude: target });
         try {
           assertSafeMainCheckoutReset({ dirty, confirmed, lostCommitCount, sha });
         } catch (err) {
           let details = `main-checkout-reset: ${err.message}`;
           if (dirty) {
-            const statusOutput = gitAt(repoRoot, ['status', '--porcelain']).trim();
-            details += `\n\nFull git status (main checkout, whole repo):\n${statusOutput || '(empty)'}`;
+            details += `\n\nFull git status (main checkout, whole repo):\n${renderStatus(inspect) || '(empty)'}`;
           }
           if (lostCommitCount > 0) {
-            details += `\n\nCommits about to be discarded (${lostCommitCount}):\n${lostCommitsOutput || '(none)'}`;
+            const lost = inspect.compareCommits({ left: target, right: head }).commits;
+            details += `\n\nCommits about to be discarded (${lostCommitCount}):\n${describeLostCommits(inspect, lost)}`;
           }
           throw new StoreError('validation', details);
         }
-        gitAt(repoRoot, ['reset', '--hard', sha]);
-        return { sha, wasDirty: dirty, lostCommitCount, confirmed };
+        // Without --confirm only a clean forward move reaches here: a plain restore, nothing discarded.
+        const options = gitPortOptions(repoRoot, { mutation: true });
+        const operationId = randomUUID();
+        const request = {
+          expectedHead: head,
+          target,
+          reason: `main-checkout-reset --sha ${sha}`,
+          ...(confirmed ? { discardLocalDelta: true, confirmedBy: `fgos main-checkout-reset --confirm (writer ${options.writer})` } : {}),
+        };
+        let restored;
+        try {
+          restored = createGitSafeRestore(options).apply({ operationId, request }, [handle]);
+        } catch (err) {
+          throw new StoreError('validation', `main-checkout-reset: SafeRestore refused to reset "${repoRoot}" to ${sha}: ${nativeError(err).cause}`);
+        }
+        return { sha, wasDirty: dirty, lostCommitCount, confirmed, operationId, snapshot: restored.snapshot };
       };
       try {
         return await withMainCheckout(createLockScope('main-checkout-reset'), 'reset', reset, { fgosDir: dir });

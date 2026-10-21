@@ -45,7 +45,8 @@ export {
   computeChangedFiles,
 };
 import crypto from 'node:crypto';
-import { execFileSync } from 'node:child_process';
+import { createGitInspect, gitPortOptions } from '../../git/inspect.mjs';
+import { inspectEntries, inspectPath } from '../../util/git-paths.mjs';
 import { bind } from '../execution/bind.mjs';
 import { walkStateOf } from '../execution/account-rotation.mjs';
 import { bindSeatOf } from '../execution/seat-resolver.mjs';
@@ -1161,14 +1162,9 @@ function allowedInputRoots(mainRoot) {
   const add = (p) => { try { roots.add(fs.realpathSync(p)); } catch { /* a listed root that is gone holds nothing */ } };
   add(mainRoot);
   try {
-    // `-z` is not in every git this runs on; a worktree path holding a newline is then unlisted
-    // and its inputs get a null digest, which only ever fails closed.
-    const listing = execFileSync('git', ['worktree', 'list', '--porcelain'], {
-      cwd: mainRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
-    });
-    for (const field of listing.split('\n')) {
-      if (!field.startsWith('worktree ')) continue;
-      const listed = field.slice('worktree '.length);
+    const inspect = createGitInspect(gitPortOptions(mainRoot));
+    for (const entry of inspectEntries((page) => inspect.listWorktrees(page))) {
+      const listed = inspectPath(entry.path);
       // A listed path that is now a symlink is not that worktree any more.
       try { if (fs.lstatSync(listed).isSymbolicLink()) continue; } catch { continue; }
       add(listed);

@@ -56,7 +56,7 @@ When the user asks to run a plan, a phase ("run phase 2"), or a phase range ("ru
    detached process. Read progress with `fgos workflow status <workflowRunId>` (or pass `--foreground`
    to wait in place); `fgos workflow answer` and `fgos workflow resume` return the same way. Do not treat
    the output of `start`, `answer` or `resume` as the final state.
-3. Each Unit runs via `fgos run` in its own isolated worktree and integrates changes cleanly using pure git. `fgos workflow start --plan` no longer exists; [`fgos-cook`](../fgos-cook/SKILL.md) owns whole-plan execution on a case; this mode is for running one phase or a bounded wave as it stands.
+3. Each Unit runs via `fgos run` in its own isolated worktree; the runner commits the Unit's declared `writes` on that worktree's branch and merges nothing (`fgos workflow status` lists `writeBranches`). `fgos workflow start --plan` no longer exists; [`fgos-cook`](../fgos-cook/SKILL.md) owns whole-plan execution on a case; this mode is for running one phase or a bounded wave as it stands.
 
 ---
 

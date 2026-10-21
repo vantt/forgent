@@ -14,12 +14,9 @@ pub fn main(args: &[String]) -> i32 {
             }
         }
         let cwd = std::env::current_dir().map_err(|e| e.to_string())?;
-        let state = fgos_holder_lock::state_root::state_root().0;
-        let driver = fgos_git::GitDriver::new(&state).map_err(|e| e.cause)?;
-        let repo = match driver.resolve_repo(&cwd, &cwd).map_err(|e| e.cause)? {
-            fgos_git::ResolveRepo::Repository(r) => r,
-            _ => return Err("not-a-repository".into()),
-        };
+        let (driver, repo) = fgos_git::GitDriver::open_at(&cwd)
+            .map_err(|e| e.cause)?
+            .ok_or("not-a-repository")?;
         let index = std::env::var_os("GIT_INDEX_FILE")
             .map(std::path::PathBuf::from)
             .unwrap_or_else(|| repo.git_dir().join("index"));

@@ -1,4 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
+import { activateGitFixture } from './worktree-native-fixture.helper.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -9,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { createLockScope, probe } from '../../src/holder-lock/index.mjs';
 import { withMainCheckout, addWorktree, addWorktreeSync } from '../../src/runner/repo-locks.mjs';
 import { createClaimWorktree, createWorktree, removeWorktree } from '../../src/runner/worktree.mjs';
-import { createWorkflowWorktree } from '../../src/workflow/integrate.mjs';
+import { createWorkflowWorktree } from '../../src/workflow/unit-handoff.mjs';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 import { HOOK_TEST_SKIP } from '../helpers/main-checkout-hook-repo.mjs';
 
@@ -26,6 +27,7 @@ function tempRepo() {
   const git = (...args) => spawnSync('git', args, { cwd: root, encoding: 'utf8' });
   git('init', '-q', '-b', 'main');
   git('-c', 'user.email=t@example.com', '-c', 'user.name=T', 'commit', '-q', '--allow-empty', '-m', 'seed');
+  activateGitFixture(root);
   return { root, fgosDir: path.join(root, '.fgos'), git };
 }
 

@@ -8,7 +8,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawn, spawnSync, execFileSync } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 import { parseEtime, parsePs, treeOf, findOverdue } from '../../scripts/lib/test-file-watchdog.mjs';
-import { discoverTestFiles, buildTestArgv, GIT_CONFIG_GUARD_PATH, snapshotGitIdentity, diffGitIdentity, buildTestEnv, runTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, snapshotFgos, diffFgosSnapshots, SENSITIVE_FGOS_FILES, leftoverTempPrefixes } from '../../scripts/run-tests.mjs';
+import { discoverTestFiles, buildTestArgv, GIT_CONFIG_GUARD_PATH, GIT_SPAWN_SPY_PATH, snapshotGitIdentity, diffGitIdentity, buildTestEnv, runTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, snapshotFgos, diffFgosSnapshots, SENSITIVE_FGOS_FILES, leftoverTempPrefixes } from '../../scripts/run-tests.mjs';
 
 function tmpFixtureRoot() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'run-tests-fixture-'));
@@ -121,16 +121,17 @@ test('DEFAULT_TEST_ROOT resolves to <repo>/test', () => {
 });
 
 const GUARD_ARG = `--import=${pathToFileURL(GIT_CONFIG_GUARD_PATH).href}`;
+const SPY_ARG = `--import=${pathToFileURL(GIT_SPAWN_SPY_PATH).href}`;
 
 // --- buildTestArgv: ordering ------------------------------------------------
 
 test('buildTestArgv places forwarded flags before the full file list, both after --test', () => {
   const argv = buildTestArgv(['test/a.test.mjs', 'test/b.test.mjs'], ['--test-reporter=tap', '--test-concurrency=1']);
-  assert.deepEqual(argv, ['--test', GUARD_ARG, '--test-reporter=tap', '--test-concurrency=1', 'test/a.test.mjs', 'test/b.test.mjs']);
+  assert.deepEqual(argv, ['--test', GUARD_ARG, SPY_ARG, '--test-reporter=tap', '--test-concurrency=1', 'test/a.test.mjs', 'test/b.test.mjs']);
 });
 
 test('buildTestArgv with no forwarded args is just --test plus the files', () => {
-  assert.deepEqual(buildTestArgv(['x.test.mjs']), ['--test', GUARD_ARG, 'x.test.mjs']);
+  assert.deepEqual(buildTestArgv(['x.test.mjs']), ['--test', GUARD_ARG, SPY_ARG, 'x.test.mjs']);
 });
 
 // --- runTests: env merge, argv shape, zero-file refusal ---------------------
@@ -170,7 +171,7 @@ test('runTests spawns node --test with the discovered files as argv elements and
 
   assert.equal(result.status, 0);
   assert.equal(captured.execPath, '/fake/node');
-  assert.deepEqual(captured.argv, ['--test', GUARD_ARG, path.relative(root, f)]);
+  assert.deepEqual(captured.argv, ['--test', GUARD_ARG, SPY_ARG, path.relative(root, f)]);
   assert.equal(captured.opts.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS, '1');
   assert.equal(captured.opts.env.PATH, '/usr/bin');
   assert.equal(captured.opts.env.UNRELATED, 'kept');
@@ -278,6 +279,10 @@ function mirroredRepoRoot(prefix) {
   fs.copyFileSync(realScriptPath, path.join(root, 'scripts', 'run-tests.mjs'));
   fs.copyFileSync(realLibPath, path.join(root, 'scripts', 'lib', 'is-main-module.mjs'));
   fs.copyFileSync(realQueueLibPath, path.join(root, 'scripts', 'lib', 'full-suite-queue.mjs'));
+  // ...and the libraries run-tests.mjs and the distribution builder (its one-door census step) import.
+  for (const rel of ['lib/dev-host-manifest.mjs', 'lib/git-addon-stage.mjs', 'lib/git-dir-layout.mjs', 'lib/js-source-lexer.mjs', 'lib/git-spawn-match.mjs', 'git-one-door-scan.mjs']) {
+    fs.copyFileSync(fileURLToPath(new URL(`../../scripts/${rel}`, import.meta.url)), path.join(root, 'scripts', rel));
+  }
   // run-tests.mjs builds the native addon record through the distribution builder's helpers.
   fs.copyFileSync(realDistributionPath, path.join(root, 'scripts', 'build-rust-distribution.mjs'));
   // The queue lib imports the holder-lock facade (src/holder-lock), which
@@ -858,7 +863,7 @@ test('snapshotGitIdentity lists only user, author and committer keys of the repo
 
 test('snapshotGitIdentity is empty outside a repository', () => {
   const base = tempBase();
-  assert.deepEqual(snapshotGitIdentity(base, () => { throw new Error('not a repository'); }), []);
+  assert.deepEqual(snapshotGitIdentity(base), []);
   fs.rmSync(base, { recursive: true, force: true });
 });
 
@@ -899,4 +904,31 @@ test('runSelectedTests leaves the run green when the identity keys are untouched
   assert.equal(result.status, 0);
   assert.equal(result.gitIdentityDiff.leaked, false);
   fs.rmSync(base, { recursive: true, force: true });
+});
+
+// run-tests.mjs awaits `import('./test-proof-inventory.mjs')` at its top level to print the suite
+// report. A module of that graph that imports run-tests.mjs back waits for the launcher's own
+// evaluation, which waits for the report: the process then ends with exit 13 (unsettled top-level
+// await) before any suite line. No other test starts the launcher as the main module, so the graph is
+// what proves it.
+function staticImportClosure(entry) {
+  const seen = new Set();
+  const visit = (file) => {
+    if (seen.has(file)) return;
+    seen.add(file);
+    const source = fs.readFileSync(file, 'utf8');
+    for (const match of source.matchAll(/^\s*(?:import|export)\b[^'"\n;]*?from\s*['"](\.{1,2}\/[^'"]+)['"]|^\s*import\s*['"](\.{1,2}\/[^'"]+)['"]/gm)) {
+      visit(path.resolve(path.dirname(file), match[1] ?? match[2]));
+    }
+  };
+  visit(entry);
+  return seen;
+}
+
+test('the suite report module does not import the launcher back, or the launcher cannot print it', () => {
+  const launcher = path.join(REPO_ROOT, 'scripts', 'run-tests.mjs');
+  const report = staticImportClosure(path.join(REPO_ROOT, 'scripts', 'test-proof-inventory.mjs'));
+  assert.equal(report.has(launcher), false, 'test-proof-inventory.mjs reaches run-tests.mjs through static imports');
+  // The check sees a cycle when there is one: test-select.mjs imports the launcher directly.
+  assert.equal(staticImportClosure(path.join(REPO_ROOT, 'scripts', 'test-select.mjs')).has(launcher), true);
 });

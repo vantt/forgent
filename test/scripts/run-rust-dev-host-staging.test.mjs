@@ -5,7 +5,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
-import { devHostEnv, pruneRunDirs, releaseRunDir, STALE_RUN_DIR_MS } from '../../scripts/run-rust-dev-host.mjs';
+import { devHostEnv } from '../../scripts/lib/dev-host-manifest.mjs';
+import { pruneRunDirs, releaseRunDir, STALE_RUN_DIR_MS } from '../../scripts/run-rust-dev-host.mjs';
 
 // The staged dev host outlives its invocation while a detached process (a run supervisor) still runs
 // from it, and goes once that process has ended. A real executable copied into the run directory

@@ -47,7 +47,7 @@
 //       RUL30's headAtTake/headAtReturn tracking already exists to guard
 //       against).
 
-import { execFileSync } from 'node:child_process';
+import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { getDomain } from './domain-registry.mjs';
@@ -75,13 +75,32 @@ export function resolveTtlDaysForItem(view, id, { ttlDays, leafTtlDays } = {}) {
   return isLeaf ? leafTtlDays : ttlDays;
 }
 
-function git(repoRoot, args) {
-  return execFileSync('git', args, {
-    cwd: repoRoot,
-    encoding: 'utf8',
-    shell: false,
-    stdio: ['ignore', 'pipe', 'pipe'],
-  }).trim();
+// The Git facts the merge checks read, through one Inspect port opened on
+// first use; every unreadable fact answers "no".
+function gitFacts(repoRoot) {
+  let port;
+  const inspect = () => (port ??= createGitInspect(gitPortOptions(repoRoot)));
+  const commit = (name) => {
+    try {
+      const oid = inspect().resolveCommit({ name });
+      return typeof oid === 'string' ? oid : null;
+    } catch {
+      return null;
+    }
+  };
+  return {
+    commit,
+    isAncestor(sha, ref) {
+      const [ancestor, descendant] = [commit(sha), commit(ref)];
+      if (!ancestor || !descendant) return false;
+      try { return inspect().ancestry({ ancestor, descendant }).answer === 'yes'; } catch { return false; }
+    },
+    unmatchedCount(ref, sha) {
+      const [upstream, head] = [commit(ref), commit(sha)];
+      if (!upstream || !head) return null;
+      try { return inspect().unmatchedCommitCount({ upstream, head }); } catch { return null; }
+    },
+  };
 }
 
 /**
@@ -152,6 +171,10 @@ function git(repoRoot, args) {
  * inferred content match.
  */
 export function checkMergeStillResolves(repoRoot, work, { view, id } = {}) {
+  return mergeStillResolves(gitFacts(repoRoot), work, { view, id });
+}
+
+function mergeStillResolves(git, work, { view, id } = {}) {
   if (view && id) {
     // tsk-4bh: a canceled/wontfix child never had content to merge in the
     // first place (wontfix-terminal-status-filter-consistency D1, the same
@@ -168,14 +191,14 @@ export function checkMergeStillResolves(repoRoot, work, { view, id } = {}) {
     // above), rather than a new code path of its own.
     const children = Object.entries(view.work ?? {}).filter(([, item]) => item.parent === id && !isCanceledStatus(item));
     if (children.length > 0) {
-      const childrenResult = checkChildrenResolve(repoRoot, view, children);
+      const childrenResult = checkChildrenResolve(git, view, children);
       if (!childrenResult.ok) return childrenResult;
       // tsk-5j0: children resolving into THIS item's branch says nothing
       // about whether THIS item's own branch ever reached main -- only
       // matters for the true root, since a non-root decomposed node's own
       // branch is never itself merged forward (tsk-psb).
       return resolveRoot(view, id) === id
-        ? checkRootBranchResolves(repoRoot, id, childrenResult, work)
+        ? checkRootBranchResolves(git, id, childrenResult, work)
         : childrenResult;
     }
   }
@@ -194,15 +217,15 @@ export function checkMergeStillResolves(repoRoot, work, { view, id } = {}) {
   const rootId = view && id ? resolveRoot(view, id) : id;
   const namedRef = rootId && rootId !== id ? `fgw/${rootId}` : null;
 
-  if (namedRef && !refExists(repoRoot, namedRef)) {
-    return checkAncestry(repoRoot, sha, 'HEAD', `${namedRef} no longer exists (pruned)`);
+  if (namedRef && !git.commit(namedRef)) {
+    return checkAncestry(git, sha, 'HEAD', `${namedRef} no longer exists (pruned)`);
   }
-  return checkAncestry(repoRoot, sha, namedRef ?? 'HEAD');
+  return checkAncestry(git, sha, namedRef ?? 'HEAD');
 }
 
-function checkChildrenResolve(repoRoot, view, children) {
+function checkChildrenResolve(git, view, children) {
   for (const [childId, childWork] of children) {
-    const result = checkMergeStillResolves(repoRoot, childWork, { view, id: childId });
+    const result = mergeStillResolves(git, childWork, { view, id: childId });
     if (!result.ok) {
       return {
         ok: false,
@@ -236,9 +259,10 @@ function checkChildrenResolve(repoRoot, view, children) {
  * with no way to ever recover, even though its own recorded sha was a
  * genuine ancestor of HEAD the whole time.
  */
-function checkRootBranchResolves(repoRoot, id, childrenResult, work) {
+function checkRootBranchResolves(git, id, childrenResult, work) {
   const namedRef = `fgw/${id}`;
-  if (!refExists(repoRoot, namedRef)) {
+  const tipSha = git.commit(namedRef);
+  if (!tipSha) {
     const sha = work?.branchHeadAtReturn ?? work?.headAtReturn ?? work?.branchHeadAtTake ?? work?.headAtTake
       ?? work?.lastAttempt?.branchHeadAtReturn ?? work?.lastAttempt?.headAtReturn
       ?? work?.lastAttempt?.branchHeadAtTake ?? work?.lastAttempt?.headAtTake;
@@ -248,7 +272,7 @@ function checkRootBranchResolves(repoRoot, id, childrenResult, work) {
         detail: `${childrenResult.detail} — but this root's own branch ${namedRef} no longer exists, so whether it ever reached HEAD cannot be confirmed`,
       };
     }
-    const rootAncestry = checkAncestry(repoRoot, sha, 'HEAD', `${namedRef} no longer exists (pruned)`);
+    const rootAncestry = checkAncestry(git, sha, 'HEAD', `${namedRef} no longer exists (pruned)`);
     if (!rootAncestry.ok) {
       return {
         ok: false,
@@ -260,8 +284,7 @@ function checkRootBranchResolves(repoRoot, id, childrenResult, work) {
       detail: `${childrenResult.detail}; root's own branch ${namedRef} no longer exists, but its recorded sha is still an ancestor of HEAD`,
     };
   }
-  const tipSha = git(repoRoot, ['rev-parse', namedRef]);
-  const rootAncestry = checkAncestry(repoRoot, tipSha, 'HEAD');
+  const rootAncestry = checkAncestry(git, tipSha, 'HEAD');
   if (!rootAncestry.ok) {
     return {
       ok: false,
@@ -274,68 +297,39 @@ function checkRootBranchResolves(repoRoot, id, childrenResult, work) {
   };
 }
 
-function refExists(repoRoot, ref) {
-  try {
-    git(repoRoot, ['rev-parse', '--verify', '--quiet', ref]);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function checkAncestry(repoRoot, sha, targetRef, fallbackNote) {
-  try {
-    git(repoRoot, ['merge-base', '--is-ancestor', sha, targetRef]);
+function checkAncestry(git, sha, targetRef, fallbackNote) {
+  if (git.isAncestor(sha, targetRef)) {
     return {
       ok: true,
       detail: fallbackNote
         ? `${fallbackNote} — fell back to HEAD, commit ${sha} is still an ancestor of HEAD`
         : `commit ${sha} is still an ancestor of ${targetRef}`,
     };
-  } catch {
-    // Direct check failed; fall through to fallbacks.
   }
 
   // Fallback 1: Main-ancestry fallback (resolves blind spot 2)
-  if (targetRef !== 'HEAD') {
-    try {
-      git(repoRoot, ['merge-base', '--is-ancestor', sha, 'HEAD']);
-      return {
-        ok: true,
-        detail: fallbackNote
-          ? `${fallbackNote} — fell back to HEAD, commit ${sha} resolved as an ancestor of HEAD (main-ancestry fallback)`
-          : `commit ${sha} is not an ancestor of ${targetRef}, but resolved as an ancestor of HEAD (main-ancestry fallback)`,
-      };
-    } catch {
-      // Main-ancestry fallback failed
-    }
+  if (targetRef !== 'HEAD' && git.isAncestor(sha, 'HEAD')) {
+    return {
+      ok: true,
+      detail: fallbackNote
+        ? `${fallbackNote} — fell back to HEAD, commit ${sha} resolved as an ancestor of HEAD (main-ancestry fallback)`
+        : `commit ${sha} is not an ancestor of ${targetRef}, but resolved as an ancestor of HEAD (main-ancestry fallback)`,
+    };
   }
 
-  // Fallback 2: Content-equivalence fallback (resolves a CLEAN rebase-rehash)
+  // Fallback 2: Content-equivalence fallback (resolves a CLEAN rebase-rehash):
+  // no non-merge commit of `sha` lacks a patch-equivalent on the ref.
   const refsToTry = [targetRef];
   if (targetRef !== 'HEAD') {
     refsToTry.push('HEAD');
   }
 
   for (const ref of refsToTry) {
-    try {
-      const out = git(repoRoot, [
-        'rev-list',
-        '--count',
-        '--cherry-pick',
-        '--right-only',
-        '--no-merges',
-        `${ref}...${sha}`,
-      ]).trim();
-      const count = Number.parseInt(out, 10);
-      if (count === 0) {
-        return {
-          ok: true,
-          detail: `commit ${sha} is not an ancestor of ${targetRef}, but its content is present on ${ref} under a different commit (content-equivalence fallback)`,
-        };
-      }
-    } catch {
-      // Ignore git errors in rev-list and try next ref or fall through
+    if (git.unmatchedCount(ref, sha) === 0) {
+      return {
+        ok: true,
+        detail: `commit ${sha} is not an ancestor of ${targetRef}, but its content is present on ${ref} under a different commit (content-equivalence fallback)`,
+      };
     }
   }
 

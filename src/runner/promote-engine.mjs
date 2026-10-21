@@ -1,9 +1,8 @@
 // promote-engine.mjs — tsk-3gx-2: the mutating half of `promote-to-component`
 // (docs/history/promote-to-component/CONTEXT.md/plan.md). Resolves or
 // creates the shared integration branch (D1), then merges each member's own
-// branch into it — reusing `sync-root`'s own battle-tested primitive
-// (`mergeRunnerItem`/`withMergeEphemeralWorktree`) instead of a destructive
-// rebase (plan.md's Approach). Gated per member by `promote-preflight.mjs`'s
+// branch into it — reusing `sync-root`'s own primitive, the Land sequence
+// of `landRunnerItem`, instead of a destructive rebase (plan.md's Approach). Gated per member by `promote-preflight.mjs`'s
 // read-only D3 judgment; a member preflight already flagged unsafe is never
 // even attempted.
 //
@@ -12,11 +11,9 @@
 // which is `tsk-3gx-3`'s (the CLI action layer's) job, "chỉ khi git thành
 // công thật mới set field parent" (the item's own description).
 
-import { createBranchRef, withMergeEphemeralWorktree, detectTrunk, isMainWorktree, branchNameFor } from './worktree.mjs';
-import { mergeRunnerItem, withMergeSlot } from './merge.mjs';
-import { createLockScope } from '../holder-lock/index.mjs';
+import { createBranchRef, detectTrunk, isMainWorktree, branchNameFor } from './worktree.mjs';
+import { landRunnerItem } from './merge.mjs';
 import { preflightRetarget } from './promote-preflight.mjs';
-import { withLockRetry } from './lock-wait.mjs';
 
 /**
  * D1: resolve the shared integration branch for `rootId`. Reuses
@@ -41,15 +38,15 @@ export function resolveIntegrationBranch(repoRoot, rootId) {
  * untouched; the caller (tsk-3gx-3) sets it only after seeing this outcome.
  *
  * Refuses to run from a linked worktree (mirrors `sync-root`'s own
- * `isMainWorktree` discipline) — this creates and tears down real ephemeral
+ * `isMainWorktree` discipline) — Land creates and tears down its candidate
  * worktrees under `repoRoot`, which only makes sense from the main
  * checkout.
  *
  * @returns {Promise<
  *   {id: string, outcome: 'skipped', reason: 'is-root'} |
  *   {id: string, outcome: 'bailed', reason: string, detail: string} |
- *   {id: string, outcome: 'merged'} |
- *   {id: string, outcome: 'blocked', reason: string, detail: string|null}
+ *   {id: string, outcome: 'merged', landSettlement?: object} |
+ *   {id: string, outcome: 'blocked', reason: string, detail: string|null, landSettlement?: object}
  * >}
  */
 export async function retargetMember(repoRoot, memberItem, rootId, opts = {}) {
@@ -71,27 +68,26 @@ export async function retargetMember(repoRoot, memberItem, rootId, opts = {}) {
     return { id: memberItem.id, outcome: 'bailed', reason: preflight.reason, detail: preflight.detail };
   }
 
-  // The integration branch's merge slot is held OUTSIDE the ephemeral
-  // worktree: the worktree reads the branch tip when it is created, so the
-  // slot must already be held by then. The main checkout mutex is taken
-  // inside `mergeRunnerItem` only for the steps that write the main checkout,
-  // never across the merge and its verify.
-  const scope = createLockScope('promote-member');
-  const result = await withLockRetry(
-    ({ waitMs }) => withMergeSlot(scope, repoRoot, branchNameFor(rootId), () =>
-      withMergeEphemeralWorktree(repoRoot, rootId, (ephemeral) =>
-        mergeRunnerItem(ephemeral.path, memberItem, { ...(opts.timeoutMs ? { timeoutMs: opts.timeoutMs } : {}), lockRoot: repoRoot, scope, waitMs }),
-      ), { waitMs }),
-    { waitMs: undefined },
-  );
+  // Land holds the integration branch's merge slot from the moment it pins
+  // the branch tip through verification to publication, waiting for it up
+  // to Land's default budget; no main checkout mutex is held across the
+  // merge and its verify.
+  const result = await landRunnerItem(repoRoot, memberItem, {
+    target: branchNameFor(rootId),
+    ...(opts.timeoutMs ? { timeoutMs: opts.timeoutMs } : {}),
+  });
 
+  // The caller releases a Land candidate under `landSettlement` once it has
+  // durably recorded this member's outcome (Git spec §9, M4).
+  const settlement = result.landSettlement ? { landSettlement: result.landSettlement } : {};
   if (result.outcome !== 'merged') {
     return {
       id: memberItem.id,
       outcome: 'blocked',
       reason: result.outcome,
       detail: result.check?.output ?? (result.paths ? `staged .fgos write: ${result.paths.join(', ')}` : null),
+      ...settlement,
     };
   }
-  return { id: memberItem.id, outcome: 'merged' };
+  return { id: memberItem.id, outcome: 'merged', ...settlement };
 }

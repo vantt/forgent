@@ -180,26 +180,16 @@ pub fn resolve_product_root() -> Option<PathBuf> {
     None
 }
 
-/// Resolves the short git commit hash from git rev-parse --short HEAD.
+/// The product checkout's HEAD commit, as the first 12 hex digits of its full
+/// id, read through the Git component.
 ///
-/// Returns None on any failure (not a git checkout, git binary missing, command failed).
+/// Returns None on any failure (not a git checkout, no product root, an unborn
+/// HEAD, or a refused read).
 pub fn resolve_git_commit() -> Option<String> {
-    let mut cmd = std::process::Command::new("git");
-    cmd.args(["rev-parse", "--short", "HEAD"]);
-    if let Some(root) = resolve_product_root() {
-        cmd.current_dir(root);
-    }
-    match cmd.output() {
-        Ok(output) if output.status.success() => {
-            let s = String::from_utf8_lossy(&output.stdout).trim().to_string();
-            if s.is_empty() {
-                None
-            } else {
-                Some(s)
-            }
-        }
-        _ => None,
-    }
+    let root = resolve_product_root()?;
+    let (driver, repo) = fgos_git::GitDriver::open_at(&root).ok()??;
+    let head = driver.resolve_commit_ref(&repo, "HEAD").ok()??;
+    Some(head.as_str()[..12].to_string())
 }
 
 /// Resolves the sorted list of command verb selectors from embedded command-routes.json.

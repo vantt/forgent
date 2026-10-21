@@ -21,6 +21,7 @@ import { resolveAction } from '../../src/runner/recovery.mjs';
 import { confinedRunnerConfig, persistRunnerConfig, unitRuns, countWorkerRuns } from './loop-worker-fixture.helper.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+import { activateGitFixture } from '../helpers/git-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -60,8 +61,9 @@ function fixture(config) {
   fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
   git(repoRoot, 'add', 'seed.txt');
   git(repoRoot, 'commit', '-q', '-m', 'seed');
+  activateGitFixture(repoRoot);
   const fgosDir = path.join(repoRoot, '.fgos');
-  fs.mkdirSync(fgosDir);
+  fs.mkdirSync(fgosDir, { recursive: true });
   const worktree = path.join(fs.realpathSync(makeFixtureDir('fgos-spawn-worker-wt-')), 'sample-work');
   git(repoRoot, 'worktree', 'add', '-q', '-b', 'fgw/sample-work', worktree);
   const cfg = confinedRunnerConfig(config);

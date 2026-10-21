@@ -1,57 +1,9 @@
-// worktree.mjs — isolated git worktree/branch lifecycle for the runner (per
-// D2/D4, reliability panel revision on phase-2-routing-7): every worker runs
-// on its own worktree, checked out on branch `fgw/<id>`, so its result stays
-// a proposal on a disposable branch (per D4) until a human/review approves
-// it — this module never merges, pushes, or touches the main working tree.
-//
-// SAME-USER TRUST INVARIANT: like dispatch.mjs, this module assumes the
-// repo it operates on is the user's own trusted checkout — it shells out to
-// `git` with the repo root as `cwd`, and does not sandbox or restrict what
-// the worker committed on its branch. Isolation here is "own branch, easy
-// to discard," not a security boundary against a hostile worker.
-//
-// CWD DISCIPLINE (probe-learned, reliability panel): every `git` call in
-// this module runs with `cwd: repoRoot` — NEVER from inside a worktree that
-// is itself being removed. Running `git worktree remove` (or anything else)
-// from inside the very worktree it targets makes the process's own cwd
-// vanish mid-command; the fix is structural, not a retry: always operate
-// from the stable repo root.
-//
-// RETRY-WITHOUT-SELF-COLLISION: `createWorktree` REUSES an existing
-// `fgw/<id>` branch (checkout via `git worktree add <path> <branch>`, never
-// `-b`) whenever that branch already exists, and always allocates a FRESH
-// worktree directory (via `mkdtemp`) for the checkout. A retried dispatch of
-// the same work item therefore never collides with its own previous attempt
-// — same branch, new empty directory slot.
-//
-// BRANCH-TREE TOPOLOGY (fan-out-parallel, D3/D4/D17): a root's integration
-// branch `fgw/<root>` is created EARLY as a ref only, via `createBranchRef`
-// — no worktree/checkout, just `git branch <branch> <baseRef>`. Leaves of
-// that root then fork their own `fgw/<leaf>` branch from the *tip of the
-// root's branch* (D3 "leaf fork-from-tip-of-parent") by passing that tip as
-// `opts.baseRef` to `createWorktree`, instead of forking from `main`/current
-// HEAD. D17 revises the original D4 design: no worktree is ever long-lived
-// here — only branches are durable; every checkout (leaf execution,
-// leaf-into-parent merge, root-into-main merge) is ephemeral and rebuilt
-// from its branch ref on demand.
-//
-// CRASH RECLAIM (phase-2-routing-10): a normal teardown always runs
-// `removeWorktree` before a branch is ever reused, so under ordinary
-// operation the branch is never checked out anywhere when `createWorktree`
-// reuses it. But a genuine process kill (the runner itself SIGKILLed
-// mid-item) skips every `finally` — the worker's commit lands, yet the
-// worktree checkout is never torn down, so `fgw/<id>` stays checked out at
-// that now-orphaned path. The next `createWorktree` call for the same id
-// (e.g. the startup reap's own throwaway goal-check worktree) would
-// otherwise hit git's own "already checked out at <path>" refusal.
-// `reclaimOrphanedCheckout` runs first whenever the branch is being reused:
-// it finds any existing checkout of the branch via `git worktree list
-// --porcelain` and clears it — force-removing the directory if it still
-// exists on disk, or pruning git's own bookkeeping if the directory is
-// already gone — before the fresh worktree is added. The branch (and its
-// commit) survives; only the stale checkout directory is discarded, exactly
-// like an ordinary `removeWorktree` would have done had it run. Only a
-// genuinely irreconcilable state surfaces as a hard `worktree-fail`.
+// Worktree consumer adapters. Typed Git ports own Git effects, locks, snapshots
+// and recovery. Execution owns provisioning and the dispatch-cwd lease; Work
+// owns claim/approval policy. fgw/<id> refs remain durable proposals after
+// their disposable checkouts are removed. Administration always uses the
+// trusted main handle, so removing or moving a checkout cannot invalidate the
+// driver's own gitdir. Native refusals preserve uncertain or undelivered work.
 
 import fs from 'node:fs';
 import os from 'node:os';
@@ -59,10 +11,63 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { StoreError } from '../state/store.mjs';
-import { createLockScope, HolderLockError } from '../holder-lock/index.mjs';
+import { createLockScope, HolderLockError, acquireSync } from '../holder-lock/index.mjs';
+import { resolveStateRoot } from '../holder-lock/state-root.mjs';
 import { addWorktreeSync } from './repo-locks.mjs';
+import crypto from 'node:crypto';
+import { gitPortOptions, createGitInspect } from '../git/inspect.mjs';
+import { createGitWorktree } from '../git/worktree.mjs';
+import { createGitRefs } from '../git/refs.mjs';
+import { createGitRemote } from '../git/remote.mjs';
+import { createGitSafeRestore } from '../git/restore.mjs';
+export const inspectGit = repo => createGitInspect(gitPortOptions(repo));
+const worktreePort = repo => { const options = gitPortOptions(repo, { mutation: true }); return createGitWorktree({ ...options, repoPath: options.trustedMain }); };
+const refsPort = repo => createGitRefs(gitPortOptions(repo, { mutation: true }));
+const operationId = () => crypto.randomUUID();
+export function gitWorktrees(repo) {
+  const port = inspectGit(repo);
+  const rows = [];
+  let cursor;
+  do {
+    const page = port.listWorktrees({ cursor, maxEntries: 4096 });
+    rows.push(...page.entries);
+    cursor = page.nextCursor;
+  } while (cursor);
+  return rows;
+}
+function checkoutPathIn(rows, branch) {
+  const row = rows.find(row => row.branch === `refs/heads/${branch}`);
+  return row ? realpathOrSelf(Buffer.from(row.path).toString('utf8')) : null;
+}
+export function checkoutPathForBranch(repo, branch) { return checkoutPathIn(gitWorktrees(repo), branch); }
+
+export function compareCommits(repo, left, right) {
+  return inspectGit(repo).compareCommits({ left: resolveRefSha(repo, left), right: resolveRefSha(repo, right) });
+}
+function checkoutFacts(repo, worktree, revision) { return inspectGit(worktree).checkoutFacts({ revision: revision ?? currentHead(worktree) }); }
+function ancestorOf(repo, ancestor, descendant) { return inspectGit(repo).ancestry({ ancestor, descendant }).answer === 'yes'; }
+export function deleteBranchRef(repo, branch, expected = resolveRefSha(repo, branch)) {
+  return refsPort(repo).deleteRef({ name: `refs/heads/${branch}`, expected, operationId: operationId() });
+}
+function pruneWorktrees(repo, id) {
+  if (!id) throw new WorktreeError('worktree prune requires a recorded removal operation', { reason: 'worktree-prune-remove-evidence-required' });
+  return worktreePort(repo).prune({ operationId: id });
+}
+function withCheckoutCustody(worktree, fn, { custody, scope = createLockScope('worktree-custody') } = {}) {
+  const options = gitPortOptions(worktree, { mutation: true });
+  if (custody) return fn(options, custody);
+  const acquired = acquireSync(scope, 'dispatch-cwd', { fgosDir: path.join(options.trustedMain, '.fgos'), cwd: worktree });
+  if (acquired.result !== 'acquired') throw new HolderLockError('lock-held', 'worktree custody is held', { lock: 'dispatch-cwd' });
+  try { return fn(options, acquired.handle); }
+  finally { acquired.handle.release(); }
+}
+function restoreCheckout(repo, worktree, target, { baseline, reapplyLocalDelta = false, discardLocalDelta = false } = {}) {
+  return withCheckoutCustody(worktree, (options, custody) => createGitSafeRestore(options).apply({ operationId: operationId(), request: { expectedHead: currentHead(worktree), target, reason: 'worktree resync', reapplyLocalDelta, checkoutBaseline: baseline, discardLocalDelta, requireCleanBaseline: !!baseline && !reapplyLocalDelta, requireStagedOnly: !!baseline && reapplyLocalDelta } }, [custody]));
+}
+export function resetDispatchWorktree(repo, worktree, target) { return restoreCheckout(repo, worktree, target, { discardLocalDelta: true }); }
+
 import { readWorktreeSetupCommands } from '../config/shared-config-file.mjs';
-import { statusPaths, nulPaths, GIT_LIST_MAX_BUFFER } from '../util/git-paths.mjs';
+import { statusPaths, inspectEntries, inspectPath } from '../util/git-paths.mjs';
 import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
 
 /** Raised for any git worktree/branch operation failure. `errorClass`
@@ -156,22 +161,33 @@ export function runWorktreeSetupCommands(worktreePath, repoRoot) {
   }
 }
 
+
 // The provisioning record: what `provisionWorktree` placed in one checkout,
 // so `fgos worktree remove` can take back exactly those bytes before the Git
 // port's clean check, and nothing else. One file per checkout, keyed by its
 // real path, under the machine state root; Git never reads it.
 const PROVISIONING_CONTRACT = 'worktree-provisioning.v1';
 
+/** The state root a checkout of `repoRoot` keeps its provisioning record under. */
+export function provisioningStateRoot(repoRoot) {
+  return resolveStateRoot({ fgosDir: path.join(repoRoot, '.fgos') }).stateRoot;
+}
+
 function provisioningRecordPath(stateRoot, worktreePath) {
   const key = createHash('sha256').update(realpathOrSelf(worktreePath)).digest('hex');
   return path.join(stateRoot, 'worktree-provisioning', `${key}.json`);
 }
 
-// Untracked and ignored paths, a wholly untracked directory collapsed to `dir/`.
+// Untracked and ignored paths, a wholly untracked or ignored directory collapsed
+// to `dir/`. Git also names an ignored path inside a collapsed untracked
+// directory; the directory already covers it.
 function untrackedEntries(worktreePath) {
-  return nulPaths(execFileSync('git', ['ls-files', '--others', '--directory', '-z'], {
-    cwd: worktreePath, encoding: 'utf8', shell: false, maxBuffer: GIT_LIST_MAX_BUFFER,
-  }));
+  const inspect = inspectGit(worktreePath);
+  const listed = inspectEntries((page) => inspect.status({ ...page, untracked: 'normal', ignored: true }))
+    .filter((entry) => entry.untracked || entry.ignored)
+    .map((entry) => inspectPath(entry.path));
+  const dirs = listed.filter((rel) => rel.endsWith('/'));
+  return listed.filter((rel) => !dirs.some((dir) => rel !== dir && rel.startsWith(dir)));
 }
 
 function fileDigest(file) {
@@ -248,7 +264,7 @@ function stillAsPlaced(abs, entry) {
  * the moved bytes and the record (the port removed the checkout). Without a
  * record for this checkout nothing moves.
  */
-export function setProvisionedAside(stateRoot, worktreePath) {
+function setProvisionedAside(stateRoot, worktreePath) {
   const recordFile = provisioningRecordPath(stateRoot, worktreePath);
   const record = readProvisioningRecord(recordFile, worktreePath);
   const aside = path.join(path.dirname(worktreePath), `.${path.basename(worktreePath)}.provisioned-${uniqueTmpTag()}`);
@@ -291,8 +307,24 @@ export function setProvisionedAside(stateRoot, worktreePath) {
   };
 }
 
-function git(repoRoot, args) {
-  return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
+/**
+ * Run `remove` (one Git port removal of `worktreePath`) with what provisioning
+ * placed set aside: the port judges only the checkout's own bytes, a refusal
+ * puts the set-aside bytes back, and a removal deletes them with the record.
+ * The one removal door for every provisioned checkout, the `fgos worktree
+ * remove` verb's and the runner's own alike.
+ */
+export function removeProvisioned(stateRoot, worktreePath, remove) {
+  const provisioned = setProvisionedAside(stateRoot, worktreePath);
+  let removed;
+  try {
+    removed = remove();
+  } catch (err) {
+    provisioned.restore();
+    throw err;
+  }
+  provisioned.discard();
+  return removed;
 }
 
 // Same call as `git` above, but with git's own stderr swallowed rather than
@@ -303,9 +335,7 @@ function git(repoRoot, args) {
 // would turn "this directory is not a repo" into apparent breakage on a
 // path that is deliberately fail-open. Byte-identical to the `stdio` the
 // two functions had at their previous home in merge.mjs (tsk-49i D1).
-function gitQuiet(repoRoot, args) {
-  return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'pipe'] });
-}
+
 
 function stripExtendedPrefix(p) {
   if (typeof p !== 'string') return p;
@@ -359,18 +389,10 @@ export function realpathOrSelf(p) {
  * Private on purpose: the merge-cluster use cases read refs through the two
  * named helpers below (tsk-49i D3) rather than carrying their own
  * git-error policy. */
-function gitRead(repoRoot, args) {
-  try {
-    return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
-  } catch (err) {
-    throw new StoreError('validation', `git ${args.join(' ')} failed in "${repoRoot}": ${err.message}`);
-  }
-}
+
 
 /** The sha `repoRoot`'s own HEAD currently points at. */
-export function currentHead(repoRoot) {
-  return gitRead(repoRoot, ['rev-parse', 'HEAD']).trim();
-}
+export function currentHead(repoRoot) { return resolveRefSha(repoRoot, 'HEAD'); }
 
 /** tsk-5dk: a named branch/ref's own tip sha, not "whatever HEAD happens to
  * be in some worktree's checkout" (`currentHead` above) — branch refs are
@@ -380,7 +402,11 @@ export function currentHead(repoRoot) {
  * for an idempotent already-merged re-approve too (always reads the
  * target's real current tip, never a stale pre-merge snapshot). */
 export function resolveRefSha(repoRoot, ref) {
-  return gitRead(repoRoot, ['rev-parse', ref]).trim();
+  try {
+    const oid = inspectGit(repoRoot).resolveCommit({ name: ref });
+    if (typeof oid !== 'string') throw new Error(`unknown ref ${ref}`);
+    return oid;
+  } catch (err) { throw new StoreError('validation', `reading ref ${ref} failed in "${repoRoot}": ${err.message}`); }
 }
 
 /** Resolve `repoRoot`'s trunk branch name without assuming `'main'`: prefers
@@ -394,24 +420,10 @@ export function resolveRefSha(repoRoot, ref) {
  * merge-content semantics — and keeping it here removes the circular
  * merge.mjs <-> worktree.mjs import the old placement forced. */
 export function detectTrunk(repoRoot) {
-  try {
-    const ref = gitQuiet(repoRoot, ['symbolic-ref', '--short', 'refs/remotes/origin/HEAD']).trim();
-    if (ref.startsWith('origin/')) {
-      return ref.slice('origin/'.length);
-    }
-  } catch {
-    // no origin remote, or origin/HEAD isn't set locally — fall through
-  }
-
-  for (const candidate of ['main', 'master']) {
-    try {
-      gitQuiet(repoRoot, ['show-ref', '--verify', '--quiet', `refs/heads/${candidate}`]);
-      return candidate;
-    } catch {
-      // candidate branch doesn't exist locally — try the next one
-    }
-  }
-
+  const port = inspectGit(repoRoot);
+  const remote = port.resolveRef({ name: 'refs/remotes/origin/HEAD' });
+  if (remote.kind === 'symbolic' && remote.target.startsWith('refs/remotes/origin/')) return remote.target.slice('refs/remotes/origin/'.length);
+  for (const name of ['main','master']) if (branchExists(repoRoot, name)) return name;
   return 'main';
 }
 
@@ -441,17 +453,8 @@ export function detectTrunk(repoRoot) {
  * it is a pure worktree-identity check with zero merge-content semantics.
  */
 export function isMainWorktree(repoRoot) {
-  let toplevelRaw;
-  try {
-    toplevelRaw = gitQuiet(repoRoot, ['rev-parse', '--show-toplevel']).trim();
-  } catch {
-    return true;
-  }
-  const toplevel = realpathOrSelf(toplevelRaw);
-  const commonDirRaw = gitQuiet(repoRoot, ['rev-parse', '--git-common-dir']).trim();
-  const commonDirAbs = path.isAbsolute(commonDirRaw) ? commonDirRaw : path.resolve(repoRoot, commonDirRaw);
-  const commonDirParent = realpathOrSelf(path.dirname(commonDirAbs));
-  return pathsEqual(toplevel, commonDirParent);
+  const facts = inspectGit(repoRoot).resolveRepo();
+  return facts.notARepository || pathsEqual(realpathOrSelf(facts.worktreeRoot), realpathOrSelf(facts.trustedMainRoot));
 }
 
 // Push a runner item's branch to origin unless it already tracks an upstream.
@@ -462,13 +465,9 @@ export function isMainWorktree(repoRoot) {
 // is a real operation. Lives here rather than in bin/fgos.mjs (tsk-49i D3):
 // pushing a branch is branch mechanics, this module's own job.
 export function ensureBranchPushed(repoRoot, branch) {
-  try {
-    execFileSync('git', ['rev-parse', '--abbrev-ref', `${branch}@{upstream}`], { cwd: repoRoot, encoding: 'utf8', shell: false });
-    return; // upstream already set — nothing to push
-  } catch {
-    // no upstream yet — the normal, expected first-review case; fall through
-  }
-  execFileSync('git', ['push', '-u', 'origin', branch], { cwd: repoRoot, encoding: 'utf8', shell: false });
+  const tracking = inspectGit(repoRoot).remoteTracking({ branch: `refs/heads/${branch}`, remote: 'origin' });
+  if (tracking.upstream) return;
+  createGitRemote(gitPortOptions(repoRoot, { mutation: true })).pushRefs({ remoteGrant: { name: 'origin', pinnedUrl: tracking.url }, mappings: [[`refs/heads/${branch}`, `refs/heads/${branch}`]], operationId: operationId() });
 }
 
 // Exported (pr-lifecycle-2): the approval-gate merge engine (merge.mjs)
@@ -476,43 +475,7 @@ export function ensureBranchPushed(repoRoot, branch) {
 // `fgw/<id>` branch) vs "pull"/"legacy" (no branch) — one existence check,
 // never a second implementation of "does this branch exist" elsewhere.
 export function branchExists(repoRoot, branch) {
-  try {
-    execFileSync('git', ['rev-parse', '--verify', '--quiet', `refs/heads/${branch}`], {
-      cwd: repoRoot,
-      encoding: 'utf8',
-      shell: false,
-    });
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Parse `git worktree list --porcelain` output and return the checkout
- * path currently registered for `branch` (as `refs/heads/<branch>`), or
- * `null` if the branch is not checked out anywhere. Porcelain records are
- * blank-line-separated stanzas, each starting with a `worktree <path>`
- * line followed by a `branch refs/heads/<name>` line (or `detached`).
- *
- * Exported (tsk-3gx-1): `promote-preflight.mjs` reuses this exact parse to
- * judge whether a member branch is currently checked out elsewhere before
- * a retarget — same "one implementation of this check" discipline
- * `branchExists` above already documents for its own callers.
- */
-export function findCheckoutPath(porcelainOutput, branch) {
-  const ref = `refs/heads/${branch}`;
-  let currentPath = null;
-  for (const line of porcelainOutput.split('\n')) {
-    if (line.startsWith('worktree ')) {
-      currentPath = line.slice('worktree '.length).trim();
-    } else if (line.startsWith('branch ')) {
-      if (line.slice('branch '.length).trim() === ref) return realpathOrSelf(currentPath);
-    } else if (line === '') {
-      currentPath = null;
-    }
-  }
-  return null;
+  try { return inspectGit(repoRoot).resolveRef({ name: `refs/heads/${branch}` }).kind === 'direct'; } catch { return false; }
 }
 
 /**
@@ -529,14 +492,7 @@ export function findCheckoutPath(porcelainOutput, branch) {
  * judgment — never a second implementation of "is this checkout dirty".
  */
 export function isCheckoutDirty(repoRoot, worktreePath) {
-  let status;
-  try {
-    // Explicit untracked mode: a user's status.showUntrackedFiles=no would hide new files.
-    status = git(repoRoot, ['-C', worktreePath, 'status', '--porcelain', '--untracked-files=normal', '--', ':!.fgos']);
-  } catch {
-    return true;
-  }
-  return status.trim().length > 0;
+  try { return checkoutFacts(repoRoot, worktreePath).status.length > 0; } catch { return true; }
 }
 
 /**
@@ -547,17 +503,7 @@ export function isCheckoutDirty(repoRoot, worktreePath) {
  * by one. Fails open (returns empty array) on git error.
  */
 export function checkoutDirtyPaths(repoRoot, worktreePath) {
-  let statusOutput;
-  try {
-    // Untracked files one by one, whatever status.showUntrackedFiles says: a new file inside an
-    // already-untracked directory is a new path, not the same collapsed `dir`.
-    statusOutput = execFileSync('git', ['-C', worktreePath, 'status', '--porcelain=v1', '-z', '--untracked-files=all', '--', ':!.fgos'], {
-      cwd: repoRoot, encoding: 'utf8', shell: false, maxBuffer: GIT_LIST_MAX_BUFFER,
-    });
-  } catch {
-    return [];
-  }
-  return statusPaths(statusOutput);
+  try { return statusPaths(Buffer.from(checkoutFacts(repoRoot, worktreePath).status).toString('utf8')); } catch { return []; }
 }
 
 
@@ -587,12 +533,12 @@ export function checkoutDirtyPaths(repoRoot, worktreePath) {
 export function reclaimOrphanedCheckout(repoRoot, branch, { callerCwd = process.cwd() } = {}) {
   let listing;
   try {
-    listing = git(repoRoot, ['worktree', 'list', '--porcelain']);
+    listing = gitWorktrees(repoRoot);
   } catch (err) {
     throw new WorktreeError(`listing worktrees failed while reclaiming "${branch}": ${err.message}`, { branch });
   }
 
-  const orphanPath = findCheckoutPath(listing, branch);
+  const orphanPath = checkoutPathIn(listing, branch);
   if (!orphanPath) return { reclaimed: false, path: null };
 
   // REPO-ROOT GUARD (tsk-k8u D1): an orphan checkout that resolves to
@@ -645,7 +591,7 @@ export function reclaimOrphanedCheckout(repoRoot, branch, { callerCwd = process.
       );
     }
     try {
-      git(repoRoot, ['worktree', 'remove', '--force', orphanPath]);
+      removeWorktree(repoRoot, orphanPath, { force: true });
     } catch (err) {
       throw new WorktreeError(
         `reclaiming orphaned checkout of "${branch}" at "${orphanPath}" failed: ${err.message}`,
@@ -654,7 +600,7 @@ export function reclaimOrphanedCheckout(repoRoot, branch, { callerCwd = process.
     }
   } else {
     try {
-      git(repoRoot, ['worktree', 'prune']);
+      worktreePort(repoRoot).prune({ path: orphanPath, operationId: operationId() });
     } catch (err) {
       throw new WorktreeError(
         `pruning stale worktree registration for "${branch}" (path already gone: "${orphanPath}") failed: ${err.message}`,
@@ -698,17 +644,17 @@ export function reclaimOrphanedCheckout(repoRoot, branch, { callerCwd = process.
 function relocateOrphanedCheckout(repoRoot, branch, targetPath) {
   let listing;
   try {
-    listing = git(repoRoot, ['worktree', 'list', '--porcelain']);
+    listing = gitWorktrees(repoRoot);
   } catch (err) {
     throw new WorktreeError(`listing worktrees failed while reclaiming "${branch}": ${err.message}`, { branch });
   }
 
-  const orphanPath = findCheckoutPath(listing, branch);
+  const orphanPath = checkoutPathIn(listing, branch);
   if (!orphanPath) return { relocated: false };
 
   if (!fs.existsSync(orphanPath)) {
     try {
-      git(repoRoot, ['worktree', 'prune']);
+      worktreePort(repoRoot).prune({ path: orphanPath, operationId: operationId() });
     } catch (err) {
       throw new WorktreeError(
         `pruning stale worktree registration for "${branch}" (path already gone: "${orphanPath}") failed: ${err.message}`,
@@ -736,7 +682,7 @@ function relocateOrphanedCheckout(repoRoot, branch, targetPath) {
   }
 
   try {
-    git(repoRoot, ['worktree', 'move', orphanPath, targetPath]);
+    withCheckoutCustody(orphanPath, (options, custody) => createGitWorktree({ ...options, repoPath: options.trustedMain }).relocate({ source: orphanPath, destination: targetPath, expectedTip: currentHead(orphanPath), operationId: operationId() }, [custody]));
   } catch (err) {
     throw new WorktreeError(
       `relocating checkout of "${branch}" from "${orphanPath}" to "${targetPath}" failed: ${err.message}`,
@@ -769,7 +715,7 @@ export function createBranchRef(repoRoot, id, opts = {}) {
   }
 
   try {
-    git(repoRoot, ['branch', branch, baseRef]);
+    refsPort(repoRoot).ensureBranch({ name: `refs/heads/${branch}`, next: resolveRefSha(repoRoot, baseRef), operationId: operationId() });
   } catch (err) {
     throw new WorktreeError(`git branch failed creating ref "${branch}" from "${baseRef}": ${err.message}`, {
       branch,
@@ -783,31 +729,13 @@ export function createBranchRef(repoRoot, id, opts = {}) {
 /**
  * `.fgos/` strip (ADR0020) + dependency provisioning, shared by every
  * function in this module that stands up a fresh checkout — `createWorktree`
- * and `createDetachedMergeWorktree` below.
+ * below.
  *
  * Runs after `git worktree add` has returned, so it holds no repo lock:
  * the slow, synchronous `provisionDependencies` (`npm ci`/`npm install`)
  * works entirely inside `worktreePath` and never touches `repoRoot`'s index.
  */
 function finishWorktreeSetup(repoRoot, worktreePath, branch) {
-  // `.fgos/` (ADR0020): since `.fgos/` is git-tracked in this repo, a bare
-  // checkout would carry a snapshot frozen at fork time — stale the moment
-  // main gets another uncommitted event, and a live escape hatch into the
-  // shared store if it were symlinked instead (rejected, ADR0020). The
-  // worker running in this worktree has no legitimate reason to read or
-  // write `.fgos/` at all (`0005`: the runner is the sole writer, always
-  // against `repoRoot`), so any checked-out copy is removed outright — not
-  // shared, not synced. `mergeRunnerItem` (merge.mjs) is the trusted-side
-  // backstop if a worker commits a fresh `.fgos/` of its own anyway.
-  try {
-    fs.rmSync(path.join(worktreePath, '.fgos'), { recursive: true, force: true });
-  } catch (err) {
-    throw new WorktreeError(`removing checked-out .fgos in worktree "${worktreePath}" failed: ${err.message}`, {
-      branch,
-      worktreePath,
-    });
-  }
-
   // A symlink to repoRoot's node_modules was considered and rejected here
   // (tsk-2vd D2): instant and no network, but only ever matches whatever
   // repoRoot itself has installed — a worktree whose own package.json
@@ -816,9 +744,9 @@ function finishWorktreeSetup(repoRoot, worktreePath, branch) {
   // dependency before that merge lands on repoRoot's own default branch)
   // would still hit ERR_MODULE_NOT_FOUND. provisionDependencies installs
   // for THIS worktree's own declared dependencies instead, correct at the
-  // cost of the install itself.
-  provisionDependencies(worktreePath);
-  runWorktreeSetupCommands(worktreePath, repoRoot);
+  // cost of the install itself. What it places is recorded, so
+  // `removeWorktree` can take it back.
+  provisionWorktree(worktreePath, repoRoot, provisioningStateRoot(repoRoot));
 }
 
 /**
@@ -844,7 +772,7 @@ function finishWorktreeSetup(repoRoot, worktreePath, branch) {
  * ADR0020). The worker running in this worktree has no legitimate reason to
  * read or write `.fgos/` at all (`0005`: the runner is the sole writer,
  * always against `repoRoot`), so any checked-out copy is removed outright —
- * not shared, not synced. `mergeRunnerItem` (merge.mjs) is the trusted-side
+ * not shared, not synced. `declareLandFiles` (merge.mjs) is the trusted-side
  * backstop if a worker commits a fresh `.fgos/` of its own anyway.
  */
 export function createWorktree(repoRoot, id, opts = {}) {
@@ -861,7 +789,7 @@ export function createWorktree(repoRoot, id, opts = {}) {
       relocated = relocateOrphanedCheckout(repoRoot, branch, worktreePath).relocated;
     } catch (err) {
       try {
-        fs.rmSync(worktreePath, { recursive: true, force: true });
+        fs.rmdirSync(worktreePath);
       } catch {
         // best-effort cleanup of the empty dir mkdtemp created; the real
         // failure below is what the caller needs to see.
@@ -882,7 +810,7 @@ export function createWorktree(repoRoot, id, opts = {}) {
       }
     } catch (err) {
       try {
-        fs.rmSync(worktreePath, { recursive: true, force: true });
+        fs.rmdirSync(worktreePath);
       } catch {
         // best-effort cleanup of the empty dir mkdtemp created; the real
         // failure below is what the caller needs to see.
@@ -936,7 +864,7 @@ export function createWorktree(repoRoot, id, opts = {}) {
 /**
  * The checkout of `branch` a claim may reattach to instead of standing up a
  * new one, or `null` when there is none to reattach to. Deliberately
- * stricter than `findCheckoutPath` alone, on two counts:
+ * stricter than `checkoutPathForBranch` alone, on two counts:
  *
  * - the registration must still exist on disk. `git worktree list` reports
  *   a path whose directory was deleted out from under it until someone
@@ -957,11 +885,11 @@ export function createWorktree(repoRoot, id, opts = {}) {
 function reattachableCheckout(repoRoot, branch, baseDir) {
   let listing;
   try {
-    listing = git(repoRoot, ['worktree', 'list', '--porcelain']);
+    listing = gitWorktrees(repoRoot);
   } catch {
     return null;
   }
-  const registered = findCheckoutPath(listing, branch);
+  const registered = checkoutPathIn(listing, branch);
   if (!registered || !fs.existsSync(registered) || !fs.existsSync(baseDir)) return null;
 
   let relative;
@@ -980,9 +908,9 @@ function reattachableCheckout(repoRoot, branch, baseDir) {
  * The commit a reattached claim worktree's own files/index are ACTUALLY
  * synced to — never `git -C worktreePath rev-parse HEAD` (tsk-2cd): `HEAD`
  * is a symbolic ref that resolves live through the branch it's checked out
- * on, so once that branch has been force-moved from elsewhere (`git branch
- * -f`, the mechanism `withMergeEphemeralWorktree` below uses to land a
- * merge — see its own doc comment), `rev-parse HEAD` immediately reports
+ * on, so once that branch has been moved from elsewhere (a ref update made
+ * outside this worktree, such as an external `git branch -f`), `rev-parse
+ * HEAD` immediately reports
  * the NEW tip even though the worktree's actual files/index were never
  * touched. The worktree's own PER-WORKTREE `HEAD` reflog is the right
  * signal instead: it only gains an entry when a real operation (checkout,
@@ -994,13 +922,7 @@ function reattachableCheckout(repoRoot, branch, baseDir) {
  * assumes a sync point it could not actually read.
  */
 function lastSyncedCommit(repoRoot, worktreePath) {
-  let output;
-  try {
-    output = git(repoRoot, ['-C', worktreePath, 'reflog', 'show', 'HEAD', '-n', '1', '--format=%H']).trim();
-  } catch {
-    return null;
-  }
-  return output || null;
+  try { return checkoutFacts(repoRoot, worktreePath).lastSynced || null; } catch { return null; }
 }
 
 /**
@@ -1019,25 +941,17 @@ function lastSyncedCommit(repoRoot, worktreePath) {
  */
 function isDirtyRelativeToSync(repoRoot, worktreePath, lastSynced) {
   try {
-    git(repoRoot, ['-C', worktreePath, 'diff', '--quiet', lastSynced, '--', ':!.fgos']);
-  } catch {
-    return true;
-  }
-  let status;
-  try {
-    status = git(repoRoot, ['-C', worktreePath, 'status', '--porcelain', '--untracked-files=normal', '--', ':!.fgos']);
-  } catch {
-    return true;
-  }
-  return status.split('\n').some((line) => line.startsWith('??'));
+    const facts = checkoutFacts(repoRoot, worktreePath, lastSynced);
+    return facts.delta.length > 0 || Buffer.from(facts.status).toString('utf8').split('\0').some(line => line.startsWith('??'));
+  } catch { return true; }
 }
 
 /**
  * Resync a reattached claim worktree to its branch's current tip when safe
  * (tsk-2cd, `docs/history/root-worktree-drift-after-child-merge/CONTEXT.md`
- * D1/D3): `approve`'s leaf→root merge lands via a plain ref update from a
- * DETACHED ephemeral checkout (`withMergeEphemeralWorktree` below) — it
- * never touches any OTHER worktree already checked out on that branch, so
+ * D1/D3): a ref update made outside this worktree never touches any OTHER
+ * worktree already checked out on that branch (Land itself refuses to move
+ * a branch another checkout holds, Git spec §9 step 4), so
  * a long-lived claim worktree (this function's own caller,
  * `createClaimWorktree`'s reattach path) can silently fall behind: the
  * branch has advanced, but this worktree's files/index stay exactly where
@@ -1066,12 +980,12 @@ export function resyncClaimWorktree(repoRoot, worktreePath, branch) {
     );
   }
 
-  const branchTip = git(repoRoot, ['rev-parse', branch]).trim();
+  const branchTip = resolveRefSha(repoRoot, branch);
   if (lastSynced === branchTip) return { resynced: false };
 
   let isAncestor = true;
   try {
-    git(repoRoot, ['merge-base', '--is-ancestor', lastSynced, branchTip]);
+    if (!ancestorOf(repoRoot, lastSynced, branchTip)) throw new Error('not ancestor');
   } catch {
     isAncestor = false;
   }
@@ -1090,8 +1004,7 @@ export function resyncClaimWorktree(repoRoot, worktreePath, branch) {
     );
   }
 
-  git(repoRoot, ['-C', worktreePath, 'reset', '--hard', branchTip]);
-  stripFgosAfterReset(worktreePath, branch);
+  restoreCheckout(repoRoot, worktreePath, branchTip, { baseline: lastSynced });
   return { resynced: true, from: lastSynced, to: branchTip };
 }
 
@@ -1106,16 +1019,6 @@ export function resyncClaimWorktree(repoRoot, worktreePath, branch) {
  * `finishWorktreeSetup` (dependency provisioning is out of scope for a
  * resync, an unrelated side effect this must not add).
  */
-function stripFgosAfterReset(worktreePath, branch) {
-  try {
-    fs.rmSync(path.join(worktreePath, '.fgos'), { recursive: true, force: true });
-  } catch (err) {
-    throw new WorktreeError(`removing checked-out .fgos in resynced worktree "${worktreePath}" failed: ${err.message}`, {
-      branch,
-      worktreePath,
-    });
-  }
-}
 
 /**
  * The repair verb behind `fgos resync-worktree` (tsk-1d7, docs/history/
@@ -1145,17 +1048,9 @@ export function resyncWorktree(repoRoot, worktreePath, branch) {
   // same signal, same refusal shape the real-conflict path below already
   // uses (a patch file on disk IS the actionable thing to point at), just
   // checked proactively instead of only encountered reactively.
-  const gitCommonDir = git(repoRoot, ['rev-parse', '--path-format=absolute', '--git-common-dir']).trim();
-  const patchDir = path.join(gitCommonDir, 'fgos-resync-patches');
-  const branchPrefix = `${branch.replace(/\//g, '-')}-`;
-  let orphanedPatches = [];
-  try {
-    orphanedPatches = fs.readdirSync(patchDir).filter((name) => name.startsWith(branchPrefix) && name.endsWith('.patch'));
-  } catch {
-    // patchDir not created yet -- nothing to orphan.
-  }
+  const orphanedPatches = checkoutFacts(repoRoot, worktreePath).orphanedPatches;
   if (orphanedPatches.length > 0) {
-    const orphanedPaths = orphanedPatches.map((name) => path.join(patchDir, name));
+    const orphanedPaths = orphanedPatches;
     throw new WorktreeError(
       `resync-worktree: refusing "${worktreePath}" on "${branch}" — a prior resync-worktree run left ${orphanedPaths.length === 1 ? 'a patch' : 'patches'} behind at ${orphanedPaths.map((p) => `"${p}"`).join(', ')}, most likely from being interrupted between its own reset and reapply. Inspect ${orphanedPaths.length === 1 ? 'it' : 'them'} by hand — the worktree may already be reset to the branch tip with this content never reapplied — then remove the file(s) before resyncing again.`,
       { branch, worktreePath, orphanedPaths },
@@ -1170,14 +1065,14 @@ export function resyncWorktree(repoRoot, worktreePath, branch) {
     );
   }
 
-  const branchTip = git(repoRoot, ['rev-parse', branch]).trim();
+  const branchTip = resolveRefSha(repoRoot, branch);
   if (lastSynced === branchTip) {
     return { resynced: false, reason: 'already-in-sync' };
   }
 
   let isAncestor = true;
   try {
-    git(repoRoot, ['merge-base', '--is-ancestor', lastSynced, branchTip]);
+    if (!ancestorOf(repoRoot, lastSynced, branchTip)) throw new Error('not ancestor');
   } catch {
     isAncestor = false;
   }
@@ -1193,52 +1088,18 @@ export function resyncWorktree(repoRoot, worktreePath, branch) {
   // (D3) -- only STAGED content is what this repair carries forward.
   // Porcelain column 2 (working-tree status) is ' ' for a purely-staged
   // entry; anything else means real dirt outside the index.
-  const status = git(repoRoot, ['-C', worktreePath, 'status', '--porcelain', '--', ':!.fgos']);
-  const strayLines = status.split('\n').filter((line) => line !== '' && line[1] !== ' ');
-  if (strayLines.length > 0) {
-    throw new WorktreeError(
-      `resync-worktree: refusing "${worktreePath}" on "${branch}" — stray uncommitted changes beyond what's staged (${strayLines.join(', ')}). Commit, stage, or discard them before resyncing; never guessing a merge over stray dirt.`,
-      { branch, worktreePath, strayLines },
-    );
+  const facts = checkoutFacts(repoRoot, worktreePath, lastSynced);
+  const strayLines = Buffer.from(facts.status).toString('utf8').split('\0').filter(line => line && line[1] !== ' ');
+  if (strayLines.length) throw new WorktreeError(`resync-worktree: stray uncommitted changes beyond what's staged (${strayLines.join(', ')})`, { branch, worktreePath, strayLines });
+  const reapplied = facts.stagedPatch.length > 0;
+  try { restoreCheckout(repoRoot, worktreePath, branchTip, { baseline: lastSynced, reapplyLocalDelta: true }); }
+  catch (err) {
+    let detail;
+    try { detail = JSON.parse(err.message); } catch { detail = {}; }
+    const snapshot = detail.detail?.snapshot;
+    throw new WorktreeError(`resync-worktree: reapply refused${snapshot ? `; snapshot preserved at ${snapshot}` : ''}: ${err.message}`, { branch, worktreePath, ...(snapshot ? { snapshot } : {}), ...(detail.detail?.patchPath ? { patchPath: detail.detail.patchPath } : {}), ...(detail.operationId ? { operationId: detail.operationId } : {}) });
   }
-
-  // 1. Extract the staged content as a patch BEFORE touching anything,
-  // saved under --git-common-dir -- never the worktree's own --git-dir,
-  // which fgOS can force-remove later, losing the only copy (D3).
-  // `gitCommonDir`/`patchDir` already resolved above, by the orphaned-
-  // patch pre-check (tsk-jg4).
-  const patch = git(repoRoot, ['-C', worktreePath, 'diff', '--cached', '--binary', lastSynced]);
-  fs.mkdirSync(patchDir, { recursive: true });
-  const patchPath = path.join(patchDir, `${branch.replace(/\//g, '-')}-${Date.now()}.patch`);
-  fs.writeFileSync(patchPath, patch);
-
-  // 2. Reset to the branch's real tip.
-  git(repoRoot, ['-C', worktreePath, 'reset', '--hard', branchTip]);
-
-  // 3. Re-strip .fgos/ -- reset --hard always reintroduces it (D3).
-  stripFgosAfterReset(worktreePath, branch);
-
-  if (patch.trim() === '') {
-    // Nothing was staged -- nothing to reapply.
-    fs.rmSync(patchPath, { force: true });
-    return { resynced: true, from: lastSynced, to: branchTip, reapplied: false };
-  }
-
-  // 4. Reapply the patch, merging both index and working tree in one step
-  // -- never `--3way`, which was tested to leave unmerged/conflict state
-  // (D3). A real content conflict refuses and preserves the patch file so
-  // a person can review/apply it by hand.
-  try {
-    git(repoRoot, ['-C', worktreePath, 'apply', '--index', patchPath]);
-  } catch (err) {
-    throw new WorktreeError(
-      `resync-worktree: "${worktreePath}" was reset to "${branchTip}" but reapplying its staged changes hit a real conflict — the patch is preserved at "${patchPath}" for manual review. ${err.message}`,
-      { branch, worktreePath, patchPath },
-    );
-  }
-
-  fs.rmSync(patchPath, { force: true });
-  return { resynced: true, from: lastSynced, to: branchTip, reapplied: true };
+  return { resynced: true, from: lastSynced, to: branchTip, reapplied };
 }
 
 /**
@@ -1329,13 +1190,14 @@ export function createClaimWorktree(repoRoot, id, opts = {}) {
  * failing the claim outright.
  */
 export function refreshUnstartedBranch(repoRoot, branch, targetRef, checkoutPath = null) {
-  const branchTip = git(repoRoot, ['rev-parse', branch]).trim();
-  const targetTip = git(repoRoot, ['rev-parse', targetRef]).trim();
+  const branchTip = resolveRefSha(repoRoot, branch);
+  const targetTip = resolveRefSha(repoRoot, targetRef);
 
   let ahead = 0;
   let behind = 0;
   try {
-    const counts = git(repoRoot, ['rev-list', '--left-right', '--count', `${targetRef}...${branch}`]).trim();
+    const comparison = compareCommits(repoRoot, targetTip, branchTip);
+    const counts = `${comparison.left} ${comparison.right}`;
     const [behindStr, aheadStr] = counts.split(/\s+/);
     const parsedBehind = Number.parseInt(behindStr, 10);
     const parsedAhead = Number.parseInt(aheadStr, 10);
@@ -1353,7 +1215,7 @@ export function refreshUnstartedBranch(repoRoot, branch, targetRef, checkoutPath
 
   let unstarted = false;
   try {
-    git(repoRoot, ['merge-base', '--is-ancestor', branch, targetRef]);
+    if (!ancestorOf(repoRoot, branchTip, targetTip)) throw new Error('not ancestor');
     unstarted = true;
   } catch {
     unstarted = false;
@@ -1364,9 +1226,13 @@ export function refreshUnstartedBranch(repoRoot, branch, targetRef, checkoutPath
 
   try {
     if (checkoutPath) {
-      git(repoRoot, ['-C', checkoutPath, 'merge', '--ff-only', targetTip]);
+      const options = gitPortOptions(checkoutPath, { mutation: true });
+      const lock = acquireSync(createLockScope('refresh'), 'dispatch-cwd', { fgosDir: path.join(options.trustedMain, '.fgos'), cwd: checkoutPath });
+      if (lock.result !== 'acquired') throw new Error('worktree custody held');
+      try { createGitRefs(options).fastForwardCheckedOut({ name: `refs/heads/${branch}`, expected: branchTip, next: targetTip, operationId: operationId() }, [lock.handle]); }
+      finally { lock.handle.release(); }
     } else {
-      git(repoRoot, ['branch', '-f', branch, targetTip]);
+      refsPort(repoRoot).advanceRef({ name: `refs/heads/${branch}`, expected: branchTip, next: targetTip, operationId: operationId() });
     }
   } catch (err) {
     return { target: targetRef, ahead, behind, refreshed: false, reason: 'refresh-refused', detail: err.message };
@@ -1375,154 +1241,39 @@ export function refreshUnstartedBranch(repoRoot, branch, targetRef, checkoutPath
 }
 
 /**
- * merge-ephemeral: a worktree created ONLY to stage one merge (approve's
- * leaf-into-root merge, catchup's target-into-item merge) against a branch
- * that already exists — `opts.baseRef` is never needed here (createWorktree's
- * branch-reuse path ignores it) — and force-removed unconditionally once
- * `fn` settles, whether it returns or throws. Replaces the identical
- * try/finally both call sites used to write out by hand.
+ * A disposable checkout detached at `commit`, for verifying a tree that no
+ * checkout here holds (a merge already landed on a target branch that is
+ * not checked out). Git refuses a second checkout of a BRANCH, never of a
+ * commit, so this never inspects, moves or removes any checkout of the
+ * branch itself, including one a person keeps open (docs/history/
+ * merge-worktree-reclaim-clobbers-kept-checkout/CONTEXT.md D1). It is
+ * provisioned like a Land candidate, with what that placed recorded; the
+ * caller always removes it with `removeWorktree`. A provisioning failure
+ * removes the checkout before the error is rethrown.
  */
-/**
- * The checkout `withMergeEphemeralWorktree` uses for `id`'s branch —
- * detached at the branch's current tip COMMIT, never the branch ref
- * itself. Git only refuses a second checkout of the same BRANCH; a
- * detached checkout of the same commit is unrestricted, so this never
- * inspects, moves, or removes any existing checkout of the branch —
- * including one a person is deliberately keeping open (`ExitWorktree`
- * "keep"), clean or dirty, live session or not (docs/history/
- * merge-worktree-reclaim-clobbers-kept-checkout/CONTEXT.md D1). This
- * sidesteps the conflict entirely rather than detecting and refusing it —
- * `createWorktree`'s own reuse/relocate path above stays exactly as-is
- * for its other callers (`pick`/`take` reclaiming a session's own
- * abandoned checkout, a genuinely different, intentional use case
- * CONTEXT.md D1 explicitly leaves untouched).
- *
- * `fgw/<id>` is normally created EARLY as a ref only, via `createBranchRef`
- * (D17, `loop.mjs`'s own leaf-dispatch call) — but a root only ever driven
- * by a live session (never through the runner's own dispatch loop) never
- * gets that early call, so the branch can genuinely not exist yet the
- * first time a merge needs it (docs/history/
- * tsk-6ch-merge-worktree-branch-fallback/CONTEXT.md). Falling back to
- * `createBranchRef` here — idempotent, same early-creation step
- * `loop.mjs` already uses — replaces that missing step instead of crashing
- * the merge outright. No explicit `baseRef` (tsk-386): `createBranchRef`'s
- * own default already resolves through `detectTrunk(repoRoot)`, never a
- * hardcoded `'main'` — a host repo whose trunk is `master` would otherwise
- * fail this exact fallback outright.
- */
-function createDetachedMergeWorktree(repoRoot, id) {
-  const scope = createLockScope('worktree');
-  const branch = branchNameFor(id);
-  if (!branchExists(repoRoot, branch)) {
-    createBranchRef(repoRoot, id);
-  }
-  const startCommit = git(repoRoot, ['rev-parse', branch]).trim();
+export function createVerifyCheckout(repoRoot, commit) {
   const baseDir = path.join(os.tmpdir(), 'fgos-worktrees');
   fs.mkdirSync(baseDir, { recursive: true });
-  const worktreePath = fs.mkdtempSync(path.join(baseDir, `${branch.replace(/\//g, '-')}-merge-`));
-
+  const worktreePath = fs.mkdtempSync(path.join(baseDir, 'verify-'));
   try {
-    addWorktreeSync(scope, repoRoot, ['--detach', worktreePath, startCommit]);
+    addWorktreeSync(createLockScope('worktree'), repoRoot, ['--detach', worktreePath, commit]);
   } catch (err) {
     try {
-      fs.rmSync(worktreePath, { recursive: true, force: true });
+      fs.rmdirSync(worktreePath);
     } catch {
       // best-effort cleanup of the empty dir mkdtemp created; the real
       // failure below is what the caller needs to see.
     }
     if (err instanceof HolderLockError) throw err;
-    throw new WorktreeError(`git worktree add --detach failed for "${branch}" at ${startCommit}: ${err.message}`, {
-      branch,
-      worktreePath,
-    });
+    throw new WorktreeError(`git worktree add --detach failed at ${commit}: ${err.message}`, { worktreePath });
   }
-
-  // tsk-4yv: same reasoning as createWorktree's own identical wrap above --
-  // `git worktree add --detach` has already succeeded by this point, so a
-  // `finishWorktreeSetup` failure (the `.fgos/` strip, or
-  // `provisionDependencies`'s `npm ci`/`npm install`) must force-remove the
-  // now-registered worktree before rethrowing, or it leaks: this is
-  // specifically the DETACHED case (a `withMergeEphemeralWorktree` call
-  // during `approve`), which `reclaimOrphanedCheckout`/`findCheckoutPath`
-  // (both branch-keyed) never reclaim, unlike a branch-attached
-  // `createWorktree` checkout, which mostly self-heals via the
-  // relocate/reattach paths. Left unfixed, a repeated npm registry flake
-  // during `approve` accumulates full checkouts under tmp indefinitely.
   try {
-    finishWorktreeSetup(repoRoot, worktreePath, branch);
+    provisionWorktree(worktreePath, repoRoot, provisioningStateRoot(repoRoot));
   } catch (err) {
-    try {
-      removeWorktree(repoRoot, worktreePath, { force: true });
-    } catch {
-      // best-effort — a failed cleanup here must never mask the real
-      // finishWorktreeSetup failure the caller needs to see.
-    }
+    try { removeWorktree(repoRoot, worktreePath, { force: true }); } catch { /* the provisioning error is the one to report */ }
     throw err;
   }
-
-  return { path: worktreePath, branch, startCommit };
-}
-
-export async function withMergeEphemeralWorktree(repoRoot, id, fn) {
-  const branch = branchNameFor(id);
-  const worktree = createDetachedMergeWorktree(repoRoot, id);
-  try {
-    const result = await fn(worktree);
-    // fn committed on top of startCommit (a successful merge) -- land it on
-    // the real branch via a plain ref update, which needs no exclusive
-    // checkout, instead of the ephemeral checkout ever having BEEN the real
-    // branch. fn that only read/verified without committing (conflict,
-    // verify-fail, already-caught-up) leaves HEAD at startCommit, so no
-    // ref move happens -- the real branch is untouched, same as today.
-    const endCommit = git(worktree.path, ['rev-parse', 'HEAD']).trim();
-    if (endCommit !== worktree.startCommit) {
-      // CAS GUARD (tsk-46a, docs/history/merge-ephemeral-branch-force-race/
-      // CONTEXT.md D1; hardened tsk-18k): `startCommit` was captured back in
-      // createDetachedMergeWorktree, before `fn` ran and before any lock was
-      // held over THIS step -- a second concurrent call for the same `id`
-      // (e.g. two leaf approves into the same fgw/<rootId>) can land its own
-      // ref update in between, moving `branch` out from under this call
-      // without this call ever knowing.
-      //
-      // `git update-ref <ref> <new> <old>` is git's own atomic
-      // compare-and-swap on the ref: it refuses the write outright
-      // (non-zero exit, ref left completely untouched) unless the ref's
-      // CURRENT value still equals `<old>` at the exact moment of the
-      // write -- there is no separate read-then-write window left for a
-      // second caller to land in between. The prior shape here was a plain
-      // `git rev-parse` (read) followed by an unconditional `git branch -f`
-      // (write): two genuinely concurrent callers could BOTH pass that read
-      // before either one wrote, letting the second `branch -f` silently
-      // discard whichever commit the first one had just landed, with no
-      // error and no conflict. That window is exactly what tsk-18k's own
-      // bug (the merge-target-slot lock's release/renew misidentifying a
-      // sibling's live lock as its own after a TTL-starvation reclaim,
-      // fixed above in `withMergeTargetSlot`) could put two callers through
-      // at once -- confirmed still possible even after that identity fix,
-      // since a TTL-starvation reclaim can happen while the original
-      // holder's own `fn()` (this whole merge) is still running, unaware
-      // its lock was reclaimed. D2 still holds: fail loudly here, never
-      // retry automatically -- the caller (merge-loop, or a person
-      // re-running `fgos approve`) owns retrying against the new tip.
-      try {
-        git(repoRoot, ['update-ref', `refs/heads/${branch}`, endCommit, worktree.startCommit]);
-      } catch {
-        // update-ref's own error already named the mismatch on stderr; read
-        // the branch's actual current tip here only to report it back in
-        // the same message/field shape callers and tests already expect --
-        // this read is diagnostic, never the guard itself (the guard
-        // already ran, atomically, in the update-ref call above).
-        const liveTip = git(repoRoot, ['rev-parse', branch]).trim();
-        throw new WorktreeError(
-          `refusing to force-move "${branch}" to ${endCommit} -- its tip changed from ${worktree.startCommit} to ${liveTip} since this merge started (a concurrent merge into the same branch already landed). Retry against the new tip instead of overwriting it.`,
-          { branch, expectedTip: worktree.startCommit, actualTip: liveTip, endCommit },
-        );
-      }
-    }
-    return result;
-  } finally {
-    removeWorktree(repoRoot, worktree.path, { force: true });
-  }
+  return worktreePath;
 }
 
 /**
@@ -1543,6 +1294,10 @@ export function createDispatchWorktree(repoRoot, id, opts = {}) {
 /** Cleanup half of the runner-dispatch pair — see `createDispatchWorktree`. */
 export function removeDispatchWorktree(repoRoot, worktreePath, log = () => {}) {
   try {
+    // What a failed round left in its own dispatch checkout is producer output the Worktree port
+    // preserves (it never removes a dirty checkout). SafeRestore pins it in a snapshot before the
+    // checkout is reset to its own HEAD, so the removal below can proceed and the retry starts clean.
+    if (isCheckoutDirty(repoRoot, worktreePath)) resetDispatchWorktree(repoRoot, worktreePath, currentHead(worktreePath));
     removeWorktree(repoRoot, worktreePath, { force: true });
   } catch (err) {
     if (typeof log === 'function') {
@@ -1559,20 +1314,30 @@ export function removeDispatchWorktree(repoRoot, worktreePath, log = () => {}) {
  * inspect or merge later.
  */
 export function removeWorktree(repoRoot, worktreePath, opts = {}) {
-  const args = ['worktree', 'remove', worktreePath];
-  if (opts.force) args.push('--force');
+  const id = operationId();
+  let retained;
   try {
-    git(repoRoot, args);
-  } catch (err) {
-    throw new WorktreeError(`git worktree remove failed for "${worktreePath}": ${err.message}`, {
-      worktreePath,
-    });
-  }
-  try {
-    git(repoRoot, ['worktree', 'prune']);
-  } catch {
-    // best-effort — a failed prune does not invalidate a successful remove.
-  }
+    withCheckoutCustody(worktreePath, (options, custody) => {
+      let expectedTip = currentHead(worktreePath);
+      if (opts.retainTo && expectedTip !== opts.retainTo) {
+        // SafeRestore durably pins the old HEAD before resetting. Keep its
+        // evidence unacknowledged: the session is gone but its commit is not.
+        const restoreId = operationId();
+        const saved = createGitSafeRestore(options).apply({ operationId: restoreId, request: {
+          expectedHead: expectedTip, target: opts.retainTo, reason: 'retain forced session HEAD before cleanup',
+          discardLocalDelta: true, requireCleanBaseline: true,
+        } }, [custody]);
+        retained = { retainedRef: `refs/fgos/git-operations/${restoreId}/candidate`, snapshot: saved.snapshot };
+        expectedTip = currentHead(worktreePath);
+      }
+      const deliveredTo = opts.deliveredTo ?? expectedTip;
+      const evidenceDigest = crypto.createHash('sha256').update(JSON.stringify({ worktreePath, expectedTip, deliveredTo })).digest('hex');
+      removeProvisioned(provisioningStateRoot(repoRoot), worktreePath, () => createGitWorktree({ ...options, repoPath: options.trustedMain })
+        .remove({ path: worktreePath, expectedTip, deliveredTo, evidenceDigest, operationId: id }, [custody]));
+    }, opts);
+  } catch (err) { throw new WorktreeError(`git worktree remove failed for "${worktreePath}": ${err.message}${retained ? `; commit preserved at ${retained.retainedRef}; snapshot ${retained.snapshot}` : ''}`, { worktreePath, ...retained }); }
+  try { pruneWorktrees(repoRoot, id); } catch { /* removal already succeeded */ }
+  return retained;
 }
 
 /**
@@ -1586,30 +1351,11 @@ export function removeWorktree(repoRoot, worktreePath, opts = {}) {
  * must be kept for human/review, never auto-deleted.
  */
 export function listLeftovers(repoRoot, opts = {}) {
-  const base = opts.base ?? 'HEAD';
-  let refsOut;
   try {
-    refsOut = git(repoRoot, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
-  } catch (err) {
-    throw new WorktreeError(`listing "fgw/" branches failed: ${err.message}`, {});
-  }
-
-  const branches = refsOut
-    .split('\n')
-    .map((line) => line.trim())
-    .filter(Boolean);
-
-  return branches.map((branch) => {
-    let aheadCount;
-    try {
-      const mergeBase = git(repoRoot, ['merge-base', base, branch]).trim();
-      const countOut = git(repoRoot, ['rev-list', '--count', `${mergeBase}..${branch}`]);
-      aheadCount = parseInt(countOut.trim(), 10) || 0;
-    } catch (err) {
-      throw new WorktreeError(`computing ahead-count for branch "${branch}" failed: ${err.message}`, {
-        branch,
-      });
-    }
-    return { branch, aheadCount };
-  });
+    const base = resolveRefSha(repoRoot, opts.base ?? 'HEAD');
+    return inspectGit(repoRoot).listBranches({ prefix: 'refs/heads/fgw/' }).map(ref => {
+      const tip = resolveRefSha(repoRoot, ref);
+      return { branch: ref.slice('refs/heads/'.length), aheadCount: inspectGit(repoRoot).compareCommits({ left: base, right: tip }).right, ...(opts.includeTip ? { tip } : {}) };
+    });
+  } catch (err) { throw new WorktreeError(`listing "fgw/" branches failed: ${err.message}`); }
 }
