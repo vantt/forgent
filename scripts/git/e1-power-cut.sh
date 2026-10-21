@@ -56,7 +56,9 @@ loop() { truncate -s "$2" "$WORK/$1.img"; local l; l="$(losetup --show -f "$WORK
 [ -n "$LOG" ] || LOG="$(loop log "$((SIZE_MIB * 4))M")"
 REPLAY="$(loop replay "${SIZE_MIB}M")"; COW="$(loop cow "${SIZE_MIB}M")"
 SECTORS="$(blockdev --getsz "$DATA")"
-as_user() { runuser -u "$RUN_AS" -- "$@"; }
+# sudo leaves HOME at root's; the owner's Git state, cargo and node need the owner's own.
+RUN_HOME="$(getent passwd "$RUN_AS" | cut -d: -f6)"
+as_user() { runuser -u "$RUN_AS" -- env HOME="$RUN_HOME" "$@"; }
 
 # Addon descriptor and host binary are built as the checkout's owner, outside the device.
 DESCRIPTOR="$(as_user "$NODE" "$CHECKOUT/scripts/git/e1-power-cut.mjs" descriptor --root "$OUT")"
