@@ -21,6 +21,9 @@ pub enum Installed {
 #[derive(Debug)]
 pub struct InstallError {
     pub source: io::Error,
+    /// The boundary the failure happened at: `name-check`, `temp-created`, `bytes-written`,
+    /// `file-fsync`, `name-installed`, `temp-removed` or `parent-fsync`.
+    pub step: &'static str,
     /// `Some(Created)` means the final name was installed (or replaced), but durability or
     /// cleanup failed. Never retry assuming that no effect occurred.
     pub installed: Option<Installed>,
@@ -29,7 +32,16 @@ pub struct InstallError {
 }
 impl std::fmt::Display for InstallError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "durable install ({:?}): {}", self.installed, self.source)
+        let installed = match self.installed {
+            Some(Installed::Created) => "created",
+            Some(Installed::AlreadyExists) => "already-exists",
+            None => "none",
+        };
+        write!(
+            f,
+            "durable install failed at {} (installed: {installed}): {}",
+            self.step, self.source
+        )
     }
 }
 impl std::error::Error for InstallError {
@@ -83,13 +95,24 @@ pub fn install_ordered(
     before_install: &mut dyn FnMut() -> io::Result<()>,
     also_sync: &[&Path],
 ) -> Result<Installed, InstallError> {
-    write_durably(dir, name, bytes, false, 0o600, &mut |step| match step {
-        "file-fsync" => {
-            filesystem.checkpoint(step)?;
-            before_install()
-        }
-        _ => filesystem.checkpoint(step),
-    }, Ordered { also_sync, alongside })
+    write_durably(
+        dir,
+        name,
+        bytes,
+        false,
+        0o600,
+        &mut |step| match step {
+            "file-fsync" => {
+                filesystem.checkpoint(step)?;
+                before_install()
+            }
+            _ => filesystem.checkpoint(step),
+        },
+        Ordered {
+            also_sync,
+            alongside,
+        },
+    )
 }
 
 /// Sync several directories, each with its own fsync, issued concurrently
@@ -100,10 +123,15 @@ pub fn sync_directories(dirs: &[&Path]) -> io::Result<()> {
         [] => Ok(()),
         [one] => sync_directory(one),
         [first, rest @ ..] => std::thread::scope(|scope| {
-            let others: Vec<_> = rest.iter().map(|dir| scope.spawn(move || sync_directory(dir))).collect();
+            let others: Vec<_> = rest
+                .iter()
+                .map(|dir| scope.spawn(move || sync_directory(dir)))
+                .collect();
             let mut result = sync_directory(first);
             for other in others {
-                let synced = other.join().unwrap_or_else(|_| Err(io::Error::other("directory sync panicked")));
+                let synced = other
+                    .join()
+                    .unwrap_or_else(|_| Err(io::Error::other("directory sync panicked")));
                 if result.is_ok() {
                     result = synced;
                 }
@@ -115,8 +143,21 @@ pub fn sync_directories(dirs: &[&Path]) -> io::Result<()> {
 
 /// Install with the caller's historical Unix creation mode (still filtered by
 /// umask). Other platforms use their normal creation permissions.
-pub fn install_once_with_mode(dir: &Path, name: &str, bytes: &[u8], mode: u32) -> Result<Installed, InstallError> {
-    write_durably(dir, name, bytes, false, mode, &mut |_| Ok(()), Ordered::NONE)
+pub fn install_once_with_mode(
+    dir: &Path,
+    name: &str,
+    bytes: &[u8],
+    mode: u32,
+) -> Result<Installed, InstallError> {
+    write_durably(
+        dir,
+        name,
+        bytes,
+        false,
+        mode,
+        &mut |_| Ok(()),
+        Ordered::NONE,
+    )
 }
 
 /// Replace a name atomically without opening its old target, then sync its parent.
@@ -125,7 +166,12 @@ pub fn replace_durably(dir: &Path, name: &str, bytes: &[u8]) -> Result<Installed
 }
 
 /// Replace with a caller-selected Unix creation mode, filtered by umask.
-pub fn replace_durably_with_mode(dir: &Path, name: &str, bytes: &[u8], mode: u32) -> Result<Installed, InstallError> {
+pub fn replace_durably_with_mode(
+    dir: &Path,
+    name: &str,
+    bytes: &[u8],
+    mode: u32,
+) -> Result<Installed, InstallError> {
     write_durably(dir, name, bytes, true, mode, &mut |_| Ok(()), Ordered::NONE)
 }
 
@@ -144,13 +190,21 @@ pub fn replace_durably_observed(
     bytes: &[u8],
     mut observe: impl FnMut(ReplacePoint) -> io::Result<()>,
 ) -> Result<Installed, InstallError> {
-    write_durably(dir, name, bytes, true, 0o600, &mut |step| match step {
-        "bytes-written" => observe(ReplacePoint::Written),
-        "file-fsync" => observe(ReplacePoint::Synced),
-        "name-installed" => observe(ReplacePoint::Renamed),
-        "parent-fsync" => observe(ReplacePoint::DirectorySynced),
-        _ => Ok(()),
-    }, Ordered::NONE)
+    write_durably(
+        dir,
+        name,
+        bytes,
+        true,
+        0o600,
+        &mut |step| match step {
+            "bytes-written" => observe(ReplacePoint::Written),
+            "file-fsync" => observe(ReplacePoint::Synced),
+            "name-installed" => observe(ReplacePoint::Renamed),
+            "parent-fsync" => observe(ReplacePoint::DirectorySynced),
+            _ => Ok(()),
+        },
+        Ordered::NONE,
+    )
 }
 
 /// Effects an ordered install adds around one record (see [`install_ordered`]).
@@ -160,7 +214,10 @@ struct Ordered<'a> {
 }
 
 impl Ordered<'_> {
-    const NONE: Ordered<'static> = Ordered { also_sync: &[], alongside: None };
+    const NONE: Ordered<'static> = Ordered {
+        also_sync: &[],
+        alongside: None,
+    };
 }
 
 /// One write path for both modes. `replace` renames over the name; otherwise the
@@ -175,7 +232,10 @@ fn write_durably(
     checkpoint: &mut dyn FnMut(&'static str) -> io::Result<()>,
     ordered: Ordered<'_>,
 ) -> Result<Installed, InstallError> {
-    let Ordered { also_sync, alongside } = ordered;
+    let Ordered {
+        also_sync,
+        alongside,
+    } = ordered;
     let mut components = Path::new(name).components();
     if name.is_empty()
         || !matches!(components.next(), Some(Component::Normal(_)))
@@ -184,6 +244,7 @@ fn write_durably(
     {
         return Err(InstallError {
             source: io::Error::new(io::ErrorKind::InvalidInput, "expected one literal filename"),
+            step: "name-check",
             installed: None,
             temporary: None,
         });
@@ -209,22 +270,25 @@ fn write_durably(
             Err(source) => {
                 return Err(InstallError {
                     source,
+                    step: "temp-created",
                     installed: None,
                     temporary: None,
                 })
             }
         }
     };
-    let error = |source, installed| InstallError {
+    let error = |source, step, installed| InstallError {
         source,
+        step,
         installed,
         temporary: Some(temporary.clone()),
     };
-    checkpoint("temp-created").map_err(|e| error(e, None))?;
+    checkpoint("temp-created").map_err(|e| error(e, "temp-created", None))?;
     // write_all retries short writes and reports WriteZero/EFBIG rather than
     // publishing a truncated record. Keep the temporary on every failure.
-    file.write_all(bytes).map_err(|e| error(e, None))?;
-    checkpoint("bytes-written").map_err(|e| error(e, None))?;
+    file.write_all(bytes)
+        .map_err(|e| error(e, "bytes-written", None))?;
+    checkpoint("bytes-written").map_err(|e| error(e, "bytes-written", None))?;
     #[cfg(target_os = "linux")]
     {
         use std::os::fd::AsRawFd;
@@ -237,7 +301,9 @@ fn write_durably(
                 file.as_raw_fd(),
                 0,
                 0,
-                libc::SYNC_FILE_RANGE_WAIT_BEFORE | libc::SYNC_FILE_RANGE_WRITE | libc::SYNC_FILE_RANGE_WAIT_AFTER,
+                libc::SYNC_FILE_RANGE_WAIT_BEFORE
+                    | libc::SYNC_FILE_RANGE_WRITE
+                    | libc::SYNC_FILE_RANGE_WAIT_AFTER,
             );
         }
     }
@@ -245,12 +311,15 @@ fn write_durably(
         Some(alongside) => std::thread::scope(|scope| {
             let other = scope.spawn(alongside);
             let synced = file.sync_all();
-            let other = other.join().unwrap_or_else(|_| Err(io::Error::other("concurrent durable step panicked")));
+            let other = other
+                .join()
+                .unwrap_or_else(|_| Err(io::Error::other("concurrent durable step panicked")));
             synced.and(other)
         }),
         None => file.sync_all(),
-    }.map_err(|e| error(e, None))?;
-    checkpoint("file-fsync").map_err(|e| error(e, None))?;
+    }
+    .map_err(|e| error(e, "file-fsync", None))?;
+    checkpoint("file-fsync").map_err(|e| error(e, "file-fsync", None))?;
     drop(file);
     let target = dir.join(name);
     let installed = match if replace {
@@ -260,35 +329,45 @@ fn write_durably(
     } {
         Ok(()) => Installed::Created,
         Err(e) if !replace && e.kind() == io::ErrorKind::AlreadyExists => Installed::AlreadyExists,
-        Err(e) => return Err(error(e, None)),
+        Err(e) => return Err(error(e, "name-installed", None)),
     };
     // A rename consumed the temporary; only a no-replace install can leave one.
-    let after_install = |source| InstallError {
-        source,
-        installed: Some(installed),
-        temporary: (!replace).then(|| temporary.clone()),
+    let after_install = |step: &'static str| {
+        let temporary = (!replace).then(|| temporary.clone());
+        move |source| InstallError {
+            source,
+            step,
+            installed: Some(installed),
+            temporary,
+        }
     };
-    checkpoint("name-installed").map_err(after_install)?;
+    checkpoint("name-installed").map_err(after_install("name-installed"))?;
     if !replace {
         // Windows moves the temp; Unix links then unlinks. A surviving Unix temp
         // is an orphan, not a second record or permission to overwrite a target.
         #[cfg(not(windows))]
-        fs::remove_file(&temporary).map_err(after_install)?;
+        fs::remove_file(&temporary).map_err(after_install("temp-removed"))?;
         #[cfg(windows)]
         if installed == Installed::AlreadyExists {
-            fs::remove_file(&temporary).map_err(after_install)?;
+            fs::remove_file(&temporary).map_err(after_install("temp-removed"))?;
         }
-        checkpoint("temp-removed").map_err(after_install)?;
+        checkpoint("temp-removed").map_err(after_install("temp-removed"))?;
+        if installed == Installed::AlreadyExists {
+            // Nothing was installed and the loser's temporary is gone: there is no new name to make durable.
+            return Ok(installed);
+        }
     }
     let mut dirs = vec![dir];
     dirs.extend_from_slice(also_sync);
     sync_directories(&dirs).map_err(|source| InstallError {
         source,
+        step: "parent-fsync",
         installed: Some(installed),
         temporary: None,
     })?;
     checkpoint("parent-fsync").map_err(|source| InstallError {
         source,
+        step: "parent-fsync",
         installed: Some(installed),
         temporary: None,
     })?;

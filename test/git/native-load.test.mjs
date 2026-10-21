@@ -80,6 +80,11 @@ test('the door refuses a symlinked addon and a value that is not JSON, and write
     assert.equal(fs.readFileSync(path.join(temp, 'once'), 'utf8'), 'c');
     assert.equal(fs.statSync(path.join(temp, 'once')).mode & 0o777, 0o640 & ~process.umask());
     assert.throws(() => replaceDurably(path.join(temp, 'missing'), 'x', 'c', 0o600), (e) => e.installed === 'none' && /durable-file-replaceDurably/.test(e.message));
+    // A write that fails before the name is installed leaves no retained temporary behind, and the error names the step.
+    fs.mkdirSync(path.join(temp, 'occupied'));
+    fs.writeFileSync(path.join(temp, 'occupied', 'inner'), 'x');
+    assert.throws(() => replaceDurably(temp, 'occupied', 'c', 0o600), (e) => e.installed === 'none' && /failed at name-installed \(installed: none\)/.test(e.message));
+    assert.deepEqual(fs.readdirSync(temp).filter((n) => /^\.durable-file-.*\.tmp$/.test(n)), []);
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });
 

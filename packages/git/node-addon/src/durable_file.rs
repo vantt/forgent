@@ -21,7 +21,7 @@ fn failure(e: InstallError) -> Error {
         .temporary
         .as_ref()
         .map(|t| t.to_string_lossy().into_owned());
-    Error::from_reason(serde_json::json!({"cause": e.source.to_string(), "installed": word(e.installed), "temporary": temporary}).to_string())
+    Error::from_reason(serde_json::json!({"cause": e.to_string(), "installed": word(e.installed), "temporary": temporary}).to_string())
 }
 
 #[napi(namespace = "durableFile", js_name = "replaceDurably")]
