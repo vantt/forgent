@@ -27,6 +27,7 @@ export async function simulateUnitBindings(unit, runnerConfig, { session = {}, o
   const ledger = createSeatLedger();
   const seats = [];
   const runRole = async ({ seat, unit: seatUnit, independentOf = [], preferIndependentOf = [], batch }) => {
+    const workflowTier = workflowTierOf(seat, seatUnit || unit, workflowId);
     const record = await ledger.serialize(() => {
       const bound = bind(
         {
@@ -35,7 +36,7 @@ export async function simulateUnitBindings(unit, runnerConfig, { session = {}, o
           role: seat.role,
           posture: seat.posture,
           ...(seat.persona ? { persona: seat.persona } : {}),
-          ...(workflowTierOf(seat, seatUnit || unit, workflowId) ? { workflowTier: workflowTierOf(seat, seatUnit || unit, workflowId) } : {}),
+          ...(workflowTier ? { workflowTier } : {}),
           ...(selectors && Object.values(selectors).some((v) => v) ? { selectors } : {}),
           raiseAuthorized: raiseAuthorized === true,
           readOnly: seat.posture.readOnly,

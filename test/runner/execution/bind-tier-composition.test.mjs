@@ -9,6 +9,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { bind } from '../../../src/runner/execution/bind.mjs';
+import { workflowTierOf } from '../../../src/runner/execution/seat-resolver.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 
 seedFileLocalBwrapRegistry();
@@ -196,4 +197,11 @@ test('a door-chosen persona that lifts the tier above what the seat resolves to 
   const authorized = tierOf(seatAsk('code:review', 'producer', 'producer', { ...selected, raiseAuthorized: true }), config);
   assert.equal(authorized.tier, 'frontier');
   assert.equal(authorized.provenance.tier.raisedBy, 'selector:persona');
+});
+
+test('a workflow seat recommendation names the workflow, the unit and the seat, and drops the workflow when the run does not know it', () => {
+  const seat = { seat: 'system', tier: 'frontier' };
+  assert.deepEqual(workflowTierOf(seat, { id: 'shape-proposals' }, 'architecture-advisory'), recommendation('frontier', 'system'));
+  assert.deepEqual(workflowTierOf(seat, { id: 'shape-proposals' }), { tier: 'frontier', source: 'workflow:shape-proposals/system' });
+  assert.equal(workflowTierOf({ seat: 'system' }, { id: 'shape-proposals' }, 'architecture-advisory'), undefined);
 });

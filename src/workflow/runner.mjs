@@ -357,6 +357,7 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
                 worktree: unitWorktree,
                 pattern: unitPatternOf(u.template),
                 personaScope,
+                workflowId: workflow.id,
                 overrides: await (async () => {
                   let unitAccount = state.account ?? null;
                   if (unitAccount !== null) {
