@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "Identities, registry, generations, short names, resolution"
-status: pending
+status: done
 priority: P2
 effort: "4h"
 dependencies: [1]
@@ -110,3 +110,12 @@ node scripts/git-one-door-scan.mjs --write-census
 
 - A caller that judges the wrong binding: the mismatch refusal catches `Some`/`None` errors; judging a different binding of the same key is impossible because there is one binding per key.
 - Name collisions across CLIs are impossible by shape (the CLI is in the name).
+
+## Implementation notes (2026-10-21)
+
+- Deviations (smallest correct fix, no behaviour beyond the plan):
+  - `RegisterRefusal::NameDoesNotFit` added: an empty project folder name, or a header bound too small for `-<cli>-<suffix>`, leaves no short name to allocate; refusing is the only answer that keeps the bound.
+  - `Registered` variants carry the allocated `name` as well as the generation, so the caller (hook, V3) need not read the binding again.
+  - `Timestamp::is_past(since, secs)` replaces the planned `secs_since`: comparisons are made in milliseconds so a sub-second remainder never rounds a deadline down.
+  - The judgement check runs before the clock and (from phase 4) the sweep, so a mismatch leaves the whole state equal.
+  - On `Replaced` the name and the CLI are kept from the stored binding; the head, handle and times come from the request.

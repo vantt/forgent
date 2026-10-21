@@ -11,9 +11,21 @@
 #![forbid(unsafe_code)]
 #![deny(clippy::print_stdout, clippy::print_stderr)]
 
+mod ids;
 mod limits;
+mod names;
+mod registry;
+mod state;
+mod time;
 
+pub use ids::{
+    AttemptToken, Cli, Generation, IdSource, InvalidValue, MessageId, ShortName, WriterKey,
+};
 pub use limits::{
     ChainLimits, CounterLimits, FrameLimits, HumanLimits, Limits, LoopLimits, NoticeLimits,
     QueueLimits, RecordLimits, SessionLimits, WakeLimits,
 };
+pub use names::ResolveRefusal;
+pub use registry::{Binding, Liveness, RegisterRefusal, RegisterRequest, Registered, StoredHead};
+pub use state::MailboxState;
+pub use time::Timestamp;

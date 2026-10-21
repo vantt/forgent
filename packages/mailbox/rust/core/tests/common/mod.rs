@@ -43,3 +43,80 @@ pub fn spec_limits() -> Limits {
     serde_json::from_value(config_section(&limits_contract()))
         .expect("the contract fills every Limits field")
 }
+
+use fgos_mailbox_core::{
+    Cli, IdSource, MailboxState, RegisterRequest, Registered, StoredHead, Timestamp, WriterKey,
+};
+
+/// A counter id source: 1, 2, 3 … A real implementation of the port.
+#[derive(Debug, Default)]
+pub struct SeqIds {
+    last: u64,
+}
+
+impl IdSource for SeqIds {
+    fn next_u64(&mut self) -> u64 {
+        self.last += 1;
+        self.last
+    }
+}
+
+/// A point in time `secs` seconds after the epoch.
+pub fn t(secs: u64) -> Timestamp {
+    Timestamp::from_millis(secs * 1000)
+}
+
+pub fn key(text: &str) -> WriterKey {
+    WriterKey::new(text).unwrap()
+}
+
+pub fn cli(text: &str) -> Cli {
+    Cli::new(text).unwrap()
+}
+
+/// A registration in project `forgent` for the head `head`.
+pub fn request(
+    key_text: &str,
+    cli_text: &str,
+    own_suffix: Option<&str>,
+    head: &str,
+) -> RegisterRequest {
+    RegisterRequest {
+        key: key(key_text),
+        cli: cli(cli_text),
+        project: "forgent".to_string(),
+        own_suffix: own_suffix.map(str::to_string),
+        head: head.to_string(),
+        handle: None,
+    }
+}
+
+/// Registers a head that has no binding yet and returns its name.
+pub fn register_new(
+    state: &mut MailboxState,
+    req: RegisterRequest,
+    now: Timestamp,
+    limits: &Limits,
+    ids: &mut SeqIds,
+) -> String {
+    match state.register(req, None, now, limits, ids).unwrap() {
+        Registered::Created { name, .. } => name.as_str().to_string(),
+        other => panic!("expected a new binding, got {other:?}"),
+    }
+}
+
+/// The store's judgement that the stored head is a different process.
+pub fn other_head(liveness: fgos_mailbox_core::Liveness) -> Option<StoredHead> {
+    Some(StoredHead {
+        same_head: false,
+        liveness,
+    })
+}
+
+/// The store's judgement that the registering head is the stored one.
+pub fn same_head() -> Option<StoredHead> {
+    Some(StoredHead {
+        same_head: true,
+        liveness: fgos_mailbox_core::Liveness::Alive,
+    })
+}
