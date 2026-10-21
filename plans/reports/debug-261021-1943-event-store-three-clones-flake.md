@@ -39,3 +39,17 @@ The failure message now names Git's stderr. If it says "No space left on device"
 ## Unresolved
 - Real cause of the observed 2/12 failures: unknown.
 - Whether the other session ran at high /tmp occupancy at that time.
+
+## Update: `with_port` Held under load (sync_review)
+Failure: `Held { reason: KernelLockHeld, domain: None }` at `tests/sync_support/mod.rs` `with_port`, `acquire(.., Ex, Wait::Try, 2000)`.
+
+Cause (proven, deterministic): the seal lock is a `flock` on an open file description (`packages/holder-lock/rust/src/driver/flock.rs`, never `LOCK_UN`), so it lasts until every copy of the description closes. Test threads in one binary share one process; any sibling thread that forks (a Git child, `pre_exec` setsid) gives the child a copy of every descriptor, CLOEXEC only closing it at exec. Handle drop deliberately spares such a direct child (parent == self) and waits `kill_wait_ms` (2000) for it, then returns `Release::Stuck` which `Drop` discards. The next `Wait::Try` sees the lock held.
+Repro (scratch test, since removed): hold the lock, fork a child blocked in `pre_exec` from another thread, drop the handle. Drop took 2.03 s, then `acquire(Try)` = not acquired; after the child exec'd, acquire succeeded. Under load the fork-to-exec window exceeds 2 s, hence the flake. The lock's answer is truthful, so the product is innocent; the existing sparing logic in `flock.rs` owns the product behaviour.
+
+Fix (harness only): `with_port` waits `Wait::Ms(30_000)` instead of `Try`, with a comment. Not a retry or sleep: it waits on the lock itself. `Wait::Try` remains in the product only for opportunistic seals (`acquire_seal`), where "held" is a valid answer.
+
+Evidence after: sync_review x 48 runs (8 parallel x 6, no hogs) 0 failures; sync_review, v_event, three_clones pass; clippy clean. Before: failure seen once by HARDEN, not reproduced by me in 140 loaded runs of sync_review (killed by the stop request), so the after-count is weaker than the deterministic repro above.
+
+Does it explain three_clones? No. three_clones is one thread and never calls `with_port`, so no sibling fork exists; its panic sites (`sync`, `hashes`, `git-command-failed`, `path-read-failed`) stay OPEN. The earlier stderr fix will name their cause when they recur; /tmp quota remains the unproven lead.
+
+Product note (not changed): `Handle::drop` discards `Release::Stuck`; a caller needing proof of release cannot see it. Candidate follow-up, owner's call.
