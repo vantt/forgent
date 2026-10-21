@@ -1,9 +1,11 @@
 // src/setup/seat-binding-conversion.mjs — the one function that moves a project's runner config from
 // "rigor picks the tier" to "the config declares the tier".
 //
-// PURE: no fs, no clock, no env. The caller reads the project runner section and the global one, passes
-// them in, and writes the returned `runner` back (the project file only; the global file takes no new
-// keys). Deterministic and idempotent: converting a converted config returns `changes: []`.
+// `convertRunnerConfig` is PURE: no fs, no clock, no env. The caller reads the project runner section and
+// the global one, passes them in, and writes the returned `runner` back (the project file only; the global
+// file takes no new keys). Deterministic and idempotent: converting a converted config returns
+// `changes: []`. `convertProjectConfigFile` is the file step `fgos setup` runs: read, convert, back up,
+// write.
 //
 // What it does to a project runner section:
 //   - deletes `rigorToTier` and states the tier it implied: `defaults.tier` (the standard tier) and a
@@ -17,12 +19,12 @@
 //   - sets `patterns.seatBinding.schema`, the marker an older release refuses (its `patterns` map is strict).
 //
 // A key the project already declares is never overwritten, so converting again after something put
-// `rigorToTier` back only deletes it.
+// `rigorToTier` back only deletes it. A converted config is touched only when its `$comment` differs from
+// the ladder.
 
-import {
-  MODEL_POLICY_TIERS,
-  SEAT_BINDING_SCHEMA_VERSION,
-} from '../runner/dispatch/config.mjs';
+import fs from 'node:fs';
+import { MODEL_POLICY_TIERS, SEAT_BINDING_SCHEMA_VERSION } from '../runner/dispatch/config.mjs';
+import { readSharedConfig, sharedConfigFilePath, writeSharedConfig } from '../config/shared-config-file.mjs';
 import { RIGOR_VALUES, resolveStrongerRigor } from '../runner/rigor.mjs';
 import { hasUsablePrefer } from '../runner/execution/seat-resolver.mjs';
 
@@ -52,7 +54,12 @@ export function convertRunnerConfig(projectRunner, { globalRunner = {}, register
   const markerPresent = runner.patterns?.seatBinding?.schema !== undefined;
   // The marker alone never says "converted": something can put `rigorToTier` back into a converted file
   // (a fill-missing writer does), and that file has to be converted again.
-  if (runner.rigorToTier === undefined && markerPresent) return { runner, changes: [], reports: [] };
+  if (runner.rigorToTier === undefined && markerPresent) {
+    // Converted: the ladder text is the one thing that can still be stale. A missing `$comment` is not drift.
+    if (runner.$comment === undefined || sameJson(runner.$comment, ladder)) return { runner, changes: [], reports: [] };
+    runner.$comment = ladder;
+    return { runner, changes: [{ op: 'set', path: 'runner.$comment', to: ladder, why: 'the tier ladder, from its one source' }], reports: [] };
+  }
 
   const changes = [];
   const reports = [];
@@ -245,4 +252,45 @@ function reportRigorEffects(runner, global, rigorTier, defaultTier, capabilityNa
       }
     }
   }
+}
+
+/** The `$comment` lines of the tier ladder the crate answers: one line per tier, weakest first. */
+export function ladderCommentLines(definitions) {
+  return definitions.map((d) => `${d.name}: ${d.work}; self-check: ${d.selfCheck}; e.g. ${d.examples}`);
+}
+
+/** Every capability name the loaded workflows' units use. */
+export function registeredCapabilitiesOf(workflows) {
+  const names = (workflows ?? []).flatMap((workflow) => workflow.steps.flatMap((step) => step.units.map((unit) => (unit.template ?? unit).capability)));
+  return [...new Set(names.filter(Boolean))];
+}
+
+/** Where the project config is copied before a conversion writes it. */
+export function seatBindingBackupPath(projectDir, now) {
+  return `${sharedConfigFilePath(projectDir)}.pre-seat-binding-${now.toISOString().replace(/[-:.]/g, '')}`;
+}
+
+/**
+ * The file step of `fgos setup`, run before any default is filled in: convert the project's runner
+ * section, copy the file aside first, write it back with every other section untouched.
+ *
+ * @param {string} projectDir
+ * @param {object} context
+ * @param {string} [context.globalDir] where `~/.fgos/config.json` lives (read, never written)
+ * @param {() => string[]} context.ladder the tier ladder text; read only when there is a runner section
+ * @param {() => object[]} [context.workflows] loaded workflow definitions; read only when there is a runner section
+ * @param {Date} [context.now]
+ * @returns {{status: 'absent'|'unchanged'|'converted', backupPath?: string, changes: object[], reports: object[]}}
+ */
+export function convertProjectConfigFile(projectDir, { globalDir, ladder, workflows = () => [], now = new Date() }) {
+  const shared = readSharedConfig(projectDir);
+  if (!isPlainObject(shared.runner) || Object.keys(shared.runner).length === 0) return { status: 'absent', changes: [], reports: [] };
+  const globalRunner = globalDir ? readSharedConfig(globalDir).runner ?? {} : {};
+  const loaded = workflows();
+  const result = convertRunnerConfig(shared.runner, { globalRunner, registeredCapabilities: registeredCapabilitiesOf(loaded), ladder: ladder(), workflows: loaded });
+  if (result.changes.length === 0) return { status: 'unchanged', changes: [], reports: [] };
+  const backupPath = seatBindingBackupPath(projectDir, now);
+  fs.copyFileSync(sharedConfigFilePath(projectDir), backupPath, fs.constants.COPYFILE_EXCL);
+  writeSharedConfig(projectDir, { ...shared, runner: result.runner });
+  return { status: 'converted', backupPath, changes: result.changes, reports: result.reports };
 }

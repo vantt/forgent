@@ -103,6 +103,8 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'worktree-setup-configured',
       'writer-identity-resolvable',
       'seat-binding-route',
+      'seat-binding-config',
+      'seat-binding-drain',
       'events-jsonl-not-truncated',
       'cli-version-visible',
       'worker-slots-ceiling-usable',

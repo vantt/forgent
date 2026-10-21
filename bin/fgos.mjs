@@ -129,6 +129,9 @@ import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-re
 import { recordInvocationFault, resolveFaultLogPath } from '../src/cli/invocation-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, integrationScriptPath, ensureSharedConfigDefaults, runFixes } from '../src/setup/checks.mjs';
+import { convertProjectConfigFile, ladderCommentLines } from '../src/setup/seat-binding-conversion.mjs';
+import { createSeatBindingClient } from '../src/seat-binding/client.mjs';
+import { discoverWorkflows } from '../src/workflow/loader.mjs';
 import { sharedConfigFilePath, readSharedConfig, readSharedConfigOrEmpty, readInvariantCheckCommands } from '../src/config/shared-config-file.mjs';
 import { countWorkerSlots, hasWorkerSlotRoom } from '../src/state/worker-slots.mjs';
 import { assessCleanupReadiness, blockedItemsNowResolvable } from '../src/state/cleanup-harness.mjs';
@@ -4047,6 +4050,13 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           }
         }
       }
+      // Conversion first, then fill-missing: a project still in the old schema is converted (after a backup)
+      // before any default is written into it, so no fill-missing pass can put a retired key back.
+      const seatBindingConversion = convertProjectConfigFile(repoRoot, {
+        globalDir: os.homedir(),
+        ladder: () => ladderCommentLines(createSeatBindingClient({ cwd: repoRoot, fgosDir: path.join(repoRoot, '.fgos') }).tierLadder().definitions),
+        workflows: () => [...discoverWorkflows({ packageRoot: PACKAGE_ROOT }).values()],
+      });
       const configPath = sharedConfigFilePath(repoRoot);
       const configExisted = fs.existsSync(configPath);
       const { addedKeys } = ensureSharedConfigDefaults(repoRoot);
@@ -4091,6 +4101,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         rcFilesInserted,
         rcFilesAlreadyConfigured,
         ...(rcWriteDeclinedReason !== null && { rcWriteDeclinedReason }),
+        seatBindingConversion,
         configPath,
         configCreated: !configExisted,
         configAddedKeys: configExisted ? addedKeys : [],
@@ -4708,6 +4719,12 @@ function renderPretty(verb, data) {
     }
     if (data.rcWriteDeclinedReason) {
       lines.push(formatCheck(false, 'skipped shell-profile line', data.rcWriteDeclinedReason));
+    }
+    if (data.seatBindingConversion?.status === 'converted') {
+      const { backupPath, changes, reports } = data.seatBindingConversion;
+      lines.push(formatCheck(true, 'converted the project runner config to the seat-binding schema', `backup: ${backupPath}`));
+      for (const change of changes) lines.push(`  ${change.op} ${change.path}${change.to !== undefined ? ` = ${JSON.stringify(change.to)}` : ''} (${change.why})`);
+      for (const report of reports) lines.push(`  review: ${JSON.stringify(report)}`);
     }
     lines.push(
       formatCheck(

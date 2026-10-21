@@ -9,10 +9,13 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import crypto from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 
-import { convertRunnerConfig } from '../../src/setup/seat-binding-conversion.mjs';
+import { convertRunnerConfig, ladderCommentLines, registeredCapabilitiesOf } from '../../src/setup/seat-binding-conversion.mjs';
 import { MODEL_POLICY_TIERS, ensureRunnerConfigForDir, loadRunnerConfigFromDir } from '../../src/runner/dispatch/config.mjs';
 import { discoverWorkflows } from '../../src/workflow/loader.mjs';
+import { createSeatBindingClient } from '../../src/seat-binding/client.mjs';
 
 const readFixture = (name) => JSON.parse(fs.readFileSync(new URL(`../fixtures/seat-binding-config/${name}.json`, import.meta.url), 'utf8')).runner;
 const forgentx = () => readFixture('forgentx-runner');
@@ -29,7 +32,7 @@ const LADDER = [
 ];
 
 const workflows = [...discoverWorkflows({ packageRoot: process.cwd() }).values()];
-const registeredCapabilities = [...new Set(workflows.flatMap((workflow) => workflow.steps.flatMap((step) => step.units.map((unit) => (unit.template ?? unit).capability))).filter(Boolean))];
+const registeredCapabilities = registeredCapabilitiesOf(workflows);
 const convert = (runner, extra = {}) => convertRunnerConfig(runner, { globalRunner: globalRunner(), registeredCapabilities, ladder: LADDER, workflows, ...extra });
 
 // A project with no capability rigor, shaped like the mdview and mcp-skill-hub configs.
@@ -316,4 +319,106 @@ test('for every capability of the forgentX config the converted tier and ceiling
     const after = tierConverted(converted, name);
     assert.deepEqual(after, before, `${name}: before ${JSON.stringify(before)}, converted ${JSON.stringify(after)}`);
   }
+});
+
+// ---- `fgos setup` converts the project config before it fills any default ----------------------------
+
+const BIN = path.resolve(import.meta.dirname, '../../bin/fgos.mjs');
+const sha256 = (file) => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+
+function freshHome(globalRunnerSection) {
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-setup-home-'));
+  if (globalRunnerSection) {
+    fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
+    fs.writeFileSync(path.join(home, '.fgos', 'config.json'), `${JSON.stringify({ runner: globalRunnerSection }, null, 2)}\n`);
+  }
+  return home;
+}
+
+function setup(cwd, home) {
+  const env = { ...process.env, HOME: home, USERPROFILE: home, FGOS_SESSION_ID: 'seat-binding-setup-test', FGOS_CLAUDE_COMMAND: '/nonexistent/fgos-test-claude-binary' };
+  const result = spawnSync(process.execPath, [BIN, 'setup'], { cwd, env, encoding: 'utf8' });
+  assert.equal(result.status, 0, `setup failed: ${result.stderr}`);
+  return { stdout: result.stdout, data: JSON.parse(result.stdout).data };
+}
+
+const backupsOf = (dir) => fs.readdirSync(path.join(dir, '.fgos')).filter((name) => name.startsWith('config.json.pre-seat-binding-'));
+
+test('setup copies a project config in the old schema aside, converts it, prints the backup and every change, and adds nothing of the new schema to the global file', () => {
+  const dir = writeProject(forgentx());
+  const projectFile = path.join(dir, '.fgos', 'config.json');
+  const original = fs.readFileSync(projectFile);
+  const home = freshHome(globalRunner());
+  const globalFile = path.join(home, '.fgos', 'config.json');
+
+  const { data } = setup(dir, home);
+
+  assert.equal(data.seatBindingConversion.status, 'converted');
+  assert.equal(backupsOf(dir).length, 1);
+  const backup = path.join(dir, '.fgos', backupsOf(dir)[0]);
+  assert.equal(data.seatBindingConversion.backupPath, backup);
+  assert.deepEqual(fs.readFileSync(backup), original, 'the backup is the file as it was');
+  const converted = JSON.parse(fs.readFileSync(projectFile, 'utf8')).runner;
+  assert.equal(converted.rigorToTier, undefined);
+  assert.equal(converted.patterns.seatBinding.schema, 1);
+  assert.deepEqual(converted.$comment, ladderCommentLines(createSeatBindingClient().tierLadder().definitions));
+  assert.deepEqual(data.seatBindingConversion.changes.map((change) => change.path), convert(forgentx()).changes.map((change) => change.path));
+  assert.ok(data.seatBindingConversion.reports.length > 0, 'the behaviour changes are listed for the owner to read');
+  // The global file takes its usual fill-missing defaults and nothing of the seat-binding schema: every
+  // older release on the machine still reads it.
+  const global = JSON.parse(fs.readFileSync(globalFile, 'utf8')).runner;
+  assert.deepEqual(global.rigorToTier, globalRunner().rigorToTier);
+  assert.deepEqual(global.patterns, globalRunner().patterns);
+  assert.equal(global.defaults, globalRunner().defaults);
+  assert.equal(global.$comment, undefined);
+  assert.equal(JSON.stringify(global).includes('seatBinding'), false);
+});
+
+test('setup is idempotent: a second run on a converted project writes nothing and makes no second backup', () => {
+  const dir = writeProject(plainProject());
+  const home = freshHome(globalRunner());
+  setup(dir, home);
+  const projectFile = path.join(dir, '.fgos', 'config.json');
+  const afterFirst = sha256(projectFile);
+
+  const { data } = setup(dir, home);
+
+  assert.equal(data.seatBindingConversion.status, 'unchanged');
+  assert.equal(sha256(projectFile), afterFirst);
+  assert.equal(backupsOf(dir).length, 1);
+});
+
+test('setup refreshes a $comment that differs from the tier ladder, with a backup, and leaves a converted config with no $comment alone', () => {
+  const dir = writeProject(plainProject());
+  const home = freshHome(null);
+  setup(dir, home);
+  const projectFile = path.join(dir, '.fgos', 'config.json');
+  const shared = JSON.parse(fs.readFileSync(projectFile, 'utf8'));
+  const ladder = shared.runner.$comment;
+  shared.runner.$comment = ['a stale line'];
+  fs.writeFileSync(projectFile, JSON.stringify(shared));
+
+  const { data } = setup(dir, home);
+
+  assert.deepEqual(data.seatBindingConversion.changes.map((change) => change.path), ['runner.$comment']);
+  assert.deepEqual(JSON.parse(fs.readFileSync(projectFile, 'utf8')).runner.$comment, ladder);
+  assert.equal(backupsOf(dir).length, 2);
+
+  delete shared.runner.$comment;
+  fs.writeFileSync(projectFile, JSON.stringify(shared));
+  assert.equal(setup(dir, home).data.seatBindingConversion.status, 'unchanged');
+});
+
+test('setup on a project with no config writes a fresh one in the seat-binding schema with no backup, and the global file it creates carries no seat-binding key', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-setup-fresh-'));
+  const home = freshHome(null);
+
+  const { data } = setup(dir, home);
+
+  assert.equal(data.seatBindingConversion.status, 'absent');
+  assert.equal(JSON.parse(fs.readFileSync(path.join(dir, '.fgos', 'config.json'), 'utf8')).runner.patterns.seatBinding.schema, 1);
+  assert.deepEqual(backupsOf(dir), []);
+  const global = JSON.parse(fs.readFileSync(path.join(home, '.fgos', 'config.json'), 'utf8'));
+  assert.equal(global.runner.patterns?.seatBinding, undefined);
+  assert.equal(global.runner.rigorToTier, undefined);
 });
