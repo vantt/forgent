@@ -47,7 +47,7 @@ LW=fgos-e1-lw SNAP=fgos-e1-snap LOOPS=()
 cleanup() {
   set +e
   mountpoint -q "$MNT" && umount "$MNT"
-  dmsetup remove "$SNAP" 2>/dev/null; dmsetup remove "$LW" 2>/dev/null
+  dmsetup remove --retry "$SNAP" 2>/dev/null; dmsetup remove --retry "$LW" 2>/dev/null
   for l in "${LOOPS[@]}"; do losetup -d "$l"; done
 }
 trap cleanup EXIT
@@ -80,7 +80,7 @@ done
 wait "$WORKLOAD_CHILD" || die "workload failed"
 umount "$MNT"
 dmsetup message "$LW" 0 mark done
-dmsetup remove "$LW"
+dmsetup remove --retry "$LW"
 
 # 2. Mark positions: ack-i is acknowledged at every replay point after its entry.
 # replay-log --find prints "<entry>@<sector>"; only the entry number is used here.
@@ -106,7 +106,8 @@ while [ -n "$cur" ]; do
   else
     verdict="{\"acked\":$acked,\"violations\":[\"mount failed: $(tr -d '"\n' < "$OUT/mount.err")\"]}"
   fi
-  dmsetup remove "$SNAP"
+  udevadm settle 2>/dev/null || true  # udev may still be probing the new snapshot device
+  dmsetup remove --retry "$SNAP"
   echo "{\"entry\":$cur,\"verdict\":${verdict:-null}}" >> "$RESULTS"
   CHECKED=$((CHECKED + 1))
   echo "$verdict" | grep -q '"violations":\[\]' || FAILED=$((FAILED + 1))
