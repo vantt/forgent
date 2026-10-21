@@ -11,7 +11,7 @@
 # Needs root, device-mapper (dm-log-writes, dm-snapshot) and xfstests' replay-log. Never run it on a
 # device that holds data: both devices are overwritten.
 #
-#   sudo scripts/git/e1-power-cut.sh --work /var/tmp/fgos-e1 [--ops 24] [--size-mib 256]
+#   sudo env "PATH=$PATH" scripts/git/e1-power-cut.sh --work /var/tmp/fgos-e1 [--ops 24] [--size-mib 256]
 #        [--data /dev/X --log /dev/Y] [--replay-log /path/to/replay-log] [--user $SUDO_USER]
 #
 # Without --data/--log it makes loop devices from files under --work, which must sit on the real
@@ -27,13 +27,15 @@ while [ $# -gt 0 ]; do
   esac
 done
 CHECKOUT="$(cd "$(dirname "$0")/../.." && pwd)"
-NODE="$(command -v node)"
+NODE="$(command -v node)" || { echo 'e1: node is not on PATH; run it as sudo env "PATH=$PATH" scripts/git/e1-power-cut.sh ...' >&2; exit 1; }
 die() { echo "e1: $*" >&2; exit 1; }
 [ "$(id -u)" = 0 ] || die "needs root (dm-log-writes, mount)"
 [ -n "$WORK" ] || die "--work <dir on the ext4 disk under test> is required"
 [ -n "$RUN_AS" ] && [ "$RUN_AS" != root ] || die "--user <the checkout's owner> is required (Git refuses repositories of another owner)"
 [ -x "$REPLAY_LOG" ] || die "replay-log not found: build xfstests (git clone https://git.kernel.org/pub/scm/fs/xfs/xfstests-dev.git && make -C xfstests-dev) and pass --replay-log xfstests-dev/src/log-writes/replay-log"
-"$REPLAY_LOG" --help 2>&1 | grep -q -- '--next-fua' || die "$REPLAY_LOG lacks --find/--next-fua"
+# replay-log prints its usage and exits 1 for --help; under pipefail read the text, not the status.
+usage="$("$REPLAY_LOG" --help 2>&1 || true)"
+grep -q -- '--next-fua' <<<"$usage" && grep -q -- '--find' <<<"$usage" || die "$REPLAY_LOG lacks --find/--next-fua"
 modprobe dm-log-writes 2>/dev/null || true
 dmsetup targets | grep -q '^log-writes' || die "kernel has no dm-log-writes target"
 dmsetup targets | grep -q '^snapshot' || modprobe dm-snapshot
@@ -45,16 +47,20 @@ LW=fgos-e1-lw SNAP=fgos-e1-snap LOOPS=()
 cleanup() {
   set +e
   mountpoint -q "$MNT" && umount "$MNT"
-  dmsetup remove "$SNAP" 2>/dev/null; dmsetup remove "$LW" 2>/dev/null
+  dmsetup remove --retry "$SNAP" 2>/dev/null; dmsetup remove --retry "$LW" 2>/dev/null
   for l in "${LOOPS[@]}"; do losetup -d "$l"; done
 }
 trap cleanup EXIT
-loop() { truncate -s "$2" "$WORK/$1.img"; local l; l="$(losetup --show -f "$WORK/$1.img")"; LOOPS+=("$l"); echo "$l"; }
-[ -n "$DATA" ] || DATA="$(loop data "${SIZE_MIB}M")"
-[ -n "$LOG" ] || LOG="$(loop log "$((SIZE_MIB * 4))M")"
-REPLAY="$(loop replay "${SIZE_MIB}M")"; COW="$(loop cow "${SIZE_MIB}M")"
+# Sets LOOP_DEV in this shell (not a command substitution), so cleanup sees every loop device.
+loop() { truncate -s "$2" "$WORK/$1.img"; LOOP_DEV="$(losetup --show -f "$WORK/$1.img")"; LOOPS+=("$LOOP_DEV"); }
+[ -n "$DATA" ] || { loop data "${SIZE_MIB}M"; DATA="$LOOP_DEV"; }
+[ -n "$LOG" ] || { loop log "$((SIZE_MIB * 4))M"; LOG="$LOOP_DEV"; }
+loop replay "${SIZE_MIB}M"; REPLAY="$LOOP_DEV"
+loop cow "${SIZE_MIB}M"; COW="$LOOP_DEV"
 SECTORS="$(blockdev --getsz "$DATA")"
-as_user() { runuser -u "$RUN_AS" -- "$@"; }
+# sudo leaves HOME at root's; the owner's Git state, cargo and node need the owner's own.
+RUN_HOME="$(getent passwd "$RUN_AS" | cut -d: -f6)"
+as_user() { runuser -u "$RUN_AS" -- env HOME="$RUN_HOME" "$@"; }
 
 # Addon descriptor and host binary are built as the checkout's owner, outside the device.
 DESCRIPTOR="$(as_user "$NODE" "$CHECKOUT/scripts/git/e1-power-cut.mjs" descriptor --root "$OUT")"
@@ -67,22 +73,25 @@ dmsetup message "$LW" 0 mark mkfs
 mount "/dev/mapper/$LW" "$MNT"; mkdir "$MNT/w"; chown "$RUN_AS" "$MNT/w"
 PLAN="$OUT/plan.jsonl"; : > "$PLAN"; chown "$RUN_AS" "$PLAN"
 coproc WORKLOAD { as_user env -C "$CHECKOUT" "$NODE" scripts/git/e1-power-cut.mjs workload --root "$MNT/w" --descriptor "$DESCRIPTOR" --plan "$PLAN" --ops "$OPS" --handshake; }
+WORKLOAD_CHILD="$WORKLOAD_PID"  # bash unsets WORKLOAD_PID once the coprocess exits
 while IFS= read -r line <&"${WORKLOAD[0]}"; do
   case "$line" in ack\ *) dmsetup message "$LW" 0 mark "ack-${line#ack }"; echo ok >&"${WORKLOAD[1]}" ;; esac
 done
-wait "$WORKLOAD_PID" || die "workload failed"
+wait "$WORKLOAD_CHILD" || die "workload failed"
 umount "$MNT"
 dmsetup message "$LW" 0 mark done
-dmsetup remove "$LW"
+dmsetup remove --retry "$LW"
 
 # 2. Mark positions: ack-i is acknowledged at every replay point after its entry.
+# replay-log --find prints "<entry>@<sector>"; only the entry number is used here.
+find_entry() { local found; found="$("$REPLAY_LOG" --log "$LOG" --find "$@")" || return 1; echo "${found%%@*}"; }
 declare -a ACK_AT
-for ((i = 0; i < OPS; i++)); do ACK_AT[i]="$("$REPLAY_LOG" --log "$LOG" --find --end-mark "ack-$i")"; done
-START="$("$REPLAY_LOG" --log "$LOG" --find --end-mark mkfs)"
+for ((i = 0; i < OPS; i++)); do ACK_AT[i]="$(find_entry --end-mark "ack-$i")"; done
+START="$(find_entry --end-mark mkfs)"
 
 # 3. Replay to every FUA after mkfs and check the image through a snapshot (mount writes go to COW).
 RESULTS="$OUT/checkpoints.jsonl"; : > "$RESULTS"; FAILED=0 CHECKED=0
-cur="$("$REPLAY_LOG" --log "$LOG" --find --next-fua --start-entry "$START" || true)"
+cur="$(find_entry --next-fua --start-entry "$START" || true)"
 while [ -n "$cur" ]; do
   "$REPLAY_LOG" --log "$LOG" --replay "$REPLAY" --limit "$((cur + 1))" >/dev/null
   acked=0; for ((i = 0; i < OPS; i++)); do [ "${ACK_AT[i]}" -lt "$cur" ] && acked=$((i + 1)); done
@@ -97,11 +106,12 @@ while [ -n "$cur" ]; do
   else
     verdict="{\"acked\":$acked,\"violations\":[\"mount failed: $(tr -d '"\n' < "$OUT/mount.err")\"]}"
   fi
-  dmsetup remove "$SNAP"
+  udevadm settle 2>/dev/null || true  # udev may still be probing the new snapshot device
+  dmsetup remove --retry "$SNAP"
   echo "{\"entry\":$cur,\"verdict\":${verdict:-null}}" >> "$RESULTS"
   CHECKED=$((CHECKED + 1))
   echo "$verdict" | grep -q '"violations":\[\]' || FAILED=$((FAILED + 1))
-  cur="$("$REPLAY_LOG" --log "$LOG" --find --next-fua --start-entry "$((cur + 1))" || true)"
+  cur="$(find_entry --next-fua --start-entry "$((cur + 1))" || true)"
 done
 
 # 4. The same workload's syscall order (§10) on this disk, unprivileged.

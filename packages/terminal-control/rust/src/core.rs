@@ -447,21 +447,36 @@ impl<'a> Core<'a> {
 
     // ---- send / read / inspect / label -------------------------------------
 
-    pub fn send(&self, key: &str, text: Option<&str>, keys: Option<&[String]>, submit: bool) -> Result<(), Refusal> {
+    /// Type into the pane of `key`, through the prompt door when `submit`. Only
+    /// while a program other than the pane's shell holds the foreground: text
+    /// typed at a shell runs as commands, backtick spans included.
+    pub fn send(&self, key: &str, text: Option<&str>, keys: Option<&[String]>, submit: bool) -> Result<SendOutcome, Refusal> {
         let (store, _) = self.open()?;
-        match (text, keys) {
-            (Some(text), None) => {
-                self.need("send.text")?;
-                let record = self.live_record(&store, key)?;
-                self.driver.send_text(&record.pane_id, text, submit)
-            }
-            (None, Some(keys)) => {
-                self.need("send.keys")?;
-                let record = self.live_record(&store, key)?;
-                self.driver.send_keys(&record.pane_id, keys)
-            }
-            _ => Err(unknown("send takes exactly one of text or keys")),
+        let capability = match (text, keys) {
+            (Some(_), None) => "send.text",
+            (None, Some(_)) => "send.keys",
+            _ => return Err(unknown("send takes exactly one of text or keys")),
+        };
+        self.need(capability)?;
+        self.need("process.info")?;
+        let record = self.live_record(&store, key)?;
+        let info = match self.driver.process_info(&record.pane_id) {
+            Ok(info) => info,
+            Err(refusal) => return Ok(SendOutcome::ForegroundNotAgent { reason: format!("the pane's foreground could not be read: {refusal:?}") }),
+        };
+        if self.foreground_of(&store, key, &info).is_none() {
+            let reason = if identity::is_bare_shell(&info) {
+                format!("the pane's shell (pid {}) is in the foreground", info.shell_pid)
+            } else {
+                "no live process in the pane's foreground could be identified".to_string()
+            };
+            return Ok(SendOutcome::ForegroundNotAgent { reason });
         }
+        match text {
+            Some(text) => self.driver.send_text(&record.pane_id, text, submit),
+            None => self.driver.send_keys(&record.pane_id, keys.unwrap_or_default()),
+        }
+        .map(|()| SendOutcome::Sent)
     }
 
     pub fn read(&self, key: &str, lines: Option<u32>, source: Option<&str>) -> Result<String, Refusal> {
@@ -506,7 +521,13 @@ impl<'a> Core<'a> {
 
     fn foreground_identity(&self, store: &Store, key: &str, pane: &str) -> Option<ProcessIdentity> {
         let info = self.driver.process_info(pane).ok()?;
-        if let Some(root) = identity::first_non_shell(&info) {
+        self.foreground_of(store, key, &info)
+    }
+
+    /// The process in the foreground that is not the pane's shell: a foreground process other than the
+    /// shell, or the launched command that `exec`-replaced it. `None` for a bare shell or a process gone.
+    fn foreground_of(&self, store: &Store, key: &str, info: &crate::driver::ProcessInfo) -> Option<ProcessIdentity> {
+        if let Some(root) = identity::first_non_shell(info) {
             return identity::identity_of(root.pid, info.foreground_pgid);
         }
         // A command launched with `exec` replaced the pane's shell, so the root
