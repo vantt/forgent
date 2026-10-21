@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "36adf2f2c955bc15916bc80c5e400543f64802b64ae9dc66da883c0e3c78ed29",
+  "payloadDigest": "72d7218b7f4e97f074c64f4f8f83429825ac578b57fd9e6853ad74399c0b5999",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -534,7 +534,7 @@
     "scripts/backfill-status-category.mjs": "bff22a3805f8a38f1c7d93b7cee3b53ee5b6dde0d978b4fdbfb760c1cc3622d6",
     "scripts/backfill-unit-summaries.mjs": "a11d12e63191bc31bf7a27b2c7279ac5ea8403730045dbbaa8f8ce2738b275e5",
     "scripts/build-domain-registry.mjs": "ad239f74764832366c3c3bd43c674012904a78944bd6d6b9d2c8eb481c1a62c0",
-    "scripts/build-rust-distribution.mjs": "f6e2db5c2fa22372257f27a0d2f7391b4e08528a994e81c7d654da7804e002db",
+    "scripts/build-rust-distribution.mjs": "7ca44bee191ae7fafadbc3d3e5572aa5ebf3e7a2a1ecdab0b3d8320db208db03",
     "scripts/build-skill-wrappers.mjs": "ca8b0121333b29830a35553e7360f14c19254d0a157cb5f79c217ad749038242",
     "scripts/check-backlog-reconciliation.mjs": "5e7fa8b9548c34479e270ec666bbf8132f7fc7c38177dbac71f8d74848f9baad",
     "scripts/check-decision-citation-drift.mjs": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
@@ -964,7 +964,7 @@
     "install.sh": 1,
     "package-lock.json": 1,
     "packages": 135,
-    "plans": 1740,
+    "plans": 1743,
     "plugins": 101,
     "rustfmt.toml": 1,
     "test": 756,
