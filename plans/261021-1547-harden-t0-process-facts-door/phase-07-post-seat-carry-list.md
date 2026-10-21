@@ -18,11 +18,11 @@ Parent plan [phase 01, "SEAT carry list"](../261021-1118-harden-low-layers-botto
 
 - Start only when `git merge-base --is-ancestor origin/seat-binding-wave main` (or the SEAT landing commit named on the board) holds; re-verify every line below on the landed main before editing (SEAT moves them).
 - `src/runner/dispatch/assignment-runner.mjs` (today `:75, :82, :823` import `isProcessAlive`/`resolveHolderLiveness` from `run-lock.mjs`; `:116-117` import `canonicalJson` from `proof-helpers.mjs`; `:920-926` the staging judge): import `resolveHolderLiveness` from `process-identity.mjs`; the staging judge becomes `resolveHolderLiveness({ pid: stagedPid }) === 'dead'` (P1: unknown keeps the staging directory; `rmSync` at `:932, :942` only on `dead`); `canonicalJson` keeps coming from `proof-helpers.mjs` (a re-export of the door since phase 5), so that import is unchanged.
-- `src/runner/dispatch/run-lock.mjs`: delete the `resolveHolderLiveness` re-export (`:45-47` after phase 3) and the `isProcessAlive` name if phase 3 kept it for the carry list.
+- `src/runner/dispatch/run-lock.mjs`: delete the `resolveHolderLiveness` re-export (`:69-71` today) and the `isProcessAlive` forwarder (`:34-42` today) that phase 3 kept for `assignment-runner.mjs:75, :82, :823, :924`. `fsyncFileBestEffort`/`fsyncDirBestEffort` stay (their callers are the assignment runner's own staging files, not a T0 class).
 - `src/runner/execution/run.mjs:51-61` `writeJsonAtomic` and `src/runner/execution/unit-summary.mjs:196`: no-fsync class, stays Node (arbitration Part A `durable-file`), but the temp name comes from `uniqueTmpTag()` (speed S15). No other change.
 - `src/setup/registrations.mjs` SEAT parts: nothing of T0 remains there after phases 3 and 6; verify with `rg -n "process\.kill|/proc/" src/setup/registrations.mjs` → nothing.
 - `apps/fgos/src/main.rs`: no T0 edit is expected (the `process-observe` arm lives in `packages/holder-lock/rust/src/route.rs`, deleted in phase 6; `main.rs:183` only dispatches to `fgos_holder_lock::route::main`). Record "no edit needed" or the one edit SEAT's landing made necessary.
-- Close criterion of the parent phase 01: no exported Node liveness, signal or canonical function outside the client file; `rg -n "export function (isProcessAlive|resolveHolderLiveness|pidExists|canonicalJson)" src` → only `process-identity.mjs` (`resolveHolderLiveness`) and the door re-exports (`proof-helpers.mjs`, `effective-execution-contract.mjs` if moved).
+- Close criterion of the parent phase 01: no exported Node liveness, signal or canonical function outside the client file; `rg -n "export\s+(function\s+|\{[^}]*\b)(isProcessAlive|resolveHolderLiveness|pidExists|canonicalJson|getBootId|getProcessStartTime|getPidNs)\b" src` → only `process-identity.mjs` (`resolveHolderLiveness`), the one re-export line in `proof-helpers.mjs` (the arbitration's canonical budget) and `effective-execution-contract.mjs:39` (kept with its H11 comment until phase 07 of the parent plan).
 
 ## Files
 
@@ -36,7 +36,7 @@ Parent plan [phase 01, "SEAT carry list"](../261021-1118-harden-low-layers-botto
 
 ## Verification (exact)
 
-- `node scripts/run-tests.mjs test/runner/assignment-layout.test.mjs test/runner/assignment-dispatch.test.mjs test/runner/assignment-runresult.test.mjs test/runner/execution/run.test.mjs test/runner/execution/unit-summary.test.mjs test/runner/run-lock-identity.test.mjs`
+- One-file runs (phase 1's one-liner): `test/runner/assignment-layout.test.mjs test/runner/assignment-dispatch.test.mjs test/runner/assignment-runresult.test.mjs test/runner/execution/run.test.mjs test/runner/execution/unit-summary.test.mjs test/runner/run-lock-identity.test.mjs`
 - `rg -n "isProcessAlive|resolveHolderLivenessByIdentity" src` → nothing.
 - `rg -n "\.\$\{process\.pid\}\.\$\{.*\}\.tmp|\.tmp\.\$\{Date" src/runner/execution` → nothing.
 
