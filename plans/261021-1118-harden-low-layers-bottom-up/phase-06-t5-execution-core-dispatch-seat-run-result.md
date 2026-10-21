@@ -1,0 +1,51 @@
+---
+phase: 06
+title: "T5: Execution Core, Dispatch Transport & Confinement, Seat Binding, Run Result Evaluator"
+status: pending
+depends_on: [05 closed, SEAT landed]
+effort: ~7d (rough; largest Node block)
+---
+
+# Phase 06 — T5: Execution Core, Dispatch & Confinement, Seat Binding, Run Result (end component)
+
+Template layer: follow the loop in [plan.md](plan.md#the-per-layer-loop). From T5 up, the Rust move uses the "gain in simplicity / cost of the move" criterion (proposal §4.3), not "move everything".
+
+## Context links
+
+[runner spec](../../docs/specs/runner.md), [confinement-authority](../../docs/specs/confinement-authority.md), [seat-binding spec](../../docs/specs/seat-binding.md) (after SEAT lands), [component-boundary](../../docs/platform/component-boundary.md); [audit 09-28](../reports/audit-260928-2318-dispatch-engine-stability-speed-simplicity-report.md) C1 (five shadow binders), C3, C4; SEAT plan [`plans/261020-2132-seat-binding-component/`](../261020-2132-seat-binding-component/plan.md) and its landing report.
+
+## Components, crates, Node
+
+| Component | Rust | Node around it |
+|---|---|---|
+| Execution Core (Unit, `runUnit`, `bind()`, Pattern) | — | `src/runner/execution/*` 24 files, 5 162 lines |
+| Dispatch Transport & Confinement | — | `src/runner/dispatch/*` 64 files, 28 579 lines (largest Node block; `assignment-runner.mjs` 2 672, `config.mjs` 1 842, `run-result.mjs` 1 379, `provider-credential-renewal.mjs` 1 250, `cli.mjs` 1 100), of which `confinement/*` 10 files, 6 011 lines |
+| Seat Binding | `packages/seat-binding/rust` (on `seat-binding-wave`, not on main yet) | `src/seat-binding/client.mjs` (SEAT) |
+| Run Result Evaluator | `packages/run-result/rust` (2 468) | `src/runner/dispatch/run-result.mjs` (1 379) — twin candidate |
+
+Doctor rows in scope (many; gate 8 is the main lever here): runner/model/tier/executor rows `src/setup/registrations.mjs:1440-1518`, `dispatch-decide-hook-wired` :1600, `bwrap-available` :1746, `provider-capacity-state` :2287, executor rows :4698-4812, confinement rows :5351-5985, `runner-coordination-orgPolicy-shape` :6148, plus SEAT's rows after landing. The exact count comes from the layer's own baseline (loop step 1).
+
+## Constraints
+
+- Starts only after SEAT lands; takes SEAT's measured Node/test Δ (review §3 checkpoint after SEAT phase 08) as input.
+- T0–T4 carry items that live in T5 files (e.g. liveness and atomic writes inside `assignment-runner.mjs`, `run.mjs`, `unit-summary.mjs`) must already be closed; T5 does not inherit them.
+- One-door job owned here: config read (every `config.json` reader in `src/runner/**` through one door); T0/T1 hand-over sites in confinement probes and `recovery-planner.mjs` TTL liveness (phase 01 §A).
+
+## Files
+
+Filled by the T5 sub-plan with Create / Modify / **Delete** / **Tests to retire**. Delete candidates to check first: audit C1 shadow binders, `run-result.mjs` vs `fgos-run-result`, legacy seat reads SEAT leaves behind.
+
+## Net size
+
+Estimate before council (HARDEN commits only; SEAT's own Δ excluded): Node −2 000 to −6 000, Rust −300 to +300, tests −1 000 to −3 000. Layer total ≤ 0.
+
+## Risks (layer-specific)
+
+| Risk | L × I | Mitigation |
+|---|---|---|
+| Scope explosion in a 28 k-line block | H × H | Council ranks by gain/size; sub-plan may split T5 into tracks by file set, still one layer close. |
+| Overlap with WORK, AGENT-WF callers | M × M | Board shared-file list; Work and Workflow internals stay out of scope. |
+
+## Done when
+
+Loop close criteria; parallel paths per job in T5 = 1; T5 net size ≤ 0.
