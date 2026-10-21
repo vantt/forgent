@@ -11,13 +11,20 @@
 #![forbid(unsafe_code)]
 #![deny(clippy::print_stdout, clippy::print_stderr)]
 
+mod delivery;
+mod envelope;
 mod ids;
 mod limits;
 mod names;
 mod registry;
 mod state;
+mod sweep;
 mod time;
 
+pub use delivery::{
+    Checkpoint, Claim, ClaimedItem, Finished, MessageView, Refusal, SendOutcome, SendRequest,
+};
+pub use envelope::{Header, Kind, MessageState, RefusalReason};
 pub use ids::{
     AttemptToken, Cli, Generation, IdSource, InvalidValue, MessageId, ShortName, WriterKey,
 };

@@ -37,7 +37,7 @@ impl fmt::Display for ResolveRefusal {
 
 impl std::error::Error for ResolveRefusal {}
 
-fn in_name_alphabet(c: char) -> bool {
+pub(crate) fn in_name_alphabet(c: char) -> bool {
     c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-')
 }
 

@@ -120,3 +120,86 @@ pub fn same_head() -> Option<StoredHead> {
         liveness: fgos_mailbox_core::Liveness::Alive,
     })
 }
+
+use fgos_mailbox_core::{Checkpoint, Claim, Generation, MessageId, SendRequest};
+
+/// Two heads of project `forgent`: `a` (Claude, `forgent-claude-2b`) and
+/// `b` (Codex, `forgent-codex-9c`), both at generation 1.
+pub struct Pair {
+    pub state: MailboxState,
+    pub limits: Limits,
+    pub ids: SeqIds,
+}
+
+pub const A_NAME: &str = "forgent-claude-2b";
+pub const B_NAME: &str = "forgent-codex-9c";
+
+impl Pair {
+    pub fn new(now: Timestamp) -> Self {
+        let limits = spec_limits();
+        let mut ids = SeqIds::default();
+        let mut state = MailboxState::new();
+        register_new(
+            &mut state,
+            request("a", "claude", Some("2b"), "head-a"),
+            now,
+            &limits,
+            &mut ids,
+        );
+        register_new(
+            &mut state,
+            request("b", "codex", Some("9c"), "head-b"),
+            now,
+            &limits,
+            &mut ids,
+        );
+        Self { state, limits, ids }
+    }
+
+    pub fn send(&mut self, from: &str, to: &str, body: &str, now: Timestamp) -> MessageId {
+        self.state
+            .send(plain(from, to, body), now, &self.limits, &mut self.ids)
+            .unwrap()
+            .id
+    }
+
+    pub fn claim(&mut self, key_text: &str, generation: Generation, now: Timestamp) -> Claim {
+        self.state.claim(
+            &key(key_text),
+            generation,
+            Checkpoint::Step,
+            now,
+            &self.limits,
+            &mut self.ids,
+        )
+    }
+
+    /// Replaces the head of `key_text` after its old head was judged dead.
+    pub fn take_over(&mut self, key_text: &str, cli_text: &str, now: Timestamp) -> Generation {
+        match self
+            .state
+            .register(
+                request(key_text, cli_text, None, "a-new-head"),
+                other_head(fgos_mailbox_core::Liveness::Dead),
+                now,
+                &self.limits,
+                &mut self.ids,
+            )
+            .unwrap()
+        {
+            Registered::Replaced { generation, .. } => generation,
+            other => panic!("expected a takeover, got {other:?}"),
+        }
+    }
+}
+
+/// A plain send without wake or reply hint.
+pub fn plain(from: &str, to: &str, body: &str) -> SendRequest {
+    SendRequest {
+        from: key(from),
+        to: to.to_string(),
+        body: body.to_string(),
+        wake: false,
+        reply_to: None,
+    }
+}

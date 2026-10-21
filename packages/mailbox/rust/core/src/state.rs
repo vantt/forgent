@@ -4,7 +4,8 @@
 //! Snapshot rule: every field round-trips through `serde_json` from an owned
 //! `String`. Collections are `BTreeMap` or `Vec`, every map key is a `String`
 //! newtype, every enum is a serde enum and no field borrows.
-use crate::ids::WriterKey;
+use crate::envelope::Header;
+use crate::ids::{MessageId, WriterKey};
 use crate::registry::Binding;
 use crate::time::Timestamp;
 use serde::{Deserialize, Serialize};
@@ -16,6 +17,8 @@ pub struct MailboxState {
     /// is read as this time, so no window shrinks and no deadline grows.
     pub(crate) last_now: Timestamp,
     pub(crate) bindings: BTreeMap<WriterKey, Binding>,
+    /// Message headers in the order they were recorded.
+    pub(crate) messages: Vec<Header>,
 }
 
 impl MailboxState {
@@ -31,6 +34,15 @@ impl MailboxState {
     /// Every binding, ordered by key.
     pub fn bindings(&self) -> impl Iterator<Item = &Binding> {
         self.bindings.values()
+    }
+
+    /// Every message header, in the order they were recorded.
+    pub fn messages(&self) -> impl Iterator<Item = &Header> {
+        self.messages.iter()
+    }
+
+    pub fn message(&self, id: &MessageId) -> Option<&Header> {
+        self.messages.iter().find(|h| &h.id == id)
     }
 
     pub fn last_now(&self) -> Timestamp {

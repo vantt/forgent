@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "Send (plain), claim, emit, finish, inbox view"
-status: pending
+status: done
 priority: P2
 effort: "4h"
 dependencies: [2]
@@ -74,3 +74,16 @@ node scripts/git-one-door-scan.mjs --write-census
 
 - A finish that partly matches (some items moved by a sweep): handled per message, never all-or-nothing, so a stale part never blocks the live part.
 - Unbounded growth is not handled yet: phase 4 (TTL, retention) and phase 5 (queue cap) bound it.
+
+## Implementation notes (2026-10-21)
+
+- Deviations (smallest correct fix):
+  - The state enum is `MessageState` (a type named `State` would shadow the `state` module's role and read ambiguously next to `MailboxState`).
+  - `Claim.token` is `Option<AttemptToken>`: no token is minted when nothing is claimed, so an empty claim needs no finish.
+  - A claim checks the caller's generation before the clock and the sweep, so a stale claim changes nothing (test 8 compares the whole state).
+  - Claim order is the recording order (the header list is append-only and `recorded_at` never goes back, thanks to the clock high-water mark). The planned tie-break "then id" is dropped: ids are opaque hex of different lengths and do not order.
+  - `inbox` lists only mail to the key's current generation; mail of an older generation is never shown to a new process (spec §5.1 "never replayed into a stranger").
+  - `finish` also requires the header's recipient to be the finishing key, so a token cannot finish mail addressed to another head.
+  - Added proof: `tests/delivery.rs` *a sender with no head is labelled unregistered and can never pass for a head* owns the `from_label` rule, which had no owning test in the plan.
+  - `tests/snapshot.rs` gains offered, in-flight and recorded messages; a refused message is first reachable through the sweep and is added in phase 4.
+- `send` takes no `SendOutcome.wake_dropped` yet; phase 6 adds the field with its type `WakeDrop` rather than carrying an always-`None` placeholder now.
