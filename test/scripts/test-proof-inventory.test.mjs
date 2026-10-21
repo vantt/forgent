@@ -20,6 +20,8 @@ import {
   findCloneGroups,
   suiteReport,
   buildSuiteBaseline,
+  suiteChange,
+  cliCost,
 } from '../../scripts/test-proof-inventory.mjs';
 
 test('RESPONSIBILITIES is the exact eight-category taxonomy from the plan, unknown last', () => {
@@ -211,6 +213,42 @@ test('checkAdmission does not flag a marker on the line immediately above the vi
   assert.deepEqual(checkAdmission(changed), []);
 });
 
+test('checkAdmission flags a new CLI, host or fgctl spawn in a test unless the line or the one above gives a boundary reason', () => {
+  const marked = '  // boundary: proves the exit code the shell sees';
+  const changed = [
+    { file: 'test/cli/x.test.mjs', line: 3, text: "  const r = spawnSync(process.execPath, [FGOS, 'list'], { cwd });", prevText: null },
+    { file: 'test/cli/x.test.mjs', line: 7, text: "  spawnSync(process.execPath, [FGOS, 'list'], { cwd });", prevText: marked },
+    { file: 'test/rust-host/y.test.mjs', line: 9, text: "  spawn(FGCTL_BIN, ['init']);", prevText: null },
+    { file: 'test/cli/x.test.mjs', line: 12, text: "  spawnSync('git', ['status'], { cwd });", prevText: null },
+  ];
+  const violations = checkAdmission(changed);
+  assert.deepEqual(violations.map((v) => [v.ruleId, v.line]), [['new-cli-spawn-without-reason', 3], ['new-cli-spawn-without-reason', 9]]);
+});
+
+test('suiteChange counts test() lines added and removed under test/ and the CLI spawn sites among the added lines', () => {
+  const patch = [
+    '--- a/test/x.test.mjs',
+    '+++ b/test/x.test.mjs',
+    '@@ -1,2 +1,3 @@',
+    "-test('old title', () => {",
+    "+test('new title', () => {",
+    "+test('another', () => {",
+    "+  // boundary: the exit code",
+    "+  spawnSync(process.execPath, [FGOS, 'list']);",
+    "+  spawnSync(HOST_BIN, ['version']);",
+  ].join('\n');
+  assert.deepEqual(suiteChange({ baseRef: 'base', readPatch: () => patch }), { added: 2, removed: 1, spawns: 2, unexplained: 1 });
+});
+
+test('cliCost runs fgos --help and fgos list the asked number of times in the checkout and reports each median', () => {
+  const calls = [];
+  const cost = cliCost({ cwd: '/repo', runs: 3, spawn: (cmd, argv, opts) => { calls.push([argv.slice(1).join(' '), opts.cwd]); } });
+  assert.deepEqual(calls.map(([argv]) => argv), ['--help', '--help', '--help', 'list', 'list', 'list']);
+  assert.ok(calls.every(([, cwd]) => cwd === '/repo'));
+  assert.equal(cost.runs, 3);
+  assert.ok(Number.isInteger(cost.helpMs) && Number.isInteger(cost.listMs));
+});
+
 test('addedLinesFromGitDiff returns [] for an empty scope without touching git at all', () => {
   const rows = addedLinesFromGitDiff([], { readPatch: () => { throw new Error('must not be called'); } });
   assert.deepEqual(rows, []);
@@ -297,17 +335,20 @@ test('suiteReport prints the size line against the baseline, fails only on a clo
   fs.writeFileSync(baselinePath, JSON.stringify(baseline));
   const admission = () => [{ file: 'test/a.test.mjs', line: 2, ruleId: 'new-real-provider-network-without-marker', message: 'm' }];
 
-  const clean = suiteReport({ files, wallSeconds: 12.4, cwd: dir, baselinePath, admission });
+  const change = () => ({ base: '89abcdef0123', added: 4, removed: 6, spawns: 1, unexplained: 1 });
+  const clean = suiteReport({ files, wallSeconds: 12.4, cwd: dir, baselinePath, admission, change });
   assert.equal(clean.status, 0);
   assert.equal(clean.lines[0], 'suite: 2 files, 3 test() calls, 12 s wall (baseline 2 / 3 / 10 s at 012345678)');
   assert.ok(clean.lines.some((l) => /1 known cross-file clone/.test(l)));
   assert.ok(clean.lines.some((l) => /1 baselined clone\(s\) are gone/.test(l)));
   assert.ok(clean.lines.some((l) => /warning: test\/a\.test\.mjs:2 \[new-real-provider-network-without-marker\]/.test(l)));
+  assert.equal(clean.lines[1], 'suite: this change against 89abcdef0: +4 -6 test() calls, 1 new CLI/host spawn site(s), 1 without a reason');
 
   write('test/b.test.mjs', "test('a', () => { known(); });\ntest('copy of b', () => { fresh(); });\n");
-  const dirty = suiteReport({ files, cwd: dir, baselinePath, admission: () => { throw new Error('git diff failed\nstderr'); } });
+  const dirty = suiteReport({ files, cwd: dir, baselinePath, admission: () => { throw new Error('git diff failed\nstderr'); }, change: () => { throw new Error('no merge base\nstderr'); } });
   assert.equal(dirty.status, 1);
   assert.ok(dirty.lines.includes('  test/b.test.mjs:2'));
   assert.ok(dirty.lines.includes('suite: warning: admission rules not checked: git diff failed'));
+  assert.ok(dirty.lines.includes('suite: warning: change against the merge base not measured: no merge base'));
   assert.match(dirty.lines[0], /, \? s wall/);
 });

@@ -23,7 +23,9 @@
 // suite.
 
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { inspectRepo } from './lib/git-ports.mjs';
@@ -247,13 +249,30 @@ export function inventoryProfiledFiles(topFiles, { repoRoot = REPO_ROOT } = {}) 
 
 // -- 3. warning-only admission check (baseline ratchet) --
 
+const SPAWN_CALL_RE = /\b(?:spawn|spawnSync|execFile|execFileSync|fork)\(/;
+const CLI_TARGET_RE = /\b(?:FGOS|BIN_FGOS|FGOS_BIN|fgosBin|HOST_BIN|FGOS_HOST_BIN|HOST|FGCTL_BIN)\b|bin\/fgos\.mjs|run-rust-dev-host/;
+
+/** A line that starts the CLI, the Rust host or fgctl as a process: the costliest way a test can prove something. */
+export function isCliSpawn(line) {
+  return SPAWN_CALL_RE.test(line) && CLI_TARGET_RE.test(line);
+}
+
+const hasBoundaryMarker = (line, prevLine) => /\/\/\s*boundary:/.test(line) || /\/\/\s*boundary:/.test(prevLine ?? '');
+
 const ADMISSION_RULES = [
   {
     id: 'new-fixture-only-init-without-reason',
     // A brand-new `run(cwd, ['init'])`/`run(cwd, ['init', ...])` call with
     // no adjacent `// boundary:` marker comment on the same or previous line.
-    test: (line, prevLine) => /\brun\(\s*[A-Za-z_$][\w$]*\s*,\s*\[\s*'init'/.test(line) && !/\/\/\s*boundary:/.test(line) && !/\/\/\s*boundary:/.test(prevLine ?? ''),
+    test: (line, prevLine) => /\brun\(\s*[A-Za-z_$][\w$]*\s*,\s*\[\s*'init'/.test(line) && !hasBoundaryMarker(line, prevLine),
     message: 'new fgos init call site with no `// boundary:` reason marker',
+  },
+  {
+    id: 'new-cli-spawn-without-reason',
+    // Design principle 8: a behaviour's owning proof sits at the lowest layer that observes it. A new
+    // CLI/host/fgctl process in a test says on its line, or the one above, why no lower layer can.
+    test: (line, prevLine) => isCliSpawn(line) && !hasBoundaryMarker(line, prevLine),
+    message: 'new CLI/host spawn with no `// boundary:` reason saying why a lower layer cannot prove it',
   },
   {
     id: 'new-real-provider-network-without-marker',
@@ -336,6 +355,23 @@ export function addedLinesFromGitDiff(scopeFiles, { baseRef = 'HEAD', cwd = REPO
 
 export const SUITE_BASELINE_PATH = path.join(REPO_ROOT, 'test', 'suite-baseline.json');
 const TEST_CALL_RE = /^[ \t]*(?:test|it)\(/gm;
+const TEST_CALL_LINE_RE = /^[ \t]*(?:test|it)\(/;
+
+/**
+ * What the work tree changes in the suite against `baseRef`: `test()` lines added and removed under
+ * test/, and the CLI/host spawn sites among the added lines (with how many carry no reason).
+ */
+export function suiteChange({ baseRef, cwd = REPO_ROOT, readPatch = worktreePatch } = {}) {
+  let added = 0;
+  let removed = 0;
+  for (const line of readPatch(['test'], { baseRef, cwd }).split('\n')) {
+    if (line.startsWith('+++') || line.startsWith('---') || !TEST_CALL_LINE_RE.test(line.slice(1))) continue;
+    if (line[0] === '+') added += 1;
+    else if (line[0] === '-') removed += 1;
+  }
+  const spawns = addedLinesFromGitDiff(['test'], { baseRef, cwd, readPatch }).filter((row) => isCliSpawn(row.text));
+  return { added, removed, spawns: spawns.length, unexplained: spawns.filter((row) => !hasBoundaryMarker(row.text, row.prevText)).length };
+}
 
 /**
  * Index of the `)` closing the `(` at `open`, and of the first comma at the
@@ -482,6 +518,7 @@ export function suiteReport({
   baselinePath = SUITE_BASELINE_PATH,
   readFile = (f) => fs.readFileSync(f, 'utf8'),
   admission = () => checkAdmission(addedLinesFromGitDiff(['test'], { baseRef: admissionBaseRef({ cwd }), cwd })),
+  change = () => ({ base: admissionBaseRef({ cwd }), ...suiteChange({ baseRef: admissionBaseRef({ cwd }), cwd }) }),
 } = {}) {
   const calls = files.flatMap((file) => scanTestCalls(readFile(path.resolve(cwd, file)), path.relative(cwd, path.resolve(cwd, file)).replaceAll('\\', '/')));
   const baseline = readSuiteBaseline(baselinePath);
@@ -489,6 +526,12 @@ export function suiteReport({
   const at = baseline.sha ? ` at ${baseline.sha.slice(0, 9)}` : '';
   const base = baseline.tests === null ? 'no baseline' : `baseline ${baseline.files} / ${baseline.tests} / ${formatWall(baseline.wallSeconds)}${at}`;
   lines.push(`suite: ${files.length} files, ${calls.length} test() calls, ${formatWall(wallSeconds)} wall (${base})`);
+  try {
+    const delta = change();
+    if (delta) lines.push(`suite: this change against ${String(delta.base).slice(0, 9)}: +${delta.added} -${delta.removed} test() calls, ${delta.spawns} new CLI/host spawn site(s), ${delta.unexplained} without a reason`);
+  } catch (err) {
+    lines.push(`suite: warning: change against the merge base not measured: ${String(err.message).split('\n')[0]}`);
+  }
 
   const clones = findCloneGroups(calls);
   const known = new Set(baseline.knownClones.map((c) => c.hash));
@@ -526,6 +569,25 @@ export function buildSuiteBaseline({ files, cwd = REPO_ROOT, sha, wallSeconds, p
   };
 }
 
+/**
+ * Median wall time of one `fgos --help` and one `fgos list` in `cwd`, each run `runs` times: the cost every
+ * CLI-spawning test pays per call. Run it on the base and on the branch to see what a change adds.
+ */
+export function cliCost({ cwd = REPO_ROOT, runs = 5, spawn = spawnSync } = {}) {
+  const bin = path.join(cwd, 'bin', 'fgos.mjs');
+  const env = { ...process.env, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' };
+  const median = (argv) => {
+    const times = [];
+    for (let i = 0; i < runs; i += 1) {
+      const started = process.hrtime.bigint();
+      spawn(process.execPath, [bin, ...argv], { cwd, env, stdio: 'ignore' });
+      times.push(Number(process.hrtime.bigint() - started) / 1e6);
+    }
+    return Math.round(times.sort((a, b) => a - b)[Math.floor(times.length / 2)]);
+  };
+  return { helpMs: median(['--help']), listMs: median(['list']), runs, load: Number(os.loadavg()[0].toFixed(1)) };
+}
+
 // -- CLI entrypoint --
 
 const __filename = fileURLToPath(import.meta.url);
@@ -551,6 +613,9 @@ if (process.argv[1] === __filename) {
       for (const m of group.members) console.log(`  ${m.file}:${m.line} ${m.title}`);
     }
     for (const { title, files } of report.shared) console.log(`title ${title}: ${files.join(', ')}`);
+  } else if (args[0] === '--cli-cost') {
+    const cost = cliCost();
+    console.log(`cli-cost: fgos --help ${cost.helpMs} ms, fgos list ${cost.listMs} ms (median of ${cost.runs}, load ${cost.load})`);
   } else if (args[0] === '--check') {
     const scopeIdx = args.indexOf('--scope');
     const scopeFiles = scopeIdx === -1 ? [] : args[scopeIdx + 1].split(',');
@@ -567,7 +632,7 @@ if (process.argv[1] === __filename) {
     }
     process.exitCode = 0; // warning-only: never fails the build in this track
   } else {
-    console.error('Usage: node scripts/test-proof-inventory.mjs --check --scope <files> [--baseline <path>] | --duplicates | --write-baseline [--wall-seconds <s>]');
+    console.error('Usage: node scripts/test-proof-inventory.mjs --check --scope <files> [--baseline <path>] | --duplicates | --write-baseline [--wall-seconds <s>] | --cli-cost');
     process.exitCode = 1;
   }
 }
