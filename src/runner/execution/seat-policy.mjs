@@ -10,6 +10,7 @@
 
 import crypto from 'node:crypto';
 import { bindSeat } from '../../seat-binding/client.mjs';
+import { stripConfigComments } from '../dispatch/config.mjs';
 
 /** The runner config keys seat choice reads; everything else in `runner` is not part of the digest. */
 const SEAT_CONFIG_KEYS = Object.freeze(['defaults', 'maxTier', 'tierFallback', 'modelPolicies']);
@@ -59,14 +60,8 @@ function canonicalJson(value) {
 
 /** The semantic config slice and its digest. `$comment` never reaches either. */
 export function seatConfigDigestOf(runnerConfig) {
-  const config = stripComments(seatConfigOf(runnerConfig));
+  const config = stripConfigComments(seatConfigOf(runnerConfig));
   return { config, digest: `sha256:${crypto.createHash('sha256').update(canonicalJson(config)).digest('hex')}` };
-}
-
-function stripComments(value) {
-  if (Array.isArray(value)) return value.map(stripComments);
-  if (!isObject(value)) return value;
-  return Object.fromEntries(Object.entries(value).filter(([key]) => key !== '$comment').map(([key, child]) => [key, stripComments(child)]));
 }
 
 const answers = new Map();
