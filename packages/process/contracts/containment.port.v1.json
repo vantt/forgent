@@ -25,14 +25,14 @@
         }
       },
       "output": "hostTuple of the root process (linux-gate: the gate as pid 1 of the new namespace, read from bwrap --info-fd child-pid); the domain id is now complete",
-      "errors": { "enum": ["spawn-failed", "namespace-unavailable", "io"] }
+      "errors": { "enum": ["spawn-failed", "namespace-unavailable", "invalid-bwrap-prefix", "driver-unavailable", "io"] }
     },
     "is_empty": {
       "input": { "domain": "domain" },
       "output": { "enum": ["empty", "not-empty", "unknown"] },
       "drivers": {
         "linux-gate": "judge(gate hostTuple) == dead -> empty (the kernel kills and reaps every task of the namespace before init becomes a zombie); alive -> not-empty; unknown -> unknown. No ns/pid inode scan (doctor only)",
-        "linux-pgroup": "no process left in the process group of the root (kill(-pgid, 0) == ESRCH) and judge(root) == dead -> empty; best-effort: a setsid descendant escapes",
+        "linux-pgroup": "judge(root) == dead, no process in the /proc row scan of the root's group, and no process seen in the root's tree still alive -> empty; any seen or listed member that cannot be judged or read -> unknown; best-effort: a setsid descendant escapes",
         "windows-job": "judged by fgos-process::domain_watch (windows_job.rs): job view and contender view of predecessor.v1.json windowsJobViews; never \"ActiveProcesses == 0\" alone, never unopenable == empty",
         "macos-tree": "no process in the pgid and none in the scanned descendant tree (proc_listchildpids) -> empty; best-effort: a double-forked setsid process reparented to launchd escapes"
       },
@@ -53,7 +53,7 @@
       "output": { "driver": "string", "level": { "enum": ["kernel", "best-effort", "unsupported"] }, "escapes": "string[], named escape routes reported by doctor" },
       "drivers": {
         "linux-gate": { "level": "kernel", "escapes": ["processes created by a daemon outside the namespace on the agent's request (herdr, systemd, docker)"] },
-        "linux-pgroup": { "level": "best-effort", "escapes": ["setsid descendants leave the process group", "daemons outside the domain"] },
+        "linux-pgroup": { "level": "best-effort", "escapes": ["setsid descendants leave the process group", "daemons outside the domain", "a group scan after the leader died can meet a reused pgid"] },
         "windows-job": { "level": "kernel", "escapes": ["processes created by a service or COM server outside the job"] },
         "macos-tree": { "level": "best-effort", "escapes": ["setsid + double fork reparented to launchd (measured: survives killpg)", "launchd/XPC services"] }
       }

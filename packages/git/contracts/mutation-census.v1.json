@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "4bf479886ad9018085473c40507147bffa8fc2d5d0021127de24a9fd82680821",
+  "payloadDigest": "9d5c378c25fdebe5bec653ec84dd98bdf8e8cab862dfd00988d709b1216bf0c2",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -84,7 +84,7 @@
     "apps/fgos/src/wiring/metrics_sources.rs": "92b08ef96478699952332d937ab2e4c121bcf48f671b648098190dc3abe120df",
     "apps/fgos/src/wiring/mod.rs": "fe91da3081b555d716f8defadb72e9fe9ed81669e946b4017b0d87f28faa06d1",
     "apps/fgos/tests/cli_tests.rs": "cc3034cf1b16f674f29cccf2fd28208c0e190e038f3b684830f4b6f6200de055",
-    "apps/fgos/tests/internal_lock_routes.rs": "e755a47db40a873853b9cd2742890794bb8f090860115dca9f9ad0f664a2fdfd",
+    "apps/fgos/tests/internal_lock_routes.rs": "3c524adc50f5ee65346c65d07dd8be018508f1f51d038572b6f93f4a425b274a",
     "apps/fgos/tests/windows_borrow.rs": "59258d09ea0b2420b7cecfe73fd9b67d61f83bb3a4d97feaa770aa6d26a05521",
     "apps/fgos/tests/windows_lock_hold_route.rs": "78fa00f135d13dea9a0ea97317e4bc3fe96aac7a2cb3989178b14142e219e62b",
     "apps/fgos/tests/windows_predecessor_stress.rs": "0bf5b06644fdb212a693fb2a12979c8e3fb1c88800ae96a7494c00434e01c6c0",
@@ -342,7 +342,7 @@
     "packages/holder-lock/rust/src/lib.rs": "2e0cffb3a9efb1092ad6e75978c8a2e338aff7c56cacb6d960b239248e52e9f9",
     "packages/holder-lock/rust/src/port.rs": "c5835ad5d6dfb58190c9b5a25cca5ea46fc209436bd2d9488b74add9e1ae387c",
     "packages/holder-lock/rust/src/predecessor.rs": "c6ef266690f04f19f145c8726093d0dff1fa171645e5d7d89bb0eb62773ca9ce",
-    "packages/holder-lock/rust/src/route.rs": "50c33c59d3d0b3b99892abe9eb9505c932dfed81bc84add10b979236ce17bae3",
+    "packages/holder-lock/rust/src/route.rs": "d7b652a31830a4507198b8841083eb0496fa688673715d4a201c3a52fe438342",
     "packages/holder-lock/rust/src/route/hold.rs": "48336f85b1025d1c289f4a560dcd8d60c32c3680403b745a21521a0ec1bb6e13",
     "packages/holder-lock/rust/src/scope.rs": "9dd5a7e31c4e8d38940ca752700fc9ef8cf80e47624441d6f028033c20dde312",
     "packages/holder-lock/rust/src/semantics.rs": "c6b4f1425da2dd0d1d9ce972aa2b65bd86c36b3e38478c6be3fe5c4b1553553e",
@@ -416,10 +416,10 @@
     "packages/process/rust/src/containment/pgroup.rs": "70eae45ba0ea30ddd05210a2910fc1627e28f2dcdf95b5f6db55e191ac8ec0fd",
     "packages/process/rust/src/containment/windows.rs": "8c94f9ed9492ca95ecf36ab0030f2fc6dec1086505ca95d19dd33c9f6d2c3618",
     "packages/process/rust/src/control.rs": "cc7d3b6da3ea0b6d618e0cbfcf87d2eab06cdb455b77bb1a1c442f2df8642a05",
-    "packages/process/rust/src/facts.rs": "30f290273612255182bccd7919e79a4f37490560c440e942d4cd2ba35c4e49f3",
+    "packages/process/rust/src/facts.rs": "d721931085cc34964b5585cb0648eb59b15dfe8e1657182a2f246b7f0f674c10",
     "packages/process/rust/src/lib.rs": "3660c9f3bd967f0cdd3dbc181e921d305ee597199e48e487e40013f8d4e9ae9b",
     "packages/process/rust/src/mapped.rs": "10a60edf2c77662c0fe53fdfa0cb42ab447421340b613f9dd6c742678c30055c",
-    "packages/process/rust/src/platform/linux.rs": "8069897152ff3dad1cb8f4216180d3ff041404217b23b106f9b49158ee859878",
+    "packages/process/rust/src/platform/linux.rs": "879c6013e6410389045f82215014f9617a14777b3994b60b0bf648da6ed6bc62",
     "packages/process/rust/src/platform/macos.rs": "8224a406882097afea071ce4750c7d3f02ff05109662a1366415a3b9d48af455",
     "packages/process/rust/src/platform/mod.rs": "b3670dba078206b05b152d2a59373c2056620f32f53c4145369a580626a5a7f2",
     "packages/process/rust/src/platform/windows.rs": "b0230ed4e6a61a6a112f2d3201d69234a97b376c2cf2620851f2c90f644d18d6",
@@ -433,7 +433,7 @@
     "packages/process/rust/tests/file_users.rs": "6dfa7e15e0641b32ca730e0c9fdb0c1f3deca30e4f3c2bd3db056d107085aca6",
     "packages/process/rust/tests/fixtures/bwrap-without-info-fd.sh": "111366f74ac4efc4497524d5181754ad8e4c50837bf4caa26777ff1f3bc6a69c",
     "packages/process/rust/tests/fixtures/heartbeat-grandchild.sh": "71c6568f2f95b3e59883ddbd45e1527bead193017594b6b2f0dc767ab4d9fd22",
-    "packages/process/rust/tests/holders_multiprocess.rs": "5acbbcb82b2a3fd77e177592785ae4579c50c0612fd4a9fe0424928fa116b03f",
+    "packages/process/rust/tests/holders_multiprocess.rs": "1113e38c9f04cfcde575d9ac59502ab02ad4ebe72fe7524bf4d407d7b348c70f",
     "packages/process/rust/tests/judge_vectors.rs": "b1633fd4092114d469cba250fbbb8f01724cc5e3a66d85e046b373ed259ef401",
     "packages/process/rust/tests/signal_identity.rs": "7048cb36bffbf0fe9700e4d27460416b908f8169b57843c6c79d69920cfa9c4e",
     "packages/process/rust/tests/spawn_fds_leak.rs": "c6fefe723951b53ad2704a174b6c430a74fabbaf6ba13f7e00ce8aab9dea585f",
@@ -643,7 +643,7 @@
     "src/git/scoped-commit.mjs": "db173261ee00a062fbc98c0650d77093a5d877153f3d5fcaade7ec6c55ddb6e5",
     "src/git/sync.mjs": "c434a1a92d2f1fe3c10bd81b3e2830a4e28765bb4dc53e35ffa166b9b3c534e2",
     "src/git/worktree.mjs": "75e467d3cd210a54c2ef0c83714ec57ab362507dae18a268efd9a5833e1c746d",
-    "src/holder-lock/driver.mjs": "21115820e58b6906599117cf5a084dffa9f68153b73546bdd7a62bec8339ea61",
+    "src/holder-lock/driver.mjs": "52e9ca6b71ead6c20347f5b5821a404d3b8758499764c6985f46bcca528ea31e",
     "src/holder-lock/fences.mjs": "4196ac59aaabe0076c6c8adaabc3585aebea68876bb47ffea2d37168be4a234e",
     "src/holder-lock/hold-transport.mjs": "107ad4ae82c21a18fd21a0d02c7909f30678cc1492a16dfff6b3f426c64c4f81",
     "src/holder-lock/hot-guard.mjs": "0cb873f2422fe1567e0265ffabd705cae3e526fa1573ec4854acdde5190c44c7",
@@ -836,7 +836,7 @@
     "src/setup/model-pool-checks.mjs": "9a5f4c2319d630932b4c1ef3bf97ba90c41a2147271725fa1c87e64b472b1ec1",
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
     "src/setup/registrations.mjs": "48318dfdf87e29122678e9cb04e4d239ab874097d7766d47986a0afc7af4d3a4",
-    "src/setup/run-supervisor-checks.mjs": "4e8a05f500564f67fbfa7684cd71d160281c4cc345ec1bbecd74505994a9f1fb",
+    "src/setup/run-supervisor-checks.mjs": "93789ede921ca39d33fa7883fd8ae0daff5b6c120581534446c761b5e2fa0a06",
     "src/setup/shell-rc.mjs": "36c0eb600e6943d5c6ed94918d5d6a294d447fa8a6491076faaf525aa80807c0",
     "src/setup/skill-wrappers.mjs": "4b57fd3e06a89bf9817a40c6e18dc52c449b6000a071b3fcb28a80b8c1a6e96b",
     "src/setup/terminal-control-checks.mjs": "ce1e85c2d622611d2c6e6b47bfadc49ebb4a0f801c80bfcc7a91d3e8d0139656",
@@ -1486,7 +1486,7 @@
     },
     {
       "path": "apps/fgos/tests/internal_lock_routes.rs",
-      "line": 405,
+      "line": 404,
       "spawn": "Command::new",
       "binary": "sh",
       "class": "rust-test"
@@ -1927,7 +1927,7 @@
     },
     {
       "path": "packages/holder-lock/rust/src/route.rs",
-      "line": 514,
+      "line": 480,
       "spawn": "Command::new <- packages/process/rust/src/mapped.rs:146",
       "binary": "git",
       "class": "production-sandbox-probe",
@@ -2492,14 +2492,14 @@
     },
     {
       "path": "src/holder-lock/driver.mjs",
-      "line": 212,
-      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:136",
+      "line": 215,
+      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:139",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/holder-lock/driver.mjs",
-      "line": 249,
+      "line": 252,
       "spawn": "spawnSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
@@ -2514,7 +2514,7 @@
     {
       "path": "src/holder-lock/index.mjs",
       "line": 103,
-      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:136",
+      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:139",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
@@ -2528,7 +2528,7 @@
     {
       "path": "src/holder-lock/index.mjs",
       "line": 252,
-      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:136",
+      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:139",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
@@ -2542,49 +2542,49 @@
     {
       "path": "src/holder-lock/index.mjs",
       "line": 370,
-      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:136",
+      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:139",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/holder-lock/index.mjs",
       "line": 374,
-      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:136",
+      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:139",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/holder-lock/index.mjs",
       "line": 439,
-      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:136",
+      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:139",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/holder-lock/index.mjs",
       "line": 445,
-      "spawn": "runLockRoute -> src/holder-lock/driver.mjs:164",
+      "spawn": "runLockRoute -> src/holder-lock/driver.mjs:167",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/holder-lock/index.mjs",
       "line": 654,
-      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:136",
+      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:139",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/holder-lock/index.mjs",
       "line": 678,
-      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:136",
+      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:139",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/holder-lock/index.mjs",
       "line": 684,
-      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:136",
+      "spawn": "runLockRouteSync -> src/holder-lock/driver.mjs:139",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },

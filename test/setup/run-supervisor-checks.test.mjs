@@ -111,11 +111,13 @@ test('process-containment: kernel passes; best-effort warns on Linux and informs
   assert.equal(linux.passed, true, 'no user namespace warns, never fails');
   assert.match(linux.message, /^warning: linux-pgroup, level best-effort: bwrap with a user namespace is unavailable here/);
   assert.match(linux.message, /escapes: setsid descendants/);
+  assert.match(linux.message, /Install bwrap and enable unprivileged user namespaces/);
   assert.match(checkProcessContainment(root, { bin: bestEffort, platform: 'darwin' }).message, /^info: linux-pgroup, level best-effort/);
 
   const none = checkProcessContainment(root, { bin: fakeHost('h-none', probeLine({ driver: null, level: 'unsupported', escapes: [], error: 'unsupported-platform' })) });
   assert.equal(none.passed, false);
   assert.match(none.message, /no containment driver on this machine \(unsupported-platform\)/);
+  assert.match(none.message, /Rebuild the host from this checkout/);
 });
 
 // ─── runtime-socket-dir ─────────────────────────────────────────────────
