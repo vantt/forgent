@@ -7,6 +7,8 @@ description: "Lịch sử của board: mỗi dòng một sự kiện, mới nh�
 
 Ghi **dòng mới lên đầu**, ngay dưới đây: `- YYYY-MM-DD HH:MM (phiên, lệnh owner nếu có): nội dung — kèm điều kiện đảo lại nếu là quyết định`. Bảng hiện trạng ở [plan.md](plan.md).
 
+- 2026-10-22 00:25 (GIT/ES điều phối, máy thứ hai): **land release `sha256:9e4c2630…` (main 9670da5ff: T0 + sửa doctor 406a81f98 + ScopedCommit bền object)**, active 00:21:35, rollback về 613dfa84; doctor mọi row git-*/lock-* đạt, smoke gateway/fence/`fgos run` ghi committed ([báo cáo land](../reports/landing-261022-0011-git-durability-and-t0-this-machine.md)). **Máy owner (H15):** [hướng dẫn](../reports/guide-261022-0011-owner-machine-git-durability-and-t0.md) land bản này cùng T0, một lần dừng, bước 6 corpus canonical-JSON bắt buộc. Mở: smoke gemini `terminal:foreground-not-agent` (báo HARDEN).
+
 - 2026-10-22 00:21 (phiên `forgent-a8`, HARDEN): **Bản sửa rò store của T0 đã lên main `986680477`.** `stageLauncherDoor` chỉ ghi `manifest.json` khi byte khác; test `run-rust-dev-host-staging` khẳng định mtime không đổi ở lần stage thứ hai. Full npm test không còn dòng `run-tests: ERROR`. Đã báo TEST (`forgent-f8`). HARDEN giữ yên fgos run cho tới khi GIT báo xong doctor/smoke của release `9e4c2630`.
 
 - 2026-10-22 00:05 (GIT/ES điều phối): E3 sạch 2 vòng (TEST+HARDEN dừng, tải < 2,5 lúc bắt đầu): mọi hàng pass trừ push không object (193 / 146 ms, ngân sách 150) — chưa ngã ngũ; backlog 10k bản ghi pass, 10k thao tác × 3 bản ghi 303–345 ms (hỏi owner đơn vị) ([kiểm chứng](../reports/verification-261022-0005-git-e3-clean-rerun.md)). Mount E1 làm hỏng bwrap của phiên khác: sửa b36a8e6ad (namespace mount riêng); có thể là nguyên nhân `three_clones`.
