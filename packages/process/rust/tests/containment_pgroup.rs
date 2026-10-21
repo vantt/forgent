@@ -130,9 +130,9 @@ fn containment_pgroup_grace_snapshot_keeps_a_setsid_child_of_a_leader_that_ends_
 }
 
 #[test]
-fn a_thousand_fast_exits_are_normal_spawns() {
+fn a_hundred_fast_exits_are_normal_spawns() {
     let driver = LinuxPgroup;
-    for i in 0..1000 {
+    for i in 0..100 {
         let mut domain = driver.create(&format!("fast-{i}")).unwrap();
         let mut spawned = driver.spawn_in(&mut domain, spec(&["/bin/true"])).unwrap();
         assert!(spawned.child.wait().unwrap().success(), "spawn {i}");

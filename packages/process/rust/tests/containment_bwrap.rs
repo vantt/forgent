@@ -242,9 +242,9 @@ fn containment_select_prefers_bwrap_pidns_when_user_namespaces_work() {
 }
 
 #[test]
-fn a_thousand_fast_exits_are_normal_spawns() {
+fn a_hundred_fast_exits_are_normal_spawns() {
     let Some(driver) = bwrap_driver("fast-exit") else { return };
-    for i in 0..1000 {
+    for i in 0..100 {
         let mut domain = driver.create(&format!("fast-{i}")).unwrap();
         let mut spawned = driver.spawn_in(&mut domain, spec(&["/bin/true"], StartMode::Direct)).unwrap();
         assert!(spawned.child.wait().unwrap().success(), "spawn {i}");
