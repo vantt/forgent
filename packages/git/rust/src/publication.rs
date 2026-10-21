@@ -1906,16 +1906,24 @@ impl<F: FileSystem> PublicationPort<'_, F> {
                     },
                 )
                 .map_err(werr)?;
-            let old = expected(chain.intent().candidate(), repo.object_format())?;
-            let out = self.cas_raw(repo, &pin, &old, &ExpectedTip::Absent)?;
-            if !out.success && self.ref_tip(repo, &pin)? != ExpectedTip::Absent {
-                return Err(out.error("pin-release-failed"));
-            }
         }
-        // A resumed release never retries its irreversible deletion. Absence
-        // is a terminal observation, any other value preserves the evidence.
+        // The pin name is unique to this operation id, written once before
+        // Prepared, and nothing but this release touches it after the
+        // operation is terminal. So a pin still equal to the recorded
+        // candidate proves the earlier delete did not take effect (no ABA is
+        // possible), and the same exact-old delete is re-issued. Absence is
+        // the terminal observation; any other value preserves the evidence.
+        // A native lock blocks the delete, is never removed here, and a later
+        // call completes once it is gone.
         if matches!(chain.last_state(), Phase::PinReleaseAttempt { .. }) {
-            if self.absent_tip(repo, &pin)? != ExpectedTip::Absent {
+            let candidate = expected(chain.intent().candidate(), repo.object_format())?;
+            let now = self.absent_tip(repo, &pin)?;
+            if now == candidate {
+                let out = self.cas_raw(repo, &pin, &candidate, &ExpectedTip::Absent)?;
+                if !out.success && self.ref_tip(repo, &pin)? != ExpectedTip::Absent {
+                    return Err(out.error("pin-release-failed"));
+                }
+            } else if now != ExpectedTip::Absent {
                 return Err(werr(WalError::RecoveryRequired));
             }
             chain = self.append_after_ref_durable(repo, &wal, &chain, Phase::PinReleased, &pin)?;

@@ -772,6 +772,70 @@ fn recovery_reconciles_only_the_recorded_pin_and_preserves_native_locks() {
     }
 }
 #[test]
+fn an_interrupted_pin_release_is_resumed_only_while_the_pin_still_equals_its_candidate() {
+    for backend in ["files", "reftable"] {
+        let t = Temp::new();
+        let root = t.0.join("repo");
+        init(&root, "sha1", backend);
+        let driver = GitDriver::new(&t.0).unwrap();
+        let repo = resolve(&driver, &root);
+        let mut h = handle(&t.0.join("seal.lock"));
+        let port = PublicationPort::new(&driver, authority(&repo, &mut h));
+        let a = commit(&port, &repo, vec![], "a");
+        let b = commit(&port, &repo, vec![a.clone()], "b");
+        for (id, from, to) in [("stuck", ExpectedTip::Absent, &a), ("moved", ExpectedTip::Oid(a.clone()), &b)] {
+            port.compare_and_swap(&repo, &reference(), &from, &ExpectedTip::Oid(to.clone()), id)
+                .unwrap();
+        }
+        let native = root.join(if backend == "files" {
+            "packed-refs.lock"
+        } else {
+            "reftable/tables.list.lock"
+        });
+        let pin = |id: &str| format!("refs/fgos/git-operations/{id}/candidate");
+        let wal = wal::Wal::open(&repo).unwrap();
+
+        // Delete blocked by a native lock: the chain stays at the release
+        // attempt, the lock bytes are preserved, the pin is still held.
+        fs::write(&native, b"unknown owner evidence").unwrap();
+        assert!(port.release_pin_and_compact(&repo, "stuck").is_err());
+        assert_eq!(fs::read(&native).unwrap(), b"unknown owner evidence");
+        assert!(matches!(
+            wal.inspect("stuck").unwrap().last().phase,
+            Phase::PinReleaseAttempt { .. }
+        ));
+        assert_eq!(
+            String::from_utf8(git(&root, &["rev-parse", &pin("stuck")])).unwrap().trim(),
+            a.as_str()
+        );
+        // Still blocked on a later call; nothing is removed on its behalf.
+        assert!(port.release_pin_and_compact(&repo, "stuck").is_err());
+        assert_eq!(fs::read(&native).unwrap(), b"unknown owner evidence");
+
+        // Once the lock is gone the same release completes and compacts.
+        fs::remove_file(&native).unwrap();
+        port.release_pin_and_compact(&repo, "stuck").unwrap();
+        assert!(wal.inspect("stuck").is_err());
+        assert!(wal.compacted("stuck").unwrap().is_some());
+        assert!(git(&root, &["for-each-ref", &pin("stuck")]).is_empty());
+
+        // A pin holding any other value is evidence, not a delete target.
+        fs::write(&native, b"unknown owner evidence").unwrap();
+        assert!(port.release_pin_and_compact(&repo, "moved").is_err());
+        fs::remove_file(&native).unwrap();
+        git(&root, &["update-ref", "--no-deref", &pin("moved"), a.as_str(), b.as_str()]);
+        assert!(port.release_pin_and_compact(&repo, "moved").is_err());
+        assert!(matches!(
+            wal.inspect("moved").unwrap().last().phase,
+            Phase::PinReleaseAttempt { .. }
+        ));
+        assert_eq!(
+            String::from_utf8(git(&root, &["rev-parse", &pin("moved")])).unwrap().trim(),
+            a.as_str()
+        );
+    }
+}
+#[test]
 fn shallow_crossing_is_an_error_but_a_stop_boundary_is_complete_and_facts_are_read_only() {
     let t = Temp::new();
     let root = t.0.join("repo");

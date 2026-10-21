@@ -42,9 +42,9 @@ Mỗi tiền đề phải được chủ của nó chấp nhận. Chủ từ ch�
 
 ## Chỉ nằm trên máy `d50dc90b`, không có trong git
 
-- Bộ chạy đo (`.fgos/runtime/tmp/mailbox-probe*`, khoảng 235 MB): lệnh và dữ liệu thô của mọi phép đo trong các báo cáo. Kết quả đã nằm trong báo cáo; chỉ cần bộ chạy khi muốn đo lại. `mailbox-probe9` (nhỏ, 468 KB) là bộ chạy trusted-sender: `job.sh`, `job2.sh`, `instr-TRUST.txt`, các `prompt-*.txt`.
+- Bộ chạy đo còn lại: `.fgos/runtime/tmp/mailbox-probe7` (đo tiêm lệnh), `mailbox-probe8` (vòng lặp), `mailbox-probe9` (trusted-sender), tổng khoảng 4,5 MB, gồm lệnh chạy, chỉ dẫn, thân tin và kết quả thô. Kết quả đã nằm trong báo cáo; chỉ cần bộ chạy khi muốn đo lại. Sáu thư mục probe còn lại (khoảng 229 MB, gồm bản sao thư mục nhà Codex) đã xoá ngày 2026-10-21, không còn gì cần chuyển từ đó.
 - Đầu ra thô của hội đồng: `.fgos/assignments/unit-run-1792504271864-ec79d45e` (tổng hợp) và `...-11102d7d` (giải thích). Bản giải thích đã chép vào repo ở mục 2 phía trên.
-- Fixture hook thật cho V3: chỉ có ba payload `Stop` mỗi CLI (Claude, Codex, agy) ở `.fgos/runtime/tmp/mailbox-probe/{claude,codex,agy}/hook.log`, chưa có `PostToolUse`, và chứa id phiên đầy đủ. **Nên ghi lại trên máy nhận** bằng đúng phiên bản CLI đã kiểm (Claude Code 2.1.303 hoặc 2.1.304, Codex 0.162.1, agy 1.4.2), xoá id phiên đầy đủ và đường dẫn nhà trước khi đưa vào test.
+- Fixture hook cho V3: **không còn gì để chuyển.** Bộ cũ chỉ có ba payload `Stop` mỗi CLI và đã bị xoá cùng các probe; V3 ghi lại từ đầu trên máy nhận bằng đúng phiên bản CLI đã kiểm (Claude Code 2.1.303 hoặc 2.1.304, Codex 0.162.1, agy 1.4.2), gồm cả `PostToolUse`, rồi xoá id phiên đầy đủ và đường dẫn nhà trước khi đưa vào test.
 
 ## Ràng buộc đã nêu từ chủ dự án
 
@@ -61,5 +61,5 @@ Mỗi tiền đề phải được chủ của nó chấp nhận. Chủ từ ch�
 1. `codex queue` khi Codex đang bận: chưa đo (S0).
 2. Q16 ở mục 16 của spec: hình dạng của khoá tin cậy `inbound.<class>` chưa quyết.
 3. Bố cục git lạ (submodule, bare repo kèm worktree) chưa kiểm cho hàm tìm `.fgos` main checkout.
-4. Dọn tồn dư từ các phép đo trên máy `d50dc90b`: transcript CLI, hội thoại agy, file phiên pi và omp, và pane herdr `w6:p4S` còn hiện id phiên thăm dò. Chủ dự án chưa yêu cầu dọn.
+4. Tồn dư nhỏ từ các phép đo trên máy `d50dc90b`, nằm ngoài repo trong thư mục nhà của từng CLI: transcript, hội thoại agy, file phiên pi và omp, và pane herdr `w6:p4S` còn hiện id phiên thăm dò. Các thư mục probe lớn đã xoá (2026-10-21); phần này chưa dọn vì chủ dự án chưa yêu cầu.
 5. Lỗi thiết kế workflow `architecture-advisory` (chỉ dẫn "xuất JSON thô" lẫn sang reviewer và red-team qua `{objective}`) đã báo lane Seat Binding, chưa sửa.
