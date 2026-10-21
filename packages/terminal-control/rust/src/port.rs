@@ -142,6 +142,15 @@ pub enum LaunchOutcome {
     NotStarted { reason: String },
 }
 
+/// What `send` did with the input.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SendOutcome {
+    Sent,
+    /// Nothing was typed: the pane's foreground is its shell, or no program
+    /// could be identified there. A shell would run the text as commands.
+    ForegroundNotAgent { reason: String },
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Disposition {

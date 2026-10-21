@@ -125,6 +125,23 @@ impl Pane {
     pub fn running(&mut self) -> bool {
         self.child.try_wait().unwrap().is_none()
     }
+
+    /// Type at the pane, as the multiplexer does with keys a person or a supervisor sends.
+    pub fn type_text(&self, text: &str) {
+        (&self.master).write_all(text.as_bytes()).unwrap();
+    }
+
+    /// Another descriptor of the pane's tty, as the pane's shell keeps one while the sandbox runs.
+    pub fn open_tty(&self) -> File {
+        use std::os::fd::AsRawFd;
+        use std::os::unix::fs::OpenOptionsExt;
+        let mut name = [0 as libc::c_char; 128];
+        // SAFETY: ptsname_r writes a NUL-terminated name into the buffer of the given length.
+        assert_eq!(unsafe { libc::ptsname_r(self.master.as_raw_fd(), name.as_mut_ptr(), name.len()) }, 0, "ptsname_r");
+        // SAFETY: the buffer now holds a NUL-terminated path.
+        let path = unsafe { std::ffi::CStr::from_ptr(name.as_ptr()) }.to_string_lossy().into_owned();
+        OpenOptions::new().read(true).write(true).custom_flags(libc::O_NOCTTY).open(path).unwrap()
+    }
 }
 
 impl Drop for Pane {

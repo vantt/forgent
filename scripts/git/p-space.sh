@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # P-SPACE (Git spec §15, §10 C4) on a private small filesystem: the part that needs root to mount.
 #
-#   sudo scripts/git/p-space.sh --work /var/tmp/fgos-p-space [--user $SUDO_USER] [--size-mib 24]
+#   sudo env "PATH=$PATH" scripts/git/p-space.sh --work /var/tmp/fgos-p-space [--user $SUDO_USER] [--size-mib 24]
 #
 # Three loop-backed ext4 filesystems, each mounted only for this run and owned by --user:
 #   bytes   ENOSPC sweep: scripts/git/p-space-resource.mjs space leaves k bytes free per run
@@ -23,30 +23,32 @@ die() { echo "p-space: $*" >&2; exit 1; }
 [ -n "$WORK" ] || die "--work <dir> is required"
 [ -n "$RUN_AS" ] && [ "$RUN_AS" != root ] || die "--user <the checkout's owner> is required"
 CHECKOUT="$(cd "$(dirname "$0")/../.." && pwd)"
-NODE="$(command -v node)"
+NODE="$(command -v node)" || { echo 'p-space: node is not on PATH; run it as sudo env "PATH=$PATH" scripts/git/p-space.sh ...' >&2; exit 1; }
 mkdir -p "$WORK/out"; WORK="$(cd "$WORK" && pwd)"; chown "$RUN_AS" "$WORK/out"
 LOOPS=() MOUNTS=() FLAKEY=fgos-p-space-flakey
 cleanup() {
   set +e
   for m in "${MOUNTS[@]}"; do mountpoint -q "$m" && umount "$m"; done
-  dmsetup remove "$FLAKEY" 2>/dev/null
+  udevadm settle 2>/dev/null; dmsetup remove --retry "$FLAKEY" 2>/dev/null
   for l in "${LOOPS[@]}"; do losetup -d "$l"; done
 }
 trap cleanup EXIT
-as_user() { runuser -u "$RUN_AS" -- env -C "$CHECKOUT" "$@"; }
-fresh_fs() { # name, mkfs options...; prints the mount point
+# sudo leaves HOME at root's; the owner's Git state, cargo and node need the owner's own.
+RUN_HOME="$(getent passwd "$RUN_AS" | cut -d: -f6)"
+as_user() { runuser -u "$RUN_AS" -- env -C "$CHECKOUT" HOME="$RUN_HOME" "$@"; }
+fresh_fs() { # name, mkfs options...; sets FS_DIR (no command substitution, so cleanup sees the loop and mount)
   local name="$1"; shift
   truncate -s "${SIZE_MIB}M" "$WORK/$name.img"
   local loop; loop="$(losetup --show -f "$WORK/$name.img")"; LOOPS+=("$loop")
   mkfs.ext4 -q -F "$@" "$loop" >/dev/null
   mkdir -p "$WORK/$name"; mount "$loop" "$WORK/$name"; MOUNTS+=("$WORK/$name")
-  chown "$RUN_AS" "$WORK/$name"; echo "$WORK/$name"
+  chown "$RUN_AS" "$WORK/$name"; FS_DIR="$WORK/$name"
 }
 
 status=0
-bytes="$(fresh_fs bytes)"
+fresh_fs bytes; bytes="$FS_DIR"
 as_user "$NODE" scripts/git/p-space-resource.mjs space --root "$bytes" --step 4096 --out "$WORK/out/p-space-bytes.json" || status=1
-inodes="$(fresh_fs inodes -N 256)"
+fresh_fs inodes -N 256; inodes="$FS_DIR"
 as_user "$NODE" scripts/git/p-space-resource.mjs space --inodes --root "$inodes" --step 1 --out "$WORK/out/p-space-inodes.json" || status=1
 
 # EIO: alternate working and failing writes under a steady workload, then judge the image.

@@ -198,7 +198,11 @@ fn dispatch(op: &str, core: &Core, request: &Value) -> Result<Answer, String> {
             if text.is_some() == keys.is_some() {
                 return Err("send takes exactly one of request.text or request.keys".into());
             }
-            answer(core.send(&key, text.as_deref(), keys.as_deref(), submit.unwrap_or(false)), ok_answer)
+            match core.send(&key, text.as_deref(), keys.as_deref(), submit.unwrap_or(false)) {
+                Ok(SendOutcome::Sent) => ok_answer(()),
+                Ok(SendOutcome::ForegroundNotAgent { reason }) => ("foreground-not-agent".into(), json!({ "reason": reason })),
+                Err(refusal) => refusal_fields(&refusal),
+            }
         }
         "read" => {
             let key: String = field(request, "key")?;

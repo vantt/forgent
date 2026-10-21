@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - A persona file that names a model `tier` or `prefer` is now refused with `persona-model-taste-not-allowed` (model taste belongs to the seat, at `capabilities.<cap>.personas.<name>`), a packaged workflow (`<name>/wf.<name>.yaml`) can keep its own personas beside it (`agent.<name>.yaml`), and a domain persona is visible only to workflows of that domain.
 
+- A brief is never typed into a herdr pane's shell any more: terminal-control refuses a `send` (prompt door included) unless a program other than the pane's shell holds the foreground, and the run ends as a failed attempt with reason `terminal:foreground-not-agent`; the gate also drops tty input its agent never read before the pane's shell gets the tty back, so a brief typed at an agent that never started can no longer run as shell commands (backtick spans included).
+- Event Store seals and every Git publication now survive a power cut: trees are written through the same fsynced object write as blobs and commits (git `mktree` never fsynced them), and a pin release interrupted by a crash resumes on the next release instead of staying `recovery-required`. Proven on ext4 by the Git E1 power-cut replay (1029 points, 0 violations) and the Event Store power-loss run (20/20).
 - Git (branch `git/p07-switch` fixes from the host gate):
   - A commit hook may print up to 64 MiB again (Git sends hook output to stderr); a borrowed Git run no longer fails at 64 KiB.
   - A hook or filter child that drops the lock descriptor and leaves its process group now turns a commit, Sync or Land into `containment-unproven` (`recovery-required`) on every machine, also where bwrap can make a PID namespace; before, only machines without it were watched.
@@ -1488,7 +1490,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- The `cli-spawn` dispatch adapter (`src/runner/dispatch/transport.mjs`)
   now spawns every executor with `stdin: 'ignore'` instead of the
   default open pipe. `codex` (unlike `agy`) checks for piped stdin on
   startup ("Reading additional input from stdin...") and blocks

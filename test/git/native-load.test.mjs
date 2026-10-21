@@ -169,6 +169,11 @@ test('inspection leaves WAL absent; setup and mapping use the shared Rust config
     fs.writeFileSync(path.join(repo, 'config.lock'), 'native owner');
     assert.deepEqual(addon.inspectGit(temp, repo, repo).nativeLocks, ['config.lock']);
     assert.equal(fs.readFileSync(path.join(repo, 'config.lock'), 'utf8'), 'native owner');
+    const pinDir = path.join(repo, 'refs', 'fgos', 'git-operations', 'op-1');
+    fs.mkdirSync(pinDir, { recursive: true });
+    fs.writeFileSync(path.join(pinDir, 'candidate.lock'), '');
+    assert.deepEqual(addon.inspectGit(temp, repo, repo).nativeLocks, ['config.lock', 'refs/fgos/git-operations/op-1/candidate.lock']);
+    assert.ok(fs.existsSync(path.join(pinDir, 'candidate.lock')));
   } finally { port?.close(); fs.rmSync(temp, { recursive: true, force: true }); }
 });
 

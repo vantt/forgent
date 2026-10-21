@@ -50,6 +50,9 @@ function prepare(root) {
   fs.mkdirSync(fence, { recursive: true });
   fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({ at: 'e1 fixture', v: 1, lock: 'activation', by: 'fgos git' }) + '\n');
   fs.mkdirSync(state, { recursive: true, mode: 0o700 });
+  // The fixture predates every judged operation: `git init` does not fsync HEAD or config, and
+  // ext4 delays their data, so make the whole filesystem durable before the first write we judge.
+  execFileSync('sync', ['--file-system', root]);
   return { repo: fs.realpathSync(repo), state: fs.realpathSync(state), git };
 }
 function appendDurably(file, line) {
@@ -65,7 +68,8 @@ async function workload(args) {
   const { repo, state, git } = prepare(path.resolve(args.root));
   const { index, loader } = await loaders(args.descriptor);
   const tips = new Map(REFS.map((ref) => [ref, null]));
-  const lines = args.handshake ? readline.createInterface({ input: process.stdin })[Symbol.asyncIterator]() : null;
+  const input = args.handshake ? readline.createInterface({ input: process.stdin }) : null;
+  const lines = input ? input[Symbol.asyncIterator]() : null;
   for (let i = 0; i < ops; i++) {
     const ref = REFS[i % REFS.length];
     // One port at a time: a Publication port holds the repository's publication borrow.
@@ -82,9 +86,16 @@ async function workload(args) {
     port.close();
     tips.set(ref, next);
     // Halfway through, move every ref into packed-refs so later CASes start from a packed ref.
-    if (i === Math.floor(ops / 2)) git(['--git-dir', repo, 'pack-refs', '--all']);
+    if (i === Math.floor(ops / 2)) {
+      git(['--git-dir', repo, 'pack-refs', '--all']);
+      // Packing is fixture preparation, not a judged operation: Git writes packed-refs without
+      // a directory fsync, so make it durable before the next judged write.
+      execFileSync('sync', ['--file-system', repo]);
+    }
     if (lines) { process.stdout.write(`ack ${i}\n`); await lines.next(); }
   }
+  // The open stdin reader would keep the process alive, and the root driver waits for its exit.
+  input?.close();
 }
 
 /** Post-cut invariants on a replayed image, given the acknowledgements that reached the log
@@ -97,12 +108,41 @@ async function check(args) {
   const violations = [];
   const git = sandboxGit(root);
   const run = (argv) => { try { return { ok: true, out: git(argv, { stdio: ['ignore', 'pipe', 'pipe'] }) }; } catch (e) { return { ok: false, out: `${e.stdout ?? ''}${e.stderr ?? ''}` }; } };
-  if (!fs.existsSync(repo)) {
-    if (acked > 0) violations.push('repository missing after acknowledged operations');
+  // Before the first acknowledgement the repository may be absent or half-initialised (its
+  // creation is not an acknowledged operation); after it, it must be a readable repository.
+  const opened = fs.existsSync(repo) ? run(['--git-dir', repo, 'rev-parse', '--git-dir']) : { ok: false, out: 'absent' };
+  if (!opened.ok) {
+    if (acked > 0) violations.push(`repository missing or unreadable after acknowledged operations: ${String(opened.out).trim().slice(0, 300)}`);
     return finish({ acked, violations });
   }
+  // A pin delete interrupted by the cut leaves the chain at pin-release-attempt. The next release
+  // re-issues the same exact-old delete, so such a chain is resumable while its pin still holds
+  // the recorded candidate (or is already gone); any other pin value is evidence and a violation.
+  const releaseChains = new Map();
+  const opsDir = path.join(repo, 'fgos', 'git', 'operations');
+  for (const id of fs.existsSync(opsDir) ? fs.readdirSync(opsDir) : []) {
+    const last = fs.readdirSync(path.join(opsDir, id)).filter((f) => /^\d+\.json$/.test(f)).sort().at(-1);
+    let record;
+    try { record = last && JSON.parse(fs.readFileSync(path.join(opsDir, id, last), 'utf8')); } catch { continue; }
+    if (record?.phase?.phase !== 'pin-release-attempt') continue;
+    const pin = `refs/fgos/git-operations/${id}/candidate`;
+    const shown = run(['--git-dir', repo, 'rev-parse', '--verify', '-q', pin]);
+    const held = shown.ok ? String(shown.out).trim() : null;
+    const candidate = record.phase.data?.expected?.oid;
+    if (held !== null && held !== candidate) violations.push(`${id}: pin release not resumable, ${pin} holds ${held}, recorded ${candidate}`);
+    else releaseChains.set(pin, id);
+  }
+  // Git leaves a zero-byte `<pin>.lock` when the cut lands inside that delete: legal crash residue
+  // that the resumed release clears, so only badRefContent on such a lock is excused.
   const fsck = run(['--git-dir', repo, 'fsck', '--full', '--no-dangling']);
-  if (!fsck.ok) violations.push(`git fsck: ${String(fsck.out).trim().slice(0, 400)}`);
+  if (!fsck.ok) {
+    const residue = (line) => {
+      const m = /^error: (refs\/fgos\/git-operations\/[^/]+\/candidate)\.lock: badRefContent\b/.exec(line);
+      return Boolean(m && releaseChains.has(m[1]));
+    };
+    const rest = String(fsck.out).split('\n').filter((l) => l.trim() && !residue(l));
+    if (rest.length) violations.push(`git fsck: ${rest.join('\n').trim().slice(0, 400)}`);
+  }
   for (const ref of REFS) {
     const ops = plan.filter((p) => p.kind === 'intent' && p.ref === ref);
     const lastAck = plan.filter((p) => p.kind === 'ack' && p.ref === ref && p.i < acked).at(-1);
@@ -118,9 +158,16 @@ async function check(args) {
   // Every acknowledged operation's WAL chain must still be readable and terminal; an
   // unacknowledged one may be pending or absent, never corrupt.
   const { index, loader } = await loaders(args.descriptor);
-  const recovery = index.createGitRecovery({ stateRoot: state, repoPath: repo, trustedMain: repo, writer: WRITER }, loader);
+  let recovery;
+  try { recovery = index.createGitRecovery({ stateRoot: state, repoPath: repo, trustedMain: repo, writer: WRITER }, loader); } catch (e) {
+    violations.push(`WAL open: ${e.message.slice(0, 400)}`);
+    return finish({ acked, violations });
+  }
   let pending;
-  try { pending = recovery.listPending({}); } catch (e) { violations.push(`WAL scan: ${e.message.slice(0, 400)}`); }
+  try { pending = recovery.listPending({}); } catch (e) {
+    // Before the first acknowledgement the WAL directory may not exist yet; after it, it must scan.
+    if (acked > 0 || !e.message.includes('NotFound')) violations.push(`WAL scan: ${e.message.slice(0, 400)}`);
+  }
   for (const p of plan.filter((q) => q.kind === 'ack' && q.i < acked)) {
     try {
       const seen = recovery.inspectOperation({ operationId: p.id });
