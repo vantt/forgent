@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { fixture } from './land-fixture.mjs';
 import { createGitRecovery, createGitSafeRestore } from '../../src/git/index.mjs';
-import { fixLandRecovery } from '../../src/setup/git-checks.mjs';
+import { fixLandRecovery, checkLandRetainedCandidates } from '../../src/setup/git-checks.mjs';
 
 test('Recovery lists and inspects an interrupted Land and delegates to its existing recovery', () => {
   const f = fixture();
@@ -38,6 +38,21 @@ test('doctor --fix recovers an interrupted Land through the Recovery door and th
     assert.match(fixed.message,/recovered interrupted Land operations: interrupted-fix/);
     assert.equal(createGitRecovery(f.options,f.loader).inspectOperation({operationId:'interrupted-fix'}).terminal,true);
     assert.deepEqual(fixLandRecovery(f.repo,f.loader,f.options),{changed:false,message:'no interrupted Land operation'});
+  } finally { f.close(); }
+});
+test('doctor warns, never fails, about a finished Land whose candidate is still retained', () => {
+  const f = fixture();
+  try {
+    assert.deepEqual(checkLandRetainedCandidates(f.repo,f.loader,f.options),{passed:true,message:'no retained Land candidate'});
+    const land = f.port();
+    land.prepare({operationId:'retained-land',request:f.request});
+    land.close();
+    fixLandRecovery(f.repo,f.loader,f.options);
+    const row = checkLandRetainedCandidates(f.repo,f.loader,f.options);
+    assert.equal(row.passed,true);
+    assert.match(row.message,/^warning: retained Land candidates: retained-land \(/);
+    assert.match(row.message,/pins refs\/fgos\/git-operations\/retained-land\/candidate, refs\/fgos\/git-operations\/retained-land\/source\/candidate, refs\/fgos\/git-operations\/retained-land\/target\/candidate/);
+    assert.match(row.message,/No manual release command exists today/);
   } finally { f.close(); }
 });
 test('Recovery terminal Restore replay delegates without changing its outcome', () => {

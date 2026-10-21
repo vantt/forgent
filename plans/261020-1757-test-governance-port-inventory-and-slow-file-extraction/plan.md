@@ -1,7 +1,7 @@
 ---
 title: "Test governance phases 2-3: Node-vs-Rust port inventory and use-case extraction for the slowest files"
 description: "Retire Node copies of Rust-owned cases in the five ported areas (one route proof per port stays), then move business cases of the slowest CLI-spawn files into direct use-case tests with one CLI parity test per verb."
-status: pending
+status: in-progress
 priority: P2
 effort: 5-8 agent-days
 branch: chore/test-governance-p2-p3
@@ -17,7 +17,27 @@ created: 2026-10-20
 
 ## Hard constraint: Git 07 files
 
+**Lifted 2026-10-21:** Git 07–08 landed on both machines; the list below is history.
+
 Until branch `git/p07-switch` and its sub-branches land, do not edit or delete: `test/setup/*`, `test/githooks/*`, `test/holder-lock/*`, `test/workflow/*`, `test/git/*`, `test/runner/merge*`, `test/runner/worktree*`, `test/runner/session*`, `test/runner/loop*`, `test/runner/claim*`, `test/runner/execution/*`, `test/direct/merge-gate*`, `test/scripts/*`, `test/cli/fgos-merge*`, `test/state/events-*`, `test/state/drift-status*`. Work on those areas is a separate batch after the landing, re-based on the post-landing tree. First item of that batch: the 59 `test/setup` clones listed in the phase 0-1 report.
+
+## Received items and owner decisions (2026-10-21)
+
+Every item this lane took on is listed here until it closes; a row closes only with its commit. Owner `forgent-f8` since 10-21 15:40 ([handoff](../reports/handoff-261021-1519-test-lane-governance.md)). Rows H1–H5 are the HARDEN hand-off ledger in `plans/261021-1118-harden-low-layers-bottom-up/plan.md`; HARDEN closes each only on TEST's confirmation.
+
+| ID | Item | Source | Decision | State / trigger |
+|---|---|---|---|---|
+| RS5 | Apply the 5 decided run-supervisor retirements | [phase 2 report](../reports/phase-lead-261021-1129-test-governance-p2-ported-areas.md) §4 | decided by the phase lead | **done** main `4bb8058dc`: npm test 8774/0 fail, cargo 1219/0, coverage map 0 sources lost |
+| D1 | Six behaviours no test notices (report §6) | phase 2 report §6 | owner 10-21 15:49, option (a): add owning proofs for ES-R4 (`sync --no-push` pushes) and ES-R5 (`porting/` root) in the event-store crate, RS-N4 (`attempt-still-running` code) and RS-N6 (held controller keeps the unit `running`) in the Node run-supervisor tests; delete the duplicate JS rank check (ES-N1, native is the one authority); keep the retained-view cache (ES-N5) only if a measurement shows it saves work, else delete it | **done** on main with this batch ([report](../reports/phase-lead-261021-1759-test-governance-guards-claude-and-help-routes.md) §3): ES-R4, ES-R5, RS-N6 owned; ES-N1 deleted; RS-N4 no reader of the code; ES-N5 kept (137 vs 274 ms) |
+| D2 | Reading of "contract-prose" | phase 2 report §9 | owner 10-21 15:49, option (a): narrow. A contract lint stays while it is the only thing that catches the contract file contradicting itself; prose retires only when every behaviour it describes has an owner | applies to git and holder-lock in phase 2 |
+| H1 | "Test cost of the change" line in every lead brief and phase file: tests added and retired (`suite:` line), new CLI/host spawns, one CLI call's cost before/after (`fgos --help`, `fgos list`); a new CLI-spawning test says why a lower layer cannot prove it | [HARDEN test investigation](../reports/research-261021-1210-harden-test-suite-investigation.md) §8 | owner 10-21 15:49: adopt | **done** ([report](../reports/phase-lead-261021-1759-test-governance-guards-claude-and-help-routes.md) §5): `suite:` change line, admission warning for an unexplained CLI spawn, `--cli-cost`, and the `fgos-run` §4 review checklist asks for them (owner 18:13) |
+| H2 | Run test files longest-first from the last junit | HARDEN investigation §3, §8 | owner 10-21 15:49: adopt; **replaced 10-21 17:3x, option (c)**: `node --test` sorts files by name itself (checked on Node 24), so ordering needs a `run()`-based driver replacing the suite's core door (~150–250 lines), outside the approved cost | **Parked with a trigger:** after phase 3 makes the slow files cheaper, re-measure the suite tail; if one file still holds the tail alone, ask the owner again with option (a) |
+| H3 | Debug vs release staging of the test host and addon | HARDEN investigation §3, §8 | owner 10-21 15:49: **not now** | **Parked with a trigger:** when HARDEN ledger H13 lands (T9/Packaging: each CLI call verifies the release once, so the suite stops hashing the debug addon in every process; owner 10-21 17:43 OQ-3 (c) kept this out of T0), re-measure one CLI call in the suite (`fgos --help`, `fgos list`, debug vs release); if release still saves more than about 20% of CLI-file time, bring the option back to the owner as a decision question. Also listed in the board TEST row "waits" column |
+| H4 | `test/rust-host/fgctl-*` call the real `claude` CLI and the network (no `FGOS_CLAUDE_COMMAND`) | HARDEN investigation §4, §7 | in frame (regression of the 08-27 `NO_CLAUDE_ENV` fix); TEST decides | **done** ([report](../reports/phase-lead-261021-1759-test-governance-guards-claude-and-help-routes.md) §4): `buildTestEnv` keeps every suite process off the real claude CLI; a logging shim saw 0 calls in a full run (11 before); the per-file string lint retired |
+| H5 | `test/rust-host/help-routes.test.mjs` 119 s: cases spawn `FGOS_HOST_BIN` directly as `internal-routes.test.mjs` does; one case keeps the dev door | [T0 arbitration](../reports/council-261021-1507-harden-t0-arbitration.md) §3 | in frame (phase 3 slow file) | **done** ([report](../reports/phase-lead-261021-1759-test-governance-guards-claude-and-help-routes.md) §5): 95 s → 14 s alone, same five tests |
+| — | 1 000-iteration loops in `packages/process/rust/tests/containment_*.rs` | T0 arbitration §5 | stays with HARDEN T0 (its crate's tests) | not TEST's; listed so it is not lost |
+
+Order: RS5 → D1 → H4 → H5 → H2 → H1 → phase 2 git and holder-lock → phase 3 → the 59 `test/setup` clones. H3 waits for its trigger.
 
 ## Rules for every batch
 

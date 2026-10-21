@@ -13,6 +13,7 @@ import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs
 import { inspectDispatchUseCase } from '../../src/verbs/dispatch/inspect.mjs';
 import { showRunUseCase } from '../../src/verbs/dispatch/show-run.mjs';
 import { recoverApplyUseCase, recoverObserveUseCase } from '../../src/verbs/dispatch/recover.mjs';
+import { acquireUnitControl } from '../../src/runner/execution/unit-control.mjs';
 
 const HOST = process.env.FGOS_HOST_BIN;
 const skip = HOST && fs.existsSync(HOST) ? false : 'FGOS_HOST_BIN does not name a host built from this checkout';
@@ -104,9 +105,9 @@ test('a recommendation goes stale when the run changes between observe and apply
   assert.equal(fs.existsSync(path.join(p.dir, 'closed.json')), false);
 });
 
-test('inspect and show-run: a unit with a closed attempt, no summary and no controller awaits resume and names the command', { skip }, () => {
+test('inspect and show-run: a unit with a closed attempt, no summary and no controller awaits resume and names the command; a live controller keeps it running', { skip }, () => {
   const p = project();
-  unitOf(p);
+  const unitDir = unitOf(p);
   const rec = recoverObserveUseCase(p.ctx, { runId: 'run-1' });
   recoverApplyUseCase(p.ctx, {
     runId: 'run-1', action: rec.action, expectedSnapshot: rec.snapshotHash, expectedControlEpoch: rec.expectedControlEpoch,
@@ -117,6 +118,14 @@ test('inspect and show-run: a unit with a closed attempt, no summary and no cont
     assert.equal(view.unitState, 'awaiting-resume');
     assert.equal(view.resumeCommand, 'fgos run --resume unit-run-1');
   }
+  const control = acquireUnitControl(unitDir, 'unit-run-1');
+  assert.equal(control.status, 'acquired');
+  try {
+    assert.equal(showRunUseCase(p.ctx, { runId: 'run-1' }).unitState, 'running');
+  } finally {
+    control.release();
+  }
+  assert.equal(showRunUseCase(p.ctx, { runId: 'run-1' }).unitState, 'awaiting-resume');
 });
 
 test('a unit whose attempt is not closed stays running, and one with a summary reads its verdict', { skip }, () => {

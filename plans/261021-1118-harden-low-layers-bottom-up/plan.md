@@ -179,6 +179,33 @@ Per layer:
 3. **The state store's hot mutex stays in Node until WORK lands** (it belongs to the Work layer, T7, out of scope).
 4. **Council per component** (new): each layer council settles a target shape per component (Part A) before reviewing (Part B); large components get their own council (see the per-layer loop, step 2).
 
+2026-10-21 15:46, owner, T0 ask 1 ([arbitration](../reports/council-261021-1507-harden-t0-arbitration.md) §6): "1a 2b 3a, đồng ý theo khuyến nghị".
+5. **T0 target shapes approved as written** (arbitration §2): they go into each component's spec in the T0 sub-plan.
+6. **Proposed additions:** only doctor per-row timing in `--json`, in phase 07 (T9). No `durable-file::replace_atomic`, no per-machine bwrap probe cache.
+7. **T0 landing:** when T0 closes, the second machine self-lands in a quiet window (GIT/ES told first); the owner machine follows a guide at a time the owner picks on receipt.
+8. **Hand-offs must be recorded by the receiving lane in its own plan** (owner: "dặn các luồng nhận gì thì nhớ ghi và cập nhật plan của nó, không được xót"). The ledger below tracks each one until the receiver confirms.
+
+## Hand-off ledger (items HARDEN gave to other lanes)
+
+A row closes only when the receiving lane has written the item into its own plan and said where. HARDEN re-checks open rows at every layer close.
+
+| # | Item | Source | Receiver | Where the receiver records it | Status |
+|---|---|---|---|---|---|
+| H1 | Test-cost line in every lead brief / phase file (tests added/retired, new CLI/host spawns, CLI-call cost before/after) | [test investigation](../reports/research-261021-1210-harden-test-suite-investigation.md) §8 | TEST (`forgent-f8`) + rule-management lane | TEST plan `plans/261020-1757-test-governance-port-inventory-and-slow-file-extraction/plan.md`; rule-management handoff `handoff-261021-1021-…` | **closed (TEST part)** 18:42: on main `4ebf60748` (suite: change line, admission warning for a new CLI/host/fgctl spawn without a `// boundary:` reason, `--cli-cost`, fgos-run §4 checklist); [report](../reports/phase-lead-261021-1759-test-governance-guards-claude-and-help-routes.md). Rule text: **closed** 18:50: owner 18:13 told TEST to do it ("em làm đi"); landed as an extension of the review checklist in `core/skills/fgos-run/SKILL.md` §4 (`4b9518c44`), which AGENTS.md L5 q5 points to; kept out of AGENTS.md by L8 (review procedure, not doctrine) |
+| H2 | Run test files longest-first (488 s → ~330 s estimated) | investigation §3, §8 | TEST | TEST plan | **recorded 16:00 in TEST plan "Received items and owner decisions (2026-10-21)" (`7ed88b85f`)**, row H2; owner adopted, then **parked** (owner chose (c): `node --test` sorts files by name, so ordering needs a run()-based driver; tail re-measured after TEST phase 3; `b71005d55`) |
+| H3 | Debug vs release host/addon staging for tests | investigation §3, §8 | TEST | TEST plan | **recorded 16:00 in TEST plan "Received items and owner decisions (2026-10-21)" (`7ed88b85f`)**, row H3; owner: not now, parked until the addon stops being hashed per process; since 17:43 that fix is H13 (T9), not T0 (TEST told). **Whoever lands H13 owes TEST (`forgent-f8`) a ping** |
+| H4 | `test/rust-host/fgctl-*` call the real `claude` CLI over the network (missing `FGOS_CLAUDE_COMMAND`) | investigation §4, §7 | TEST | TEST plan | **closed** 18:42: on main `4ebf60748`; `buildTestEnv` sets `FGOS_CLAUDE_COMMAND` to a missing binary for every suite process; a full run saw 0 real claude calls (was 11) |
+| H5 | `help-routes.test.mjs` 119 s → ~1 s (spawn host directly, keep one dev-door case) | arbitration §3, §5 | TEST | TEST plan, phase 3 slow-file batch | **closed** 18:42: on main `4ebf60748`; help-routes 95 s → 14 s alone |
+| H6 | bwrap probe per process + git in a pid namespace (~10 ms of every CLI call) | arbitration D3 | GIT (OPC design) | `plans/reports/design-261020-1035-operation-scoped-containment.md` input row | **closed** 15:55: OPC design "Input from HARDEN T0 (2026-10-21)" (`23b23528e`), GIT board row open items (`2ac24696a`) |
+| H7 | RT-M1 (subreaper set on the calling process) — fixed by T0, Git informed | arbitration §3 | GIT (for information) | none needed | closed |
+| H8 | Cross-process addon verification moves from GIT into the T0 loader leaf | arbitration D1, GIT 15:35 | HARDEN T0 (taken back from GIT) | T0 sub-plan acceptance criteria | **closed** 15:55: GIT board row marks it moved to HARDEN T0 (`2ac24696a`); in no GIT lead queue; **then moved on to T9 with H13** (owner 17:43, OQ-3 (c)); GIT told |
+| H13 | **Each CLI call verifies the release once** (merges H8): today the Rust host re-hashes the whole release on every `fgos <verb>` (`apps/fgos/src/legacy_exec.rs:145-148`, ~36 ms for 30 MB / 820 files) and the Node loader hashes the addon again (~8 ms release, 75 ms debug). Owner 17:43 chose OQ-3 (c): T0 only moves the existing per-process check into its leaf; the cross-process fix is designed once here | T0 sub-plan OQ-3; measured 2026-10-21 17:40 on the second machine | HARDEN phase 07 (T9/Packaging) | [phase 07](phase-07-closing-and-handoff.md) inputs | recorded here (owner: "nhớ nhắc T9 note vào plan") |
+| H14 | **Retire the `npm install -g github:vantt/forgent` channel formally** (README:102-117, `docs/specs/distribution.md:34-36`, the doctor message naming it): owner 17:43 confirmed fgOS is not supported when installed by npm; the only supported install is `fgctl init`. T0's process door refuses there by name, as Git already does | T0 sub-plan OQ-2 | HARDEN phase 07 (T9/Packaging) | [phase 07](phase-07-closing-and-handoff.md) inputs | recorded here |
+| H9 | host-runtime T9 list: `providers/external_process/**`, production `EchoProvider`/`test.fixture.echo`, tautological admission gate, empty `RouterPolicy`, `command-routes-drift` spawn cost | arbitration §2, §5 | HARDEN phase 07 (T9 handoff) | [phase 07](phase-07-closing-and-handoff.md) inputs | recorded here |
+| H10 | Doctor per-row timing in `fgos doctor --json` (owner 2b) | arbitration §6 | HARDEN phase 07 (T9) | [phase 07](phase-07-closing-and-handoff.md) inputs | recorded here |
+| H11 | Release-manifest canonical-JSON producer/verifier pair (if the corpus proof does not pass in T0) | arbitration §2 | HARDEN phase 07 (Packaging) | [phase 07](phase-07-closing-and-handoff.md) inputs | recorded here |
+| H12 | Spec/boundary/doc files T0 will change (`process/spec.md`, `component-boundary.md`, `holder-lock/spec.md:229,238,312`, `reading-map.md:57,59`, three docs listing `coordination-abandoned-claims`) | arbitration §5 | DOC (`forgentx-5f`, owner machine) | DOC plan `plans/260925-documentation-authority-unification/` | board note; message before merge |
+
 ## Red Team Review
 
 ### Session — 2026-10-21

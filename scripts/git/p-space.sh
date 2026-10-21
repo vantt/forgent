@@ -64,7 +64,8 @@ writer=$!
 sleep 2
 dmsetup suspend "$FLAKEY"; dmsetup load "$FLAKEY" --table "0 $sectors flakey $loop 0 1 1 1 error_writes"; dmsetup resume "$FLAKEY"
 wait "$writer" && echo "eio: workload finished without meeting EIO" || echo "eio: workload stopped: $(tail -c 400 "$WORK/out/eio-workload.log")"
-dmsetup suspend "$FLAKEY"; dmsetup load "$FLAKEY" --table "0 $sectors linear $loop 0"; dmsetup resume "$FLAKEY"
+# Back to working writes without flushing through the failing table (a flush there returns EIO).
+dmsetup suspend --noflush --nolockfs "$FLAKEY"; dmsetup load "$FLAKEY" --table "0 $sectors linear $loop 0"; dmsetup resume "$FLAKEY"
 umount "$WORK/eio"; mount "/dev/mapper/$FLAKEY" "$WORK/eio"   # drop the page cache: judge what reached the device
 acked="$(grep -c '"kind":"ack"' "$plan" || true)"
 as_user "$NODE" scripts/git/e1-power-cut.mjs check --root "$WORK/eio/w" --descriptor "$descriptor" --plan "$plan" --acked "$acked" > "$WORK/out/p-space-eio.json" || status=1

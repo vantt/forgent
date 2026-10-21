@@ -5,8 +5,6 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { DEFAULT_GATE_KILL_GRACE_MS } from '../../src/run-supervisor/gate-kill-grace.mjs';
-
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const readJson = (name) => JSON.parse(readFileSync(join(root, 'packages/run-supervisor/contracts', name), 'utf8'));
 
@@ -43,28 +41,6 @@ test('cancel-requested names who asked and keeps the fields the supervisor reads
   assert.deepEqual(cancel.exitCodes, { 'signal:SIGINT': 130, 'signal:SIGTERM': 143 });
   assert.equal(unitState.signalExit.firstSignal.includes('130'), true);
   assert.equal(unitState.signalExit.firstSignal.includes('143'), true);
-});
-
-test('the cancel wait key is documented with its default and floor', () => {
-  const key = unitState.config['dispatch.cancelWaitMs'];
-  assert.match(key.default, /gateKillGraceMs \+ 5000/);
-  assert.equal(key.min, 1000);
-  assert.equal(DEFAULT_GATE_KILL_GRACE_MS + 5000, 15000);
-});
-
-test('resume rules cover every attempt state a resume can meet', () => {
-  const keys = Object.keys(unitState.resumeRule).join(' ');
-  for (const state of ['closed', 'running', 'being-adopted', 'abandoned-not-started', 'abandoned-before-brief', 'legacy-run']) {
-    assert.ok(keys.includes(state), state);
-  }
-  assert.match(unitState.resumeRule['running|being-adopted'], /attempt-still-running/);
-  assert.match(unitState.resumeRule.concurrentResume, /resume-in-progress/);
-  assert.match(unitState.resumeRule.neverSecondSupervisor, /never starts a supervisor/);
-});
-
-test('automatic resume stays deferred with its seam named', () => {
-  assert.match(unitState.deferred.automaticResume, /unit-control/);
-  assert.match(unitState.deferred.automaticResume, /single-taker/);
 });
 
 test('recover offers adopt beside the existing actions', () => {

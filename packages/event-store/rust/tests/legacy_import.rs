@@ -211,3 +211,22 @@ fn legacy_import_sealed_tree_refuses_missing_data_and_invalid_events_before_publ
         RefValue::Absent
     ));
 }
+
+#[test]
+fn a_root_porting_log_alone_still_needs_migration_before_a_write() {
+    let f = Fixture::new();
+    git(&f, &["config", "user.name", "Fixture"]);
+    git(&f, &["config", "user.email", "fixture@example.test"]);
+    let dir = f.repo.trusted_main_root().join("porting");
+    fs::create_dir_all(&dir).unwrap();
+    fs::write(dir.join("events.jsonl"),"{\"ts\":\"2026-01-01T00:00:00.000Z\",\"type\":\"porting.add\",\"payload\":{\"id\":\"p\"}}\n").unwrap();
+    git(&f, &["add", "porting"]);
+    git(&f, &["commit", "-qm", "porting only"]);
+    assert_eq!(
+        write_readiness(&f.driver, &f.repo, "origin")
+            .unwrap_err()
+            .code
+            .to_string(),
+        "event-store-migration-required"
+    );
+}

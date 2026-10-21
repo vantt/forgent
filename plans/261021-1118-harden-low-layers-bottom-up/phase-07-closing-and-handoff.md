@@ -14,6 +14,20 @@ effort: ~0.5d
 2. **One handoff table** for the out-of-scope layers — T6 Workflow (guide + case), T7 Work Lifecycle (WORK lane), T8 Skill/Domain, T9 Host & Surface (`bin/fgos.mjs`, gateway, herdr-dashboard) plus Packaging-Distribution (`fgctl`, `src/setup` 13 846 lines): per row, the items T0–T5 found there but did not own (e.g. host-runtime parts flagged at T0, the distribution canonical-JSON pair, herdr caller logic), the open owner decisions that touch it, and the main-SHA of the last measurement. Each layer measures its own baseline when its plan opens.
 3. Board: HARDEN row → done with the report link; one log line.
 
+## Inputs already recorded for the handoff table
+
+From the T0 council ([arbitration](../reports/council-261021-1507-harden-t0-arbitration.md), plan ledger H9–H11):
+- **T9 Host & Surface:**
+  - `packages/host-runtime` is the T9 invocation kernel; only `civil_time` is a T0 leaf.
+  - Delete candidates with no production caller: `providers/external_process/**` (≈ 4 600 lines incl. tests and the `fixture-echo-process` bin), and the test `EchoProvider` and `test.fixture.echo` registered in the production host (`apps/fgos/src/main.rs:105,225`, `catalog.rs:62-72`).
+  - The admission gate is tautological in production (`authority_gate.rs:131-146`).
+  - The empty `RouterPolicy`.
+  - `command-routes-drift` spawns `node scripts/export-command-selectors.mjs` on every doctor run (150–250 ms); calling `checkCommandRoutes()` in-process keeps the condition.
+- **Owner pick 2b (10-21 15:46):** doctor per-row timing in `fgos doctor --json`. Doctor takes 40.7 s for 145 rows on the second machine and cannot be attributed.
+- **T9/Packaging, ledger H13 (owner 17:43, "nhớ nhắc T9 note vào plan"):** each CLI call should verify the release once. Today `fgos <verb>` re-hashes the whole release in the Rust host (`apps/fgos/src/legacy_exec.rs:145-148`, ~36 ms for 30 MB / 820 files on the second machine) and the Node loader hashes the addon again (~8 ms release, 75 ms debug in tests). T0 chose not to add a cross-process record (OQ-3 (c)); GIT's three criteria for any such record stand: fail closed on digest mismatch, invalidated by any change of dev/ino/size/mtime/ctime, never trusted across a different manifest digest; plus a rollback vector (activate A, B, roll back to A) and an older-release compatibility test.
+- **T9/Packaging, ledger H14 (owner 17:43):** fgOS installed by `npm install -g github:vantt/forgent` is not supported; retire the channel formally (README:102-117, `docs/specs/distribution.md:34-36`, doctor messages naming it) and decide whether to block it.
+- **Packaging:** the release-manifest canonical-JSON producer/verifier pair (`scripts/build-rust-distribution.mjs:37-47`, `packages/distribution/rust/src/verify.rs:46-75`), if T0's corpus proof does not move it.
+
 ## Files
 
 - **Create:** one closing report with the handoff table (convention path).

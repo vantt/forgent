@@ -61,20 +61,6 @@ test('adoptRun drives an attempt to closed once and reports closed after that', 
   }
 });
 
-test('adoptRun with probeOnly changes nothing and a foreign run dir is legacy-run', { skip: NEEDS_HOST }, () => {
-  const root = tmp('probe');
-  try {
-    const dir = attemptDir(root, 'a1');
-    assert.equal(adoptRun(dir, { probeOnly: true }).state, 'needs-adopt');
-    assert.deepEqual(fs.readdirSync(dir).sort(), ['attempt.lock', 'envelope.json']);
-    const foreign = path.join(root, 'old');
-    fs.mkdirSync(foreign);
-    assert.equal(adoptRun(foreign).state, 'legacy-run');
-  } finally {
-    fs.rmSync(root, { recursive: true, force: true });
-  }
-});
-
 test('adoptScan lists open attempts under runs/, skips closed ones and answers in listing order', { skip: NEEDS_HOST }, () => {
   const root = tmp('scan');
   try {
