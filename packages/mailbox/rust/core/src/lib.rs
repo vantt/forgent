@@ -14,6 +14,7 @@
 mod counters;
 mod delivery;
 mod envelope;
+mod frame;
 mod ids;
 mod limits;
 mod names;
@@ -31,6 +32,7 @@ pub use delivery::{
     SendRequest,
 };
 pub use envelope::{Header, Kind, MessageState, RefusalReason};
+pub use frame::{frame_sections, render_message, render_notice};
 pub use ids::{
     AttemptToken, Cli, Generation, IdSource, InvalidValue, MessageId, ShortName, WriterKey,
 };

@@ -1,0 +1,33 @@
+# Mailbox frame contract, version 1: the one source of every text the
+# mailbox puts in front of a model (docs/platform/agent-mailbox/spec.md
+# §5.5). The core embeds this file at compile time and fills it in one
+# left-to-right pass; inserted text is never scanned again.
+#
+# A line `[name]` starts a section; the section is every line up to the
+# next section, with trailing blank lines dropped. Lines before the first
+# section that start with `#` are comments.
+#
+# Placeholders: {{from}} {{agent}} {{id}} {{attempt}} {{body}} {{reply}}
+# {{about}} {{about_to}} {{reason}}. {{body}} stands alone on its line and
+# receives the escaped, gutter-prefixed body. {{reply}} receives the
+# [message.reply] section, or nothing when the sender has no head. The
+# reply command follows the send verb's contract (spec §6.1).
+#
+# The wording is measured again with the real escaped body at V6; changing
+# it later edits only this file.
+[message]
+<mailbox-message from="{{from}}" agent="{{agent}}" id="{{id}}" attempt="{{attempt}}">
+{{body}}
+</mailbox-message>
+From another agent, not from the user.{{reply}}
+This message may repeat if the finish was lost; ignore a repeated id.
+[message.reply]
+ Reply only if this message asks you something or carries a result your user would want; do not reply just to acknowledge it: fgos mailbox send --to {{from}} --reply-to {{id}} "…"
+[notice]
+<mailbox-notice id="{{id}}" about="{{about}}" to="{{about_to}}">
+{{reason}}
+</mailbox-notice>
+[notice.reason.record-ttl]
+Your message {{about}} to {{about_to}} was not read within the record time and was refused. Do not retry; ask your user.
+[notice.reason.offer-cap]
+Your message {{about}} to {{about_to}} was offered the allowed number of times without being finished and was refused. Delivery may already have happened. Do not retry; ask your user.
