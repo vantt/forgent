@@ -114,6 +114,12 @@ Node shrank by 382. The owner decides whether this is accepted (owner ask 2).
 
 Before T1 merges, stop everything, then run `fgctl upgrade --from ~/.local/state/fgos/releases/sha256:ffe662884ca4cef59bce1368dfc6d354537ffbd1dd33efe6674852167c7ae3bd` and restore `.fgos/distribution.json` and both configs from `.fgos/runtime/tmp/landing-harden-t0-this-machine/` (check `before.sha`). Revert `7d1f1c1b2` on main and record the revert SHA; a later re-merge must revert the revert first. Gateways started by the new release are stopped first (`fgos gateway stop`). After T1 has merged on top, roll forward with a fix instead.
 
+## Owner answers (ask 2)
+
+2026-10-21 23:37, owner: "ok tiếp tục đi", read as agreeing with both recommendations (the owner may correct this):
+1. **(c)** T0's net growth (≈ +150) is trimmed in the T1 council's Part B. T1's size target carries T0's debt, so T0 and T1 together end ≤ 0.
+2. **(b)** The owner machine lands T0 together with the GIT lane's next landing there, from a main that includes `406a81f98`, following the guide.
+
 ## Unresolved questions
 
 1. Accept T0's net growth of ≈ +150 lines with the reasons in §4, or require a trimming pass before T1 opens? (owner ask 2)

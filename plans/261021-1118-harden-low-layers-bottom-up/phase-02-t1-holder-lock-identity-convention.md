@@ -17,6 +17,10 @@ Specs: [holder-lock](../../docs/platform/holder-lock/spec.md), [session-identity
 
 ## Received from other lanes (record here, never lose)
 
+- **T0 debt carried into T1 (owner 2026-10-21 23:37, ask 2 (c)).** T0 ended ≈ +150 lines net (Node −382, Rust +327, tests +207; [closing report](../reports/closing-261021-2213-harden-t0-process-facts-door.md) §4). T1's Part B trims it, starting with N-API boilerplate in `packages/git/node-addon/src/{process,durable_file,canonical_json}.rs` and phase-1 red tests that duplicate post-fix owning tests. T1's size target is set so that T0 + T1 ≤ 0. Also from T0:
+  - **T0-R1:** canonical JSON through N-API is 2.2× slower than the old Node twin for 200 keys (384 vs 171 µs); fix the marshalling cost or justify it.
+  - **T0-R2 (Low):** the durable door's `mode` argument is required, and omitting it gives a raw N-API `NumberExpected`; make it a named error or a default.
+
 - **HL-N8 / HL-N9 (TEST → HARDEN T1, owner decision 2026-10-21 ~20:50).** Dropping the bytes-equal check in `unlinkRecordIfUnchanged` (`src/state/hot-lock.mjs`) leaves every test green, and so does dropping it in `reclaimDeadHolder`: each check covers for the other, so no single test pins either; only the contract prose `test/holder-lock/hot-lock-contract.test.mjs:30` names them. Evidence: [TEST holder-lock report](../reports/phase-lead-261021-1845-test-governance-p2-holder-lock.md) §4 and §7 (main `ff24dbde3`). T1 must add one owning proof per check (a process race in the state layer that reaches each check alone), then decide whether both checks are needed. Note: `reclaimDeadHolder` is in the T0/T1 range of `hot-lock.mjs`; check `unlinkRecordIfUnchanged`'s line range against the WORK-owned staging region (`:290-394` before T0) before editing, and coordinate with WORK if it falls inside.
 
 ## Components, crates, Node (proposal §4.1)
