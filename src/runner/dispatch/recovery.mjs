@@ -73,7 +73,7 @@ function isPlainObject(value) {
  * `originalPlan` is a real DispatchPlan (dispatch/plan.mjs's
  * `compileDispatchPlan` output): this reads `originalPlan.policy.
  * executorPreference` (the resolved primary executor plus its own declared
- * `fallbackExecutors`, dispatch/assignment-policy.mjs) as the governed
+ * `fallbackExecutors`, dispatch/plan.mjs) as the governed
  * candidate list, and `originalPlan.provenance`/`originalPlan.tier` as the
  * governance-relevant baseline a scoped candidate must still match.
  *
@@ -101,7 +101,7 @@ export function resolveFallback(originalPlan, candidateId, { compilePlan } = {})
   // Governed means: this exact id was already blessed by the SAME
   // PolicyPatch/governance resolution that produced originalPlan --
   // `executorPreference` is `[primaryExecutor, ...declaredFallbacks]`
-  // (assignment-policy.mjs). A candidate absent from it was never seen by
+  // (plan.mjs). A candidate absent from it was never seen by
   // that governance decision at all, regardless of whether it would
   // separately compile clean.
   const declaredCandidates = Array.isArray(originalPlan.policy?.executorPreference)
@@ -178,7 +178,7 @@ const NETWORK_EGRESS_VALUES = Object.freeze(['deny', 'filtered', 'allow']);
  * about at all, so it always parks as `effect-unknown` here too.
  *
  * `repeatMode` must already be one of REPEAT_MODE_VALUES -- this function
- * never infers it (that is `assignment-policy.mjs`'s job, and even there it
+ * never infers it (that is the dispatch policy's job, and even there it
  * only ever reads a DECLARED value, never `Assignment.mutation`). An
  * undeclared or invalid repeatMode is a caller/config bug, not a runtime
  * effect-boundary decision, so it throws rather than silently parking.

@@ -20,16 +20,17 @@
 // `rigorToTier` back only deletes it.
 
 import {
-  DEFAULT_RIGOR_TO_TIER,
   MODEL_POLICY_TIERS,
   SEAT_BINDING_SCHEMA_VERSION,
 } from '../runner/dispatch/config.mjs';
 import { RIGOR_VALUES, resolveStrongerRigor } from '../runner/rigor.mjs';
+import { hasUsablePrefer } from '../runner/execution/seat-resolver.mjs';
+
+/** The table the retired `rigorToTier` key held when a config did not declare one: what the converter reads. */
+const LEGACY_RIGOR_TO_TIER = Object.freeze({ low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' });
 
 const tierRank = (tier) => MODEL_POLICY_TIERS.indexOf(tier);
 const isPlainObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
-const hasUsablePrefer = (entry) => (typeof entry?.prefer === 'string' && entry.prefer.trim() !== '')
-  || (Array.isArray(entry?.prefer) && entry.prefer.length > 0);
 const sameJson = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
 /** Keys of a bare-verb entry that are catalog text, not behaviour: never copied, never reported. */
@@ -127,7 +128,7 @@ function assertLadder(ladder) {
 function effectiveRigorToTier(runner, global) {
   const table = {};
   for (const rigor of RIGOR_VALUES) {
-    const tier = runner.rigorToTier?.[rigor] ?? global.rigorToTier?.[rigor] ?? DEFAULT_RIGOR_TO_TIER[rigor];
+    const tier = runner.rigorToTier?.[rigor] ?? global.rigorToTier?.[rigor] ?? LEGACY_RIGOR_TO_TIER[rigor];
     if (!MODEL_POLICY_TIERS.includes(tier)) throw new RangeError(`rigorToTier.${rigor} is "${tier}", not one of ${MODEL_POLICY_TIERS.join('/')}; fix it before converting`);
     table[rigor] = tier;
   }

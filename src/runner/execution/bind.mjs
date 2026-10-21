@@ -5,13 +5,12 @@ import { decideExecutorDispatchMechanism } from '../dispatch/mechanism.mjs';
 import { deriveProviderFamily, resolveTierCandidates, resolveTierModel, tierCellMissingDetail, tierFallbackOf } from '../dispatch/resolve.mjs';
 import { checkProviderDisallowed } from '../dispatch/provider-adapter.mjs';
 import { canApplyPosture, resolvePostureInvocation } from '../dispatch/confinement/policies.mjs';
-import { resolveStrongerRigor } from '../rigor.mjs';
-import { MODEL_POLICY_TIERS, DEFAULT_RIGOR_TO_TIER, assertReasoningEffort, assertRunTimeoutMs } from '../dispatch/config.mjs';
-import { resolveStrongerTier, TIER_STRENGTH } from '../dispatch/assignment-policy.mjs';
+import { MODEL_POLICY_TIERS, RunnerConfigError, assertReasoningEffort, assertRunTimeoutMs } from '../dispatch/config.mjs';
 import { credentialSourceForCli, credentialStoreOf, providerAccountInventory } from '../dispatch/provider-capacity.mjs';
 import { legacyStateKey } from '../dispatch/llm-accounts.mjs';
 import { PIN_REFUSES_SEAT, parseAccountPin, resolveAccountPin } from './account-pin.mjs';
-import { PRODUCER_POSTURE } from './seat-resolver.mjs';
+import { DEFAULT_RUN_CAPABILITY, PRODUCER_POSTURE, capabilityEntriesOf, effectiveRigorOf } from './seat-resolver.mjs';
+import { seatPolicy } from './seat-policy.mjs';
 
 export const BIND_CONTRACT_VERSION = 'v1alpha1';
 
@@ -55,30 +54,6 @@ function findHerdrInvocation(executorEntry) {
 }
 
 /**
- * Look up capability config in runnerConfig:
- * First capabilities[domain:verb], then fallback capabilities[verb].
- */
-export function hasUsablePrefer(entry) {
-  const prefer = entry?.prefer;
-  return typeof prefer === 'string' ? prefer.trim() !== '' : Array.isArray(prefer) && prefer.length > 0;
-}
-
-function lookupCapabilityConfig(runnerConfig, capability) {
-  if (!runnerConfig || typeof runnerConfig !== 'object' || !capability) {
-    return { entry: null, key: null };
-  }
-  const capabilities = runnerConfig.capabilities ?? runnerConfig.runner?.capabilities ?? {};
-  // An entry wins only with a usable prefer pool: a description-only slot must not
-  // hide a bare-verb entry that has one. With no usable pool anywhere, the exact
-  // entry (then the bare verb) is still returned so its rigor/persona apply.
-  const verb = capability.includes(':') ? capability.split(':')[1] : null;
-  const ordered = [capability, verb].filter(Boolean).map((key) => ({ key, entry: capabilities[key] })).filter((hit) => hit.entry);
-  const hit = ordered.find((h) => hasUsablePrefer(h.entry)) ?? ordered[0];
-  if (hit) return { entry: hit.entry, key: hit.key };
-  return { entry: null, key: null };
-}
-
-/**
  * Filter candidate matching scope
  */
 function findMatchingOverride(overrides, unit, seat, role) {
@@ -107,56 +82,85 @@ export function getProviderFamily(runnerConfig, executorId) {
   return deriveProviderFamily(executorEntry, resolvedCommand);
 }
 
-/**
- * The highest tier a seat of `capability` may run at. runner.maxTier caps every seat, except that a
- * capability declaring its own rigor in the config raises the cap for itself to that rigor's tier.
- * A unit's rigor and an override stay under the ceiling, so only the config decides which
- * capabilities may run above the cap. Null when runner.maxTier is not set.
- *
- * @returns {{value: string, source: string}|null} `source` is `global` or `capability-rigor(<cap>, <rigor>)`.
- */
-export function resolveTierCeiling(runnerConfig, capability, capabilityRigor) {
-  const globalMaxTier = runnerConfig?.maxTier ?? runnerConfig?.runner?.maxTier;
-  if (!globalMaxTier || !MODEL_POLICY_TIERS.includes(globalMaxTier)) return null;
-  const rigorToTier = runnerConfig.rigorToTier ?? runnerConfig.runner?.rigorToTier ?? DEFAULT_RIGOR_TO_TIER;
-  const capabilityTier = capabilityRigor ? rigorToTier[capabilityRigor] : undefined;
-  if (capabilityTier && MODEL_POLICY_TIERS.includes(capabilityTier) && TIER_STRENGTH[capabilityTier] > TIER_STRENGTH[globalMaxTier]) {
-    return { value: capabilityTier, source: `capability-rigor(${capability}, ${capabilityRigor})` };
-  }
-  return { value: globalMaxTier, source: 'global' };
-}
-
 const identityKey = (executor, invocation, pool, model) => [executor, invocation ?? '', pool ?? '', model ?? ''].join('\u0000');
 
 /** What names one candidate of a seat's walk: executor, invocation, pool and model. */
 export const bindingIdentity = (binding) => identityKey(binding?.executor, binding?.invocation, binding?.pool, binding?.model);
 
-/** The tier a seat runs at, its source, and the ceiling that applied (all independent of the executor). */
-function resolveSeatTier({ unit, capConfig, capKey, matchingOverride, runnerConfig }) {
-  const unitRigor = unit?.rigor;
-  const capRigor = capConfig?.rigor;
-  // The implicit standard is a fallback, not a floor (same rule as
-  // resolveAssignmentDispatchPolicy): a unit may ask for low, and only an
-  // explicit capability rigor floor raises it.
-  const effectiveRigor = unitRigor && capRigor
-    ? resolveStrongerRigor(unitRigor, capRigor)
-    : (unitRigor ?? capRigor ?? 'standard');
+/** Where an override came from: its origin when it names one (a workflow's seat persona), else just "override". */
+const overrideSource = (override) => (override?.origin ? `override:${override.origin}` : 'override');
 
-  const rigorToTier = runnerConfig.rigorToTier ?? runnerConfig.runner?.rigorToTier ?? DEFAULT_RIGOR_TO_TIER;
-  const derivedTier = rigorToTier[effectiveRigor] ?? 'standard';
+/**
+ * The persona that sits a seat, and where it came from: an override's, else the seat's own, the
+ * unit's, the locked one, the capability's default (its exact entry, then its prefix entry).
+ * `base` is the same chain without the persona a door selected, which is what the tier is judged
+ * against before the selection (a persona a door picks that lifts the tier is a raise).
+ */
+function resolvePersona({ ask, unit, matchingOverride, capEntries }) {
+  const { persona: seatPersona = null, lockedPersona = null } = ask ?? {};
+  const unitPersona = typeof unit?.persona === 'string' && unit.persona ? unit.persona : null;
+  if (lockedPersona && unitPersona && unitPersona !== lockedPersona) {
+    return { refused: { reason: 'locked-persona', detail: `Unit persona "${unitPersona}" conflicts with locked persona "${lockedPersona}"` } };
+  }
+  if (matchingOverride?.persona && lockedPersona && matchingOverride.persona !== lockedPersona) {
+    return { refused: { reason: 'locked-persona', detail: `Cannot override locked persona "${lockedPersona}" with "${matchingOverride.persona}"` } };
+  }
+  const capDefault = capEntries.find(({ entry }) => entry.persona);
+  const chain = (skip) => {
+    if (seatPersona) return { persona: seatPersona, source: 'seat' };
+    if (unitPersona && unitPersona !== skip) return { persona: unitPersona, source: 'unit' };
+    if (lockedPersona) return { persona: lockedPersona, source: 'locked-persona' };
+    if (capDefault) return { persona: capDefault.entry.persona, source: `capability:${capDefault.key}` };
+    return { persona: null, source: 'none' };
+  };
+  const selected = ask?.selectors?.persona ?? matchingOverride?.persona ?? null;
+  const chosen = matchingOverride?.persona
+    ? { persona: matchingOverride.persona, source: overrideSource(matchingOverride) }
+    : chain(null);
+  return { ...chosen, selected, base: chain(selected).persona };
+}
 
-  let tier = derivedTier;
-  let source = `rigor:${effectiveRigor}`;
-  if (matchingOverride && matchingOverride.tier) {
-    tier = resolveStrongerTier(derivedTier, matchingOverride.tier);
-    source = `override:${matchingOverride.origin ?? 'unknown'}`;
+/**
+ * Stage 1: the tier, the ordered executors and where each came from, decided by Seat Binding (the
+ * crate). This builds its ask from the unit, the seat and the overrides; it chooses nothing itself.
+ * Returns `{ policy }` or `{ refused }`.
+ */
+function decidePolicy({ ask, unit, seat, role, seatPosture, blind, matchingOverride, persona, runnerConfig }) {
+  const overrideTier = matchingOverride?.tier;
+  if (overrideTier !== undefined && !MODEL_POLICY_TIERS.includes(overrideTier)) {
+    throw new RunnerConfigError(`invalid tier "${overrideTier}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
   }
-  const ceiling = resolveTierCeiling(runnerConfig, capKey ?? unit?.capability, capRigor);
-  if (ceiling && TIER_STRENGTH[tier] > TIER_STRENGTH[ceiling.value]) {
-    tier = ceiling.value;
-    source = `clamped:maxTier(${ceiling.value}, ${ceiling.source})`;
-  }
-  return { tier, source, ceiling };
+  const doorSelectors = ask?.selectors ?? {};
+  const selectors = {
+    ...(persona.selected ? { persona: persona.selected } : {}),
+    ...(doorSelectors.seat ? { seat: doorSelectors.seat } : {}),
+    ...(doorSelectors.capability ? { capability: doorSelectors.capability } : {}),
+  };
+  return seatPolicy({
+    // A door that names the capability changes it: the ask carries what the door would have run without it.
+    capability: selectors.capability ? DEFAULT_RUN_CAPABILITY : unit?.capability,
+    seat,
+    role,
+    ...(persona.base ? { persona: persona.base } : {}),
+    label: unit?.id ?? null,
+    ...(ask?.workflowTier ? { workflow: ask.workflowTier } : {}),
+    selectors,
+    raiseAuthorized: ask?.raiseAuthorized === true,
+    ...(overrideTier !== undefined ? { override: { tier: overrideTier } } : {}),
+    posture: { readOnly: seatPosture.readOnly === true, forceOutOfProcess: seatPosture.forceOutOfProcess === true, blind: blind === true },
+    effectiveRigor: effectiveRigorOf(unit, runnerConfig, { fallback: 'standard' }),
+  }, runnerConfig);
+}
+
+/**
+ * The executor a `prefer` entry of the decided policy names. An entry that comes from the tier's own
+ * fallback list names a family; the agent executor that serves the family is the candidate. Any other
+ * entry already names an executor.
+ */
+function executorOfEntry(entry, { fromFallback, runnerConfig, executors }) {
+  if (!fromFallback) return entry.executor;
+  if (executors[entry.executor] && executors[entry.executor].kind !== 'tool') return entry.executor;
+  return Object.keys(executors).find((id) => executors[id]?.kind !== 'tool' && getProviderFamily(runnerConfig, id) === entry.executor) ?? null;
 }
 
 /**
@@ -252,11 +256,14 @@ function prepare(ask, ctx, { excludePools = [] } = {}) {
   // seat reads the result and is chosen on independence, not on what the producer's task needs.
   const requiredSkills = !seatPosture.forceOutOfProcess && Array.isArray(unit?.skills) ? unit.skills : [];
 
-  // Level 2 & 1: Capability prefer candidates (project / global)
-  const { entry: capConfig, key: capKey } = lookupCapabilityConfig(runnerConfig, unit?.capability);
-
-  // The tier first: each family's cell is read at it while the candidates are built.
-  const seatTier = resolveSeatTier({ unit, capConfig, capKey, matchingOverride, runnerConfig });
+  // The persona, then the tier and the executor order, which Seat Binding decides (stage 1). The tier
+  // comes first: each family's cell is read at it while the candidates are built.
+  const persona = resolvePersona({ ask, unit, matchingOverride, capEntries: capabilityEntriesOf(runnerConfig, unit?.capability) });
+  if (persona.refused) return { refused: persona.refused };
+  const decided = decidePolicy({ ask, unit, seat, role, seatPosture, blind, matchingOverride, persona, runnerConfig });
+  if (decided.refused) return { refused: decided.refused };
+  const { policy } = decided;
+  const seatTier = { tier: policy.tier, source: policy.tierSource };
 
   // Each candidate carries its own `source`; the binding records the source of the one chosen.
   let basePool = [];
@@ -279,9 +286,11 @@ function prepare(ask, ctx, { excludePools = [] } = {}) {
       .filter((cand) => !seen.has(keyOf(cand)) && seen.add(keyOf(cand)))
       .map((cand) => ({ ...cand, source: 'unit-prefer' }));
     const bareExecutors = new Set(unitCandidates.filter((cand) => !cand.invocation).map((cand) => cand.executor));
-    const capabilityCandidates = (capConfig?.prefer ? normalizeCandidates(capConfig.prefer) : [])
-      .filter((cand) => !seen.has(keyOf(cand)) && !bareExecutors.has(cand.executor))
-      .map((cand) => ({ ...cand, source: `capability:${capKey}` }));
+    const fromFallback = policy.preferSource.startsWith('tierFallback.');
+    const capabilityCandidates = normalizeCandidates(policy.prefer)
+      .map((cand) => ({ ...cand, executor: executorOfEntry(cand, { fromFallback, runnerConfig, executors }) }))
+      .filter((cand) => cand.executor && !seen.has(keyOf(cand)) && !bareExecutors.has(cand.executor))
+      .map((cand) => ({ ...cand, source: policy.preferSource }));
     basePool = [...unitCandidates, ...capabilityCandidates];
   }
 
@@ -377,9 +386,9 @@ function prepare(ask, ctx, { excludePools = [] } = {}) {
         if (executors[dep]) forbiddenFamilies.add(getProviderFamily(runnerConfig, dep).toLowerCase());
       }
       if (forbiddenFamilies.has(providerFamily.toLowerCase())) {
-        // Override exception: acceptDependence === true AND origin === 'human-cli'
-        const isHumanOverrideAllowed = cand.override && cand.override.acceptDependence === true && cand.override.origin === 'human-cli';
-        if (!isHumanOverrideAllowed) {
+        // Accepting a dependence is a raise only an authorized door may make; no door is authorized yet.
+        const isDependenceAccepted = cand.override?.acceptDependence === true && ask?.raiseAuthorized === true;
+        if (!isDependenceAccepted) {
           return { reason: 'independence', detail: `Candidate "${executorId}" (provider: "${providerFamily}") violates independence requirement against [${independentOf.join(', ')}]` };
         }
       }
@@ -409,9 +418,9 @@ function prepare(ask, ctx, { excludePools = [] } = {}) {
   };
 
   return {
-    unit, seat, role, seatPosture, seatPersona: ask?.persona ?? null, blind, runnerConfig, session, executors, policyConfig,
-    posture, isReadOnlyPosture, matchingOverride, requiredSkills, capConfig, capKey,
-    seatTier, candidates, identityOf, rejectionOf, inventory,
+    unit, seat, role, seatPosture, blind, runnerConfig, session, executors, policyConfig,
+    posture, isReadOnlyPosture, matchingOverride, requiredSkills, persona,
+    policy, seatTier, candidates, identityOf, rejectionOf, inventory,
   };
 }
 
@@ -448,8 +457,9 @@ function walkOrder(prep, tried) {
  */
 export function bind(ask, ctx, { tried = [], excludePools = [] } = {}) {
   const prep = prepare(ask, ctx, { excludePools });
-  const { unit, seat, seatPosture, seatPersona, blind, runnerConfig, session, executors, posture, isReadOnlyPosture, matchingOverride, requiredSkills, capConfig, capKey, seatTier } = prep;
-  const { preferIndependentOf = null, lockedPersona = null } = ask ?? {};
+  if (prep.refused) return { refused: prep.refused };
+  const { unit, seat, seatPosture, blind, runnerConfig, session, executors, posture, isReadOnlyPosture, matchingOverride, requiredSkills, seatTier, policy } = prep;
+  const { preferIndependentOf = null } = ask ?? {};
   const isHeadless = Boolean(session.headless);
   const isLeadPresent = !isHeadless && (session.hasNativeAgent || session.provider);
 
@@ -555,46 +565,7 @@ export function bind(ask, ctx, { tried = [], excludePools = [] } = {}) {
   }
 
   const finalTier = seatTier.tier;
-  const tierCeiling = seatTier.ceiling;
-
-  // 7. Persona
-  let persona = null;
-  let personaSource = 'none';
-  const unitPersona = typeof unit?.persona === 'string' && unit.persona ? unit.persona : null;
-
-  if (lockedPersona && unitPersona && unitPersona !== lockedPersona) {
-    return {
-      refused: {
-        reason: 'locked-persona',
-        detail: `Unit persona "${unitPersona}" conflicts with locked persona "${lockedPersona}"`,
-      },
-    };
-  }
-
-  if (matchingOverride && matchingOverride.persona) {
-    if (lockedPersona && matchingOverride.persona !== lockedPersona) {
-      return {
-        refused: {
-          reason: 'locked-persona',
-          detail: `Cannot override locked persona "${lockedPersona}" with "${matchingOverride.persona}"`,
-        },
-      };
-    }
-    persona = matchingOverride.persona;
-    personaSource = `override:${matchingOverride.origin ?? 'unknown'}`;
-  } else if (seatPersona) {
-    persona = seatPersona;
-    personaSource = 'seat';
-  } else if (unitPersona) {
-    persona = unitPersona;
-    personaSource = 'unit';
-  } else if (lockedPersona) {
-    persona = lockedPersona;
-    personaSource = 'locked-persona';
-  } else if (capConfig?.persona) {
-    persona = capConfig.persona;
-    personaSource = `capability:${capKey}`;
-  }
+  const { persona, source: personaSource } = prep.persona;
 
   // 7b. Reasoning effort: only an override asks for one (`fgos run --effort`, or a
   // `reasoningEffort` key in `--override`). It is checked here against the same rule the launch
@@ -612,7 +583,7 @@ export function bind(ask, ctx, { tried = [], excludePools = [] } = {}) {
     } catch (err) {
       return { refused: { reason: 'reasoning-effort', detail: err.message } };
     }
-    reasoningEffortSource = `override:${matchingOverride.origin ?? 'unknown'}`;
+    reasoningEffortSource = overrideSource(matchingOverride);
   }
 
   // 7c. Run timeout: an override (`fgos run --timeout`, or a `timeoutMs` key in `--override`), else
@@ -626,7 +597,7 @@ export function bind(ask, ctx, { tried = [], excludePools = [] } = {}) {
     } catch (err) {
       return { refused: { reason: 'run-timeout', detail: err.message } };
     }
-    timeoutMsSource = `override:${matchingOverride.origin ?? 'unknown'}`;
+    timeoutMsSource = overrideSource(matchingOverride);
   } else if (unit?.timeoutMs !== undefined) {
     try {
       timeoutMs = assertRunTimeoutMs(unit.timeoutMs, 'unit.timeoutMs');
@@ -641,7 +612,14 @@ export function bind(ask, ctx, { tried = [], excludePools = [] } = {}) {
     executor: { value: executorId, source: chosen.source },
     invocation: { value: invocation, source: invocation ? chosen.source : 'none' },
     transport: { value: transport, source: transportSource },
-    tier: { value: finalTier, source: seatTier.source, ...(tierCeiling ? { ceiling: tierCeiling } : {}) },
+    tier: {
+      value: finalTier,
+      source: seatTier.source,
+      ...(policy.recommendation ? { recommendation: policy.recommendation } : {}),
+      ...(policy.loweredFrom ? { loweredFrom: policy.loweredFrom } : {}),
+      ...(policy.maxTier ? { maxTier: policy.maxTier } : {}),
+      ...(policy.raisedBy ? { raisedBy: policy.raisedBy } : {}),
+    },
     model: { value: chosen.model, source: chosen.modelSource },
     persona: { value: persona, source: personaSource },
     reasoningEffort: { value: reasoningEffort, source: reasoningEffortSource },
@@ -668,7 +646,7 @@ export function bind(ask, ctx, { tried = [], excludePools = [] } = {}) {
   if (account || accountSkipped) {
     provenance.account = {
       value: account ? `${account.pool}/${account.id}` : null,
-      source: `override:${matchingOverride.origin ?? 'unknown'}`,
+      source: overrideSource(matchingOverride),
       ...(accountSkipped ? { skipped: accountSkipped } : {}),
     };
   }
@@ -722,8 +700,10 @@ export function walkBindings(ask, ctx, { excludePools = [] } = {}) {
  */
 export function listCandidates(ask, ctx) {
   const prep = prepare(ask, ctx);
+  if (prep.refused) return { refused: prep.refused, candidates: [] };
   return {
     tier: prep.seatTier,
+    policy: prep.policy,
     candidates: prep.candidates.map((cand) => ({
       executor: cand.executor,
       family: cand.family,

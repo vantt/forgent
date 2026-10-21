@@ -3,7 +3,8 @@
 // Evaluates bindings through dry bind().
 
 import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
-import { bind, hasUsablePrefer } from '../runner/execution/bind.mjs';
+import { bind } from '../runner/execution/bind.mjs';
+import { hasUsablePrefer } from '../runner/execution/seat-resolver.mjs';
 import { detectHerdrPresent } from '../runner/execution/run.mjs';
 
 const CORE_CAPABILITIES = ['execute', 'code:implement'];

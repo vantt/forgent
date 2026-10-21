@@ -2339,6 +2339,8 @@ export async function executeDriverOperationChoice(work, choice, opts = {}) {
       cwd: built.worktree,
       worktree: built.worktree,
       caseAdmission: createCaseAdmissionPort({ repoRoot: stateRoot }),
+      // An operation step chooses no persona, seat or capability and may raise nothing.
+      raiseAuthorized: false,
       // A background step: no Lead to fall back on, and the worker runs as a direct spawn.
       session: { headless: true, herdrPresent: false },
       ...(opts.onUnitRunCreated ? { onUnitRunCreated: opts.onUnitRunCreated } : {}),

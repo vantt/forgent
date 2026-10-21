@@ -31,6 +31,12 @@ export const CHECKER_SEATS = Object.freeze({
   tester: Object.freeze({ role: 'reviewer', verdict: false }),
 });
 
+/**
+ * The capability a door runs a unit as when its caller names none (`fgos run "<prompt>"`). A door that
+ * names another capability has chosen it: Seat Binding judges what that choice does to the tier.
+ */
+export const DEFAULT_RUN_CAPABILITY = 'execute';
+
 /** The pseudo-seats the runner itself writes results for; never declared, never bound. */
 export const VERIFY_SEAT = 'verify';
 export const SYNC_SEAT = 'sync';
@@ -64,12 +70,29 @@ const noWrites = (unit) => (unit?.writes ?? []).length === 0;
 
 // ---- rigor and checker composition --------------------------------------------------------------
 
-/** The rigor a capability declares: its exact entry, else the `<prefix>:*` entry, else the bare verb's. */
-export function capabilityRigorOf(runnerConfig, capability) {
-  if (typeof capability !== 'string' || !capability) return undefined;
+/**
+ * The config entries that apply to a capability, most specific first: its exact key, then its
+ * `<prefix>:*` entry (the text before the first colon). A capability with no colon has no prefix
+ * entry, and nothing else is inherited: the bare verb of `code:review` is not a lookup key.
+ */
+export function capabilityEntriesOf(runnerConfig, capability) {
+  if (typeof capability !== 'string' || !capability) return [];
   const capabilities = runnerConfig?.capabilities ?? runnerConfig?.runner?.capabilities ?? {};
-  const [prefix, verb] = capability.includes(':') ? capability.split(':') : [null, null];
-  const rigor = [capability, prefix ? `${prefix}:*` : null, verb].filter(Boolean).map((key) => capabilities[key]?.rigor).find((r) => r !== undefined);
+  const keys = capability.includes(':') ? [capability, `${capability.split(':')[0]}:*`] : [capability];
+  return keys
+    .filter((key) => capabilities[key] && typeof capabilities[key] === 'object')
+    .map((key) => ({ key, entry: capabilities[key] }));
+}
+
+/** Whether a capability entry names at least one executor in `prefer` (a string or a non-empty list). */
+export function hasUsablePrefer(entry) {
+  const prefer = entry?.prefer;
+  return typeof prefer === 'string' ? prefer.trim() !== '' : Array.isArray(prefer) && prefer.length > 0;
+}
+
+/** The rigor a capability declares: its exact entry, else the `<prefix>:*` entry's. */
+export function capabilityRigorOf(runnerConfig, capability) {
+  const rigor = capabilityEntriesOf(runnerConfig, capability).map(({ entry }) => entry.rigor).find((r) => r !== undefined);
   if (rigor !== undefined && !RIGOR_VALUES.includes(rigor)) {
     throw new RangeError(`invalid capability rigor "${rigor}" for "${capability}". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);
   }
@@ -263,14 +286,34 @@ export function seatOfRecord(unitRecord, seatId) {
 }
 
 /**
- * The seat part of a bind ask for a seat already recorded in `unitRecord`: its id, role and posture.
- * A seat the record does not list is the unit's own producer seat.
+ * The tier a workflow recommends on a seat, with where it was declared (`workflow:<id>/<unit>/<seat>`,
+ * or `workflow:<unit>/<seat>` when the run does not know its workflow). Undefined when the seat
+ * declares none.
+ */
+export function workflowTierOf(seat, unit, workflowId) {
+  if (!seat?.tier) return undefined;
+  return { tier: seat.tier, source: `workflow:${workflowId ? `${workflowId}/` : ''}${unit?.id ?? 'unit'}/${seat.seat}` };
+}
+
+/**
+ * The seat part of a bind ask for a seat already recorded in `unitRecord`: its id, role and posture,
+ * the tier its workflow recommended and the selectors its door chose, so a replay asks what the run
+ * asked. A seat the record does not list is the unit's own producer seat.
  */
 export function bindSeatOf(unitRecord, seatId) {
   const seat = seatOfRecord(unitRecord, seatId);
-  return seat
-    ? { seat: seat.seat, role: seat.role, posture: seat.posture, ...(seat.persona ? { persona: seat.persona } : {}) }
-    : { seat: seatId, role: 'producer', posture: PRODUCER_POSTURE };
+  const selectors = unitRecord?.selectors;
+  const common = selectors && Object.keys(selectors).length > 0 ? { selectors } : {};
+  if (!seat) return { seat: seatId, role: 'producer', posture: PRODUCER_POSTURE, ...common };
+  const workflowTier = workflowTierOf(seat, unitRecord.unit, unitRecord.workflowId);
+  return {
+    seat: seat.seat,
+    role: seat.role,
+    posture: seat.posture,
+    ...(seat.persona ? { persona: seat.persona } : {}),
+    ...(workflowTier ? { workflowTier } : {}),
+    ...common,
+  };
 }
 
 /**

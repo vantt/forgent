@@ -22,8 +22,10 @@ class StoreError extends Error {
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir, loadRunnerConfigFromDir, MODEL_POLICY_TIERS, normalizePreferCandidates, withDefaultExecutor } from './config.mjs';
 import { RIGOR_VALUES, resolveStrongerRigor } from '../rigor.mjs';
-import { resolveExecutorAndOverrides, resolveTierModel, deriveProviderFamily, resolveCapabilityDetailsFromHints } from './resolve.mjs';
-import { WORK_ITEM_KEYS, refuseWorkItemInput, resolveExecutorProvider, resolveExecutorGovernance, resolveStrongerTier } from './assignment-policy.mjs';
+import { resolveExecutorAndOverrides, deriveProviderFamily, resolveCapabilityDetailsFromHints, tierCellMissingDetail } from './resolve.mjs';
+import { WORK_ITEM_KEYS, refuseWorkItemInput } from './work-item-input.mjs';
+import { resolveExecutorProvider, resolveExecutorGovernance } from './executor-governance.mjs';
+import { seatPolicy } from '../execution/seat-policy.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { resolveExecutorCommand, DispatchError } from './transport.mjs';
 import { executeThroughConfinement, buildConfinementAttestation } from './confinement/authority.mjs';
@@ -322,7 +324,7 @@ export async function executeExecutorCli(
     runDir,
     // Additive (Dispatch Core Contract Normalization follow-up): governance
     // options (`disallowedProviders`/`disallowedExecutors`) forwarded to
-    // `resolveAssignmentDispatchPolicy` below. Undefined for every existing
+    // the dispatch policy below. Undefined for every existing
     // caller -- opens a real governance channel this function never had at
     // all before (it computed tier/model with its own inline logic that
     // never checked either list), without requiring any caller to opt in.
@@ -406,7 +408,7 @@ export async function executeExecutorCli(
   // caller's raw input (which may be capability-shaped, e.g.
   // "fgos-coding-implement", per the comment above), while
   // `resolveExecutorConfig` re-resolves it fresh downstream. The new
-  // resolveAssignmentDispatchPolicy() call below needs the REAL resolved
+  // the dispatch policy call below needs the REAL resolved
   // executor id (e.g. "agy") for its own `preferExecutor` field, distinct
   // from `executorId` -- and must never pass one at all when nothing
   // resolved, since that resolver throws on an unregistered preferExecutor
@@ -558,21 +560,12 @@ export async function executeExecutorCli(
   }
 
   const executor = resolvedExecutor;
-  // Dispatch Core Contract Normalization follow-up, consolidated further
-  // (dispatch-engine-liveness-hardening Phase 7, C3): governance now runs
-  // through the SAME `resolveExecutorProvider`/`resolveExecutorGovernance`
-  // helpers `resolveAssignmentDispatchPolicy` itself uses internally
-  // (assignment-policy.mjs) -- this used to call that entire resolver just
-  // to reach its two governance throws, discarding its whole computed
-  // policy object (tier/quality/persona/reasoningEffort/constraints/
-  // provenance) afterward, a real "three resolvers, one feeding the output"
-  // waste the audit named (C3). Calling the two small shared helpers
-  // directly closes the SAME governance gap (`options.disallowedProviders`/
-  // `.disallowedExecutors` are still consulted, unchanged) without paying
-  // for the unused computation.
+  // Governance runs through the same `resolveExecutorProvider`/`resolveExecutorGovernance` checks every
+  // dispatch door uses (`options.disallowedProviders`/`.disallowedExecutors`).
   //
-  // The literal MODEL is computed via resolveTierModel and handed to the
-  // resolver as an already-resolved `cliOverride.model`.
+  // The tier and the model come from the caller (the unit runner passes the ones its seat was bound
+  // at), then from the executor entry's own declaration. A caller that gives neither asks Seat Binding
+  // for the capability's tier and takes the first model of the executor family's cell at that tier.
   const capabilityName = anchorCapability ?? capabilityIdentity ?? purpose ?? executorIdArg;
   const capabilityRigor = capabilityRigorOf(cfg, capabilityName);
   if (tierOverride !== undefined && !MODEL_POLICY_TIERS.includes(tierOverride)) {
@@ -587,14 +580,28 @@ export async function executeExecutorCli(
   const effectiveRigor = (rigorOverride && capabilityRigor)
     ? resolveStrongerRigor(rigorOverride, capabilityRigor)
     : (rigorOverride ?? capabilityRigor);
-  const derivedTier = effectiveRigor ? cfg?.rigorToTier?.[effectiveRigor] : undefined;
-  const tier = tierOverride
-    ?? resolveStrongerTier(derivedTier ?? 'standard', executor?.tier);
   const providerFamily = deriveProviderFamily(executor);
-  const fallbackModel = resolveTierModel(cfg, tier, providerFamily);
-  const model = modelOverride ?? executor?.model ?? fallbackModel;
+  let tier = tierOverride ?? executor?.tier;
+  let model = modelOverride ?? executor?.model;
+  if (tier === undefined || model === undefined) {
+    const decided = seatPolicy({
+      capability: capabilityName ?? '',
+      seat: 'producer',
+      role: 'producer',
+      selectors: {},
+      raiseAuthorized: false,
+      effectiveRigor: effectiveRigor ?? 'standard',
+      ...(tier !== undefined ? { override: { tier } } : {}),
+    }, cfg);
+    if (decided.refused) throw new RunnerConfigError(`${decided.refused.reason}: ${decided.refused.detail}`, { code: decided.refused.reason });
+    tier ??= decided.policy.tier;
+    if (model === undefined) {
+      model = decided.policy.cells?.[providerFamily]?.[0]?.model;
+      if (model === undefined) throw new RunnerConfigError(`tier-cell-missing: ${tierCellMissingDetail(providerFamily, tier)}`, { code: 'tier-cell-missing' });
+    }
+  }
   // `primaryExecutor`/`explicitProviderModel` mirror exactly what the
-  // former `resolveAssignmentDispatchPolicy({assignment: {policy: {...}}})`
+  // former the dispatch policy
   // call built for this door: only when a real registered executor
   // resolved -- an unconfigured executorId must fall through to
   // `resolveExecutorProvider`'s own global-executor default, exactly like

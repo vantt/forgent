@@ -25,7 +25,7 @@ export {
   INVOCATION_VIA,
 } from './dispatch/config.mjs';
 
-export { resolveTierModel, resolveExecutorAndOverrides } from './dispatch/resolve.mjs';
+export { resolveExecutorAndOverrides } from './dispatch/resolve.mjs';
 
 export { decideDispatchMechanism, decideExecutorDispatchMechanism } from './dispatch/mechanism.mjs';
 
@@ -61,12 +61,6 @@ export {
   buildAssignment,
   renderAssignmentPrompt,
 } from './dispatch/assignment.mjs';
-
-export {
-  resolveAssignmentDispatchPolicy,
-  resolveStrongerTier,
-  TIER_STRENGTH,
-} from './dispatch/assignment-policy.mjs';
 
 export {
   executeAssignment,

@@ -67,7 +67,7 @@ export function explainCapability(runnerConfig, { capability, rigor, session, pr
   const executorEntry = runnerConfig.executors?.[binding.executor];
   const family = executorEntry ? deriveProviderFamily(executorEntry) : null;
   const p = binding.provenance ?? {};
-  const { candidates } = listCandidates(bindAsk, bindCtx);
+  const { candidates, policy } = listCandidates(bindAsk, bindCtx);
   const walk = walkBindings(bindAsk, bindCtx);
   const storeOf = (executor, invocation) => storeOfBinding(runnerConfig.executors?.[executor], invocation);
 
@@ -88,7 +88,16 @@ export function explainCapability(runnerConfig, { capability, rigor, session, pr
     invocation: binding.invocation,
     credentialStore: storeOfBinding(executorEntry, binding.invocation),
     transport: binding.transport,
-    tier: { value: binding.tier, source: p.tier?.source ?? null, ceiling: p.tier?.ceiling ?? null },
+    // Where the tier came from, the workflow's recommendation when it is not the tier chosen, and the
+    // ceiling: a tier lowered by `maxTier` names the tier it was lowered from and the `maxTier` line.
+    tier: {
+      value: binding.tier,
+      source: p.tier?.source ?? null,
+      definition: policy?.definition ?? null,
+      recommendation: p.tier?.recommendation ?? null,
+      loweredFrom: p.tier?.loweredFrom ?? null,
+      maxTier: p.tier?.maxTier ?? null,
+    },
     model: { value: binding.model, source: p.model?.source ?? null },
     pool: binding.pool,
     cell: { entries: cellEntries },

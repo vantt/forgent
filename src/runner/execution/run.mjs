@@ -18,7 +18,7 @@ import { assertPinnedAccountsUsable, runnerConfigForBinding } from './account-pi
 import { simulateUnitBindings } from './dry-bind.mjs';
 import { worktreeSnapshot, writesSince } from './partial-writes.mjs';
 import { createSeatLedger } from './seat-ledger.mjs';
-import { resolveSeats, assertNoSeatTier, effectiveRigorOf } from './seat-resolver.mjs';
+import { resolveSeats, assertNoSeatTier, effectiveRigorOf, workflowTierOf } from './seat-resolver.mjs';
 import { isSeatRecord } from './legacy-seat-read.mjs';
 import { assertSeatId } from '../../convention/seat-id.mjs';
 import { runPattern } from './patterns/index.mjs';
@@ -28,7 +28,7 @@ import { runCommand } from '../goal-check.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { declaredOperationFields } from '../dispatch/assignment.mjs';
 import { createCredentialProbe } from '../dispatch/provider-credential-probe.mjs';
-import { ensureRunnerConfigForDir, RunnerConfigError, assertRunTimeoutMs } from '../dispatch/config.mjs';
+import { ensureRunnerConfigForDir, RunnerConfigError, assertRunTimeoutMs, stripConfigComments } from '../dispatch/config.mjs';
 import { commitOnBranch, commitUnitWork, foreignIndexDetail, preflightUnitWorktree } from './commit-unit-work.mjs';
 import { assertSyncResumable, commitRoundWithSync, effectiveWriteScope, runPendingSync, seedSync, syncBrief, syncSummary } from './unit-sync.mjs';
 import { AgentNotFoundError, resolveAgentDefinition } from '../agent-definitions.mjs';
@@ -163,14 +163,19 @@ export function resolveGitRoots(cwd = process.cwd()) {
  */
 export function snapshotRunnerConfig(mainCheckoutRoot, runnerConfig) {
   const cfg = runnerConfig ?? ensureRunnerConfigForDir(mainCheckoutRoot);
-  const filtered = {
+  // What the hash covers is what seat choice and the run read: the tier defaults and ceiling, the
+  // fallback order, the cells, the capability taste, the patterns (with the schema marker), the
+  // executors and governance. `$comment` is documentation and never changes the hash.
+  const filtered = stripConfigComments({
+    defaults: cfg.defaults || {},
+    maxTier: cfg.maxTier ?? null,
+    tierFallback: cfg.tierFallback || {},
     capabilities: cfg.capabilities || {},
     patterns: cfg.patterns || {},
-    rigorToTier: cfg.rigorToTier || {},
     modelPolicies: cfg.modelPolicies || {},
     executors: cfg.executors || {},
     governance: cfg.governance || null,
-  };
+  });
   const serialized = JSON.stringify(filtered);
   const hash = crypto.createHash('sha256').update(serialized).digest('hex');
   return {
@@ -388,19 +393,61 @@ function requireFreeWorktree(port, worktree) {
   throw new CaseAdmissionRefusedError({ code: answer, condition: binding?.condition ?? `worktree ${worktree} is not free for a run that names no case: ${answer}${owner}` });
 }
 
+const hasSelectors = (selectors) => selectors !== null && typeof selectors === 'object' && Object.values(selectors).some((v) => v !== undefined && v !== null);
+
 /**
- * Refuse a pinned account before a unit run exists: each seat an `account` override applies to
- * (bound the way the run would bind it) must take that account, at least one seat must, and the
- * account must not be quarantined now.
+ * What a seat's bind ask carries beyond the seat itself: the tier its workflow recommended, what the
+ * calling door chose, and whether that door may raise. The recommendation and the selectors come from
+ * the unit record, so a resume and a replay ask what the run asked; `raiseAuthorized` is never
+ * persisted, so a replay can only ever be the unauthorized one.
  */
-async function assertAccountPinsBeforeRun(unit, runnerConfig, options) {
+function bindContextOf(unitRecord, seatUnit, seat, options = {}) {
+  const workflowTier = workflowTierOf(seat, seatUnit, unitRecord.workflowId);
+  return {
+    ...(workflowTier ? { workflowTier } : {}),
+    ...(hasSelectors(unitRecord.selectors) ? { selectors: unitRecord.selectors } : {}),
+    raiseAuthorized: options.raiseAuthorized === true,
+  };
+}
+
+/**
+ * Refuse what the calling door has no authority for, and a pinned account no seat takes, before a unit
+ * run exists.
+ *
+ * - An override that accepts a dependence, and a tier above the one a seat resolves to (an override's, or
+ *   one a door's chosen persona or capability resolves to), are raises. No door is authorized yet, so they
+ *   are refused by name: `dependence-acceptance-unauthorized`, `tier-escalation-unauthorized`.
+ * - Each seat an `account` override applies to (bound the way the run would bind it) must take that
+ *   account, at least one seat must, and the account must not be quarantined now.
+ */
+async function assertDoorChoicesBeforeRun(unit, runnerConfig, options) {
   const overrides = options.overrides ?? [];
-  if (!overrides.some((o) => o && typeof o === 'object' && o.account !== undefined)) return;
+  const objects = overrides.filter((o) => o && typeof o === 'object');
+  if (options.raiseAuthorized !== true && objects.some((o) => o.acceptDependence === true)) {
+    throw new RunnerConfigError(
+      'dependence-acceptance-unauthorized: accepting a dependence between seats needs an authorized door; no door of this release is authorized, so every seat keeps the independence its pattern asks for',
+      { code: 'dependence-acceptance-unauthorized', phase: 'pre-admission' },
+    );
+  }
+  const pinsAccount = objects.some((o) => o.account !== undefined);
+  const mayRaise = objects.some((o) => o.tier !== undefined) || hasSelectors(options.selectors) || objects.some((o) => o.persona !== undefined);
+  if (!pinsAccount && !mayRaise) return;
   const { seats } = await simulateUnitBindings(
     { ...unit, pattern: chosenPattern(options, unit) },
     runnerConfig,
-    { session: { herdrPresent: options.session?.herdrPresent ?? detectHerdrPresent(), ...(options.session ?? {}) }, overrides },
+    {
+      session: { herdrPresent: options.session?.herdrPresent ?? detectHerdrPresent(), ...(options.session ?? {}) },
+      overrides,
+      selectors: options.selectors,
+      raiseAuthorized: options.raiseAuthorized === true,
+      workflowId: options.workflowId,
+    },
   );
+  const unauthorized = seats.find((r) => r.refused?.reason === 'tier-escalation-unauthorized');
+  if (unauthorized) {
+    throw new RunnerConfigError(`tier-escalation-unauthorized: ${unauthorized.refused.detail}`, { code: 'tier-escalation-unauthorized', phase: 'pre-admission' });
+  }
+  if (!pinsAccount) return;
   const refused = seats.find((r) => r.refused?.reason?.startsWith('account-pin'));
   if (refused) throw new RunnerConfigError(`cannot pin the account for seat "${refused.seat}": ${refused.refused.detail}`);
   if (!seats.some((r) => r.account)) {
@@ -418,6 +465,12 @@ async function assertAccountPinsBeforeRun(unit, runnerConfig, options) {
  * @param {object} [options.unitData] Raw unit object (in-memory)
  * @param {string} [options.pattern] Pattern name or preset
  * @param {Array} [options.overrides] Array of overrides [{scope, origin, executor, invocation, tier, persona, reasoningEffort, account, timeoutMs}]
+ * @param {{persona?: string, seat?: string, capability?: string}} [options.selectors] What the calling door chose
+ *   (a persona or capability a person typed): a choice that lifts a seat's tier above what the seat resolves
+ *   to without it is a raise, refused unless the door is authorized
+ * @param {boolean} [options.raiseAuthorized] Whether the calling door may raise a tier or accept a dependence.
+ *   No door is authorized yet: every caller passes false (the default)
+ * @param {string} [options.workflowId] The workflow this unit belongs to, to name where a seat's recommended tier was declared
  * @param {string} [options.resumeUnitRunId] Unit run ID to resume
  * @param {string} [options.repoRoot] Main repository root
  * @param {string} [options.cwd] Current working directory / worktree
@@ -637,7 +690,7 @@ async function runUnitBody(options, scope) {
     const seats = resolveSeats({ pattern: chosenPattern(options, unit), unit, runnerConfig: configSnapshot.runner });
     // A pinned account is checked before the unit run exists: every seat it applies to must bind an
     // executor whose provider lists it, and it must not be quarantined now.
-    await assertAccountPinsBeforeRun(unit, configSnapshot.runner, options);
+    await assertDoorChoicesBeforeRun(unit, configSnapshot.runner, options);
     // A sync ref is resolved to its commit once, before the run exists; a resume merges that commit.
     const sync = seedSync(unit, { worktree: worktreePath, mainRoot });
     const writing = unit.writes.length > 0 || Boolean(sync);
@@ -701,6 +754,8 @@ async function runUnitBody(options, scope) {
       unit,
       seatSchema: 1,
       seats,
+      ...(hasSelectors(options.selectors) ? { selectors: Object.fromEntries(Object.entries(options.selectors).filter(([, v]) => v !== undefined && v !== null)) } : {}),
+      ...(typeof options.workflowId === 'string' && options.workflowId ? { workflowId: options.workflowId } : {}),
       workflow: scope.admission ? normalizeWorkflowLink({ caseId: scope.admission.caseId, activity: caseRef.activity, reservationId: scope.admission.reservationId }) : null,
       ...(admittedCeiling !== null ? { seatLaunchCeiling: admittedCeiling } : {}),
       pattern: options.pattern ?? unit.pattern ?? 'solo',
@@ -964,6 +1019,7 @@ async function runUnitBody(options, scope) {
       role: seat.role,
       posture: seat.posture,
       ...(seat.persona ? { persona: seat.persona } : {}),
+      ...bindContextOf(unitRecord, rUnit || unit, seat, options),
       readOnly,
       independentOf: seatLedger.resolve(independentOf),
       ...(preferIndependentOf.length > 0 ? { preferIndependentOf: seatLedger.seats(preferIndependentOf) } : {}),

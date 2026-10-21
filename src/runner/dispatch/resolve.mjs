@@ -190,7 +190,7 @@ export function resolveTierModel(cfg, tier, provider = 'claude') {
  * then a Claude-CLI-command inference, then the resolved command literal
  * itself. Extracted (pure move, byte-identical for every existing caller)
  * from `resolveExecutorConfig`'s own inline derivation below so a second
- * caller (`assignment-policy.mjs`'s pre-spawn policy resolution, which has
+ * caller (the dispatch policy's pre-spawn policy resolution, which has
  * no resolved `executor.command` yet) reads the SAME rule instead of a
  * third, independently-drifting copy of it — `resolvedCommand` defaults to
  * `'claude'` for that caller, which resolves through the

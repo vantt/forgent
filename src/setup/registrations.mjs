@@ -70,7 +70,6 @@ import {
   checkLlmAccountsShape,
   checkLlmAccountsVsLegacy,
   checkGlobalModelPoliciesPortable,
-  checkCapabilityRigorCeiling,
 } from './model-pool-checks.mjs';
 import { checkBlindStepsUseProvenPools } from './blind-steps-proven-pools.mjs';
 import { checkExecutorPostureCoverage } from './executor-posture-coverage.mjs';
@@ -88,13 +87,13 @@ import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/
 import { readOwnershipMarker, cleanupConfinementResource, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
-import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, DEFAULT_RIGOR_TO_TIER, validateCapabilityServesShape, validateGeneratedPathsShape, RunnerConfigError, VALID_CHECKER_SEATS } from '../runner/dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, SEAT_BINDING_SCHEMA_VERSION, validateCapabilityServesShape, validateGeneratedPathsShape, RunnerConfigError, VALID_CHECKER_SEATS } from '../runner/dispatch/config.mjs';
 import { RIGOR_VALUES } from '../runner/rigor.mjs';
 import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
-import { bind, hasUsablePrefer } from '../runner/execution/bind.mjs';
+import { bind } from '../runner/execution/bind.mjs';
 import { walkStateOf } from '../runner/execution/account-rotation.mjs';
-import { bindSeatOf } from '../runner/execution/seat-resolver.mjs';
+import { bindSeatOf, capabilityEntriesOf, hasUsablePrefer } from '../runner/execution/seat-resolver.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
 import { listWork, StoreError } from '../state/store.mjs';
@@ -270,11 +269,18 @@ function assembleRegistryDefaults() {
  * missing, at any depth, and writes back only when a key was actually
  * added or the shared file did not exist yet. This is the write path
  * `fgos setup` calls (RUL9: doctor checks stay read-only; `setup` is the
- * one write verb).
+ * one write verb). `layer` is `project` (the default) or `global`.
  */
-export function ensureSharedConfigDefaults(dir) {
+export function ensureSharedConfigDefaults(dir, { layer = 'project' } = {}) {
   const existing = readSharedConfig(dir);
-  const defaults = assembleRegistryDefaults();
+  const registered = assembleRegistryDefaults();
+  // A project's own runner section starts in the seat-binding schema, so its loader accepts what setup
+  // wrote. A runner section that is already there is the setup conversion's, never marked here, and the
+  // global file takes no seat-binding key (every older release on the machine reads it).
+  const freshProjectRunner = layer === 'project' && registered.runner && Object.keys(existing.runner ?? {}).length === 0;
+  const defaults = freshProjectRunner
+    ? { ...registered, runner: { ...registered.runner, patterns: { ...registered.runner.patterns, seatBinding: { schema: SEAT_BINDING_SCHEMA_VERSION } } } }
+    : registered;
   const { merged, addedKeys } = mergeConfigDefaults(existing, defaults);
   const sharedExisted = fs.existsSync(sharedConfigFilePath(dir));
   if (sharedExisted && addedKeys.length === 0) {
@@ -499,38 +505,6 @@ function checkConfigNotStale(cwd) {
   return { passed: true, message: `config up to date at ${sharedPath}` };
 }
 
-function checkRunnerRigorConfig(cwd) {
-  const levels = [
-    ['project', readSharedConfig(cwd)?.runner],
-    ['global', loadGlobalConfig()?.runner],
-  ];
-  const problems = [];
-  for (const [level, runner] of levels) {
-    if (!runner) continue;
-    const map = runner.rigorToTier;
-    if (!map || typeof map !== 'object' || Array.isArray(map)) {
-      problems.push(`${level} runner.rigorToTier missing -- run fgos setup`);
-    } else {
-      for (const rigor of RIGOR_VALUES) {
-        if (!MODEL_POLICY_TIERS.includes(map[rigor])) {
-          problems.push(`${level} runner.rigorToTier.${rigor} must be one of ${MODEL_POLICY_TIERS.join('/')}`);
-        }
-      }
-      for (const rigor of Object.keys(map)) {
-        if (!RIGOR_VALUES.includes(rigor)) problems.push(`${level} runner.rigorToTier has unknown rigor "${rigor}"`);
-      }
-    }
-    for (const [capability, entry] of Object.entries(runner.capabilities ?? {})) {
-      if (entry?.overrides !== undefined) {
-        problems.push(`${level} runner.capabilities.${capability}.overrides was removed; use .rigor`);
-      }
-    }
-  }
-  return problems.length > 0
-    ? { passed: false, message: problems.join('; ') }
-    : { passed: true, message: 'runner rigor maps and capability floors are valid at every configured level' };
-}
-
 export function checkRunnerGeneratedPathsConfig(cwd) {
   const projectRunner = readSharedConfig(cwd)?.runner;
   const globalRunner = loadGlobalConfig()?.runner;
@@ -723,6 +697,10 @@ export function checkTierVocabularyDeadKeys(cwd) {
     if ('PLACEMENT_POLICY_SHADOW' in runner) {
       problems.push(`${level} config contains dead key "runner.PLACEMENT_POLICY_SHADOW"`);
     }
+    // The global file of a machine that has not re-run setup still carries it; it is dropped at load.
+    if (level === 'project' && 'rigorToTier' in runner) {
+      problems.push('project config contains retired key "runner.rigorToTier"; rigor no longer chooses a tier, run `fgos setup` to convert the config');
+    }
     for (const [execId, exec] of Object.entries(runner.executors ?? {})) {
       if (exec && typeof exec === 'object') {
         if ('rigorOverrides' in exec) {
@@ -763,8 +741,10 @@ export function checkModelPolicyTierCoverage(cwd) {
   const problems = [];
   for (const [level, runner] of levels) {
     if (!runner || typeof runner !== 'object') continue;
-    const rigorToTier = runner.rigorToTier ?? DEFAULT_RIGOR_TO_TIER;
-    const neededTiers = new Set(Object.values(rigorToTier));
+    // Every family must serve the tier a seat runs at when nothing names one. A tier a capability, role,
+    // persona or seat declares is that taste's own business: a family without a cell for it is skipped
+    // by the walk, never an error here.
+    const neededTiers = new Set([runner.defaults?.tier ?? 'standard']);
     const providersChecked = new Set();
 
     for (const [execId, exec] of Object.entries(runner.executors ?? {})) {
@@ -780,14 +760,14 @@ export function checkModelPolicyTierCoverage(cwd) {
       }
       for (const tier of neededTiers) {
         if (!providerPolicies[tier]) {
-          problems.push(`${level} provider "${provider}" missing model for tier "${tier}" (required by rigorToTier)`);
+          problems.push(`${level} provider "${provider}" missing model for tier "${tier}" (the tier a seat runs at when nothing names one)`);
         }
       }
     }
   }
   return problems.length > 0
     ? { passed: false, message: problems.join('; ') }
-    : { passed: true, message: 'modelPolicies covers all tiers required by rigorToTier' };
+    : { passed: true, message: 'modelPolicies covers the default tier for every registered executor' };
 }
 
 export function checkCoordinationProtocolDeadVocabulary(cwd) {
@@ -1435,12 +1415,6 @@ registerCheck({
 });
 
 registerCheck({
-  id: 'runner-rigor-config',
-  description: 'project and global runner rigorToTier maps are complete and capabilities declare only rigor floors',
-  check: (cwd) => checkRunnerRigorConfig(cwd),
-});
-
-registerCheck({
   id: 'runner-generated-paths',
   description: 'runner.generatedPaths maps generated sources to render targets with well-formed write-scope entries',
   check: (cwd) => checkRunnerGeneratedPathsConfig(cwd),
@@ -1466,7 +1440,7 @@ registerCheck({
 
 registerCheck({
   id: 'model-policy-tier-coverage',
-  description: 'runner.modelPolicies covers every tier generated by rigorToTier for all registered executors',
+  description: 'runner.modelPolicies covers the default tier (runner.defaults.tier) for all registered executors',
   check: (cwd) => checkModelPolicyTierCoverage(cwd),
 });
 
@@ -1510,12 +1484,6 @@ registerCheck({
   id: 'global-model-policies-portable',
   description: 'runner.modelPolicies in ~/.fgos/config.json uses plain model names only, since every fgOS release on the machine reads it',
   check: () => checkGlobalModelPoliciesPortable(),
-});
-
-registerCheck({
-  id: 'capability-rigor-ceiling',
-  description: 'lists the capabilities whose own rigor lifts their seats above runner.maxTier, with the tier and model they then run at; informational',
-  check: (cwd) => checkCapabilityRigorCeiling(cwd),
 });
 
 registerCheck({
@@ -2651,9 +2619,8 @@ function checkWorkflowCapabilitiesConfigured(cwd) {
 function evaluateWorkflowCapabilities(cwd, uses) {
   const capabilities = readSharedConfig(cwd)?.runner?.capabilities;
   const declared = capabilities && typeof capabilities === 'object' && !Array.isArray(capabilities) ? capabilities : {};
-  const missing = [...uses].filter(
-    ([capability]) => !declared[capability] && !(capability.includes(':') && declared[capability.split(':')[1]]),
-  );
+  const entriesOf = (capability) => capabilityEntriesOf({ capabilities: declared }, capability);
+  const missing = [...uses].filter(([capability]) => entriesOf(capability).length === 0);
   if (missing.length > 0) {
     const list = missing.map(([cap, ids]) => `${cap} (${[...ids].join(', ')})`).join('; ');
     return {
@@ -2661,18 +2628,18 @@ function evaluateWorkflowCapabilities(cwd, uses) {
       message: `runner.capabilities has no entry for Workflow capabilities: ${list} -- declare each under runner.capabilities (fgos setup adds every shipped Workflow's)`,
     };
   }
-  // Declared is not enough: bind() needs a prefer pool, on the exact entry or the bare
-  // verb, or it refuses the unit headless. Setup's own slots are description-only on
+  // Declared is not enough: a seat needs a prefer pool, on the exact entry or its prefix entry
+  // (or a tierFallback list for its tier), or it is refused headless. Setup's own slots are description-only on
   // purpose (which executors serve a capability is the project's taste), so this is a
   // warning that names the gap rather than a failure on a fresh project.
   const noPool = [...uses].filter(
-    ([capability]) => !hasUsablePrefer(declared[capability]) && !(capability.includes(':') && hasUsablePrefer(declared[capability.split(':')[1]])),
+    ([capability]) => !entriesOf(capability).some(({ entry }) => hasUsablePrefer(entry)),
   );
   if (noPool.length > 0) {
     const list = noPool.map(([cap, ids]) => `${cap} (${[...ids].join(', ')})`).join('; ');
     return {
       passed: true,
-      message: `warning: Workflow capabilities declared but with no "prefer" pool, so a headless run of those units is refused: ${list} -- add "prefer" under the exact name or its bare verb in runner.capabilities`,
+      message: `warning: Workflow capabilities declared but with no "prefer" pool, so a headless run of those units is refused: ${list} -- add "prefer" under the exact name or its prefix entry in runner.capabilities`,
     };
   }
   return { passed: true, message: `every capability a Workflow unit names (${uses.size}) is declared in runner.capabilities with a prefer pool` };
@@ -2753,7 +2720,7 @@ registerCheck({
 // real dispatch re-resolves at execution time, never a second, drifting
 // lookup. An operation naming a capability with nothing registered for it
 // does not fail at dispatch time (it quietly falls back to the runner's
-// global default executor, per `resolveAssignmentDispatchPolicy`'s own
+// global default executor, per the dispatch policy's own
 // precedence) -- this check is the only place that quiet degradation is
 // surfaced before it happens for real. Also reports the count of distinct
 // provider families reachable across every resolved capability (design

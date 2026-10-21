@@ -69,7 +69,6 @@
     "src/runner/dispatch/usage-parsers.mjs": "infra",
     "src/runner/dispatch/runtime-inspection.mjs": "infra",
     "src/runner/dispatch/reconciliation-planner.mjs": "infra",
-    "src/runner/dispatch/assignment-policy.mjs": "infra",
     "src/runner/dispatch/operation-prompt-templates.mjs": "infra",
     "src/runner/dispatch/provider-adapter.mjs": "infra",
     "src/runner/dispatch/llm-accounts.mjs": "infra",
@@ -357,6 +356,9 @@
     "src/git/restore.mjs": "infra",
     "src/git/config.mjs": "infra",
     "src/git/native-lock.mjs": "infra",
-    "src/git/recovery.mjs": "infra"
+    "src/git/recovery.mjs": "infra",
+    "src/runner/dispatch/executor-governance.mjs": "infra",
+    "src/runner/dispatch/work-item-input.mjs": "infra",
+    "src/runner/execution/seat-policy.mjs": "infra"
   }
 }

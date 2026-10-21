@@ -59,11 +59,7 @@ import {
   renderAgentResultClaimInstructions,
   validateAgentResultClaimContract,
 } from './agent-result-claim-contract.mjs';
-// Step 08 P04.2b: `resolveStrongerTier` is the SAME tier-strength
-// comparison `resolveAssignmentDispatchPolicy` itself uses to guarantee a
-// more-specific scope can only RAISE a tier requirement, never lower one
-// never-weaken invariant.
-import { refuseWorkItemInput, resolveStrongerTier } from './assignment-policy.mjs';
+import { refuseWorkItemInput } from './work-item-input.mjs';
 import { resolveAndRenderOperationPrompt, TemplateResolutionError } from './operation-prompt-templates.mjs';
 
 /**
@@ -594,17 +590,16 @@ function buildInlineAssignment({ provenance, workId, createdBy, options = {} }) 
   });
 
   // Merge the domain harness's own policy with the validated current
-  // contract.policy.tier. Retired persisted keys are normalized only while
-  // loading assignment.json, never on this new-contract path.
+  // contract.policy.tier. The tier the caller declared in the contract is the one the assignment
+  // carries; no tier is chosen here (Seat Binding decides what that tier may be when the plan is
+  // compiled). Retired persisted keys are normalized only while loading assignment.json, never on
+  // this new-contract path.
   const contractPolicyTier = contract.policy?.tier;
   let mergedInlinePolicy = harnessPolicy;
   if (contractPolicyTier !== undefined) {
-    const harnessTier = harnessPolicy?.tier;
     mergedInlinePolicy = Object.freeze({
       ...(harnessPolicy || {}),
-      tier: harnessTier
-        ? resolveStrongerTier(harnessTier, contractPolicyTier)
-        : contractPolicyTier,
+      tier: contractPolicyTier,
     });
   }
 

@@ -59,9 +59,9 @@ import { mintAttemptWriterId, resolveWriterIdentity } from '../../util/session-i
 import { resolveExecutorEnv, workerBaseEnv, caseContextEnv, CASE_ID_ENV, CASE_RESERVATION_ENV } from './adapters.mjs';
 import { compileDispatchPlan } from './plan.mjs';
 import { resolveFallback } from './recovery.mjs';
-import { deriveProviderFamily, resolveTierModel, resolveExecutorConfig, selectConfinedInvocationId } from './resolve.mjs';
+import { deriveProviderFamily, resolveExecutorConfig, selectConfinedInvocationId } from './resolve.mjs';
 import { normalizeProviderFamily, checkProviderDisallowed, collectModelWarnings } from './provider-adapter.mjs';
-import { explicitReasoningEffort, refuseWorkItemInput } from './assignment-policy.mjs';
+import { refuseWorkItemInput } from './work-item-input.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 import { extractProtocolOperationStamp, normalizeSavedPolicyTier, resolveMutatingCwdPosture } from './execution-contract.mjs';
@@ -169,15 +169,6 @@ function fallbackMutationForAssignment(asgn) {
   }
 }
 
-function resolveExecutorCommandFallback(entry, executorId) {
-  if (entry?.command) return entry.command;
-  if (Array.isArray(entry?.invocations)) {
-    const cli = entry.invocations.find((inv) => inv?.via === 'cli');
-    if (cli?.command) return cli.command;
-  }
-  return executorId;
-}
-
 /**
  * The login stores a launch of `executorId` may read, before the invocation is settled: the store key of the
  * pinned invocation when the caller pinned one, else of the executor's `cli` invocations in declaration
@@ -208,44 +199,6 @@ function declaredStoreCli(cfg, executorId, pinnedInvocationId) {
   const invocations = Array.isArray(entry?.invocations) ? entry.invocations.filter((inv) => inv?.via === 'cli') : [];
   const invocation = pinnedInvocationId ? invocations.find((inv) => inv.id === pinnedInvocationId) : invocations[0];
   return invocation ? (credentialStoreOf({ ...invocation, command: invocation.command ?? entry.command })?.use ?? null) : null;
-}
-
-function resolveProviderFamilyForExecutor(entry, executorId) {
-  const declared = entry?.providerModel || entry?.provider;
-  if (declared) return normalizeProviderFamily(declared);
-  const cmd = resolveExecutorCommandFallback(entry, executorId);
-  return normalizeProviderFamily(deriveProviderFamily(entry, cmd), cmd);
-}
-
-
-function policyForActualExecutor(cfg, policy, executorId, sourceExecutorId) {
-  if (executorId === sourceExecutorId) return policy;
-  const executorEntry = cfg?.executors?.[executorId];
-  const providerModel = resolveProviderFamilyForExecutor(executorEntry, executorId);
-  // dispatch-engine-liveness-hardening Phase 7: `resolveVerifiedAssignmentModel`
-  // retired -- both sides call the identical `resolveTierModel(cfg, policy.tier, provider)` with
-  // identical inputs, so divergence was never possible.
-  // (a provenance/ownership label, not a second competing computation).
-  const model = providerModel === policy.providerModel
-    ? policy.model
-    : resolveTierModel(cfg, policy.tier, providerModel);
-  return {
-    ...policy,
-    executorId,
-    providerModel,
-    model,
-    provenance: {
-      ...policy.provenance,
-      provider: providerModel === policy.providerModel ? policy.provenance?.provider : {
-        value: providerModel,
-        source: { scope: 'readOnlyExecutorRedirect', id: executorId },
-      },
-      model: model === policy.model ? policy.provenance?.model : {
-        value: model,
-        source: { scope: 'readOnlyExecutorRedirect', id: `${providerModel}.${policy.tier}` },
-      },
-    },
-  };
 }
 
 /**
@@ -999,7 +952,7 @@ function admitRunAttempt(
  * Phase B (plans/260917-executor-profile-schema-migration/plan.md): when
  * the primary executor's provider-capacity lease is refused, attempt ONE
  * real dispatch against a declared fallback executor instead of settling
- * the Run as failed immediately. assignment-policy.mjs's own
+ * the Run as failed immediately. the dispatch policy's own
  * `fallbackExecutors`/`executorPreference` field has been
  * "reserved-not-executed" (Phase 00 R10) until now; this closes that gap.
  *
@@ -1010,7 +963,7 @@ function admitRunAttempt(
  * verifies the scoped plan's governance verdict reads "allowed" and its
  * tier/visibility provenance agrees with the original plan, and never
  * silently downgrades a governance floor.
- * inside `resolveAssignmentDispatchPolicy`), plus a full, correctly
+ * inside the dispatch policy), plus a full, correctly
  * recompiled invocation/confinement-policy for the candidate, "for free".
  *
  * This function only picks a candidate and (at most once) attempts its
@@ -1403,7 +1356,7 @@ export async function executeAssignment(assignment, opts = {}) {
 
   // Enforce decide-first governance gate (Step 06). Dispatch Core Contract
   // Normalization Slice D: compileDispatchPlan() now merges
-  // resolveAssignmentDispatchPolicy()'s tier/model/providerModel/provenance
+  // the dispatch policy's tier/model/providerModel/provenance
   // into the plan itself (compiledPlan.policy) and enforces the
   // decided-executor-vs-policy-executor agreement internally -- this call
   // site no longer resolves policy a second time or re-checks that
@@ -1457,7 +1410,6 @@ export async function executeAssignment(assignment, opts = {}) {
   const defaultExecutorId = effectivePolicy.executorPreference?.[0] ?? 'claude';
   const hasExplicitInvocationPin = typeof opts.cliOverride?.preferInvocation === 'string' && opts.cliOverride.preferInvocation.trim();
   let resolvedExecutorId = defaultExecutorId;
-  effectivePolicy = policyForActualExecutor(cfg, effectivePolicy, resolvedExecutorId, defaultExecutorId);
   // Cell 6.7 Bug B: `resolvedExecutorId` can diverge from `defaultExecutorId`
   // for a redirected read-only op (above). `policy.executorPreference[0]`
   // (persisted below, unchanged) always records the DECLARED preference
@@ -1971,7 +1923,7 @@ export async function executeAssignment(assignment, opts = {}) {
   // agent-result.json and agent-report.md. Use absolute path to avoid worktree ambiguity.
   // Phase 02 (executor-policy-dispatch-seams): thread the ALREADY-resolved
   // persona (effectivePolicy.persona/provenance.persona, computed above by
-  // the same resolveAssignmentDispatchPolicy() every dispatch path shares)
+  // the same the dispatch policy every dispatch path shares)
   // into the actual worker-visible prompt -- previously resolved but never
   // delivered. Additive: `undefined` when no persona resolved, byte-identical
   // to the pre-Phase-02 prompt for every such assignment.
@@ -2046,7 +1998,7 @@ export async function executeAssignment(assignment, opts = {}) {
 
   const executorId = resolvedExecutorId;
   // ADR-006 R7 sibling bug (RT059-F1): `compiledPlan.policy` (the object
-  // `resolveAssignmentDispatchPolicy()` returns -- tier/model/providerModel/
+  // the dispatch policy returns -- tier/model/providerModel/
   // confinement/executorPreference) has never carried an `adapter` field.
   // The real resolved adapter lives at `compiledPlan.invocation.adapter`
   // (plan.mjs: `invocation = { via: 'cli', adapter: resolvedForDispatch.adapter
@@ -2231,7 +2183,7 @@ export async function executeAssignment(assignment, opts = {}) {
           prompt,
           model: effectivePolicy.model,
           requestedModel: opts.cliOverride?.model,
-          reasoningEffort: explicitReasoningEffort(effectivePolicy),
+          reasoningEffort: effectivePolicy.reasoningEffort,
           tier: effectivePolicy.tier,
           executorId: resolvedExecutorId,
           fgosDir,
@@ -2553,7 +2505,7 @@ export async function executeAssignment(assignment, opts = {}) {
           runnerConfig: cfg,
           model: effectivePolicy.model,
           requestedModel: opts.cliOverride?.model,
-          reasoningEffort: explicitReasoningEffort(effectivePolicy),
+          reasoningEffort: effectivePolicy.reasoningEffort,
           tier: effectivePolicy.tier,
           timeoutMs,
           onChunk: opts.onChunk,

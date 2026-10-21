@@ -172,8 +172,8 @@ export function unitPatternOf(template) {
  * synthesizer included) has no matching override and falls through to the unit's own persona.
  *
  * A run started with `--effort` asks every role for that reasoning effort, the way `fgos run --effort`
- * does: on every entry above, and as a trailing unscoped `human-cli` override that a role no entry
- * names falls through to.
+ * does: on every entry above, and as a trailing unscoped override that a role no entry names falls
+ * through to. No override names an origin that says a person typed it: nothing of this release can attest one.
  */
 export function unitOverridesOf(unit, seatPersonas = [], options = {}) {
   const { effort = null, timeoutMs = null, account = null } = options ?? {};
@@ -196,7 +196,6 @@ export function unitOverridesOf(unit, seatPersonas = [], options = {}) {
   if (!hasFallback) return seatScoped;
 
   const fallback = {
-    origin: 'human-cli',
     ...(effort !== null ? { reasoningEffort: effort } : {}),
     ...(applyTimeout ? { timeoutMs } : {}),
     ...(account !== null ? { account } : {}),

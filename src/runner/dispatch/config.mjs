@@ -203,13 +203,6 @@ export function detectAssistantCli(candidateNames = KNOWN_ASSISTANT_CLI_NAMES, p
  */
 export const DEFAULT_COORDINATION_ORG_DISCHARGE_ON = Object.freeze(["accepted"]);
 
-export const DEFAULT_RIGOR_TO_TIER = Object.freeze({
-  low: 'nano',
-  standard: 'standard',
-  high: 'flagship',
-  critical: 'frontier',
-});
-
 export const DEFAULT_RUNNER_CONFIG = {
   coordination: { orgPolicy: { dischargeOn: [...DEFAULT_COORDINATION_ORG_DISCHARGE_ON] } },
   executor: {
@@ -241,7 +234,6 @@ export const DEFAULT_RUNNER_CONFIG = {
       frontier: 'opus',
     },
   },
-  rigorToTier: { ...DEFAULT_RIGOR_TO_TIER },
   timeoutMs: 900000,
   confinement: {
     strict: false,
@@ -302,6 +294,16 @@ const SEAT_BINDING_CAPABILITY_KEYS = Object.freeze(['tier', 'maxTier', 'roles', 
 export const SEAT_BINDING_SCHEMA_VERSION = 1;
 
 /**
+ * What a project file with no runner section is given: the defaults plus the seat-binding schema
+ * marker. The marker is a project setting only; `DEFAULT_RUNNER_CONFIG` is what `fgos setup` also
+ * writes into the global file, which takes no seat-binding key.
+ */
+export const FRESH_PROJECT_RUNNER_CONFIG = {
+  ...DEFAULT_RUNNER_CONFIG,
+  patterns: { ...DEFAULT_RUNNER_CONFIG.patterns, seatBinding: { schema: SEAT_BINDING_SCHEMA_VERSION } },
+};
+
+/**
  * Seat binding keys are the project config's: the global file is read by every fgOS release on the
  * machine, and an older one refuses a capability key it does not know. A global file that carries one
  * is an error naming the project config, not a value that silently fills a gap in every project.
@@ -326,7 +328,8 @@ function refuseGlobalSeatBindingKeys(globalConfig) {
 
 /**
  * `mergeWithGlobalConfig`'s `sanitizeGlobal` hook for this module's own
- * schema: drops any `runner.modelPolicies.<provider>` tier key not in
+ * schema (`sanitizeGlobalLayer`, one function for the whole global layer). It drops the retired
+ * `runner.rigorToTier` key and any `runner.modelPolicies.<provider>` tier key not in
  * `MODEL_POLICY_TIERS`. A stale key here is not a project-level
  * customization — `validateModelPoliciesShape` already rejects any tier key
  * outside this vocabulary, so leaving a retired one in the global config
@@ -344,7 +347,27 @@ function refuseGlobalSeatBindingKeys(globalConfig) {
  */
 const warnedGlobalExtendedCells = new Set();
 
-function sanitizeGlobalModelPolicies(globalConfig) {
+let warnedGlobalRigorToTier = false;
+
+/**
+ * `runner.rigorToTier` no longer exists: rigor sets checker count and independence, never a tier. The
+ * global file of a machine that has not re-run setup still carries it, and every older release on
+ * that machine still requires it, so the file is left alone and the key is dropped in memory here,
+ * once per process with a note on stderr. A project file that carries it is refused instead
+ * (`assertProjectConverted`).
+ */
+function dropRetiredGlobalKeys(globalConfig) {
+  if (!globalConfig?.runner || !Object.hasOwn(globalConfig.runner, 'rigorToTier')) return globalConfig;
+  if (!warnedGlobalRigorToTier) {
+    warnedGlobalRigorToTier = true;
+    process.stderr.write('fgos: ignoring ~/.fgos/config.json runner.rigorToTier: rigor no longer chooses a tier (the file is left as it is; older fgOS releases on this machine still read it)\n');
+  }
+  const { rigorToTier: _retired, ...runner } = globalConfig.runner;
+  return { ...globalConfig, runner };
+}
+
+function sanitizeGlobalLayer(rawGlobalConfig) {
+  const globalConfig = dropRetiredGlobalKeys(rawGlobalConfig);
   refuseGlobalSeatBindingKeys(globalConfig);
   const modelPolicies = globalConfig?.runner?.modelPolicies;
   if (!modelPolicies || typeof modelPolicies !== 'object' || Array.isArray(modelPolicies)) {
@@ -381,6 +404,25 @@ function sanitizeGlobalModelPolicies(globalConfig) {
 }
 
 /**
+ * The project layer must be in the seat-binding schema before anything reads or writes it: no
+ * `runner.rigorToTier` (a retired key), and the `runner.patterns.seatBinding` marker an older
+ * release refuses (the validator reads its value). A project file in the old shape is refused by name and left untouched; `fgos setup`
+ * converts it. A project file with no `runner` section is a fresh one: the loader has nothing to
+ * convert, and the first-run writer puts the marker in. Checked on the project layer alone, so a
+ * machine whose global file still carries `rigorToTier` keeps loading (`sanitizeGlobalLayer`).
+ */
+function assertProjectConverted(parsed, sharedPath) {
+  const runner = parsed?.runner;
+  if (!runner || typeof runner !== 'object' || Array.isArray(runner) || Object.keys(runner).length === 0) return;
+  const retired = Object.hasOwn(runner, 'rigorToTier');
+  if (!retired && runner.patterns?.seatBinding !== undefined) return;
+  throw new RunnerConfigError(
+    `${sharedPath}#runner is not in the seat-binding schema (${retired ? 'it still carries "rigorToTier", which no longer exists' : 'it has no runner.patterns.seatBinding.schema'}): run \`fgos setup\` to convert it; nothing was changed.`,
+    { code: 'config-not-converted' },
+  );
+}
+
+/**
  * Resolve+validate the runner section of the shared project config file at
  * `dir` (`.fgos/config.json`'s `runner` key, the sole config source since
  * tsk-5hv D1 retired the legacy fallback). Its content is merged against
@@ -404,7 +446,8 @@ export function loadRunnerConfigFromDir(dir) {
     throw new RunnerConfigError(`shared config at "${sharedPath}" is not valid JSON: ${err.message}`);
   }
   rejectProjectProviderAccountInventory(parsed, sharedPath);
-  const withGlobal = mergeWithGlobalConfig(parsed, undefined, { sanitizeGlobal: sanitizeGlobalModelPolicies });
+  assertProjectConverted(parsed, sharedPath);
+  const withGlobal = mergeWithGlobalConfig(parsed, undefined, { sanitizeGlobal: sanitizeGlobalLayer });
   const runnerCfg = stripConfigComments(withGlobal.runner ?? {});
   validateRunnerConfigShape(runnerCfg, `${sharedPath}#runner`);
   normalizeConfigConfinement(runnerCfg);
@@ -450,8 +493,9 @@ export function ensureRunnerConfigForDir(dir) {
   if (fs.existsSync(sharedPath)) {
     const parsed = JSON.parse(fs.readFileSync(sharedPath, 'utf8'));
     rejectProjectProviderAccountInventory(parsed, sharedPath);
+    assertProjectConverted(parsed, sharedPath);
     const existingRunner = parsed.runner ?? {};
-    const { merged, addedKeys } = mergeConfigDefaults(existingRunner, DEFAULT_RUNNER_CONFIG);
+    const { merged, addedKeys } = mergeConfigDefaults(existingRunner, Object.keys(existingRunner).length === 0 ? FRESH_PROJECT_RUNNER_CONFIG : DEFAULT_RUNNER_CONFIG);
     let projectShared = parsed;
     if (addedKeys.length > 0) {
       projectShared = { ...parsed, runner: merged };
@@ -460,7 +504,7 @@ export function ensureRunnerConfigForDir(dir) {
         `fgos: added missing default config keys to ${sharedPath}#runner: ${addedKeys.join(', ')}\n`,
       );
     }
-    const withGlobal = mergeWithGlobalConfig(projectShared, undefined, { sanitizeGlobal: sanitizeGlobalModelPolicies });
+    const withGlobal = mergeWithGlobalConfig(projectShared, undefined, { sanitizeGlobal: sanitizeGlobalLayer });
     const runnerCfg = stripConfigComments(withGlobal.runner ?? {});
     validateRunnerConfigShape(runnerCfg, `${sharedPath}#runner`);
     normalizeConfigConfinement(runnerCfg);
@@ -468,7 +512,7 @@ export function ensureRunnerConfigForDir(dir) {
   }
 
   const { detected, executor } = bootstrapDefaultExecutor('.fgos/config.json');
-  const runnerConfig = { ...DEFAULT_RUNNER_CONFIG, executor };
+  const runnerConfig = { ...FRESH_PROJECT_RUNNER_CONFIG, executor };
   fs.mkdirSync(path.dirname(sharedPath), { recursive: true });
   fs.writeFileSync(sharedPath, `${JSON.stringify({ runner: runnerConfig }, null, 2)}\n`);
   process.stderr.write(
@@ -556,14 +600,7 @@ export const EXECUTOR_KINDS = Object.freeze(['agent', 'tool']);
  */
 export const EXECUTOR_CARRIES = Object.freeze(['user-text', 'repo-content']);
 
-// Phase 03 (executor-policy-dispatch-seams) — canonical reasoningEffort
-// (design.md §3.3). Defined here (moved from assignment-policy.mjs, Phase C
-// of executor-profile-schema-migration) so this file's own
-// `validateExecutorEntryShape` can validate `supports.reasoningEffort`
-// against the exact same vocabulary `resolveAssignmentDispatchPolicy`
-// enforces at dispatch time, without a config.mjs -> assignment-policy.mjs
-// -> config.mjs import cycle. `assignment-policy.mjs` re-exports this name
-// unchanged for its own existing callers.
+// Canonical reasoningEffort vocabulary, validated here for `supports.reasoningEffort` and at dispatch time.
 // The vocabulary itself lives in tier-cell.mjs (a leaf), because a tier cell names an effort too.
 export { REASONING_EFFORT_VALUES };
 
@@ -936,7 +973,7 @@ function validateInteractiveModeShape(interactiveMode, label) {
 /**
  * Advisory-only, config-load-time warning: an `executors.<id>` entry that
  * declares neither `providerModel` nor `provider`, and for which
- * `assignment-policy.mjs`'s own pre-spawn command extraction
+ * the dispatch policy's own pre-spawn command extraction
  * (`invocations[].find((inv) => inv.via === 'cli')?.command` — mirrored
  * here EXACTLY, since that's the only signal that call site ever reads)
  * yields no usable command, has no reliable way to name its own provider
@@ -947,10 +984,10 @@ function validateInteractiveModeShape(interactiveMode, label) {
  * already agree, nothing to flag). It's UNSAFE for every other shape that
  * still lacks `providerModel`/`provider`: a bare (non-`invocations[]`)
  * entry with a real non-Claude flat `.command` (resolve.mjs correctly
- * reads that bare command; assignment-policy.mjs never does), and an
+ * reads that bare command; the dispatch policy never does), and an
  * `invocations[]`-shaped entry with no `via:"cli"` entry at all — e.g. this
  * repo's own live `gitnexus` (`invocations: [{via:'mcp', ...}]`, MCP-only)
- * — where assignment-policy.mjs has literally nothing to extract and
+ * — where the dispatch policy has literally nothing to extract and
  * silently defaults to `'claude'` while other call sites resolve a
  * different (or no) provider family. Never throws — this must not break a
  * config that currently loads fine; it only recommends declaring
@@ -975,7 +1012,7 @@ function warnIfProviderFamilyUnreliable(executorId, executor) {
   // "mcpTool":"mcp__gitnexus__impact"}` -- never a cli-spawn, so the
   // cross-call-site provider disagreement it warns about cannot arise on
   // that path. That observation does NOT by itself refute the reason named
-  // in the test's own title (assignment-policy.mjs has no command to extract
+  // in the test's own title (the dispatch policy has no command to extract
   // for this shape and defaults the family), so the behaviour is not
   // reversed here on one agent's judgment. Decide it deliberately: either
   // declare a truthful provider on the entry, narrow the warning to shapes
@@ -1660,36 +1697,6 @@ function validateRunnerDefaultsShape(defaults, label) {
   if (defaults.tier !== undefined) validateTierName(defaults.tier, `${label}.tier`);
 }
 
-function validateRigorToTierShape(rigorToTier, label) {
-  const missingRigors = RIGOR_VALUES.filter((rigor) => rigorToTier[rigor] === undefined);
-  if (missingRigors.length > 0) {
-    throw new RunnerConfigError(
-      `runner config (${label}) must map every rigor (${RIGOR_VALUES.join('/')}); missing: ${missingRigors.join(', ')}.`,
-    );
-  }
-  for (const [rigor, tier] of Object.entries(rigorToTier)) {
-    if (!RIGOR_VALUES.includes(rigor)) {
-      throw new RunnerConfigError(
-        `runner config (${label}) has unknown rigor "${rigor}". Valid rigors: ${RIGOR_VALUES.join('/')}.`,
-      );
-    }
-    if (!MODEL_POLICY_TIERS.includes(tier)) {
-      throw new RunnerConfigError(
-        `runner config (${label}.${rigor}) must map to one of ${MODEL_POLICY_TIERS.join('/')}, got: ${JSON.stringify(tier)}.`,
-      );
-    }
-  }
-  for (let i = 1; i < RIGOR_VALUES.length; i += 1) {
-    const weakerRigor = RIGOR_VALUES[i - 1];
-    const strongerRigor = RIGOR_VALUES[i];
-    if (MODEL_POLICY_TIERS.indexOf(rigorToTier[strongerRigor]) < MODEL_POLICY_TIERS.indexOf(rigorToTier[weakerRigor])) {
-      throw new RunnerConfigError(
-        `runner config (${label}) lowers tier from rigor "${weakerRigor}" (${rigorToTier[weakerRigor]}) to "${strongerRigor}" (${rigorToTier[strongerRigor]}); rigorToTier must be monotonic.`,
-      );
-    }
-  }
-}
-
 /**
  * Pure query (Phase 00 R8): does `cfg.modelPolicies.<providerModel>` declare
  * `policyTier`? No I/O, no credential probing, no "is the executable on
@@ -1844,12 +1851,12 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
   if (cfg.tierFallback !== undefined) validateTierFallbackShape(cfg.tierFallback, `${sourceLabel} tierFallback`);
   if (cfg.maxTier !== undefined) validateTierName(cfg.maxTier, `${sourceLabel} maxTier`);
   if (cfg.defaults !== undefined) validateRunnerDefaultsShape(cfg.defaults, `${sourceLabel} defaults`);
-  if (!cfg.rigorToTier || typeof cfg.rigorToTier !== 'object' || Array.isArray(cfg.rigorToTier)) {
+  if ('rigorToTier' in cfg) {
     throw new RunnerConfigError(
-      `runner config (${sourceLabel}) must declare a "rigorToTier" object mapping rigor -> tier.`,
+      `runner config (${sourceLabel}) declares retired "rigorToTier": rigor no longer chooses a tier (declare "tier" per capability, role, persona or seat); run \`fgos setup\` to convert the config.`,
+      { code: 'config-not-converted' },
     );
   }
-  validateRigorToTierShape(cfg.rigorToTier, `${sourceLabel} rigorToTier`);
   validateProviderAccountInventory(cfg, sourceLabel);
   if (typeof cfg.timeoutMs !== 'number' || !Number.isFinite(cfg.timeoutMs) || cfg.timeoutMs <= 0) {
     throw new RunnerConfigError(`runner config (${sourceLabel}) must declare a positive numeric "timeoutMs".`);
