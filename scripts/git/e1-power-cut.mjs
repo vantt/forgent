@@ -40,9 +40,9 @@ function options(argv) {
   return out;
 }
 async function loaders(descriptorFile) {
-  const { env = {}, ...descriptor } = JSON.parse(fs.readFileSync(descriptorFile, 'utf8'));
+  const descriptor = JSON.parse(fs.readFileSync(descriptorFile, 'utf8'));
   // The staged host travels with the descriptor: each mode runs as its own process.
-  Object.assign(process.env, env);
+  Object.assign(process.env, descriptor.env);
   const index = await import('../../src/git/index.mjs');
   return { index, loader: { descriptor } };
 }

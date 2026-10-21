@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "993aa6361050460a9bca50f2947b7849b0e69d634050dc4602ced5fa8b964445",
+  "payloadDigest": "ec27050979eb22154ec790db6f49189dad67d5e737b913d36c3652ba20df2bb4",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -559,8 +559,8 @@
     "scripts/fgos-session-start-hook.mjs": "6ec944bb42698570cb5cb860d24bde1229d884f968ce0f6771c05b9c11a93af6",
     "scripts/fgos-shell-integration.sh": "89d74fd3352594dccc46c85174725a7095714ed436a599342ef87c78a60b732c",
     "scripts/git-addon.mjs": "67532c2006d74a97cbc40814e82882da1de5d48b5d072670444489e2ed963d71",
-    "scripts/git/e1-power-cut.mjs": "d262b48f77e6b7e7028a451831a3b7ddf1b25139a3d39e8941b6dc9930ea23a3",
-    "scripts/git/e1-power-cut.sh": "80d3c0a41609694f3a317127701250f7526b45390d2f154b9946ba6bda144789",
+    "scripts/git/e1-power-cut.mjs": "a8157f33b3d6433d40fe5d6beb2c4a304552ce962529d751ca697c26d2aeb815",
+    "scripts/git/e1-power-cut.sh": "da2bc0900e7d8bd59c66b2112ad9ca39df7bb2bade1be9a4de47f111aa022610",
     "scripts/git/e3-bench.mjs": "324b205b6ac185b7d1f1d5e1c10070de9d6261714bb5c4ae334a35307d68e003",
     "scripts/git/p-release-checks.sh": "08bb9b3c32e7915b27f645f7aa68d42cba0dbddd2a7dc9adc45d43a75b4d0056",
     "scripts/git/p-space-resource.mjs": "31e12327e2782a769a341cb6819f7e1e24d63e78de732c1ad210e430433aad06",
@@ -943,36 +943,7 @@
     "src/workflow/unit-handoff.mjs": "76f4be618c5202f829311d0c161d144ef0fb1b4ddcf08425eef43afee78991bd",
     "src/workflow/units-source.mjs": "4e7c37fd0b0cced310b968154d579b8dc0c1949e27493f8ca68bb92421e91745"
   },
-  "sites": [
-    {
-      "path": "scripts/git/e1-power-cut.mjs",
-      "line": 108,
-      "spawn": "createGitScopedCommit -> src/git/scoped-commit.mjs:7",
-      "binary": "? descriptor.manifest.entries.fgos",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "scripts/git/e1-power-cut.mjs",
-      "line": 143,
-      "spawn": "createGitPublication -> src/git/index.mjs:9",
-      "binary": "? descriptor.manifest.entries.fgos",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "scripts/git/e1-power-cut.mjs",
-      "line": 212,
-      "spawn": "createGitRecovery -> src/git/recovery.mjs:7",
-      "binary": "? descriptor.manifest.entries.fgos",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "scripts/git/e1-power-cut.mjs",
-      "line": 291,
-      "spawn": "createGitRecovery -> src/git/recovery.mjs:7",
-      "binary": "? descriptor.manifest.entries.fgos",
-      "family": "unresolved-binary"
-    }
-  ],
+  "sites": [],
   "classes": [
     {
       "path": ".agents/skills/distill/scripts/distill.mjs",
@@ -2271,6 +2242,34 @@
       "path": "scripts/git-addon.mjs",
       "line": 16,
       "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e1-power-cut.mjs",
+      "line": 108,
+      "spawn": "createGitScopedCommit -> src/git/scoped-commit.mjs:7",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e1-power-cut.mjs",
+      "line": 143,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e1-power-cut.mjs",
+      "line": 212,
+      "spawn": "createGitRecovery -> src/git/recovery.mjs:7",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e1-power-cut.mjs",
+      "line": 291,
+      "spawn": "createGitRecovery -> src/git/recovery.mjs:7",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
