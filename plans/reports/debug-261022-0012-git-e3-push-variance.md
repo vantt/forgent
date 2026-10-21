@@ -33,7 +33,7 @@ Fast mode p95 is 145-147 ms against the 150 ms budget (about 3% headroom); slow 
 
 1. Set the push-without-objects budget from the fsync floor, as was done for the changing CAS: for example p95 <= 200 ms on the owner's host class, and have the bench record the fsync probe next to the verdict (same idea as the 2026-10-19 measurement condition). Gain: stable verdict, no product change. Cost: budget loosened by 50 ms against the original 150.
 2. Keep 150 ms and make the verdict conditional on the recorded probe: judge only when probe p50 < 6 ms, otherwise report "host in slow-fsync mode, not judged". Gain: keeps the number honest. Cost: a run can be unjudged.
-3. Product side: fewer fsyncs per push (13 now). Not evaluated here: it needs a read of the transfer WAL sequence (Intent, pin, start, outcome records) against the signed ordering rules, and RUL104 says no new mechanism. Each fsync removed saves about 2.3-4 ms in slow mode and about 0 to 1.5 ms of nothing in fast mode (5.2 ms each in fast mode, so about 5 ms). Mention only; not proposed without the owner's call on the durability rules.
+3. Product side: fewer fsyncs per push (13 now). Not evaluated here: it needs a read of the transfer WAL sequence (Intent, pin, start, outcome records) against the signed ordering rules, and RUL104 says no new mechanism. Each fsync removed saves about 5 ms in fast mode and 2.3-4 ms more in slow mode. Mention only; not proposed without the owner's call on the durability rules.
 
 ## Small fix made
 
