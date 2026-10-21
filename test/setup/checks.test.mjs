@@ -102,6 +102,9 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'invariant-checks-configured',
       'worktree-setup-configured',
       'writer-identity-resolvable',
+      'seat-binding-route',
+      'seat-binding-config',
+      'seat-binding-drain',
       'events-jsonl-not-truncated',
       'cli-version-visible',
       'worker-slots-ceiling-usable',
@@ -164,7 +167,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'non-claude-trust-stores-readable',
       'confined-pane-accounts',
       'agent-cli-project-trusted',
-      'workflow-pools-satisfy-independence',
+      'seat-binding-dry-bind',
       'blind-steps-use-proven-pools',
       'observe-dir-writable',
       'observe-friction-migrated',
@@ -191,17 +194,13 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'confinement-probe-freshness',
       'confinement-blind-read',
       'confinement-strict-readiness',
-      'coordination-abandoned-claims',
       'operation-prompt-templates-valid',
       'operation-capability-resolves',
       'runner-coordination-orgPolicy-shape',
       'runner-patterns-config',
       'runner-generated-paths',
-      'runner-rigor-config',
-      'mutating-assignment-binding-snapshot',
       'shadow-binder-divergence',
       'tier-vocabulary-dead-keys',
-      'model-policy-tier-coverage',
       'executor-family-unique',
       'executor-skills-installed',
       'tier-fallback',
@@ -209,7 +208,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'llm-accounts-shape',
       'llm-accounts-vs-legacy',
       'global-model-policies-portable',
-      'capability-rigor-ceiling',
       'coordination-protocol-dead-vocabulary',
     ].sort(),
   );
@@ -878,6 +876,8 @@ function declareExecutor(cwd, id, fields) {
   cfg.runner ??= {};
   cfg.runner.executors ??= {};
   cfg.runner.executors[id] = fields;
+  // A project config in the seat-binding schema: the loader refuses one that has no marker.
+  cfg.runner.patterns = { ...cfg.runner.patterns, seatBinding: { schema: 1 } };
   // tsk-45f D11 (tsk-34n retired the "capability" singular fallback --
   // "for" is the only field read now): "for" is catalog-validated against
   // cfg.runner.capabilities -- declare each entry here so this raw fixture

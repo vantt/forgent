@@ -5,6 +5,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { nativeAddonLibraryName } from './build-rust-distribution.mjs';
 import { devHostEnv, devHostManifest } from './lib/dev-host-manifest.mjs';
+import { gitAddonDirectory } from './lib/git-addon-stage.mjs';
 import { processesInside } from '../src/runner/dispatch/stop-processes-inside.mjs';
 
 const checkoutRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -77,6 +78,39 @@ function forwardResult(result, description) {
   return result.status ?? 1;
 }
 
+/**
+ * Point this launcher's own environment at a persistent staged copy of the addon and host that cargo just built,
+ * so the process door loads from a directory the launcher never deletes (a per-run copy is removed at the end,
+ * which a loaded addon forbids on Windows). Nothing is built here; unchanged bytes are not rewritten.
+ */
+export function stageLauncherDoor(targetDir = path.resolve(checkoutRoot, process.env.CARGO_TARGET_DIR ?? 'target')) {
+  const dir = gitAddonDirectory(checkoutRoot);
+  assertLocalPath(path.relative(checkoutRoot, dir).split(path.sep).join('/'));
+  fs.mkdirSync(dir, { recursive: true });
+  const stage = (name, source, mode) => {
+    const destination = path.join(dir, name);
+    const bytes = fs.readFileSync(source);
+    if (!fs.existsSync(destination) || !fs.readFileSync(destination).equals(bytes)) {
+      atomicWrite(destination, (temporary) => {
+        fs.writeFileSync(temporary, bytes);
+        fs.chmodSync(temporary, mode);
+      });
+    }
+    return destination;
+  };
+  const fgosBin = stage(process.platform === 'win32' ? 'fgos.exe' : 'fgos', path.join(targetDir, 'debug', process.platform === 'win32' ? 'fgos.exe' : 'fgos'), 0o755);
+  const addonFile = stage('fgos.node', path.join(targetDir, 'debug', nativeAddonLibraryName()), 0o644);
+  const manifestPath = path.join(dir, 'manifest.json');
+  const manifestBytes = `${JSON.stringify(devHostManifest({ checkoutRoot, fgosBin, addonFile }), null, 2)}\n`;
+  if (!fs.existsSync(manifestPath) || fs.readFileSync(manifestPath, 'utf8') !== manifestBytes) {
+    atomicWrite(manifestPath, (temporary) => {
+      fs.writeFileSync(temporary, manifestBytes);
+      fs.chmodSync(temporary, 0o644);
+    });
+  }
+  Object.assign(process.env, devHostEnv({}, { fgosBin, checkoutRoot, manifestPath }));
+}
+
 function main() {
   const build = spawnSync('cargo', ['build', '--locked', '--package', 'fgos', '--package', 'fgos-node-addon'], {
     cwd: checkoutRoot,
@@ -94,6 +128,7 @@ function main() {
   assertLocalPath('bin/fgos.mjs');
   const runtimeBase = path.join(checkoutRoot, runtimeBaseRelative);
   fs.mkdirSync(runtimeBase, { recursive: true });
+  stageLauncherDoor(targetDir);
   pruneRunDirs(runtimeBase);
   const runtimeDir = fs.mkdtempSync(path.join(runtimeBase, 'run-'));
   let child;

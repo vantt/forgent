@@ -23,6 +23,7 @@ import { admitProposal, newReservationId, recheckReservation } from './case-admi
 import { bindWorktree, ensureBindingsSentinel, readBinding } from './case-bindings.mjs';
 import { workflowCheckout, playbookSubjectDigests } from './unit-handoff.mjs';
 import { CASE_ID_ENV, CASE_RESERVATION_ENV, currentDispatchDepth } from '../runner/dispatch/adapters.mjs';
+import { seatKeyOf } from '../runner/execution/legacy-seat-read.mjs';
 import { bindingsDir } from './case-bindings.mjs';
 
 const caseDirOf = (mainRoot, caseId) => path.join(mainRoot, '.fgos', 'workflow-runs', caseId);
@@ -72,8 +73,8 @@ function proposedAchievements({ mainRoot, projection, reservation, result }) {
     : (projection.guide?.activities.find((a) => a.id === reservation.activity)?.produces ?? []);
   if (produces.length === 0) return { achieved: [], receipts: base };
   const reports = () => {
-    const roles = [...new Set((result.results ?? []).filter((r) => r?.runResult).map((r) => r.role))];
-    return result.unitRunId && roles.length > 0 ? digestUnitRunReports([{ unitRunId: result.unitRunId, roles }], mainRoot) : null;
+    const seats = [...new Set((result.results ?? []).filter((r) => r?.runResult).map(seatKeyOf))];
+    return result.unitRunId && seats.length > 0 ? digestUnitRunReports([{ unitRunId: result.unitRunId, seats }], mainRoot) : null;
   };
   const achieved = [];
   const receipts = [];

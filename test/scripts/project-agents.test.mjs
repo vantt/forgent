@@ -9,7 +9,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { projectAgentMarkdown, AgentDefinitionError, DEFAULT_MODELS, readRunnerModels, findAgentYamlFiles, resolveAgentFiles } from '../../scripts/project-agents.mjs';
+import { projectAgentMarkdown, AgentDefinitionError, findAgentYamlFiles, resolveAgentFiles } from '../../scripts/project-agents.mjs';
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'project-agents-test-'));
@@ -42,15 +42,16 @@ tool-scope:
 `;
 
 test('tool-scope maps exactly into the generated tools: frontmatter -- no silent add, no silent drop (D1)', () => {
-  const markdown = projectAgentMarkdown('test-agent', VALID_YAML, DEFAULT_MODELS);
+  const markdown = projectAgentMarkdown('test-agent', VALID_YAML);
   const toolsLine = markdown.split('\n').find((line) => line.startsWith('tools:'));
   assert.equal(toolsLine, 'tools: Read, Grep, Bash');
 });
 
-test('rigor resolves through the same tier->model map the shared config file/dispatch.mjs already use', () => {
-  const markdown = projectAgentMarkdown('test-agent', VALID_YAML, DEFAULT_MODELS);
-  const modelLine = markdown.split('\n').find((line) => line.startsWith('model:'));
-  assert.equal(modelLine, 'model: haiku');
+test('a persona rigor names no model: the projected agent carries no model line and inherits the session\'s', () => {
+  for (const rigor of ['low', 'standard', 'high', 'critical']) {
+    const markdown = projectAgentMarkdown('test-agent', VALID_YAML.replace('rigor: low', `rigor: ${rigor}`));
+    assert.equal(markdown.split('\n').some((line) => line.startsWith('model:')), false, rigor);
+  }
 });
 
 // skills (tsk-397 D20): optional eligibility field --
@@ -58,76 +59,58 @@ test('rigor resolves through the same tier->model map the shared config file/dis
 // frontmatter when the source yaml never declares it.
 test('skills, when declared, projects into the frontmatter as a bracketed list', () => {
   const withSkills = VALID_YAML + '\nskills:\n  - fgos-coding-implement\n  - fgos-coding-validating\n';
-  const markdown = projectAgentMarkdown('test-agent', withSkills, DEFAULT_MODELS);
+  const markdown = projectAgentMarkdown('test-agent', withSkills);
   const skillsLine = markdown.split('\n').find((line) => line.startsWith('skills:'));
   assert.equal(skillsLine, 'skills: [fgos-coding-implement, fgos-coding-validating]');
 });
 
 test('skills is absent from the frontmatter when the source yaml never declares it (backward compatible)', () => {
-  const markdown = projectAgentMarkdown('test-agent', VALID_YAML, DEFAULT_MODELS);
+  const markdown = projectAgentMarkdown('test-agent', VALID_YAML);
   assert.equal(markdown.includes('skills:'), false);
 });
 
 test('a skills list containing a non-string entry is refused, not silently coerced', () => {
   const badSkills = VALID_YAML + '\nskills:\n  - fgos-coding-implement\n  - 42\n';
-  assert.throws(() => projectAgentMarkdown('test-agent', badSkills, DEFAULT_MODELS), AgentDefinitionError);
+  assert.throws(() => projectAgentMarkdown('test-agent', badSkills), AgentDefinitionError);
 });
 
 test('projection is idempotent -- identical source produces byte-identical output across two runs', () => {
-  const first = projectAgentMarkdown('test-agent', VALID_YAML, DEFAULT_MODELS);
-  const second = projectAgentMarkdown('test-agent', VALID_YAML, DEFAULT_MODELS);
+  const first = projectAgentMarkdown('test-agent', VALID_YAML);
+  const second = projectAgentMarkdown('test-agent', VALID_YAML);
   assert.equal(first, second);
 });
 
 test('a platform name in the source yaml is refused, not silently projected', () => {
   const withPlatformName = VALID_YAML.replace('A test agent.', 'A Claude-specific test agent.');
-  assert.throws(() => projectAgentMarkdown('test-agent', withPlatformName, DEFAULT_MODELS), AgentDefinitionError);
+  assert.throws(() => projectAgentMarkdown('test-agent', withPlatformName), AgentDefinitionError);
 });
 
 test('each forbidden platform name (claude/codex/anthropic) is refused, case-insensitively', () => {
   for (const name of ['Claude', 'CODEX', 'anthropic']) {
     const withPlatformName = VALID_YAML.replace('Tester', `${name}-flavored tester`);
-    assert.throws(() => projectAgentMarkdown('test-agent', withPlatformName, DEFAULT_MODELS), AgentDefinitionError);
+    assert.throws(() => projectAgentMarkdown('test-agent', withPlatformName), AgentDefinitionError);
   }
 });
 
 test('a missing required field is refused, not silently defaulted', () => {
   const missingRole = VALID_YAML.replace('role: Test Role\n', '');
-  assert.throws(() => projectAgentMarkdown('test-agent', missingRole, DEFAULT_MODELS), AgentDefinitionError);
+  assert.throws(() => projectAgentMarkdown('test-agent', missingRole), AgentDefinitionError);
 });
 
 test('an empty tool-scope is refused -- an agent-type with no declared tools is a config error, not an implicit deny-all', () => {
   const emptyToolScope = VALID_YAML.replace('tool-scope:\n  - Read\n  - Grep\n  - Bash\n', 'tool-scope: []\n');
-  assert.throws(() => projectAgentMarkdown('test-agent', emptyToolScope, DEFAULT_MODELS), AgentDefinitionError);
+  assert.throws(() => projectAgentMarkdown('test-agent', emptyToolScope), AgentDefinitionError);
 });
 
 test('an unrecognized rigor is refused rather than silently falling through to undefined', () => {
   const badRigor = VALID_YAML.replace('rigor: low', 'rigor: extreme');
-  assert.throws(() => projectAgentMarkdown('test-agent', badRigor, DEFAULT_MODELS), AgentDefinitionError);
+  assert.throws(() => projectAgentMarkdown('test-agent', badRigor), AgentDefinitionError);
 });
 
 // --- readRunnerModels: real integration coverage (tsk-5tm, D9) -- this
 // function was previously untested and read the legacy `runner.models`
 // shape directly, silently ignoring `modelPolicies` (the shape this repo's
 // own committed .fgos/config.json now uses) with no error. -------------
-
-test('readRunnerModels resolves via modelPolicies when present, not the legacy models map', () => {
-  const dir = mkTempDir();
-  writeSharedConfig(dir, {
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
-    modelPolicies: {
-      claude: { nano: 'haiku-custom', standard: 'sonnet-custom', advanced: 'sonnet-custom', flagship: 'flagship-custom', frontier: 'opus-custom' },
-    },
-  });
-  assert.deepEqual(readRunnerModels(dir), { low: 'haiku-custom', standard: 'sonnet-custom', high: 'flagship-custom', critical: 'opus-custom' });
-});
-
-
-test('readRunnerModels falls back to DEFAULT_MODELS per-tier when neither modelPolicies nor models configures that tier', () => {
-  const dir = mkTempDir();
-  writeSharedConfig(dir, {});
-  assert.deepEqual(readRunnerModels(dir), DEFAULT_MODELS);
-});
 
 test('findAgentYamlFiles scans core/agents/ and domains/*/agents/ (D24)', () => {
   const dir = mkTempDir();

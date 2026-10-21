@@ -74,21 +74,27 @@ test('a binding without a pinned account carries no account at all', () => {
   assert.equal(bound.provenance.account, undefined);
 });
 
-test('a seat whose family has no entry in the pool binds unpinned and says why', () => {
+test('a pin selects the entries its pool serves, so it can move the seat to the family that pool belongs to', () => {
   const bound = bind(ask([{ origin: 'human-cli', account: 'beta/b1' }]), ctx);
   assert.equal(bound.refused, undefined);
-  assert.equal(bound.executor, 'alpha', 'the pin does not steer which executor binds');
+  assert.equal(bound.executor, 'beta');
+  assert.deepEqual(bound.account, { pool: 'beta', id: 'b1' });
+});
+
+test('a seat none of whose entries the pinned pool serves binds unpinned and says why', () => {
+  const bound = bind(ask([{ origin: 'human-cli', account: 'router/r1' }], 'docs:gamma'), ctx);
+  assert.equal(bound.refused, undefined);
+  assert.equal(bound.executor, 'gamma');
   assert.equal(bound.account, undefined);
   assert.equal(bound.provenance.account.value, null);
   assert.equal(bound.provenance.account.skipped.reason, 'account-pin-other-pool');
-  assert.match(bound.provenance.account.skipped.detail, /"beta\/b1".*"alpha".*pool "beta"/);
+  assert.match(bound.provenance.account.skipped.detail, /"router\/r1".*pool "router"/);
 });
 
-test('an executor whose pool has no account list binds unpinned', () => {
+test('a pin that names an account of a pool with no account list is refused, naming the list to add', () => {
   const bound = bind(ask([{ origin: 'human-cli', account: 'gamma/g1' }], 'docs:gamma'), ctx);
-  assert.equal(bound.account, undefined);
-  assert.equal(bound.provenance.account.skipped.reason, 'account-pin-no-inventory');
-  assert.match(bound.provenance.account.skipped.detail, /pool "gamma".*no account list/);
+  assert.equal(bound.refused.reason, 'account-pin-no-inventory');
+  assert.match(bound.refused.detail, /account "gamma\/g1" cannot be pinned: pool "gamma" has no account list/);
 });
 
 test('an unknown account of the seat\'s own pool is refused, naming the pool\'s accounts', () => {
@@ -102,10 +108,9 @@ test('a disabled account of the seat\'s own pool is refused', () => {
   assert.equal(bound.refused.reason, 'account-pin-disabled');
 });
 
-test('a tool executor leases no account, so it binds unpinned', () => {
+test('a tool executor is not an agent seat, so no pin applies and the seat is refused by name', () => {
   const bound = bind(ask([{ origin: 'human-cli', account: 'alpha/a1' }], 'docs:tool'), ctx);
-  assert.equal(bound.account, undefined);
-  assert.equal(bound.provenance.account.skipped.reason, 'account-pin-unsupported');
+  assert.equal(bound.refused.reason, 'not-an-agent-seat');
 });
 
 test('an account that is not pool/account is refused, a bare id with the form to write', () => {

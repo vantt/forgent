@@ -1,7 +1,7 @@
 ---
 phase: 03
 title: "Process sites outside the SEAT carry list onto the door; route and client retired"
-status: pending
+status: done
 depends_on: [01, 02]
 parallel: "may run in parallel with phase 04 (Rust process crate; disjoint files); phase 05 starts after this phase (shared run-lock.mjs, proof-helpers.mjs, provider-capacity.mjs)"
 effort: ~1.5d

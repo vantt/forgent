@@ -599,15 +599,19 @@ test('lintPhaseUnits allows overlapping writes when units have dependency relati
   assert.equal(collisions.length, 0);
 });
 
-test('lintPhaseUnits checks capability declaration with direct match and fallback verb', () => {
+test('lintPhaseUnits checks capability declaration by exact key and prefix entry, and no longer by the bare verb', () => {
   const text = `## Units
 - unit: u-exact
   capability: docs:write
   objective: "Direct capability match"
 
-- unit: u-fallback
+- unit: u-prefix
   capability: code:implement
-  objective: "Fallback verb match"
+  objective: "Prefix entry match"
+
+- unit: u-bare-verb
+  capability: triage:implement
+  objective: "A bare verb key does not declare it"
 
 - unit: u-missing
   capability: deploy:custom-target
@@ -621,7 +625,8 @@ test('lintPhaseUnits checks capability declaration with direct match and fallbac
     runner: {
       capabilities: {
         'docs:write': { description: 'Exact capability' },
-        implement: { description: 'Fallback verb' },
+        'code:*': { description: 'Prefix entry' },
+        implement: { description: 'Bare verb, no longer a lookup key' },
       },
     },
   };
@@ -630,9 +635,8 @@ test('lintPhaseUnits checks capability declaration with direct match and fallbac
   assert.equal(result.ok, true);
 
   const unreg = result.findings.filter((f) => f.code === 'capability.unregistered');
-  assert.equal(unreg.length, 1);
-  assert.equal(unreg[0].unit, 'u-missing');
-  assert.equal(unreg[0].severity, 'warn');
+  assert.deepEqual(unreg.map((f) => f.unit).sort(), ['u-bare-verb', 'u-missing']);
+  assert.ok(unreg.every((f) => f.severity === 'warn'));
 
   const unres = result.findings.filter((f) => f.code === 'capability.unresolved');
   assert.equal(unres.length, 1);

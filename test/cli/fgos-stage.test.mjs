@@ -186,6 +186,7 @@ test('fgos plan on a standard plan without caller verdict advances Work to execu
     `,
   );
   const runnerCfg = {
+    patterns: { seatBinding: { schema: 1 } },
     executors: {
       'fixture-validator': {
         kind: 'agent',

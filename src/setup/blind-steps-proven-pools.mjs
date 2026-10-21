@@ -10,10 +10,10 @@
 // (the pool a first binding and a quota fallback both choose from), so nothing is dispatched, written
 // or paid for.
 
-import { listCandidates } from '../runner/execution/bind.mjs';
+import { explainSeat } from '../runner/execution/bind.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
 import { deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
-import { loadWorkflowDefinitions, withUnreadableDefinitions, workflowRoots } from './workflow-pool-independence.mjs';
+import { loadWorkflowDefinitions, withUnreadableDefinitions, workflowRoots, workflowUnitContract } from './workflow-definition-files.mjs';
 
 /**
  * Pairs a live canary proved blind: a worker of that provider family, run through that transport
@@ -68,12 +68,21 @@ function describeCandidate(runnerConfig, bound) {
 // is completed, so the proof counts it; every other filter (governance, posture, skills) is a real exclusion.
 const CONFIG_GAPS = new Set(['tier-cell-missing', 'pool-unusable']);
 
-/** Every executor/invocation a role could bind (a primary or a fallback), in pool order. */
-function candidatesForRole(unit, role, runnerConfig, session) {
-  return listCandidates(
-    { unit, role, independentOf: [], overrides: [], blind: true },
+/** Every executor/invocation a role could bind (a primary or a fallback), in rank order. */
+function candidatesForRole(unit, seat, runnerConfig, session) {
+  const { ranked, launchView } = explainSeat(
+    { unit, seat: seat.seat, role: seat.role, posture: seat.posture, independentOf: [], overrides: [], blind: true },
     { runnerConfig, session: { headless: true, ...session } },
-  ).candidates.filter((candidate) => !candidate.out || CONFIG_GAPS.has(candidate.out.reason)).map((candidate) => describeCandidate(runnerConfig, candidate));
+  );
+  const named = (c) => ({ executor: c.executor, invocation: c.invocation ?? null });
+  return [
+    ...(ranked?.candidates ?? []).map(named),
+    // A family with no cell is dropped before posture is judged, so the executor must itself carry it.
+    ...(ranked?.skipped ?? []).filter((skip) => CONFIG_GAPS.has(skip.reason) && launchView?.executors[skip.executor]?.defaultInvocation && !launchView.executors[skip.executor].disallowed).map((skip) => ({
+      executor: skip.executor,
+      invocation: launchView?.executors[skip.executor]?.defaultInvocation ?? null,
+    })),
+  ].map((candidate) => describeCandidate(runnerConfig, candidate));
 }
 
 /**
@@ -105,21 +114,13 @@ async function evaluateBlindPools(workflows, runnerConfig) {
         evaluated += 1;
         const label = `${wf.id}/${step.id}/${u.id} (capability "${template.capability}")`;
         try {
-          const unit = {
-            id: u.id,
-            objective: template.objective ?? '',
-            capability: template.capability,
-            rigor: template.rigor,
-            writes: template.writes ?? [],
-            pattern: template.pattern,
-            blind: true,
-          };
-          // The pattern decides which roles exist; bind() decides what each could be.
-          const { roles } = await simulateUnitBindings(unit, runnerConfig, { session: SESSIONS[0] });
+          const unit = { ...workflowUnitContract(u), blind: true };
+          // The pattern decides which seats exist; bind() decides what each could be.
+          const { seats } = await simulateUnitBindings(unit, runnerConfig, { session: SESSIONS[0] });
           const unproven = new Map();
           for (const session of SESSIONS) {
-            for (const { role } of roles) {
-              for (const c of candidatesForRole(unit, role, runnerConfig, session)) {
+            for (const seat of seats) {
+              for (const c of candidatesForRole(unit, seat, runnerConfig, session)) {
                 if (!isProven(c)) unproven.set(`${c.executor}/${c.invocation}`, c);
               }
             }

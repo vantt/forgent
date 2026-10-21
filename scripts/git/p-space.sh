@@ -11,6 +11,11 @@
 #           verifies every acknowledged operation and the WAL scan
 # Results land in <work>/out/*.json. Nothing outside --work is written.
 set -euo pipefail
+# Mount the fixture filesystems in a private mount namespace: a mount visible on the
+# host makes every `bwrap --dev-bind / /` on the machine fail while it exists.
+if [ -z "${FGOS_FIXTURE_MOUNT_NS:-}" ] && [ "$(id -u)" = 0 ]; then
+  exec env FGOS_FIXTURE_MOUNT_NS=1 unshare --mount --propagation private "$0" "$@"
+fi
 WORK="" RUN_AS="${SUDO_USER:-}" SIZE_MIB=24
 while [ $# -gt 0 ]; do
   case "$1" in

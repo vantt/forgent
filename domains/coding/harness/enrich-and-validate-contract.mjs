@@ -77,9 +77,6 @@ export function mergeHarnessPolicy(opPolicy, callerPolicy) {
   if (opPolicy?.model && !callerPolicy?.model) {
     combined._fromYaml = true;
   }
-  if (Array.isArray(combined.fallbackExecutors)) {
-    combined.fallbackExecutors = Object.freeze([...combined.fallbackExecutors]);
-  }
   return Object.freeze(combined);
 }
 

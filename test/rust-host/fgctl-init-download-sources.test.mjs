@@ -6,9 +6,11 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync, spawn, execFileSync } from 'node:child_process';
 import http from 'node:http';
-import { useReleaseFixture, FGCTL_BIN, fixture, runFgctl, waitForProcess, RELEASE_TARGET, makeDownloadProject, makeReleaseAssets, readActivation, withoutActiveRelease } from './fgctl-init-fixture.mjs';
+import { useReleaseFixture, useInitializedWorkspace, FGCTL_BIN, fixture, runFgctl, waitForProcess, RELEASE_TARGET, makeDownloadProject, makeReleaseAssets, readActivation, withoutActiveRelease } from './fgctl-init-fixture.mjs';
 
 useReleaseFixture();
+// One real `fgctl init --from <fixture release>`, restored by the cases that start from it.
+const initialized = useInitializedWorkspace(() => fixture.releaseDir, { tag: 'dl-initialized', ownHome: true });
 
 test('download: --from beats FGCTL_FROM beats FGCTL_VERSION (the losing sources are never touched)', () => {
   const t = makeDownloadProject('dl-precedence');
@@ -52,26 +54,17 @@ test('download: --from beats FGCTL_FROM beats FGCTL_VERSION (the losing sources 
 });
 
 test('download: a committed pin beats "latest" (no network when nothing explicit is given)', () => {
-  const t = makeDownloadProject('dl-pin');
-  try {
-    const first = runFgctl(['init', '--from', fixture.releaseDir], {
-      cwd: t.proj,
-      stateHome: t.state,
-      env: { HOME: t.home },
-    });
-    assert.equal(first.status, 0, first.stderr);
+  // A workspace a local `init --from` installed, which wrote the pin.
+  const t = initialized.restore();
 
-    // The asset base is unreachable: a download attempt would fail the run.
-    const again = runFgctl(['init'], {
-      cwd: t.proj,
-      stateHome: t.state,
-      env: { HOME: t.home, FGCTL_ASSET_BASE_URL: 'http://127.0.0.1:1' },
-    });
-    assert.equal(again.status, 0, again.stderr);
-    assert.ok(!/downloading/.test(again.stderr), 'a pinned workspace must not download');
-  } finally {
-    fs.rmSync(t.root, { recursive: true, force: true });
-  }
+  // The asset base is unreachable: a download attempt would fail the run.
+  const again = runFgctl(['init'], {
+    cwd: t.proj,
+    stateHome: t.state,
+    env: { HOME: t.home, FGCTL_ASSET_BASE_URL: 'http://127.0.0.1:1' },
+  });
+  assert.equal(again.status, 0, again.stderr);
+  assert.ok(!/downloading/.test(again.stderr), 'a pinned workspace must not download');
 });
 
 test('download: with no pin and nothing explicit, init resolves and installs the latest release', async () => {
@@ -117,17 +110,10 @@ test('download: with no pin and nothing explicit, init resolves and installs the
 
 
 test('fgctl init writes the sh and cmd launchers; verify names a missing one and repair rewrites it', () => {
-  const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-shims-home-'));
-  const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-shims-state-'));
-  const tempProj = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-shims-proj-'));
-  try {
-    execFileSync('git', ['init'], { cwd: tempProj });
-    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: tempProj });
-    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempProj });
+  // The launchers the shared workspace's real `fgctl init --from` wrote.
+  const { proj: tempProj, state: tempState, home: tempHome } = initialized.restore();
+  {
     const opts = { cwd: tempProj, stateHome: tempState, env: { HOME: tempHome } };
-
-    const init = runFgctl(['init', '--from', fixture.releaseDir], opts);
-    assert.equal(init.status, 0, `fgctl init: stdout=${init.stdout} stderr=${init.stderr}`);
 
     const binDir = path.join(tempProj, '.fgos', 'installation', 'bin');
     const names = fs.readdirSync(binDir).sort();
@@ -168,10 +154,6 @@ test('fgctl init writes the sh and cmd launchers; verify names a missing one and
     const edited = runFgctl(['verify'], opts);
     assert.notEqual(edited.status, 0);
     assert.match(`${edited.stdout}${edited.stderr}`, /differs from the one this fgctl writes; run fgctl repair/);
-  } finally {
-    fs.rmSync(tempHome, { recursive: true, force: true });
-    fs.rmSync(tempState, { recursive: true, force: true });
-    fs.rmSync(tempProj, { recursive: true, force: true });
   }
 });
 

@@ -28,7 +28,9 @@ import {
   validateEffectiveExecutionContract,
 } from '../../src/runner/dispatch/effective-execution-contract.mjs';
 
-import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { executeAssignment as executeAssignmentRaw } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { bindableExecute } from '../helpers/work-seat-config.mjs';
+const executeAssignment = bindableExecute(executeAssignmentRaw);
 const loadCoordinationProtocol = () => null;
 const discoverCoordinationProtocols = () => [];
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
@@ -795,7 +797,7 @@ test('I04-REV-01 regression: executeAssignment retry uses pinned template snapsh
       allowCrossProvider: true,
       command: process.execPath,
       args: [executorScript, '{prompt}'],
-    }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+    }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
     const assignment = {
       assignmentId: 'asgn_rev01_runner',
@@ -1049,7 +1051,7 @@ test('I04-REV-02 negative: validateEffectiveExecutionContract refuses corrupted 
     },
     dispatchPlan: {
       mechanism: 'in-process',
-      policy: { executorPreference: ['claude'], confinement: { requirement: 'none', backend: 'none' } },
+      policy: { executorId: 'claude', confinement: { requirement: 'none', backend: 'none' } },
       invocation: { adapter: 'cli-spawn', cwd: process.cwd() },
     },
     runId: 'run_contract_val_01',

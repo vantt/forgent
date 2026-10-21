@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { bind, bindingIdentity, listCandidates, nextCandidate, walkBindings } from '../../../src/runner/execution/bind.mjs';
+import { bind, bindingIdentity, explainSeat } from '../../../src/runner/execution/bind.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 
 seedFileLocalBwrapRegistry();
@@ -31,13 +31,13 @@ const executor = (family) => ({
 });
 const cells = (family, cell) => ({ nano: cell ?? `${family}-s`, standard: cell ?? `${family}-m`, advanced: cell ?? `${family}-m`, flagship: cell ?? `${family}-l`, frontier: cell ?? `${family}-l` });
 
-function config({ prefer = FAMILIES, tierFallback, modelPolicies = {}, llmAccounts, extra = {} } = {}) {
+function config({ prefer = FAMILIES, tier, tierFallback, modelPolicies = {}, llmAccounts, extra = {} } = {}) {
   return {
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     modelPolicies: { ...Object.fromEntries(FAMILIES.map((family) => [family, cells(family)])), ...modelPolicies },
     ...(tierFallback ? { tierFallback } : {}),
     ...(llmAccounts ? { llmAccounts } : {}),
-    capabilities: { 'docs:write': { prefer: prefer.map((name) => ({ executor: name })) } },
+    capabilities: { 'docs:write': { prefer: prefer.map((name) => ({ executor: name })), ...(tier ? { tier } : {}) } },
     executors: Object.fromEntries(FAMILIES.map((family) => [family, executor(family)])),
     ...extra,
   };
@@ -50,26 +50,27 @@ const families = (bindings) => bindings.map((b) => b.executor);
 test('the primary follows prefer order; after a failure the walk follows the tier order, narrowed to prefer', () => {
   const cfg = config({ tierFallback: { standard: ['gamma', 'beta', 'delta', 'alpha'] } });
   assert.equal(bind(ask, ctx(cfg)).executor, 'alpha', 'prefer order picks the primary, not the tier order');
-  assert.deepEqual(families(walkBindings(ask, ctx(cfg))), ['alpha', 'gamma', 'beta', 'delta']);
+  assert.deepEqual(families(explainSeat(ask, ctx(cfg)).walk), ['alpha', 'gamma', 'beta', 'delta']);
 
   const narrow = config({ prefer: ['alpha', 'gamma'], tierFallback: { standard: ['gamma', 'beta', 'delta', 'alpha'] } });
-  assert.deepEqual(families(walkBindings(ask, ctx(narrow))), ['alpha', 'gamma'], 'a listed family prefer does not name is never reached');
+  assert.deepEqual(families(explainSeat(ask, ctx(narrow)).walk), ['alpha', 'gamma'], 'a listed family prefer does not name is never reached');
 
   const widerPrefer = config({ prefer: ['alpha', 'beta', 'delta'], tierFallback: { standard: ['gamma'] } });
-  assert.deepEqual(families(walkBindings(ask, ctx(widerPrefer))), ['alpha'], 'a prefer family absent from the list is not a fallback target');
+  assert.deepEqual(families(explainSeat(ask, ctx(widerPrefer)).walk), ['alpha'], 'a prefer family absent from the list is not a fallback target');
 });
 
 test('with no tier list the walk is the prefer order after the failed candidate', () => {
   const cfg = config();
-  assert.deepEqual(families(walkBindings(ask, ctx(cfg))), ['alpha', 'beta', 'gamma', 'delta']);
+  assert.deepEqual(families(explainSeat(ask, ctx(cfg)).walk), ['alpha', 'beta', 'gamma', 'delta']);
   const otherTier = config({ tierFallback: { flagship: ['delta', 'alpha'] } });
-  assert.deepEqual(families(walkBindings(ask, ctx(otherTier))), ['alpha', 'beta', 'gamma', 'delta'], 'a list for another tier does not apply');
+  assert.deepEqual(families(explainSeat(ask, ctx(otherTier)).walk), ['alpha', 'beta', 'gamma', 'delta'], 'a list for another tier does not apply');
 });
 
 test('the walk never leaves the tier it started at', () => {
-  const cfg = config({ tierFallback: { flagship: ['delta', 'gamma'] } });
+  // The capability declares its tier; a unit's rigor says how careful it is and never moves the tier.
+  const cfg = config({ tier: 'flagship', tierFallback: { flagship: ['delta', 'gamma'] } });
   const high = { ...ask, unit: { ...ask.unit, rigor: 'high' } };
-  const walk = walkBindings(high, ctx(cfg));
+  const walk = explainSeat(high, ctx(cfg)).walk;
   assert.deepEqual(families(walk), ['alpha', 'delta', 'gamma']);
   assert.ok(walk.every((b) => b.tier === 'flagship'));
   assert.deepEqual(walk.map((b) => b.model), ['alpha-l', 'delta-l', 'gamma-l'], 'each family runs its own cell at that tier');
@@ -80,7 +81,7 @@ test('two entries of one cell are two candidates in cell order, taken before the
     modelPolicies: { alpha: cells('alpha', ['alpha-m@alpha', 'alpha-via-router@router']) },
     llmAccounts: { router: { r1: { credentialStore: { alpha: '/nonexistent/r1' } } } },
   });
-  const walk = walkBindings(ask, ctx(cfg));
+  const walk = explainSeat(ask, ctx(cfg)).walk;
   assert.deepEqual(walk.map((b) => [b.executor, b.pool, b.model]), [
     ['alpha', 'alpha', 'alpha-m'],
     ['alpha', 'router', 'alpha-via-router'],
@@ -88,10 +89,10 @@ test('two entries of one cell are two candidates in cell order, taken before the
     ['gamma', 'gamma', 'gamma-m'],
     ['delta', 'delta', 'delta-m'],
   ]);
-  const second = nextCandidate(walk[0], ask, ctx(cfg));
+  const second = bind(ask, ctx(cfg), { walk: { tried: [walk[0]] } });
   assert.equal(second.provenance.fallbackFrom.walk, 'entry');
   assert.equal(second.provenance.fallbackFrom.pool, 'alpha');
-  const third = nextCandidate(walk[1], ask, ctx(cfg), 'provider-limit', { tried: walk.slice(0, 2) });
+  const third = bind(ask, ctx(cfg), { walk: { tried: walk.slice(0, 2) } });
   assert.equal(third.provenance.fallbackFrom.walk, 'family');
 });
 
@@ -101,9 +102,9 @@ test('a fault excludes one pool and keeps the other pool of the same family', ()
     llmAccounts: { router: { r1: { credentialStore: { alpha: '/nonexistent/r1' } } } },
   });
   const first = bind(ask, ctx(cfg));
-  const next = nextCandidate(first, ask, ctx(cfg), 'provider-limit', { excludePools: ['alpha'] });
+  const next = bind(ask, ctx(cfg), { walk: { tried: [first], excludePools: ['alpha'] } });
   assert.deepEqual([next.executor, next.pool], ['alpha', 'router']);
-  const none = bind(ask, ctx(config({ prefer: ['alpha'] })), { excludePools: ['alpha'] });
+  const none = bind(ask, ctx(config({ prefer: ['alpha'] })), { walk: { excludePools: ['alpha'] } });
   assert.equal(none.refused.reason, 'pool-excluded');
 });
 
@@ -113,9 +114,10 @@ test('a pool no account can serve gives no candidate, and explain material says 
     modelPolicies: { alpha: cells('alpha', ['alpha-via-router@router', 'alpha-m']) },
     llmAccounts: { router: { r1: { credentialStore: { other: '/nonexistent/r1' } }, r2: { credentialStore: { alpha: '/nonexistent/r2' }, disabled: true } } },
   });
-  const { candidates } = listCandidates(ask, ctx(cfg));
-  assert.deepEqual(candidates.map((c) => [c.pool, c.out?.reason ?? null]), [['router', 'pool-unusable'], ['alpha', null]]);
-  assert.match(candidates[0].out.detail, /no enabled account of pool "router" holds a "alpha" login store/);
+  const { ranked } = explainSeat(ask, ctx(cfg));
+  assert.deepEqual(ranked.candidates.map((c) => c.pool), ['alpha']);
+  assert.deepEqual(ranked.skipped.map((s) => [s.pool, s.reason]), [['router', 'pool-unusable']]);
+  assert.match(ranked.skipped[0].detail, /no enabled account of pool "router" holds a "alpha" login store/);
   const bound = bind(ask, ctx(cfg));
   assert.equal(bound.pool, 'alpha');
   assert.equal(bound.provenance.skipped[0].pool, 'router');
@@ -127,7 +129,8 @@ test('a missing tier cell refuses by name for an out-of-process agent seat', () 
   delete cfg.modelPolicies.alpha.standard;
   const refused = bind(ask, ctx(cfg));
   assert.equal(refused.refused.reason, 'tier-cell-missing');
-  assert.equal(refused.refused.detail, 'no model for tier "standard" under family "alpha" (runner.modelPolicies.alpha.standard)');
+  assert.match(refused.refused.detail, /no allowed executor has a cell; change capabilities\."docs:write"\.prefer or set /);
+  assert.equal(refused.refused.config, 'capabilities."docs:write".prefer', 'the refusal names the config line to change');
 
   const noPolicies = config({ prefer: ['alpha'] });
   delete noPolicies.modelPolicies.alpha;
@@ -141,21 +144,22 @@ test('the executor model is no longer a fallthrough for a missing cell', () => {
   assert.equal(bind(ask, ctx(cfg)).refused.reason, 'tier-cell-missing');
 });
 
-test('in a walk a family with no cell is skipped and recorded; a lone refusal names the last skipped cell', () => {
+test('in a walk a family with no cell is skipped and recorded, and the skipped family names the cell to configure', () => {
   const cfg = config({ prefer: ['alpha', 'beta', 'gamma'] });
   delete cfg.modelPolicies.beta.standard;
   const first = bind(ask, ctx(cfg));
-  const next = nextCandidate(first, ask, ctx(cfg));
+  const next = bind(ask, ctx(cfg), { walk: { tried: [first] } });
   assert.equal(next.executor, 'gamma');
   assert.deepEqual(next.provenance.skipped.map((s) => [s.family, s.reason]), [['beta', 'tier-cell-missing']]);
-  const last = nextCandidate(next, ask, ctx(cfg), 'provider-limit', { tried: [first, next] });
-  assert.equal(last.refused.reason, 'headless-no-executor', 'nothing is left after the last candidate');
+  const last = bind(ask, ctx(cfg), { walk: { tried: [first, next] } });
+  assert.equal(last.refused.reason, 'no-candidate', 'nothing is left after the last candidate');
 
   const only = config({ prefer: ['alpha', 'beta'] });
   delete only.modelPolicies.beta.standard;
-  const done = nextCandidate(bind(ask, ctx(only)), ask, ctx(only));
-  assert.equal(done.refused.reason, 'tier-cell-missing');
-  assert.match(done.refused.detail, /runner\.modelPolicies\.beta\.standard/);
+  const walk = { tried: [bind(ask, ctx(only))] };
+  assert.equal(bind(ask, ctx(only), { walk }).refused.reason, 'no-candidate');
+  const { ranked } = explainSeat(ask, ctx(only), { walk });
+  assert.deepEqual(ranked.skipped.map((s) => [s.family, s.reason, s.config]), [['beta', 'tier-cell-missing', 'modelPolicies.beta.standard']], 'the skipped family names the cell to configure');
 });
 
 test('a seat that needs no model is not refused for a missing cell', () => {
@@ -174,13 +178,13 @@ test('the walk state is the earlier bindings: binding N+1 from the recorded ones
     llmAccounts: { router: { r1: { credentialStore: { alpha: '/nonexistent/r1' } } } },
     tierFallback: { standard: ['gamma', 'alpha', 'beta', 'delta'] },
   });
-  const walk = walkBindings(ask, ctx(cfg));
+  const walk = explainSeat(ask, ctx(cfg)).walk;
   assert.equal(new Set(walk.map(bindingIdentity)).size, walk.length, 'a candidate is never visited twice');
   walk.forEach((binding, index) => {
-    const recomputed = bind(ask, ctx(cfg), { tried: JSON.parse(JSON.stringify(walk.slice(0, index))) });
+    const recomputed = bind(ask, ctx(cfg), { walk: { tried: JSON.parse(JSON.stringify(walk.slice(0, index))) } });
     assert.deepEqual(recomputed, binding, `step ${index}`);
   });
-  assert.ok(bind(ask, ctx(cfg), { tried: walk }).refused, 'with every candidate tried nothing is left');
+  assert.ok(bind(ask, ctx(cfg), { walk: { tried: walk } }).refused, 'with every candidate tried nothing is left');
 });
 
 test('a committed-config walk stays in its tier and keeps each family to its own tier cell', () => {
@@ -188,20 +192,19 @@ test('a committed-config walk stays in its tier and keeps each family to its own
   const committed = JSON.parse(fs.readFileSync(path.join(root, '.fgos', 'config.json'), 'utf8')).runner;
   const DOER = ['gemini', 'deepseek', 'z-ai', 'claude', 'openai'];
   const PREMIUM = ['claude', 'openai', 'gemini', 'xai'];
-  const runnerConfig = {
+  const withTier = (tier) => ({
     ...committed,
     governance: undefined,
     maxTier: undefined,
     tierFallback: { nano: DOER, standard: DOER, advanced: DOER, flagship: PREMIUM, frontier: PREMIUM },
-  };
-  const familyOf = (id) => runnerConfig.executors[id].providerModel ?? runnerConfig.executors[id].provider;
+    // The tier is declared by the config, per capability, the way a project declares it.
+    capabilities: { ...committed.capabilities, 'marketing:research': { ...committed.capabilities['marketing:research'], tier } },
+  });
+  const familyOf = (id) => committed.executors[id].providerModel ?? committed.executors[id].provider;
   for (const [tier, order] of [['nano', DOER], ['standard', DOER], ['advanced', DOER], ['flagship', PREMIUM], ['frontier', PREMIUM]]) {
-    const tierAsk = {
-      unit: { id: 'u', capability: 'marketing:research', writes: [], ...(tier === 'nano' ? { rigor: 'low' } : {}) },
-      role: 'reviewer',
-      overrides: tier === 'nano' ? [] : [{ origin: 'human-cli', tier }],
-    };
-    const walk = walkBindings(tierAsk, { runnerConfig, session: { headless: true } });
+    const runnerConfig = withTier(tier);
+    const tierAsk = { unit: { id: 'u', capability: 'marketing:research', writes: [] }, role: 'reviewer' };
+    const walk = explainSeat(tierAsk, { runnerConfig, session: { headless: true } }).walk;
     assert.ok(walk.length > 1, `${tier}: a chain exists`);
     assert.ok(walk.every((b) => b.tier === tier), `${tier}: the chain stays in the tier`);
     const chain = walk.map((b) => familyOf(b.executor));

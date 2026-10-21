@@ -1,3 +1,8 @@
+// fgctl upgrade, repair and verify against real staged releases. Release A is built from this
+// checkout; every other candidate (B, the schema-incompatible ones, the bad-preflight and
+// failing-tail ones) is A's tree under an edited manifest and the digest of that manifest, which
+// is all that tells two releases apart for these commands. A case that starts from a workspace
+// initialized at A restores one shared real `fgctl init --from A` (fgctl-init-fixture.mjs).
 import '../helpers/process-tmp-root.mjs';
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
@@ -6,7 +11,6 @@ import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { spawnSync, execFileSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
 
 import {
   REPO_ROOT,
@@ -14,42 +18,24 @@ import {
   computeArtifactDigest,
   releaseOutputDir,
 } from '../../scripts/build-rust-distribution.mjs';
-import { withoutActiveRelease } from './fgctl-init-fixture.mjs';
 import { releaseBinaryPath } from '../../src/util/release-binary-path.mjs';
-import { pathWithGcLeakingGit, processesUnder } from './fgctl-init-fixture.mjs';
+import {
+  FGCTL_BIN,
+  releaseDirName,
+  runFgctl,
+  runShim,
+  useInitializedWorkspace,
+  withoutActiveRelease,
+  pathWithGcLeakingGit,
+  processesUnder,
+} from './fgctl-init-fixture.mjs';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const FGCTL_BIN = releaseBinaryPath(releaseOutputDir(), 'fgctl');
 const FGOS_BIN = releaseBinaryPath(releaseOutputDir(), 'fgos');
-
-const releaseDirName = (digest) => (process.platform === 'win32' ? digest.replace(':', '-') : digest);
 
 let releaseDirA = null;
 let digestA = null;
 let releaseDirB = null;
 let digestB = null;
-
-function runFgctl(args, { cwd, stateHome, env = {} } = {}) {
-  return spawnSync(FGCTL_BIN, args, {
-    cwd,
-    env: {
-      ...withoutActiveRelease(process.env),
-      FGOS_STATE_HOME: stateHome,
-      ...env,
-    },
-    encoding: 'utf8',
-  });
-}
-
-function runShim(shimPath, args, opts = {}) {
-  if (process.platform === 'win32') {
-    const clean = shimPath.replace(/^\\\\\?\\/, '').replace(/\\/g, '/');
-    return spawnSync('sh', [clean, ...args], opts);
-  }
-  return spawnSync(shimPath, args, opts);
-}
 
 function runFgos(args, { cwd, stateHome, env = {} } = {}) {
   return spawnSync(FGOS_BIN, args, {
@@ -87,6 +73,44 @@ function hashDirectory(dirPath) {
   return hashes;
 }
 
+/**
+ * A copy of the release at `fromDir` whose manifest `edit(manifest, dir)` changed, published
+ * under the digest of the edited manifest, as the build computes it. Returns its dir and digest.
+ */
+function restampRelease(fromDir, prefix, edit) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  fs.cpSync(fromDir, dir, { recursive: true });
+  const manifestPath = path.join(dir, 'manifest.json');
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  edit(manifest, dir);
+  delete manifest.artifactDigest;
+  manifest.artifactDigest = computeArtifactDigest(manifest);
+  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
+  return { dir, digest: manifest.artifactDigest };
+}
+
+/** A copy of `fromDir` whose payload exits 42 on `doctor` while SIMULATE_TAIL_FAILURE=1. */
+function releaseWithFailingDoctor(fromDir, prefix, label) {
+  return restampRelease(fromDir, prefix, (manifest, dir) => {
+    const fgosMjsPath = path.join(dir, 'libexec', 'legacy-node', 'bin', 'fgos.mjs');
+    const originalContent = fs.readFileSync(fgosMjsPath, 'utf8');
+    const firstLineEnd = originalContent.indexOf('\n');
+    const shebang = originalContent.slice(0, firstLineEnd + 1);
+    const rest = originalContent.slice(firstLineEnd + 1);
+    const failInjection = `if (process.env.SIMULATE_TAIL_FAILURE === '1' && process.argv.includes('doctor')) {\n  console.error('simulated ${label} doctor failure in tail');\n  process.exit(42);\n}\n`;
+    fs.writeFileSync(fgosMjsPath, shebang + failInjection + rest);
+    const newMjsHash = 'sha256:' + hashFile(fgosMjsPath);
+    const newMjsSize = fs.statSync(fgosMjsPath).size;
+    for (const f of manifest.files) {
+      if (f.path === 'libexec/legacy-node/bin/fgos.mjs') {
+        f.digest = newMjsHash;
+        f.size = newMjsSize;
+      }
+    }
+    manifest.components.legacyNode.digest = newMjsHash;
+  });
+}
+
 before(() => {
   assert.ok(fs.existsSync(FGCTL_BIN), `fgctl binary must exist at ${FGCTL_BIN}`);
   assert.ok(fs.existsSync(FGOS_BIN), `fgos binary must exist at ${FGOS_BIN}`);
@@ -100,14 +124,9 @@ before(() => {
   });
   digestA = resA.artifactDigest;
 
-  releaseDirB = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-upgrade-fixture-b-'));
-  const resB = buildRustDistribution({
-    outDir: releaseDirB,
-    repoRoot: REPO_ROOT,
-    releaseVersion: '0.2.0',
-    stateSchemas: { read: ['1'], write: ['1'], migrations: [] },
-  });
-  digestB = resB.artifactDigest;
+  ({ dir: releaseDirB, digest: digestB } = restampRelease(releaseDirA, 'fgctl-upgrade-fixture-b-', (manifest) => {
+    manifest.releaseVersion = '0.2.0';
+  }));
 
   assert.notEqual(digestA, digestB, 'fixture digests A and B must differ');
 });
@@ -121,480 +140,338 @@ after(() => {
   }
 });
 
+// Registered after the release hook above, so release A exists when it runs.
+const workspaceAtA = useInitializedWorkspace(() => releaseDirA, { tag: 'upgrade-at-a' });
+
 test('R1, R2, R3, R6: A -> B upgrade then repair round-trips reported digest with zero work-state changes', () => {
-  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-upgrade-state-'));
-  const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-upgrade-proj-'));
+  const { proj: projDir, state: stateHome } = workspaceAtA.restore();
 
-  try {
-    execFileSync('git', ['init'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
+  // Step 1: the workspace is initialized at A
+  const versionResA = runFgos(['version', '--runtime-json'], { cwd: projDir, stateHome });
+  assert.equal(versionResA.status, 0, `version --runtime-json must succeed: ${versionResA.stderr}`);
+  const versionJsonA = JSON.parse(versionResA.stdout.trim());
+  assert.equal(versionJsonA.data.artifactDigest, digestA);
+  assert.equal(versionJsonA.data.previousArtifactDigest, null);
 
-    // Step 1: fgctl init --from A
-    const initRes = runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome });
-    assert.equal(initRes.status, 0, `fgctl init must succeed: ${initRes.stderr}`);
+  // Step 2: Establish work history directory and populate state files
+  const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
+  const activationA = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+  const workStateId = activationA.workStateId;
+  const workHistoryDir = path.join(projDir, '.fgos', 'local', 'work-state', workStateId);
+  fs.mkdirSync(workHistoryDir, { recursive: true });
 
-    // Verify initial version
-    const versionResA = runFgos(['version', '--runtime-json'], { cwd: projDir, stateHome });
-    assert.equal(versionResA.status, 0, `version --runtime-json must succeed: ${versionResA.stderr}`);
-    const versionJsonA = JSON.parse(versionResA.stdout.trim());
-    assert.equal(versionJsonA.data.artifactDigest, digestA);
-    assert.equal(versionJsonA.data.previousArtifactDigest, null);
+  // Write schema.json with currentStateSchema = "1"
+  fs.writeFileSync(
+    path.join(workHistoryDir, 'schema.json'),
+    JSON.stringify({ schemaVersion: 1, currentStateSchema: '1' }, null, 2),
+    'utf8'
+  );
+  // Write arbitrary state file
+  fs.writeFileSync(
+    path.join(workHistoryDir, 'session-state.json'),
+    JSON.stringify({ cursor: 42, activeTask: 'tsk-upgrade-test' }, null, 2),
+    'utf8'
+  );
 
-    // Step 2: Establish work history directory and populate state files
-    const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
-    const activationA = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
-    const workStateId = activationA.workStateId;
-    const workHistoryDir = path.join(projDir, '.fgos', 'local', 'work-state', workStateId);
-    fs.mkdirSync(workHistoryDir, { recursive: true });
+  const hashesBefore = hashDirectory(workHistoryDir);
+  assert.ok(Object.keys(hashesBefore).length >= 2, 'Must have at least 2 work-state files');
 
-    // Write schema.json with currentStateSchema = "1"
-    fs.writeFileSync(
-      path.join(workHistoryDir, 'schema.json'),
-      JSON.stringify({ schemaVersion: 1, currentStateSchema: '1' }, null, 2),
-      'utf8'
-    );
-    // Write arbitrary state file
-    fs.writeFileSync(
-      path.join(workHistoryDir, 'session-state.json'),
-      JSON.stringify({ cursor: 42, activeTask: 'tsk-upgrade-test' }, null, 2),
-      'utf8'
-    );
+  // Step 3: fgctl upgrade --from B
+  const upgradeRes = runFgctl(['upgrade', '--from', releaseDirB], { cwd: projDir, stateHome });
+  assert.equal(upgradeRes.status, 0, `fgctl upgrade must succeed: ${upgradeRes.stderr}`);
 
-    const hashesBefore = hashDirectory(workHistoryDir);
-    assert.ok(Object.keys(hashesBefore).length >= 2, 'Must have at least 2 work-state files');
+  // Step 4: Verify upgraded activation
+  const versionResB = runFgos(['version', '--runtime-json'], { cwd: projDir, stateHome });
+  assert.equal(versionResB.status, 0, `version --runtime-json after upgrade: ${versionResB.stderr}`);
+  const versionJsonB = JSON.parse(versionResB.stdout.trim());
+  assert.equal(versionJsonB.data.artifactDigest, digestB, 'artifactDigest must be B');
+  assert.equal(versionJsonB.data.previousArtifactDigest, digestA, 'previousArtifactDigest must be A');
 
-    // Step 3: fgctl upgrade --from B
-    const upgradeRes = runFgctl(['upgrade', '--from', releaseDirB], { cwd: projDir, stateHome });
-    assert.equal(upgradeRes.status, 0, `fgctl upgrade must succeed: ${upgradeRes.stderr}`);
+  // Check status --json
+  const statusResB = runFgctl(['status', '--json'], { cwd: projDir, stateHome });
+  assert.equal(statusResB.status, 0, `status --json: ${statusResB.stderr}`);
+  const statusJsonB = JSON.parse(statusResB.stdout.trim());
+  assert.equal(statusJsonB.activeArtifactDigest, digestB);
+  assert.equal(statusJsonB.previousArtifactDigest, digestA);
+  assert.ok(!statusJsonB.quarantined, 'quarantined marker should not be set when healthy');
 
-    // Step 4: Verify upgraded activation
-    const versionResB = runFgos(['version', '--runtime-json'], { cwd: projDir, stateHome });
-    assert.equal(versionResB.status, 0, `version --runtime-json after upgrade: ${versionResB.stderr}`);
-    const versionJsonB = JSON.parse(versionResB.stdout.trim());
-    assert.equal(versionJsonB.data.artifactDigest, digestB, 'artifactDigest must be B');
-    assert.equal(versionJsonB.data.previousArtifactDigest, digestA, 'previousArtifactDigest must be A');
+  // Old release directory under releases/ is retained (Retention decision)
+  const storeRoot = stateHome;
+  const oldReleaseDir = path.join(storeRoot, 'releases', releaseDirName(digestA));
+  assert.ok(fs.existsSync(oldReleaseDir), 'Previous release directory must be retained under releases/');
 
-    // Check status --json
-    const statusResB = runFgctl(['status', '--json'], { cwd: projDir, stateHome });
-    assert.equal(statusResB.status, 0, `status --json: ${statusResB.stderr}`);
-    const statusJsonB = JSON.parse(statusResB.stdout.trim());
-    assert.equal(statusJsonB.activeArtifactDigest, digestB);
-    assert.equal(statusJsonB.previousArtifactDigest, digestA);
-    assert.ok(!statusJsonB.quarantined, 'quarantined marker should not be set when healthy');
+  // Step 5: fgctl repair rolls back to previousArtifactDigest (A)
+  const repairRes = runFgctl(['repair'], { cwd: projDir, stateHome });
+  assert.equal(repairRes.status, 0, `fgctl repair must succeed: ${repairRes.stderr}`);
 
-    // Old release directory under releases/ is retained (Retention decision)
-    const storeRoot = stateHome;
-    const oldReleaseDir = path.join(storeRoot, 'releases', releaseDirName(digestA));
-    assert.ok(fs.existsSync(oldReleaseDir), 'Previous release directory must be retained under releases/');
+  // Step 6: Verify rolled back activation
+  const versionResRepaired = runFgos(['version', '--runtime-json'], { cwd: projDir, stateHome });
+  assert.equal(versionResRepaired.status, 0, `version --runtime-json after repair: ${versionResRepaired.stderr}`);
+  const versionJsonRepaired = JSON.parse(versionResRepaired.stdout.trim());
+  assert.equal(versionJsonRepaired.data.artifactDigest, digestA, 'artifactDigest must be restored to A');
 
-    // Step 5: fgctl repair rolls back to previousArtifactDigest (A)
-    const repairRes = runFgctl(['repair'], { cwd: projDir, stateHome });
-    assert.equal(repairRes.status, 0, `fgctl repair must succeed: ${repairRes.stderr}`);
+  // Step 7: Hash work-history directory and assert byte-identical
+  const hashesAfter = hashDirectory(workHistoryDir);
+  assert.deepEqual(hashesAfter, hashesBefore, 'work-state directory files must be byte-identical after upgrade/repair');
+});
 
-    // Step 6: Verify rolled back activation
-    const versionResRepaired = runFgos(['version', '--runtime-json'], { cwd: projDir, stateHome });
-    assert.equal(versionResRepaired.status, 0, `version --runtime-json after repair: ${versionResRepaired.stderr}`);
-    const versionJsonRepaired = JSON.parse(versionResRepaired.stdout.trim());
-    assert.equal(versionJsonRepaired.data.artifactDigest, digestA, 'artifactDigest must be restored to A');
-
-    // Step 7: Hash work-history directory and assert byte-identical
-    const hashesAfter = hashDirectory(workHistoryDir);
-    assert.deepEqual(hashesAfter, hashesBefore, 'work-state directory files must be byte-identical after upgrade/repair');
-  } finally {
-    fs.rmSync(projDir, { recursive: true, force: true });
-    fs.rmSync(stateHome, { recursive: true, force: true });
-  }
+// Release A's manifest carries version 0.1.0, so this local install would expose the build's own
+// version leaking into the pin (before the fix, a later plain init tried to download it as a tag).
+test('download: a local install writes a digest-only pin (a manifest version is not a download tag)', () => {
+  const { proj: projDir } = workspaceAtA.restore();
+  const manifestA = JSON.parse(fs.readFileSync(path.join(releaseDirA, 'manifest.json'), 'utf8'));
+  assert.equal(manifestA.releaseVersion, '0.1.0', 'precondition: the installed release names a version of its own');
+  const pin = JSON.parse(fs.readFileSync(path.join(projDir, '.fgos', 'distribution.json'), 'utf8'));
+  assert.equal(pin.projectRuntime.artifactDigest, digestA);
+  assert.equal(pin.projectRuntime.releaseVersion, null);
 });
 
 test('R4, R5, R6: Corrupting one byte in active release triggers quarantine and status reflects quarantined: true', () => {
-  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-verify-state-'));
-  const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-verify-proj-'));
+  const { proj: projDir, state: stateHome } = workspaceAtA.restore();
 
-  try {
-    execFileSync('git', ['init'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
+  // Verify works initially
+  const verifyInitial = runFgctl(['verify'], { cwd: projDir, stateHome });
+  assert.equal(verifyInitial.status, 0, `fgctl verify must succeed before tamper: ${verifyInitial.stderr}`);
 
-    const initRes = runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome });
-    assert.equal(initRes.status, 0);
+  // Corrupt one byte in active staged release file
+  const storeRoot = stateHome;
+  const stagedFile = path.join(storeRoot, 'releases', releaseDirName(digestA), 'bin', 'fgos');
+  assert.ok(fs.existsSync(stagedFile), `Staged file must exist at ${stagedFile}`);
+  fs.appendFileSync(stagedFile, 'TAMPER');
 
-    // Verify works initially
-    const verifyInitial = runFgctl(['verify'], { cwd: projDir, stateHome });
-    assert.equal(verifyInitial.status, 0, `fgctl verify must succeed before tamper: ${verifyInitial.stderr}`);
+  // Run fgctl verify -> must fail and quarantine
+  const verifyTampered = runFgctl(['verify'], { cwd: projDir, stateHome });
+  assert.notEqual(verifyTampered.status, 0, 'fgctl verify must fail when file is tampered');
 
-    // Corrupt one byte in active staged release file
-    const storeRoot = stateHome;
-    const stagedFile = path.join(storeRoot, 'releases', releaseDirName(digestA), 'bin', 'fgos');
-    assert.ok(fs.existsSync(stagedFile), `Staged file must exist at ${stagedFile}`);
-    fs.appendFileSync(stagedFile, 'TAMPER');
+  // Releases dir for digestA must be gone, and moved to quarantine/
+  const originalReleaseDir = path.join(storeRoot, 'releases', releaseDirName(digestA));
+  assert.ok(!fs.existsSync(originalReleaseDir), 'Release dir must be moved out of releases/');
 
-    // Run fgctl verify -> must fail and quarantine
-    const verifyTampered = runFgctl(['verify'], { cwd: projDir, stateHome });
-    assert.notEqual(verifyTampered.status, 0, 'fgctl verify must fail when file is tampered');
+  const quarantineDir = path.join(storeRoot, 'quarantine');
+  assert.ok(fs.existsSync(quarantineDir), 'quarantine dir must exist');
+  const quarantinedEntries = fs.readdirSync(quarantineDir);
+  assert.ok(
+    quarantinedEntries.some((e) => e.startsWith(releaseDirName(digestA))),
+    `quarantine must contain entry starting with ${releaseDirName(digestA)}`
+  );
 
-    // Releases dir for digestA must be gone, and moved to quarantine/
-    const originalReleaseDir = path.join(storeRoot, 'releases', releaseDirName(digestA));
-    assert.ok(!fs.existsSync(originalReleaseDir), 'Release dir must be moved out of releases/');
+  // activation.json status is "quarantined"
+  const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
+  const activation = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+  assert.equal(activation.status, 'quarantined');
 
-    const quarantineDir = path.join(storeRoot, 'quarantine');
-    assert.ok(fs.existsSync(quarantineDir), 'quarantine dir must exist');
-    const quarantinedEntries = fs.readdirSync(quarantineDir);
-    assert.ok(
-      quarantinedEntries.some((e) => e.startsWith(releaseDirName(digestA))),
-      `quarantine must contain entry starting with ${releaseDirName(digestA)}`
-    );
+  // status --json reflects quarantined: true
+  const statusJsonRes = runFgctl(['status', '--json'], { cwd: projDir, stateHome });
+  assert.equal(statusJsonRes.status, 0);
+  const statusJson = JSON.parse(statusJsonRes.stdout.trim());
+  assert.equal(statusJson.activeArtifactDigest, digestA);
+  assert.equal(statusJson.quarantined, true, 'status --json must have quarantined: true');
 
-    // activation.json status is "quarantined"
-    const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
-    const activation = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
-    assert.equal(activation.status, 'quarantined');
+  // status text output reflects quarantined: true
+  const statusTextRes = runFgctl(['status'], { cwd: projDir, stateHome });
+  assert.equal(statusTextRes.status, 0);
+  assert.match(statusTextRes.stdout, /quarantined:\s*true/, 'status text must show quarantined: true');
 
-    // status --json reflects quarantined: true
-    const statusJsonRes = runFgctl(['status', '--json'], { cwd: projDir, stateHome });
-    assert.equal(statusJsonRes.status, 0);
-    const statusJson = JSON.parse(statusJsonRes.stdout.trim());
-    assert.equal(statusJson.activeArtifactDigest, digestA);
-    assert.equal(statusJson.quarantined, true, 'status --json must have quarantined: true');
-
-    // status text output reflects quarantined: true
-    const statusTextRes = runFgctl(['status'], { cwd: projDir, stateHome });
-    assert.equal(statusTextRes.status, 0);
-    assert.match(statusTextRes.stdout, /quarantined:\s*true/, 'status text must show quarantined: true');
-
-    // Runtime reader treats quarantined as missing binding / fails closed
-    const shimPath = path.join(projDir, '.fgos', 'installation', 'bin', 'fgos');
-    const shimRes = runShim(shimPath, ['version'], { cwd: projDir, encoding: 'utf8' });
-    assert.notEqual(shimRes.status, 0, 'shim execution must fail closed when runtime is quarantined');
-    assert.match(shimRes.stderr, /quarantined/);
-  } finally {
-    fs.rmSync(projDir, { recursive: true, force: true });
-    fs.rmSync(stateHome, { recursive: true, force: true });
-  }
+  // Runtime reader treats quarantined as missing binding / fails closed
+  const shimPath = path.join(projDir, '.fgos', 'installation', 'bin', 'fgos');
+  const shimRes = runShim(shimPath, ['version'], { cwd: projDir, encoding: 'utf8' });
+  assert.notEqual(shimRes.status, 0, 'shim execution must fail closed when runtime is quarantined');
+  assert.match(shimRes.stderr, /quarantined/);
 });
 
-test('R1, R6: Upgrade candidate whose stateSchemas.write omits workspace current schema is refused before publish', () => {
-  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-schema-write-state-'));
-  const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-schema-write-proj-'));
-  const badWriteReleaseDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-bad-write-release-'));
-
-  try {
-    execFileSync('git', ['init'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
-
-    const initRes = runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome });
-    assert.equal(initRes.status, 0);
-
-    const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
-    const activationA = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
-    const workStateId = activationA.workStateId;
-    const workHistoryDir = path.join(projDir, '.fgos', 'local', 'work-state', workStateId);
-    fs.mkdirSync(workHistoryDir, { recursive: true });
-    fs.writeFileSync(
-      path.join(workHistoryDir, 'schema.json'),
-      JSON.stringify({ schemaVersion: 1, currentStateSchema: '1' }, null, 2),
-      'utf8'
-    );
-
-    const activationContentBefore = fs.readFileSync(activationPath, 'utf8');
-
-    // Build candidate with write: ['2'] (omitting '1')
-    buildRustDistribution({
-      outDir: badWriteReleaseDir,
-      repoRoot: REPO_ROOT,
-      releaseVersion: '0.3.0',
-      stateSchemas: { read: ['1'], write: ['2'], migrations: [] },
+for (const [side, stateSchemas, releaseVersion, code] of [
+  ['write', { read: ['1'], write: ['2'], migrations: [] }, '0.3.0', /state-schema-write-incompatible/],
+  ['read', { read: ['2'], write: ['1'], migrations: [] }, '0.4.0', /state-schema-incompatible/],
+]) {
+  test(`R1, R6: Upgrade candidate whose stateSchemas.${side} omits workspace current schema is refused before publish`, () => {
+    const { proj: projDir, state: stateHome } = workspaceAtA.restore();
+    // A candidate whose list on that side omits the workspace's schema '1'
+    const candidate = restampRelease(releaseDirA, `fgctl-bad-${side}-release-`, (manifest) => {
+      manifest.releaseVersion = releaseVersion;
+      manifest.stateSchemas = stateSchemas;
     });
 
-    const upgradeRes = runFgctl(['upgrade', '--from', badWriteReleaseDir], { cwd: projDir, stateHome });
-    assert.notEqual(upgradeRes.status, 0, 'upgrade must be refused');
-    assert.match(upgradeRes.stderr, /state-schema-write-incompatible/);
+    try {
+      const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
+      const activationA = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+      const workStateId = activationA.workStateId;
+      const workHistoryDir = path.join(projDir, '.fgos', 'local', 'work-state', workStateId);
+      fs.mkdirSync(workHistoryDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(workHistoryDir, 'schema.json'),
+        JSON.stringify({ schemaVersion: 1, currentStateSchema: '1' }, null, 2),
+        'utf8'
+      );
 
-    const activationContentAfter = fs.readFileSync(activationPath, 'utf8');
-    assert.equal(activationContentAfter, activationContentBefore, 'activation.json must be byte-for-byte unchanged');
-  } finally {
-    fs.rmSync(projDir, { recursive: true, force: true });
-    fs.rmSync(stateHome, { recursive: true, force: true });
-    fs.rmSync(badWriteReleaseDir, { recursive: true, force: true });
-  }
-});
+      const activationContentBefore = fs.readFileSync(activationPath, 'utf8');
 
-test('R1, R6: Upgrade candidate whose stateSchemas.read omits workspace current schema is refused before publish', () => {
-  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-schema-read-state-'));
-  const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-schema-read-proj-'));
-  const badReadReleaseDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-bad-read-release-'));
+      const upgradeRes = runFgctl(['upgrade', '--from', candidate.dir], { cwd: projDir, stateHome });
+      assert.notEqual(upgradeRes.status, 0, 'upgrade must be refused');
+      assert.match(upgradeRes.stderr, code);
 
-  try {
-    execFileSync('git', ['init'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
-
-    const initRes = runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome });
-    assert.equal(initRes.status, 0);
-
-    const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
-    const activationA = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
-    const workStateId = activationA.workStateId;
-    const workHistoryDir = path.join(projDir, '.fgos', 'local', 'work-state', workStateId);
-    fs.mkdirSync(workHistoryDir, { recursive: true });
-    fs.writeFileSync(
-      path.join(workHistoryDir, 'schema.json'),
-      JSON.stringify({ schemaVersion: 1, currentStateSchema: '1' }, null, 2),
-      'utf8'
-    );
-
-    const activationContentBefore = fs.readFileSync(activationPath, 'utf8');
-
-    // Build candidate with read: ['2'] (omitting '1')
-    buildRustDistribution({
-      outDir: badReadReleaseDir,
-      repoRoot: REPO_ROOT,
-      releaseVersion: '0.4.0',
-      stateSchemas: { read: ['2'], write: ['1'], migrations: [] },
-    });
-
-    const upgradeRes = runFgctl(['upgrade', '--from', badReadReleaseDir], { cwd: projDir, stateHome });
-    assert.notEqual(upgradeRes.status, 0, 'upgrade must be refused');
-    assert.match(upgradeRes.stderr, /state-schema-incompatible/);
-
-    const activationContentAfter = fs.readFileSync(activationPath, 'utf8');
-    assert.equal(activationContentAfter, activationContentBefore, 'activation.json must be byte-for-byte unchanged');
-  } finally {
-    fs.rmSync(projDir, { recursive: true, force: true });
-    fs.rmSync(stateHome, { recursive: true, force: true });
-    fs.rmSync(badReadReleaseDir, { recursive: true, force: true });
-  }
-});
+      const activationContentAfter = fs.readFileSync(activationPath, 'utf8');
+      assert.equal(activationContentAfter, activationContentBefore, 'activation.json must be byte-for-byte unchanged');
+    } finally {
+      fs.rmSync(candidate.dir, { recursive: true, force: true });
+    }
+  });
+}
 
 test('Reviewer M1: a quarantined workspace recovers via fgctl init --from (documented door), status returns to ready', () => {
-  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-m1-state-'));
-  const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-m1-proj-'));
+  const { proj: projDir, state: stateHome } = workspaceAtA.restore();
 
-  try {
-    execFileSync('git', ['init'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
+  // Tamper and quarantine via verify (same repro as the R4/R5/R6 test above).
+  const stagedFile = path.join(stateHome, 'releases', releaseDirName(digestA), 'bin', 'fgos');
+  fs.appendFileSync(stagedFile, 'TAMPER');
+  assert.notEqual(runFgctl(['verify'], { cwd: projDir, stateHome }).status, 0);
 
-    assert.equal(runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome }).status, 0);
+  const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
+  assert.equal(JSON.parse(fs.readFileSync(activationPath, 'utf8')).status, 'quarantined');
 
-    // Tamper and quarantine via verify (same repro as the R4/R5/R6 test above).
-    const stagedFile = path.join(stateHome, 'releases', releaseDirName(digestA), 'bin', 'fgos');
-    fs.appendFileSync(stagedFile, 'TAMPER');
-    assert.notEqual(runFgctl(['verify'], { cwd: projDir, stateHome }).status, 0);
+  // Before the fix, `fgctl init` (no --from) would idempotent-skip on
+  // digest match alone and never reach the tail; confirm it now refuses
+  // clearly instead, naming the quarantine.
+  const initNoFrom = runFgctl(['init'], { cwd: projDir, stateHome });
+  assert.notEqual(initNoFrom.status, 0, 'init with no --from must not silently no-op a quarantined workspace');
+  assert.match(initNoFrom.stderr, /quarantined/i);
 
-    const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
-    assert.equal(JSON.parse(fs.readFileSync(activationPath, 'utf8')).status, 'quarantined');
+  // The documented recovery door: fgctl init --from <matching source>
+  // must genuinely re-stage/re-verify/re-publish, not idempotent-skip.
+  const recoverRes = runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome });
+  assert.equal(recoverRes.status, 0, `init --from must recover a quarantined workspace: ${recoverRes.stderr}`);
 
-    // Before the fix, `fgctl init` (no --from) would idempotent-skip on
-    // digest match alone and never reach the tail; confirm it now refuses
-    // clearly instead, naming the quarantine.
-    const initNoFrom = runFgctl(['init'], { cwd: projDir, stateHome });
-    assert.notEqual(initNoFrom.status, 0, 'init with no --from must not silently no-op a quarantined workspace');
-    assert.match(initNoFrom.stderr, /quarantined/i);
-
-    // The documented recovery door: fgctl init --from <matching source>
-    // must genuinely re-stage/re-verify/re-publish, not idempotent-skip.
-    const recoverRes = runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome });
-    assert.equal(recoverRes.status, 0, `init --from must recover a quarantined workspace: ${recoverRes.stderr}`);
-
-    const recovered = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
-    assert.equal(recovered.status, 'ready', 'status must return to ready after recovery');
-    assert.equal(recovered.artifactDigest, digestA);
-    assert.ok(fs.existsSync(path.join(stateHome, 'releases', releaseDirName(digestA))), 'digestA must be staged again under releases/');
-  } finally {
-    fs.rmSync(projDir, { recursive: true, force: true });
-    fs.rmSync(stateHome, { recursive: true, force: true });
-  }
+  const recovered = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+  assert.equal(recovered.status, 'ready', 'status must return to ready after recovery');
+  assert.equal(recovered.artifactDigest, digestA);
+  assert.ok(fs.existsSync(path.join(stateHome, 'releases', releaseDirName(digestA))), 'digestA must be staged again under releases/');
 });
 
 test('Reviewer M2: upgrading away from a quarantined activation chains previousArtifactDigest past it, not to the moved digest', () => {
-  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-m2-state-'));
-  const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-m2-proj-'));
+  const { proj: projDir, state: stateHome } = workspaceAtA.restore();
 
-  try {
-    execFileSync('git', ['init'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
+  const stagedFile = path.join(stateHome, 'releases', releaseDirName(digestA), 'bin', 'fgos');
+  fs.appendFileSync(stagedFile, 'TAMPER');
+  assert.notEqual(runFgctl(['verify'], { cwd: projDir, stateHome }).status, 0);
 
-    assert.equal(runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome }).status, 0);
+  const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
+  assert.equal(JSON.parse(fs.readFileSync(activationPath, 'utf8')).status, 'quarantined');
 
-    const stagedFile = path.join(stateHome, 'releases', releaseDirName(digestA), 'bin', 'fgos');
-    fs.appendFileSync(stagedFile, 'TAMPER');
-    assert.notEqual(runFgctl(['verify'], { cwd: projDir, stateHome }).status, 0);
+  // Upgrade away from the quarantined A straight to B.
+  const upgradeRes = runFgctl(['upgrade', '--from', releaseDirB], { cwd: projDir, stateHome });
+  assert.equal(upgradeRes.status, 0, `upgrade from a quarantined activation must succeed: ${upgradeRes.stderr}`);
 
-    const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
-    assert.equal(JSON.parse(fs.readFileSync(activationPath, 'utf8')).status, 'quarantined');
-
-    // Upgrade away from the quarantined A straight to B.
-    const upgradeRes = runFgctl(['upgrade', '--from', releaseDirB], { cwd: projDir, stateHome });
-    assert.equal(upgradeRes.status, 0, `upgrade from a quarantined activation must succeed: ${upgradeRes.stderr}`);
-
-    const afterUpgrade = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
-    assert.equal(afterUpgrade.artifactDigest, digestB);
-    assert.equal(afterUpgrade.status, 'ready');
-    // digestA's release directory was moved to quarantine/ and no longer
-    // exists -- previousArtifactDigest must never point at it (a later
-    // `fgctl repair` would otherwise fail looking for a directory that's
-    // gone by design, per the M2 finding).
-    assert.notEqual(afterUpgrade.previousArtifactDigest, digestA);
-    if (afterUpgrade.previousArtifactDigest !== null) {
-      assert.ok(
-        fs.existsSync(path.join(stateHome, 'releases', releaseDirName(afterUpgrade.previousArtifactDigest))),
-        'previousArtifactDigest, if set, must name a release directory that still genuinely exists'
-      );
-    }
-  } finally {
-    fs.rmSync(projDir, { recursive: true, force: true });
-    fs.rmSync(stateHome, { recursive: true, force: true });
+  const afterUpgrade = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+  assert.equal(afterUpgrade.artifactDigest, digestB);
+  assert.equal(afterUpgrade.status, 'ready');
+  // digestA's release directory was moved to quarantine/ and no longer
+  // exists -- previousArtifactDigest must never point at it (a later
+  // `fgctl repair` would otherwise fail looking for a directory that's
+  // gone by design, per the M2 finding).
+  assert.notEqual(afterUpgrade.previousArtifactDigest, digestA);
+  if (afterUpgrade.previousArtifactDigest !== null) {
+    assert.ok(
+      fs.existsSync(path.join(stateHome, 'releases', releaseDirName(afterUpgrade.previousArtifactDigest))),
+      'previousArtifactDigest, if set, must name a release directory that still genuinely exists'
+    );
   }
 });
 
 test('Red-team LOW: same-digest upgrade is idempotent (no new activationId, no self-referential previousArtifactDigest)', () => {
-  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-idem-upgrade-state-'));
-  const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-idem-upgrade-proj-'));
+  const { proj: projDir, state: stateHome } = workspaceAtA.restore();
+  const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
+  const before = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
 
-  try {
-    execFileSync('git', ['init'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
+  // Re-run upgrade against the SAME digest that's already active.
+  const upgradeRes = runFgctl(['upgrade', '--from', releaseDirA], { cwd: projDir, stateHome });
+  assert.equal(upgradeRes.status, 0, `same-digest upgrade must succeed: ${upgradeRes.stderr}`);
 
-    assert.equal(runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome }).status, 0);
-    const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
-    const before = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
-
-    // Re-run upgrade against the SAME digest that's already active.
-    const upgradeRes = runFgctl(['upgrade', '--from', releaseDirA], { cwd: projDir, stateHome });
-    assert.equal(upgradeRes.status, 0, `same-digest upgrade must succeed: ${upgradeRes.stderr}`);
-
-    const after = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
-    assert.equal(after.activationId, before.activationId, 'same-digest upgrade must not mint a new activationId');
-    assert.equal(after.artifactDigest, digestA);
-    assert.notEqual(after.previousArtifactDigest, digestA, 'previousArtifactDigest must never self-reference the active digest');
-    assert.equal(after.previousArtifactDigest, before.previousArtifactDigest, 'previousArtifactDigest must be unchanged by a same-digest upgrade');
-  } finally {
-    fs.rmSync(projDir, { recursive: true, force: true });
-    fs.rmSync(stateHome, { recursive: true, force: true });
-  }
+  const after = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+  assert.equal(after.activationId, before.activationId, 'same-digest upgrade must not mint a new activationId');
+  assert.equal(after.artifactDigest, digestA);
+  assert.notEqual(after.previousArtifactDigest, digestA, 'previousArtifactDigest must never self-reference the active digest');
+  assert.equal(after.previousArtifactDigest, before.previousArtifactDigest, 'previousArtifactDigest must be unchanged by a same-digest upgrade');
 });
 
 test('Red-team MEDIUM: repair of a tampered active release (no previousArtifactDigest) quarantines it, not just refuses', () => {
-  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-repair-tamper-state-'));
-  const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-repair-tamper-proj-'));
+  const { proj: projDir, state: stateHome } = workspaceAtA.restore();
 
-  try {
-    execFileSync('git', ['init'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
+  // Tamper the active release WITHOUT going through `fgctl verify` first --
+  // `fgctl repair` (previousArtifactDigest null) must independently detect
+  // and quarantine it, not merely refuse and leave a known-bad payload
+  // sitting under releases/<digest>/.
+  const stagedFile = path.join(stateHome, 'releases', releaseDirName(digestA), 'bin', 'fgos');
+  fs.appendFileSync(stagedFile, 'TAMPER');
 
-    assert.equal(runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome }).status, 0);
+  const repairRes = runFgctl(['repair'], { cwd: projDir, stateHome });
+  assert.notEqual(repairRes.status, 0, 'repair of a tampered active release must fail');
 
-    // Tamper the active release WITHOUT going through `fgctl verify` first --
-    // `fgctl repair` (previousArtifactDigest null) must independently detect
-    // and quarantine it, not merely refuse and leave a known-bad payload
-    // sitting under releases/<digest>/.
-    const stagedFile = path.join(stateHome, 'releases', releaseDirName(digestA), 'bin', 'fgos');
-    fs.appendFileSync(stagedFile, 'TAMPER');
+  const releaseDir = path.join(stateHome, 'releases', releaseDirName(digestA));
+  assert.ok(!fs.existsSync(releaseDir), 'tampered release must be moved out of releases/ by repair, not left in place');
 
-    const repairRes = runFgctl(['repair'], { cwd: projDir, stateHome });
-    assert.notEqual(repairRes.status, 0, 'repair of a tampered active release must fail');
+  const quarantineDir = path.join(stateHome, 'quarantine');
+  assert.ok(fs.existsSync(quarantineDir), 'quarantine dir must exist after a failed repair');
+  const quarantinedEntries = fs.readdirSync(quarantineDir);
+  assert.ok(
+    quarantinedEntries.some((e) => e.startsWith(releaseDirName(digestA))),
+    `quarantine must contain an entry for ${digestA} after repair fails`
+  );
 
-    const releaseDir = path.join(stateHome, 'releases', releaseDirName(digestA));
-    assert.ok(!fs.existsSync(releaseDir), 'tampered release must be moved out of releases/ by repair, not left in place');
-
-    const quarantineDir = path.join(stateHome, 'quarantine');
-    assert.ok(fs.existsSync(quarantineDir), 'quarantine dir must exist after a failed repair');
-    const quarantinedEntries = fs.readdirSync(quarantineDir);
-    assert.ok(
-      quarantinedEntries.some((e) => e.startsWith(releaseDirName(digestA))),
-      `quarantine must contain an entry for ${digestA} after repair fails`
-    );
-
-    const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
-    const activation = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
-    assert.equal(activation.status, 'quarantined', 'activation.json must be marked quarantined after repair fails');
-  } finally {
-    fs.rmSync(projDir, { recursive: true, force: true });
-    fs.rmSync(stateHome, { recursive: true, force: true });
-  }
+  const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
+  const activation = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+  assert.equal(activation.status, 'quarantined', 'activation.json must be marked quarantined after repair fails');
 });
 
 test('Red-team MEDIUM: a "falsely ready" binding (release moved but status never updated) self-heals via init --from', () => {
-  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-falseready-state-'));
-  const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-falseready-proj-'));
+  const { proj: projDir, state: stateHome } = workspaceAtA.restore();
 
-  try {
-    execFileSync('git', ['init'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
+  // Simulate the exact crash window red-team found: `fgctl verify` moves
+  // the release directory to quarantine/ but is killed before it
+  // publishes status: "quarantined" -- activation.json still (falsely)
+  // reads "ready" for a digest whose release directory no longer exists.
+  const releaseDir = path.join(stateHome, 'releases', releaseDirName(digestA));
+  const quarantineDir = path.join(stateHome, 'quarantine', `${releaseDirName(digestA)}-simulated-crash`);
+  fs.mkdirSync(path.dirname(quarantineDir), { recursive: true });
+  fs.renameSync(releaseDir, quarantineDir);
 
-    assert.equal(runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome }).status, 0);
+  const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
+  const beforeActivation = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+  assert.equal(beforeActivation.status, 'ready', 'precondition: status must still read ready (simulating the crash window)');
+  assert.ok(!fs.existsSync(releaseDir), 'precondition: the release directory must genuinely be gone');
 
-    // Simulate the exact crash window red-team found: `fgctl verify` moves
-    // the release directory to quarantine/ but is killed before it
-    // publishes status: "quarantined" -- activation.json still (falsely)
-    // reads "ready" for a digest whose release directory no longer exists.
-    const releaseDir = path.join(stateHome, 'releases', releaseDirName(digestA));
-    const quarantineDir = path.join(stateHome, 'quarantine', `${releaseDirName(digestA)}-simulated-crash`);
-    fs.mkdirSync(path.dirname(quarantineDir), { recursive: true });
-    fs.renameSync(releaseDir, quarantineDir);
+  // Without the is_release_staged check, this would take the idempotent
+  // fast path (digest matches, status looks ready) and never re-stage --
+  // the tail would then fail against a missing binary with no recovery.
+  const recoverRes = runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome });
+  assert.equal(recoverRes.status, 0, `init --from must self-heal a falsely-ready binding: ${recoverRes.stderr}`);
+  assert.ok(fs.existsSync(releaseDir), 'digestA must be genuinely re-staged under releases/');
 
-    const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
-    const beforeActivation = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
-    assert.equal(beforeActivation.status, 'ready', 'precondition: status must still read ready (simulating the crash window)');
-    assert.ok(!fs.existsSync(releaseDir), 'precondition: the release directory must genuinely be gone');
-
-    // Without the is_release_staged check, this would take the idempotent
-    // fast path (digest matches, status looks ready) and never re-stage --
-    // the tail would then fail against a missing binary with no recovery.
-    const recoverRes = runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome });
-    assert.equal(recoverRes.status, 0, `init --from must self-heal a falsely-ready binding: ${recoverRes.stderr}`);
-    assert.ok(fs.existsSync(releaseDir), 'digestA must be genuinely re-staged under releases/');
-
-    const afterActivation = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
-    assert.equal(afterActivation.status, 'ready');
-    assert.equal(afterActivation.artifactDigest, digestA);
-  } finally {
-    fs.rmSync(projDir, { recursive: true, force: true });
-    fs.rmSync(stateHome, { recursive: true, force: true });
-  }
+  const afterActivation = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+  assert.equal(afterActivation.status, 'ready');
+  assert.equal(afterActivation.artifactDigest, digestA);
 });
 
 test('R3: Repair when previousArtifactDigest is null re-verifies active release and heals broken capsule', () => {
-  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-repair-null-state-'));
-  const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-repair-null-proj-'));
+  const { proj: projDir, state: stateHome } = workspaceAtA.restore();
 
-  try {
-    execFileSync('git', ['init'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
+  const shimPath = path.join(projDir, '.fgos', 'installation', 'bin', 'fgos');
+  assert.ok(fs.existsSync(shimPath), 'Shim must exist');
 
-    const initRes = runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome });
-    assert.equal(initRes.status, 0);
+  // Delete shim
+  fs.rmSync(shimPath);
+  assert.ok(!fs.existsSync(shimPath), 'Shim must be deleted');
 
-    const shimPath = path.join(projDir, '.fgos', 'installation', 'bin', 'fgos');
-    assert.ok(fs.existsSync(shimPath), 'Shim must exist');
+  // fgctl repair when previousArtifactDigest is null heals capsule
+  const repairRes = runFgctl(['repair'], { cwd: projDir, stateHome });
+  assert.equal(repairRes.status, 0, `fgctl repair must succeed: ${repairRes.stderr}`);
 
-    // Delete shim
-    fs.rmSync(shimPath);
-    assert.ok(!fs.existsSync(shimPath), 'Shim must be deleted');
+  assert.ok(fs.existsSync(shimPath), 'Shim must be restored by repair');
 
-    // fgctl repair when previousArtifactDigest is null heals capsule
-    const repairRes = runFgctl(['repair'], { cwd: projDir, stateHome });
-    assert.equal(repairRes.status, 0, `fgctl repair must succeed: ${repairRes.stderr}`);
-
-    assert.ok(fs.existsSync(shimPath), 'Shim must be restored by repair');
-
-    // Verify identity unchanged
-    const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
-    const activation = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
-    assert.equal(activation.artifactDigest, digestA);
-    assert.equal(activation.previousArtifactDigest, null);
-    assert.equal(activation.status, 'ready');
-  } finally {
-    fs.rmSync(projDir, { recursive: true, force: true });
-    fs.rmSync(stateHome, { recursive: true, force: true });
-  }
+  // Verify identity unchanged
+  const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
+  const activation = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+  assert.equal(activation.artifactDigest, digestA);
+  assert.equal(activation.previousArtifactDigest, null);
+  assert.equal(activation.status, 'ready');
 });
 
 test('P7: Repair failure when no runtime is active refuses with clear message', () => {
@@ -616,30 +493,17 @@ test('P7: Repair failure when no runtime is active refuses with clear message', 
 });
 
 test('P7: Repair failure when rollback previous release is missing refuses with clear message', () => {
-  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-repair-missprev-state-'));
-  const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-repair-missprev-proj-'));
+  const { proj: projDir, state: stateHome } = workspaceAtA.restore();
 
-  try {
-    execFileSync('git', ['init'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
+  const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
+  const activation = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+  const missingDigest = 'sha256:0000000000000000000000000000000000000000000000000000000000000000';
+  activation.previousArtifactDigest = missingDigest;
+  fs.writeFileSync(activationPath, JSON.stringify(activation, null, 2) + '\n');
 
-    const initRes = runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome });
-    assert.equal(initRes.status, 0);
-
-    const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
-    const activation = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
-    const missingDigest = 'sha256:0000000000000000000000000000000000000000000000000000000000000000';
-    activation.previousArtifactDigest = missingDigest;
-    fs.writeFileSync(activationPath, JSON.stringify(activation, null, 2) + '\n');
-
-    const repairRes = runFgctl(['repair'], { cwd: projDir, stateHome });
-    assert.notEqual(repairRes.status, 0, 'repair must fail when previous release is missing');
-    assert.match(repairRes.stderr, new RegExp(`cannot repair: previous release ${missingDigest} not found in release store`));
-  } finally {
-    fs.rmSync(projDir, { recursive: true, force: true });
-    fs.rmSync(stateHome, { recursive: true, force: true });
-  }
+  const repairRes = runFgctl(['repair'], { cwd: projDir, stateHome });
+  assert.notEqual(repairRes.status, 0, 'repair must fail when previous release is missing');
+  assert.match(repairRes.stderr, new RegExp(`cannot repair: previous release ${missingDigest} not found in release store`));
 });
 
 test('P7: Upgrade failure when no runtime is active refuses with clear message', () => {
@@ -661,32 +525,17 @@ test('P7: Upgrade failure when no runtime is active refuses with clear message',
 });
 
 test('P7: Upgrade candidate preflight failure refuses upgrade and leaves existing activation untouched', () => {
-  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-upg-preflight-state-'));
-  const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-upg-preflight-proj-'));
-  const badCandidateDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-upg-badpreflight-'));
+  const { proj: projDir, state: stateHome } = workspaceAtA.restore();
+  // Bad candidate with impossible node requirement
+  const badCandidate = restampRelease(releaseDirB, 'fgctl-upg-badpreflight-', (manifest) => {
+    manifest.requires = { node: '>=999.0.0' };
+  });
 
   try {
-    execFileSync('git', ['init'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
-
-    const initRes = runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome });
-    assert.equal(initRes.status, 0);
-
     const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
     const activationContentBefore = fs.readFileSync(activationPath, 'utf8');
 
-    // Build bad candidate with impossible node requirement
-    fs.cpSync(releaseDirB, badCandidateDir, { recursive: true });
-    const manifestPath = path.join(badCandidateDir, 'manifest.json');
-    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-    manifest.requires = { node: '>=999.0.0' };
-    delete manifest.artifactDigest;
-    const newDigest = computeArtifactDigest(manifest);
-    manifest.artifactDigest = newDigest;
-    fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
-
-    const upgRes = runFgctl(['upgrade', '--from', badCandidateDir], { cwd: projDir, stateHome });
+    const upgRes = runFgctl(['upgrade', '--from', badCandidate.dir], { cwd: projDir, stateHome });
     assert.notEqual(upgRes.status, 0, 'upgrade must fail on preflight failure');
     assert.match(upgRes.stderr, /preflight failed/i);
     assert.match(upgRes.stderr, /runtime-dependency-missing/);
@@ -694,54 +543,18 @@ test('P7: Upgrade candidate preflight failure refuses upgrade and leaves existin
     const activationContentAfter = fs.readFileSync(activationPath, 'utf8');
     assert.equal(activationContentAfter, activationContentBefore, 'activation.json must remain byte-for-byte untouched');
   } finally {
-    fs.rmSync(projDir, { recursive: true, force: true });
-    fs.rmSync(stateHome, { recursive: true, force: true });
-    fs.rmSync(badCandidateDir, { recursive: true, force: true });
+    fs.rmSync(badCandidate.dir, { recursive: true, force: true });
   }
 });
 
 test('P7: Upgrade candidate local tail failure leaves workspace in diagnosable state with ready-degraded transaction', () => {
-  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-upg-tailfail-state-'));
-  const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-upg-tailfail-proj-'));
-  const tailFailCandidateDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-upg-tailfail-cand-'));
+  const { proj: projDir, state: stateHome } = workspaceAtA.restore();
+  // Release B whose doctor fails when SIMULATE_TAIL_FAILURE is set
+  const candidate = releaseWithFailingDoctor(releaseDirB, 'fgctl-upg-tailfail-cand-', 'upgrade');
+  const newDigest = candidate.digest;
 
   try {
-    execFileSync('git', ['init'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
-
-    const initRes = runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome });
-    assert.equal(initRes.status, 0);
-
-    // Copy release B and inject doctor failure when SIMULATE_TAIL_FAILURE is set
-    fs.cpSync(releaseDirB, tailFailCandidateDir, { recursive: true });
-    const fgosMjsPath = path.join(tailFailCandidateDir, 'libexec', 'legacy-node', 'bin', 'fgos.mjs');
-    const originalContent = fs.readFileSync(fgosMjsPath, 'utf8');
-    const firstLineEnd = originalContent.indexOf('\n');
-    const shebang = originalContent.slice(0, firstLineEnd + 1);
-    const rest = originalContent.slice(firstLineEnd + 1);
-    const failInjection = `if (process.env.SIMULATE_TAIL_FAILURE === '1' && process.argv.includes('doctor')) {\n  console.error('simulated upgrade doctor failure in tail');\n  process.exit(42);\n}\n`;
-    fs.writeFileSync(fgosMjsPath, shebang + failInjection + rest);
-
-    // Update manifest
-    const manifestPath = path.join(tailFailCandidateDir, 'manifest.json');
-    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-    const newMjsHash = 'sha256:' + hashFile(fgosMjsPath);
-    const newMjsSize = fs.statSync(fgosMjsPath).size;
-
-    for (const f of manifest.files) {
-      if (f.path === 'libexec/legacy-node/bin/fgos.mjs') {
-        f.digest = newMjsHash;
-        f.size = newMjsSize;
-      }
-    }
-    manifest.components.legacyNode.digest = newMjsHash;
-    delete manifest.artifactDigest;
-    const newDigest = computeArtifactDigest(manifest);
-    manifest.artifactDigest = newDigest;
-    fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
-
-    const upgRes = runFgctl(['upgrade', '--from', tailFailCandidateDir], {
+    const upgRes = runFgctl(['upgrade', '--from', candidate.dir], {
       cwd: projDir,
       stateHome,
       env: { SIMULATE_TAIL_FAILURE: '1' },
@@ -776,52 +589,24 @@ test('P7: Upgrade candidate local tail failure leaves workspace in diagnosable s
     assert.equal(versionData.data.artifactDigest, newDigest);
     assert.equal(versionData.data.previousArtifactDigest, digestA);
   } finally {
-    fs.rmSync(projDir, { recursive: true, force: true });
-    fs.rmSync(stateHome, { recursive: true, force: true });
-    fs.rmSync(tailFailCandidateDir, { recursive: true, force: true });
+    fs.rmSync(candidate.dir, { recursive: true, force: true });
   }
 });
 
 test('P7: Repair local tail failure leaves workspace in diagnosable state with ready-degraded transaction', () => {
   const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-rep-tailfail-state-'));
   const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-rep-tailfail-proj-'));
-  const tailFailCandidateDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-rep-tailfail-cand-'));
+  // Release A whose doctor fails when SIMULATE_TAIL_FAILURE is set
+  const candidate = releaseWithFailingDoctor(releaseDirA, 'fgctl-rep-tailfail-cand-', 'repair');
+  const newDigest = candidate.digest;
 
   try {
     execFileSync('git', ['init'], { cwd: projDir });
     execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
     execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
 
-    // Copy release A and inject doctor failure when SIMULATE_TAIL_FAILURE is set
-    fs.cpSync(releaseDirA, tailFailCandidateDir, { recursive: true });
-    const fgosMjsPath = path.join(tailFailCandidateDir, 'libexec', 'legacy-node', 'bin', 'fgos.mjs');
-    const originalContent = fs.readFileSync(fgosMjsPath, 'utf8');
-    const firstLineEnd = originalContent.indexOf('\n');
-    const shebang = originalContent.slice(0, firstLineEnd + 1);
-    const rest = originalContent.slice(firstLineEnd + 1);
-    const failInjection = `if (process.env.SIMULATE_TAIL_FAILURE === '1' && process.argv.includes('doctor')) {\n  console.error('simulated repair doctor failure in tail');\n  process.exit(42);\n}\n`;
-    fs.writeFileSync(fgosMjsPath, shebang + failInjection + rest);
-
-    // Update manifest
-    const manifestPath = path.join(tailFailCandidateDir, 'manifest.json');
-    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-    const newMjsHash = 'sha256:' + hashFile(fgosMjsPath);
-    const newMjsSize = fs.statSync(fgosMjsPath).size;
-
-    for (const f of manifest.files) {
-      if (f.path === 'libexec/legacy-node/bin/fgos.mjs') {
-        f.digest = newMjsHash;
-        f.size = newMjsSize;
-      }
-    }
-    manifest.components.legacyNode.digest = newMjsHash;
-    delete manifest.artifactDigest;
-    const newDigest = computeArtifactDigest(manifest);
-    manifest.artifactDigest = newDigest;
-    fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
-
     // Init with tail failure disabled so init succeeds
-    const initRes = runFgctl(['init', '--from', tailFailCandidateDir], { cwd: projDir, stateHome });
+    const initRes = runFgctl(['init', '--from', candidate.dir], { cwd: projDir, stateHome });
     assert.equal(initRes.status, 0);
 
     // Now run fgctl repair with tail failure enabled
@@ -860,15 +645,13 @@ test('P7: Repair local tail failure leaves workspace in diagnosable state with r
   } finally {
     fs.rmSync(projDir, { recursive: true, force: true });
     fs.rmSync(stateHome, { recursive: true, force: true });
-    fs.rmSync(tailFailCandidateDir, { recursive: true, force: true });
+    fs.rmSync(candidate.dir, { recursive: true, force: true });
   }
 });
 
 test('download: fgctl upgrade downloads the target release, verifies SHA256SUMS, and records the tag in the pin so a teammate can init from it', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-upg-dl-'));
-  const projA = path.join(root, 'proj-a');
   const projB = path.join(root, 'proj-b');
-  const stateA = path.join(root, 'state-a');
   const stateB = path.join(root, 'state-b');
   const homeA = path.join(root, 'home-a');
   const homeB = path.join(root, 'home-b');
@@ -876,14 +659,12 @@ test('download: fgctl upgrade downloads the target release, verifies SHA256SUMS,
   const target = 'x86_64-unknown-linux-gnu';
 
   try {
-    for (const d of [projA, projB, stateA, stateB, homeA, homeB, assets]) {
+    for (const d of [projB, stateB, homeA, homeB, assets]) {
       fs.mkdirSync(d, { recursive: true, mode: 0o700 });
     }
-    for (const p of [projA, projB]) {
-      execFileSync('git', ['init'], { cwd: p });
-      execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: p });
-      execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: p });
-    }
+    execFileSync('git', ['init'], { cwd: projB });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projB });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projB });
 
     const assetA = `fgos-v0.1.0-${target}.tar.gz`;
     const assetB = `fgos-v0.2.0-${target}.tar.gz`;
@@ -897,13 +678,8 @@ test('download: fgctl upgrade downloads the target release, verifies SHA256SUMS,
 
     const baseUrl = `file://${assets.replace(/\\/g, '/')}`;
 
-    // 1. Init project A on v0.1.0 via download
-    const initRes = runFgctl(['init'], {
-      cwd: projA,
-      stateHome: stateA,
-      env: { HOME: homeA, FGCTL_VERSION: 'v0.1.0', FGCTL_TARGET: target, FGCTL_ASSET_BASE_URL: baseUrl },
-    });
-    assert.equal(initRes.status, 0, initRes.stderr);
+    // 1. Project A runs on release A (how it got there is fgctl-init-download.test.mjs's case)
+    const { proj: projA, state: stateA } = workspaceAtA.restore();
 
     // 2. Tampered SHA256SUMS for v0.2.0 refuses upgrade and leaves activation A untouched
     fs.writeFileSync(path.join(assets, 'SHA256SUMS'), `${'0'.repeat(64)}  ${assetB}\n`);
@@ -959,20 +735,11 @@ test('download: fgctl upgrade downloads the target release, verifies SHA256SUMS,
 
 test('holder-lock gate: a git that leaves a background gc while it borrows a lock passes upgrade and repair, and the escaped gc is ended with nothing left holding a lock', { skip: process.platform === 'win32' && 'no holder-lock driver on Windows' }, () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-lock-gate-upgrade-'));
-  const stateHome = path.join(root, 'state');
-  const projDir = path.join(root, 'proj');
   // The borrow vectors build their throwaway repository under TMPDIR: pin it so the escaped gc can be looked for.
   const tmpDir = path.join(root, 'tmp');
   try {
-    fs.mkdirSync(stateHome, { mode: 0o700 });
-    fs.mkdirSync(projDir);
     fs.mkdirSync(tmpDir);
-    execFileSync('git', ['init'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
-    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
-
-    const initRes = runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome });
-    assert.equal(initRes.status, 0, `init must succeed: ${initRes.stderr}`);
+    const { proj: projDir, state: stateHome } = workspaceAtA.restore();
     const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
     const leaky = { PATH: pathWithGcLeakingGit(root), TMPDIR: tmpDir };
     const holders = () => processesUnder([path.join(tmpDir, 'fgos-borrow-vectors-'), path.join(projDir, '.fgos', 'locks'), path.join(stateHome, 'locks')]);

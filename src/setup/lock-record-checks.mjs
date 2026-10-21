@@ -37,7 +37,7 @@ function recordProblem(resource, fgosDir, now) {
   }
   if (seen.state === 'absent') return null;
   if (seen.state === 'unreadable') return `${resource}: ${recordPath} does not parse (${JSON.stringify(seen.raw.slice(0, 80))})`;
-  if (judgeHotRecord(seen.record, fgosDir) !== 'unknown') return null;
+  if (judgeHotRecord(seen.record) !== 'unknown') return null;
   const age = ageMs(recordPath, now);
   if (age <= UNKNOWN_JUDGE_GRACE_MS) return null;
   return `${resource}: ${recordPath} names pid ${seen.record.pid} that cannot be judged here, for ${Math.round(age / 60000)} min`;

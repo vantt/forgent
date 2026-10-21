@@ -13,10 +13,10 @@
 // The core never writes the ledger itself and never between admit and settle.
 
 import { RunnerConfigError } from '../dispatch/config.mjs';
-import { resolvePattern } from './patterns/presets.mjs';
-import { resolvePanelRoles } from './patterns/panel.mjs';
-import { debateSeatLaunches } from './patterns/debate.mjs';
-import { resolveCheckers } from './patterns/reviewed.mjs';
+
+// How many seat launches a Unit plans is the seat resolver's answer, so admission counts the same seats
+// the run will bind.
+export { seatLaunchesOf } from './seat-resolver.mjs';
 
 export const PORT_MISSING = 'case-admission-port-missing';
 export const SEAT_LAUNCH_CEILING = 'seat-launch-ceiling';
@@ -57,32 +57,6 @@ export class CaseAdmissionRefusedError extends RunnerConfigError {
   }
 }
 
-/**
- * Seat launches a Unit plans, before any fallback: seats per round times the rounds the pattern may
- * run. Read from the pattern the run will use, never from what a seat did.
- *
- * @returns {number | null} null for a pattern this core does not know
- */
-export function seatLaunchesOf({ pattern, unit, runnerConfig }) {
-  const { patternName, params } = resolvePattern(pattern);
-  switch (patternName) {
-    case 'solo':
-      return 1;
-    case 'reviewed': {
-      const maxRounds = params?.maxRounds ?? runnerConfig?.patterns?.reviewed?.maxRounds ?? 2;
-      return (1 + resolveCheckers(unit, runnerConfig, params).length) * maxRounds;
-    }
-    case 'panel': {
-      const { panelists } = resolvePanelRoles(runnerConfig, {}, params);
-      return panelists.length + 1;
-    }
-    case 'debate':
-      return debateSeatLaunches(params);
-    default:
-      return null;
-  }
-}
-
 /** The case a Unit names: `{ caseId, activity }` plus the optional unit id and the route the proposer says it takes. */
 export function normalizeCaseRef(value) {
   if (value === undefined || value === null) return null;
@@ -96,5 +70,6 @@ export function normalizeCaseRef(value) {
 /** Every attempt a Unit run has launched so far, from its record: the one count the ceiling is held against. */
 export function seatLaunchesUsed(unitRecord) {
   return Object.values(unitRecord.bindings ?? {})
-    .reduce((sum, attempts) => sum + attempts.filter((a) => a.dispatchRetryId !== undefined).length, 0);
+    // An attempt whose account could not be leased never started a worker: it is not a launch.
+    .reduce((sum, attempts) => sum + attempts.filter((a) => a.dispatchRetryId !== undefined && a.leaseConflict !== true).length, 0);
 }

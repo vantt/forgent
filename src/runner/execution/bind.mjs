@@ -1,108 +1,60 @@
-// src/runner/execution/bind.mjs — Single authority for executor/transport/tier/model/persona/mechanism/posture binding (Wave B / Phase 3)
+// src/runner/execution/bind.mjs — Seat Binding for Node callers: one seat, one answer.
 // Architecture guard: MUST NOT import src/state/** or src/runner/coordination/**
+//
+// Every decision (tier, ranking, independence, pins, effort, continuity, the walk after a failure) is the
+// Rust crate's (`fgos internal seat-binding`, through seat-policy.mjs). This module collects what the
+// crate must not read itself and turns its answer into the binding the runner launches:
+//   - the ask: unit, seat, overrides, independence and the persona that sits the seat;
+//   - launchView: per executor, what this machine can launch (family, mechanism, invocations that carry
+//     the posture, the CLI each reads a login from, the effort levels its CLI renders);
+//   - accountView: per pool, the accounts the config declares and the CLIs each holds a login for.
+// It never ranks, filters or orders candidates.
 
 import { decideExecutorDispatchMechanism } from '../dispatch/mechanism.mjs';
-import { deriveProviderFamily, resolveTierCandidates, resolveTierModel, tierCellMissingDetail, tierFallbackOf } from '../dispatch/resolve.mjs';
-import { checkProviderDisallowed } from '../dispatch/provider-adapter.mjs';
+import { deriveProviderFamily } from '../dispatch/resolve.mjs';
+import { checkProviderDisallowed, renderedEffortLevels } from '../dispatch/provider-adapter.mjs';
 import { canApplyPosture, resolvePostureInvocation } from '../dispatch/confinement/policies.mjs';
-import { resolveStrongerRigor } from '../rigor.mjs';
-import { MODEL_POLICY_TIERS, DEFAULT_RIGOR_TO_TIER, assertReasoningEffort, assertRunTimeoutMs } from '../dispatch/config.mjs';
-import { resolveStrongerTier, TIER_STRENGTH } from '../dispatch/assignment-policy.mjs';
-import { credentialSourceForCli, credentialStoreOf, providerAccountInventory } from '../dispatch/provider-capacity.mjs';
+import { MODEL_POLICY_TIERS, RunnerConfigError, assertReasoningEffort, assertRunTimeoutMs } from '../dispatch/config.mjs';
+import { credentialSourceForCli, credentialStoreOf, providerAccountInventory, readAccountStates } from '../dispatch/provider-capacity.mjs';
+import { parseTierCell } from '../dispatch/tier-cell.mjs';
 import { legacyStateKey } from '../dispatch/llm-accounts.mjs';
-import { PIN_REFUSES_SEAT, parseAccountPin, resolveAccountPin } from './account-pin.mjs';
+import { DEFAULT_RUN_CAPABILITY, PRODUCER_POSTURE, capabilityEntriesOf, effectiveRigorOf } from './seat-resolver.mjs';
+import { seatBinding } from './seat-policy.mjs';
 
 export const BIND_CONTRACT_VERSION = 'v1alpha1';
 
-// The one list of pattern roles that never run inline or in-process: checkers, panel seats, and the
-// debate's two sides and its judge.
-const CHECKER_ROLES = new Set(['reviewer', 'red-team', 'tester', 'panelist', 'synthesizer', 'thesis', 'antithesis', 'judge']);
+const identityKey = (executor, invocation, pool, model, effort) => [executor, invocation ?? '', pool ?? '', model ?? '', effort ?? ''].join('\u0000');
 
-/** Checker, panel and debate roles never run inline or in-process. */
-function isCheckerOrPanelRole(role) {
-  return CHECKER_ROLES.has(role) || Boolean(role && role.startsWith('panelist-'));
-}
+/** What names one candidate of a seat's walk: executor, invocation, pool, model and effort. */
+export const bindingIdentity = (binding) => identityKey(binding?.executor, binding?.invocation, binding?.pool, binding?.model, binding?.reasoningEffort);
 
-/**
- * Normalizes capability prefer pool to array of { executor, invocation }
- */
-function normalizeCandidates(prefer) {
-  if (!prefer) return [];
-  if (typeof prefer === 'string') {
-    return [{ executor: prefer, invocation: null }];
-  }
-  if (Array.isArray(prefer)) {
-    return prefer.map((entry) => {
-      if (typeof entry === 'string') {
-        return { executor: entry, invocation: null };
-      }
-      if (entry && typeof entry === 'object') {
-        return {
-          executor: entry.executor,
-          invocation: entry.invocation ?? null,
-        };
-      }
-      return null;
-    }).filter(Boolean);
-  }
-  return [];
-}
+/** A binding as the crate's walk state names a candidate. */
+export const identityOf = (binding) => ({
+  executor: binding.executor,
+  ...(binding.invocation ? { invocation: binding.invocation } : {}),
+  ...(binding.pool ? { pool: binding.pool } : {}),
+  ...(binding.model && binding.model !== 'default' ? { model: binding.model } : {}),
+  ...(binding.reasoningEffort ? { effort: binding.reasoningEffort } : {}),
+});
 
-/**
- * The executor's herdr-spawn invocation, when it has one a caller can pin by id.
- * A herdr invocation without an id cannot be named, so it is never chosen.
- */
-function findHerdrInvocation(executorEntry) {
-  if (!executorEntry || !Array.isArray(executorEntry.invocations)) {
-    return null;
-  }
-  return executorEntry.invocations.find(
-    (inv) => inv?.via === 'cli' && inv?.adapter === 'herdr-spawn' && typeof inv.id === 'string' && inv.id,
-  ) ?? null;
-}
+/** Where an override came from: its origin when it names one (a workflow's seat persona), else just "override". */
+const overrideSource = (override) => (override?.origin ? `override:${override.origin}` : 'override');
 
-/**
- * Look up capability config in runnerConfig:
- * First capabilities[domain:verb], then fallback capabilities[verb].
- */
-export function hasUsablePrefer(entry) {
-  const prefer = entry?.prefer;
-  return typeof prefer === 'string' ? prefer.trim() !== '' : Array.isArray(prefer) && prefer.length > 0;
-}
-
-function lookupCapabilityConfig(runnerConfig, capability) {
-  if (!runnerConfig || typeof runnerConfig !== 'object' || !capability) {
-    return { entry: null, key: null };
-  }
-  const capabilities = runnerConfig.capabilities ?? runnerConfig.runner?.capabilities ?? {};
-  // An entry wins only with a usable prefer pool: a description-only slot must not
-  // hide a bare-verb entry that has one. With no usable pool anywhere, the exact
-  // entry (then the bare verb) is still returned so its rigor/persona apply.
-  const verb = capability.includes(':') ? capability.split(':')[1] : null;
-  const ordered = [capability, verb].filter(Boolean).map((key) => ({ key, entry: capabilities[key] })).filter((hit) => hit.entry);
-  const hit = ordered.find((h) => hasUsablePrefer(h.entry)) ?? ordered[0];
-  if (hit) return { entry: hit.entry, key: hit.key };
-  return { entry: null, key: null };
-}
-
-/**
- * Filter candidate matching scope
- */
-function findMatchingOverride(overrides, unit, role) {
+/** An override that applies to this unit, seat and role (a scope-less one applies to every seat of the run). */
+function findMatchingOverride(overrides, unit, seat, role) {
   if (!Array.isArray(overrides)) return null;
   return overrides.find((ov) => {
     if (!ov || typeof ov !== 'object') return false;
     const scope = ov.scope;
-    if (!scope) return true; // Global scope override
+    if (!scope) return true;
     const unitMatch = scope.unit === undefined || scope.unit === null || scope.unit === unit?.id;
+    const seatMatch = scope.seat === undefined || scope.seat === null || scope.seat === seat;
     const roleMatch = scope.role === undefined || scope.role === null || scope.role === role;
-    return unitMatch && roleMatch;
+    return unitMatch && seatMatch && roleMatch;
   }) ?? null;
 }
 
-/**
- * Resolve provider family for an executor id or candidate
- */
+/** The provider family of an executor id: its own `providerModel`/`provider`, else inferred from its command. */
 export function getProviderFamily(runnerConfig, executorId) {
   const executors = runnerConfig?.executors ?? runnerConfig?.runner?.executors ?? {};
   const executorEntry = executors[executorId];
@@ -114,87 +66,112 @@ export function getProviderFamily(runnerConfig, executorId) {
 }
 
 /**
- * The highest tier a seat of `capability` may run at. runner.maxTier caps every seat, except that a
- * capability declaring its own rigor in the config raises the cap for itself to that rigor's tier.
- * A unit's rigor and an override stay under the ceiling, so only the config decides which
- * capabilities may run above the cap. Null when runner.maxTier is not set.
- *
- * @returns {{value: string, source: string}|null} `source` is `global` or `capability-rigor(<cap>, <rigor>)`.
+ * The persona that sits a seat, and where it came from: an override's, else the seat's own, the
+ * unit's, the locked one, the capability's default (its exact entry, then its prefix entry).
+ * `base` is the same chain without the persona a door selected, which is what the tier is judged
+ * against before the selection (a persona a door picks that lifts the tier is a raise).
  */
-export function resolveTierCeiling(runnerConfig, capability, capabilityRigor) {
-  const globalMaxTier = runnerConfig?.maxTier ?? runnerConfig?.runner?.maxTier;
-  if (!globalMaxTier || !MODEL_POLICY_TIERS.includes(globalMaxTier)) return null;
-  const rigorToTier = runnerConfig.rigorToTier ?? runnerConfig.runner?.rigorToTier ?? DEFAULT_RIGOR_TO_TIER;
-  const capabilityTier = capabilityRigor ? rigorToTier[capabilityRigor] : undefined;
-  if (capabilityTier && MODEL_POLICY_TIERS.includes(capabilityTier) && TIER_STRENGTH[capabilityTier] > TIER_STRENGTH[globalMaxTier]) {
-    return { value: capabilityTier, source: `capability-rigor(${capability}, ${capabilityRigor})` };
+function resolvePersona({ ask, unit, matchingOverride, capEntries }) {
+  const { persona: seatPersona = null, lockedPersona = null } = ask ?? {};
+  const unitPersona = typeof unit?.persona === 'string' && unit.persona ? unit.persona : null;
+  if (lockedPersona && unitPersona && unitPersona !== lockedPersona) {
+    return { refused: { reason: 'locked-persona', detail: `Unit persona "${unitPersona}" conflicts with locked persona "${lockedPersona}"` } };
   }
-  return { value: globalMaxTier, source: 'global' };
+  if (matchingOverride?.persona && lockedPersona && matchingOverride.persona !== lockedPersona) {
+    return { refused: { reason: 'locked-persona', detail: `Cannot override locked persona "${lockedPersona}" with "${matchingOverride.persona}"` } };
+  }
+  const capDefault = capEntries.find(({ entry }) => entry.persona);
+  const chain = (skip) => {
+    if (seatPersona) return { persona: seatPersona, source: 'seat' };
+    if (unitPersona && unitPersona !== skip) return { persona: unitPersona, source: 'unit' };
+    if (lockedPersona) return { persona: lockedPersona, source: 'locked-persona' };
+    if (capDefault) return { persona: capDefault.entry.persona, source: `capability:${capDefault.key}` };
+    return { persona: null, source: 'none' };
+  };
+  const selected = ask?.selectors?.persona ?? matchingOverride?.persona ?? null;
+  const chosen = matchingOverride?.persona
+    ? { persona: matchingOverride.persona, source: overrideSource(matchingOverride) }
+    : chain(null);
+  return { ...chosen, selected, base: chain(selected).persona };
 }
 
-const identityKey = (executor, invocation, pool, model) => [executor, invocation ?? '', pool ?? '', model ?? ''].join('\u0000');
+// ---- machine facts ------------------------------------------------------------------------------
 
-/** What names one candidate of a seat's walk: executor, invocation, pool and model. */
-export const bindingIdentity = (binding) => identityKey(binding?.executor, binding?.invocation, binding?.pool, binding?.model);
+const executorsOf = (runnerConfig) => runnerConfig.executors ?? runnerConfig.runner?.executors ?? {};
 
-/** The tier a seat runs at, its source, and the ceiling that applied (all independent of the executor). */
-function resolveSeatTier({ unit, capConfig, capKey, matchingOverride, runnerConfig }) {
-  const unitRigor = unit?.rigor;
-  const capRigor = capConfig?.rigor;
-  // The implicit standard is a fallback, not a floor (same rule as
-  // resolveAssignmentDispatchPolicy): a unit may ask for low, and only an
-  // explicit capability rigor floor raises it.
-  const effectiveRigor = unitRigor && capRigor
-    ? resolveStrongerRigor(unitRigor, capRigor)
-    : (unitRigor ?? capRigor ?? 'standard');
+/** The command an invocation runs: its own, else the executor's, else the runner's default executor. */
+const commandOf = (runnerConfig, entry, invocation) => invocation.command ?? entry.command
+  ?? runnerConfig.executor?.command ?? runnerConfig.runner?.executor?.command;
 
-  const rigorToTier = runnerConfig.rigorToTier ?? runnerConfig.runner?.rigorToTier ?? DEFAULT_RIGOR_TO_TIER;
-  const derivedTier = rigorToTier[effectiveRigor] ?? 'standard';
-
-  let tier = derivedTier;
-  let source = `rigor:${effectiveRigor}`;
-  if (matchingOverride && matchingOverride.tier) {
-    tier = resolveStrongerTier(derivedTier, matchingOverride.tier);
-    source = `override:${matchingOverride.origin ?? 'unknown'}`;
-  }
-  const ceiling = resolveTierCeiling(runnerConfig, capKey ?? unit?.capability, capRigor);
-  if (ceiling && TIER_STRENGTH[tier] > TIER_STRENGTH[ceiling.value]) {
-    tier = ceiling.value;
-    source = `clamped:maxTier(${ceiling.value}, ${ceiling.source})`;
-  }
-  return { tier, source, ceiling };
+/** Why governance disallows an executor, or undefined when it does not. */
+function disallowedReason(runnerConfig, id, entry, family) {
+  const governance = runnerConfig.governance ?? runnerConfig.runner?.governance;
+  const verdict = checkProviderDisallowed(governance?.disallowedProviders, family, entry?.command ?? id);
+  if (verdict.disallowed) return `provider "${verdict.canonicalProvider || family}" is disallowed`;
+  if (Array.isArray(governance?.disallowedExecutors) && governance.disallowedExecutors.includes(id)) return `executor "${id}" is disallowed`;
+  return undefined;
 }
 
 /**
- * The invocation and transport a candidate launches with (G7): herdr when this session runs inside
- * one and the executor has a herdr-spawn invocation that can carry the posture; the invocation that
- * runs is then that herdr one. An invocation a human pinned by override, or one a unit named in its
- * own `prefer`, stays as named. Null when no invocation can carry the posture.
+ * What the crate may know of one executor: its family, mechanism and skills, the invocations that can
+ * carry the posture (with the CLI each reads a login from and the effort levels it renders), and the
+ * invocation the transport takes when nothing pins one: the herdr-spawn invocation when this session runs
+ * inside herdr and it can carry the posture, else the first plain one that can.
  */
-function resolveLaunch(cand, { posture, runnerConfig, executors, session }) {
-  const executorEntry = executors[cand.executor];
-  const approved = resolvePostureInvocation(cand, posture, { runnerConfig, executors, herdrPresent: session.herdrPresent === true });
-  if (!approved.ok) return null;
-  let invocation = approved.invocation;
-  let transport = 'cli';
-  let transportSource = 'default-cli';
-  const herdrInvocation = findHerdrInvocation(executorEntry);
-  const namedInvocation = cand.override?.invocation
-    || (cand.source === 'unit-prefer' && cand.invocation);
-  if (namedInvocation) {
-    transportSource = cand.override?.invocation ? 'override-pinned-invocation' : 'unit-prefer-pinned-invocation';
-    const pinned = executorEntry?.invocations?.find((inv) => inv?.id === invocation);
-    if (pinned?.adapter === 'herdr-spawn') transport = 'herdr';
-  } else if (herdrInvocation && session.herdrPresent === true) {
-    if (canApplyPosture({ executor: cand.executor, invocation: herdrInvocation.id }, posture, { runnerConfig, executors })) {
-      transport = 'herdr';
-      transportSource = 'herdr-invocation-present';
-      invocation = herdrInvocation.id;
-    } else {
-      transportSource = 'cli:herdr-invocation-cannot-apply-posture';
-    }
+function executorFacts(id, entry, { runnerConfig, executors, session }) {
+  const family = getProviderFamily(runnerConfig, id);
+  const mechanism = decideExecutorDispatchMechanism(runnerConfig, id, { hasLiveTaskAccess: Boolean(session.hasNativeAgent) });
+  const supported = Array.isArray(entry.supports?.reasoningEffort) ? entry.supports.reasoningEffort : null;
+  const herdrPresent = session.herdrPresent === true;
+  const ctx = { runnerConfig, executors, herdrPresent };
+  // A caller that binds only to learn who, which model and what tier (not to launch this binding) leaves
+  // the posture to the launch: the confinement authority judges it when the assignment starts.
+  const atLaunch = session.postureAtLaunch === true;
+  const invocations = (entry.invocations ?? []).filter((inv) => typeof inv?.id === 'string' && inv.id).map((inv) => {
+    const store = credentialStoreOf({ ...inv, command: commandOf(runnerConfig, entry, inv) });
+    const efforts = renderedEffortLevels(commandOf(runnerConfig, entry, inv));
+    return {
+      id: inv.id,
+      ...(store?.use ? { cli: store.use } : {}),
+      efforts: supported ? efforts.filter((level) => supported.includes(level)) : efforts,
+      carriesPosture: atLaunch || canApplyPosture({ executor: id, invocation: inv.id }, 'read-only', ctx),
+    };
+  });
+  let defaultInvocation;
+  let approved = resolvePostureInvocation({ executor: id, invocation: null }, 'read-only', ctx);
+  if (!approved.ok && atLaunch) approved = { ok: true, invocation: invocations[0]?.id ?? null };
+  if (approved.ok && approved.invocation) {
+    defaultInvocation = approved.invocation;
+    const herdr = (entry.invocations ?? []).find((inv) => inv?.via === 'cli' && inv?.adapter === 'herdr-spawn' && typeof inv.id === 'string' && inv.id);
+    if (herdrPresent && invocations.find((inv) => inv.id === herdr?.id)?.carriesPosture) defaultInvocation = herdr.id;
   }
-  return { invocation, transport, transportSource };
+  // An executor that declares no invocation runs its own command: for a caller that does not launch this
+  // binding, that command is the one invocation whose effort levels are judged.
+  if (atLaunch && invocations.length === 0) {
+    invocations.push({ id: 'command', efforts: renderedEffortLevels(commandOf(runnerConfig, entry, {})), carriesPosture: true });
+    defaultInvocation = 'command';
+  }
+  const disallowed = disallowedReason(runnerConfig, id, entry, family);
+  return {
+    kind: entry.kind === 'tool' ? 'tool' : 'agent',
+    family,
+    mechanism: mechanism === 'out-of-process' ? 'out-of-process' : 'in-process',
+    ...(disallowed ? { disallowed } : {}),
+    skills: Array.isArray(entry.supports?.skills) ? entry.supports.skills : [],
+    invocations,
+    ...(defaultInvocation ? { defaultInvocation } : {}),
+    ...(approved.ok && !approved.invocation ? { unnamedCarries: true } : {}),
+  };
+}
+
+/** Every executor of the config, as the crate reads them. */
+function launchViewOf(runnerConfig, session) {
+  const executors = executorsOf(runnerConfig);
+  return {
+    executors: Object.fromEntries(Object.entries(executors)
+      .filter(([, entry]) => entry && typeof entry === 'object')
+      .map(([id, entry]) => [id, executorFacts(id, entry, { runnerConfig, executors, session })])),
+  };
 }
 
 /** The accounts the lease reads, per state key; empty when the inventory cannot be read. */
@@ -207,597 +184,414 @@ function readInventory(runnerConfig) {
 }
 
 /**
- * Why a pool cannot serve a launch through `invocation`, or null when it can. A pool with no
- * account runs on the executor's own login, which only the pool named after the family may do; a
- * pool with accounts needs one that is enabled and holds a login store for the CLI the invocation
- * reads. Config only: quarantine and leases are the lease's business at dispatch.
+ * The pools a seat may be served by and the accounts each declares: a pool is named by a cell entry or is
+ * the family itself. An account lists the CLIs it holds a login store for (never where it is kept).
+ * With `accounts` ({ runtimeDir, assignmentId }) the view also carries what the lease state says, read here
+ * and not under the lock: the account this assignment already holds, until when an account is quarantined,
+ * and whether a quarantined login may be lifted by one real call (offered, unprobed, only when no account of
+ * the pool is healthy). Without it the view is the config alone, which is what a replay and a read-only
+ * explanation rank from.
  */
-export function poolUnusableReason(inventory, { pool, family, executorEntry, invocation }) {
-  const accounts = Object.values(inventory?.[legacyStateKey(pool)]?.accounts ?? {});
-  const invocationEntry = executorEntry?.invocations?.find((inv) => inv?.id === invocation);
-  const store = invocationEntry ? credentialStoreOf({ ...invocationEntry, command: invocationEntry.command ?? executorEntry.command }) : null;
-  if (accounts.length === 0) {
-    return pool === family ? null : `pool "${pool}" has no account in runner.llmAccounts, so nothing can pay for the call`;
+function accountViewOf(runnerConfig, launchView, accounts = null, now = Date.now()) {
+  const inventory = readInventory(runnerConfig);
+  const clis = [...new Set(Object.values(launchView.executors).flatMap((facts) => facts.invocations.map((inv) => inv.cli).filter(Boolean)))];
+  const pools = new Set(Object.values(launchView.executors).map((facts) => facts.family));
+  const policies = runnerConfig.modelPolicies ?? runnerConfig.runner?.modelPolicies ?? {};
+  for (const [family, tiers] of Object.entries(policies)) {
+    for (const cell of Object.values(tiers ?? {})) {
+      try {
+        for (const entry of parseTierCell(cell, family)) pools.add(entry.pool);
+      } catch { /* a malformed cell is the config validator's to report */ }
+    }
   }
-  if (!store) return pool === family ? null : `the invocation reads no login store, which pool "${pool}" needs an account for`;
-  if (!accounts.some((account) => account.disabled !== true && credentialSourceForCli(account, store.use))) {
-    return `no enabled account of pool "${pool}" holds a "${store.use}" login store`;
-  }
-  return null;
+  const poolOf = (pool) => {
+    const states = accounts ? readAccountStates({ provider: legacyStateKey(pool), assignmentId: accounts.assignmentId, runtimeDir: accounts.runtimeDir, now }) : {};
+    const declared = Object.entries(inventory[legacyStateKey(pool)]?.accounts ?? {});
+    const out = (state) => state?.quarantinedUntil != null && state.quarantinedUntil > now;
+    const healthy = declared.some(([id, account]) => account.disabled !== true && !out(states[id]));
+    return declared.map(([id, account]) => {
+      const state = states[id];
+      const liftable = out(state) && state.probeable && !healthy;
+      return {
+        id,
+        clis: clis.filter((cli) => credentialSourceForCli(account, cli)),
+        ...(account.disabled === true ? { disabled: true } : {}),
+        ...(state?.sticky ? { sticky: true } : {}),
+        ...(out(state) && !liftable ? { quarantinedUntil: state.quarantinedUntil } : {}),
+        ...(out(state) && state.probeFailed ? { probe: 'failed' } : {}),
+      };
+    });
+  };
+  return { pools: Object.fromEntries([...pools].map((pool) => [pool, poolOf(pool)])) };
+}
+
+// ---- the ask ------------------------------------------------------------------------------------
+
+/** The unit's own `prefer` (`fgos run --provider`) in the shape the crate reads. */
+const unitPreferOf = (prefer) => (Array.isArray(prefer) ? prefer.map((entry) => (typeof entry === 'string' ? entry : { executor: entry.executor, ...(entry.invocation ? { invocation: entry.invocation } : {}) })) : []);
+
+/** The crate's override from the override that matched: an override with no scope is run-wide. */
+function crateOverrideOf(override) {
+  if (!override) return undefined;
+  const out = {};
+  if (override.tier !== undefined) out.tier = override.tier;
+  if (override.executor) out.executor = override.executor;
+  if (override.invocation) out.invocation = override.invocation;
+  if (override.reasoningEffort !== undefined) out.effort = override.reasoningEffort;
+  if (override.account !== undefined) out.account = typeof override.account === 'string' ? override.account : String(override.account);
+  if (override.acceptDependence === true) out.acceptDependence = true;
+  if (!override.scope && override.executor) out.runWide = true;
+  return Object.keys(out).length > 0 ? out : undefined;
 }
 
 /**
- * Everything a binding is chosen from, before any candidate is judged: the posture, the tier, the
- * candidates (one per tier-cell entry of each `prefer` executor, in order) and the filter that says
- * why a candidate is out. Pure over `ask` and `ctx`.
+ * Everything the crate is asked for one seat. Throws RunnerConfigError for an override no seat could take
+ * (an unknown tier or effort name); returns `{ refused }` for a persona conflict.
  */
-function prepare(ask, ctx, { excludePools = [] } = {}) {
+function requestOf(ask, ctx, walk) {
   const {
     unit,
-    role,
+    seat = 'producer',
+    role = 'producer',
+    posture: seatPosture = PRODUCER_POSTURE,
     readOnly = false,
     independentOf = [],
+    preferIndependentOf = null,
     overrides = [],
     blind = false,
   } = ask ?? {};
   const { runnerConfig = {}, session = {} } = ctx ?? {};
-  const executors = runnerConfig.executors ?? runnerConfig.runner?.executors ?? {};
-  const policyConfig = runnerConfig.modelPolicies ? runnerConfig : (runnerConfig.runner ?? runnerConfig);
+  const executors = executorsOf(runnerConfig);
 
-  // Posture resolution (X-1)
   const isWriteEmpty = !Array.isArray(unit?.writes) || unit.writes.length === 0;
-  const isReadOnlyPosture = readOnly === true || isWriteEmpty;
-  const posture = isReadOnlyPosture ? 'read-only' : (role === 'producer' ? 'workspace-write' : 'read-only');
-
-  // Candidate collection (5 levels). Level 4: overrides matching role/unit.
-  const matchingOverride = findMatchingOverride(overrides, unit, role);
-
-  // Skills the work needs. Only roles that do the unit's work are asked for them; a checker or panel
-  // seat reads the result and is chosen on independence, not on what the producer's task needs.
-  const requiredSkills = !isCheckerOrPanelRole(role) && Array.isArray(unit?.skills) ? unit.skills : [];
-
-  // Level 2 & 1: Capability prefer candidates (project / global)
-  const { entry: capConfig, key: capKey } = lookupCapabilityConfig(runnerConfig, unit?.capability);
-
-  // The tier first: each family's cell is read at it while the candidates are built.
-  const seatTier = resolveSeatTier({ unit, capConfig, capKey, matchingOverride, runnerConfig });
-
-  // Each candidate carries its own `source`; the binding records the source of the one chosen.
-  let basePool = [];
-  if (matchingOverride && matchingOverride.executor) {
-    basePool = [{
-      executor: matchingOverride.executor,
-      invocation: matchingOverride.invocation ?? null,
-      override: matchingOverride,
-      source: 'override',
-    }];
-  } else {
-    // The unit's own `prefer` is soft: its candidates go ahead of the capability's pool, a
-    // capability candidate it already names is not listed twice, and every filter below applies
-    // to both alike. A bare executor id names the executor whatever invocation it runs, so it
-    // covers every capability entry of that executor: a failover never walks back onto it.
-    // A unit without one binds exactly as before.
-    const seen = new Set();
-    const keyOf = (cand) => `${cand.executor}\u0000${cand.invocation ?? ''}`;
-    const unitCandidates = normalizeCandidates(unit?.prefer)
-      .filter((cand) => !seen.has(keyOf(cand)) && seen.add(keyOf(cand)))
-      .map((cand) => ({ ...cand, source: 'unit-prefer' }));
-    const bareExecutors = new Set(unitCandidates.filter((cand) => !cand.invocation).map((cand) => cand.executor));
-    const capabilityCandidates = (capConfig?.prefer ? normalizeCandidates(capConfig.prefer) : [])
-      .filter((cand) => !seen.has(keyOf(cand)) && !bareExecutors.has(cand.executor))
-      .map((cand) => ({ ...cand, source: `capability:${capKey}` }));
-    basePool = [...unitCandidates, ...capabilityCandidates];
+  const isReadOnlyPosture = readOnly === true || seatPosture.readOnly === true || isWriteEmpty;
+  const posture = isReadOnlyPosture ? 'read-only' : (seatPosture.writer ? 'workspace-write' : 'read-only');
+  const matchingOverride = findMatchingOverride(overrides, unit, seat, role);
+  const overrideTier = matchingOverride?.tier;
+  if (overrideTier !== undefined && !MODEL_POLICY_TIERS.includes(overrideTier)) {
+    throw new RunnerConfigError(`invalid tier "${overrideTier}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
   }
-
-  // Candidates are (executor, tier-cell entry). A seat that leases a provider account (an
-  // out-of-process agent) needs a model, so its family's cell at the tier must exist and each of its
-  // entries is a candidate of its own; a seat that runs in-process or as a tool needs none.
-  const launchEnv = { posture, runnerConfig, executors, session };
-  const candidates = [];
-  for (const base of basePool) {
-    const executorEntry = executors[base.executor];
-    const family = getProviderFamily(runnerConfig, base.executor);
-    const mechanism = !executorEntry ? null
-      : isCheckerOrPanelRole(role) ? 'out-of-process'
-        : decideExecutorDispatchMechanism(runnerConfig, base.executor, { hasLiveTaskAccess: Boolean(session.hasNativeAgent) });
-    const common = { ...base, family, executorEntry, mechanism, launch: executorEntry ? resolveLaunch(base, launchEnv) : null, entry: null, cellProblem: null };
-    const leases = Boolean(executorEntry) && executorEntry.kind !== 'tool' && mechanism === 'out-of-process';
-    if (!leases) {
-      let model = 'default';
-      let modelSource = 'no-model-needed';
-      try {
-        model = resolveTierModel(policyConfig, seatTier.tier, family);
-        modelSource = `modelPolicies.${family}.${seatTier.tier}`;
-      } catch { /* an in-process or tool seat runs without a model */ }
-      candidates.push({ ...common, pool: null, model, modelSource });
-      continue;
-    }
-    let cell = null;
+  if (matchingOverride?.reasoningEffort !== undefined) {
     try {
-      cell = resolveTierCandidates(policyConfig, seatTier.tier, family);
-    } catch { /* reported as the missing cell below */ }
-    if (!cell) {
-      candidates.push({
-        ...common,
-        pool: null,
-        model: null,
-        modelSource: null,
-        cellProblem: tierCellMissingDetail(family, seatTier.tier),
-      });
-      continue;
-    }
-    cell.forEach((entry, index) => candidates.push({
-      ...common,
-      entry,
-      pool: entry.pool,
-      model: entry.model,
-      modelSource: `modelPolicies.${family}.${seatTier.tier}[${index}]`,
-    }));
-  }
-  const identityOf = (cand) => identityKey(cand.executor, cand.launch?.invocation, cand.pool, cand.model);
-
-  const inventory = readInventory(runnerConfig);
-  const excluded = new Set(Array.isArray(excludePools) ? excludePools : []);
-
-  /** Why this candidate is out of the running, or null. */
-  const rejectionOf = (cand) => {
-    const executorId = cand.executor;
-    const executorEntry = cand.executorEntry;
-    const providerFamily = cand.family;
-
-    // A unit may name an executor this config does not register; it is skipped, not thrown.
-    if (cand.source === 'unit-prefer' && !executorEntry) {
-      return { reason: 'unknown-executor', detail: `Unit prefers executor "${executorId}", which is not registered` };
-    }
-
-    const disallowedProviders = runnerConfig.governance?.disallowedProviders ?? runnerConfig.runner?.governance?.disallowedProviders;
-    const disallowedExecutors = runnerConfig.governance?.disallowedExecutors ?? runnerConfig.runner?.governance?.disallowedExecutors;
-    const govResult = checkProviderDisallowed(disallowedProviders, providerFamily, executorEntry?.command ?? executorId);
-    if (govResult.disallowed || (Array.isArray(disallowedExecutors) && disallowedExecutors.includes(executorId))) {
-      return { reason: 'governance', detail: `Governance rejected executor "${executorId}" (provider: "${govResult.canonicalProvider || providerFamily}")` };
-    }
-
-    // The executor must declare every skill the unit needs (`supports.skills`).
-    if (requiredSkills.length > 0) {
-      const declared = executorEntry?.supports?.skills ?? [];
-      const missing = requiredSkills.filter((skill) => !declared.includes(skill));
-      if (missing.length > 0) {
-        return { reason: 'skills-unavailable', detail: `Candidate "${executorId}" does not declare skill${missing.length > 1 ? 's' : ''} [${missing.join(', ')}] in supports.skills` };
-      }
-    }
-
-    // A pool excluded by the caller (a dead credential seen earlier in this unit).
-    if (cand.pool && excluded.has(cand.pool)) {
-      return { reason: 'pool-excluded', detail: `Candidate "${executorId}" (pool: "${cand.pool}") is excluded because its credential just failed` };
-    }
-
-    if (Array.isArray(independentOf) && independentOf.length > 0) {
-      // Collect provider families that we must be independent of
-      const forbiddenFamilies = new Set();
-      for (const dep of independentOf) {
-        // dep might be a role name (e.g. 'producer') or a provider family directly
-        forbiddenFamilies.add(dep.toLowerCase());
-        // If dep is an executor registered in config, add its provider family too
-        if (executors[dep]) forbiddenFamilies.add(getProviderFamily(runnerConfig, dep).toLowerCase());
-      }
-      if (forbiddenFamilies.has(providerFamily.toLowerCase())) {
-        // Override exception: acceptDependence === true AND origin === 'human-cli'
-        const isHumanOverrideAllowed = cand.override && cand.override.acceptDependence === true && cand.override.origin === 'human-cli';
-        if (!isHumanOverrideAllowed) {
-          return { reason: 'independence', detail: `Candidate "${executorId}" (provider: "${providerFamily}") violates independence requirement against [${independentOf.join(', ')}]` };
-        }
-      }
-    }
-
-    // Posture capability: the invocation that can carry the posture is decided once, in `launch`.
-    if (!cand.launch) {
-      return { reason: 'posture-unavailable', detail: `Candidate "${executorId}" cannot apply posture "${posture}"` };
-    }
-
-    // A blind role needs a sandbox around its worker. An in-process agent has none,
-    // so a candidate that would run in-process is never chosen for it.
-    if (blind && !isCheckerOrPanelRole(role) && cand.mechanism !== 'out-of-process') {
-      return { reason: 'blind-in-process', detail: `Candidate "${executorId}" would run in-process, where no sandbox can keep a blind role blind` };
-    }
-
-    if (cand.cellProblem) {
-      return { reason: 'tier-cell-missing', detail: cand.cellProblem, family: providerFamily };
-    }
-    if (cand.entry) {
-      const unusable = poolUnusableReason(inventory, { pool: cand.pool, family: providerFamily, executorEntry, invocation: cand.launch.invocation });
-      if (unusable) {
-        return { reason: 'pool-unusable', detail: `Candidate "${executorId}" with model "${cand.model}" is not served: ${unusable}`, family: providerFamily };
-      }
-    }
-    return null;
-  };
-
-  return {
-    unit, role, blind, runnerConfig, session, executors, policyConfig,
-    posture, isReadOnlyPosture, matchingOverride, requiredSkills, capConfig, capKey,
-    seatTier, candidates, identityOf, rejectionOf, inventory,
-  };
-}
-
-/**
- * The order a walk visits candidates after `tried` (the seat's earlier bindings, last one failed):
- * first the remaining entries of the failed candidate's family in cell order, then the tier's
- * declared family order (`runner.tierFallback.<tier>`, limited to the families `prefer` names, so a
- * list narrows and never widens), or, with no list declared, the rest of the `prefer` order.
- */
-function walkOrder(prep, tried) {
-  const { candidates, identityOf } = prep;
-  const last = tried[tried.length - 1];
-  const lastKey = bindingIdentity(last);
-  const lastIndex = candidates.findIndex((cand) => identityOf(cand) === lastKey);
-  const lastFamily = lastIndex >= 0 ? candidates[lastIndex].family : getProviderFamily(prep.runnerConfig, last.executor);
-  const tierList = tierFallbackOf(prep.policyConfig, prep.seatTier.tier);
-  const sameFamily = candidates.filter((cand) => cand.family === lastFamily);
-  const rest = tierList
-    ? tierList.flatMap((family) => candidates.filter((cand) => cand.family === family))
-    : candidates.slice(lastIndex + 1);
-  const triedKeys = new Set(tried.map(bindingIdentity));
-  return [...new Set([...sameFamily, ...rest])].filter((cand) => !triedKeys.has(identityOf(cand)));
-}
-
-/**
- * Pure bind function implementing the 5-level table and filter rules.
- *
- * @param {object} ask
- * @param {object} ctx
- * @param {object} [walk] where a failed seat's walk stands
- * @param {object[]} [walk.tried] the seat's earlier bindings, oldest first (empty: the first binding)
- * @param {string[]} [walk.excludePools] pools the walk must not land on (a login that just failed)
- * @returns {object} success binding or { refused: { reason, detail } }
- */
-export function bind(ask, ctx, { tried = [], excludePools = [] } = {}) {
-  const prep = prepare(ask, ctx, { excludePools });
-  const { unit, role, blind, runnerConfig, session, executors, posture, isReadOnlyPosture, matchingOverride, requiredSkills, capConfig, capKey, seatTier } = prep;
-  const { preferIndependentOf = null, lockedPersona = null } = ask ?? {};
-  const isHeadless = Boolean(session.headless);
-  const isLeadPresent = !isHeadless && (session.hasNativeAgent || session.provider);
-
-  // Soft spread: `preferIndependentOf` is [{ role, executor }] of the seats already bound (empty
-  // for the first seat of a spread; absent when the role asks for none). It never refuses; it only
-  // ranks the candidates that passed every filter, in first-binding order or, after a failure, in
-  // walk order.
-  const walking = tried.length > 0;
-  const spreadRequested = Array.isArray(preferIndependentOf);
-  const familyUse = new Map();
-  for (const seat of spreadRequested ? preferIndependentOf : []) {
-    if (!seat?.executor) continue;
-    const family = getProviderFamily(runnerConfig, seat.executor).toLowerCase();
-    familyUse.set(family, (familyUse.get(family) ?? 0) + 1);
-  }
-
-  const ordered = walking ? walkOrder(prep, tried) : prep.candidates;
-  let chosen = null;
-  let chosenFamilyUse = Infinity;
-  let refusalReason = null;
-  let refusalDetail = null;
-  const skipped = [];
-  for (const cand of ordered) {
-    const rejection = prep.rejectionOf(cand);
-    if (rejection) {
-      refusalReason = rejection.reason;
-      refusalDetail = rejection.detail;
-      if (rejection.family) skipped.push({ family: rejection.family, executor: cand.executor, pool: cand.pool, reason: rejection.reason, detail: rejection.detail });
-      continue;
-    }
-    // Without a soft spread the first one in order wins. With one, the family used by the fewest
-    // listed seats wins (an unused family has 0), and the order breaks ties because a later
-    // candidate must be strictly better to replace it.
-    const use = spreadRequested ? (familyUse.get(cand.family.toLowerCase()) ?? 0) : 0;
-    if (!chosen || use < chosenFamilyUse) {
-      chosen = cand;
-      chosenFamilyUse = use;
-    }
-    if (!spreadRequested || use === 0) break;
-  }
-
-  // Fallback: If no candidate chosen yet
-  let inlineFallback = false;
-  if (!chosen) {
-    // If role === 'producer' and session has Lead (not headless) -> inline
-    // The session lead declares no skills, so a unit that needs some never falls back to it.
-    if (role === 'producer' && isLeadPresent && !blind && requiredSkills.length === 0) {
-      inlineFallback = true;
-      const leadId = session.provider ?? 'lead';
-      chosen = {
-        executor: leadId,
-        launch: { invocation: null, transport: 'cli', transportSource: 'default-cli' },
-        family: getProviderFamily(runnerConfig, leadId),
-        mechanism: 'inline',
-        pool: null,
-        model: 'default',
-        modelSource: 'no-model-needed',
-        source: 'session-lead-inline',
-      };
-    } else {
-      const reason = refusalReason || (requiredSkills.length > 0 ? 'skills-unavailable' : (isHeadless ? 'headless-no-executor' : 'no-candidate'));
-      const detail = refusalDetail || (isHeadless
-        ? `No candidate executor available in headless session for capability "${unit?.capability}"`
-        : `No candidate executor found for role "${role}" and capability "${unit?.capability}"`);
-      return { refused: { reason, detail } };
-    }
-  }
-
-  // 5b. Account: only an override pins one (`fgos run --account pool/account`, or `account` in
-  // `--override`). The pin selects the candidate of the chosen family whose pool it names; a seat
-  // whose family has no entry in that pool (a checker must use another family) binds unpinned, with
-  // the reason recorded, and the unit run refuses a pin no seat takes. The pin never steers the
-  // executor choice.
-  let pin = null;
-  if (matchingOverride && matchingOverride.account !== undefined) {
-    pin = parseAccountPin(matchingOverride.account);
-    if (pin.refused) return pin;
-    if (!inlineFallback && chosen.pool !== pin.pool) {
-      const inPool = ordered.find((cand) => cand.family === chosen.family && cand.pool === pin.pool && !prep.rejectionOf(cand));
-      if (inPool) chosen = inPool;
-    }
-  }
-
-  const executorId = chosen.executor;
-  const executorEntry = executors[executorId];
-  const providerFamily = chosen.family;
-  const { invocation, transport, transportSource } = chosen.launch;
-  const mechanism = chosen.mechanism ?? 'out-of-process';
-  const mechanismSource = inlineFallback ? 'lead-producer-inline'
-    : isCheckerOrPanelRole(role) ? 'checker-role-forced-out-of-process'
-      : 'decideExecutorDispatchMechanism';
-
-  let account = null;
-  let accountSkipped = null;
-  if (pin) {
-    // A seat that leases nothing (in-process, inline, tool) has no pool: the pin says why it cannot apply.
-    const resolved = chosen.pool === pin.pool || chosen.pool === null
-      ? resolveAccountPin(runnerConfig, { executorId, mechanism, pool: pin.pool, accountId: pin.id })
-      : { refused: { reason: 'account-pin-other-pool', detail: `account "${pin.pool}/${pin.id}" cannot be pinned on executor "${executorId}": family "${providerFamily}" has no usable entry in its tier cell served by pool "${pin.pool}"` } };
-    if (resolved.refused && PIN_REFUSES_SEAT.has(resolved.refused.reason)) return resolved;
-    if (resolved.refused) accountSkipped = resolved.refused;
-    else account = resolved;
-  }
-
-  const finalTier = seatTier.tier;
-  const tierCeiling = seatTier.ceiling;
-
-  // 7. Persona
-  let persona = null;
-  let personaSource = 'none';
-  const unitPersona = typeof unit?.persona === 'string' && unit.persona ? unit.persona : null;
-
-  if (lockedPersona && unitPersona && unitPersona !== lockedPersona) {
-    return {
-      refused: {
-        reason: 'locked-persona',
-        detail: `Unit persona "${unitPersona}" conflicts with locked persona "${lockedPersona}"`,
-      },
-    };
-  }
-
-  if (matchingOverride && matchingOverride.persona) {
-    if (lockedPersona && matchingOverride.persona !== lockedPersona) {
-      return {
-        refused: {
-          reason: 'locked-persona',
-          detail: `Cannot override locked persona "${lockedPersona}" with "${matchingOverride.persona}"`,
-        },
-      };
-    }
-    persona = matchingOverride.persona;
-    personaSource = `override:${matchingOverride.origin ?? 'unknown'}`;
-  } else if (unitPersona) {
-    persona = unitPersona;
-    personaSource = 'unit';
-  } else if (lockedPersona) {
-    persona = lockedPersona;
-    personaSource = 'locked-persona';
-  } else if (capConfig?.persona) {
-    persona = capConfig.persona;
-    personaSource = `capability:${capKey}`;
-  }
-
-  // 7b. Reasoning effort: only an override asks for one (`fgos run --effort`, or a
-  // `reasoningEffort` key in `--override`). It is checked here against the same rule the launch
-  // applies (canonical levels, then the executor's declared `supports.reasoningEffort`), so a
-  // level the chosen executor refuses is a refused binding, not a failed run; the transport
-  // renders it into the provider CLI's own flag. Without one the executor's own default stands.
-  let reasoningEffort = null;
-  let reasoningEffortSource = 'none';
-  if (matchingOverride && matchingOverride.reasoningEffort !== undefined) {
-    try {
-      reasoningEffort = assertReasoningEffort(matchingOverride.reasoningEffort, {
-        supported: executorEntry?.supports?.reasoningEffort,
-        executorId,
-      });
+      assertReasoningEffort(matchingOverride.reasoningEffort);
     } catch (err) {
       return { refused: { reason: 'reasoning-effort', detail: err.message } };
     }
-    reasoningEffortSource = `override:${matchingOverride.origin ?? 'unknown'}`;
   }
 
-  // 7c. Run timeout: an override (`fgos run --timeout`, or a `timeoutMs` key in `--override`), else
-  // the unit's own `timeoutMs`; without either the dispatch uses `runner.timeoutMs`. Checked here so
-  // a value out of range is a refused binding, never a run killed at once or left to hang.
-  let timeoutMs = null;
-  let timeoutMsSource = 'none';
+  const persona = resolvePersona({ ask, unit, matchingOverride, capEntries: capabilityEntriesOf(runnerConfig, unit?.capability) });
+  if (persona.refused) return { refused: persona.refused };
+
+  const doorSelectors = ask?.selectors ?? {};
+  const selectors = {
+    ...(persona.selected ? { persona: persona.selected } : {}),
+    ...(doorSelectors.seat ? { seat: doorSelectors.seat } : {}),
+    ...(doorSelectors.capability ? { capability: doorSelectors.capability } : {}),
+  };
+  // Only roles that do the unit's work are asked for its skills; a checker or panel seat reads the result.
+  const requiredSkills = !seatPosture.forceOutOfProcess && Array.isArray(unit?.skills) ? unit.skills : [];
+  // A hard `independentOf` names executors (or seats not bound yet): the crate compares provider families.
+  const hard = [...new Set(independentOf.map((dep) => (executors[dep] ? getProviderFamily(runnerConfig, dep) : dep)))];
+  // A soft preference names the seats already bound, each at the executor it holds now.
+  const peers = [];
+  for (const [index, peer] of (Array.isArray(preferIndependentOf) ? preferIndependentOf : []).entries()) {
+    if (!peer?.executor) continue;
+    const entry = { seat: peer.seat ?? `${peer.executor}#${index}`, executor: peer.executor, family: getProviderFamily(runnerConfig, peer.executor) };
+    const at = peers.findIndex((known) => known.seat === entry.seat);
+    if (at >= 0) peers[at] = entry; else peers.push(entry);
+  }
+  const crateAsk = {
+    // A door that names the capability changes it: the ask carries what the door would have run without it.
+    capability: selectors.capability ? DEFAULT_RUN_CAPABILITY : unit?.capability,
+    seat,
+    role,
+    ...(persona.base ? { persona: persona.base } : {}),
+    label: unit?.id ?? null,
+    ...(ask?.workflowTier ? { workflow: ask.workflowTier } : {}),
+    selectors,
+    raiseAuthorized: ask?.raiseAuthorized === true,
+    ...(crateOverrideOf(matchingOverride) ? { override: crateOverrideOf(matchingOverride) } : {}),
+    posture: { readOnly: seatPosture.readOnly === true, forceOutOfProcess: seatPosture.forceOutOfProcess === true, blind: blind === true },
+    effectiveRigor: effectiveRigorOf(unit, runnerConfig, { fallback: 'standard' }),
+    independence: { hard, hardCheckers: [], soft: peers.map((peer) => peer.seat) },
+    requiredSkills,
+    unitPrefer: unitPreferOf(unit?.prefer),
+  };
+  const launchView = launchViewOf(runnerConfig, session);
+  return {
+    persona, matchingOverride, posture, isReadOnlyPosture, requiredSkills, launchView,
+    request: {
+      ask: crateAsk,
+      runnerConfig,
+      peers,
+      walk: walkOf(walk),
+      accountView: accountViewOf(runnerConfig, launchView, ctx?.accounts),
+      launchView,
+    },
+  };
+}
+
+/** The crate's walk state from the runner's: earlier bindings, pools to avoid, the identity a seat keeps. */
+function walkOf({ tried = [], excludePools = [], failedAccounts = [], continuity = null } = {}) {
+  return {
+    tried: tried.map(identityOf),
+    excludePools: [...excludePools],
+    failedAccounts,
+    ...(continuity ? { continuity: identityOf(continuity) } : {}),
+  };
+}
+
+// ---- the binding --------------------------------------------------------------------------------
+
+/** A refusal in the runner's shape; the headless wording is the session's fact, not the crate's. */
+function refusalOf(refusal, { session, unit }) {
+  const nothingConfigured = refusal.reason === 'no-candidate' && (refusal.configured ?? 0) === 0;
+  if (nothingConfigured && session.headless) {
+    return { reason: 'headless-no-executor', detail: `No candidate executor available in headless session for capability "${unit?.capability}"` };
+  }
+  return {
+    reason: refusal.reason,
+    detail: refusal.detail,
+    ...(refusal.config ? { config: refusal.config } : {}),
+    ...(refusal.peers?.length ? { peers: refusal.peers } : {}),
+    ...(refusal.rendered?.length ? { rendered: refusal.rendered } : {}),
+  };
+}
+
+/** How the transport got to the invocation that runs. */
+function transportOf({ cand, executorEntry, session, launchFacts }) {
+  const invocation = executorEntry?.invocations?.find((inv) => inv?.id === cand.invocation);
+  const transport = invocation?.adapter === 'herdr-spawn' ? 'herdr' : 'cli';
+  if (cand.pinned) {
+    const source = cand.source === 'override' ? 'override-pinned-invocation'
+      : cand.source === 'unit-prefer' ? 'unit-prefer-pinned-invocation' : 'prefer-pinned-invocation';
+    return { transport, transportSource: source };
+  }
+  if (transport === 'herdr') return { transport, transportSource: 'herdr-invocation-present' };
+  const herdr = launchFacts?.invocations.find((inv) => (executorEntry?.invocations ?? []).some((raw) => raw?.id === inv.id && raw.adapter === 'herdr-spawn'));
+  if (session.herdrPresent === true && herdr && !herdr.carriesPosture) return { transport, transportSource: 'cli:herdr-invocation-cannot-apply-posture' };
+  return { transport, transportSource: 'default-cli' };
+}
+
+/** The run timeout an override or the unit asks for, checked here so an out-of-range value is a refused binding. */
+function timeoutOf(matchingOverride, unit) {
   if (matchingOverride && matchingOverride.timeoutMs !== undefined) {
-    try {
-      timeoutMs = assertRunTimeoutMs(matchingOverride.timeoutMs, 'override timeoutMs');
-    } catch (err) {
-      return { refused: { reason: 'run-timeout', detail: err.message } };
+    return { timeoutMs: assertRunTimeoutMs(matchingOverride.timeoutMs, 'override timeoutMs'), timeoutMsSource: overrideSource(matchingOverride) };
+  }
+  if (unit?.timeoutMs !== undefined) return { timeoutMs: assertRunTimeoutMs(unit.timeoutMs, 'unit.timeoutMs'), timeoutMsSource: 'unit' };
+  return { timeoutMs: null, timeoutMsSource: 'none' };
+}
+
+/** What the walk step records about the candidate it left: another entry or family, or another account of the same candidate. */
+function fallbackFrom(previous, binding, { reason, rotation, detail, runnerConfig }) {
+  const base = { executor: previous.executor, invocation: previous.invocation ?? null, transport: previous.transport ?? null, pool: previous.pool ?? null, reason };
+  if (rotation) return { ...base, kind: 'account-rotation', ...detail };
+  if (reason === 'lease-conflict') return { ...base, kind: 'lease-conflict' };
+  const sameFamily = getProviderFamily(runnerConfig, previous.executor) === getProviderFamily(runnerConfig, binding.executor);
+  return { ...base, kind: 'next-candidate', walk: sameFamily ? 'entry' : 'family' };
+}
+
+function bindingOf({ out, prep, ask, ctx, walk }) {
+  const { unit, seat = 'producer', posture: seatPosture = PRODUCER_POSTURE, blind = false } = ask ?? {};
+  const { runnerConfig = {}, session = {} } = ctx ?? {};
+  const { persona: personaChoice, matchingOverride, posture, isReadOnlyPosture, requiredSkills, launchView } = prep;
+  const executors = executorsOf(runnerConfig);
+  const { policy, ranked } = out;
+  // Stage 1 refused (a tier no cell serves, a raise no door may make): there is nothing to rank.
+  if (!ranked) return { refused: refusalOf(out.refusal, { session, unit }) };
+
+  let cand = ranked.candidates[0];
+  let inlineFallback = false;
+  if (!cand) {
+    // The session lead runs a seat that may run inline only when the unit configured no candidate at all.
+    const unconfigured = out.refusal?.reason === 'no-candidate' && (out.refusal.configured ?? 0) === 0;
+    const isLeadPresent = !session.headless && (session.hasNativeAgent || session.provider);
+    if (unconfigured && seatPosture.inlineAllowed && isLeadPresent && !blind && requiredSkills.length === 0) {
+      inlineFallback = true;
+      const leadId = session.provider ?? 'lead';
+      cand = {
+        executor: leadId,
+        family: getProviderFamily(runnerConfig, leadId),
+        invocation: null,
+        model: null,
+        modelSource: 'no-model-needed',
+        effort: null,
+        effortSource: 'invocation-default',
+        pool: null,
+        mechanism: 'inline',
+        source: 'session-lead-inline',
+        pinned: false,
+      };
+    } else {
+      return { refused: refusalOf(out.refusal ?? { reason: 'no-candidate', detail: 'no candidate' }, { session, unit }) };
     }
-    timeoutMsSource = `override:${matchingOverride.origin ?? 'unknown'}`;
-  } else if (unit?.timeoutMs !== undefined) {
-    try {
-      timeoutMs = assertRunTimeoutMs(unit.timeoutMs, 'unit.timeoutMs');
-    } catch (err) {
-      return { refused: { reason: 'run-timeout', detail: err.message } };
-    }
-    timeoutMsSource = 'unit';
   }
 
-  // 8. Provenance
+  let timeout;
+  try {
+    timeout = timeoutOf(matchingOverride, unit);
+  } catch (err) {
+    return { refused: { reason: 'run-timeout', detail: err.message } };
+  }
+
+  const executorEntry = executors[cand.executor];
+  const mechanism = cand.mechanism;
+  const { transport, transportSource } = inlineFallback
+    ? { transport: 'cli', transportSource: 'default-cli' }
+    : transportOf({ cand, executorEntry, session, launchFacts: launchView.executors[cand.executor] });
+  const model = cand.model ?? 'default';
+  const reasoningEffort = cand.effort ?? null;
+  const mechanismSource = inlineFallback ? 'lead-producer-inline'
+    : seatPosture.forceOutOfProcess ? 'posture-forced-out-of-process'
+      : 'decideExecutorDispatchMechanism';
+
+  // An override pins an account (`fgos run --account pool/account`) only on a seat whose chosen entry is
+  // served by that pool; any other seat runs unpinned and says why.
+  const pinText = matchingOverride?.account;
+  const pinSkip = pinText === undefined ? null : ranked.skipped.find((skip) => skip.reason === 'account-pin-other-pool') ?? null;
+  const account = pinText !== undefined && !pinSkip && cand.pool && cand.account ? { pool: cand.pool, id: cand.account } : null;
+
   const provenance = {
-    executor: { value: executorId, source: chosen.source },
-    invocation: { value: invocation, source: invocation ? chosen.source : 'none' },
+    executor: { value: cand.executor, source: cand.source },
+    invocation: { value: cand.invocation ?? null, source: cand.invocation ? cand.source : 'none' },
     transport: { value: transport, source: transportSource },
-    tier: { value: finalTier, source: seatTier.source, ...(tierCeiling ? { ceiling: tierCeiling } : {}) },
-    model: { value: chosen.model, source: chosen.modelSource },
-    persona: { value: persona, source: personaSource },
-    reasoningEffort: { value: reasoningEffort, source: reasoningEffortSource },
-    timeoutMs: { value: timeoutMs, source: timeoutMsSource },
+    tier: {
+      value: policy.tier,
+      source: policy.tierSource,
+      ...(policy.recommendation ? { recommendation: policy.recommendation } : {}),
+      ...(policy.loweredFrom ? { loweredFrom: policy.loweredFrom } : {}),
+      ...(policy.maxTier ? { maxTier: policy.maxTier } : {}),
+      ...(policy.raisedBy ? { raisedBy: policy.raisedBy } : {}),
+    },
+    model: { value: model, source: cand.modelSource },
+    persona: { value: personaChoice.persona, source: personaChoice.source },
+    reasoningEffort: { value: reasoningEffort, source: cand.effortSource === 'override' ? overrideSource(matchingOverride) : cand.effortSource },
+    timeoutMs: { value: timeout.timeoutMs, source: timeout.timeoutMsSource },
     mechanism: { value: mechanism, source: mechanismSource },
     posture: { value: posture, source: isReadOnlyPosture ? 'read-only-ask-or-writes-empty' : 'producer-writes-declared' },
   };
-  if (chosen.pool) provenance.pool = { value: chosen.pool, source: chosen.modelSource };
-  if (skipped.length > 0) provenance.skipped = skipped;
-
-  // Degraded independence is recorded, never hidden: which seats this one shares a provider
-  // family with, and that no eligible (governance, posture) unused family was left in the pool.
-  if (spreadRequested && !inlineFallback) {
-    const family = providerFamily.toLowerCase();
-    const sharedWith = preferIndependentOf
-      .filter((seat) => seat?.executor && getProviderFamily(runnerConfig, seat.executor).toLowerCase() === family)
-      .map((seat) => seat.role);
+  if (cand.pool) provenance.pool = { value: cand.pool, source: cand.modelSource };
+  if (ranked.skipped.length > 0) provenance.skipped = ranked.skipped;
+  // Degraded independence is recorded, never hidden: which seats this one shares a provider family with.
+  if (Array.isArray(ask?.preferIndependentOf) && !inlineFallback) {
     provenance.familySpread = {
-      value: { family: providerFamily, sharedWith: [...new Set(sharedWith)] },
-      source: sharedWith.length === 0 ? 'prefer-independent-of:distinct-family' : 'prefer-independent-of:no-eligible-unused-family',
+      value: { family: cand.family, sharedWith: [...new Set(ranked.sharedWith)] },
+      source: ranked.sharedWith.length === 0 ? 'prefer-independent-of:distinct-family' : 'prefer-independent-of:no-eligible-unused-family',
     };
   }
-
-  if (account || accountSkipped) {
+  if (pinText !== undefined) {
     provenance.account = {
       value: account ? `${account.pool}/${account.id}` : null,
-      source: `override:${matchingOverride.origin ?? 'unknown'}`,
-      ...(accountSkipped ? { skipped: accountSkipped } : {}),
+      source: overrideSource(matchingOverride),
+      ...(pinSkip ? { skipped: { reason: pinSkip.reason, detail: pinSkip.detail } } : {}),
     };
   }
+  if (matchingOverride?.origin) provenance.overridesOrigin = { value: matchingOverride.origin, source: 'override' };
 
-  if (matchingOverride?.origin) {
-    provenance.overridesOrigin = { value: matchingOverride.origin, source: 'override' };
-  }
-
-  return {
+  // What was decided from, without the config body and without account facts: what a replay needs to
+  // recompute the answer and an audit needs to see what the seat was asked.
+  const { now, ...bindingInput } = out.bindingInput;
+  const binding = {
     contractVersion: BIND_CONTRACT_VERSION,
-    executor: executorId,
-    invocation: invocation ?? null,
+    executor: cand.executor,
+    invocation: cand.invocation ?? null,
     transport,
-    pool: chosen.pool ?? null,
-    tier: finalTier,
-    model: chosen.model,
-    persona: persona ?? null,
+    pool: cand.pool ?? null,
+    tier: policy.tier,
+    model,
+    persona: personaChoice.persona ?? null,
     reasoningEffort,
-    timeoutMs,
+    timeoutMs: timeout.timeoutMs,
     mechanism,
     posture,
+    // The account the lease takes: named here, taken under the lock, re-ranked (a new bind) when it cannot be.
+    ...(cand.pool && cand.account ? { leaseAccount: cand.account } : {}),
     ...(account ? { account } : {}),
     provenance,
+    ...(inlineFallback ? {} : { bindingInput: { ...bindingInput, hostVersion: out.hostVersion } }),
   };
-}
-
-/**
- * Every binding a seat would visit if each one failed, in walk order, ending where bind() refuses:
- * the same walk a provider-limit failover takes, so nothing is dispatched, written or paid for.
- *
- * @param {object} ask
- * @param {object} ctx
- * @param {{excludePools?: string[]}} [options]
- * @returns {object[]} bindings, the first being what bind() returns without a walk
- */
-export function walkBindings(ask, ctx, { excludePools = [] } = {}) {
-  const visited = [];
-  const seen = new Set();
-  for (;;) {
-    const next = bind(ask, ctx, { tried: visited, excludePools });
-    if (next.refused || next.mechanism === 'inline' || seen.has(bindingIdentity(next))) return visited;
-    seen.add(bindingIdentity(next));
-    visited.push(next);
+  const from = walk?.from ?? walk?.tried?.at(-1);
+  if (from && !inlineFallback) {
+    binding.provenance.fallbackFrom = fallbackFrom(from, binding, { reason: walk.reason ?? 'provider-limit', rotation: walk.rotation === true, detail: walk.detail, runnerConfig });
   }
+  return binding;
 }
 
 /**
- * The candidates a seat of `ask` is chosen from, in `prefer` order and cell-entry order, each with
- * the reason it is out of the running (`out`, null when it is in). Read-only, for
- * `fgos dispatch explain`.
+ * Both stages for one seat through the crate: one exec. Returns the crate's answer and the facts the
+ * binding is built from, or `{ refused }` for a refusal Node owns (a persona conflict, an effort name no
+ * seat could take).
  */
-export function listCandidates(ask, ctx) {
-  const prep = prepare(ask, ctx);
-  return {
-    tier: prep.seatTier,
-    candidates: prep.candidates.map((cand) => ({
-      executor: cand.executor,
-      family: cand.family,
-      invocation: cand.launch?.invocation ?? null,
-      executorEntry: cand.executorEntry ?? null,
-      pool: cand.pool,
-      model: cand.model,
-      out: prep.rejectionOf(cand),
-    })),
-  };
+function decide(ask, ctx, walk) {
+  const prep = requestOf(ask, ctx, walk);
+  if (prep.refused) return { refused: prep.refused };
+  return { prep, out: seatBinding(prep.request) };
 }
 
 /**
- * Quota helper: walks to the next candidate after the binding that just failed, recording
- * provenance fallbackFrom (`kind: 'next-candidate'`, `walk: 'entry'` when the next candidate is
- * another model entry of the failed family, `'family'` when it is another family).
+ * The binding of one seat, or `{ refused: { reason, detail } }`.
  *
- * @param {object} prevBinding the binding that just failed
- * @param {object} ask
- * @param {object} ctx
- * @param {string} [reason='provider-limit']
- * @param {object} [opts]
- * @param {object[]} [opts.tried] the seat's earlier bindings, oldest first, `prevBinding` last (what
- *   the unit record can still read; empty restarts the walk at the primary)
- * @param {string[]} [opts.excludePools] pools the walk must not land on
- * @returns {object} next binding or refusal
+ * @param {object} ask unit, seat, role, posture, persona, overrides, independentOf (executors or seats the
+ *   seat must differ from), preferIndependentOf ([{ seat, executor }] it should differ from), blind,
+ *   workflowTier, selectors, raiseAuthorized
+ * @param {object} ctx { runnerConfig, session }
+ * @param {object} [options]
+ * @param {object} [options.walk] where the seat stands after a failure
+ * @param {object[]} [options.walk.tried] the seat's earlier bindings, oldest first (empty: the first binding)
+ * @param {string[]} [options.walk.excludePools] pools the walk must not land on (a login that just failed)
+ * @param {object} [options.walk.continuity] a binding the seat keeps (a later round, or another account of
+ *   the same candidate): executor, model and effort stay, else `seat-continuity-unavailable`
+ * @param {object} [options.walk.from] the binding the seat is leaving (default: the last of `tried`); a bind
+ *   that has one records `fallbackFrom` in its provenance
+ * @param {boolean} [options.walk.rotation] the bind retries the kept candidate on another account (not a step)
+ * @param {object} [options.walk.detail] extra provenance of a rotation, e.g. `{ accountsHealthy }`
+ * @param {string} [options.walk.reason] why the walk moved (default `provider-limit`)
  */
-export function nextCandidate(prevBinding, ask, ctx, reason = 'provider-limit', { tried = [prevBinding], excludePools = [] } = {}) {
-  const nextResult = bind(ask, ctx, { tried, excludePools });
-  if (nextResult.refused) return nextResult;
-
-  const prevFamily = getProviderFamily(ctx.runnerConfig, prevBinding.executor);
-  const nextFamily = getProviderFamily(ctx.runnerConfig, nextResult.executor);
-  nextResult.provenance = {
-    ...nextResult.provenance,
-    fallbackFrom: {
-      executor: prevBinding.executor,
-      invocation: prevBinding.invocation ?? null,
-      transport: prevBinding.transport ?? null,
-      pool: prevBinding.pool ?? null,
-      reason,
-      kind: 'next-candidate',
-      walk: prevFamily === nextFamily ? 'entry' : 'family',
-    },
-  };
-  return nextResult;
+export function bind(ask, ctx, { walk = {} } = {}) {
+  const decided = decide(ask, ctx, walk);
+  if (decided.refused) return { refused: decided.refused };
+  return bindingOf({ out: decided.out, prep: decided.prep, ask, ctx, walk });
 }
 
 /**
- * The same candidate again, for another account of its pool: the binding is unchanged (same
- * executor, invocation, transport, pool and model, so a later walk resumes where this one would
- * have) and only its provenance says it is a retry of `prevBinding` (`kind: 'account-rotation'`).
- * Which account the retry runs on is the lease's choice, not bind()'s.
+ * The seat a Work operation or a raw dispatch runs, by the same crate call a unit run makes (one headless
+ * producer seat; the posture is judged when the assignment launches, not here, so the ask names no writes). A pinned executor, a tier or an effort the caller stated come in as one override. A
+ * refusal throws, named; there is no policy of its own behind it.
  *
- * @param {object} prevBinding
- * @param {object} [detail] extra provenance, e.g. { accountsHealthy }
- * @param {string} [reason='provider-limit']
+ * @param {object} args `{ runnerConfig, unit, role, readOnly, overrides }`; `unit` is `{ id, capability, rigor }`
  */
-export function retrySameCandidate(prevBinding, detail = {}, reason = 'provider-limit') {
-  return {
-    ...prevBinding,
-    provenance: {
-      ...prevBinding.provenance,
-      fallbackFrom: {
-        executor: prevBinding.executor,
-        invocation: prevBinding.invocation ?? null,
-        transport: prevBinding.transport ?? null,
-        pool: prevBinding.pool ?? null,
-        reason,
-        kind: 'account-rotation',
-        ...detail,
-      },
-    },
-  };
+export function bindWorkSeat({ runnerConfig, unit, role = 'producer', readOnly = false, overrides = [] }) {
+  const bound = bind(
+    { unit: { ...unit, writes: [] }, seat: 'producer', role, readOnly, overrides, raiseAuthorized: false },
+    { runnerConfig, session: { headless: true, postureAtLaunch: true } },
+  );
+  if (bound.refused) throw new RunnerConfigError(`${bound.refused.reason}: ${bound.refused.detail}`, { code: bound.refused.reason });
+  return bound;
 }
+
+/**
+ * Why a seat lands where it does, read-only: the same crate call as `bind` (nothing is leased, spawned or
+ * written), its ranked candidates and skip reasons, its explanation text, and the walk a failure would
+ * take, one binding per step.
+ *
+ * @returns {{ binding: object, policy?: object, ranked?: object, explain?: {lines: string[]}, launchView?: object, walk: object[] }}
+ */
+export function explainSeat(ask, ctx, { walk = {} } = {}) {
+  const decided = decide(ask, ctx, walk);
+  if (decided.refused) return { binding: { refused: decided.refused }, walk: [] };
+  const { out, prep } = decided;
+  const binding = bindingOf({ out, prep, ask, ctx, walk });
+  const chain = [];
+  if (!binding.refused && binding.mechanism !== 'inline') {
+    const seen = new Set();
+    let current = binding;
+    while (current && !current.refused && current.mechanism !== 'inline' && !seen.has(bindingIdentity(current))) {
+      seen.add(bindingIdentity(current));
+      chain.push(current);
+      current = bind(ask, ctx, { walk: { ...walk, tried: [...(walk.tried ?? []), ...chain] } });
+    }
+  }
+  return { binding, policy: out.policy, ranked: out.ranked, explain: out.explain, launchView: prep.launchView, walk: chain };
+}
+
 export { canApplyPosture };

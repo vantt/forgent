@@ -259,7 +259,7 @@ required field means "do not dispatch, fall back to
 `<INLINE_FALLBACK_HEADING>` — Step C above): here, failing to reach a
 confident tier/provider judgment means dispatch ANYWAY, with the
 executor's own declared default (`executor.tier`/`executor.model`, or the
-computed `resolveTierModel` fallback) — an unresolved judgment is never a
+model of its tier's cell) — an unresolved judgment is never a
 reason to block a dispatch that would otherwise proceed.
 
 Record whichever tier/model actually gets used — judged or defaulted —

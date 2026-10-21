@@ -1,8 +1,9 @@
 // src/runner/execution/unit.mjs — Unit data contract and validator (Wave B / Phase 2)
 // Architecture guard: MUST NOT import src/state/**, src/runner/coordination/**, src/runner/worktree.mjs, or src/runner/merge.mjs
 
-import { RunnerConfigError, assertRunTimeoutMs } from '../dispatch/config.mjs';
+import { RunnerConfigError, assertRunTimeoutMs, MODEL_POLICY_TIERS } from '../dispatch/config.mjs';
 import { RIGOR_VALUES } from '../rigor.mjs';
+import { checkDeclaredSeats } from './seat-resolver.mjs';
 import { canonicalizeWriteEntry } from '../dispatch/write-scope.mjs';
 
 const DISALLOWED_UNIT_FIELDS = Object.freeze([
@@ -137,6 +138,7 @@ function isSyncRef(ref) {
  * - stanceOptions?: question-local option labels; "other" is reserved; omitted means unmeasured
  * - prefer?: soft executor preference, array of "<executorId>" or {executor, invocation?}
  * - persona?: non-empty string
+ * - seats?: `[{ seat, role, persona?, tier? }]`, the seats a panel or debate unit fills (see seat-resolver.mjs)
  * - timeoutMs?: the time each of its runs may take instead of `runner.timeoutMs` (whole ms, 1m..4h);
  *   the size of the work, not how it is executed
  * - verify?: shell command the runner runs in the unit's worktree after each producing round; a non-zero
@@ -292,6 +294,16 @@ export function validateUnit(raw) {
 
   const prefer = raw.prefer !== undefined ? normalizePrefer(raw.prefer) : undefined;
 
+  // seats: the seats a panel or debate unit fills, `[{ seat, role, persona?, tier? }]`
+  let seats;
+  if (raw.seats !== undefined) {
+    try {
+      seats = Object.freeze(checkDeclaredSeats(raw.seats, 'unit.seats', { tiers: MODEL_POLICY_TIERS }));
+    } catch (err) {
+      throw new RunnerConfigError(err.message);
+    }
+  }
+
   if (raw.persona !== undefined && (typeof raw.persona !== 'string' || !raw.persona.trim())) {
     throw new RunnerConfigError('unit.persona must be a non-empty string when present.');
   }
@@ -335,6 +347,7 @@ export function validateUnit(raw) {
     dependsOn: Object.freeze(dependsOn),
     ...(pattern !== undefined ? { pattern } : {}),
     ...(prefer !== undefined ? { prefer } : {}),
+    ...(seats !== undefined ? { seats } : {}),
     ...(raw.persona !== undefined ? { persona: raw.persona.trim() } : {}),
     ...(raw.timeoutMs !== undefined ? { timeoutMs: raw.timeoutMs } : {}),
     ...(raw.verify !== undefined ? { verify: raw.verify.trim() } : {}),

@@ -21,6 +21,11 @@
 # ext4 disk being judged (not tmpfs). --ops defaults to 24 for Publication and 12 for ScopedCommit.
 # The verdict is written to <work>/e1-verdict.json, one entry per kind.
 set -euo pipefail
+# Mount the fixture filesystems in a private mount namespace: a mount visible on the
+# host makes every `bwrap --dev-bind / /` on the machine fail while it exists.
+if [ -z "${FGOS_FIXTURE_MOUNT_NS:-}" ] && [ "$(id -u)" = 0 ]; then
+  exec env FGOS_FIXTURE_MOUNT_NS=1 unshare --mount --propagation private "$0" "$@"
+fi
 
 WORK="" OPS="" KIND=both SIZE_MIB=256 DATA="" LOG="" REPLAY_LOG="$(command -v replay-log || true)" RUN_AS="${SUDO_USER:-}"
 while [ $# -gt 0 ]; do

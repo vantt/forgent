@@ -40,9 +40,9 @@ function options(argv) {
   return out;
 }
 async function loaders(descriptorFile) {
-  const { env = {}, ...descriptor } = JSON.parse(fs.readFileSync(descriptorFile, 'utf8'));
+  const descriptor = JSON.parse(fs.readFileSync(descriptorFile, 'utf8'));
   // The staged host travels with the descriptor: each mode runs as its own process.
-  Object.assign(process.env, env);
+  Object.assign(process.env, descriptor.env);
   const index = await import('../../src/git/index.mjs');
   return { index, loader: { descriptor } };
 }
@@ -154,9 +154,11 @@ async function workload(args) {
     tips.set(ref, next);
     // Halfway through, move every ref into packed-refs so later CASes start from a packed ref.
     if (i === Math.floor(ops / 2)) {
-      git(['--git-dir', repo, 'pack-refs', '--all']);
-      // Packing is fixture preparation, not a judged operation: Git writes packed-refs without
-      // a directory fsync, so make it durable before the next judged write.
+      // Packing is fixture preparation, not a judged operation. core.fsync=all makes Git fsync
+      // the new packed-refs before it renames it into place, so a cut never leaves the file
+      // unterminated; Git still fsyncs no directory, so make the rename and the removed loose
+      // refs durable before the next judged write.
+      git(['--git-dir', repo, '-c', 'core.fsync=all', 'pack-refs', '--all']);
       execFileSync('sync', ['--file-system', repo]);
     }
     if (lines) { process.stdout.write(`ack ${i}\n`); await lines.next(); }
@@ -345,7 +347,11 @@ const ok = (text) => /= 0$/.test(text) || /= 0 /.test(text);
  *  R5 its fan-out directory and `objects/` fsynced after the object is linked and before the outcome;
  *  R6 its file fsynced (under the temp name before the link, or its own name) before the outcome;
  *  R7 every blob and tree of them (all but the commit object) has its file, fan-out directory and `objects/`
- *     fsynced before the ref rename that moves the branch to name them. */
+ *     fsynced before the ref rename that moves the branch to name them;
+ *  R8 each of those staged objects had its file fsynced under its temp name before Git linked it to its
+ *     final name: a cut then leaves a temp file, never an empty object under the final name;
+ *  R9 every packed-refs installed by rename had its new file fsynced first (else a cut keeps a rename of
+ *     unwritten bytes and every ref packed into it is gone). */
 export function checkOrder(trace) {
   const list = calls(trace);
   const writes = new Map(), installs = [], fsyncs = [], refRenames = [], objectLinks = [], planIntents = [], violations = [];
@@ -381,7 +387,7 @@ export function checkOrder(trace) {
       const from = path.resolve(m[1] || '/', real(pid, m[2])), to = path.resolve(m[3] || '/', real(pid, m[4]));
       if (/\/fgos\/git\/operations\/[^/]+\/\d{8}\.json$/.test(to)) installs.push({ at, from, to, how });
       else if (/\.lock$/.test(from) && /\/refs\//.test(to)) refRenames.push({ at, to });
-      else if (/\/packed-refs$/.test(to)) refRenames.push({ at, to });
+      else if (/\/packed-refs$/.test(to)) refRenames.push({ at, to, from });
     }
   });
   const fsyncedAfter = (dir, from, until = Infinity) => fsyncs.some((s) => s.path === dir && s.at > from && s.at < until);
@@ -396,6 +402,9 @@ export function checkOrder(trace) {
     const next = records.find((q) => q.op === r.op && q.seq === r.seq + 1);
     if (!fsyncedAfter(path.dirname(r.to), r.at, next?.at)) violations.push(`R1 ${r.to}: operation directory not fsynced after install`);
     if (r.seq === 0 && !fsyncedAfter(path.dirname(path.dirname(r.to)), r.at, next?.at)) violations.push(`R1 ${r.to}: operations directory not fsynced after record 0`);
+  }
+  for (const r of refRenames.filter((x) => x.from && /\/packed-refs$/.test(x.to))) {
+    if (!fsyncedBefore(r.from, r.at)) violations.push(`R9 ${r.to}: new file not fsynced before it was renamed into place`);
   }
   const byOp = Map.groupBy(records, (r) => r.op);
   const ops = [];
@@ -431,6 +440,7 @@ export function checkOrder(trace) {
           const fanout = path.dirname(l.to), objects = path.dirname(fanout);
           const named = (x) => x.path === l.to || x.path === l.from || (path.basename(l.from).startsWith('tmp_obj_') && path.basename(x.path ?? '') === path.basename(l.from));
           if (!fsyncs.some((x) => x.at < move.at && named(x))) violations.push(`R7 ${op}: staged object ${oid.slice(0, 12)} file not fsynced before the ref rename`);
+          if (!fsyncs.some((x) => x.at < l.at && path.basename(l.from).startsWith('tmp_obj_') && x.path === l.from)) violations.push(`R8 ${op}: staged object ${oid.slice(0, 12)} file not fsynced before it was linked to its name`);
           if (!fsyncedAfter(fanout, l.at, move.at) || !fsyncedAfter(objects, l.at, move.at)) violations.push(`R7 ${op}: staged object ${oid.slice(0, 12)} fan-out directory or objects/ not fsynced before the ref rename`);
         }
       }

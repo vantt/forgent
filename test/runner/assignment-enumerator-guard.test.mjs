@@ -87,12 +87,12 @@ const ALLOWED = new Map([
   // the unit owner. It walks one known unit directory's seats and rounds, not
   // the assignments tree, and its nested shape is the layout's own shape.
   ['src/runner/execution/unit-run-history.mjs: readUnitRunSeats: readdirSync(unitDir)', { count: 1, reason: 'unit owner: seats of one known unit directory' }],
-  ['src/runner/execution/unit-run-history.mjs: readUnitRunSeats: readdirSync(roleDir)', { count: 1, reason: 'unit owner: rounds of one known seat directory' }],
+  ['src/runner/execution/unit-run-history.mjs: readUnitRunSeats: readdirSync(seatDir)', { count: 1, reason: 'unit owner: rounds of one known seat directory' }],
   ['src/runner/execution/unit-run-history.mjs: readUnitRunSeats: readdirSync(runsDir)', { count: 1, reason: 'unit owner: numbered attempts of one known round' }],
   // The unit summary writer shares the unit owner's seat/round rules to decide
   // whether a unit still has an attempt in flight.
   ['src/runner/execution/unit-summary.mjs: unitHasActiveRun: readdirSync(unitDir)', { count: 1, reason: 'unit owner: seats of one known unit directory' }],
-  ['src/runner/execution/unit-summary.mjs: unitHasActiveRun: readdirSync(roleDir)', { count: 1, reason: 'unit owner: rounds of one known seat directory' }],
+  ['src/runner/execution/unit-summary.mjs: unitHasActiveRun: readdirSync(seatDir)', { count: 1, reason: 'unit owner: rounds of one known seat directory' }],
   ['src/runner/execution/unit-summary.mjs: unitHasActiveRun: readdirSync(runsDir)', { count: 1, reason: 'unit owner: attempts of one known round' }],
   // Unit summary backfill lists only top-level `unit-run-*` directories (units
   // are always top-level) and hands each one to the unit owner.

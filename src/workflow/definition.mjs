@@ -319,8 +319,11 @@ export function validateWorkflow(raw, { source } = {}) {
           ? u.dependsOn.map((ud) => String(ud).trim()).filter(Boolean)
           : [];
 
+        if (template.seats !== undefined && (!Array.isArray(template.seats) || template.seats.some((entry) => !entry || typeof entry !== 'object' || Array.isArray(entry)))) {
+          throw new WorkflowDefinitionError(`${unitLabel}.seats must be an array of { seat, role, persona?, tier? } (checked in full by validateWorkflowChecked)`);
+        }
         if (template.params !== undefined && (template.params === null || typeof template.params !== 'object' || Array.isArray(template.params))) {
-          throw new WorkflowDefinitionError(`${unitLabel} params must be an object (pattern params such as members or roleTasks)`);
+          throw new WorkflowDefinitionError(`${unitLabel} params must be an object (pattern params such as roleTasks)`);
         }
 
         let stanceOptions;
@@ -375,6 +378,7 @@ export function validateWorkflow(raw, { source } = {}) {
               // Shape is checked by the Unit contract (validateUnit) before a units file gets here and again at run.
               ...(templateAllowsPrefer && template.prefer !== undefined ? { prefer: Object.freeze(structuredClone(template.prefer)) } : {}),
               params: template.params === undefined ? undefined : structuredClone(template.params),
+              ...(template.seats !== undefined ? { seats: Object.freeze(template.seats.map((entry) => Object.freeze({ ...entry }))) } : {}),
               contextRefs,
               ...(template.pattern === 'reviewed' ? { acceptOutcomes: Object.freeze([...acceptOutcomes]) } : {}),
               ...(stanceOptions === undefined ? {} : { stanceOptions: Object.freeze(stanceOptions) }),

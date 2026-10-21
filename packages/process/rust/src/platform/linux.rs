@@ -5,6 +5,7 @@ use std::fs::{self, File};
 use std::io;
 use std::path::PathBuf;
 use std::process::{Child, Command};
+use std::sync::OnceLock;
 
 use super::{as_pid_t, unix_hostname, ProcessPlatform};
 use crate::control::{self, Signal, SignalOutcome};
@@ -23,34 +24,42 @@ impl ProcessPlatform for Linux {
         unix_hostname()
     }
 
+    /// Read once: the boot id never changes while this process runs.
     fn boot_id(&self) -> Option<String> {
-        fs::read_to_string("/proc/sys/kernel/random/boot_id")
-            .ok()
-            .map(|s| s.trim().to_string())
-            .filter(|s| !s.is_empty())
+        static BOOT_ID: OnceLock<Option<String>> = OnceLock::new();
+        BOOT_ID
+            .get_or_init(|| {
+                fs::read_to_string("/proc/sys/kernel/random/boot_id")
+                    .ok()
+                    .map(|s| s.trim().to_string())
+                    .filter(|s| !s.is_empty())
+            })
+            .clone()
     }
 
+    /// Read once: fgOS never unshares its pid namespace in a process that
+    /// judges (the gate is a separate process), so the link cannot move.
     fn pid_ns(&self) -> PidNs {
-        match fs::read_link("/proc/self/ns/pid") {
-            Ok(link) => {
-                let id = link.to_string_lossy().into_owned();
-                let is_initial = id == INIT_PID_NS;
-                PidNs { id, is_initial }
-            }
-            Err(_) => PidNs { id: "unknown".to_string(), is_initial: false },
-        }
+        static PID_NS: OnceLock<PidNs> = OnceLock::new();
+        PID_NS
+            .get_or_init(|| match fs::read_link("/proc/self/ns/pid") {
+                Ok(link) => {
+                    let id = link.to_string_lossy().into_owned();
+                    let is_initial = id == INIT_PID_NS;
+                    PidNs { id, is_initial }
+                }
+                Err(_) => PidNs { id: "unknown".to_string(), is_initial: false },
+            })
+            .clone()
     }
 
     fn observe(&self, pid: ProcId) -> Observed {
         let Some(raw) = as_pid_t(pid) else {
             return Observed::Absent;
         };
-        match fs::read_to_string(format!("/proc/{}/stat", pid.0)) {
-            Ok(stat) => match facts::parse_proc_stat(&stat) {
-                Some(('Z', _)) | Some(('X', _)) => Observed::Zombie,
-                Some((_, start_time)) => Observed::Live { start_time },
-                None => Observed::Unreadable(UnreadableCause::DriverMissing),
-            },
+        match read_stat(pid.0) {
+            Ok(stat) if stat.is_gone() => Observed::Zombie,
+            Ok(stat) => Observed::Live { start_time: stat.start_ticks.to_string() },
             Err(err) => match err.kind() {
                 // A pid hidden by `hidepid` reads as missing too; signal 0
                 // tells a hidden process (EPERM) from no process (ESRCH).
@@ -254,6 +263,12 @@ fn read_relation_and_leader(proc_dir: &File, pid: ProcId, buf: &mut [u8; 4096]) 
     Some((relation, exit_signal != "-1"))
 }
 
+/// `/proc/<pid>/stat` through the one parser; an unparsable line is
+/// `InvalidData`.
+pub(crate) fn read_stat(pid: u32) -> io::Result<facts::Stat> {
+    facts::parse_stat(&fs::read_to_string(format!("/proc/{pid}/stat"))?).ok_or_else(|| io::Error::from(io::ErrorKind::InvalidData))
+}
+
 /// Signal 0: does any process (even one `/proc` hides from us) own `pid`?
 fn pid_exists(pid: libc::pid_t) -> bool {
     // SAFETY: kill with signal 0 only checks for existence and permission.
@@ -411,13 +426,6 @@ pub fn file_users(dev: u64, ino: u64) -> Option<Vec<facts::FileUser>> {
     Some(users)
 }
 
-/// Compare open descriptions without keeping a duplicate alive.
-pub fn kcmp_same_file(pid_a: ProcId, fd_a: FdSlot, pid_b: ProcId, fd_b: FdSlot) -> io::Result<bool> {
-    // SAFETY: KCMP_FILE (0) compares descriptor identities and changes nothing.
-    let result = unsafe { libc::syscall(libc::SYS_kcmp, pid_a.0, pid_b.0, 0, fd_a.0 as libc::c_ulong, fd_b.0 as libc::c_ulong) };
-    if result < 0 { Err(io::Error::last_os_error()) } else { Ok(result == 0) }
-}
-
 /// The scan view of one process. Each read that fails is named in
 /// `unreadable` with the OS error (another user's process gives
 /// `permission denied`; a kernel thread has no exe).
@@ -544,17 +552,7 @@ mod tests {
         let token = own_lock_token(&file).unwrap();
         let me = proc_self_pid().unwrap();
         assert!(lock_table_entries().unwrap().iter().any(|entry| entry.kind == "FLOCK" && entry.pid == i64::from(me.0) && entry.token == token));
-        let dup = file.try_clone().unwrap();
-        let independent = File::open(&path).unwrap();
-        match kcmp_same_file(me, FdSlot(file.as_raw_fd() as u32), me, FdSlot(dup.as_raw_fd() as u32)) {
-            Ok(same) => {
-                assert!(same);
-                assert!(!kcmp_same_file(me, FdSlot(file.as_raw_fd() as u32), me, FdSlot(independent.as_raw_fd() as u32)).unwrap());
-            }
-            Err(e) if matches!(e.raw_os_error(), Some(libc::EPERM | libc::ENOSYS)) => eprintln!("skip: kcmp unavailable: {e}"),
-            Err(e) => panic!("kcmp: {e}"),
-        }
-        drop((file, dup, independent));
+        drop(file);
         fs::remove_file(path).unwrap();
     }
 

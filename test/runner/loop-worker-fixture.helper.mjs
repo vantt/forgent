@@ -54,7 +54,8 @@ export function confinedRunnerConfig(config = {}) {
   for (const [capability, executorId] of Object.entries(LOOP_STEP_EXECUTORS)) {
     if (!capabilities[capability] && executors[executorId]) capabilities[capability] = { prefer: [{ executor: executorId }] };
   }
-  return { ...config, executors, capabilities };
+  // A project config in the seat-binding schema: the loader refuses one that has no marker.
+  return { ...config, executors, capabilities, patterns: { ...(config.patterns ?? {}), seatBinding: { schema: 1 } } };
 }
 
 /** Write `config` as the runner block of `<repoRoot>/.fgos/config.json`, keeping other blocks. */

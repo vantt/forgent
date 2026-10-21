@@ -9,7 +9,18 @@ use crate::{
 use fgos_git::{Inspect, Oid, PathValue, RepoHandle, WalkBounds};
 use std::collections::{BTreeMap, BTreeSet};
 pub(crate) fn git_error(e: fgos_git::OperationError) -> Error {
-    Error::new(ErrorCode::EventStoreIo, format!("Git: {}", e.cause))
+    let mut detail = format!("Git: {}", e.cause);
+    if let Some(code) = e.exit_code {
+        detail.push_str(&format!(" (exit {code})"));
+    }
+    if let Some(signal) = e.signal {
+        detail.push_str(&format!(" (signal {signal})"));
+    }
+    let stderr = String::from_utf8_lossy(&e.stderr);
+    if !stderr.trim().is_empty() {
+        detail.push_str(&format!(": {}", stderr.trim()));
+    }
+    Error::new(ErrorCode::EventStoreIo, detail)
 }
 pub fn blob(
     port: &dyn Inspect,
@@ -373,4 +384,29 @@ pub fn own_origin_bounded(
         ));
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::git_error;
+    use fgos_git::{OperationError, ResultCode};
+
+    #[test]
+    fn a_failed_git_command_keeps_its_exit_status_and_stderr_in_the_store_error() {
+        let error = git_error(OperationError {
+            code: ResultCode::Refused,
+            cause: "path-read-failed".into(),
+            retryable: false,
+            operation_id: None,
+            receipt: None,
+            exit_code: Some(128),
+            signal: None,
+            stderr: b"fatal: unable to read object\n".to_vec(),
+            detail: None,
+        });
+        assert_eq!(
+            error.detail,
+            "Git: path-read-failed (exit 128): fatal: unable to read object"
+        );
+    }
 }

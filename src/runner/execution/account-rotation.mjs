@@ -58,7 +58,9 @@ export function mayRotateAccount(rotation, rotationsSpent) {
 export function triedBindingsOf(attempts, at) {
   if (!Array.isArray(attempts) || at <= 0) return [];
   const own = attempts[at]?.binding ? bindingIdentity(attempts[at].binding) : null;
+  // An attempt that never launched (its account could not be leased) is not a step of the walk.
   return attempts.slice(0, at)
+    .filter((attempt) => attempt?.leaseConflict !== true)
     .map((attempt) => attempt?.binding)
     .filter((binding) => binding && Object.hasOwn(binding, 'pool') && bindingIdentity(binding) !== own);
 }
@@ -71,17 +73,55 @@ export function triedBindingsOf(attempts, at) {
  * pools it had walked away from. A first attempt or an unknown assignment binds from the primary.
  *
  * @param {object} unitRecord parsed `unit.json`
- * @param {{ role: string, round: string|number, assignmentId: string }} attempt the seat and the attempt
- * @returns {{ tried: object[], excludePools: string[] }} the `bind()` walk options
+ * @param {{ seat: string, round: string|number, assignmentId: string }} attempt the seat and the attempt
+ * @returns {{ tried: object[], excludePools: string[], continuity?: object }} the `bind()` walk state
  */
-export function walkStateOf(unitRecord, { role, round, assignmentId }) {
-  const attempts = unitRecord?.bindings?.[`${role}/${round}`];
+export function walkStateOf(unitRecord, { seat, round, assignmentId }) {
+  const attempts = unitRecord?.bindings?.[`${seat}/${round}`];
   const at = Array.isArray(attempts) ? attempts.findIndex((attempt) => attempt?.assignmentId === assignmentId) : -1;
   const boundAt = Date.parse(attempts?.[at]?.boundAt);
+  const kept = keptBindingOf(unitRecord, seat, round);
   return {
     tried: Array.isArray(attempts) ? triedBindingsOf(attempts, at) : [],
+    failedAccounts: Array.isArray(attempts) && at > 0 ? failedAccountsOf(attempts.slice(0, at)) : [],
     excludePools: [...credentialFaultPools(unitRecord, { boundBefore: Number.isFinite(boundAt) ? boundAt : -Infinity })],
+    ...(kept ? { continuity: kept } : {}),
   };
+}
+
+/**
+ * The accounts a seat's earlier attempts failed on (a provider limit, or a lease that could not be taken):
+ * a bind that goes on from them never names one of these again.
+ *
+ * @returns {Array<{ pool: string, account: string }>}
+ */
+export function failedAccountsOf(attempts) {
+  const seen = new Map();
+  for (const attempt of attempts ?? []) {
+    const { pool, leaseAccount } = attempt?.binding ?? {};
+    if (!pool || !leaseAccount || (attempt.outcome !== 'provider-limit' && attempt.leaseConflict !== true)) continue;
+    seen.set(`${pool}\u0000${leaseAccount}`, { pool, account: leaseAccount });
+  }
+  return [...seen.values()];
+}
+
+/**
+ * The binding a seat keeps into round `round`: the last binding the unit recorded for the same seat in
+ * its latest earlier round. A seat that runs several rounds in one unit (a debate side's rebuttal, a
+ * producer's next pass) keeps executor, model and effort; null in its first round.
+ *
+ * @returns {object|null}
+ */
+export function keptBindingOf(unitRecord, seat, round) {
+  const current = Number(round);
+  let latest = null;
+  for (const [key, attempts] of Object.entries(unitRecord?.bindings ?? {})) {
+    const [keySeat, keyRound] = [key.slice(0, key.lastIndexOf('/')), Number(key.slice(key.lastIndexOf('/') + 1))];
+    if (keySeat !== seat || !Number.isFinite(keyRound) || keyRound >= current || !Array.isArray(attempts)) continue;
+    const binding = attempts.at(-1)?.binding;
+    if (binding && !binding.refused && binding.mechanism !== 'inline' && (latest === null || keyRound > latest.round)) latest = { round: keyRound, binding };
+  }
+  return latest?.binding ?? null;
 }
 
 /**

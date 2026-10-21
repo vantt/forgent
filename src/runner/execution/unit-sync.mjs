@@ -12,6 +12,7 @@ import crypto from 'node:crypto';
 
 import { RunnerConfigError } from '../dispatch/config.mjs';
 import { matchesWriteScope } from '../dispatch/write-scope.mjs';
+import { SYNC_SEAT } from './seat-resolver.mjs';
 import { commitOnBranch, finishSyncMerge, resolveSyncBase, startSyncMerge, syncMergeState } from './commit-unit-work.mjs';
 
 /**
@@ -90,7 +91,7 @@ export function runPendingSync(unitRecord, mainRoot, persist, custody) {
     // Git failing, or a commit that landed holding the wrong set, is a failure; anything else (a
     // pre-commit hook's `hook-refused` included) refused to start, and left no merge open.
     const outcome = ['git-error', 'committed-set-mismatch'].includes(result.reason) ? 'execution-failure' : 'policy-refusal';
-    return { outcome, results: [{ outcome, role: 'producer', round: 1, refused: { reason: result.reason, detail: result.error }, ...(result.warnings?.length ? { warnings: result.warnings } : {}) }] };
+    return { outcome, results: [{ outcome, seat: 'producer', role: 'producer', round: 1, refused: { reason: result.reason, detail: result.error }, ...(result.warnings?.length ? { warnings: result.warnings } : {}) }] };
   }
   if (result.status === 'conflicted') {
     // In scope only while the merge is open (effectiveWriteScope); writeScope is left as declared.
@@ -108,7 +109,7 @@ function syncOnlyPass(sync) {
     ? { status: 'committed', sha: sync.commit.sha, subject: sync.commit.subject, outOfScope: [], preExistingInScope: [] }
     : { status: 'no-changes', outOfScope: [], preExistingInScope: [] };
   if (sync.warnings?.length) commit.warnings = [...sync.warnings];
-  return { outcome: 'pass', results: [{ outcome: 'pass', role: 'sync', round: 0, commit }] };
+  return { outcome: 'pass', results: [{ outcome: 'pass', seat: SYNC_SEAT, round: 0, commit }] };
 }
 
 /** What a writing seat is told about a merge left open for it; empty when there is none. */

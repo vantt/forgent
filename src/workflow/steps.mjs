@@ -8,6 +8,29 @@
 
 const EMPTY = Object.freeze([]);
 
+/**
+ * The Unit fields a step's unit template declares: the one projection of a template into a Unit, used by
+ * the runner when it starts the unit, by `--seats` and by the doctor when they bind it ahead of a run, so
+ * all three bind the same seats. The caller adds what only a run knows (objective, inputs, dependsOn,
+ * stanceOptions).
+ */
+export function unitFieldsOfTemplate(template) {
+  return {
+    capability: template.capability,
+    pattern: template.pattern || 'solo',
+    rigor: template.rigor,
+    writes: template.writes || [],
+    ...(template.anonymizeInputs ? { anonymizeInputs: true } : {}),
+    ...(template.blind ? { blind: true } : {}),
+    ...(template.prefer ? { prefer: template.prefer } : {}),
+    ...(template.persona ? { persona: template.persona } : {}),
+    ...(template.seats ? { seats: template.seats } : {}),
+    ...(template.timeoutMs !== undefined ? { timeoutMs: template.timeoutMs } : {}),
+    ...(template.verify !== undefined ? { verify: template.verify } : {}),
+    ...(template.skills !== undefined ? { skills: template.skills } : {}),
+  };
+}
+
 /** @param {object} wf @param {string} stepId */
 export function stepById(wf, stepId) {
   return wf?.steps?.find((s) => s.id === stepId);

@@ -495,7 +495,7 @@ function writeRunnerConfig(cwd, verdict) {
   const cfg = {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
     modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 5000,
   };
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
@@ -545,7 +545,7 @@ function writeShortRunnerConfig(cwd, timeoutMs) {
   const cfg = {
     executor: { command: process.execPath, args: ['{prompt}'] },
     modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs,
     parallel: { maxRoots: 4, maxLeavesPerRoot: 4 },
   };

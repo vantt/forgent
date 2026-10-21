@@ -25,6 +25,7 @@ export function sha256(content) {
   return crypto.createHash('sha256').update(content).digest('hex');
 }
 
+// Not the door's canonicalJson: a script run from a checkout has no release addon to load.
 export function stableStringify(obj) {
   if (obj === null || typeof obj !== 'object') {
     return JSON.stringify(obj);

@@ -18,7 +18,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { loadRunnerConfigFromDir } from '../../src/runner/dispatch/config.mjs';
-import { resolveExecutorAndOverrides, resolveTierModel, deriveProviderFamily } from '../../src/runner/dispatch/resolve.mjs';
+import { resolveExecutorAndOverrides, deriveProviderFamily } from '../../src/runner/dispatch/resolve.mjs';
+import { parseTierCell } from '../../src/runner/dispatch/tier-cell.mjs';
 import { resolveExecutorCommand } from '../../src/runner/dispatch/transport.mjs';
 
 /**
@@ -63,7 +64,7 @@ export function resolveNormalizedSnapshotRow(cfg, executorId, workTier, throwawa
   const provider = deriveProviderFamily(executor);
   const tierMap = { light: 'nano', standard: 'standard', heavy: 'frontier' };
   const policyTier = tierMap[workTier] ?? workTier;
-  const model = resolveTierModel(cfg, policyTier, provider);
+  const [{ model }] = parseTierCell(cfg.modelPolicies[provider][policyTier], provider);
 
   // 3. Resolve command/args/env via pure transport resolver
   const resolvedCmd = resolveExecutorCommand(cfg, {

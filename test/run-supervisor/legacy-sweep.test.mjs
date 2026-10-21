@@ -9,7 +9,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
-import { getProcessStartTime } from '../../src/runner/dispatch/process-identity.mjs';
+import { selfRecord } from '../../src/runner/dispatch/process-identity.mjs';
 import { recoverApplyUseCase, recoverObserveUseCase } from '../../src/verbs/dispatch/recover.mjs';
 import { findLegacyStuck, judgeLegacyHolders, settleLegacy, sweepLegacy } from '../../src/run-supervisor/legacy-sweep.mjs';
 
@@ -38,7 +38,7 @@ const statusOf = (dir) => readJson(path.join(dir, 'run.json'));
 function holdByThisProcess(dir, { withStartTime = true } = {}) {
   const file = path.join(dir, 'control', 'generations', '0000000001.json');
   const record = readJson(file);
-  record.holder = { id: 'live', pid: process.pid, ...(withStartTime ? { processStartTime: getProcessStartTime(process.pid) } : {}) };
+  record.holder = { id: 'live', pid: process.pid, ...(withStartTime ? { processStartTime: selfRecord().startTime } : {}) };
   fs.writeFileSync(file, JSON.stringify(record));
 }
 

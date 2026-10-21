@@ -9,7 +9,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import {
   acquireAccountLock,
-  acquireProviderAccountLease,
+  acquireNamedAccountLease,
+  LEASE_CONFLICT_REASON,
+  readAccountStates,
   clearProviderAccountQuarantine,
   probeQuarantinedAccounts,
   providerAccountDir,
@@ -21,12 +23,11 @@ import {
   ProviderCapacityLockError,
   providerCapacityStatePaths,
   quarantineProviderAccount,
-  rankProviderAccounts,
-  releaseProviderAccountLease,
+    releaseProviderAccountLease,
   validateProviderAccountInventory,
 } from '../../src/runner/dispatch/provider-capacity.mjs';
 import { reconcileProviderCapacityQuarantineUseCase } from '../../src/verbs/dispatch/reconcile.mjs';
-import { getProcessStartTime } from '../../src/runner/dispatch/process-identity.mjs';
+import { selfRecord } from '../../src/runner/dispatch/process-identity.mjs';
 import { lockHolders, resolveLockRoot } from '../../src/holder-lock/index.mjs';
 
 // Every lock here is machine-scoped under the state root: a private root keeps this file's locks off
@@ -39,7 +40,7 @@ const PROVIDER_CAPACITY_MJS = path.resolve(fileURLToPath(import.meta.url), '../.
 // Linux -- elsewhere resolveHolderLiveness has nothing to cross-check
 // against and fails closed to 'held' by contract (process-identity.mjs's
 // own documented decision table).
-const HAS_PROC_START_TIME = getProcessStartTime(process.pid) !== null;
+const HAS_PROC_START_TIME = typeof selfRecord().startTime === 'string';
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-provider-capacity-test-'));
@@ -62,61 +63,10 @@ function runnerConfig() {
   };
 }
 
-test('selector ranks accounts in the order the config declares them, whatever their load', () => {
-  const inventory = validateProviderAccountInventory(runnerConfig());
-  const state = {
-    providers: {
-      'openai-codex': {
-        accounts: {
-          a: { lastSelectedAt: '2026-09-16T03:00:00.000Z', leases: { run1: { pid: process.pid }, run2: { pid: process.pid } } },
-          b: { lastSelectedAt: '2026-09-16T01:00:00.000Z', leases: {} },
-          c: { lastSelectedAt: '2026-09-16T02:00:00.000Z', leases: {} },
-        },
-      },
-    },
-    assignments: {},
-  };
-  assert.deepEqual(rankProviderAccounts({ provider: 'openai-codex', inventory, state }), ['a', 'b', 'c']);
-});
-
-test('selector skips a quarantined or disabled account and keeps declared order for the rest', () => {
-  const config = runnerConfig();
-  const inventory = { ...validateProviderAccountInventory(config), 'openai-codex': { accounts: { ...validateProviderAccountInventory(config)['openai-codex'].accounts } } };
-  inventory['openai-codex'].accounts.b = { ...inventory['openai-codex'].accounts.b, disabled: true };
-  const state = {
-    providers: { 'openai-codex': { accounts: { a: { leases: {}, quarantine: { kind: 'manual-clear', reasonCode: 'auth-token' } }, b: { leases: {} }, c: { leases: {} } } } },
-    assignments: {},
-  };
-  assert.deepEqual(rankProviderAccounts({ provider: 'openai-codex', inventory, state }), ['c']);
-  state.providers['openai-codex'].accounts.a.quarantine = null;
-  assert.deepEqual(rankProviderAccounts({ provider: 'openai-codex', inventory, state }), ['a', 'c']);
-  // A sticky assignment on a disabled account is not honored.
-  state.assignments['openai-codex:asgn1'] = { accountId: 'b' };
-  assert.deepEqual(rankProviderAccounts({ provider: 'openai-codex', inventory, state, assignmentId: 'asgn1' }), ['a', 'c']);
-});
-
-test('sticky assignment is honored only while account is present and not quarantined', () => {
-  const inventory = validateProviderAccountInventory(runnerConfig());
-  const state = {
-    providers: {
-      'openai-codex': {
-        accounts: {
-          a: { leases: {}, quarantine: { kind: 'manual-clear', reasonCode: 'auth-token' } },
-          b: { leases: {}, lastSelectedAt: '2026-09-16T00:00:00.000Z' },
-          c: { leases: {}, lastSelectedAt: '2026-09-16T01:00:00.000Z' },
-        },
-      },
-    },
-    assignments: { 'openai-codex:asgn1': { accountId: 'a' } },
-  };
-  assert.equal(rankProviderAccounts({ provider: 'openai-codex', inventory, state, assignmentId: 'asgn1' })[0], 'b');
-  state.assignments['openai-codex:asgn1'] = { accountId: 'b' };
-  assert.equal(rankProviderAccounts({ provider: 'openai-codex', inventory, state, assignmentId: 'asgn1' })[0], 'b');
-});
-
 test('lease acquire/release uses runId and does not reclaim by elapsed time alone', () => {
   const runtimeDir = mkTempDir();
-  const first = acquireProviderAccountLease({
+  const first = acquireNamedAccountLease({
+    accountId: 'a',
     runnerConfig: runnerConfig(),
     provider: 'openai-codex',
     assignmentId: 'asgn1',
@@ -125,7 +75,8 @@ test('lease acquire/release uses runId and does not reclaim by elapsed time alon
     now: new Date('2026-09-16T00:00:00.000Z'),
   });
   assert.equal(first.status, 'selected');
-  const second = acquireProviderAccountLease({
+  const second = acquireNamedAccountLease({
+    accountId: 'a',
     runnerConfig: runnerConfig(),
     provider: 'openai-codex',
     assignmentId: 'asgn2',
@@ -133,7 +84,7 @@ test('lease acquire/release uses runId and does not reclaim by elapsed time alon
     runtimeDir,
     now: new Date('2026-09-20T00:00:00.000Z'),
   });
-  // Declared order, not load: the first account takes the second lease too, and the first lease is still open days later.
+  // Named by the caller, not chosen by load: the same account takes the second lease, and the first lease is still open days later.
   assert.equal(first.accountId, 'a');
   assert.equal(second.accountId, 'a');
 
@@ -165,7 +116,8 @@ test('lease reclaim requires dead-run proof', () => {
     audit: [],
   }));
 
-  const selected = acquireProviderAccountLease({
+  const selected = acquireNamedAccountLease({
+    accountId: 'a',
     runnerConfig: runnerConfig(),
     provider: 'openai-codex',
     assignmentId: 'asgn',
@@ -205,7 +157,8 @@ test('lease reclaim (S1, dispatch-engine-liveness-hardening Phase 2): a dead RUN
     audit: [],
   }));
 
-  const selected = acquireProviderAccountLease({
+  const selected = acquireNamedAccountLease({
+    accountId: 'a',
     runnerConfig: runnerConfig(),
     provider: 'openai-codex',
     assignmentId: 'other-asgn',
@@ -213,7 +166,7 @@ test('lease reclaim (S1, dispatch-engine-liveness-hardening Phase 2): a dead RUN
     runtimeDir,
     isRunWorkerAlive: (runId) => runId === 'run_asgn_01',
   });
-  assert.equal(selected.accountId, 'a', 'declared order picks account a however many leases it holds');
+  assert.equal(selected.accountId, 'a', 'the named account takes the lease however many leases it holds');
   const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
   assert.ok(
     state.providers['openai-codex'].accounts.a.leases.run_asgn_01,
@@ -241,7 +194,8 @@ test('lease reclaim: a dead RUNNER pid with no isRunWorkerAlive evidence still r
     audit: [],
   }));
 
-  const selected = acquireProviderAccountLease({
+  const selected = acquireNamedAccountLease({
+    accountId: 'a',
     runnerConfig: runnerConfig(),
     provider: 'openai-codex',
     assignmentId: 'other-asgn',
@@ -275,7 +229,8 @@ test('lease reclaim (dispatch-engine-liveness-hardening Phase 4, C2): a live pid
     audit: [],
   }));
 
-  const selected = acquireProviderAccountLease({
+  const selected = acquireNamedAccountLease({
+    accountId: 'a',
     runnerConfig: runnerConfig(),
     provider: 'openai-codex',
     assignmentId: 'asgn',
@@ -368,10 +323,11 @@ test('concurrent lease acquires from separate processes never lose a lease', { t
   const TRIALS = 10;
   const CONTENDERS = 10;
   const pool = await startContenders(t, CONTENDERS, `
-import { acquireProviderAccountLease } from ${JSON.stringify(pathToFileURL(PROVIDER_CAPACITY_MJS).href)};
+import { acquireNamedAccountLease } from ${JSON.stringify(pathToFileURL(PROVIDER_CAPACITY_MJS).href)};
 const runnerConfig = ${JSON.stringify(runnerConfig())};
 function handle({ runtimeDir, runId, assignmentId }) {
-  const result = acquireProviderAccountLease({
+  const result = acquireNamedAccountLease({
+    accountId: 'a',
     runnerConfig,
     provider: 'openai-codex',
     assignmentId,
@@ -485,15 +441,15 @@ test('lease acquire waits for a live lock holder only as long as lockWaitMs, and
   const { holder, exited, ready } = spawnStateLockHolder(t, HOLD_MS);
   await ready;
 
-  const args = { runnerConfig: runnerConfig(), provider: 'openai-codex', runId: 'run_lock_wait', runtimeDir };
+  const args = { runnerConfig: runnerConfig(), provider: 'openai-codex', accountId: 'a', runId: 'run_lock_wait', runtimeDir };
   const started = Date.now();
   assert.throws(
-    () => acquireProviderAccountLease({ ...args, lockWaitMs: 50 }),
+    () => acquireNamedAccountLease({ ...args, lockWaitMs: 50 }),
     (err) => err instanceof ProviderCapacityLockError && err.code === 'provider-capacity-lock-stale' && err.holderPid === holder.pid,
   );
   assert.ok(Date.now() - started < HOLD_MS, `a 50ms lockWaitMs must give up before the ${HOLD_MS}ms hold ends`);
 
-  const selected = acquireProviderAccountLease(args);
+  const selected = acquireNamedAccountLease(args);
   assert.equal(selected?.status, 'selected');
   assert.ok(Date.now() - started >= HOLD_MS - 100, 'the default wait must have outlasted the holder rather than finding the lock free');
   assert.equal((await exited).code, 0);
@@ -506,11 +462,13 @@ test('a state-lock holder killed by SIGKILL frees the lock at once', { timeout: 
   await ready;
   assert.deepEqual(lockHolders('provider-state', { lockRoot: resolveLockRoot() }).pids, [holder.pid], 'the kernel lists the live holder');
   const args = { runnerConfig: runnerConfig(), provider: 'openai-codex', runId: 'run_after_kill', runtimeDir };
-  assert.throws(() => acquireProviderAccountLease({ ...args, lockWaitMs: 50 }), ProviderCapacityLockError);
+  assert.throws(() => acquireNamedAccountLease({
+    accountId: 'a', ...args, lockWaitMs: 50 }), ProviderCapacityLockError);
   holder.kill('SIGKILL');
   await exited;
   const started = Date.now();
-  assert.equal(acquireProviderAccountLease({ ...args, lockWaitMs: 1000 })?.status, 'selected');
+  assert.equal(acquireNamedAccountLease({
+    accountId: 'a', ...args, lockWaitMs: 1000 })?.status, 'selected');
   assert.ok(Date.now() - started < 1000, 'no wait for a dead holder');
   assert.deepEqual(lockHolders('provider-state', { lockRoot: resolveLockRoot() }).pids, []);
 });
@@ -618,34 +576,29 @@ test('H1: a temporary quarantine with no until (a malformed/legacy state record)
   const inspected = inspectProviderCapacity({ runnerConfig: runnerConfig(), runtimeDir });
   assert.equal(inspected.providers['openai-codex'].accounts.a.healthy, false);
 
-  const inventory = validateProviderAccountInventory(runnerConfig());
-  const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
-  const ranked = rankProviderAccounts({ provider: 'openai-codex', inventory, state });
-  assert.ok(!ranked.includes('a'), 'an expiry-less temporary quarantine must never be selectable');
-  // `runnerConfig()`'s shared fixture also declares account "c" (no state
-  // entry at all, genuinely never quarantined) -- this test only asserts
-  // the H1 property (quarantined "a" excluded), not the full ranking.
-  assert.ok(ranked.includes('b'));
+  // The lease refuses the quarantined account, and the account facts say it is out for good.
+  const conflict = acquireNamedAccountLease({ accountId: 'a', runnerConfig: runnerConfig(), provider: 'openai-codex', runId: 'run-h1', runtimeDir });
+  assert.equal(conflict.status, 'refused');
+  assert.equal(conflict.reason, LEASE_CONFLICT_REASON);
+  assert.equal(readAccountStates({ provider: 'openai-codex', runtimeDir }).a.quarantinedUntil, Number.MAX_SAFE_INTEGER, 'an expiry-less temporary quarantine never ends');
+  // `runnerConfig()`'s shared fixture also declares account "b" (never quarantined): it can still be leased.
+  assert.equal(acquireNamedAccountLease({ accountId: 'b', runnerConfig: runnerConfig(), provider: 'openai-codex', runId: 'run-h1b', runtimeDir }).status, 'selected');
 });
 
 test('H1: a real conservative-TTL quarantine correctly EXPIRES once "until" has passed', () => {
-  const acct = { quarantine: { kind: 'temporary', reasonCode: 'quota-limit', until: '2026-09-16T01:00:00.000Z' } };
-  const inventory = validateProviderAccountInventory(runnerConfig());
-  const beforeExpiry = rankProviderAccounts({
-    provider: 'openai-codex',
-    inventory,
-    state: { providers: { 'openai-codex': { accounts: { a: acct, b: { leases: {} } } } }, assignments: {} },
-    now: Date.parse('2026-09-16T00:00:00.000Z'),
-  });
-  assert.ok(!beforeExpiry.includes('a'));
-
-  const afterExpiry = rankProviderAccounts({
-    provider: 'openai-codex',
-    inventory,
-    state: { providers: { 'openai-codex': { accounts: { a: acct, b: { leases: {} } } } }, assignments: {} },
-    now: Date.parse('2026-09-16T02:00:00.000Z'),
-  });
-  assert.ok(afterExpiry.includes('a'), 'a temporary quarantine with a real past `until` must expire normally');
+  const runtimeDir = mkTempDir();
+  const { statePath } = providerCapacityStatePaths(runtimeDir);
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  fs.writeFileSync(statePath, JSON.stringify({
+    contract: 'provider-capacity-state.v1',
+    providers: { 'openai-codex': { accounts: { a: { leases: {}, quarantine: { kind: 'temporary', reasonCode: 'quota-limit', until: '2026-09-16T01:00:00.000Z' } }, b: { leases: {} } } } },
+    assignments: {},
+    audit: [],
+  }));
+  const lease = (now, runId) => acquireNamedAccountLease({ accountId: 'a', runnerConfig: runnerConfig(), provider: 'openai-codex', runId, runtimeDir, now: new Date(now) });
+  assert.equal(lease('2026-09-16T00:00:00.000Z', 'run-before').reason, LEASE_CONFLICT_REASON);
+  assert.equal(readAccountStates({ provider: 'openai-codex', runtimeDir, now: Date.parse('2026-09-16T00:00:00.000Z') }).a.quarantinedUntil, Date.parse('2026-09-16T01:00:00.000Z'));
+  assert.equal(lease('2026-09-16T02:00:00.000Z', 'run-after').status, 'selected', 'a temporary quarantine with a real past `until` must expire normally');
 });
 
 test('manual clear refuses unknown and non-quarantined accounts unless forced, then writes audit', () => {
@@ -730,11 +683,9 @@ test('an owner-set quarantine keeps the account out of selection until its end t
   assert.equal(result.status, 'quarantined');
   assert.equal(result.quarantine.detail.kind, 'owner');
 
-  const inventory = validateProviderAccountInventory(runnerConfig());
-  const state = inspectProviderCapacity({ runnerConfig: runnerConfig(), runtimeDir: dir });
-  const rank = (now) => rankProviderAccounts({ provider: 'openai-codex', inventory, state: { providers: state.providers, assignments: {} }, now });
-  assert.ok(!rank(Date.now()).includes('a'), 'out of selection before the end time');
-  assert.ok(rank(Date.parse(until) + 1000).includes('a'), 'selectable again after the end time');
+  const lease = (now, runId) => acquireNamedAccountLease({ accountId: 'a', runnerConfig: runnerConfig(), provider: 'openai-codex', runId, runtimeDir: dir, now: new Date(now) });
+  assert.equal(lease(Date.now(), 'run-owner-before').reason, LEASE_CONFLICT_REASON, 'out of selection before the end time');
+  assert.equal(lease(Date.parse(until) + 1000, 'run-owner-after').status, 'selected', 'selectable again after the end time');
 });
 
 test('the clock time codex prints ("try again at 6:02 PM") becomes the next such local time', () => {
@@ -757,7 +708,8 @@ test('the account lock is exclusive per account, independent of other accounts a
   assert.equal(tryAcquireAccountLock({ runtimeDir, provider: 'xai', accountId: 'a' }), null, 'a live holder keeps it');
   const other = tryAcquireAccountLock({ runtimeDir, provider: 'xai', accountId: 'b' });
   assert.ok(other, 'another account is not affected');
-  assert.ok(acquireProviderAccountLease({ runnerConfig: runnerConfig(), provider: 'openai-codex', runId: 'run-1', runtimeDir }), 'leasing does not wait for an account lock');
+  assert.ok(acquireNamedAccountLease({
+    accountId: 'a', runnerConfig: runnerConfig(), provider: 'openai-codex', runId: 'run-1', runtimeDir }), 'leasing does not wait for an account lock');
   first.release();
   other.release();
   const again = tryAcquireAccountLock({ runtimeDir, provider: 'xai', accountId: 'a' });

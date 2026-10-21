@@ -218,6 +218,26 @@ fn unreadable_objects(mut error: OperationError) -> OperationError {
     }
     error
 }
+/// The blobs and trees a staged change makes the commit name, root tree included.
+fn staged_object_ids(repo: &RepoHandle, tree: &str, staged: &[RawEntry]) -> Result<Vec<Oid>> {
+    object_ids(
+        repo,
+        std::iter::once(tree.to_owned())
+            .chain(staged.iter().filter_map(RawEntry::new_object).map(str::to_owned)),
+    )
+}
+const MAX_HEAL_ROUNDS: usize = 8;
+/// Every object id Git printed in `text`, whatever its sentence.
+fn oids_in(repo: &RepoHandle, text: &[u8]) -> Vec<Oid> {
+    let ids: BTreeSet<&[u8]> = text
+        .split(|b| !b.is_ascii_hexdigit())
+        .filter(|t| t.len() == 40 || t.len() == 64)
+        .collect();
+    ids.into_iter()
+        .filter_map(|t| std::str::from_utf8(t).ok())
+        .filter_map(|t| Oid::parse(&t.to_ascii_lowercase(), repo.object_format()).ok())
+        .collect()
+}
 fn object_ids(repo: &RepoHandle, oids: impl IntoIterator<Item = String>) -> Result<Vec<Oid>> {
     oids.into_iter()
         .collect::<BTreeSet<_>>()
@@ -837,6 +857,118 @@ impl GitDriver {
             Err(out.error("literal-path-staging-failed"))
         }
     }
+    /// Stages the selection until the objects the commit will name are all
+    /// readable. `core.fsync=loose-object` makes Git fsync each loose file
+    /// before it links the name, so a cut leaves a temp file, never an empty
+    /// object. An object an earlier cut left empty keeps its name, though, and
+    /// Git, finding the name taken, never rewrites it: remove it and stage
+    /// again so Git writes it from the worktree, or refuse, never name it.
+    fn stage_healed(
+        &self,
+        repo: &RepoHandle,
+        scope: &LockScope<'_>,
+        head: &str,
+        selected: &[String],
+    ) -> Result<(String, Vec<RawEntry>)> {
+        // Each round removes at least one corrupt file; a tree chain is shallow.
+        for _ in 0..MAX_HEAL_ROUNDS {
+            let corrupt = match self.stage_selected(repo, scope, head, selected) {
+                Ok((tree, staged)) => {
+                    let ids = staged_object_ids(repo, &tree, &staged)?;
+                    let corrupt = crate::objects::corrupt_loose_objects(repo.common_dir(), &ids)
+                        .map_err(failure)?;
+                    if corrupt.is_empty() {
+                        return Ok((tree, staged));
+                    }
+                    corrupt
+                }
+                // Listing a corrupt tree fails inside Git, which names the object.
+                Err(error) if error.cause == "checkout-command-failed" => {
+                    let named = oids_in(repo, &error.stderr);
+                    let corrupt = crate::objects::corrupt_loose_objects(repo.common_dir(), &named)
+                        .map_err(failure)?;
+                    if corrupt.is_empty() {
+                        return Err(error);
+                    }
+                    corrupt
+                }
+                Err(error) => return Err(error),
+            };
+            self.heal_corrupt_objects(repo, scope, selected, &corrupt)?;
+        }
+        Err(failure("object-file-corrupt"))
+    }
+    /// Stages the selected paths, writes the index tree and lists the staged
+    /// change against `head`: the tree and every blob and tree the commit will
+    /// name, after checking the staged files are exactly the selection.
+    fn stage_selected(
+        &self,
+        repo: &RepoHandle,
+        scope: &LockScope<'_>,
+        head: &str,
+        selected: &[String],
+    ) -> Result<(String, Vec<RawEntry>)> {
+        self.stage_paths(
+            repo,
+            scope,
+            &["-c", "core.fsync=loose-object", "add", "-A"],
+            selected,
+        )?;
+        let tree = self.checkout_text(
+            repo,
+            scope,
+            &["-c", "core.fsync=loose-object", "write-tree"],
+        )?;
+        let staged = raw_entries(&self.checkout_bytes(
+            repo,
+            scope,
+            &["diff-tree", "--raw", "-t", "-r", "--no-abbrev", "--no-renames", "-z", head, &tree],
+        )?)?;
+        if staged.iter().filter(|e| e.is_file()).map(|e| &e.path).ne(selected.iter()) {
+            return Err(failure("staged-set-mismatch"));
+        }
+        Ok((tree, staged))
+    }
+    /// Removes the corrupt loose files and drops the selected paths from the
+    /// index (which also drops the cached trees above them), so the next
+    /// staging pass hashes the worktree again and Git writes the objects it
+    /// would otherwise skip. Which path a corrupt tree belongs to is unknown
+    /// while Git cannot read it, hence every selected path.
+    fn heal_corrupt_objects(
+        &self,
+        repo: &RepoHandle,
+        scope: &LockScope<'_>,
+        selected: &[String],
+        corrupt: &[Oid],
+    ) -> Result<()> {
+        for oid in corrupt {
+            let hex = oid.as_str();
+            let file = repo.common_dir().join("objects").join(&hex[..2]).join(&hex[2..]);
+            fs::remove_file(&file).map_err(|_| failure("object-file-corrupt"))?;
+        }
+        // A path the worktree no longer has is already a deletion in the index.
+        let checkout = root(repo)?;
+        let present: Vec<u8> = selected
+            .iter()
+            .filter(|p| fs::symlink_metadata(checkout.join(p)).is_ok())
+            .flat_map(|p| p.as_bytes().iter().copied().chain([0]))
+            .collect();
+        if present.is_empty() {
+            return Ok(());
+        }
+        let out = self.checkout_call(
+            repo,
+            scope,
+            &["update-index", "--force-remove", "-z", "--stdin"],
+            &present,
+            false,
+        )?;
+        if out.success {
+            Ok(())
+        } else {
+            Err(out.error("literal-path-staging-failed"))
+        }
+    }
     pub(crate) fn staged(&self, repo: &RepoHandle, scope: &LockScope<'_>) -> Result<Vec<String>> {
         paths(&self.checkout_bytes(
             repo,
@@ -1338,37 +1470,12 @@ impl GitDriver {
             .collect::<Result<BTreeMap<_, _>>>()?;
         let mut recorded_terminal = None;
         let mut prepared = (|| {
-            self.stage_paths(repo, scope, &["add", "-A"], &selected)?;
-            let tree = self.checkout_text(repo, scope, &["write-tree"])?;
-            // The staged change as a tree diff: the same set check the index diff
-            // gave, plus the oid of every blob and tree the commit will name.
-            let staged = raw_entries(&self.checkout_bytes(
-                repo,
-                scope,
-                &[
-                    "diff-tree",
-                    "--raw",
-                    "-t",
-                    "-r",
-                    "--no-abbrev",
-                    "--no-renames",
-                    "-z",
-                    &baseline.head,
-                    &tree,
-                ],
-            )?)?;
-            if staged.iter().filter(|e| e.is_file()).map(|e| &e.path).ne(selected.iter()) {
-                return Err(failure("staged-set-mismatch"));
-            }
-            // `git add` and `write-tree` do not fsync what they write, and `git
-            // commit` moves the branch before anything else could: make the
-            // blobs and trees durable first, so a branch tip never names an
-            // object a power cut can still lose.
-            let staged_objects = object_ids(
-                repo,
-                std::iter::once(tree.clone())
-                    .chain(staged.iter().filter_map(RawEntry::new_object).map(str::to_owned)),
-            )?;
+            let (tree, staged) = self.stage_healed(repo, scope, &baseline.head, &selected)?;
+            // The fsync above covers what Git wrote now. An object that already
+            // existed (freshened, not rewritten) and the directory entries are
+            // made durable here, before `git commit` can move the branch to name
+            // them, so a branch tip never names an object a power cut can lose.
+            let staged_objects = staged_object_ids(repo, &tree, &staged)?;
             sync_staged_objects(repo, &staged_objects, filesystem)?;
             let kind = OperationKind::ScopedCommit(Box::new(wal::ScopedCommitIntent {
                 worktree: baseline.worktree.clone(),

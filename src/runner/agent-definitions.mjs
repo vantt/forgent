@@ -1,10 +1,11 @@
-// agent-definitions.mjs — the one lookup of an agent definition (persona) by name across its three tiers.
-// LAYER: infra. Customer customization lives in `fgos/agents/<name>.yaml` of the project (workspace tier);
-// a domain keeps its own in `domains/<domain>/agents/`; the installed set is `core/agents/`.
+// agent-definitions.mjs — the one lookup of an agent definition (persona) by name across its layers.
+// LAYER: infra. Customer customization lives in `fgos/agents/<name>.yaml` of the project (workspace layer);
+// a packaged workflow keeps its own beside it (`agent.<name>.yaml`); a domain keeps its own in
+// `domains/<domain>/agents/`, visible only to workflows that domain owns; the installed set is `core/agents/`.
 //
-// Lookup order is workspace, then domain, then core: the first tier that holds the name wins and its file
-// replaces a lower tier's whole file (fields are never merged). Two files of one name in the same tier are
-// an error, and an unknown name is an error that names every directory searched; there is no fallback.
+// Lookup order is workspace, workflow folder, owning domain, then core: the first layer that holds the name
+// wins and its file replaces a lower layer's whole file (fields are never merged). An unknown name is an error
+// that names every directory searched; there is no fallback. A persona file never carries model taste.
 //
 // A project that ships its own `domains/` or `core/agents/` folder is read there. A project without one
 // (any customer project) falls back to the installed package that is running this code, so installed
@@ -17,6 +18,7 @@ import { fileURLToPath } from 'node:url';
 
 import { describeYamlError, parseYaml } from '../util/yaml.mjs';
 import { RunnerConfigError } from './dispatch/config.mjs';
+import { definitionFileName } from '../convention/definition-names.mjs';
 
 export const AGENT_NAME_PATTERN = /^[a-z][a-z0-9-]{0,63}$/;
 // A definition is a short persona sketch; the cap bounds what a pinned copy adds to a run record.
@@ -193,6 +195,8 @@ export function agentShapeProblem(name, text) {
 export function shapeProblemOf(name, { data, error, name: declared, description }) {
   if (error) return error;
   if (declared !== name) return `must declare name: ${name} (got ${JSON.stringify(declared ?? null)})`;
+  const taste = personaModelTasteProblem(data);
+  if (taste) return taste;
   const [nonText] = nonTextPersonaValues(data);
   if (nonText) return nonText;
   if (description === '') return 'must declare a non-empty description';
@@ -200,31 +204,73 @@ export function shapeProblemOf(name, { data, error, name: declared, description 
 }
 
 /**
- * Resolve a definition by name: its text, the tier it came from and a digest of the exact bytes.
+ * The directories one lookup reads, in order, for the workflow it is made for. Narrower than the listing's
+ * tiers: a packaged workflow's own folder is read first after the workspace, and a domain's personas are
+ * visible only to workflows that domain owns, so a lookup with no domain never reads `domains/`.
  *
- * @returns {{ name: string, tier: string, source: string, text: string, digest: string }}
+ * @param {{ projectRoot: string, installRoot?: string }} options
+ * @param {{ workflowDir?: string|null, owningDomain?: string|null }} [workflow]
+ * @returns {Array<{ layer: string, label: string, dir: string, relDir: string, fileOf: (name: string) => string }>}
+ */
+function lookupTiers(options, workflow) {
+  const { projectRoot, installRoot = INSTALL_ROOT } = options;
+  const [workspace, domainTier, core] = agentTierDirs({ projectRoot, installRoot });
+  const plain = (name) => `${name}.yaml`;
+  const tiers = [{ layer: 'workspace', label: workspace.label, ...workspace.dirs[0], fileOf: plain }];
+  if (typeof workflow?.workflowDir === 'string' && workflow.workflowDir !== '') {
+    const root = [projectRoot, installRoot].find((candidate) => !path.relative(candidate, workflow.workflowDir).startsWith('..'));
+    const relDir = root ? path.relative(root, workflow.workflowDir).split(path.sep).join('/') : workflow.workflowDir;
+    tiers.push({ layer: 'workflow', label: 'the workflow folder', dir: workflow.workflowDir, relDir, fileOf: (name) => definitionFileName('agent-file', name) });
+  }
+  if (typeof workflow?.owningDomain === 'string' && workflow.owningDomain !== '') {
+    const own = domainTier.dirs.find((entry) => entry.relDir === `domains/${workflow.owningDomain}/agents`);
+    if (own) tiers.push({ layer: 'domain', label: `domains/${workflow.owningDomain}/agents`, ...own, fileOf: plain });
+  }
+  tiers.push({ layer: 'core', label: core.label, ...core.dirs[0], fileOf: plain });
+  return tiers;
+}
+
+/**
+ * Model taste (`tier`, `prefer`) belongs to a seat, not to a persona: a persona file that names one is refused,
+ * and the refusal says where it goes. `rigor` stays a plain field of the persona and no seat choice reads it.
+ *
+ * @param {object|null} data a parsed definition (see readAgentDefinition)
+ * @returns {string|null}
+ */
+export function personaModelTasteProblem(data) {
+  const field = ['tier', 'prefer'].find((key) => isPlainObject(data) && Object.hasOwn(data, key));
+  if (field === undefined) return null;
+  return `persona-model-taste-not-allowed: "${field}" is a model choice and a persona does not make one; set it at capabilities.<cap>.personas.<name> in the runner config`;
+}
+
+/**
+ * Resolve a definition by name for a workflow: its text, the layer it came from, a digest of the exact bytes and
+ * its qualified identity `<layer>:<source>/<name>`. Lookup order: workspace `fgos/agents`, the workflow's own
+ * folder (`agent.<name>.yaml`), the workflow's owning domain, then core. A lookup made without a workflow
+ * (`fgos run --persona`) reads workspace and core only.
+ *
+ * @param {string} name
+ * @param {{ projectRoot: string, installRoot?: string, workflow?: { workflowDir?: string|null, owningDomain?: string|null }|null }} options
+ * @returns {{ name: string, tier: string, source: string, identity: string, text: string, digest: string }}
  */
 export function resolveAgentDefinition(name, options) {
   if (typeof name !== 'string' || !AGENT_NAME_PATTERN.test(name)) {
     throw new RunnerConfigError(`persona name ${JSON.stringify(name)} must match ${AGENT_NAME_PATTERN} (lowercase letters, digits and "-")`);
   }
-  const scan = scanAgentTiers(options);
-  for (const { tier, label, entries } of scan) {
-    const matches = entries.filter((entry) => entry.name === name);
-    if (matches.length > 1) {
-      throw new RunnerConfigError(`persona "${name}" is defined more than once in the ${label} tier (${matches.map((m) => m.rel).join(', ')}); keep one`);
-    }
-    if (matches.length === 0) continue;
-    const [{ file, rel }] = matches;
+  const tiers = lookupTiers(options, options.workflow);
+  for (const { layer, dir, relDir, fileOf } of tiers) {
+    const file = path.join(dir, fileOf(name));
+    if (!fs.existsSync(file) || !fs.statSync(file).isFile()) continue;
+    const rel = `${relDir}/${fileOf(name)}`;
     if (fs.statSync(file).size > AGENT_FILE_MAX_BYTES) {
       throw new RunnerConfigError(`persona "${name}" (${rel}) is larger than ${AGENT_FILE_MAX_BYTES} bytes`);
     }
     const text = fs.readFileSync(file, 'utf8');
     const problem = agentShapeProblem(name, text);
     if (problem) throw new RunnerConfigError(`persona "${name}" (${rel}) ${problem}`);
-    return { name, tier, source: rel, text, digest: crypto.createHash('sha256').update(text).digest('hex') };
+    return { name, tier: layer, source: rel, identity: `${layer}:${relDir}/${name}`, text, digest: crypto.createHash('sha256').update(text).digest('hex') };
   }
-  const searched = scan.map(({ label, dirs }) => `${label} (${dirs.length > 0 ? dirs.join(', ') : 'no such folder'})`).join('; ');
-  const hint = scan.flatMap((t) => t.ignored).find((rel) => rel.endsWith(`/${name}.yml`));
+  const searched = tiers.map(({ label, dir }) => `${label} (${dir})`).join('; ');
+  const hint = tiers.flatMap(({ dir, relDir }) => (fs.existsSync(path.join(dir, `${name}.yml`)) ? [`${relDir}/${name}.yml`] : []))[0];
   throw new AgentNotFoundError(`persona "${name}" not found; searched ${searched}${hint ? `; ${hint} exists but only .yaml files are read` : ''}`);
 }

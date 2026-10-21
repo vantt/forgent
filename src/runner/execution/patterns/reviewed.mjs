@@ -4,7 +4,8 @@
  */
 
 import { roleUnit } from './role-tasks.mjs';
-import { resolveStrongerRigor } from '../../rigor.mjs';
+import { resolveSeats, requiresDistinctFamilies, VERIFY_SEAT } from '../seat-resolver.mjs';
+import { createBindBarrier } from '../seat-ledger.mjs';
 
 export const VALID_OUTCOMES = Object.freeze([
   'pass',
@@ -21,41 +22,6 @@ const ERROR_OUTCOMES = Object.freeze([
   'provider-limit',
   'blocked',
 ]);
-
-export const DEFAULT_CHECKERS_BY_RIGOR = Object.freeze({
-  low: Object.freeze(['reviewer']),
-  standard: Object.freeze(['reviewer']),
-  high: Object.freeze(['reviewer', 'red-team']),
-  critical: Object.freeze(['reviewer', 'red-team']),
-});
-
-/**
- * Resolve the set of checker roles for a unit.
- *
- * @param {object} unit
- * @param {object} cfg
- * @param {object} [params]
- * @returns {Array<string>}
- */
-export function resolveCheckers(unit, cfg, params = {}) {
-  const rigor = unit?.rigor || 'standard';
-  const checkersByRigor = cfg?.patterns?.reviewed?.checkersByRigor || DEFAULT_CHECKERS_BY_RIGOR;
-  const fromRigor = checkersByRigor[rigor] || DEFAULT_CHECKERS_BY_RIGOR[rigor] || ['reviewer'];
-
-  const capConfig = cfg?.capabilities?.[unit?.capability];
-  const minFromCap = capConfig?.minCheckers || [];
-  const minFromParams = Array.isArray(params?.minCheckers)
-    ? params.minCheckers
-    : (params?.minCheckers ? [params.minCheckers] : []);
-
-  const checkers = new Set([...fromRigor, ...minFromCap, ...minFromParams]);
-
-  if (unit?.capability?.startsWith('code:') || unit?.capability === 'code') {
-    checkers.add('red-team');
-  }
-
-  return Array.from(checkers);
-}
 
 /**
  * The verify command of a unit: its own `verify`, else its capability's. Nothing else supplies one,
@@ -82,17 +48,6 @@ export function hasVerifyCommand(unit, cfg) {
 }
 
 /**
- * At rigor high or critical (the unit's, or its capability's floor, the same stronger-of rule
- * bind() applies) every seat of the unit runs on its own provider family: the producer and each
- * checker differ from one another, and a pool without enough families refuses the seat that
- * cannot be placed. Standard and low only require checkers to differ from the producer.
- */
-export function requiresDistinctFamilies(unit, cfg) {
-  const rigor = resolveStrongerRigor(unit?.rigor, cfg?.capabilities?.[unit?.capability]?.rigor) ?? 'standard';
-  return rigor === 'high' || rigor === 'critical';
-}
-
-/**
  * Extract findings array from a result object.
  *
  * @param {object} res
@@ -104,7 +59,7 @@ export function extractFindings(res) {
   if (typeof res.findings === 'string') return [res.findings];
   if (res.finding) return [res.finding];
   if (res.outcome === 'findings') {
-    return [`Role ${res.role || 'checker'} reported findings`];
+    return [`Seat ${res.seat || 'checker'} reported findings`];
   }
   return [];
 }
@@ -122,18 +77,18 @@ export function extractFindings(res) {
  * @param {boolean} hasVerify
  * @returns {boolean}
  */
-function isRoundSettledInHistory(r, priorResults, checkerList, hasVerify) {
-  const prod = priorResults.find((h) => h.role === 'producer' && (h.round ?? 1) === r);
+function isRoundSettledInHistory(r, priorResults, producerSeat, checkerList, hasVerify) {
+  const prod = priorResults.find((h) => h.seat === producerSeat && (h.round ?? 1) === r);
   if (!prod) return false;
   if (ERROR_OUTCOMES.includes(prod.outcome)) return true;
 
-  for (const checkerRole of checkerList) {
-    const chk = priorResults.find((h) => h.role === checkerRole && (h.round ?? 1) === r);
+  for (const checkerSeat of checkerList) {
+    const chk = priorResults.find((h) => h.seat === checkerSeat && (h.round ?? 1) === r);
     if (!chk) return false;
   }
 
   if (hasVerify) {
-    const ver = priorResults.find((h) => (h.role === 'verify' || h.role === 'verifier') && (h.round ?? 1) === r);
+    const ver = priorResults.find((h) => h.seat === VERIFY_SEAT && (h.round ?? 1) === r);
     if (!ver) return false;
   }
 
@@ -145,7 +100,7 @@ function assessRound(results) {
   const error = results.find((res) => ERROR_OUTCOMES.includes(res.outcome));
   if (error) return { outcome: error.outcome, findings: [] };
   const findings = results.flatMap((res) =>
-    res.outcome === 'findings' || (res.role === 'verify' && res.outcome !== 'pass')
+    res.outcome === 'findings' || (res.seat === VERIFY_SEAT && res.outcome !== 'pass')
       ? extractFindings(res) : []);
   return { outcome: findings.length > 0 ? 'findings' : 'pass', findings };
 }
@@ -154,18 +109,19 @@ function assessRound(results) {
  * Read a terminal outcome without dispatching/verification. Incomplete history
  * cannot establish completion and must remain unknown to the summary.
  */
-export function reviewedHistoryOutcome(unit, cfg, priorResults, params = {}) {
+export function reviewedHistoryOutcome(unit, cfg, priorResults, params = {}, seats = []) {
   const maxRounds = params?.maxRounds ?? cfg?.patterns?.reviewed?.maxRounds ?? 2;
-  const checkerList = resolveCheckers(unit, cfg, params);
+  const producerSeat = seats.find((seat) => seat.role === 'producer')?.seat ?? 'producer';
+  const checkerList = seats.filter((seat) => seat.role !== 'producer').map((seat) => seat.seat);
   const hasVerify = hasVerifyCommand(unit, cfg);
   for (let round = 1; round <= maxRounds; round++) {
-    if (!isRoundSettledInHistory(round, priorResults, checkerList, hasVerify)) return null;
-    const producer = priorResults.find((res) => res.role === 'producer' && (res.round ?? 1) === round);
+    if (!isRoundSettledInHistory(round, priorResults, producerSeat, checkerList, hasVerify)) return null;
+    const producer = priorResults.find((res) => res.seat === producerSeat && (res.round ?? 1) === round);
     if (ERROR_OUTCOMES.includes(producer.outcome)) return producer.outcome;
-    const results = [producer, ...checkerList.map((role) =>
-      priorResults.find((res) => res.role === role && (res.round ?? 1) === round))];
+    const results = [producer, ...checkerList.map((seat) =>
+      priorResults.find((res) => res.seat === seat && (res.round ?? 1) === round))];
     if (hasVerify) results.push(priorResults.find((res) =>
-      (res.role === 'verify' || res.role === 'verifier') && (res.round ?? 1) === round));
+      res.seat === VERIFY_SEAT && (res.round ?? 1) === round));
     const assessment = assessRound(results.filter(Boolean));
     if (assessment.outcome !== 'findings' || round === maxRounds) return assessment.outcome;
   }
@@ -188,7 +144,10 @@ export async function runReviewed(unit, cfg, { runRole, verify, history, hasLaun
   const maxRounds = params?.maxRounds ?? cfg?.patterns?.reviewed?.maxRounds ?? 2;
   const priorResults = typeof history === 'function' ? history() : (Array.isArray(history) ? history : []);
 
-  const checkerList = resolveCheckers(unit, cfg, params);
+  const seats = resolveSeats({ pattern: { pattern: 'reviewed', params }, unit, runnerConfig: cfg });
+  const producerSeat = seats.find((seat) => seat.role === 'producer');
+  const checkerSeats = seats.filter((seat) => seat.role !== 'producer');
+  const checkerList = checkerSeats.map((seat) => seat.seat);
   const hasVerify = hasVerifyCommand(unit, cfg);
   const distinctFamilies = requiresDistinctFamilies(unit, cfg);
 
@@ -198,8 +157,8 @@ export async function runReviewed(unit, cfg, { runRole, verify, history, hasLaun
 
   for (let r = 1; r <= maxRounds; r++) {
     // Check if this round settled entirely in history
-    if (isRoundSettledInHistory(r, priorResults, checkerList, hasVerify)) {
-      const histProducer = priorResults.find((h) => h.role === 'producer' && (h.round ?? 1) === r);
+    if (isRoundSettledInHistory(r, priorResults, producerSeat.seat, checkerList, hasVerify)) {
+      const histProducer = priorResults.find((h) => h.seat === producerSeat.seat && (h.round ?? 1) === r);
       allResults.push(histProducer);
 
       if (ERROR_OUTCOMES.includes(histProducer.outcome)) {
@@ -212,14 +171,14 @@ export async function runReviewed(unit, cfg, { runRole, verify, history, hasLaun
       }
 
       const roundHistoryResults = [histProducer];
-      for (const checkerRole of checkerList) {
-        const histChk = priorResults.find((h) => h.role === checkerRole && (h.round ?? 1) === r);
+      for (const checkerSeat of checkerList) {
+        const histChk = priorResults.find((h) => h.seat === checkerSeat && (h.round ?? 1) === r);
         allResults.push(histChk);
         roundHistoryResults.push(histChk);
       }
 
       if (hasVerify) {
-        const histVer = priorResults.find((h) => (h.role === 'verify' || h.role === 'verifier') && (h.round ?? 1) === r);
+        const histVer = priorResults.find((h) => h.seat === VERIFY_SEAT && (h.round ?? 1) === r);
         allResults.push(histVer);
         roundHistoryResults.push(histVer);
       }
@@ -272,17 +231,16 @@ export async function runReviewed(unit, cfg, { runRole, verify, history, hasLaun
     const currentRoundResults = [];
 
     // Step A: Run producer role
-    const existingProducer = priorResults.find((h) => h.role === 'producer' && (h.round ?? 1) === r && h.outcome === 'pass');
+    const existingProducer = priorResults.find((h) => h.seat === producerSeat.seat && (h.round ?? 1) === r && h.outcome === 'pass');
     let producerResult;
     if (existingProducer) {
       producerResult = existingProducer;
     } else {
       const payload = {
-        role: 'producer',
+        seat: producerSeat,
         // Round 1 is the unit as given; a later round also lists what the checks found, so the
         // producer knows what to fix.
-        unit: roleUnit(unit, { role: 'producer', params, findings: r > 1 ? priorFindings : [] }),
-        readOnly: (unit?.writes || []).length === 0,
+        unit: roleUnit(unit, { seat: producerSeat.seat, kind: 'producer', params, findings: r > 1 ? priorFindings : [] }),
         round: r,
       };
       producerResult = await runRole(payload);
@@ -301,22 +259,22 @@ export async function runReviewed(unit, cfg, { runRole, verify, history, hasLaun
     }
 
     // Step B: Dispatch checkers and verification together, then drain every peer.
-    const pendingCheckerRoles = [];
+    const pendingCheckerSeats = [];
     const reusedCheckerResults = [];
 
-    for (const checkerRole of checkerList) {
-      const existingChecker = priorResults.find((h) => h.role === checkerRole && (h.round ?? 1) === r && h.outcome === 'pass');
+    for (const checkerSeat of checkerSeats) {
+      const existingChecker = priorResults.find((h) => h.seat === checkerSeat.seat && (h.round ?? 1) === r && h.outcome === 'pass');
       if (existingChecker) {
         reusedCheckerResults.push(existingChecker);
       } else {
-        pendingCheckerRoles.push(checkerRole);
+        pendingCheckerSeats.push(checkerSeat);
       }
     }
 
     let reusedVerify = null;
     let runPendingVerify = false;
     if (hasVerify) {
-      const existingVer = priorResults.find((h) => (h.role === 'verify' || h.role === 'verifier') && (h.round ?? 1) === r && h.outcome === 'pass');
+      const existingVer = priorResults.find((h) => h.seat === VERIFY_SEAT && (h.round ?? 1) === r && h.outcome === 'pass');
       if (existingVer) {
         reusedVerify = existingVer;
       } else if (typeof verify === 'function') {
@@ -324,15 +282,16 @@ export async function runReviewed(unit, cfg, { runRole, verify, history, hasLaun
       }
     }
 
-    const checkerPromises = pendingCheckerRoles.map((checkerRole) =>
+    const barrier = createBindBarrier(pendingCheckerSeats.length);
+    const checkerPromises = pendingCheckerSeats.map((checkerSeat) =>
       Promise.resolve().then(() => runRole({
-        role: checkerRole,
+        seat: checkerSeat,
         // Told to check rather than to do the work, and handed the producer's account of this round.
-        unit: roleUnit(unit, { role: checkerRole, params }),
-        readOnly: true,
-        independentOf: distinctFamilies ? ['producer', ...checkerList.filter((role) => role !== checkerRole)] : ['producer'],
+        unit: roleUnit(unit, { seat: checkerSeat.seat, params }),
+        independentOf: distinctFamilies ? [producerSeat.seat, ...checkerList.filter((id) => id !== checkerSeat.seat)] : [producerSeat.seat],
         round: r,
         inputs: [producerResult],
+        batch: barrier,
       })),
     );
 
@@ -340,7 +299,7 @@ export async function runReviewed(unit, cfg, { runRole, verify, history, hasLaun
       ? Promise.resolve().then(async () => {
           const vRes = await verify(unit);
           return {
-            role: 'verify',
+            seat: VERIFY_SEAT,
             round: r,
             outcome: vRes?.pass ? 'pass' : 'findings',
             findings: vRes?.findings || (vRes?.pass ? [] : ['Verification failed']),

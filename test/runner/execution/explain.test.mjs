@@ -18,7 +18,7 @@ const headless = { headless: true, herdrPresent: false };
 
 function deepseekConfig() {
   return {
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     modelPolicies: { deepseek: { standard: ['deepseek-v4-flash@deepseek-api', 'deepseek/deepseek-v4-flash'] } },
     capabilities: { research: { prefer: [{ executor: 'deepseek' }] } },
     executors: {
@@ -41,10 +41,14 @@ test('explain reports the entry that runs, the entries that follow it and the po
   const result = explainCapability(deepseekConfig(), { capability: 'research', session: headless });
   assert.equal(result.family, 'deepseek');
   assert.equal(result.executor.id, 'deepseek');
-  assert.equal(result.executor.source, 'capability:research');
+  assert.equal(result.executor.source, 'capabilities."research".prefer');
   assert.equal(result.invocation, 'pi-cli-bwrap');
   assert.deepEqual(result.credentialStore, { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR', files: ['auth.json'], source: 'declared' });
-  assert.deepEqual(result.tier, { value: 'standard', source: 'rigor:standard', ceiling: null });
+  assert.equal(result.tier.value, 'standard');
+  assert.equal(result.tier.source, 'defaults.tier');
+  assert.equal(result.tier.maxTier, null);
+  assert.equal(result.tier.loweredFrom, null);
+  assert.match(result.tier.definition, /^standard: /, 'the tier is named with its definition');
   assert.equal(result.model.value, 'deepseek-v4-flash', 'the first entry of the cell whose pool can run it');
   assert.equal(result.pool, 'deepseek-api');
   assert.deepEqual(result.cell.entries, [

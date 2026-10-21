@@ -129,6 +129,9 @@ import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-re
 import { recordInvocationFault, resolveFaultLogPath } from '../src/cli/invocation-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, integrationScriptPath, ensureSharedConfigDefaults, runFixes } from '../src/setup/checks.mjs';
+import { convertProjectConfigFile, ladderCommentLines } from '../src/setup/seat-binding-conversion.mjs';
+import { createSeatBindingClient } from '../src/seat-binding/client.mjs';
+import { discoverWorkflows } from '../src/workflow/loader.mjs';
 import { sharedConfigFilePath, readSharedConfig, readSharedConfigOrEmpty, readInvariantCheckCommands } from '../src/config/shared-config-file.mjs';
 import { countWorkerSlots, hasWorkerSlotRoom } from '../src/state/worker-slots.mjs';
 import { assessCleanupReadiness, blockedItemsNowResolvable } from '../src/state/cleanup-harness.mjs';
@@ -378,7 +381,7 @@ function lockErrorToStoreError(err, verbName) {
 // Asks on the terminal before `lock fence` signals anything. Without a
 // terminal there is nobody to ask, so the answer is no (pass --yes).
 async function confirmFence(name, holders) {
-  const list = holders.map((h) => `  pid ${h.pid} (started ${h.startTime}): ${h.cmdline || '(no command line)'}`).join('\n');
+  const list = holders.map((h) => `  pid ${h.pid} (started ${h.startTime})`).join('\n');
   process.stderr.write(`fgos: lock ${name} is held by:\n${list}\n`);
   if (!process.stdin.isTTY || !process.stderr.isTTY) return false;
   const rl = readline.createInterface({ input: process.stdin, output: process.stderr });
@@ -2594,7 +2597,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const cap = unit.capability;
         let desc = null;
         if (cap != null) {
-          desc = catalog[cap]?.description ?? (cap.includes(':') ? catalog[cap.split(':')[1]]?.description : null) ?? null;
+          desc = catalog[cap]?.description ?? (cap.includes(':') ? catalog[`${cap.split(':')[0]}:*`]?.description : null) ?? null;
         }
         return {
           ...unit,
@@ -2861,9 +2864,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         try {
           const parsed = JSON.parse(overrideStr);
           overrides = Array.isArray(parsed) ? parsed : [parsed];
-          for (const ov of overrides) {
-            if (!ov.origin) ov.origin = 'human-cli';
-          }
         } catch (e) {
           throw new StoreError('validation', `invalid JSON for --override: ${e.message}`);
         }
@@ -2873,7 +2873,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // scoped override does not name still gets it. bind() checks it against the chosen executor.
       if (flags.effort !== undefined) {
         const effort = requireField(flags.effort, '--effort requires a level (low, medium, high, max)');
-        if (!overrides.some((ov) => ov && typeof ov === 'object' && !ov.scope)) overrides.push({ origin: 'human-cli' });
+        if (!overrides.some((ov) => ov && typeof ov === 'object' && !ov.scope)) overrides.push({});
         for (const ov of overrides) {
           if (ov.reasoningEffort === undefined) ov.reasoningEffort = effort;
         }
@@ -2889,7 +2889,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         } catch (err) {
           throw new StoreError('validation', err.message);
         }
-        if (!overrides.some((ov) => ov && typeof ov === 'object' && !ov.scope)) overrides.push({ origin: 'human-cli' });
+        if (!overrides.some((ov) => ov && typeof ov === 'object' && !ov.scope)) overrides.push({});
         for (const ov of overrides) {
           if (ov.timeoutMs === undefined) ov.timeoutMs = timeoutMs;
         }
@@ -2900,7 +2900,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       if (flags.account !== undefined) {
         if (resumeUnitRunId) throw new StoreError('validation', '--account cannot change a resumed unit run: it keeps the account its seats were bound to');
         const account = requireField(flags.account, '--account requires pool/account (an account of a pool in runner.llmAccounts of ~/.fgos/config.json, for example openai/work)');
-        if (!overrides.some((ov) => ov && typeof ov === 'object' && !ov.scope)) overrides.push({ origin: 'human-cli' });
+        if (!overrides.some((ov) => ov && typeof ov === 'object' && !ov.scope)) overrides.push({});
         for (const ov of overrides) {
           if (ov.account === undefined) ov.account = account;
         }
@@ -2944,6 +2944,14 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         unitData,
         ...(portRoot ? { caseAdmission: createCaseAdmissionPort({ repoRoot: portRoot }) } : {}),
         ...(caseRef ? { caseRef } : {}),
+        // What this door chose, and that it may raise nothing: a persona or capability a person typed that
+        // lifts a seat's tier above what the seat resolves to without it is refused by name, and so is an
+        // override tier above the resolved one. No door of this release can attest a person.
+        selectors: buildsUnit ? {
+          ...(flags.capability !== undefined ? { capability: unitData.capability } : {}),
+          ...(flags.persona !== undefined ? { persona: unitData.persona } : {}),
+        } : {},
+        raiseAuthorized: false,
         pattern,
         stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),
         overrides,
@@ -4042,12 +4050,19 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           }
         }
       }
+      // Conversion first, then fill-missing: a project still in the old schema is converted (after a backup)
+      // before any default is written into it, so no fill-missing pass can put a retired key back.
+      const seatBindingConversion = convertProjectConfigFile(repoRoot, {
+        globalDir: os.homedir(),
+        ladder: () => ladderCommentLines(createSeatBindingClient({ cwd: repoRoot, fgosDir: path.join(repoRoot, '.fgos') }).tierLadder().definitions),
+        workflows: () => [...discoverWorkflows({ packageRoot: PACKAGE_ROOT }).values()],
+      });
       const configPath = sharedConfigFilePath(repoRoot);
       const configExisted = fs.existsSync(configPath);
       const { addedKeys } = ensureSharedConfigDefaults(repoRoot);
       const globalConfigPath = sharedConfigFilePath(os.homedir());
       const globalConfigExisted = fs.existsSync(globalConfigPath);
-      const { addedKeys: globalAddedKeys } = ensureSharedConfigDefaults(os.homedir());
+      const { addedKeys: globalAddedKeys } = ensureSharedConfigDefaults(os.homedir(), { layer: 'global' });
       // str65-6/str88: wires core.hooksPath the same way `npm run setup:hooks`
       // does — a second, non-npm-lifecycle-dependent activation path for the
       // main-checkout lock hook, since pnpm 10+ blocks `prepare` for a
@@ -4086,6 +4101,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         rcFilesInserted,
         rcFilesAlreadyConfigured,
         ...(rcWriteDeclinedReason !== null && { rcWriteDeclinedReason }),
+        seatBindingConversion,
         configPath,
         configCreated: !configExisted,
         configAddedKeys: configExisted ? addedKeys : [],
@@ -4703,6 +4719,12 @@ function renderPretty(verb, data) {
     }
     if (data.rcWriteDeclinedReason) {
       lines.push(formatCheck(false, 'skipped shell-profile line', data.rcWriteDeclinedReason));
+    }
+    if (data.seatBindingConversion?.status === 'converted') {
+      const { backupPath, changes, reports } = data.seatBindingConversion;
+      lines.push(formatCheck(true, 'converted the project runner config to the seat-binding schema', `backup: ${backupPath}`));
+      for (const change of changes) lines.push(`  ${change.op} ${change.path}${change.to !== undefined ? ` = ${JSON.stringify(change.to)}` : ''} (${change.why})`);
+      for (const report of reports) lines.push(`  review: ${JSON.stringify(report)}`);
     }
     lines.push(
       formatCheck(

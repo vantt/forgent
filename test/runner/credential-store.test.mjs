@@ -49,7 +49,7 @@ function writeConfig(executor) {
   fs.writeFileSync(file, JSON.stringify({
     executor: { command: 'claude', args: ['{prompt}'] },
     modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', advanced: 'sonnet', flagship: 'sonnet', frontier: 'opus' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 1000,
     executors: { agent: { kind: 'agent', providerModel: 'claude', allowCrossProvider: true, ...executor } },
   }));

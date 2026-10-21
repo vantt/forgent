@@ -14,7 +14,9 @@ import os from 'node:os';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { renderReasoningEffortArgs, checkLaunchedModel, collectModelWarnings } from '../../src/runner/dispatch/provider-adapter.mjs';
-import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { executeAssignment as executeAssignmentRaw } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { bindableExecute } from '../helpers/work-seat-config.mjs';
+const executeAssignment = bindableExecute(executeAssignmentRaw);
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { bind } from '../../src/runner/execution/bind.mjs';
 import { runUnitWithPort as runUnit } from '../helpers/run-unit-with-port.mjs';
@@ -92,7 +94,7 @@ function fixtureRepo({ commandName = 'codex', executorPatch = {} } = {}) {
   fs.chmodSync(cli, 0o755);
   const runner = {
     modelPolicies: { fake: { standard: 'fake-standard', flagship: 'fake-flagship' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 20000,
     executors: {
       fake: {
@@ -114,7 +116,7 @@ const spawnedArgv = (root) => JSON.parse(fs.readFileSync(path.join(root, 'argv.j
 
 test('execute --effort renders the level into the spawned CLI and reports what it applied', async () => {
   const root = fixtureRepo();
-  const result = await executeExecutorCli('fake', { sharedCwd: true, for: 'execute', prompt: 'hello', reasoningEffort: 'high', cwd: root, repoRoot: root });
+  const result = await executeExecutorCli('fake', { tier: 'standard', model: 'fake-standard', sharedCwd: true, for: 'execute', prompt: 'hello', reasoningEffort: 'high', cwd: root, repoRoot: root });
   assert.equal(result.status, 0, result.stderr);
   assert.deepEqual(spawnedArgv(root), ['exec', '-c', 'model_reasoning_effort=high', '--model', 'fake-standard', 'hello']);
   assert.deepEqual(result.reasoningEffort, { requested: 'high', command: 'codex', flag: '-c model_reasoning_effort', native: 'high' });
@@ -122,7 +124,7 @@ test('execute --effort renders the level into the spawned CLI and reports what i
 
 test('execute without --effort leaves the argv exactly as the template renders it', async () => {
   const root = fixtureRepo();
-  const result = await executeExecutorCli('fake', { sharedCwd: true, for: 'execute', prompt: 'hello', cwd: root, repoRoot: root });
+  const result = await executeExecutorCli('fake', { tier: 'standard', model: 'fake-standard', sharedCwd: true, for: 'execute', prompt: 'hello', cwd: root, repoRoot: root });
   assert.equal(result.status, 0, result.stderr);
   assert.deepEqual(spawnedArgv(root), ['exec', '--model', 'fake-standard', 'hello']);
   assert.equal(result.reasoningEffort, undefined);
@@ -131,7 +133,7 @@ test('execute without --effort leaves the argv exactly as the template renders i
 test('execute --effort refuses an invalid level before spawning', async () => {
   const root = fixtureRepo();
   await assert.rejects(
-    executeExecutorCli('fake', { sharedCwd: true, for: 'execute', prompt: 'hello', reasoningEffort: 'turbo', cwd: root, repoRoot: root }),
+    executeExecutorCli('fake', { tier: 'standard', model: 'fake-standard', sharedCwd: true, for: 'execute', prompt: 'hello', reasoningEffort: 'turbo', cwd: root, repoRoot: root }),
     /invalid reasoningEffort "turbo"/,
   );
   assert.equal(fs.existsSync(path.join(root, 'argv.json')), false);
@@ -140,7 +142,7 @@ test('execute --effort refuses an invalid level before spawning', async () => {
 test('execute --effort refuses a level the executor does not declare', async () => {
   const root = fixtureRepo({ executorPatch: { supports: { reasoningEffort: ['low', 'medium'] } } });
   await assert.rejects(
-    executeExecutorCli('fake', { sharedCwd: true, for: 'execute', prompt: 'hello', reasoningEffort: 'high', cwd: root, repoRoot: root }),
+    executeExecutorCli('fake', { tier: 'standard', model: 'fake-standard', sharedCwd: true, for: 'execute', prompt: 'hello', reasoningEffort: 'high', cwd: root, repoRoot: root }),
     /executor "fake" supports reasoningEffort \[low, medium\], not "high"/,
   );
   assert.equal(fs.existsSync(path.join(root, 'argv.json')), false);
@@ -149,7 +151,7 @@ test('execute --effort refuses a level the executor does not declare', async () 
 test('execute --effort refuses an invocation whose CLI has no effort control', async () => {
   const root = fixtureRepo({ commandName: 'some-agent' });
   await assert.rejects(
-    executeExecutorCli('fake', { sharedCwd: true, for: 'execute', prompt: 'hello', reasoningEffort: 'high', cwd: root, repoRoot: root }),
+    executeExecutorCli('fake', { tier: 'standard', model: 'fake-standard', sharedCwd: true, for: 'execute', prompt: 'hello', reasoningEffort: 'high', cwd: root, repoRoot: root }),
     /runs "some-agent", which has no reasoning-effort control fgOS can set/,
   );
   assert.equal(fs.existsSync(path.join(root, 'argv.json')), false);
@@ -183,7 +185,7 @@ test('execute surfaces a model the CLI reports running instead of the launched o
   const prev = process.env.FAKE_REPORTED_MODEL;
   process.env.FAKE_REPORTED_MODEL = 'some-other-model';
   try {
-    const result = await executeExecutorCli('fake', { sharedCwd: true, for: 'execute', prompt: 'hello', model: 'asked-model', cwd: root, repoRoot: root });
+    const result = await executeExecutorCli('fake', { tier: 'standard', sharedCwd: true, for: 'execute', prompt: 'hello', model: 'asked-model', cwd: root, repoRoot: root });
     assert.equal(result.status, 0, result.stderr);
     assert.deepEqual(result.modelWarnings.map((w) => [w.code, w.launched, w.reported]), [['model-reported-different', 'asked-model', 'some-other-model']]);
   } finally {
@@ -233,7 +235,7 @@ console.log('All good');
 
 const bindConfig = () => ({
   modelPolicies: { openai: { standard: 'gpt-std' }, claude: { standard: 'sonnet' } },
-  rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+  defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
   capabilities: { 'docs:write': { prefer: [{ executor: 'codex' }], rigor: 'standard' } },
   executors: {
     codex: { kind: 'agent', providerModel: 'openai', allowCrossProvider: true, invocations: [{ id: 'codex-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: 'codex', args: ['exec', '{prompt}'] }] },
@@ -249,7 +251,7 @@ test('bind() takes a reasoningEffort override and records where it came from', (
   assert.deepEqual(bound.provenance.reasoningEffort, { value: 'high', source: 'override:human-cli' });
   const plain = bind(unitAsk([]), { runnerConfig: bindConfig(), session: {} });
   assert.equal(plain.reasoningEffort, null);
-  assert.deepEqual(plain.provenance.reasoningEffort, { value: null, source: 'none' });
+  assert.deepEqual(plain.provenance.reasoningEffort, { value: null, source: 'invocation-default' });
 });
 
 test('bind() refuses an effort outside the vocabulary or outside what the bound executor declares', () => {
@@ -257,7 +259,9 @@ test('bind() refuses an effort outside the vocabulary or outside what the bound 
   assert.equal(bad.refused.reason, 'reasoning-effort');
   assert.match(bad.refused.detail, /invalid reasoningEffort "turbo"/);
   const locked = bind(unitAsk([{ executor: 'claude', reasoningEffort: 'max', origin: 'human-cli' }]), { runnerConfig: bindConfig(), session: {} });
-  assert.match(locked.refused.detail, /executor "claude" supports reasoningEffort \[low, medium, high\], not "max"/);
+  assert.equal(locked.refused.reason, 'effort-unsupported');
+  assert.match(locked.refused.detail, /invocation "claude-cli" cannot render effort max; it renders \[low, medium, high\]/);
+  assert.deepEqual(locked.refused.rendered, ['low', 'medium', 'high']);
 });
 
 test('fgos run with an effort override renders it into the CLI the bound executor spawns', async () => {
@@ -279,7 +283,7 @@ test('fgos run with an effort override renders it into the CLI the bound executo
   fs.writeFileSync(cli, `#!${process.execPath}\nprocess.stdout.write('ARGV' + JSON.stringify(process.argv.slice(2)) + '\\n');\n`);
   fs.chmodSync(cli, 0o755);
   const runner = {
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     modelPolicies: { openai: { standard: 'gpt-std' } },
     executors: { codex: { kind: 'agent', providerModel: 'openai', allowCrossProvider: true, invocations: [{ id: 'codex-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: cli, args: ['exec', '--model', '{model}', '{prompt}'] }] } },
     capabilities: { 'docs:write': { prefer: [{ executor: 'codex' }], rigor: 'standard' } },
@@ -311,7 +315,7 @@ test('fgos run --effort reaches bind() as an override, and a level the executor 
   execFileSync('git', ['add', '.'], { cwd: repo });
   execFileSync('git', ['commit', '-q', '-m', 'initial'], { cwd: repo });
   const runner = {
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     modelPolicies: { claude: { standard: 'sonnet' } },
     executors: { claude: { kind: 'agent', supports: { reasoningEffort: ['low', 'medium', 'high'] }, invocations: [{ id: 'c', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: 'claude', args: ['-p', '{prompt}'] }] } },
     capabilities: { 'docs:write': { prefer: [{ executor: 'claude' }], rigor: 'standard' } },
@@ -327,7 +331,7 @@ test('fgos run --effort reaches bind() as an override, and a level the executor 
   assert.equal(res.status, 4, res.stderr);
   const { data } = JSON.parse(res.stdout);
   assert.equal(data.outcome, 'policy-refusal');
-  assert.deepEqual(data.results[0].refused, { reason: 'reasoning-effort', detail: 'executor "claude" supports reasoningEffort [low, medium, high], not "max"' });
+  assert.deepEqual(data.results[0].refused, { reason: 'effort-unsupported', detail: 'u/producer: invocation "c" cannot render effort max; it renders [low, medium, high]', rendered: ['low', 'medium', 'high'] });
 });
 
 test('fgos run --effort still reaches a role that a scoped --override does not name', () => {
@@ -340,9 +344,9 @@ test('fgos run --effort still reaches a role that a scoped --override does not n
   // No real CLI is ever launched: the effort check refuses before spawn, and the
   // command does not exist if it were reached.
   const runner = {
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     modelPolicies: { claude: { standard: 'sonnet' } },
-    executors: { claude: { kind: 'agent', providerModel: 'claude', supports: { reasoningEffort: ['low', 'medium', 'high'] }, invocations: [{ id: 'c', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: 'fgos-test-no-such-cli', args: ['-p', '{prompt}'] }] } },
+    executors: { claude: { kind: 'agent', providerModel: 'claude', supports: { reasoningEffort: ['low', 'medium', 'high'] }, invocations: [{ id: 'c', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: '/nonexistent/claude', args: ['-p', '{prompt}'] }] } },
     capabilities: { 'docs:write': { prefer: [{ executor: 'claude' }], rigor: 'standard' } },
   };
   fs.mkdirSync(path.join(repo, '.fgos'));
@@ -361,7 +365,7 @@ test('fgos run --effort still reaches a role that a scoped --override does not n
   }
   const { data } = JSON.parse(out);
   assert.equal(data.outcome, 'policy-refusal');
-  assert.deepEqual(data.results[0].refused, { reason: 'reasoning-effort', detail: 'executor "claude" supports reasoningEffort [low, medium, high], not "max"' });
+  assert.deepEqual(data.results[0].refused, { reason: 'effort-unsupported', detail: 'u/producer: invocation "c" cannot render effort max; it renders [low, medium, high]', rendered: ['low', 'medium', 'high'] });
 });
 
 test('one settled run keeps effort and model drift provenance beside a correlated warning and the sandbox that ran', async () => {

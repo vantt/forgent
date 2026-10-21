@@ -29,13 +29,13 @@ test('the projection ignores event kinds it does not know and anything that is n
     { seq: 2, ts: 'b', type: 'step.start', payload: { stepId: 's' } },
     { seq: 3, ts: 'c', type: 'case.opened', payload: { caseId: 'x' } },
     { seq: 4, ts: 'd', type: 'unit.scheduled', payload: { stepId: 's', unitId: 'u' } },
-    { seq: 5, ts: 'e', type: 'unit.complete', payload: { stepId: 's', unitId: 'u', outcome: 'pass', results: [{ role: 'synthesizer', round: 1 }, { role: 'panelist-1', round: 1 }] } },
+    { seq: 5, ts: 'e', type: 'unit.complete', payload: { stepId: 's', unitId: 'u', outcome: 'pass', results: [{ seat: 'synthesis', role: 'synthesizer', round: 1 }, { seat: 'member-1', role: 'producer', posture: { stance: true }, round: 1 }] } },
     { seq: 6, ts: 'f', type: 'step.complete', payload: { stepId: 's', outcome: 'pass' } },
     { seq: 7, ts: 'g', type: 'workflow.complete', payload: { outcome: 'pass' } },
   ];
   const withoutUnknown = events.filter((e) => e.type !== 'case.opened');
   assert.deepEqual(observableOrder(events), observableOrder(withoutUnknown));
-  assert.deepEqual(observableOrder(events).steps[0].units[0].roles, [['panelist-1', 'synthesizer']]);
+  assert.deepEqual(observableOrder(events).steps[0].units[0].roles, [['member-1', 'synthesis']]);
 });
 
 test('every playbook and a units wave run in the order of the committed baseline', async () => {

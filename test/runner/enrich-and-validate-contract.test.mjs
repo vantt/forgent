@@ -143,7 +143,6 @@ test('enrichAndValidateContract writes the matched operation\'s own declared pol
     rigor: 'standard',
   });
   assert.ok(Object.isFrozen(policy));
-  assert.ok(Object.isFrozen(policy.fallbackExecutors));
 });
 
 test('enrichAndValidateContract omits policy entirely when the matched operation declares none', () => {
@@ -210,10 +209,4 @@ test('mergeHarnessPolicy does not stamp _fromYaml when the caller overrides the 
   const merged = mergeHarnessPolicy({ model: 'pinned-yaml-model' }, { model: 'caller-chosen-model' });
   assert.equal(merged.model, 'caller-chosen-model');
   assert.equal(merged._fromYaml, undefined);
-});
-
-test('mergeHarnessPolicy freezes a fallbackExecutors array when present', () => {
-  const merged = mergeHarnessPolicy({ fallbackExecutors: ['pi', 'codex'] }, undefined);
-  assert.deepEqual(merged.fallbackExecutors, ['pi', 'codex']);
-  assert.ok(Object.isFrozen(merged.fallbackExecutors));
 });

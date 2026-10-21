@@ -77,7 +77,8 @@ fn handle(path: &Path) -> Handle {
     match acquire(
         &Resource::new("event-seal", path),
         Mode::Ex,
-        Wait::Try,
+        // Sibling test threads fork children holding a copy of the descriptor until exec.
+        Wait::Ms(30_000),
         2000,
     ) {
         Acquire::Acquired(h) => h,

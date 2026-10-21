@@ -68,8 +68,8 @@ test('clearDomain cannot erase a live domain, then records handoff after it exit
   const f = fixture(t);
   const handle = admitSuccessor(createLockScope('holder'), f.fgosDir, f.cwd);
   const child = spawn(process.execPath, ['--input-type=module', '-e', `
-    import { localObserver, getProcessStartTime } from ${JSON.stringify(identity)};
-    process.stdout.write(JSON.stringify({ ...localObserver(), pid: process.pid, startTime: getProcessStartTime(process.pid) }) + '\\n');
+    import { selfRecord } from ${JSON.stringify(identity)};
+    process.stdout.write(JSON.stringify(selfRecord()) + '\\n');
     process.stdin.resume();
   `], { stdio: ['pipe', 'pipe', 'inherit'], detached: true });
   t.after(() => { child.kill('SIGKILL'); if (!handle.released) handle.release(); });
@@ -96,13 +96,13 @@ test('controller death with a setsid escapee keeps an unconfined worktree inadmi
   const actor = spawn(process.execPath, ['--input-type=module', '-e', `
     import fs from 'node:fs';
     import { spawn } from 'node:child_process';
-    import { localObserver, getProcessStartTime } from ${JSON.stringify(identity)};
+    import { selfRecord } from ${JSON.stringify(identity)};
     import { admitSuccessor, recordCustodyHandoff } from ${JSON.stringify(new URL('../../src/runner/dispatch/cwd-lock.mjs', import.meta.url).href)};
     import { createLockScope } from ${JSON.stringify(new URL('../../src/holder-lock/index.mjs', import.meta.url).href)};
     const custody = admitSuccessor(createLockScope('controller'), ${JSON.stringify(f.fgosDir)}, ${JSON.stringify(f.cwd)});
     const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { detached: true, stdio: 'ignore' });
     child.unref();
-    fs.writeFileSync(${JSON.stringify(f.record)}, JSON.stringify({ v: 1, domainKind: 'linux-pgroup', domainId: { ...localObserver(), pid: process.pid, startTime: getProcessStartTime(process.pid) } }));
+    fs.writeFileSync(${JSON.stringify(f.record)}, JSON.stringify({ v: 1, domainKind: 'linux-pgroup', domainId: selfRecord() }));
     process.stdout.write(String(child.pid) + '\\n');
     setInterval(() => {}, 1000);
   `], { stdio: ['ignore', 'pipe', 'inherit'], detached: true });
@@ -130,9 +130,9 @@ test('an unsupervised mutating executor is refused before its process starts', {
     executors: { fake: { kind: 'agent', command: process.execPath, args: ['-e', `require('fs').writeFileSync(${JSON.stringify(marker)}, 'started')`], allowCrossProvider: true, providerModel: 'fake' } },
     capabilities: { execute: { serves: { outputKind: 'change', mutates: true } } },
     modelPolicies: { fake: { standard: 'fake-standard' } },
-    rigorToTier: { standard: 'standard' }, timeoutMs: 5000,
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000,
   };
-  await assert.rejects(() => executeExecutorCli('fake', { cwd: f.cwd, repoRoot: f.cwd, runnerConfig, for: 'execute' }), (err) => {
+  await assert.rejects(() => executeExecutorCli('fake', { tier: 'standard', model: 'sonnet', cwd: f.cwd, repoRoot: f.cwd, runnerConfig, for: 'execute' }), (err) => {
     assert.equal(err.code, 'custody-domain-required');
     assert.equal(err.cwd, f.cwd);
     assert.equal(err.executorId, 'fake');
@@ -187,10 +187,10 @@ test('best-effort handoff limitation: live controller clears a linux-pgroup reco
   const custody = admitSuccessor(createLockScope('live-controller'), f.fgosDir, f.cwd);
   const producer = spawn(process.execPath, ['--input-type=module', '-e', `
     import { spawn } from 'node:child_process';
-    import { localObserver, getProcessStartTime } from ${JSON.stringify(identity)};
+    import { selfRecord } from ${JSON.stringify(identity)};
     const escapee = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { detached: true, stdio: 'ignore' });
     escapee.unref();
-    process.stdout.write(JSON.stringify({ escapedPid: escapee.pid, tuple: { ...localObserver(), pid: process.pid, startTime: getProcessStartTime(process.pid) } }) + '\\n');
+    process.stdout.write(JSON.stringify({ escapedPid: escapee.pid, tuple: selfRecord() }) + '\\n');
     process.stdin.resume();
   `], { detached: true, stdio: ['pipe', 'pipe', 'inherit'] });
   const [data] = await once(producer.stdout, 'data');
@@ -239,9 +239,9 @@ test('recreating a directory with a reused inode gets a new custody record key',
 
 test('a record left after the kernel lock was released is judged by pid and start time, never by pid alone', { skip }, async (t) => {
   const f = fixture(t);
-  const { localObserver } = await import(identity);
+  const { selfRecord } = await import(identity);
   // The holder's own pid is live, but the recorded start time is not its: a reused pid, so the domain is dead.
-  fs.writeFileSync(f.record, JSON.stringify({ v: 1, domainKind: 'linux-gate', domainId: { ...localObserver(), pid: process.pid, startTime: '1' } }));
+  fs.writeFileSync(f.record, JSON.stringify({ v: 1, domainKind: 'linux-gate', domainId: { ...selfRecord(), startTime: '1' } }));
   const successor = admitSuccessor(createLockScope('successor'), f.fgosDir, f.cwd);
   try { assert.equal(predecessorState(f.lockPath, { fgosDir: f.fgosDir }).state, 'absent'); }
   finally { successor.release(); }

@@ -4,13 +4,11 @@
 // a model (`model@pool`) or list several; runner.llmAccounts is the machine's account inventory,
 // read beside the provider account inventory the lease still uses. These checks only read.
 
-import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
+import { loadRunnerConfigFromDir, MODEL_POLICY_TIERS } from '../runner/dispatch/config.mjs';
 import { deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { parseTierCell, isExtendedTierCell } from '../runner/dispatch/tier-cell.mjs';
 import { readLlmAccounts, compareWithLegacyInventory, deriveLegacyInventory } from '../runner/dispatch/llm-accounts.mjs';
 import { readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
-import { resolveTierCeiling } from '../runner/execution/bind.mjs';
-import { resolveTierModel } from '../runner/dispatch/resolve.mjs';
 import { loadGlobalConfig } from '../config/global-config.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -88,7 +86,9 @@ export function checkExecutorSkillsInstalled(cwd) {
 
 /**
  * A family a tier's fallback list names but that has no cell at that tier, or no agent executor, is
- * skipped by the walk and recorded. Warns, never fails: the list still works for the families that serve it.
+ * skipped by the walk and recorded; a declared `tierFallback` names every tier of the ladder, `mini`
+ * included, or a seat at the missing tier has no walk after a failure. Warns, never fails: the list still
+ * works for the families that serve it.
  */
 export function checkTierFallback(cwd) {
   const { runnerConfig, skip } = loadOrExplain(cwd);
@@ -99,7 +99,7 @@ export function checkTierFallback(cwd) {
   for (const entry of Object.values(runnerConfig.executors ?? {})) {
     if (entry?.kind === 'agent') served.add(deriveProviderFamily(entry));
   }
-  const problems = [];
+  const problems = MODEL_POLICY_TIERS.filter((tier) => runnerConfig.tierFallback[tier] === undefined).map((tier) => `${tier}: no list, so a seat at ${tier} has no walk after a failure`);
   for (const [tier, families] of declared) {
     for (const family of families) {
       if (runnerConfig.modelPolicies?.[family]?.[tier] === undefined) problems.push(`${tier}: ${family} has no modelPolicies cell at ${tier}`);
@@ -185,40 +185,9 @@ export function checkGlobalModelPoliciesPortable() {
   if (extended.length > 0) {
     return {
       passed: false,
-      message: `~/.fgos/config.json runner.modelPolicies has list or "model@pool" cells (${extended.join(', ')}); older fgOS releases on this machine fail on a list and run "model@pool" as a model id, and this release ignores them -- move them to the project config`,
+      message: `~/.fgos/config.json runner.modelPolicies has list, "model@pool" or object cells (${extended.join(', ')}); older fgOS releases on this machine fail on a list or an object and run "model@pool" as a model id, and this release ignores them -- move them to the project config`,
     };
   }
   return { passed: true, message: 'global modelPolicies cells are plain model names' };
 }
 
-/**
- * The capabilities whose own rigor lifts them above runner.maxTier, with the tier and model their
- * seats then run at, so whoever sets `rigor: critical` on a capability sees what it costs.
- */
-export function checkCapabilityRigorCeiling(cwd) {
-  const { runnerConfig, skip } = loadOrExplain(cwd);
-  if (skip) return skip;
-  const globalMaxTier = runnerConfig.maxTier;
-  if (!globalMaxTier) return { passed: true, message: 'runner.maxTier not set; no tier ceiling' };
-  const raised = [];
-  for (const [capability, entry] of Object.entries(runnerConfig.capabilities ?? {})) {
-    const ceiling = resolveTierCeiling(runnerConfig, capability, entry?.rigor);
-    if (!ceiling || ceiling.source === 'global') continue;
-    const families = [...new Set(normalizePreferFamilies(runnerConfig, entry.prefer))];
-    const models = families.map((family) => {
-      try { return `${family} ${resolveTierModel(runnerConfig, ceiling.value, family)}`; } catch { return `${family} (no model for ${ceiling.value})`; }
-    });
-    raised.push(`${capability} (rigor ${entry.rigor}) runs at ${ceiling.value}${models.length ? `: ${models.join(', ')}` : ''}`);
-  }
-  if (raised.length === 0) return { passed: true, message: `no capability rigor lifts a seat above runner.maxTier ${globalMaxTier}` };
-  return { passed: true, message: `above runner.maxTier ${globalMaxTier} by their own rigor: ${raised.join('; ')}` };
-}
-
-function normalizePreferFamilies(runnerConfig, prefer) {
-  const entries = Array.isArray(prefer) ? prefer : prefer ? [prefer] : [];
-  return entries
-    .map((p) => (typeof p === 'string' ? p : p?.executor))
-    .map((id) => runnerConfig.executors?.[id])
-    .filter(Boolean)
-    .map((executor) => deriveProviderFamily(executor));
-}

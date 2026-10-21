@@ -132,6 +132,9 @@ export async function spawnWorker(work, cfg, cwd, opts = {}) {
     ...(repoRoot ? { repoRoot } : {}),
     // The claim worktree is no case's: the real port answers `unbound` and the run goes on as before.
     caseAdmission: createCaseAdmissionPort({ repoRoot: mainRoot }),
+    // A Work item chooses no persona, seat or capability and may raise nothing: its rigor and risk add
+    // checkers, never a tier.
+    raiseAuthorized: false,
     session: { headless: true, herdrPresent: false },
     onUnitRunCreated: (id) => {
       unitRunId = id;

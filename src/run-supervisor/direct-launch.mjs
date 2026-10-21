@@ -14,7 +14,7 @@ import { acquireSync, createLockScope, spawnWithLocks, resolveLock, resolveState
 import { admitSuccessor } from '../runner/dispatch/cwd-lock.mjs';
 import { DispatchError } from '../runner/dispatch/dispatch-error.mjs';
 import { computeSha256Digest, publishImmutableProof, publishMutableProjection } from '../runner/dispatch/proof-helpers.mjs';
-import { getBootId } from '../runner/dispatch/process-identity.mjs';
+import { selfRecord } from '../runner/dispatch/process-identity.mjs';
 import { interpretRunResult } from '../runner/dispatch/run-result.mjs';
 import { adoptRun, resolveRouteHostBin, RunSupervisorError } from './client.mjs';
 import { readGateKillGraceMs } from './gate-kill-grace.mjs';
@@ -128,7 +128,7 @@ export function terminalSocketPath(attemptId) {
 
 /** CLOCK_BOOTTIME now, in the shape the envelope uses. */
 function boottimeNow() {
-  return { bootId: getBootId(), boottimeNs: Math.round(os.uptime() * 1e9) };
+  return { bootId: selfRecord().bootId ?? 'unknown-boot', boottimeNs: Math.round(os.uptime() * 1e9) };
 }
 
 /** The same boot, `afterMs` from now. */

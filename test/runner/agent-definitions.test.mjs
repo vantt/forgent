@@ -30,12 +30,14 @@ function makeProject(t) {
   return { root, write };
 }
 
-test('the workspace tier shadows a domain, which shadows core, as a whole file', (t) => {
+const finance = { owningDomain: 'finance', workflowDir: null };
+
+test('the workspace layer shadows an owning domain, which shadows core, as a whole file', (t) => {
   const { root, write } = makeProject(t);
   write('core/agents/planner.yaml', definition('planner', 'role: core-only-field\n'));
   write('domains/finance/agents/planner.yaml', definition('planner', 'role: domain-field\n'));
-  assert.equal(resolveAgentDefinition('planner', { projectRoot: root }).tier, 'domain');
-  assert.equal(resolveAgentDefinition('planner', { projectRoot: root }).source, 'domains/finance/agents/planner.yaml');
+  assert.equal(resolveAgentDefinition('planner', { projectRoot: root, workflow: finance }).tier, 'domain');
+  assert.equal(resolveAgentDefinition('planner', { projectRoot: root, workflow: finance }).source, 'domains/finance/agents/planner.yaml');
 
   const own = definition('planner', 'persona:\n  voice: the customer voice\n');
   write('fgos/agents/planner.yaml', own);
@@ -64,20 +66,17 @@ test('a project that ships its own core folder is read there, not from the insta
   assert.throws(() => resolveAgentDefinition('council-assumptions', { projectRoot: root }), /not found/);
 });
 
-test('the same name twice in one tier is an error that names both files, found or shadowed', (t) => {
+test('the listing still reports one name defined by two domains, though each lookup sees only its own domain', (t) => {
   const { root, write } = makeProject(t);
   write('domains/finance/agents/dup.yaml', definition('dup'));
   write('domains/hr/agents/dup.yaml', definition('dup'));
-  assert.throws(
-    () => resolveAgentDefinition('dup', { projectRoot: root }),
-    /persona "dup" is defined more than once in the domains\/\*\/agents tier \(domains\/finance\/agents\/dup\.yaml, domains\/hr\/agents\/dup\.yaml\)/,
-  );
   assert.deepEqual(findAgentDuplicates(scanAgentTiers({ projectRoot: root })).map((d) => [d.tier, d.name, d.files]), [
     ['domain', 'dup', ['domains/finance/agents/dup.yaml', 'domains/hr/agents/dup.yaml']],
   ]);
-  // The workspace tier is checked first, so a workspace definition settles the lookup.
+  assert.equal(resolveAgentDefinition('dup', { projectRoot: root, workflow: finance }).source, 'domains/finance/agents/dup.yaml');
+  assert.equal(resolveAgentDefinition('dup', { projectRoot: root, workflow: { owningDomain: 'hr' } }).source, 'domains/hr/agents/dup.yaml');
   write('fgos/agents/dup.yaml', definition('dup'));
-  assert.equal(resolveAgentDefinition('dup', { projectRoot: root }).tier, 'workspace');
+  assert.equal(resolveAgentDefinition('dup', { projectRoot: root, workflow: finance }).tier, 'workspace');
 });
 
 test('an unknown name names every tier searched and never falls back', (t) => {
@@ -85,10 +84,10 @@ test('an unknown name names every tier searched and never falls back', (t) => {
   write('core/agents/other.yaml', definition('other'));
   write('domains/finance/agents/other-domain.yaml', definition('other-domain'));
   assert.throws(
-    () => resolveAgentDefinition('nobody', { projectRoot: root }),
+    () => resolveAgentDefinition('nobody', { projectRoot: root, workflow: finance }),
     (error) => error.message.startsWith('persona "nobody" not found; searched fgos/agents (')
       && error.message.includes(path.join(root, 'fgos', 'agents'))
-      && error.message.includes(`domains/*/agents (${path.join(root, 'domains', 'finance', 'agents')})`)
+      && error.message.includes(`domains/finance/agents (${path.join(root, 'domains', 'finance', 'agents')})`)
       && error.message.includes(`core/agents (${path.join(root, 'core', 'agents')})`),
   );
 });
@@ -173,4 +172,50 @@ test('every installed core definition resolves through the lookup', (t) => {
   const names = fs.readdirSync(path.join(INSTALL_ROOT, 'core', 'agents')).filter((f) => f.endsWith('.yaml')).map((f) => f.slice(0, -5));
   assert.ok(names.length > 0);
   for (const name of names) assert.equal(resolveAgentDefinition(name, { projectRoot: root }).tier, 'core', name);
+});
+
+test('an adjacent persona shadows only its own workflow, ahead of the domain and core', (t) => {
+  const { root, write } = makeProject(t);
+  write('core/agents/critic.yaml', definition('critic', 'role: core\n'));
+  write('domains/finance/agents/critic.yaml', definition('critic', 'role: domain\n'));
+  write('domains/finance/workflows/audit/agent.critic.yaml', definition('critic', 'role: adjacent\n'));
+  const audit = { owningDomain: 'finance', workflowDir: path.join(root, 'domains/finance/workflows/audit') };
+  const other = { owningDomain: 'finance', workflowDir: path.join(root, 'domains/finance/workflows/close') };
+
+  const adjacent = resolveAgentDefinition('critic', { projectRoot: root, workflow: audit });
+  assert.equal(adjacent.tier, 'workflow');
+  assert.equal(adjacent.source, 'domains/finance/workflows/audit/agent.critic.yaml');
+  assert.equal(adjacent.identity, 'workflow:domains/finance/workflows/audit/critic');
+  assert.equal(resolveAgentDefinition('critic', { projectRoot: root, workflow: other }).identity, 'domain:domains/finance/agents/critic');
+  assert.equal(resolveAgentDefinition('critic', { projectRoot: root }).identity, 'core:core/agents/critic');
+  // The workspace still wins over everything beside a workflow.
+  write('fgos/agents/critic.yaml', definition('critic', 'role: workspace\n'));
+  assert.equal(resolveAgentDefinition('critic', { projectRoot: root, workflow: audit }).identity, 'workspace:fgos/agents/critic');
+});
+
+test('a domain persona is invisible to another domain, to core workflows and to a lookup with no workflow', (t) => {
+  const { root, write } = makeProject(t);
+  write('core/agents/shared.yaml', definition('shared'));
+  write('domains/finance/agents/ledger-keeper.yaml', definition('ledger-keeper'));
+  assert.equal(resolveAgentDefinition('ledger-keeper', { projectRoot: root, workflow: finance }).tier, 'domain');
+  for (const workflow of [{ owningDomain: 'hr', workflowDir: null }, { owningDomain: null, workflowDir: null }, undefined]) {
+    assert.throws(() => resolveAgentDefinition('ledger-keeper', { projectRoot: root, workflow }), /not found/);
+    // A workflow of another domain still resolves its core persona.
+    assert.equal(resolveAgentDefinition('shared', { projectRoot: root, workflow }).tier, 'core');
+  }
+});
+
+test('a persona file that names a model tier or preference is refused and told where model taste goes', (t) => {
+  const { root, write } = makeProject(t);
+  write('fgos/agents/picky.yaml', definition('picky', 'prefer: [codex]\n'));
+  write('fgos/agents/ranked.yaml', definition('ranked', 'tier: flagship\n'));
+  write('fgos/agents/steady.yaml', definition('steady', 'rigor: standard\n'));
+  for (const [name, field] of [['picky', 'prefer'], ['ranked', 'tier']]) {
+    assert.throws(
+      () => resolveAgentDefinition(name, { projectRoot: root }),
+      new RegExp(`\\(fgos/agents/${name}\\.yaml\\) persona-model-taste-not-allowed: "${field}".*capabilities\\.<cap>\\.personas\\.<name>`),
+    );
+    assert.match(agentShapeProblem(name, fs.readFileSync(path.join(root, `fgos/agents/${name}.yaml`), 'utf8')), /^persona-model-taste-not-allowed/);
+  }
+  assert.equal(resolveAgentDefinition('steady', { projectRoot: root }).tier, 'workspace', 'rigor stays a plain persona field');
 });

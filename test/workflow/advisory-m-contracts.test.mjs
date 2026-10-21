@@ -69,8 +69,8 @@ function fixture(t, mode) {
   ]) capabilities[name] = { prefer: [{ executor: 'test-node' }], rigor: 'standard' };
   const cfg = withProviderFamilies({ runner: {
     defaultExecutor: 'test-node',
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
-    modelPolicies: { node: { standard: 'node-std', flagship: 'node-high' } },
+    defaults: { tier: 'standard' },
+    modelPolicies: { node: { standard: 'node-std', flagship: 'node-high', frontier: 'node-top' } },
     executors: { 'test-node': {
       kind: 'agent', allowCrossProvider: true, command: process.execPath,
       args: [worker, '{prompt}'], providerModel: 'node',
@@ -78,7 +78,7 @@ function fixture(t, mode) {
         confinement: { backend: 'bwrap' }, command: process.execPath, args: [worker, '{prompt}'] }],
     } },
     capabilities,
-    patterns: {
+    patterns: { seatBinding: { schema: 1 },
       defaultRule: { mutatingMinRigor: 'standard' },
       reviewed: { maxRounds: 2, checkersByRigor: {
         standard: ['reviewer'], high: ['reviewer'],
@@ -95,6 +95,25 @@ function assignment(root, unit, role = 'producer', round = 1) {
     unit.unitRunId, role, String(round), 'assignment.json'), 'utf8'));
 }
 
+// The registered reopen preserves done reviewer findings through explanation and owner close; it
+// starts from the settled architecture-advisory parent of the findings test below.
+async function assertReopenPreservesFindings(root, parent) {
+  assert.equal((await answerWorkflow(parent.workflowRunId, { repoRoot: root, cwd: root, stepId: 'close', answer: 'Keep the expertise limitation explicit.' })).status, 'completed');
+  const parentUnit = parent.steps.synthesis.units['synthesize-recommendation'].unitRunId;
+  const reopened = await startWorkflow({ repoRoot: root, cwd: root, workflow: loadWorkflow('architecture-advisory-reopen'),
+    contextRefs: [`unit-run:${parentUnit}/producer`] });
+  const synthesis = reopened.steps.synthesis.units['synthesize-recommendation'];
+  assert.equal(synthesis.outcome, 'findings');
+  assert.equal(reopened.steps.explanation.status, 'completed');
+  assert.equal(reopened.status, 'parked');
+  for (const record of synthesis.results.filter((r) => r.role === 'reviewer')) {
+    assert.equal(record.runResult.agentClaim.status, 'done');
+    assert.equal(record.runResult.classification.assessment.verdict, 'findings');
+    assert.equal(record.runResult.classification.failure, null);
+  }
+  assert.equal((await answerWorkflow(reopened.workflowRunId, { repoRoot: root, cwd: root, stepId: 'close', answer: 'Retain dissent and close the bounded revisit.' })).status, 'completed');
+}
+
 for (const flow of [
   { id: 'business-discussion', review: 'critique', unit: 'challenge-assumptions',
     downstream: 'synthesis', synthesis: 'synthesize-strategy', gate: 'approval' },
@@ -103,7 +122,7 @@ for (const flow of [
   { id: 'marketing/content-publish', review: 'draft', unit: 'draft-copy',
     downstream: 'approval', gate: 'approval' },
 ]) {
-  test(`${flow.id}: bounded findings reach synthesis/gate; transport failure blocks`, async (t) => {
+  test(`${flow.id}: bounded findings reach synthesis/gate; transport failure blocks${flow.id === 'architecture-advisory' ? '; the registered reopen keeps the findings through explanation and owner close' : ''}`, async (t) => {
     const workflow = loadWorkflow(flow.id);
     const root = fixture(t, 'findings');
     const state = await startWorkflow({ workflow, repoRoot: root, cwd: root, worktree: root,
@@ -135,8 +154,8 @@ for (const flow of [
     if (flow.id === 'architecture-advisory') {
       const shaping = state.steps.shaping.units['shape-proposals'];
       const lenses = [];
-      for (const role of ['panelist-1', 'panelist-2', 'panelist-3']) {
-        const seat = shaping.results.find((result) => result.role === role);
+      for (const id of ['system', 'alternative', 'constraint']) {
+        const seat = shaping.results.find((result) => result.seat === id);
         const report = seat.runResult.settleReports[0];
         const packet = JSON.parse(fs.readFileSync(path.resolve(root, report.path), 'utf8'));
         lenses.push(packet.lens);
@@ -157,6 +176,7 @@ for (const flow of [
           assert.deepEqual(packet['missing expertise'], ['security architecture', 'operations']);
         }
       }
+      await assertReopenPreservesFindings(root, state);
     }
 
     const failedRoot = fixture(t, 'transport-failure');
@@ -193,22 +213,3 @@ for (const [stepId, unitId] of [['planning', 'validate-plan'], ['executing', 'im
     }
   });
 }
-
-test('registered advisory reopen preserves done reviewer findings through explanation and owner close', async (t) => {
-  const root = fixture(t, 'findings');
-  const parent = await startWorkflow({ repoRoot: root, cwd: root, workflow: loadWorkflow('architecture-advisory') });
-  assert.equal((await answerWorkflow(parent.workflowRunId, { repoRoot: root, cwd: root, stepId: 'close', answer: 'Keep the expertise limitation explicit.' })).status, 'completed');
-  const parentUnit = parent.steps.synthesis.units['synthesize-recommendation'].unitRunId;
-  const reopened = await startWorkflow({ repoRoot: root, cwd: root, workflow: loadWorkflow('architecture-advisory-reopen'),
-    contextRefs: [`unit-run:${parentUnit}/producer`] });
-  const synthesis = reopened.steps.synthesis.units['synthesize-recommendation'];
-  assert.equal(synthesis.outcome, 'findings');
-  assert.equal(reopened.steps.explanation.status, 'completed');
-  assert.equal(reopened.status, 'parked');
-  for (const record of synthesis.results.filter((r) => r.role === 'reviewer')) {
-    assert.equal(record.runResult.agentClaim.status, 'done');
-    assert.equal(record.runResult.classification.assessment.verdict, 'findings');
-    assert.equal(record.runResult.classification.failure, null);
-  }
-  assert.equal((await answerWorkflow(reopened.workflowRunId, { repoRoot: root, cwd: root, stepId: 'close', answer: 'Retain dissent and close the bounded revisit.' })).status, 'completed');
-});

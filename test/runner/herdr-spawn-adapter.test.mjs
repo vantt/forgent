@@ -36,7 +36,7 @@ test('herdr-spawn adapter validates interactiveMode config shape', () => {
   const withInteractiveMode = (interactiveMode) => JSON.stringify({
     executor: { command: 'node', args: ['{prompt}'] },
     modelPolicies: { claude: { standard: 'sonnet' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 60000,
     executors: {
       agyHerdr: { kind: 'agent', command: 'agy', args: ['-i', '{prompt}'], adapter: 'herdr-spawn', interactiveMode },

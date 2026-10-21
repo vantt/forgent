@@ -35,12 +35,26 @@ const seenBy = (tmp, unitRunId) => {
   return JSON.parse(/case variables: (\{.*?\})\./.exec(fs.readFileSync(report, 'utf8'))[1]);
 };
 
+test('a worker starts with none of its controller\'s lock descriptions: the lock fd, lock job and main-lock holder pid are dropped', () => {
+  const env = workerBaseEnv({ PATH: '/usr/bin', FGOS_LOCK_FD: 'main-checkout:3', FGOS_LOCK_JOB: 'job-1', FGOS_MAIN_LOCK_HOLDER_PID: '4242' });
+  assert.equal(env.FGOS_LOCK_FD, undefined);
+  assert.equal(env.FGOS_LOCK_JOB, undefined);
+  assert.equal(env.FGOS_MAIN_LOCK_HOLDER_PID, undefined);
+  assert.equal(env.PATH, '/usr/bin');
+});
+
 test('a worker starts with neither case variable of its controller: both are dropped like the session ids', () => {
   const env = workerBaseEnv({ PATH: '/usr/bin', [CASE_ID_ENV]: 'wf-a', [CASE_RESERVATION_ENV]: 'rsv-a', FGOS_SESSION_ID: 's' });
   assert.equal(env[CASE_ID_ENV], undefined);
   assert.equal(env[CASE_RESERVATION_ENV], undefined);
   assert.equal(env.FGOS_SESSION_ID, undefined);
   assert.deepEqual(caseContextEnv({ caseId: 'wf-b', reservationId: 'rsv-b' }), { FGOS_CASE_ID: 'wf-b', FGOS_CASE_RESERVATION: 'rsv-b' });
+});
+
+test('a worker cannot name the host binary of its controller: FGOS_HOST_BIN is dropped and the rest kept', () => {
+  const env = workerBaseEnv({ PATH: '/usr/bin', FGOS_HOST_BIN: '/tmp/other-host/fgos' });
+  assert.equal(env.FGOS_HOST_BIN, undefined);
+  assert.equal(env.PATH, '/usr/bin');
 });
 
 test('a controller carrying case A launches a worker admitted into case B: the worker sees B only; a standalone launch sees none', async () => {

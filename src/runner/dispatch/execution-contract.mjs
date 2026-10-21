@@ -40,7 +40,7 @@ import { MODEL_POLICY_TIERS, RunnerConfigError } from './config.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot } from '../paths.mjs';
 export const REPEAT_MODE_VALUES = Object.freeze(['pre-delivery', 'post-delivery']);
 export const POLICY_PATCH_FIELDS = new Set([
-  'rigor', 'tier', 'fallbackExecutors', 'visibility', 'repeatMode',
+  'rigor', 'tier', 'visibility', 'repeatMode',
   'capability', 'distinctProviderFrom',
 ]);
 
@@ -196,7 +196,7 @@ const ACCEPTED_CONTRACT_FIELDS = new Set([
   // foundation calls strictly after this validator (ADR-007 §2).
   'supports',
   // `contract.policy` may carry EXACTLY one key (`tier`), never
-  // `preferExecutor`/`preferPersona`/`model`/`visibility`/`fallbackExecutors`.
+  // `preferExecutor`/`preferPersona`/`model`/`visibility`.
   // Unit I04 / Phase 3: FlowDefinition task.contractTemplate reference for
   // operation prompt template resolution at dispatch time. Format-check only
   // here (non-empty string when present).

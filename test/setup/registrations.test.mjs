@@ -192,10 +192,29 @@ test('ensureSharedConfigDefaults on a fresh dir writes every registered entry un
   // registrations.mjs's own `DEFAULT_CAPABILITY_SLOTS` composition), so
   // the assembled "runner" section is no longer byte-identical to
   // DEFAULT_RUNNER_CONFIG alone.
-  assert.deepEqual(config.runner, EXPECTED_RUNNER_DEFAULT);
+  // A project's own runner section starts in the seat-binding schema; the registered default is the rest.
+  const projectRunner = { ...EXPECTED_RUNNER_DEFAULT, patterns: { ...EXPECTED_RUNNER_DEFAULT.patterns, seatBinding: { schema: 1 } } };
+  assert.deepEqual(config.runner, projectRunner);
   assert.ok(addedKeys.some((k) => k.startsWith('runner.')) || addedKeys.includes('runner'));
   const written = JSON.parse(fs.readFileSync(path.join(dir, '.fgos', 'config.json'), 'utf8'));
-  assert.deepEqual(written.runner, EXPECTED_RUNNER_DEFAULT);
+  assert.deepEqual(written.runner, projectRunner);
+});
+
+test('ensureSharedConfigDefaults for the global layer writes the registered runner default with no seat-binding key', () => {
+  const dir = mkTempDir();
+  const { config } = ensureSharedConfigDefaults(dir, { layer: 'global' });
+  assert.deepEqual(config.runner, EXPECTED_RUNNER_DEFAULT);
+  assert.equal(config.runner.patterns.seatBinding, undefined, 'every older release on the machine reads the global file');
+  assert.equal('rigorToTier' in config.runner, false);
+});
+
+test('ensureSharedConfigDefaults leaves the marker out of a runner section that is already there: converting it is the conversion\'s job', () => {
+  const dir = mkTempDir();
+  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({ runner: { timeoutMs: 1000 } }));
+  const { config } = ensureSharedConfigDefaults(dir);
+  assert.equal(config.runner.patterns.seatBinding, undefined);
+  assert.equal('rigorToTier' in config.runner, false);
 });
 
 test('ensureSharedConfigDefaults on an already-complete shared file does not rewrite it', () => {
@@ -239,7 +258,7 @@ test('ensureSharedConfigDefaults adds missing Workflow capabilities without touc
 
 seedFileLocalBwrapRegistry();
 
-test('setup adds a coding:plan slot beside a project bare-verb plan pool and bind still serves it from that pool', async () => {
+test('setup adds a coding:plan slot beside a project bare-verb plan pool, and bind no longer serves it from that pool', async () => {
   const { bind } = await import('../../src/runner/execution/bind.mjs');
   const dir = mkTempDir();
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
@@ -254,9 +273,9 @@ test('setup adds a coding:plan slot beside a project bare-verb plan pool and bin
     modelPolicies: { ...config.runner.modelPolicies, mine: { nano: 'm', standard: 'm', advanced: 'm', flagship: 'm', frontier: 'm' } },
     executors: { mine: { kind: 'agent', command: 'mine', invocations: [{ id: 'mine-cli', via: 'cli', confinement: { backend: 'bwrap' } }] } },
   };
+  // The bare verb of a capability is not a lookup key: the slot has no pool of its own, so it is refused.
   const bound = bind({ unit: { id: 'u', capability: 'coding:plan', writes: [] }, role: 'producer' }, { runnerConfig, session: { headless: true } });
-  assert.equal(bound.executor, 'mine');
-  assert.equal(bound.provenance.executor.source, 'capability:plan');
+  assert.equal(bound.refused.reason, 'headless-no-executor');
 });
 
 // ─── spec/registry agreement. Data Dictionary #7 and #7b used to say the
@@ -929,7 +948,7 @@ test('findWorkflowStageOperationProblems fails on invalid dispatch mode or human
   assert.ok(problems.some((p) => p.includes('dispatch: human-only operation must not declare executor policy')));
 });
 
-test('findWorkflowStageOperationProblems fails on invalid preferExecutor, fallbackExecutors shape/names, or visibility', () => {
+test('findWorkflowStageOperationProblems fails on invalid preferExecutor or visibility, and refuses the removed fallbackExecutors key', () => {
   const customDomains = {
     coding: {
       workflows: {
@@ -943,7 +962,6 @@ test('findWorkflowStageOperationProblems fails on invalid preferExecutor, fallba
                 skills: ['fgos-coding-planning'],
                 policy: {
                   preferExecutor: 'does-not-exist',
-                  fallbackExecutors: 'pi', // string instead of array
                   visibility: 'opaque',
                 },
               },
@@ -953,7 +971,7 @@ test('findWorkflowStageOperationProblems fails on invalid preferExecutor, fallba
                 role: 'implementer',
                 skills: ['fgos-coding-planning'],
                 policy: {
-                  fallbackExecutors: ['unrecognized-fake-executor'],
+                  fallbackExecutors: ['pi'],
                 },
               },
             ],
@@ -964,9 +982,8 @@ test('findWorkflowStageOperationProblems fails on invalid preferExecutor, fallba
   };
   const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
   assert.ok(problems.some((p) => p.includes('policy.preferExecutor "does-not-exist" is not a recognized executor')));
-  assert.ok(problems.some((p) => p.includes('policy.fallbackExecutors must be an array of strings')));
   assert.ok(problems.some((p) => p.includes('policy.visibility "opaque" must be "headless" or "visible"')));
-  assert.ok(problems.some((p) => p.includes('policy.fallbackExecutors contains unrecognized executor "unrecognized-fake-executor"')));
+  assert.ok(problems.some((p) => p.includes('policy contains disallowed key(s) [fallbackExecutors]')));
 });
 
 test('findWorkflowStageOperationProblems fails on duplicate operation id or empty id', () => {

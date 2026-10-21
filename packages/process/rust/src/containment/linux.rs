@@ -10,16 +10,17 @@ use std::process::{Child, Command, Stdio};
 use std::sync::{Mutex, OnceLock};
 use std::time::{Duration, Instant};
 
+use super::pgroup::{self, apply_stdio, wait_until, ListFn, Members, Unlistable, POLL};
 use super::{ContainmentDomain, ContainmentDriver, ContainmentError, Guarantee, GuaranteeLevel, SelectEnv, SpawnSpec, Spawned, StartMode};
 use crate::control::{self, Signal};
 use crate::facts::{self, ProcTuple, Verdict};
+use crate::platform::linux::read_stat;
 use crate::{signal_settled, Domain, DomainState, FdSlot, KillOutcome, ProcId};
 
 /// Where bwrap is looked for when nothing names it.
 const BWRAP_LOCATIONS: [&str; 3] = ["/usr/bin/bwrap", "/bin/bwrap", "/usr/local/bin/bwrap"];
 /// The longest wait for bwrap to report the gate's pid.
 const INFO_TIMEOUT: Duration = Duration::from_secs(10);
-const POLL: Duration = Duration::from_millis(10);
 
 /// The driver for this machine: `bwrap-pidns` when bwrap can make a pid
 /// namespace, else `linux-pgroup`.
@@ -208,12 +209,14 @@ impl ContainmentDriver for BwrapPidns {
 /// the namespace's init (every child of the monitor) takes the namespace down.
 fn end_failed_spawn(monitor: &mut Child) {
     for _ in 0..50 {
-        let children = members(monitor.id(), true, None);
-        if children.is_empty() {
+        let Ok(children) = members(monitor.id(), true, None) else {
+            break;
+        };
+        if children.tuples.is_empty() {
             break;
         }
-        for row in children.iter().filter_map(tuple_of_row) {
-            let _ = control::signal_by_identity(&row, Signal::Kill);
+        for tuple in &children.tuples {
+            let _ = control::signal_by_identity(tuple, Signal::Kill);
         }
         std::thread::sleep(POLL);
     }
@@ -222,7 +225,7 @@ fn end_failed_spawn(monitor: &mut Child) {
 }
 
 /// `linux-pgroup`: the gate leads its own session and process group, and the
-/// supervisor is the subreaper. Best-effort: a descendant that calls `setsid`
+/// supervisor is the subreaper (the gate sets it for itself). Best-effort: a descendant that calls `setsid`
 /// and double-forks leaves both the group and the scanned tree.
 pub struct LinuxPgroup;
 
@@ -240,7 +243,6 @@ impl ContainmentDriver for LinuxPgroup {
         let Some((program, args)) = spec.argv.split_first() else {
             return Err(ContainmentError::SpawnFailed("empty gate command".into()));
         };
-        become_subreaper()?;
         let mut cmd = Command::new(program);
         cmd.args(args);
         apply_stdio(&mut cmd, &spec);
@@ -270,7 +272,7 @@ impl ContainmentDriver for LinuxPgroup {
             return DomainState::Unknown;
         };
         if facts::judge_here(&leader.to_record()) == Verdict::Alive {
-            remember_tree(&leader, &mut domain.seen);
+            pgroup::remember_tree(members, &leader, &mut domain.seen);
         }
         pgroup_state(&leader, &domain.seen)
     }
@@ -281,8 +283,10 @@ impl ContainmentDriver for LinuxPgroup {
         };
         if grace_ms > 0 {
             // Snapshot first: a gate that ends on SIGTERM takes the tree links with it.
-            remember_tree(&leader, &mut domain.seen);
-            let _ = signal_group(&leader, libc::SIGTERM);
+            // Without the snapshot the tree links would be lost before they were recorded.
+            if pgroup::remember_tree(members, &leader, &mut domain.seen) {
+                let _ = pgroup::signal_group(&leader, libc::SIGTERM);
+            }
             wait_until(Duration::from_millis(grace_ms), || pgroup_state(&leader, &domain.seen) == DomainState::Empty);
         }
         let wait = domain.empty_wait();
@@ -302,81 +306,55 @@ impl ContainmentDriver for LinuxPgroup {
     }
 }
 
-/// One row of `/proc/<pid>/stat`.
-struct StatRow {
-    pid: u32,
-    state: char,
-    ppid: u32,
-    pgrp: u32,
-    start_time: String,
-}
-
-fn read_stat(pid: u32) -> Option<StatRow> {
-    let line = fs::read_to_string(format!("/proc/{pid}/stat")).ok()?;
-    let rest = &line[line.rfind(')')? + 1..];
-    let fields: Vec<&str> = rest.split_whitespace().collect();
-    Some(StatRow {
-        pid,
-        state: fields.first()?.chars().next()?,
-        ppid: fields.get(1)?.parse().ok()?,
-        pgrp: fields.get(2)?.parse().ok()?,
-        start_time: (*fields.get(19)?).to_string(),
-    })
-}
-
-/// Every process in the table that is not a zombie.
-fn live_rows() -> Vec<StatRow> {
-    let Ok(entries) = fs::read_dir("/proc") else {
-        return Vec::new();
-    };
-    entries
-        .filter_map(|entry| entry.ok())
-        .filter_map(|entry| entry.file_name().to_str().and_then(|name| name.parse::<u32>().ok()))
-        .filter_map(read_stat)
-        .filter(|row| row.state != 'Z' && row.state != 'X')
-        .collect()
+fn tuple_from(pid: u32, stat: &facts::Stat) -> ProcTuple {
+    let observer = facts::observer();
+    ProcTuple { host: observer.host, boot_id: observer.boot_id, pid_ns: observer.pid_ns, pid: ProcId(pid), start_time: stat.start_ticks.to_string() }
 }
 
 /// The identity of `pid`, a zombie included: a gate that already ended still
 /// has the start time its record needs.
 fn tuple_of(pid: ProcId) -> Option<ProcTuple> {
-    let row = read_stat(pid.0)?;
-    let observer = facts::observer();
-    Some(ProcTuple { host: observer.host, boot_id: observer.boot_id, pid_ns: observer.pid_ns, pid, start_time: row.start_time })
-}
-
-fn tuple_of_row(row: &StatRow) -> Option<ProcTuple> {
-    tuple_of(ProcId(row.pid)).filter(|tuple| tuple.start_time == row.start_time)
+    read_stat(pid.0).ok().map(|stat| tuple_from(pid.0, &stat))
 }
 
 /// Every live descendant of `root` by parent links, and every live process in
 /// the group `pgid` (when `pgid` is given). The tree is walked only while
 /// `root` is still the recorded leader: a dead leader's pid may name anyone.
-fn members(root: u32, walk_tree: bool, pgid: Option<u32>) -> Vec<StatRow> {
-    let rows = live_rows();
+/// A process that vanishes mid-listing is gone; one whose `stat` cannot be
+/// read is counted, never dropped.
+fn members(root: u32, walk_tree: bool, pgid: Option<u32>) -> Result<Members, Unlistable> {
+    let mut unreadable = 0;
+    let mut rows = Vec::new();
+    for entry in fs::read_dir("/proc").map_err(|_| Unlistable)? {
+        let Ok(entry) = entry else {
+            unreadable += 1;
+            continue;
+        };
+        let Some(pid) = entry.file_name().to_str().and_then(|name| name.parse::<u32>().ok()) else {
+            continue;
+        };
+        match read_stat(pid) {
+            Ok(stat) if !stat.is_gone() => rows.push((pid, stat)),
+            Ok(_) => {}
+            Err(err) if err.kind() == io::ErrorKind::NotFound => {}
+            Err(_) => unreadable += 1,
+        }
+    }
     let mut tree: BTreeSet<u32> = BTreeSet::new();
     let mut frontier = if walk_tree { vec![root] } else { Vec::new() };
     while let Some(parent) = frontier.pop() {
-        for row in rows.iter().filter(|row| row.ppid == parent) {
-            if tree.insert(row.pid) {
-                frontier.push(row.pid);
+        for (pid, _) in rows.iter().filter(|(_, stat)| stat.parent == parent) {
+            if tree.insert(*pid) {
+                frontier.push(*pid);
             }
         }
     }
-    rows.into_iter()
-        .filter(|row| row.pid != root && (tree.contains(&row.pid) || pgid.is_some_and(|pg| row.pgrp == pg)))
-        .collect()
-}
-
-/// Add the live descendants of the leader to what the domain has seen.
-fn remember_tree(leader: &ProcTuple, seen: &mut Vec<ProcTuple>) {
-    for row in members(leader.pid.0, true, None) {
-        if let Some(tuple) = tuple_of_row(&row) {
-            if !seen.contains(&tuple) {
-                seen.push(tuple);
-            }
-        }
-    }
+    let tuples = rows
+        .iter()
+        .filter(|(pid, stat)| *pid != root && (tree.contains(pid) || pgid.is_some_and(|pg| stat.group == pg)))
+        .map(|(pid, stat)| tuple_from(*pid, stat))
+        .collect();
+    Ok(Members { tuples, unreadable })
 }
 
 /// Pids of live processes of this user whose environment carries
@@ -396,108 +374,21 @@ pub fn environment_marked(name: &str, value: &str) -> Vec<u32> {
         .filter_map(|entry| entry.ok())
         .filter_map(|entry| entry.file_name().to_str().and_then(|n| n.parse::<u32>().ok()))
         .filter(|pid| *pid != me)
-        .filter(|pid| read_stat(*pid).is_some_and(|row| row.state != 'Z' && row.state != 'X'))
+        .filter(|pid| read_stat(*pid).is_ok_and(|stat| !stat.is_gone()))
         .filter(|pid| {
             fs::read(format!("/proc/{pid}/environ")).is_ok_and(|bytes| bytes.split(|b| *b == 0).any(|entry| entry == wanted.as_bytes()))
         })
         .collect()
 }
 
-/// The state of a `linux-pgroup` domain: the leader is dead, nobody is left in
-/// its group, and no process seen in its tree is still alive.
+/// The state of a `linux-pgroup` domain; see [`pgroup::state`].
 pub(crate) fn pgroup_state(leader: &ProcTuple, seen: &[ProcTuple]) -> DomainState {
-    match facts::judge_here(&leader.to_record()) {
-        Verdict::Alive => return DomainState::NotEmpty,
-        Verdict::Unknown => return DomainState::Unknown,
-        Verdict::Dead => {}
-    }
-    if !members(leader.pid.0, false, Some(leader.pid.0)).is_empty() {
-        return DomainState::NotEmpty;
-    }
-    if seen.iter().any(|tuple| tuple != leader && facts::judge_here(&tuple.to_record()) == Verdict::Alive) {
-        return DomainState::NotEmpty;
-    }
-    DomainState::Empty
+    pgroup::state(members as ListFn, leader, seen)
 }
 
-/// `killpg` while the leader is provably the group's leader, then kill by
-/// identity everything seen in the tree or the group, until a pass finds none.
+/// Ends a `linux-pgroup` domain; see [`pgroup::kill`].
 pub(crate) fn pgroup_kill(leader: &ProcTuple, seen: &mut Vec<ProcTuple>, empty_wait: Duration) -> KillOutcome {
-    let mut refused = false;
-    for _ in 0..10 {
-        let leader_alive = facts::judge_here(&leader.to_record()) == Verdict::Alive;
-        if leader_alive {
-            remember_tree(leader, seen);
-            let _ = signal_group(leader, libc::SIGKILL);
-        }
-        let mut targets: Vec<ProcTuple> = members(leader.pid.0, leader_alive, Some(leader.pid.0)).iter().filter_map(tuple_of_row).collect();
-        targets.extend(seen.iter().filter(|tuple| *tuple != leader).cloned());
-        if leader_alive {
-            targets.push(leader.clone());
-        }
-        let mut live = false;
-        for tuple in targets {
-            if facts::judge_here(&tuple.to_record()) != Verdict::Alive {
-                continue;
-            }
-            live = true;
-            if !seen.contains(&tuple) && tuple != *leader {
-                seen.push(tuple.clone());
-            }
-            if !signal_settled(&control::signal_by_identity(&tuple, Signal::Kill)) {
-                refused = true;
-            }
-        }
-        if !live && pgroup_state(leader, seen) == DomainState::Empty {
-            return KillOutcome::Ok;
-        }
-        std::thread::sleep(POLL);
-    }
-    wait_until(empty_wait, || pgroup_state(leader, seen) == DomainState::Empty);
-    if !refused && pgroup_state(leader, seen) == DomainState::Empty {
-        KillOutcome::Ok
-    } else {
-        KillOutcome::Refused
-    }
-}
-
-/// `kill(-pgid, sig)`, only while the leader is the process that was recorded.
-fn signal_group(leader: &ProcTuple, sig: libc::c_int) -> bool {
-    if facts::judge_here(&leader.to_record()) != Verdict::Alive {
-        return false;
-    }
-    let Ok(pgid) = libc::pid_t::try_from(leader.pid.0) else {
-        return false;
-    };
-    // SAFETY: killpg with the pgid of a leader just judged alive.
-    unsafe { libc::killpg(pgid, sig) == 0 }
-}
-
-fn become_subreaper() -> Result<(), ContainmentError> {
-    // SAFETY: prctl with PR_SET_CHILD_SUBREAPER takes one integer argument.
-    if unsafe { libc::prctl(libc::PR_SET_CHILD_SUBREAPER, 1 as libc::c_ulong, 0, 0, 0) } != 0 {
-        return Err(ContainmentError::Io(io::Error::last_os_error()));
-    }
-    Ok(())
-}
-
-fn wait_until(limit: Duration, mut done: impl FnMut() -> bool) -> bool {
-    let start = Instant::now();
-    loop {
-        if done() {
-            return true;
-        }
-        if start.elapsed() >= limit {
-            return false;
-        }
-        std::thread::sleep(POLL);
-    }
-}
-
-fn apply_stdio(cmd: &mut Command, spec: &SpawnSpec) {
-    let pick = |file: &Option<File>| file.as_ref().and_then(|f| f.try_clone().ok()).map_or_else(Stdio::null, Stdio::from);
-    cmd.env_clear().envs(&spec.env).current_dir(&spec.cwd);
-    cmd.stdin(pick(&spec.stdin)).stdout(pick(&spec.stdout)).stderr(pick(&spec.stderr));
+    pgroup::kill(members as ListFn, leader, seen, empty_wait)
 }
 
 fn cloexec_pipe() -> io::Result<(File, File)> {
@@ -582,6 +473,19 @@ mod tests {
         assert!(environment_marked("FGOS_TEST_MARK", &value).is_empty());
         bystander.kill().unwrap();
         bystander.wait().unwrap();
+    }
+
+    /// A dead leader and a member of the tree that this observer cannot judge (another host's record) is
+    /// not an empty domain: nothing proves that member is gone.
+    #[test]
+    fn pgroup_state_reports_unknown_when_a_seen_member_cannot_be_judged() {
+        let mut child = Command::new("/bin/true").spawn().unwrap();
+        assert!(wait_until(Duration::from_secs(5), || matches!(facts::observe(ProcId(child.id())), facts::Observed::Zombie)));
+        let leader = tuple_of(ProcId(child.id())).expect("zombie identity");
+        child.wait().unwrap();
+        let foreign = ProcTuple { host: "other-host".into(), ..leader.clone() };
+        assert_eq!(facts::judge_here(&foreign.to_record()), Verdict::Unknown, "the fixture member must be one this observer cannot judge");
+        assert_eq!(pgroup_state(&leader, &[foreign]), DomainState::Unknown);
     }
 
     #[test]

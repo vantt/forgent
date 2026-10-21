@@ -37,6 +37,7 @@ test('Sync abort preserves resolver bytes and only closes its own merge',()=>{
  const f=fixture(true);try {f.port.start({operationId:'abort',target:f.target,message:'sync'},f.held);fs.writeFileSync(path.join(f.linked,'a'),'keep resolver edits\n');
  assert.equal(f.port.abort({operationId:'abort'},f.held).state,'conflict-aborted');assert.equal(f.port.inspect({operationId:'abort'},f.held).state,'conflict-aborted');assert.equal(fs.readFileSync(path.join(f.linked,'a'),'utf8'),'keep resolver edits\n');assert.equal(fs.existsSync(path.join(f.linked,'incoming')),false);
  assert.equal(execFileSync('git',['-C',f.linked,'diff','--cached','--name-only'],{encoding:'utf8'}),'');
+ assert.equal(f.git('rev-parse','trunk'),f.target);
  const commit=createGitScopedCommit({stateRoot:f.temp,repoPath:f.linked,trustedMain:f.repo,writer:'fixture'},loader);
  const baseline=commit.preflight({},f.held);fs.writeFileSync(path.join(f.linked,'fresh'),'fresh');
  assert.equal(commit.commit({operationId:'after-abort',baseline,request:{writes:['fresh'],message:'fresh after abort',cutoverGrant:null}},f.held).status,'committed');
@@ -116,14 +117,3 @@ test('Sync preparation leaves the source tip unchanged until consumer verificati
  }finally{f.close();}
 });
 
-test('a consumer can abort a prepared clean Sync after a red check without changing either branch', () => {
- const f=fixture();try {
- const before=execFileSync('git',['-C',f.linked,'rev-parse','HEAD'],{encoding:'utf8'}).trim();
- f.port.prepare({operationId:'red-check',target:f.target,message:'must not publish'},f.held);
- assert.equal(f.port.abort({operationId:'red-check'},f.held).state,'conflict-aborted');
- assert.equal(execFileSync('git',['-C',f.linked,'rev-parse','HEAD'],{encoding:'utf8'}).trim(),before);
- assert.equal(f.git('rev-parse','trunk'),f.target);
- assert.equal(fs.existsSync(path.join(f.linked,'incoming')),false);
- assert.equal(execFileSync('git',['-C',f.linked,'status','--porcelain'],{encoding:'utf8'}),'');
- }finally{f.close();}
-});

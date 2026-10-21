@@ -315,7 +315,7 @@ if (prompt.includes('# Context-discovery')) {
       runner: {
         executor: { command: process.execPath, args: [executorPath, '{prompt}', '--model', '{model}'] },
         modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
-        rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+        defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
         timeoutMs: 15000,
         parallel: { maxRoots: 4, maxLeavesPerRoot: 4 },
       },

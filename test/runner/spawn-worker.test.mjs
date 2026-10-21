@@ -81,7 +81,7 @@ function baseConfig(executorArgs, extra = {}) {
     // bind picks the model from the executor's declared provider.
     executor: { command: process.execPath, args: executorArgs, providerModel: 'node' },
     modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' }, node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 20000,
     ...extra,
   };
@@ -95,7 +95,8 @@ const echoed = (stdout) => JSON.parse(stdout.slice(stdout.indexOf('{')));
 
 test('spawnWorker runs the item worker as a Unit run in its worktree: tier -> model, the objective is the worker prompt, and the run is named', async () => {
   const echo = writeScript(scriptDir(), 'echo', ECHO);
-  const fx = fixture(baseConfig([echo, '{prompt}', '--model', '{model}']));
+  // The config declares the tier; the item's rigor (critical) is a demand on checkers and never moves it.
+  const fx = fixture(baseConfig([echo, '{prompt}', '--model', '{model}'], { defaults: { tier: 'frontier' } }));
   const work = sampleWork({ rigor: 'critical' });
 
   const result = await fx.run(work);
@@ -127,12 +128,14 @@ test('spawnWorker reports the template its prompt was rendered from, for the exe
   assert.ok(record.unit.objective.includes('.claude/skills/fgos-coding-discovering/SKILL.md'));
 });
 
-test('spawnWorker defaults to the standard tier when the work item declares no rigor', async () => {
+test('spawnWorker binds the default tier whatever rigor the work item declares: rigor never moves the tier', async () => {
   const echo = writeScript(scriptDir(), 'echo', ECHO);
   const fx = fixture(baseConfig([echo, '{prompt}']));
-  const result = await fx.run();
-  assert.equal(result.tier, 'standard');
-  assert.equal(result.model, 'sonnet');
+  for (const work of [sampleWork(), sampleWork({ rigor: 'critical' }), sampleWork({ risk: 'heavy' })]) {
+    const result = await fx.run(work);
+    assert.equal(result.tier, 'standard');
+    assert.equal(result.model, 'sonnet');
+  }
 });
 
 test('spawnWorker prints one "fgos: dispatch ..." line naming the unit run, executor, transport, model, tier and outcome', async () => {
@@ -388,7 +391,7 @@ test('spawnWorker passes an executor\'s own resolved env to the worker, never in
   }
 });
 
-test('spawnWorker applies the capability rigor as a raise-only tier floor', async () => {
+test('spawnWorker binds the tier its capability declares; the capability rigor only says how careful the unit is', async () => {
   // The project config under test merges with the global one at HOME; a real
   // ~/.fgos/config.json on the machine must not leak executors into it.
   const originalHome = process.env.HOME;
@@ -403,8 +406,8 @@ test('spawnWorker applies the capability rigor as a raise-only tier floor', asyn
           invocations: [{ id: 'cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: process.execPath, args }],
         },
       },
-      capabilities: { 'code:implement': { prefer: [{ executor: 'agy' }], rigor: 'high' } },
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+      capabilities: { 'code:implement': { prefer: [{ executor: 'agy' }], rigor: 'high', tier: 'flagship' } },
+      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
       modelPolicies: { claude: { standard: 'sonnet' }, gemini: { standard: 'gemini-flash', flagship: 'gemini-pro' } },
       timeoutMs: 20000,
     });

@@ -14,6 +14,11 @@ Template layer: follow the loop in [plan.md](plan.md#the-per-layer-loop).
 
 Specs: [git](../../docs/platform/git/spec.md) (§12 one-door gate, §15 E6 test inventory), [terminal-control](../../docs/platform/terminal-control/spec.md); [component-boundary](../../docs/platform/component-boundary.md); backlog `p-d2dc4f2e`, `p-f97bb935` (brief typed into a shell pane; being fixed by lead `brief-shell-guard` — take its result as input, do not redo); [TEST plan](../261020-1757-test-governance-port-inventory-and-slow-file-extraction/plan.md) phase 2 rows git (92 Node tests in 22 files vs 202 Rust) and terminal-control (19 in 3 vs 88).
 
+
+## Received from other lanes (record here, never lose)
+
+- **R2: contained git cost (TEST runner lead, 2026-10-21 23:10).** Every Rust git-port command runs under `bwrap --unshare-pid --as-pid-1 --dev-bind / /`; 10 `addWorktreeSync` calls = 218 bwrap + 249 git execs, ≈ 0.5 s per worktree add against ≈ 20 ms for a plain `git worktree add`. Users pay it on every worktree add; it is the main cost of the runner test area. Same root as ledger H6 (now an input row of the OPC design, `plans/reports/design-261020-1035-operation-scoped-containment.md`). The T2 Git council owns it together with the GIT lane's OPC design: decide which git calls need a pid namespace, and whether one containment domain per typed operation replaces one bwrap per git child. Evidence: `plans/reports/phase-lead-261021-2137-test-governance-p3-runner.md` §4.
+
 ## Components, crates, Node
 
 | Component | Rust | Node around it |

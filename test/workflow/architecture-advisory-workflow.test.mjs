@@ -24,7 +24,7 @@ function setupTestRepo() {
     readme: '# Architecture Advisory Workflow Test',
     gitName: 'Workflow Test',
     capabilities: ['architecture:frame', 'architecture:shape', 'architecture:critique', 'architecture:synthesize', 'architecture:explain'],
-    modelPolicies: { node: { standard: 'node-std', flagship: 'node-high' } },
+    modelPolicies: { node: { standard: 'node-std', flagship: 'node-high', frontier: 'node-top' } },
     reviewed: { maxRounds: 1, checkersByRigor: { standard: ['reviewer'], high: ['reviewer', 'red-team'] } },
     workerBody: `
       fs.writeFileSync(path.join(runDir, 'agent-report.md'), JSON.stringify({

@@ -1,4 +1,5 @@
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
+import { resolveHolderLiveness } from '../runner/dispatch/process-identity.mjs';
 import { checkGit, checkMutationOneDoor, gitFloor, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories, fixLandRecovery, checkLandRetainedCandidates } from './git-checks.mjs';
 import { checkWorkflowCaseBindingSentinel, checkWorkflowCaseBindings, fixWorkflowCaseBindings } from './workflow-case-checks.mjs';
 // registrations.mjs — the doctor-check / config-default registry (CONTEXT.md
@@ -58,11 +59,10 @@ import {
 import { checkExecutorProfileWarnings } from './executor-profile-warnings.mjs';
 import { checkAgentCliProjectTrusted } from './agent-cli-trust.mjs';
 import {
-  checkWorkflowPoolsSatisfyIndependence,
   readWorkflowDefinitionFiles,
   withUnreadableDefinitions,
   workflowRoots,
-} from './workflow-pool-independence.mjs';
+} from './workflow-definition-files.mjs';
 import {
   checkExecutorFamilyUnique,
   checkExecutorSkillsInstalled,
@@ -71,7 +71,6 @@ import {
   checkLlmAccountsShape,
   checkLlmAccountsVsLegacy,
   checkGlobalModelPoliciesPortable,
-  checkCapabilityRigorCeiling,
 } from './model-pool-checks.mjs';
 import { checkBlindStepsUseProvenPools } from './blind-steps-proven-pools.mjs';
 import { checkExecutorPostureCoverage } from './executor-posture-coverage.mjs';
@@ -89,12 +88,11 @@ import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/
 import { readOwnershipMarker, cleanupConfinementResource, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
-import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, DEFAULT_RIGOR_TO_TIER, validateCapabilityServesShape, validateGeneratedPathsShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, SEAT_BINDING_SCHEMA_VERSION, validateCapabilityServesShape, validateGeneratedPathsShape, RunnerConfigError, VALID_CHECKER_SEATS } from '../runner/dispatch/config.mjs';
 import { RIGOR_VALUES } from '../runner/rigor.mjs';
 import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
-import { bind, hasUsablePrefer } from '../runner/execution/bind.mjs';
-import { walkStateOf } from '../runner/execution/account-rotation.mjs';
+import { capabilityEntriesOf, hasUsablePrefer } from '../runner/execution/seat-resolver.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
 import { listWork, StoreError } from '../state/store.mjs';
@@ -141,6 +139,8 @@ import { discoverOperationPromptTemplates, TemplateResolutionError } from '../ru
 import { resolveHostBin, invokeHost } from '../util/host-bin.mjs';
 import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
 import { probeIdentity } from '../util/session-identity.mjs';
+import { createSeatBindingClient, resolveSeatBindingHost } from '../seat-binding/client.mjs';
+import { checkSeatBindingConfig, checkSeatBindingDrain, checkSeatBindingDryBind } from './seat-binding-checks.mjs';
 import { listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from '../runner/dispatch/assignment-layout.mjs';
 import { conventionCheck } from '../convention/convention-client.mjs';
 import { checkRunSupervisorRoute, checkProcessContainment, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkGateKillGrace, checkLegacyAttemptsStuck, fixLegacyAttemptsStuck, checkUnitsAwaitingResume, checkCancelWait } from './run-supervisor-checks.mjs';
@@ -269,11 +269,18 @@ function assembleRegistryDefaults() {
  * missing, at any depth, and writes back only when a key was actually
  * added or the shared file did not exist yet. This is the write path
  * `fgos setup` calls (RUL9: doctor checks stay read-only; `setup` is the
- * one write verb).
+ * one write verb). `layer` is `project` (the default) or `global`.
  */
-export function ensureSharedConfigDefaults(dir) {
+export function ensureSharedConfigDefaults(dir, { layer = 'project' } = {}) {
   const existing = readSharedConfig(dir);
-  const defaults = assembleRegistryDefaults();
+  const registered = assembleRegistryDefaults();
+  // A project's own runner section starts in the seat-binding schema, so its loader accepts what setup
+  // wrote. A runner section that is already there is the setup conversion's, never marked here, and the
+  // global file takes no seat-binding key (every older release on the machine reads it).
+  const freshProjectRunner = layer === 'project' && registered.runner && Object.keys(existing.runner ?? {}).length === 0;
+  const defaults = freshProjectRunner
+    ? { ...registered, runner: { ...registered.runner, patterns: { ...registered.runner.patterns, seatBinding: { schema: SEAT_BINDING_SCHEMA_VERSION } } } }
+    : registered;
   const { merged, addedKeys } = mergeConfigDefaults(existing, defaults);
   const sharedExisted = fs.existsSync(sharedConfigFilePath(dir));
   if (sharedExisted && addedKeys.length === 0) {
@@ -500,38 +507,6 @@ function checkConfigNotStale(cwd) {
   return { passed: true, message: `config up to date at ${sharedPath}` };
 }
 
-function checkRunnerRigorConfig(cwd) {
-  const levels = [
-    ['project', readSharedConfig(cwd)?.runner],
-    ['global', loadGlobalConfig()?.runner],
-  ];
-  const problems = [];
-  for (const [level, runner] of levels) {
-    if (!runner) continue;
-    const map = runner.rigorToTier;
-    if (!map || typeof map !== 'object' || Array.isArray(map)) {
-      problems.push(`${level} runner.rigorToTier missing -- run fgos setup`);
-    } else {
-      for (const rigor of RIGOR_VALUES) {
-        if (!MODEL_POLICY_TIERS.includes(map[rigor])) {
-          problems.push(`${level} runner.rigorToTier.${rigor} must be one of ${MODEL_POLICY_TIERS.join('/')}`);
-        }
-      }
-      for (const rigor of Object.keys(map)) {
-        if (!RIGOR_VALUES.includes(rigor)) problems.push(`${level} runner.rigorToTier has unknown rigor "${rigor}"`);
-      }
-    }
-    for (const [capability, entry] of Object.entries(runner.capabilities ?? {})) {
-      if (entry?.overrides !== undefined) {
-        problems.push(`${level} runner.capabilities.${capability}.overrides was removed; use .rigor`);
-      }
-    }
-  }
-  return problems.length > 0
-    ? { passed: false, message: problems.join('; ') }
-    : { passed: true, message: 'runner rigor maps and capability floors are valid at every configured level' };
-}
-
 export function checkRunnerGeneratedPathsConfig(cwd) {
   const projectRunner = readSharedConfig(cwd)?.runner;
   const globalRunner = loadGlobalConfig()?.runner;
@@ -591,13 +566,12 @@ export function checkRunnerPatternsConfig(cwd) {
           if (!cbr || typeof cbr !== 'object' || Array.isArray(cbr)) {
             problems.push(`${level} runner.patterns.reviewed.checkersByRigor must be an object`);
           } else {
-            const VALID_CHECKERS = new Set(['reviewer', 'red-team', 'tester']);
             for (const [rigor, checkers] of Object.entries(cbr)) {
               if (!RIGOR_VALUES.includes(rigor)) {
                 problems.push(`${level} runner.patterns.reviewed.checkersByRigor has unknown rigor "${rigor}"`);
               }
-              if (!Array.isArray(checkers) || !checkers.every((c) => VALID_CHECKERS.has(c))) {
-                problems.push(`${level} runner.patterns.reviewed.checkersByRigor.${rigor} must be an array of strings in [${Array.from(VALID_CHECKERS).join(', ')}]`);
+              if (!Array.isArray(checkers) || !checkers.every((c) => VALID_CHECKER_SEATS.has(c))) {
+                problems.push(`${level} runner.patterns.reviewed.checkersByRigor.${rigor} must be an array of strings in [${Array.from(VALID_CHECKER_SEATS).join(', ')}]`);
               }
             }
             const orderedRigors = ['low', 'standard', 'high', 'critical'].filter((r) => r in cbr);
@@ -625,72 +599,6 @@ export function checkRunnerPatternsConfig(cwd) {
     return { passed: true, message: `warning: ${warnings.join('; ')}` };
   }
   return { passed: true, message: 'runner patterns configuration is valid at every configured level' };
-}
-
-export function checkMutatingAssignmentBindingSnapshot(cwd) {
-  const root = cwd ?? process.cwd();
-  const assignmentsDir = path.join(root, '.fgos', 'assignments');
-  if (!fs.existsSync(assignmentsDir)) {
-    return { passed: true, message: 'no assignments directory present' };
-  }
-
-  const problems = [];
-  const units = new Map();
-  try {
-    for (const run of listAssignmentRuns(path.join(root, '.fgos'))) {
-      const [unitId, role, round] = run.assignmentId.split('/');
-      if (!role || !round) continue;
-      if (!units.has(unitId)) {
-        const unitJsonPath = path.join(assignmentsDir, unitId, 'unit.json');
-        let unitRecord = null;
-        try {
-          if (fs.lstatSync(unitJsonPath).isFile()) {
-            try {
-              unitRecord = JSON.parse(fs.readFileSync(unitJsonPath, 'utf8'));
-            } catch {
-              problems.push(`corrupted unit.json in unit run "${unitId}"`);
-            }
-          }
-        } catch {}
-        units.set(unitId, unitRecord);
-      }
-      const unitRecord = units.get(unitId);
-      if (!unitRecord) continue;
-      const resultFile = path.join(run.runDir, 'result.json');
-      try {
-        if (!fs.lstatSync(resultFile).isFile()) continue;
-        const resultData = JSON.parse(fs.readFileSync(resultFile, 'utf8'));
-        if (resultData.binding && resultData.role) {
-          const recomputed = bind(
-            {
-              unit: unitRecord.unit,
-              role: resultData.role,
-              readOnly: false,
-              overrides: unitRecord.overrides || [],
-            },
-            {
-              runnerConfig: unitRecord.configSnapshot?.runner,
-              session: {},
-            },
-            // A fallback attempt lives at `<round>-fb<n>`; its walk state is read from the seat's
-            // `<role>/<round>` chain exactly as the write gate reads it.
-            walkStateOf(unitRecord, { role, round: round.replace(/-fb\d+$/, ''), assignmentId: run.assignmentId }),
-          );
-          if (recomputed.refused || recomputed.executor !== resultData.binding.executor) {
-            problems.push(`unit run "${unitId}" role "${role}" round "${round}" attempt "${run.attempt}" binding mismatches unit.json snapshot`);
-          }
-        }
-      } catch {
-        // Unsettled or unreadable results have no binding evidence to compare.
-      }
-    }
-  } catch (err) {
-    return { passed: false, message: `error scanning assignments: ${err.message}` };
-  }
-
-  return problems.length > 0
-    ? { passed: false, message: problems.join('; ') }
-    : { passed: true, message: 'every mutating assignment RunResult binding matches its unit.json snapshot' };
 }
 
 export function checkTierVocabularyDeadKeys(cwd) {
@@ -725,6 +633,10 @@ export function checkTierVocabularyDeadKeys(cwd) {
     if ('PLACEMENT_POLICY_SHADOW' in runner) {
       problems.push(`${level} config contains dead key "runner.PLACEMENT_POLICY_SHADOW"`);
     }
+    // The global file of a machine that has not re-run setup still carries it; it is dropped at load.
+    if (level === 'project' && 'rigorToTier' in runner) {
+      problems.push('project config contains retired key "runner.rigorToTier"; rigor no longer chooses a tier, run `fgos setup` to convert the config');
+    }
     for (const [execId, exec] of Object.entries(runner.executors ?? {})) {
       if (exec && typeof exec === 'object') {
         if ('rigorOverrides' in exec) {
@@ -755,41 +667,6 @@ export function checkTierVocabularyDeadKeys(cwd) {
   return problems.length > 0
     ? { passed: false, message: problems.join('; ') }
     : { passed: true, message: 'no retired tier vocabulary keys in project or global config' };
-}
-
-export function checkModelPolicyTierCoverage(cwd) {
-  const levels = [
-    ['project', readSharedConfig(cwd)?.runner],
-    ['global', loadGlobalConfig()?.runner],
-  ];
-  const problems = [];
-  for (const [level, runner] of levels) {
-    if (!runner || typeof runner !== 'object') continue;
-    const rigorToTier = runner.rigorToTier ?? DEFAULT_RIGOR_TO_TIER;
-    const neededTiers = new Set(Object.values(rigorToTier));
-    const providersChecked = new Set();
-
-    for (const [execId, exec] of Object.entries(runner.executors ?? {})) {
-      if (!exec || typeof exec !== 'object') continue;
-      const provider = deriveProviderFamily(exec);
-      if (!provider || providersChecked.has(provider)) continue;
-      providersChecked.add(provider);
-
-      const providerPolicies = runner.modelPolicies?.[provider];
-      if (!providerPolicies || typeof providerPolicies !== 'object') {
-        problems.push(`${level} provider "${provider}" for executor "${execId}" has no modelPolicies entry`);
-        continue;
-      }
-      for (const tier of neededTiers) {
-        if (!providerPolicies[tier]) {
-          problems.push(`${level} provider "${provider}" missing model for tier "${tier}" (required by rigorToTier)`);
-        }
-      }
-    }
-  }
-  return problems.length > 0
-    ? { passed: false, message: problems.join('; ') }
-    : { passed: true, message: 'modelPolicies covers all tiers required by rigorToTier' };
 }
 
 export function checkCoordinationProtocolDeadVocabulary(cwd) {
@@ -1192,8 +1069,8 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
               problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> invalid dispatch mode "${op.dispatch}" (allowed: assignment, human-only)`);
             }
             if (op.dispatch === 'human-only') {
-              if (op.policy && (op.policy.preferExecutor || (Array.isArray(op.policy.fallbackExecutors) && op.policy.fallbackExecutors.length > 0))) {
-                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> dispatch: human-only operation must not declare executor policy (preferExecutor/fallbackExecutors)`);
+              if (op.policy?.preferExecutor) {
+                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> dispatch: human-only operation must not declare executor policy (preferExecutor)`);
               }
             }
           }
@@ -1226,17 +1103,6 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
               if (op.policy.preferExecutor) {
                 if (typeof op.policy.preferExecutor !== 'string' || (knownExecutors.size > 0 && !knownExecutors.has(op.policy.preferExecutor))) {
                   problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.preferExecutor "${op.policy.preferExecutor}" is not a recognized executor`);
-                }
-              }
-              if (op.policy.fallbackExecutors !== undefined) {
-                if (!Array.isArray(op.policy.fallbackExecutors) || op.policy.fallbackExecutors.some((e) => typeof e !== 'string')) {
-                  problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.fallbackExecutors must be an array of strings`);
-                } else {
-                  for (const fb of op.policy.fallbackExecutors) {
-                    if (knownExecutors.size > 0 && !knownExecutors.has(fb)) {
-                      problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.fallbackExecutors contains unrecognized executor "${fb}"`);
-                    }
-                  }
                 }
               }
               if (op.policy.visibility !== undefined) {
@@ -1437,12 +1303,6 @@ registerCheck({
 });
 
 registerCheck({
-  id: 'runner-rigor-config',
-  description: 'project and global runner rigorToTier maps are complete and capabilities declare only rigor floors',
-  check: (cwd) => checkRunnerRigorConfig(cwd),
-});
-
-registerCheck({
   id: 'runner-generated-paths',
   description: 'runner.generatedPaths maps generated sources to render targets with well-formed write-scope entries',
   check: (cwd) => checkRunnerGeneratedPathsConfig(cwd),
@@ -1455,21 +1315,9 @@ registerCheck({
 });
 
 registerCheck({
-  id: 'mutating-assignment-binding-snapshot',
-  description: 'every mutating assignment RunResult binding matches its unit.json snapshot',
-  check: (cwd) => checkMutatingAssignmentBindingSnapshot(cwd),
-});
-
-registerCheck({
   id: 'tier-vocabulary-dead-keys',
   description: 'project and global configs have no retired tier vocabulary keys (runner.models, minTier, rigorOverrides, etc.)',
   check: (cwd) => checkTierVocabularyDeadKeys(cwd),
-});
-
-registerCheck({
-  id: 'model-policy-tier-coverage',
-  description: 'runner.modelPolicies covers every tier generated by rigorToTier for all registered executors',
-  check: (cwd) => checkModelPolicyTierCoverage(cwd),
 });
 
 registerCheck({
@@ -1512,12 +1360,6 @@ registerCheck({
   id: 'global-model-policies-portable',
   description: 'runner.modelPolicies in ~/.fgos/config.json uses plain model names only, since every fgOS release on the machine reads it',
   check: () => checkGlobalModelPoliciesPortable(),
-});
-
-registerCheck({
-  id: 'capability-rigor-ceiling',
-  description: 'lists the capabilities whose own rigor lifts their seats above runner.maxTier, with the tier and model they then run at; informational',
-  check: (cwd) => checkCapabilityRigorCeiling(cwd),
 });
 
 registerCheck({
@@ -2653,9 +2495,8 @@ function checkWorkflowCapabilitiesConfigured(cwd) {
 function evaluateWorkflowCapabilities(cwd, uses) {
   const capabilities = readSharedConfig(cwd)?.runner?.capabilities;
   const declared = capabilities && typeof capabilities === 'object' && !Array.isArray(capabilities) ? capabilities : {};
-  const missing = [...uses].filter(
-    ([capability]) => !declared[capability] && !(capability.includes(':') && declared[capability.split(':')[1]]),
-  );
+  const entriesOf = (capability) => capabilityEntriesOf({ capabilities: declared }, capability);
+  const missing = [...uses].filter(([capability]) => entriesOf(capability).length === 0);
   if (missing.length > 0) {
     const list = missing.map(([cap, ids]) => `${cap} (${[...ids].join(', ')})`).join('; ');
     return {
@@ -2663,18 +2504,18 @@ function evaluateWorkflowCapabilities(cwd, uses) {
       message: `runner.capabilities has no entry for Workflow capabilities: ${list} -- declare each under runner.capabilities (fgos setup adds every shipped Workflow's)`,
     };
   }
-  // Declared is not enough: bind() needs a prefer pool, on the exact entry or the bare
-  // verb, or it refuses the unit headless. Setup's own slots are description-only on
+  // Declared is not enough: a seat needs a prefer pool, on the exact entry or its prefix entry
+  // (or a tierFallback list for its tier), or it is refused headless. Setup's own slots are description-only on
   // purpose (which executors serve a capability is the project's taste), so this is a
   // warning that names the gap rather than a failure on a fresh project.
   const noPool = [...uses].filter(
-    ([capability]) => !hasUsablePrefer(declared[capability]) && !(capability.includes(':') && hasUsablePrefer(declared[capability.split(':')[1]])),
+    ([capability]) => !entriesOf(capability).some(({ entry }) => hasUsablePrefer(entry)),
   );
   if (noPool.length > 0) {
     const list = noPool.map(([cap, ids]) => `${cap} (${[...ids].join(', ')})`).join('; ');
     return {
       passed: true,
-      message: `warning: Workflow capabilities declared but with no "prefer" pool, so a headless run of those units is refused: ${list} -- add "prefer" under the exact name or its bare verb in runner.capabilities`,
+      message: `warning: Workflow capabilities declared but with no "prefer" pool, so a headless run of those units is refused: ${list} -- add "prefer" under the exact name or its prefix entry in runner.capabilities`,
     };
   }
   return { passed: true, message: `every capability a Workflow unit names (${uses.size}) is declared in runner.capabilities with a prefer pool` };
@@ -2755,7 +2596,7 @@ registerCheck({
 // real dispatch re-resolves at execution time, never a second, drifting
 // lookup. An operation naming a capability with nothing registered for it
 // does not fail at dispatch time (it quietly falls back to the runner's
-// global default executor, per `resolveAssignmentDispatchPolicy`'s own
+// global default executor, per the dispatch policy's own
 // precedence) -- this check is the only place that quiet degradation is
 // surfaced before it happens for real. Also reports the count of distinct
 // provider families reachable across every resolved capability (design
@@ -4769,9 +4610,9 @@ registerCheck({
 // Async: the check drives the runner's own pattern code, which is promise-based. `fgos doctor`
 // awaits every check, so a check may return its result directly or as a promise.
 registerCheck({
-  id: 'workflow-pools-satisfy-independence',
-  description: 'for every reviewed Workflow unit, the capability prefer pool supplies a provider family different from the producer\'s (hard); a panel unit whose pool has fewer families than seats is reported as seats sharing a family, not as a failure',
-  check: (cwd) => checkWorkflowPoolsSatisfyIndependence(cwd, {
+  id: 'seat-binding-dry-bind',
+  description: 'every seat of every Workflow unit binds under the committed config in a fixed headless session (no lease, nothing started); a policy refusal fails, no pool, account state, tier caps and shared families are information',
+  check: (cwd) => checkSeatBindingDryBind(cwd, {
     packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..'),
     loadRunnerConfig: loadRunnerConfigFromDir,
   }),
@@ -5506,9 +5347,7 @@ function deadOwnedConfinementDirs(roots) {
         if (!marker) continue;
         // A home held for its unstaged login is never removed; credential-copies-retained reports it.
         if ((marker.credentialKept?.attempts ?? 0) >= CREDENTIAL_KEEP_MAX_ATTEMPTS) continue;
-        const alive = Number.isInteger(marker.pid) && marker.pid > 0 && (() => {
-          try { process.kill(marker.pid, 0); return true; } catch (err) { return err.code === 'EPERM'; }
-        })();
+        const alive = Number.isInteger(marker.pid) && marker.pid > 0 && resolveHolderLiveness({ pid: marker.pid }) !== 'dead';
         if (!alive) found.push({ dir: cand, dispatchId: marker.dispatchId });
       }
     }
@@ -5985,162 +5824,6 @@ registerCheck({
   id: 'confinement-herdr-maturity',
   description: 'herdr confinement convergence maturity status (partial: pre-adapter checks under Authority, session/home lifecycle adapter-managed)',
   check: (cwd) => checkConfinementHerdrMaturity(cwd),
-});
-
-// --- coordination session abandoned claims check ---
-function getAbandonedClaims(cwd) {
-  const sessionsDir = path.join(cwd, '.fgos', 'coordination', 'sessions');
-  if (!fs.existsSync(sessionsDir)) return { deadClaims: [], unknownStale: [], sessionsDir };
-
-  const entries = fs.readdirSync(sessionsDir, { withFileTypes: true });
-  const deadClaims = [];
-  const unknownStale = [];
-  const now = Date.now();
-  const ABANDONED_MS = 10 * 60 * 1000;
-
-  for (const entry of entries) {
-    if (!entry.isDirectory()) continue;
-    if (entry.name.endsWith('.claim') || entry.name.startsWith('.staging-')) {
-      const fullPath = path.join(sessionsDir, entry.name);
-      try {
-        const stats = fs.statSync(fullPath);
-        let isDead = false;
-        let isAlive = false;
-        let fingerprint = { name: entry.name };
-
-        if (entry.name.endsWith('.claim')) {
-          const claimJsonPath = path.join(fullPath, 'claim.json');
-          if (fs.existsSync(claimJsonPath)) {
-            try {
-              const claimData = JSON.parse(fs.readFileSync(claimJsonPath, 'utf8'));
-              fingerprint.pid = claimData.pid;
-              fingerprint.token = claimData.token;
-              fingerprint.processStartTime = claimData.processStartTime;
-              if (claimData.pid) {
-                try {
-                  process.kill(claimData.pid, 0);
-                  let isSameProcess = true;
-                  if (claimData.processStartTime) {
-                    const currentStartTime = processStartFingerprint(claimData.pid);
-                    if (currentStartTime !== undefined) {
-                      if (Math.abs(currentStartTime - claimData.processStartTime) > 1000) {
-                        isSameProcess = false; // PID reused
-                      }
-                    }
-                  }
-                  if (isSameProcess) {
-                    isAlive = true;
-                  } else {
-                    isDead = true;
-                  }
-                } catch (err) {
-                  if (err.code === 'ESRCH') {
-                    isDead = true;
-                  }
-                }
-              }
-            } catch (err) {}
-          }
-        }
-
-        if (isDead) {
-          deadClaims.push(fingerprint);
-        } else if (!isAlive && now - stats.mtimeMs > ABANDONED_MS) {
-          unknownStale.push(entry.name);
-        }
-      } catch (e) {}
-    }
-  }
-  return { deadClaims, unknownStale, sessionsDir };
-}
-
-function processStartFingerprint(pid) {
-  try {
-    return fs.statSync(`/proc/${pid}`).mtimeMs;
-  } catch (err) {
-    if (err && err.code === 'ENOENT') {
-      try {
-        process.kill(pid, 0);
-        return undefined;
-      } catch (killErr) {
-        if (killErr && killErr.code === 'EPERM') return undefined;
-      }
-    }
-    return undefined;
-  }
-}
-
-registerCheck({
-  id: 'coordination-abandoned-claims',
-  description: 'coordination session directories do not contain abandoned claims (.claim or .staging-*)',
-  check: (cwd) => {
-    const { deadClaims, unknownStale } = getAbandonedClaims(cwd);
-    if (deadClaims.length === 0 && unknownStale.length === 0) return { passed: true };
-
-    if (deadClaims.length > 0) {
-      return {
-        passed: false,
-        message: `Found ${deadClaims.length} demonstrably dead claims and ${unknownStale.length} stale unknown items. Run fgos doctor --fix to remove the dead ones.`
-      };
-    } else if (unknownStale.length > 0) {
-      return {
-        passed: false,
-        message: `Found ${unknownStale.length} stale claim/staging items with unknown ownership (e.g. ${unknownStale[0]}). Leaving them intact (no auto-fix).`
-      };
-    }
-    return { passed: true };
-  }
-});
-
-registerFix({
-  id: 'coordination-abandoned-claims',
-  fix: (cwd) => {
-    const { deadClaims, unknownStale, sessionsDir } = getAbandonedClaims(cwd);
-    if (deadClaims.length === 0) {
-      return { changed: false, message: 'No dead claims found to remove.' };
-    }
-    let removed = 0;
-    for (const claim of deadClaims) {
-      try {
-        const fullPath = path.join(sessionsDir, claim.name);
-        if (claim.name.endsWith('.claim')) {
-          const claimJsonPath = path.join(fullPath, 'claim.json');
-          if (fs.existsSync(claimJsonPath)) {
-            const claimData = JSON.parse(fs.readFileSync(claimJsonPath, 'utf8'));
-            // Re-validate against the original fingerprint to avoid TOCTOU on filesystem replace
-            if (claimData.token !== claim.token || claimData.pid !== claim.pid || claimData.processStartTime !== claim.processStartTime) {
-              continue; // Fingerprint mismatch, someone else took the claim
-            }
-            if (claimData.pid) {
-              try {
-                process.kill(claimData.pid, 0);
-                let isSameProcess = true;
-                if (claimData.processStartTime) {
-                  const currentStartTime = processStartFingerprint(claimData.pid);
-                  if (currentStartTime !== undefined) {
-                    if (Math.abs(currentStartTime - claimData.processStartTime) > 1000) {
-                      isSameProcess = false;
-                    }
-                  }
-                }
-                if (isSameProcess) {
-                  continue; // The process is actually alive now, abort deletion
-                }
-              } catch (err) {
-                // ESRCH: confirmed dead
-              }
-            }
-          }
-        }
-        fs.rmSync(fullPath, { recursive: true, force: true });
-        removed++;
-      } catch (e) {}
-    }
-    const msg = unknownStale.length > 0
-      ? `Removed ${removed} dead claims. Note: ${unknownStale.length} stale unknown items remain.`
-      : `Removed ${removed} dead claims`;
-    return { changed: removed > 0, message: msg };
-  }
 });
 
 // --- runner.coordination shape check ---
@@ -6639,6 +6322,50 @@ registerCheck({
   id: 'writer-identity-resolvable',
   description: 'the writer identity resolves through the Rust host, both for the running host and for the activation a plain git commit hook uses',
   check: (cwd) => checkWriterIdentityResolvable(cwd),
+});
+
+/**
+ * The host Seat Binding would run (the same resolution the client uses:
+ * the activation host inside an activated release, FGOS_HOST_BIN outside one)
+ * answers `ladder` with protocol 1. Asked directly, never through the client's
+ * cached host, so an old activated release shows up as a version mismatch.
+ */
+export function checkSeatBindingRoute(cwd, { hostBin } = {}) {
+  const root = resolveMainCheckoutRoot(cwd) ?? cwd;
+  const fgosDir = path.join(root, '.fgos');
+  const { bin, tried, activated } = hostBin
+    ? { bin: hostBin, tried: [], activated: false }
+    : resolveSeatBindingHost({ cwd, fgosDir });
+  if (!bin) {
+    return { passed: false, message: `no host binary for the seat binding route (tried ${tried.join('; ')}) -- run fgctl init/repair, or set FGOS_HOST_BIN` };
+  }
+  try {
+    const ladder = createSeatBindingClient({ hostBin: bin }).tierLadder();
+    return {
+      passed: true,
+      message: `${bin} (${activated ? 'activation host' : 'host in reach'}) answers ladder at protocol 1, hostVersion ${ladder.hostVersion}, ${ladder.vocabulary.length} tiers`,
+    };
+  } catch (err) {
+    return { passed: false, message: `${bin} -> ${err.code ?? 'error'}: ${err.message}` };
+  }
+}
+
+registerCheck({
+  id: 'seat-binding-route',
+  description: 'the host Seat Binding runs answers the internal seat-binding route at protocol 1',
+  check: (cwd) => checkSeatBindingRoute(cwd),
+});
+
+registerCheck({
+  id: 'seat-binding-config',
+  description: 'the project runner config is in the seat-binding schema (no rigorToTier, schema marker present, ladder comment current)',
+  check: (cwd) => checkSeatBindingConfig(cwd),
+});
+
+registerCheck({
+  id: 'seat-binding-drain',
+  description: 'no unit run written before seats existed still has a live controller (the stop predicate for landing the seat-binding release)',
+  check: (cwd) => checkSeatBindingDrain(cwd),
 });
 
 registerCheck({

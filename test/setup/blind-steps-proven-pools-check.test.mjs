@@ -104,10 +104,13 @@ test('an unconfined invocation is never a candidate, so it is not reported here'
   assert.equal(result.passed, true, result.message);
 });
 
-test('a capability pool from a bare verb entry is resolved by bind like at run time', async () => {
-  const result = await run(BLIND, { propose: prefer('mistral') });
-  assert.equal(result.passed, false);
-  assert.match(result.message, /mistral via agy-herdr/);
+test('a capability pool from a prefix entry is resolved by bind like at run time, and a bare verb entry is not one', async () => {
+  const viaPrefix = await run(BLIND, { 'fixture:*': prefer('mistral') });
+  assert.equal(viaPrefix.passed, false);
+  assert.match(viaPrefix.message, /mistral via agy-herdr/);
+  // The bare verb of fixture:propose is not a lookup key: the unit has no pool, so nothing unproven can bind.
+  const viaBareVerb = await run(BLIND, { propose: prefer('mistral') });
+  assert.equal(viaBareVerb.passed, true, viaBareVerb.message);
 });
 
 test('a runner config that cannot be loaded passes with a note instead of throwing', async () => {

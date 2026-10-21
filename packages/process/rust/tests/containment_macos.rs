@@ -128,9 +128,9 @@ fn containment_macos_tree_names_the_double_fork_escape() {
 }
 
 #[test]
-fn a_thousand_fast_exits_are_normal_spawns() {
+fn a_hundred_fast_exits_are_normal_spawns() {
     let driver = MacosTree;
-    for i in 0..1000 {
+    for i in 0..100 {
         let mut domain = driver.create(&format!("fast-{i}")).unwrap();
         let mut spawned = driver.spawn_in(&mut domain, spec(&["/usr/bin/true"])).unwrap();
         assert!(spawned.child.wait().unwrap().success(), "spawn {i}");

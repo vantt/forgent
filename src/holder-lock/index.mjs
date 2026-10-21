@@ -41,13 +41,11 @@ import {
   leftoverSweep,
   borrowLeadsGroup,
   descriptionHolders,
-  runProcessObserveRoute,
   ROUTE_CALL_TIMEOUT_MS,
   ROUTE_SLACK_MS,
 } from './driver.mjs';
 import { startHold, waitReady, waitReadySync, readyBoundMs, releaseHold, removeWorkDir, borrowSync, borrowAsync, clearDomainHold } from './hold-transport.mjs';
 
-export { runProcessObserveRoute };
 export { HolderLockError, LOCK_FD_ENV, LOCK_FD_SLOT, LOCK_JOB_ENV, readPredecessorKillWaitMs } from './protocol.mjs';
 export { LockScope, createLockScope, resolveLock, loadLockRegistry, lockEntry, resolveStateRoot, resolveLockRoot, guaranteeFor };
 

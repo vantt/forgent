@@ -14,6 +14,18 @@ Template layer: follow the loop in [plan.md](plan.md#the-per-layer-loop). The co
 
 Specs: [holder-lock](../../docs/platform/holder-lock/spec.md), [session-identity](../../docs/platform/session-identity/spec.md), [convention](../../docs/platform/convention/spec.md); [component-boundary](../../docs/platform/component-boundary.md) rows; [rules-growth review](../reports/review-261021-1008-rules-that-grow-the-system.md) R2 (`src/holder-lock` thick facade) and R4 (fences); [TEST plan](../261020-1757-test-governance-port-inventory-and-slow-file-extraction/plan.md) phase 2 holder-lock row (110 Node tests in 20 files vs 74 Rust).
 
+
+## Received from other lanes (record here, never lose)
+
+- **T0 debt carried into T1 (owner 2026-10-21 23:37, ask 2 (c)).** T0 ended ≈ +150 lines net (Node −382, Rust +327, tests +207; [closing report](../reports/closing-261021-2213-harden-t0-process-facts-door.md) §4). T1's Part B trims it, starting with N-API boilerplate in `packages/git/node-addon/src/{process,durable_file,canonical_json}.rs` and phase-1 red tests that duplicate post-fix owning tests. T1's size target is set so that T0 + T1 ≤ 0. Also from T0:
+  - **T0-R1:** canonical JSON through N-API is 2.2× slower than the old Node twin for 200 keys (384 vs 171 µs); fix the marshalling cost or justify it.
+  - **T0-R2 (Low):** the durable door's `mode` argument is required, and omitting it gives a raw N-API `NumberExpected`; make it a named error or a default.
+
+- **R3: containment breaks on one unremountable host mount (GIT/ES, 2026-10-22 00:10).** `bwrap --dev-bind / /` fails for every contained call while any host mount cannot be remounted (seen with a snapshot under `/var/tmp/fgos-e1/mnt`: "Can't bind mount /oldroot/… Invalid argument"). The probe in `containment/linux.rs` `pidns_usable` passed earlier in the process, so `BwrapPidns` was chosen and then every `spawn_in` failed. The T1 council decides the shape: a named `containment-mount-refused` with the mount in the message and a next step, or a per-call fallback to `linux-pgroup` with the degraded guarantee reported. Keep the containment contract honest about the escape. Related: ledger R2 (git cost under bwrap) and H6.
+- **HL-N8 / HL-N9 (TEST → HARDEN T1, owner decision 2026-10-21 ~20:50).** Dropping the bytes-equal check in `unlinkRecordIfUnchanged` (`src/state/hot-lock.mjs`) leaves every test green, and so does dropping it in `reclaimDeadHolder`: each check covers for the other, so no single test pins either; only the contract prose `test/holder-lock/hot-lock-contract.test.mjs:30` names them. Evidence: [TEST holder-lock report](../reports/phase-lead-261021-1845-test-governance-p2-holder-lock.md) §4 and §7 (main `ff24dbde3`). T1 must add one owning proof per check (a process race in the state layer that reaches each check alone), then decide whether both checks are needed. Note: `reclaimDeadHolder` is in the T0/T1 range of `hot-lock.mjs`; check `unlinkRecordIfUnchanged`'s line range against the WORK-owned staging region (`:290-394` before T0) before editing, and coordinate with WORK if it falls inside.
+
+- **HL-F1: the hot mutex fast path may cost 6–10% more than the lock it replaced (TEST → HARDEN T1, 2026-10-22 00:30).** `test/state/hot-lock-multiprocess.test.mjs:249` measured ratio 1.101 in a full suite under load (`p50 old 22322ns, new 24581ns`, bound 1.10) and 1.055–1.065 alone at load 32. The two locks alternate call by call since `470f21c32`, so TEST reads it as a real cost, not noise. TEST will measure where the time goes (identity, record write, fsync) in its timing batch and send the numbers before touching the bound. T1 council: review the cost in the hot mutex review. Keeping the 10% bound when the cost is real is an owner question, not a test fix.
+
 ## Components, crates, Node (proposal §4.1)
 
 | Component | Rust | Node around it |
@@ -32,7 +44,7 @@ One-door jobs owned here (plan.md success criteria): lock, identity, and `.fgos`
 
 - **SEAT collision:** SEAT changes `src/util/session-identity.mjs`, `src/convention/*` (adds `definition-names.mjs`, `seat-id.mjs`) and `packages/convention/*`. The T1 council may run; edits to those files wait until SEAT lands (or the later lander rebases, board rule).
 - **Hot mutex (`src/state/hot-lock.mjs`) — no lane gap.** Its liveness judging moved at T0. T1 reviews the mutex itself (users: the state store, `src/runner/lock-fence.mjs:16`, the `src/git/*` guards via `hotLockDepth`, `src/holder-lock/hot-guard.mjs`). Either it moves under holder-lock in Rust here, or the owner accepts it as a named Node exception until WORK replaces the store (T1 ask 1). The state store's writes stay WORK-owned.
-- R4 compatibility policy unanswered ⇒ keep existing fences, add none.
+- Compatibility (review R4) is answered: owner decision 1 in [plan.md](plan.md#owner-decisions). Fences and drains live one release, then go, so T1 may delete `src/holder-lock/fences.mjs` and the legacy readers once their release has passed. Add no new fence.
 
 ## Files
 

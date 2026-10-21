@@ -41,7 +41,7 @@ function mkRepo() {
   return { repoRoot, fgosDir };
 }
 
-function setup(workerBody) {
+function setup(workerBody, itemExtra = {}) {
   const { repoRoot, fgosDir } = mkRepo();
   const scriptPath = path.join(mkTempDir(), 'worker.mjs');
   fs.writeFileSync(scriptPath, workerBody);
@@ -67,6 +67,7 @@ function setup(workerBody) {
     refs: [],
     risk: 'light',
     verify: 'test -f output.txt',
+    ...itemExtra,
   });
   return { repoRoot, fgosDir };
 }
@@ -95,6 +96,23 @@ test('fanout batch: a worker that only edits files is committed by its Unit run,
   // No claim summary: the subject is the goal line of the Unit objective (the item's title line).
   assert.equal(branchSubjects(repoRoot), 'chore(work-cand1-executing): Produce the file (kind: task)');
   assert.equal(execFileSync('git', ['rev-parse', 'fgw/cand1'], { cwd: repoRoot, encoding: 'utf8' }).trim(), fired.commit.sha, 'return judged the Unit run commit');
+});
+
+test('fanout batch: a Work item\'s rigor and risk never raise the tier its Unit run binds, and the door authorizes no raise', async () => {
+  const { repoRoot, fgosDir } = setup(`
+    import fs from 'node:fs';
+    fs.writeFileSync('output.txt', 'produced\\n');
+  `, { rigor: 'critical', risk: 'heavy' });
+
+  const result = await fanoutBatchExecutorCli(['cand1'], { repoRoot, hasLiveTaskAccess: false });
+
+  const [fired] = result.fired;
+  assert.equal(fired.outcome, 'pass');
+  const record = JSON.parse(fs.readFileSync(path.join(fgosDir, 'assignments', fired.unitRunId, 'unit.json'), 'utf8'));
+  assert.equal(record.unit.rigor, 'critical', 'the demand reaches the unit');
+  const { binding } = record.bindings['producer/1'][0];
+  assert.equal(binding.tier, 'standard', 'and moves no tier: the config declares none, so the default stands');
+  assert.equal(binding.provenance.tier.source, 'defaults.tier');
 });
 
 test('fanout batch: a worker cannot commit itself (its git dir is read-only), so the round fails and the item returns blocked', async () => {

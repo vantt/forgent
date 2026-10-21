@@ -25,6 +25,11 @@
 #   --keep-failed     stop at the first failed run and keep its post-cut filesystem as
 #                     <image-dir>/failed-run-<N>.img (readable as the user with debugfs)
 set -euo pipefail
+# Mount the fixture filesystems in a private mount namespace: a mount visible on the
+# host makes every `bwrap --dev-bind / /` on the machine fail while it exists.
+if [ -z "${FGOS_FIXTURE_MOUNT_NS:-}" ] && [ "$(id -u)" = 0 ]; then
+  exec env FGOS_FIXTURE_MOUNT_NS=1 unshare --mount --propagation private "$0" "$@"
+fi
 
 checkout=$(cd "$(dirname "$0")/../.." && pwd)
 image_dir="$checkout/.fgos/runtime/tmp/es-power-loss"

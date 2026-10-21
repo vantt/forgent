@@ -27,6 +27,48 @@ history. It is deliberately non-canonical. Current authority remains with the
 existing governance and current source documents until this proposal is accepted,
 implemented, verified, and promoted.
 
+## Objectives the system must achieve
+
+Confirmed by the owner on 2026-10-21 (rule-management lane). They apply to the
+whole system, whether the design ends up as one engine or several, and they are
+the yardstick for every design choice below. They are objectives, not a plan:
+each says how to tell that it is met.
+
+### A. What agents and people receive
+
+| # | Objective | Met when |
+|---|---|---|
+| A1 | **One truth, one owner.** Every decision, document claim and rule has exactly one owner; everything else points to it. | A machine check finds no two places claiming the same thing. |
+| A2 | **No stale guidance.** An agent's default reading contains only what is currently in force. Superseded material is hidden by default but stays traceable. | For an area that has a superseded decision, the agent's brief omits it and offers a path to its history. |
+| A3 | **The right content, at the right time, in few tokens.** Content is selected by agent CLI, domain, kind of work and role, within a budget. If the mandatory part exceeds the budget the request fails; it never truncates silently (for example Codex cuts always-loaded instructions after 32 KiB without warning). | The brief for a concrete task fits its budget and carries a manifest of what was included, what was left out and why. |
+| A4 | **One door for writing documentation, no duplicates.** An agent with no chat history finds the door, picks the right owner, and grows an existing document instead of creating a new one. | The acceptance standard in section 10 holds. |
+| A5 | **Traceable, never guessed.** Every projected statement carries a pointer to its source. When authority is missing or ambiguous the statement is not projected, instead of being summarized by guesswork. | A projected statement can be followed to its canonical source and, when needed, to its full decision history. |
+| A6 | **Two reading surfaces from one source.** Source material is collected and curated once, by the engine, but what is shown depends on the reader. Agents read a distilled surface: condensed, complete in meaning, short, few tokens. People read a rich surface: explanations, good presentation, pacing. | Both surfaces are generated from the same canonical source, neither is hand-maintained beside it, and the agent surface is measurably shorter than the human one for the same content. |
+
+### B. How the system is built
+
+| # | Objective | Met when |
+|---|---|---|
+| B1 | **Reuse what exists.** Extend the Knowledge Registry, `state.decisions` and the instruction seed (`src/setup/instruction-*`). No new store, graph or daemon (D2 and D3 of `tsk-1lv`) and no fourth engine. | A table "exists → new" shows no job with two owners. |
+| B2 | **One-way, explicit dependency.** Each system uses the results of the others through read ports (snapshots, receipts, typed references), never live mutual calls. This is the owner's reading of "the three systems use each other". | The dependency diagram has no cycle and the architecture test agrees. |
+| B3 | **Right order, do not break running work.** The cutover plan `plans/260925-documentation-authority-unification/plan.md` never waits for this system. This system does not disturb files that plan locks. Deferred capabilities are recorded under the non-preclusion law (section 0.3). | Collisions with other lanes (DOC, SEAT) are listed. |
+| B4 | **Better, not bigger.** Each change improves something that exists. A new rule says which rule it replaces. Net Node and test size does not grow without cause. Extra ideas are listed separately with reason and evidence (RUL104). | Every step has a net size budget (lines, files). |
+| B5 | **Installable and provable.** Any new configuration or dependency registers into `fgos setup` and `fgos doctor`. Each behaviour has one owning proof at the lowest layer that can observe it. | The list of doctor checks and owning tests is complete for every behaviour. |
+| B6 | **Works for every project and CLI.** Not hard-wired to Claude or to this repository's three source roots. It serves projects that use fgOS and every agent CLI (Claude, Codex, omp, pi, agy). | There is a route for a project outside this repository and no assumption about the install level. |
+
+### Open questions left to the design discussion
+
+1. Scope of "rules": only those that have a canonical document (L1 to L10, RUL, D-ADR), or also operating rules such as the decision-question template and verification discipline.
+2. Priority order when objectives pull against each other. The product order in `AGENTS.md` (ship faster, release people, definition of done, polish) is the starting point.
+
+### Out of scope for this system
+
+- Retiring `docs/specs/**` and `docs/architect/**` (owned by the cutover lane, plan 260925).
+- Building anything before the specification is approved.
+- Changing locked laws L1 to L10, or `AGENTS.md`, before Phase 9 of plan 260925.
+- Cross-session messaging (the MAIL lane).
+- Measuring agent behaviour at scale (A/B runs): not an objective of this system.
+
 ## 0. How To Use This Proposal
 
 This document is the **full-horizon architecture**, not one executable plan. It

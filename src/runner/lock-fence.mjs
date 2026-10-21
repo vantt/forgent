@@ -12,6 +12,7 @@
 
 import fs from 'node:fs';
 import { lockHolders, probe, resolveLock, lockEntry, resolveLockRoot, HolderLockError } from '../holder-lock/index.mjs';
+import { judge, observe, signalByIdentity } from './dispatch/process-identity.mjs';
 import { ownPidChain } from '../holder-lock/fences.mjs';
 import { hotPaths, readHotRecord, clearHotRecord, judgeHotRecord } from '../state/hot-lock.mjs';
 
@@ -43,57 +44,42 @@ export function lockParamsFor({ fgosDir, params = {}, scope }) {
   return filled;
 }
 
-/** Start time (clock ticks since boot) of `pid`, the half of its identity a
- * recycled pid cannot share. Null when the process is gone. */
-function startTimeOf(pid) {
-  try {
-    const stat = fs.readFileSync(`/proc/${pid}/stat`, 'utf8');
-    // The command name is parenthesised and may hold spaces: fields count after the last ')'.
-    const rest = stat.slice(stat.lastIndexOf(')') + 2).split(' ');
-    return rest[19] ?? null;
-  } catch {
-    return null;
+/** Send `signal` to each holder only while it is still the process recorded. Returns who was sent it and who
+ * has no such signal on this platform (`unsupported`: Windows has no graceful one). A holder that is no longer
+ * the recorded process was sent nothing and needs no signal; a refusal is named. */
+function sendAll(holders, signal) {
+  const sent = [];
+  const unsupported = [];
+  for (const holder of holders) {
+    const outcome = signalByIdentity(holder, signal);
+    if (outcome === 'sent') sent.push(holder);
+    else if (outcome === 'unsupported' && signal === 'term') unsupported.push(holder);
+    else if (outcome !== 'identity-mismatch' && outcome !== 'not-found') {
+      throw new HolderLockError('lock-fence-signal-refused', `pid ${holder.pid} refused ${signal}: ${outcome}`, { pid: holder.pid, signal });
+    }
   }
+  return { sent, unsupported };
 }
 
-function cmdlineOf(pid) {
-  try {
-    return fs.readFileSync(`/proc/${pid}/cmdline`, 'utf8').split('\0').filter(Boolean).join(' ');
-  } catch {
-    return '';
-  }
-}
-
-function identityOf(pid) {
-  return { pid, startTime: startTimeOf(pid), cmdline: cmdlineOf(pid) };
-}
-
-/** Send `signal` to the holder only while it is still the process listed. */
-function signalByIdentity(holder, signal) {
-  if (startTimeOf(holder.pid) !== holder.startTime) return false;
-  try {
-    process.kill(holder.pid, signal);
-    return true;
-  } catch (err) {
-    if (err.code === 'ESRCH') return false;
-    throw new HolderLockError('lock-fence-signal-refused', `pid ${holder.pid} refused ${signal}: ${err.code}`, { pid: holder.pid, signal });
-  }
-}
-
-function stillHolding(name, params, holders) {
-  const now = lockHolders(name, params);
-  if (now.kind !== 'list') return holders;
-  return holders.filter((holder) => now.pids.includes(holder.pid) && startTimeOf(holder.pid) === holder.startTime);
-}
-
-async function waitUntilGone(name, params, holders, ms) {
+async function waitUntilGone(stillHolding, holders, ms) {
   const deadline = Date.now() + ms;
   let left = holders;
   for (;;) {
-    left = stillHolding(name, params, left);
+    left = stillHolding(left);
     if (left.length === 0 || Date.now() >= deadline) return left;
     await sleep(POLL_MS);
   }
+}
+
+/** SIGTERM, a wait, SIGKILL for what is left (at once for a holder that cannot be asked to stop), a wait.
+ * `stillHolding(list)` is the subset of `list` that still holds the lock. */
+async function terminateHolders(holders, stillHolding) {
+  const term = sendAll(holders, 'term');
+  const waited = await waitUntilGone(stillHolding, holders.filter((holder) => !term.unsupported.includes(holder)), TERM_WAIT_MS);
+  const toKill = [...term.unsupported, ...waited];
+  const kill = sendAll(toKill, 'kill');
+  const left = await waitUntilGone(stillHolding, toKill, KILL_WAIT_MS);
+  return { terminated: term.sent.map((holder) => holder.pid), killed: kill.sent.map((holder) => holder.pid), left };
 }
 
 /**
@@ -133,8 +119,26 @@ export async function fenceLock({ name, fgosDir, params = {}, confirm, attestSto
     throw new HolderLockError('lock-fence-unlistable', `${name} is held, but no holder is visible to this user (another user's process?); nothing was signalled`, { lock: name });
   }
 
+  // An identity read after one listing can belong to a pid reused since: read it between two listings and keep
+  // only the pids both listings name.
+  const seen = listed.pids.map((pid) => ({ pid, seen: observe(pid) }));
+  const again = lockHolders(name, filled);
+  if (again.kind !== 'list') {
+    throw new HolderLockError('lock-fence-unlistable', `${name}: holders can no longer be listed (${again.reason}); nothing was signalled`, { lock: name, reason: again.reason });
+  }
+  const holders = [];
+  for (const { pid, seen: now } of seen.filter((entry) => again.pids.includes(entry.pid))) {
+    if (now.kind !== 'live') {
+      throw new HolderLockError('lock-fence-identity-unknown', `${name}: holder pid ${pid} has no readable identity; stop it yourself and re-run`, { lock: name, pid });
+    }
+    const { kind, ...record } = now;
+    holders.push(record);
+  }
+  if (holders.length === 0) {
+    if (probe(name, filled).result === 'free') return { lock: name, path: lock.v3Path, status: 'free', holders: [], terminated: [], killed: [] };
+    throw new HolderLockError('lock-fence-unlistable', `${name} is held, but no holder is visible to this user (another user's process?); nothing was signalled`, { lock: name });
+  }
   const own = new Set(ownPidChain());
-  const holders = listed.pids.map(identityOf);
   const self = holders.filter((holder) => own.has(holder.pid));
   if (self.length > 0) {
     throw new HolderLockError('lock-fence-self', `${name} is held by this process or one of its parents (pid ${self.map((holder) => holder.pid).join(', ')}); not fenced`, { lock: name, pids: self.map((holder) => holder.pid) });
@@ -144,10 +148,11 @@ export async function fenceLock({ name, fgosDir, params = {}, confirm, attestSto
     throw new HolderLockError('lock-fence-not-confirmed', `${name} is held by ${holders.map((holder) => `pid ${holder.pid}`).join(', ')}; nothing was signalled (confirm, or pass --yes)`, { lock: name, holders });
   }
 
-  const terminated = holders.filter((holder) => signalByIdentity(holder, 'SIGTERM')).map((holder) => holder.pid);
-  let left = await waitUntilGone(name, filled, holders, TERM_WAIT_MS);
-  const killed = left.filter((holder) => signalByIdentity(holder, 'SIGKILL')).map((holder) => holder.pid);
-  left = await waitUntilGone(name, filled, left, KILL_WAIT_MS);
+  const stillHolding = (list) => {
+    const now = lockHolders(name, filled);
+    return now.kind !== 'list' ? list : list.filter((holder) => now.pids.includes(holder.pid) && judge(holder) === 'alive');
+  };
+  const { terminated, killed, left } = await terminateHolders(holders, stillHolding);
 
   if (left.length > 0 || probe(name, filled).result !== 'free') {
     throw new HolderLockError('lock-fence-still-held', `${name} is still held after SIGTERM and SIGKILL${left.length ? ` (pid ${left.map((holder) => holder.pid).join(', ')})` : ''}`, { lock: name, pids: left.map((holder) => holder.pid) });
@@ -172,9 +177,11 @@ async function fenceHotRecord({ name, fgosDir, confirm, attestStopped }) {
   let holders = [];
   let terminated = [];
   let killed = [];
-  const verdict = seen.state === 'ok' ? judgeHotRecord(seen.record, fgosDir) : 'unreadable';
+  const verdict = seen.state === 'ok' ? judgeHotRecord(seen.record) : 'unreadable';
   if (verdict === 'alive') {
-    const holder = identityOf(seen.record.pid);
+    // The record is its own tuple: no second read of the process, so a holder that vanished since the judge
+    // yields not-found or identity-mismatch from the signal and is never confused with another process.
+    const holder = seen.record;
     if (new Set(ownPidChain()).has(holder.pid)) {
       throw new HolderLockError('lock-fence-self', `${name} is held by this process or one of its parents (pid ${holder.pid}); not fenced`, { lock: name, pids: [holder.pid] });
     }
@@ -182,13 +189,10 @@ async function fenceHotRecord({ name, fgosDir, confirm, attestStopped }) {
     if (!(await confirm(holders))) {
       throw new HolderLockError('lock-fence-not-confirmed', `${name} is held by pid ${holder.pid}; nothing was signalled (confirm, or pass --yes)`, { lock: name, holders });
     }
-    terminated = holders.filter((h) => signalByIdentity(h, 'SIGTERM')).map((h) => h.pid);
-    let left = holders.filter((h) => startTimeOf(h.pid) === h.startTime);
-    for (const deadline = Date.now() + TERM_WAIT_MS; left.length > 0 && Date.now() < deadline; left = left.filter((h) => startTimeOf(h.pid) === h.startTime)) await sleep(POLL_MS);
-    killed = left.filter((h) => signalByIdentity(h, 'SIGKILL')).map((h) => h.pid);
-    for (const deadline = Date.now() + KILL_WAIT_MS; left.length > 0 && Date.now() < deadline; left = left.filter((h) => startTimeOf(h.pid) === h.startTime)) await sleep(POLL_MS);
-    if (left.length > 0) {
-      throw new HolderLockError('lock-fence-still-held', `${name} is still held after SIGTERM and SIGKILL (pid ${left.map((h) => h.pid).join(', ')})`, { lock: name, pids: left.map((h) => h.pid) });
+    const outcome = await terminateHolders(holders, (list) => list.filter((h) => judge(h) === 'alive'));
+    ({ terminated, killed } = outcome);
+    if (outcome.left.length > 0) {
+      throw new HolderLockError('lock-fence-still-held', `${name} is still held after SIGTERM and SIGKILL (pid ${outcome.left.map((h) => h.pid).join(', ')})`, { lock: name, pids: outcome.left.map((h) => h.pid) });
     }
   } else if (verdict !== 'dead' && !attestStopped) {
     const why = verdict === 'unreadable' ? 'its record does not parse' : 'its holder cannot be judged here';

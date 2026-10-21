@@ -1,7 +1,7 @@
 ---
 phase: 05
 title: "Durable sites onto durable-file, durable-file crate fixes, temp names from uniqueTmpTag, canonical twins after the corpus proof"
-status: pending
+status: done
 depends_on: [02, 03]
 parallel: "sequential: after phase 03 (shares run-lock.mjs, proof-helpers.mjs, provider-capacity.mjs, gateway-control.mjs); phase 06 starts after it"
 effort: ~1d

@@ -61,7 +61,7 @@ function setup({ mainFiles = { 'base.txt': 'from main\n' }, branchFiles = { 'min
   fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify({
     runner: {
       defaultExecutor: 'alpha',
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+      defaults: { tier: 'standard' },
       modelPolicies: { alpha: { standard: 'alpha-std' } },
       executors: {
         alpha: {
@@ -70,7 +70,7 @@ function setup({ mainFiles = { 'base.txt': 'from main\n' }, branchFiles = { 'min
         },
       },
       capabilities: { 'docs:write': { prefer: [{ executor: 'alpha' }], rigor: 'standard' } },
-      patterns: { defaultRule: { mutatingMinRigor: 'standard' } },
+      patterns: { seatBinding: { schema: 1 }, defaultRule: { mutatingMinRigor: 'standard' } },
     },
   }, null, 2));
   prepareActivatedGitFixture(repoRoot);
@@ -162,7 +162,7 @@ test('a sync-only unit whose merge is clean is committed by the runner and passe
   assert.equal(fs.readFileSync(path.join(worktree, 'base.txt'), 'utf8'), 'from main\n');
   assert.equal(res.sync.status, 'merged');
   assert.equal(res.sync.sha, mainSha);
-  assert.equal(res.results.at(-1).role, 'sync');
+  assert.equal(res.results.at(-1).seat, 'sync');
   assert.equal(res.results.at(-1).commit.status, 'committed');
   assert.equal(res.results.at(-1).commit.sha, headOf(worktree));
   assert.equal(res.sync.commit.sha, headOf(worktree));

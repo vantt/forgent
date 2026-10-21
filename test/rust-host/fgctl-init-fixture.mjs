@@ -64,6 +64,50 @@ export function useReleaseFixture() {
   });
 }
 
+// What a shared initialized workspace keeps a copy of.
+const savedNames = (ws) => (ws.home ? ['proj', 'state', 'home'] : ['proj', 'state']);
+
+/**
+ * One real `fgctl init --from <release>` per test file, replayed for each case at the same
+ * absolute paths. A case whose starting point is an initialized workspace calls `restore()` and
+ * gets the exact files that init wrote, instead of paying for its own init (a full runtime tail
+ * each time). Cases inside one file run one after another, so no two live cases share the paths.
+ * `releaseDir` is a function: the release it names is built by an earlier `before()` hook.
+ */
+export function useInitializedWorkspace(releaseDir, { tag = 'initialized', ownHome = false } = {}) {
+  const ws = { root: null, proj: null, state: null, home: null, restore: null };
+  let saved = null;
+  before(() => {
+    ws.root = fs.mkdtempSync(path.join(os.tmpdir(), `fgctl-${tag}-`));
+    ws.proj = path.join(ws.root, 'proj');
+    ws.state = path.join(ws.root, 'state');
+    saved = path.join(ws.root, 'saved');
+    fs.mkdirSync(ws.proj);
+    fs.mkdirSync(ws.state, { mode: 0o700 });
+    // ownHome: the init runs with HOME at a directory of its own (ws.home), as the cases do.
+    if (ownHome) fs.mkdirSync((ws.home = path.join(ws.root, 'home')));
+    execFileSync('git', ['init'], { cwd: ws.proj });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: ws.proj });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: ws.proj });
+    const res = runFgctl(['init', '--from', releaseDir()], { cwd: ws.proj, stateHome: ws.state, env: ws.home ? { HOME: ws.home } : {} });
+    assert.equal(res.status, 0, `fgctl init of the shared workspace must succeed: ${res.stderr}`);
+    for (const name of savedNames(ws)) {
+      fs.cpSync(path.join(ws.root, name), path.join(saved, name), { recursive: true, preserveTimestamps: true, verbatimSymlinks: true });
+    }
+  });
+  ws.restore = () => {
+    for (const name of savedNames(ws)) {
+      fs.rmSync(path.join(ws.root, name), { recursive: true, force: true });
+      fs.cpSync(path.join(saved, name), path.join(ws.root, name), { recursive: true, preserveTimestamps: true, verbatimSymlinks: true });
+    }
+    return ws;
+  };
+  after(() => {
+    if (ws.root) fs.rmSync(ws.root, { recursive: true, force: true });
+  });
+  return ws;
+}
+
 // A PATH whose first `git` drops the `-c gc.auto=0` and `-c maintenance.auto=false` switches a
 // borrowed git runs with, then runs the real git: a git that can start a background gc while it
 // borrows a lock. An environment fixture for the activation gate's escaped-holder case, not a code

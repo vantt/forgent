@@ -400,7 +400,8 @@ activities:
       pattern: panel
       blind: true
       contextRefs: [core/agents/council-assumptions.yaml, core/agents/council-ship-maintain.yaml, core/agents/council-feedback-loops.yaml]
-      params: { members: 3, roleTasks: { panelist-1: ..., panelist-2: ..., panelist-3: ..., synthesizer: ... } }
+      seats: [member-1, member-2, member-3, synthesizer]   # ghế khai tường minh, role producer ×3 + synthesizer ([seat-binding.md](seat-binding.md) mục 7.1)
+      params: { roleTasks: { member-1: ..., member-2: ..., member-3: ..., synthesizer: ... } }   # khoá theo ghế
 must:
   - id: independent-positions
     guard: independence-blind      # đóng gói một Unit panel với ghế blind là bắt buộc

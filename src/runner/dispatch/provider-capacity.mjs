@@ -5,11 +5,13 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { replaceDurably } from '../../native/door.mjs';
 import { normalizeProviderFamily } from './provider-adapter.mjs';
 import { deriveLegacyInventory } from './llm-accounts.mjs';
 import { AUTH_FAILURE_TAIL_LINES, matchAuthFailureLine, matchQuotaLimitLine } from './provider-auth-failure.mjs';
-import { getProcessStartTime, pidExists, resolveHolderLiveness } from './process-identity.mjs';
+import { resolveHolderLiveness, selfRecord } from './process-identity.mjs';
 import { acquire, acquireSync, createLockScope, lockHolders, resolveLock, resolveLockRoot, runBorrowed } from '../../holder-lock/index.mjs';
+import { noteLockHeld, noteLockReleased } from '../../util/state-lock-held.mjs';
 
 export const PROVIDER_CAPACITY_STATE_CONTRACT = 'provider-capacity-state.v1';
 export const PROVIDER_CAPACITY_SELECTION_CONTRACT = 'provider-capacity-selection.v1';
@@ -367,16 +369,7 @@ function readState(statePath) {
 function writeState(statePath, state) {
   const dir = path.dirname(statePath);
   fs.mkdirSync(dir, { recursive: true });
-  const content = `${JSON.stringify(state, null, 2)}\n`;
-  const tmpPath = path.join(dir, `.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`);
-  const fd = fs.openSync(tmpPath, 'w');
-  try {
-    fs.writeSync(fd, content);
-    fs.fsyncSync(fd);
-  } finally {
-    fs.closeSync(fd);
-  }
-  fs.renameSync(tmpPath, statePath);
+  replaceDurably(dir, path.basename(statePath), `${JSON.stringify(state, null, 2)}\n`, 0o644);
 }
 
 export class ProviderCapacityLockError extends Error {
@@ -431,9 +424,12 @@ export function withProviderStateLock(fn, { waitMs = 30_000 } = {}) {
     throw err;
   }
   if (res.result !== 'acquired') throw busy();
+  // While the lock is held a host exec waits: the Seat Binding client and the writer identity refuse to run.
+  noteLockHeld();
   try {
     return fn();
   } finally {
+    noteLockReleased();
     res.handle.release();
   }
 }
@@ -551,7 +547,7 @@ function isQuarantined(accountStateValue, now = Date.now()) {
 }
 
 // S1 (dispatch-engine-liveness-hardening Phase 2): `lease.pid` is the
-// RUNNER's own pid (the process that called acquireProviderAccountLease),
+// RUNNER's own pid (the process that called acquireNamedAccountLease),
 // never the detached supervisor/worker that actually holds and uses the
 // credential -- the runner can die while its detached child keeps working,
 // same root cause as admitRunAttempt's own in-flight gap. A dead runner
@@ -576,7 +572,7 @@ function reclaimDeadLeases(providerState, { runIsDead = () => false, isRunWorker
   for (const [accountId, acct] of Object.entries(providerState.accounts ?? {})) {
     for (const [runId, lease] of Object.entries(acct.leases ?? {})) {
       const pidDead = lease.pid !== undefined
-        && resolveHolderLiveness({ pid: lease.pid, processStartTime: lease.processStartTime }, pidExists(lease.pid)) === 'dead';
+        && resolveHolderLiveness(lease.record ?? { pid: lease.pid, processStartTime: lease.processStartTime }) === 'dead';
       const provenDead = (pidDead && !isRunWorkerAlive(runId, lease)) || runIsDead(runId, lease);
       if (provenDead) {
         delete acct.leases[runId];
@@ -586,64 +582,90 @@ function reclaimDeadLeases(providerState, { runIsDead = () => false, isRunWorker
   }
 }
 
-/**
- * The accounts of `provider` the next lease may take, best first: the account this assignment already
- * holds while it is usable, otherwise the pool's accounts in the order the config declares them. An
- * account that is quarantined or disabled is left out; load does not reorder the list, so the first
- * account takes every lease until it cannot.
- */
-export function rankProviderAccounts({ provider, inventory, state, assignmentId, runIsDead, isRunWorkerAlive, now = Date.now() }) {
-  const accounts = inventory?.[provider]?.accounts ?? {};
-  const providerState = state.providers?.[provider] ?? { accounts: {} };
-  reclaimDeadLeases(providerState, { runIsDead, isRunWorkerAlive });
-  const usable = (accountId) => accounts[accountId]?.disabled !== true && !isQuarantined(accountState(providerState, accountId), now);
-  const stickyAccountId = assignmentId ? state.assignments?.[`${provider}:${assignmentId}`]?.accountId : null;
-  if (stickyAccountId && accounts[stickyAccountId] && usable(stickyAccountId)) return [stickyAccountId];
-  return Object.keys(accounts).filter(usable);
+/** The account inventory sections of a runner config: machine config read live, never kept in a unit record. */
+export function accountInventoryConfigOf(runnerConfig) {
+  const out = {};
+  for (const key of ['llmAccounts', 'providers']) if (runnerConfig?.[key] !== undefined) out[key] = runnerConfig[key];
+  return out;
 }
 
-export function acquireProviderAccountLease({
-  runnerConfig, provider, assignmentId, runId, runtimeDir, runIsDead, isRunWorkerAlive,
-  // The CLI the launch is known to run, when the caller knows it (a pinned invocation): only an account
-  // that declares a login store for that CLI is leased. Null leaves every account eligible.
+/** Why a lease was refused because the account Seat Binding named was not takeable any more. */
+export const LEASE_CONFLICT_REASON = 'provider-capacity.lease-conflict';
+
+/**
+ * What the account facts of one provider's pool are, read without the state lock: whether this assignment
+ * already holds an account (sticky), until when an account is quarantined, and whether a quarantine is one a
+ * real call may lift (a dead login whose probe cooldown has passed). The caller turns it into the
+ * `accountView` Seat Binding ranks from; ranking is not done here.
+ *
+ * @returns {Record<string, {sticky: boolean, quarantinedUntil: number|null, probeable: boolean, probeFailed: boolean}>}
+ */
+export function readAccountStates({ provider, assignmentId, runtimeDir, now = Date.now(), cooldownMs = DEFAULT_QUARANTINE_PROBE_COOLDOWN_MS } = {}) {
+  const { statePath } = providerCapacityStatePaths(runtimeDir);
+  const state = readState(statePath);
+  const stickyId = assignmentId ? state.assignments?.[`${provider}:${assignmentId}`]?.accountId : null;
+  const out = {};
+  for (const [accountId, acct] of Object.entries(state.providers?.[provider]?.accounts ?? {})) {
+    const quarantine = acct?.quarantine;
+    const until = Date.parse(quarantine?.until ?? '');
+    const never = !quarantine?.until || Number.isNaN(until);
+    const lastProbe = Date.parse(quarantine?.probe?.attemptedAt ?? '');
+    out[accountId] = {
+      sticky: stickyId === accountId,
+      quarantinedUntil: !quarantine ? null : (quarantine.kind === 'manual-clear' || never ? Number.MAX_SAFE_INTEGER : until),
+      probeable: quarantine?.kind === 'manual-clear' && quarantine.reasonCode === 'auth-token' && !(Number.isFinite(lastProbe) && now - lastProbe < cooldownMs),
+      probeFailed: quarantine?.probe?.status === 'failed',
+    };
+  }
+  // The account an assignment holds is sticky even when the lease state has nothing else to say about it.
+  if (stickyId && !out[stickyId]) out[stickyId] = { sticky: true, quarantinedUntil: null, probeable: false, probeFailed: false };
+  return out;
+}
+
+/**
+ * Lease exactly the account Seat Binding named. The ranking was done before the lock; under the lock this
+ * only re-checks that the account can still be taken (enabled, holding a login store for `cli`, not
+ * quarantined) and writes the lease. An account that cannot is a `lease-conflict` the runner answers with a
+ * fresh bind; it is never replaced by another account here. Returns null when the provider is not managed
+ * (no account list), and a receipt in the selection when the lease is written.
+ */
+export function acquireNamedAccountLease({
+  runnerConfig, provider, accountId, assignmentId, runId, runtimeDir, runIsDead, isRunWorkerAlive,
+  // The CLI the launch runs: only an account that declares a login store for it can be leased.
   cli = null,
+  // Digest of the account view Seat Binding ranked from, kept in the receipt.
+  accountViewDigest = null,
   now = new Date(),
-  // How long to wait for the state lock before throwing
-  // ProviderCapacityLockError; omitted keeps withProviderStateLock's own default.
   lockWaitMs,
 } = {}) {
   if (!provider || !runId) return null;
-  const fullInventory = providerAccountInventory(runnerConfig);
-  if (!fullInventory[provider] || Object.keys(fullInventory[provider].accounts).length === 0) return null;
-  const inventory = cli ? inventoryServingCli(fullInventory, provider, cli) : fullInventory;
-  if (Object.keys(inventory[provider].accounts).length === 0) {
-    return { status: 'refused', provider, reason: 'provider-capacity.no-account-for-cli', cli };
-  }
+  const accounts = providerAccountInventory(runnerConfig)[provider]?.accounts ?? {};
+  if (Object.keys(accounts).length === 0) return null;
+  const conflict = (detail) => ({ status: 'refused', provider, accountId: accountId ?? null, reason: LEASE_CONFLICT_REASON, detail, ...(cli ? { cli } : {}) });
+  const account = accountId ? accounts[accountId] : null;
+  if (!account) return conflict(`account "${provider}/${accountId}" is not in the inventory`);
+  if (account.disabled === true) return conflict(`account "${provider}/${accountId}" is disabled`);
+  if (cli && !credentialSourceForCli(account, cli)) return conflict(`account "${provider}/${accountId}" holds no "${cli}" login store`);
   const { statePath } = providerCapacityStatePaths(runtimeDir);
   return withProviderStateLock(() => {
     const state = readState(statePath);
     state.providers[provider] ??= { accounts: {} };
     const providerState = state.providers[provider];
     reclaimDeadLeases(providerState, { runIsDead, isRunWorkerAlive, nowIso: now.toISOString() });
-    const ranked = rankProviderAccounts({
-      provider, inventory, state, assignmentId, runIsDead, isRunWorkerAlive, now: now.getTime(),
-    });
-    if (ranked.length === 0) {
-      return { status: 'refused', provider, reason: 'provider-capacity.exhausted-or-quarantined' };
-    }
-    const accountId = ranked[0];
-    const account = inventory[provider].accounts[accountId];
     const acct = accountState(providerState, accountId);
-    const selectedAt = now.toISOString();
-    acct.lastSelectedAt = selectedAt;
+    if (isQuarantined(acct, now.getTime())) return conflict(`account "${provider}/${accountId}" is quarantined`);
+    const acquiredAt = now.toISOString();
+    acct.lastSelectedAt = acquiredAt;
+    const self = selfRecord();
     acct.leases[runId] = {
       runId,
       assignmentId: assignmentId ?? null,
       pid: process.pid,
-      processStartTime: getProcessStartTime(process.pid),
-      acquiredAt: selectedAt,
+      processStartTime: self.startTime,
+      record: self,
+      acquiredAt,
     };
-    if (assignmentId) state.assignments[`${provider}:${assignmentId}`] = { accountId, selectedAt };
+    if (assignmentId) state.assignments[`${provider}:${assignmentId}`] = { accountId, selectedAt: acquiredAt };
     writeState(statePath, state);
     return {
       contract: PROVIDER_CAPACITY_SELECTION_CONTRACT,
@@ -651,8 +673,9 @@ export function acquireProviderAccountLease({
       provider,
       accountId,
       accountLabel: account.label,
-      selectedAt,
+      selectedAt: acquiredAt,
       lease: { runId, assignmentId: assignmentId ?? null, pid: process.pid },
+      leaseReceipt: { provider, accountId, runId, acquiredAt, accountViewDigest },
       // An account with one store per CLI carries all of them; the launch takes the one of the CLI it
       // actually runs (providerCapacityForCommand). `credentialSource` is the store of `cli` when known.
       credentialSource: credentialSourceForCli(account, cli),
@@ -661,13 +684,16 @@ export function acquireProviderAccountLease({
   }, { waitMs: lockWaitMs });
 }
 
-/** The provider's inventory narrowed to the accounts that declare a login store for `cli`. */
-function inventoryServingCli(inventory, provider, cli) {
-  const accounts = {};
-  for (const [id, account] of Object.entries(inventory[provider].accounts)) {
-    if (credentialSourceForCli(account, cli)) accounts[id] = account;
-  }
-  return { ...inventory, [provider]: { ...inventory[provider], accounts } };
+/**
+ * Audit a lease receipt against the provider's own record of the lease it granted. The receipt is read
+ * from the attempt directory, which a worker can reach; the record in the provider state is not. Returns
+ * null when they agree, and what differs when they do not (including a receipt the provider never granted).
+ */
+export function auditLeaseReceipt(receipt, { assignmentId, runtimeDir } = {}) {
+  const { statePath } = providerCapacityStatePaths(runtimeDir);
+  const held = readState(statePath).assignments?.[`${receipt?.provider}:${assignmentId}`];
+  if (held?.accountId === receipt?.accountId && held?.selectedAt === receipt?.acquiredAt) return null;
+  return `the receipt names ${receipt?.provider}/${receipt?.accountId} acquired ${receipt?.acquiredAt}, the provider record names ${held ? `${held.accountId} selected ${held.selectedAt}` : 'no lease for this assignment'}`;
 }
 
 export function releaseProviderAccountLease({ provider, accountId, runId, runtimeDir } = {}) {
@@ -999,5 +1025,6 @@ export function redactProviderCapacitySelection(selection) {
     accountLabel: selection.accountLabel,
     selectedAt: selection.selectedAt,
     lease: selection.lease,
+    ...(selection.leaseReceipt ? { leaseReceipt: selection.leaseReceipt } : {}),
   };
 }

@@ -64,9 +64,10 @@ echo '{"v":1,"protocol":1,"op":"'"$3"'","result":"slot","slot":{"tabId":"t","pan
   return { root, run, calls };
 }
 
-// A live pid that is not an ancestor of the spawned script.
+// A live pid that is not an ancestor of the spawned script. The sleep gets its own stdio, or it
+// would hold the pipe spawnSync reads and make the call last the whole 30 s.
 function strangerPid(t) {
-  const child = spawnSync('bash', ['-c', 'sleep 30 & echo $!'], { encoding: 'utf8' });
+  const child = spawnSync('bash', ['-c', 'sleep 30 </dev/null >/dev/null 2>&1 & echo $!'], { encoding: 'utf8' });
   const pid = Number(child.stdout.trim());
   t.after(() => { try { process.kill(pid); } catch {} });
   return pid;
