@@ -53,6 +53,11 @@ fn process_info_separates_shell_from_foreground() {
     let shell = parse_process_info(&result("pane-process-info-shell")).unwrap();
     assert_eq!(shell.foreground.len(), 1);
     assert_eq!(shell.foreground[0].pid, shell.shell_pid);
+
+    // A zombie in the foreground group comes without argv and is left out;
+    // the live process beside it is still read.
+    let zombie = parse_process_info(&result("pane-process-info-zombie")).unwrap();
+    assert_eq!(zombie.foreground, vec![ForegroundProcess { pid: 1972479, argv: vec!["sleep".into(), "300".into()] }]);
 }
 
 #[test]
