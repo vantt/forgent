@@ -14,6 +14,11 @@ import { REPO_ROOT, buildRustDistribution, releaseOutputDir } from '../../script
 
 export const FGCTL_BIN = releaseBinaryPath(releaseOutputDir(), 'fgctl');
 
+// Every `fgctl init` runs doctor, and doctor's Claude plugin row would run the real `claude` CLI and
+// reach the network. Each spawn here inherits process.env, so naming a missing binary once keeps them
+// all off it, as the setup tests do; a test that sets FGOS_CLAUDE_COMMAND itself still wins.
+process.env.FGOS_CLAUDE_COMMAND ??= '/nonexistent/fgos-test-claude-binary';
+
 export const releaseDirName = (digest) => (process.platform === 'win32' ? digest.replace(':', '-') : digest);
 
 // Filled by the before() hook that useReleaseFixture() registers.

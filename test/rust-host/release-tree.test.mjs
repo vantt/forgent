@@ -172,7 +172,8 @@ test('R1 & R2: Release tree builder stages release tree and produces canonical m
     const conventionRulesPath = 'libexec/legacy-node/packages/convention/contracts/convention.rules.v1.json';
     assert.ok(paths.includes(conventionRulesPath), 'manifest files[] must cover installed doctor rule data');
 
-    const doctorEnv = { ...process.env };
+    // Doctor's Claude plugin row would run the real `claude` CLI and reach the network.
+    const doctorEnv = { ...process.env, FGOS_CLAUDE_COMMAND: '/nonexistent/fgos-test-claude-binary' };
     delete doctorEnv.CLAUDE_CODE_SESSION_ID;
     delete doctorEnv.FGOS_HOST_BIN;
     // The staged release finds its own manifest; the outer run's active-release pair names another payload.
