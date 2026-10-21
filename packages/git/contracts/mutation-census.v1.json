@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "b50abfc4dac44e2ec447523630ae456de5e25694a7e0dec537260d79f3df9b8f",
+  "payloadDigest": "e11f0d9c70507981f37d0666c89d55028c8c673d36db83c00a8b3d75518c0eea",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -713,7 +713,7 @@
     "src/runner/dispatch/assignment.mjs": "a8d4660fe96ff678cb12bc9d34bb7c4c4acbd4bcc1f747fe450e72eb7e97c31f",
     "src/runner/dispatch/brief.mjs": "7ec9287da887ff7022b0d1085dcac6e44847aef6bc81e533bed2595ecb02522b",
     "src/runner/dispatch/cli.mjs": "68e4ced9e9c07385b985e300ba698befaba214d2a7b10f8bbbe3188b43c377f9",
-    "src/runner/dispatch/config.mjs": "3b9831915f4dff629243c6c5eb0652fba974ca13d8b14aafacf71d30d2b56bc0",
+    "src/runner/dispatch/config.mjs": "5f5fc1775e9a50d48c86980c1b41aafcc573499b31cbd06f529d3afbe9b56aec",
     "src/runner/dispatch/confinement/attestation-store.mjs": "3b8fc1e59ac9282338f6bf0c9bdee8c787f67cc7f1853943509ffec6ff72d5d7",
     "src/runner/dispatch/confinement/authority.mjs": "e618d5997f85e200c50f6459c43f08f31852bbd6cefb6c27c128c4e845c78709",
     "src/runner/dispatch/confinement/backend-registry.mjs": "8c07146b675d4ad1086c88685de4a521c7004bc00de39e20d2dbb99d96bfa1ff",
@@ -967,64 +967,7 @@
     "src/workflow/unit-handoff.mjs": "6dfe2fd3402bb3f484e20def7caa8f55cf92cddfd565c90d0a543b838c1f17d9",
     "src/workflow/units-source.mjs": "63fa30666c4ba9edb5174c47042a08b02007ff1bb34e95df918956029a7e37c3"
   },
-  "sites": [
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2180,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:724",
-      "binary": "? elements of globalConfig.runner",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2180,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:724",
-      "binary": "? elements of value.map(stripConfigComments)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2180,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:724",
-      "binary": "? elements of withGlobal.runner",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2180,
-      "spawn": "executeExecutorCli -> src/runner/dispatch/cli.mjs:724",
-      "binary": "? runner",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/cli.mjs",
-      "line": 724,
-      "spawn": "executeThroughConfinement -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "? elements of globalConfig.runner",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/cli.mjs",
-      "line": 724,
-      "spawn": "executeThroughConfinement -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "? elements of value.map(stripConfigComments)",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/cli.mjs",
-      "line": 724,
-      "spawn": "executeThroughConfinement -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "? elements of withGlobal.runner",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "src/runner/dispatch/cli.mjs",
-      "line": 724,
-      "spawn": "executeThroughConfinement -> src/runner/dispatch/confinement/authority.mjs:1142",
-      "binary": "? runner",
-      "family": "unresolved-binary"
-    }
-  ],
+  "sites": [],
   "classes": [
     {
       "path": ".agents/skills/distill/scripts/distill.mjs",
