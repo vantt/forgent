@@ -534,42 +534,44 @@ test('F5: a settle write landing exactly between acquireRunControl and the settl
   // every trial reported "unsafe" regardless of whether the fix was present,
   // which was never a real signal either way.
   //
-  // Instead of racing wall-clock time, this hooks the exact fs call
-  // acquireRunControl uses to durably publish its generation record
-  // (fs.linkSync onto control/generations/<epoch>.json) and writes
-  // result.json synchronously from inside that hook. That lands the settle
-  // exactly between acquireRunControl's return and the F5 re-check's own
-  // read, every single time, with zero wall-clock dependency -- and if the
-  // F5 reorder were ever reverted (the re-check moved back to before
-  // acquireRunControl), both of the module's own result.json reads would
-  // already have run by the time this hook fires, so the write would slip
-  // through unnoticed and this test would fail.
+  // Instead of racing wall-clock time, this hooks the Node fs calls and writes result.json synchronously
+  // from the first one that runs after acquireRunControl's generation record exists on disk (the record
+  // itself is now installed by the native durable-file door, which no Node hook can intercept). That lands
+  // the settle exactly between acquireRunControl's return and the F5 re-check's own read, every single time,
+  // with zero wall-clock dependency -- and if the F5 reorder were ever reverted (the re-check moved back to
+  // before acquireRunControl), both of the module's own result.json reads would already have run by the
+  // time this hook fires, so the write would slip through unnoticed and this test would fail.
   const TRIALS = 20;
   let unsafe = 0;
-  const realLinkSync = fs.linkSync;
+  const hooked = ['existsSync', 'readFileSync', 'statSync', 'lstatSync', 'readdirSync', 'openSync'];
+  const real = Object.fromEntries(hooked.map((name) => [name, fs[name]]));
   for (let i = 0; i < TRIALS; i += 1) {
     const { root, runDir } = makeRepo();
     const resultPath = path.join(runDir, 'result.json');
     const generationsDir = path.join(runDir, 'control', 'generations');
+    const generationCount = () => (real.existsSync(generationsDir) ? real.readdirSync(generationsDir).length : 0);
+    const before = generationCount();
     let injected = false;
-    fs.linkSync = (src, dest) => {
-      realLinkSync(src, dest);
-      if (!injected && path.dirname(dest) === generationsDir && /^\d{10}\.json$/.test(path.basename(dest))) {
-        injected = true;
-        fs.writeFileSync(resultPath, JSON.stringify({ ok: true }));
-      }
-    };
+    for (const name of hooked) {
+      fs[name] = (...args) => {
+        if (!injected && generationCount() > before) {
+          injected = true;
+          fs.writeFileSync(resultPath, JSON.stringify({ ok: true }));
+        }
+        return real[name](...args);
+      };
+    }
     try {
       const rec = recoverObserveUseCase({ repoRoot: root }, { runId: 'run_1', intent: 'resume' });
       const result = recoverApplyUseCase({ repoRoot: root }, applyFrom(rec));
-      assert.ok(injected, `trial ${i}: expected acquireRunControl's generation-file link to fire the injection hook`);
+      assert.ok(injected, `trial ${i}: expected the fs call after acquireRunControl's generation record to fire the injection hook`);
 
       // Unsafe iff the apply performed the write ('applied') even though
       // the settle write had already landed on disk by the time we can
       // observe it here.
       if (result.outcome === 'applied' && fs.existsSync(resultPath)) unsafe += 1;
     } finally {
-      fs.linkSync = realLinkSync;
+      Object.assign(fs, real);
       cleanup(root);
     }
   }

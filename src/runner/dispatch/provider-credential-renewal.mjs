@@ -24,6 +24,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { replaceDurably } from '../../native/door.mjs';
 import { createRequire } from 'node:module';
 
 import { resolveHolderLiveness } from './process-identity.mjs';
@@ -104,20 +105,7 @@ function serializeJson(doc, raw) {
 }
 
 export function writeFileAtomic(file, content) {
-  const tmp = path.join(path.dirname(file), `.${path.basename(file)}.fgos-${process.pid}-${crypto.randomBytes(4).toString('hex')}`);
-  try {
-    const fd = fs.openSync(tmp, 'w', 0o600);
-    try {
-      fs.writeSync(fd, content);
-      fs.fsyncSync(fd);
-    } finally {
-      fs.closeSync(fd);
-    }
-    fs.renameSync(tmp, file);
-  } catch (err) {
-    try { fs.rmSync(tmp, { force: true }); } catch { /* nothing left to do */ }
-    throw err;
-  }
+  replaceDurably(path.dirname(file), path.basename(file), content, 0o600);
 }
 
 /**

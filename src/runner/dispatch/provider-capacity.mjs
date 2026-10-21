@@ -5,6 +5,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { replaceDurably } from '../../native/door.mjs';
 import { normalizeProviderFamily } from './provider-adapter.mjs';
 import { deriveLegacyInventory } from './llm-accounts.mjs';
 import { AUTH_FAILURE_TAIL_LINES, matchAuthFailureLine, matchQuotaLimitLine } from './provider-auth-failure.mjs';
@@ -367,16 +368,7 @@ function readState(statePath) {
 function writeState(statePath, state) {
   const dir = path.dirname(statePath);
   fs.mkdirSync(dir, { recursive: true });
-  const content = `${JSON.stringify(state, null, 2)}\n`;
-  const tmpPath = path.join(dir, `.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`);
-  const fd = fs.openSync(tmpPath, 'w');
-  try {
-    fs.writeSync(fd, content);
-    fs.fsyncSync(fd);
-  } finally {
-    fs.closeSync(fd);
-  }
-  fs.renameSync(tmpPath, statePath);
+  replaceDurably(dir, path.basename(statePath), `${JSON.stringify(state, null, 2)}\n`, 0o644);
 }
 
 export class ProviderCapacityLockError extends Error {

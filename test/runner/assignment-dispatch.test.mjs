@@ -131,44 +131,6 @@ function writeHangingExecutor(dir) {
   return scriptPath;
 }
 
-// Simulates a process crash mid-publish (S6): throws on the FIRST
-// `fs.writeSync` call whose fd was opened for a `.tmp-*` file under
-// `targetDir` -- the exact write `publishImmutableProof`'s fsynced
-// temp-file step performs -- so the target file (e.g. assignment.json)
-// never gets linked into place. By default `targetDir` must be the file's
-// immediate parent directory; pass `{ matchSubdir: true }` when the write
-// lands in an unpredictable child directory (e.g. a freshly-claimed
-// assignmentId directory under a shared assignments root). Self-restoring:
-// patches are undone as soon as the injected write fires, and the returned
-// `restore()` is a safety net for a test that throws before that happens.
-function injectSingleWriteFailureForDir(targetDir, errorMessage, { matchSubdir = false } = {}) {
-  const originalOpenSync = fs.openSync;
-  const originalWriteSync = fs.writeSync;
-  let capturedFd = null;
-  let triggered = false;
-  const restore = () => {
-    fs.openSync = originalOpenSync;
-    fs.writeSync = originalWriteSync;
-  };
-  const dirMatches = (dir) => (matchSubdir ? (dir === targetDir || dir.startsWith(`${targetDir}${path.sep}`)) : dir === targetDir);
-  fs.openSync = function patchedOpenSync(filePath, ...rest) {
-    const fd = originalOpenSync.call(fs, filePath, ...rest);
-    if (!triggered && typeof filePath === 'string' && dirMatches(path.dirname(filePath)) && path.basename(filePath).startsWith('.tmp-')) {
-      capturedFd = fd;
-    }
-    return fd;
-  };
-  fs.writeSync = function patchedWriteSync(fd, ...rest) {
-    if (!triggered && fd === capturedFd) {
-      triggered = true;
-      restore();
-      throw new Error(errorMessage);
-    }
-    return originalWriteSync.call(fs, fd, ...rest);
-  };
-  return restore;
-}
-
 test('executeAssignment executes non-mutating validate-plan assignment through fake executor', async () => {
   const tempDir = mkTempDir();
   const executorScript = writeEchoExecutor(tempDir);
@@ -2431,48 +2393,6 @@ function initGitRepo(repoDir) {
   execFileSync('git', ['add', '.'], { cwd: repoDir, stdio: 'ignore' });
   execFileSync('git', ['commit', '-m', 'initial'], { cwd: repoDir, stdio: 'ignore' });
 }
-
-test('executeAssignment: an interrupted assignment.json publish leaves it cleanly absent, and a retry recovers instead of permanently bricking the Assignment (S6)', async () => {
-  const tempDir = mkTempDir();
-  const executorScript = writeEchoExecutor(tempDir);
-  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
-
-  const work = { id: 'tsk-s6-assignment-json', status: 'doing', workflowStep: 'planning', domain: 'coding' };
-  const assignment = buildAssignment({ work, stage: 'planning', operation: 'validate-plan' });
-  const assignmentDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId);
-  const assignmentJsonPath = path.join(assignmentDir, 'assignment.json');
-
-  // 1. Simulate a crash exactly mid-`assignment.json` publish (the S6 crash
-  // window: `assignment-runner.mjs`'s own write, previously a bare
-  // `fs.writeFileSync` guarded only by `!existsSync`).
-  const restore = injectSingleWriteFailureForDir(assignmentDir, 'Injected crash mid assignment.json publish');
-  let crashed = false;
-  try {
-    await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
-  } catch (err) {
-    crashed = true;
-    assert.match(err.message, /Injected crash mid assignment\.json publish/);
-  } finally {
-    restore();
-  }
-  assert.equal(crashed, true, 'expected the injected fault to interrupt the first attempt');
-
-  // Torn-write proof: the interrupted publish must never leave partial bytes
-  // at the target path -- it is cleanly absent, not corrupt.
-  assert.equal(fs.existsSync(assignmentJsonPath), false);
-
-  // 2. Recovery proof: retrying (the crashed process restarts and calls
-  // executeAssignment again with the same Assignment) succeeds and produces
-  // a complete, valid assignment.json -- it must NOT hit "is corrupt
-  // (invalid JSON)", the failure mode a torn `fs.writeFileSync` used to
-  // cause forever.
-  const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
-  assert.equal(result.assignmentId, assignment.assignmentId);
-  assert.equal(fs.existsSync(assignmentJsonPath), true);
-  const onDisk = JSON.parse(fs.readFileSync(assignmentJsonPath, 'utf8'));
-  assert.equal(onDisk.assignmentId, assignment.assignmentId);
-});
-
 
 test('commitRunSettlement: a crash between control-settlement and result-publication is recoverable, not permanently stuck (S8)', () => {
   const tempDir = mkTempDir();

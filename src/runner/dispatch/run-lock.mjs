@@ -24,6 +24,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { installOnce } from '../../native/door.mjs';
 import { observe, selfRecord, resolveHolderLiveness } from './process-identity.mjs';
 
 // --- PID liveness --------------------------------------------------------
@@ -52,20 +53,8 @@ export { resolveHolderLiveness };
 
 // --- Fsynced atomic publication -------------------------------------------
 
-function writeFsyncedTemp(dir, content) {
-  const tmpPath = path.join(dir, `.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`);
-  const fd = fs.openSync(tmpPath, 'w');
-  try {
-    fs.writeSync(fd, content);
-    fs.fsyncSync(fd);
-  } finally {
-    fs.closeSync(fd);
-  }
-  return tmpPath;
-}
-
 /** Best-effort fsync of an already-written file, for a caller that wrote it
- * via plain `fs.writeFileSync` rather than `writeFsyncedTemp` above (e.g. a
+ * via plain `fs.writeFileSync` (e.g. a
  * file inside a staging directory this module doesn't own the writing of). */
 export function fsyncFileBestEffort(filePath) {
   let fd;
@@ -102,14 +91,6 @@ export function fsyncDirBestEffort(dir) {
         // ignore
       }
     }
-  }
-}
-
-function removeTempBestEffort(tmpPath) {
-  try {
-    fs.unlinkSync(tmpPath);
-  } catch (err) {
-    if (err.code !== 'ENOENT') throw err;
   }
 }
 
@@ -201,17 +182,9 @@ export function publishNextGeneration(generationsDir, decide) {
       return { published: false, ...decision };
     }
 
-    const targetPath = path.join(generationsDir, generationFileName(nextEpoch));
-    const tmpPath = writeFsyncedTemp(generationsDir, JSON.stringify(decision.record));
-    try {
-      fs.linkSync(tmpPath, targetPath);
-    } catch (err) {
-      if (err.code !== 'EEXIST') throw err;
-      removeTempBestEffort(tmpPath);
+    if (installOnce(generationsDir, generationFileName(nextEpoch), JSON.stringify(decision.record), 0o644) === 'already-exists') {
       continue; // lost the race -- reread and let `decide` re-evaluate
     }
-    removeTempBestEffort(tmpPath);
-    fsyncDirBestEffort(generationsDir);
     return { published: true, epoch: nextEpoch, record: decision.record };
   }
 }
@@ -227,16 +200,7 @@ export function publishNextGeneration(generationsDir, decide) {
 export function publishMarkerOnce(markerPath, record) {
   const dir = path.dirname(markerPath);
   fs.mkdirSync(dir, { recursive: true });
-  const tmpPath = writeFsyncedTemp(dir, JSON.stringify(record));
-  try {
-    fs.linkSync(tmpPath, markerPath);
-  } catch (err) {
-    if (err.code !== 'EEXIST') throw err;
-    removeTempBestEffort(tmpPath);
-    return { published: false };
-  }
-  removeTempBestEffort(tmpPath);
-  fsyncDirBestEffort(dir);
+  if (installOnce(dir, path.basename(markerPath), JSON.stringify(record), 0o644) === 'already-exists') return { published: false };
   return { published: true };
 }
 

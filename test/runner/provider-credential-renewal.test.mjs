@@ -1377,18 +1377,14 @@ test('failures closer together than the minimum interval are counted once, and t
   } finally { process.stderr.write = realWrite; w.cleanup(); }
 });
 
-test('the marker is rewritten through a rename, and a marker that cannot be read stops the removal', () => {
+test('the marker is rewritten whole, and a marker that cannot be read stops the removal', () => {
   const w = workspace();
   try {
     const dir = privateHomeWithRenewedLogin(w);
     const marker = path.join(dir, OWNERSHIP_MARKER_FILE);
-    const renamed = [];
-    const realRename = fs.renameSync;
-    fs.renameSync = (from, to) => { renamed.push(to); return realRename(from, to); };
-    try { extendOwnershipMarker(dir, { credentialKept: { attempts: 1 } }); } finally { fs.renameSync = realRename; }
-    assert.deepEqual(renamed, [marker], 'written to a temp file and renamed over the marker');
+    extendOwnershipMarker(dir, { credentialKept: { attempts: 1 } });
     assert.equal(markerOf(dir).credentialKept.attempts, 1);
-    assert.deepEqual(fs.readdirSync(dir).filter((n) => /\.fgos-\d+-/.test(n)), [], 'no temp file is left behind');
+    assert.deepEqual(fs.readdirSync(dir).filter((n) => /\.tmp$/.test(n)), [], 'no temp file is left behind');
 
     // A torn marker (a writer died half-way) does not prove the home holds no login.
     fs.writeFileSync(marker, '{"contract": "');

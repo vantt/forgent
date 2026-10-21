@@ -12,8 +12,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
-import { acquireRunControl, buildRunControlHolder } from '../../src/runner/dispatch/run-lock.mjs';
+import { spawn, spawnSync } from 'node:child_process';
+import { acquireRunControl, buildRunControlHolder, listGenerations, publishMarkerOnce, publishNextGeneration } from '../../src/runner/dispatch/run-lock.mjs';
 import { selfRecord } from '../../src/runner/dispatch/process-identity.mjs';
 
 function mkRunDir() {
@@ -66,4 +66,31 @@ test('acquireRunControl: a holder whose pid is genuinely dead IS reclaimed', () 
 
   const contender = acquireRunControl(runDir, { holder: buildRunControlHolder('contender') });
   assert.equal(contender.status, 'acquired');
+});
+
+// Publication is create-only through the durable-file door: of any number of separate processes racing for
+// one name, exactly one installs it, and no temporary is left behind.
+test('racing processes publish one marker and one next generation, never a replace', async () => {
+  const dir = mkRunDir();
+  const lock = new URL('../../src/runner/dispatch/run-lock.mjs', import.meta.url).href;
+  const race = (code) => Promise.all([1, 2, 3, 4].map((n) => new Promise((resolve) => {
+    const child = spawn(process.execPath, ['--input-type=module', '-e', code(n)], { stdio: ['ignore', 'pipe', 'inherit'] });
+    let out = '';
+    child.stdout.on('data', (chunk) => { out += chunk; });
+    child.once('exit', () => resolve(JSON.parse(out)));
+  })));
+  const marker = path.join(dir, 'releases', '0000000001.json.release');
+  const markers = await race((n) => `import { publishMarkerOnce } from ${JSON.stringify(lock)};
+    console.log(JSON.stringify(publishMarkerOnce(${JSON.stringify(marker)}, { winner: ${n} })));`);
+  assert.equal(markers.filter((r) => r.published).length, 1);
+  const generations = path.join(dir, 'generations');
+  fs.mkdirSync(generations, { recursive: true });
+  const published = await race((n) => `import { publishNextGeneration } from ${JSON.stringify(lock)};
+    const r = publishNextGeneration(${JSON.stringify(generations)}, ({ nextEpoch }) => nextEpoch > 1 ? { stop: true } : { record: { winner: ${n} } });
+    console.log(JSON.stringify({ published: r.published }));`);
+  assert.equal(published.filter((r) => r.published).length, 1);
+  assert.equal(listGenerations(generations).length, 1);
+  for (const sub of [path.dirname(marker), generations]) assert.deepEqual(fs.readdirSync(sub).filter((f) => f.endsWith('.tmp')), []);
+  assert.deepEqual(publishMarkerOnce(marker, { winner: 'late' }), { published: false });
+  assert.equal(publishNextGeneration(generations, () => ({ stop: true })).published, false);
 });
