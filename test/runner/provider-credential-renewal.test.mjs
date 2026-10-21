@@ -2055,6 +2055,17 @@ test('a staging whose writer is a zombie is reported: a writer that has exited i
   }
 });
 
+test('a staging that holds a leftover durable-file temporary still digests equal to its kept twin and is reaped', () => {
+  const w = interruptedStagingWorkspace();
+  try {
+    const dead = deadPid();
+    w.put('000000000001000-aaaa', { 'auth.json': 'KEPT' });
+    const leftover = w.put(`.tmp-${dead}-leftover`, { 'auth.json': 'KEPT', [`.durable-file-${dead}-3.tmp`]: 'KEPT' });
+    assert.deepEqual(sweepInterruptedStagings({ runtimeDir: w.runtimeDir }), { removed: 1, kept: 0 });
+    assert.equal(fs.existsSync(leftover), false);
+  } finally { w.cleanup(); }
+});
+
 test('the sweep removes an interrupted staging only when it is empty or identical to a kept copy, and never one that is young or has a live writer', () => {
   const w = interruptedStagingWorkspace();
   try {
