@@ -76,11 +76,14 @@ const executorFor = (scriptPath, family = 'node') => ({
 const modelPolicies = (...families) => Object.fromEntries(families.map((f) => [f, { nano: 'fake', mini: 'fake', standard: 'fake', advanced: 'fake', flagship: 'fake', frontier: 'fake' }]));
 
 /** Run the loop once with `config` on disk (runUnit reads it there) and in memory. */
-async function runLoop({ repoRoot, worktreeDir }, config) {
+async function runLoop({ repoRoot, worktreeDir }, config, log = noLog) {
   const confined = confinedRunnerConfig({ timeoutMs: 30000, ...config });
   persistRunnerConfig(repoRoot, confined);
-  return runOnce({ repoRoot, config: confined, worktreeDir, log: noLog });
+  return runOnce({ repoRoot, config: confined, worktreeDir, log });
 }
+
+/** The actual work.outcome event the loop wrote for `id`. */
+const actualOutcome = (dir, id) => readRawEvents(dir).find((e) => e.type === 'work.outcome' && e.payload.actual && e.payload.id === id)?.payload.actual;
 
 test('a loop worker runs as a Unit run: the run records the item, the runner commits, and the dispatch event and worker log name the run', async () => {
   const fx = setup();
@@ -210,11 +213,14 @@ test('a worker round that fails after writing files is a failed attempt: goal-ch
   seedItem(fx.dir, { id: 'item-rework', verify: 'test -f fix.txt' });
   // The worker writes the fix, then fails.
   const script = writeWorker(fx.scriptDir, 'fails-after-writing', `fs.writeFileSync('fix.txt', 'fix\\n');\nprocess.exit(1);`);
+  const logs = [];
 
-  const result = await runLoop(fx, { executors: { 'fgos-coding-implement': executorFor(script) }, modelPolicies: modelPolicies('node') });
+  const result = await runLoop(fx, { executors: { 'fgos-coding-implement': executorFor(script) }, modelPolicies: modelPolicies('node') }, (line) => logs.push(line));
 
   assert.equal(result.dispatched[0].outcome, 'parked', 'a failed round is never proposed');
   assert.equal(result.dispatched[0].errorClass, 'worker-failed');
+  assert.ok(logs.some((l) => l.startsWith('fgos-runner: worker-failed for "item-rework"')), JSON.stringify(logs));
+  assert.equal(actualOutcome(fx.dir, 'item-rework').errorClass, 'worker-failed');
   assert.equal(listWork(fx.dir).work['item-rework'].status, 'blocked');
   assert.equal(git(fx.repoRoot, 'show', '--format=', '--name-only', 'fgw/item-rework'), 'bad.txt', 'the branch still holds only the old commit');
 });
@@ -342,11 +348,17 @@ test('a failed runner commit keeps the checkout: retries and the next dispatch r
   git(fx.repoRoot, 'config', 'core.hooksPath', hooks);
   const script = writeWorker(fx.scriptDir, 'producing', PRODUCING);
   const config = { executors: { 'fgos-coding-implement': executorFor(script) }, modelPolicies: modelPolicies('node') };
+  const logs = [];
 
-  const first = await runLoop(fx, config);
+  const first = await runLoop(fx, config, (line) => logs.push(line));
 
+  assert.equal(first.exitCode, 0, 'a commit the hook refuses parks the item, never fails the run');
   assert.equal(first.dispatched[0].outcome, 'parked');
   assert.equal(first.dispatched[0].errorClass, 'worktree-fail');
+  const refused = logs.find((l) => l.startsWith('fgos-runner: worktree-fail for "item-commit-fails"'));
+  assert.ok(refused, JSON.stringify(logs));
+  assert.match(refused, /rejected-by-hook/, 'the hook\'s own words reach the loop log');
+  assert.equal(actualOutcome(fx.dir, 'item-commit-fails').errorClass, 'worktree-fail');
   assert.equal(countWorkerRuns(fx.repoRoot), 1, 'the agent ran once; the retries only tried to commit again');
   const [failed, ...others] = unitRuns(fx.repoRoot);
   assert.equal(others.length, 0, 'retries resumed the same Unit run');
