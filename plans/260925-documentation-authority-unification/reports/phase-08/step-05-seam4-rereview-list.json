@@ -1139,7 +1139,7 @@
       "file": "src/cli/command-registry.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "5885924ffb34ff669619bb0bc43070af37bbd7e738377275199056b55a09544b",
+      "recordSha256": "ac5c7da56782495eebdf320560802aaa3ba64e9df6efa36498459cf7e939c104",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "a1f46110a2bfdba3a204d01a335910e499fe2ca69e376d2b5b0e7812c692dd17"
     },
@@ -1195,7 +1195,7 @@
       "file": "apps/fgos-gateway/src/gateway.rs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "43f9f19c35a95765e4de2f6de90575508f305f37059faf27eed423ee35c3f9eb",
+      "recordSha256": "4b56dbf86662de114f880f4329d4c43180b5638626b0c01f4e66f49042e0c5bd",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6"
     },
@@ -1203,7 +1203,7 @@
       "file": "apps/fgos-gateway/src/mcp.rs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "63fb73e85dce382b8293e13d621340d6fc2caa53a8a5729d9e09782409c444fb",
+      "recordSha256": "6d5a454ae94c51440b55372f4e9e6e8ce5d06940fabcc479033cab4c6135f09b",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "b60e289295c3daad726e988d63674e7f344d554577864b34e470d89ccad90df3"
     },
@@ -1211,7 +1211,7 @@
       "file": "docs/decisions/index.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "a14e6f2fe1671b7be42b68bfbe3ff35e1a745fb49cbb48295ef71730b372ba6a",
+      "recordSha256": "554ccbefc42e3db80231ea22ab5448bafe8e09492a513b6490a98d658d40201b",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "082c2741b963b714a6976882f28bc7e84d48f5138b0f62e4feafb2db7a203200"
     },
@@ -1219,7 +1219,7 @@
       "file": "src/report/decision-index.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "e3b6ef565fb47ee0d126de8b2dc3995e40b906811482ed609528171e457323f3",
+      "recordSha256": "87c0b66b4773f0d21a7b97b0e9b32475f0826af0316151ce0d0c1dd411dff252",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "5ad753196470debd2f502b3c00994c1d75a9ed0c576c5cf8188eb8600f0a09a2"
     },
@@ -1227,7 +1227,7 @@
       "file": "docs/doc-registry.json",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "5a975f23e9575b5679310183555b4d6e9de0c968e09e1ce6b5487e96dea28b93",
+      "recordSha256": "f11d2282574ba4e08ac4f9f0a0ec93b8a65b8f25949fe1d5a81c025fb6ce11a8",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844"
     },
@@ -1235,7 +1235,7 @@
       "file": "docs/doc-registry.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "9cebf9b68b40f4d49a22d571173ef0cef3e2fd6ba8710d73e75e914654b1dcb3",
+      "recordSha256": "fe4197b59a30f00362a30a763fa126f637bfa433c0c5c97c8ff0cfae8e0fb0f0",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "d039d7ec2b1bb93780ae6a5bc09dbeb02ead6ef60d0e9a980ac59463ce511392"
     },
@@ -1251,7 +1251,7 @@
       "file": "docs/enduser-docs-index.json",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "8088d960122a7c8bae3c5029210737d867e64eae5be89bb0072e34ab478625a9",
+      "recordSha256": "ad8129901f8bc1b8a29cc225b0577b2f418138c6c6c2acd85390b85910159393",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "55a188251a55da321d4c79b363a8cf72ae234e8b55375e35e66538586df652e7"
     },
@@ -1267,7 +1267,7 @@
       "file": "src/report/enduser-index-generate.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "5aa9e332f790dc7f73b3e2cf133c69c2b55f177d80230ae125b37a2ec76b1282",
+      "recordSha256": "9cae6c0a965abfd7aa01018abc903410e3cf648e8ba9a7fec6cc5a6eca6aa207",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "347d0078b55a56f1ba019f56e492116c0fdf9ea090fb79e7043b83034728fb15"
     },
@@ -1275,7 +1275,7 @@
       "file": "src/report/enduser-index.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "771776ea550427ff047d8fc00b194c7ab58878bcb649e6f631f8987005cdbd87",
+      "recordSha256": "0db5a894d19134ed2ba9932e0ab7e57c9c6ebce3decee66cabf41d2e99c28213",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "373da334b9cd862b2c3a0fbf4fffb3fe010f244872702dbfceb25eada5c5e650"
     },
@@ -1355,7 +1355,7 @@
       "file": ".agents/skills/_shared/executor-dispatch-fallback.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "a7df6f7ddcec0ae3d283c0608da5f1b9faed99091d0f1c985f4e0c86b23ba240",
+      "recordSha256": "bdb2b974eb47c0bf010d7347bf8c0b32914bfc724d5605a1197e93990f6fecbd",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "678291e7b79e17ce8a82845ededfbb2ec0612700cf0f7297a26f03245f3241ed"
     },
@@ -1427,7 +1427,7 @@
       "file": ".agents/skills/fgos-clarifying/SKILL.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "d1b0146bb6f985f2d6aae5b6d26e61cc8f015a66bc55a95dcebf244d62ba8a7d",
+      "recordSha256": "a8fc82ccc5bd6029b067ae35a302fe3f7bbb2ad6a31d7123f794f42f659a3f1c",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "a3850c3acab72f5bc422c17b0a6f1a03b0e884872e65fe66c5b3caf22a226bf9"
     },
@@ -1507,7 +1507,7 @@
       "file": ".agents/skills/fgos-coding-knowledge/SKILL.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "df0adcfda0b6f8129be15ea0105286f1a259776b42a3474ac5c1e73864c872d6",
+      "recordSha256": "912980d238b4e707ae7a9c9a371e4ca8274b99216c6343f9c636ddd744241d9e",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "175d01cc7e6ca027ba704eac796f1e41a03c929977da0f03c8d993b6f47af94f"
     },
@@ -1843,7 +1843,7 @@
       "file": "docs/backlog.md",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "e9230472c42025ecd4938dff4d267954e4d5861e1b253d5d6b68afbdada5c487",
+      "recordSha256": "31b81f4f936e836c7338101b6e6b8ea502b7fe28a39497a7bf9a3e68e00ff05b",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "2e0cd5cd4e216a77ad108e187e109135571c0ca57e53bda77efcc2cef4e6331d"
     },
@@ -2099,7 +2099,7 @@
       "file": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "59298776cc48b2ba554b97848887a59bdb3c5f6e05f15a478edab33f56660be8",
+      "recordSha256": "e95489e8375335ae90440566579b6d11f46ac250d67a5d954344c11f6e4b850f",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "678291e7b79e17ce8a82845ededfbb2ec0612700cf0f7297a26f03245f3241ed"
     },
@@ -2211,7 +2211,7 @@
       "file": "plugins/fgOS/skills/fgos-clarifying/SKILL.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "54ba45adbf6d7bb8444a0006608a2efdea8f6b1ff37163ffee1aae5a5e94e87f",
+      "recordSha256": "05f5caa6fcd9ccfc66921112541766d26385b18b40c0697afd2c28668e800dcb",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "a3850c3acab72f5bc422c17b0a6f1a03b0e884872e65fe66c5b3caf22a226bf9"
     },
@@ -2291,7 +2291,7 @@
       "file": "plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md",
       "generated": true,
       "itemsChanged": true,
-      "recordSha256": "f3c4d5b56ad14662a64ca73331d14f7ac2a0951083f458c245a9795c2ad6e54d",
+      "recordSha256": "94b959444e6a8ca4ee634f79aba842fd2d053f9695b5b67db50764df9ddade97",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "175d01cc7e6ca027ba704eac796f1e41a03c929977da0f03c8d993b6f47af94f"
     },
@@ -2547,7 +2547,7 @@
       "file": "plugins/fgOS/skills/terminal/SKILL.md",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "23ce10e0e8bf9dd9836c1d9c09ec772e9fe08455734d83e88eadc151eb536414",
+      "recordSha256": "8ec8b163e1ff67cf09f6d7c2bbb954d47de409b911dfa3eef985967432fac747",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "65fdc9d4360dce4ed0c859879160e57bda72157b9edff99b3bff429b27c9e294"
     },
@@ -2579,7 +2579,7 @@
       "file": "scripts/backfill-status-category.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "b508e83f018b6aca9dfa0aa72d361bf29db10c4f917c7e6f17c09b5257a01471",
+      "recordSha256": "309e4f469eb73ab4444d15d0bc17e7d00df8aa9888f4ee5174b8de4139bfaf7e",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "bff22a3805f8a38f1c7d93b7cee3b53ee5b6dde0d978b4fdbfb760c1cc3622d6"
     },
@@ -2643,7 +2643,7 @@
       "file": "scripts/check-decision-supersession.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "afc6d17b593c53b31ef93600d70f8035b7db0b7a3f74a76039b4474c4476ecb1",
+      "recordSha256": "257f40a812c7079d23ad8590297fb7f22ae5099514a99e910322f2d2210d7c7b",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "1fc95bddf36b4485338125d5f902e69b95d66b6e34e5e60dc06cc822096a8f90"
     },
@@ -2651,7 +2651,7 @@
       "file": "scripts/check-doc-candidate-status.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "69dde22726a3d35980af356a69f6bc43519717e4e3f73e6caba8623de71f8525",
+      "recordSha256": "c1540d344ca0f2402eff7e249fdb50bcd1650b5c4b50fd1df04ad2f11f6f4bb2",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "f06732e0f838efe638a4df8372cd3d934e4b61dfcea0ec69cb129b94c556ab94"
     },
@@ -2659,7 +2659,7 @@
       "file": "scripts/check-doc-constitution.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "94cce7e8e275e4a6cf81f94169f5f0fdd98ef10a051c08137fb76c3cf4ab89ad",
+      "recordSha256": "539c5278864688c78568e28d66d72357a0e1a70751267fb272ecd4cc65f17270",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "947d4752810d5d6e4efa0f931b57853d348e690051b4ccdfc94217dbf0f17229"
     },
@@ -2675,7 +2675,7 @@
       "file": "scripts/check-doc-retirement.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "e7e03cc8efc9142467e93dd7d2469fd34702478616d4959c4cb02b198e8510b0",
+      "recordSha256": "4536a475a5e58cfc986ba127bd4d281c5cb69ca98834cfb8d3454030510b1bc2",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "4a396fef453dbaaa1415dca5875d236e784ae0766e3aaa17bba0ee726ba2af6e"
     },
@@ -2843,7 +2843,7 @@
       "file": "scripts/generate-shipped-path-inventory.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "197e7e0848e56726cb43e3fc4ac7975104ea8ceb9cc86f4c48c1b9c50b04e93d",
+      "recordSha256": "61a0554e272d6a7f80dd5e67f08991c778eabcba83ccc642346817bf92e72329",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "d796d762b4957d2cb9a9146a3e463858e4c8c36415c8ab6dbcb5a09e9ddd6284"
     },
@@ -2867,7 +2867,7 @@
       "file": "scripts/herdr-cockpit.sh",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "9dad8c6471653ce2f4b239ab963af851252c71733c55f8c915e6c14e077d1f1b",
+      "recordSha256": "85b3ad4dbcff648b2a35ce0cb178902d7951c075afa97a0eea507ab309c2ea16",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "486b87ae6e1ffd877971dd21b0fec7d375c8b83d0e83f1972cfa4b700720eddd"
     },
@@ -2875,7 +2875,7 @@
       "file": "scripts/install-git-hooks.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "26452d21a86045802307b32f46744d41b53b91bbd4a9dab04b6911fa02f016bc",
+      "recordSha256": "eda304a17bf6b660a08b719c571e4cb9982b3649f1951dd49c4f36be2e26de43",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "6fbb3d7dd064039e2a33f9ae6444d8417fddb5a434abb834211111404018c494"
     },
@@ -2915,7 +2915,7 @@
       "file": "scripts/knowledge-migration.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "19fdd19acdfc0aa6896710c856d6a8a4448b89c4c90c75e7a0c6b04ae1b565e2",
+      "recordSha256": "4347c357b9776aa659f1752a5dd1f55ff40c4f88fdf50cbe1a17e7a17d308239",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "f57899d74a05230a03daa78f531605fd01f64bc9d2271719d97fa7954cb21936"
     },
@@ -3011,7 +3011,7 @@
       "file": "scripts/next-doc-id.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "cded6adb6c27598ef0c4b4a044a3b9b445d6f09e39116694524418d8869d0625",
+      "recordSha256": "4d1ae408d968b9e6dc2e9977b16539d9f70ce80544a949d006cce8ebea96ca53",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "7e88c69cf6c78b4cce5240d3fcc34a1182fc963933435827a58974df5458bc9d"
     },
@@ -3051,7 +3051,7 @@
       "file": "scripts/propose-doc-decisions.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "e62f1fbe66bf36b66751e2e0cf67ec68f6764989c446ec6c7dfde2829c3bf3f0",
+      "recordSha256": "40d311754558d966babc798bd9687a0faf7be912cc30ab818bbeb54f2686cd03",
       "authorInputCommit": "95301cb9a2cfef0e6b16eade29eca0e3b0aeabbf",
       "sourceSha256": "c66cacf0b62d7c97737c570254ec91a44cf334cd7a74efb1149c21bffa20a8d5"
     },
@@ -3371,7 +3371,7 @@
       "file": "src/setup/instruction-registry.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "4db4cc25693121ff268ea6d5b11765d4f880cf7ff77052bc60a349cf1e6e74c8",
+      "recordSha256": "919c0817ce4126988a7b5462a519d35e9260e7df71c88fe737c4616e566c7a61",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697"
     },
@@ -3403,7 +3403,7 @@
       "file": "src/setup/registrations.mjs",
       "generated": false,
       "itemsChanged": true,
-      "recordSha256": "6fdbe59f9ddf8b1c60db901a563e40c46a6d08e5c79f905dd009dd21957dfe40",
+      "recordSha256": "f17ef1f8352dc3071b217ca93e6d2d49b009789d7424e6fcf364bd6914aa3f7a",
       "authorInputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
       "sourceSha256": "c47a007f45edb6017261e25bb8e918b87307d5a740b9f2ebd38e9b8ba8c7a518"
     },
@@ -142554,5 +142554,902 @@
     }
   ],
   "inputCommit": "d23a6aa3a09fae1cd039918b718e322177cb273e",
-  "currentBindingRuling": "L12-74; changes since this first scope are separately listed in step-05-seam4-rereview2-list.json."
+  "currentBindingRuling": "L12-74; changes since this first scope are separately listed in step-05-seam4-rereview2-list.json.",
+  "l12-83-reviewObligations": [
+    {
+      "file": "src/cli/command-registry.mjs",
+      "recordFile": "step-05-records/cli-help-messages.jsonl",
+      "beforeSha256": "5885924ffb34ff669619bb0bc43070af37bbd7e738377275199056b55a09544b",
+      "afterSha256": "ac5c7da56782495eebdf320560802aaa3ba64e9df6efa36498459cf7e939c104",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-003646",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003651",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003657",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s4-fix2-284fae1afd0a9579",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "recordFile": "step-05-records/gateway-contract.jsonl",
+      "beforeSha256": "43f9f19c35a95765e4de2f6de90575508f305f37059faf27eed423ee35c3f9eb",
+      "afterSha256": "4b56dbf86662de114f880f4329d4c43180b5638626b0c01f4e66f49042e0c5bd",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-000162",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000163",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000164",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000173",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000177",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000178",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000183",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000187",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-000664",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-000665",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-000694",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "recordFile": "step-05-records/gateway-contract.jsonl",
+      "beforeSha256": "63fb73e85dce382b8293e13d621340d6fc2caa53a8a5729d9e09782409c444fb",
+      "afterSha256": "6d5a454ae94c51440b55372f4e9e6e8ce5d06940fabcc479033cab4c6135f09b",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-000193",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000194",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000195",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000196",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000200",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-000767",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-000768",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-000778",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-000783",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-000788",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "docs/decisions/index.md",
+      "recordFile": "step-05-records/generators-decision-index.jsonl",
+      "beforeSha256": "a14e6f2fe1671b7be42b68bfbe3ff35e1a745fb49cbb48295ef71730b372ba6a",
+      "afterSha256": "554ccbefc42e3db80231ea22ab5448bafe8e09492a513b6490a98d658d40201b",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-000317",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000318",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000330",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000386",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "src/report/decision-index.mjs",
+      "recordFile": "step-05-records/generators-decision-index.jsonl",
+      "beforeSha256": "e3b6ef565fb47ee0d126de8b2dc3995e40b906811482ed609528171e457323f3",
+      "afterSha256": "87c0b66b4773f0d21a7b97b0e9b32475f0826af0316151ce0d0c1dd411dff252",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-003693",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003694",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003695",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-009758",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-009761",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-009767",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "docs/doc-registry.json",
+      "recordFile": "step-05-records/generators-doc-registry.jsonl",
+      "beforeSha256": "5a975f23e9575b5679310183555b4d6e9de0c968e09e1ce6b5487e96dea28b93",
+      "afterSha256": "f11d2282574ba4e08ac4f9f0a0ec93b8a65b8f25949fe1d5a81c025fb6ce11a8",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-000507",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000509",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000510",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "docs/doc-registry.md",
+      "recordFile": "step-05-records/generators-doc-registry.jsonl",
+      "beforeSha256": "9cebf9b68b40f4d49a22d571173ef0cef3e2fd6ba8710d73e75e914654b1dcb3",
+      "afterSha256": "fe4197b59a30f00362a30a763fa126f637bfa433c0c5c97c8ff0cfae8e0fb0f0",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-001349",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-001360",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "docs/enduser-docs-index.json",
+      "recordFile": "step-05-records/generators-enduser-index.jsonl",
+      "beforeSha256": "8088d960122a7c8bae3c5029210737d867e64eae5be89bb0072e34ab478625a9",
+      "afterSha256": "ad8129901f8bc1b8a29cc225b0577b2f418138c6c6c2acd85390b85910159393",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-001759",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-001760",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-001762",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "recordFile": "step-05-records/generators-enduser-index.jsonl",
+      "beforeSha256": "5aa9e332f790dc7f73b3e2cf133c69c2b55f177d80230ae125b37a2ec76b1282",
+      "afterSha256": "9cae6c0a965abfd7aa01018abc903410e3cf648e8ba9a7fec6cc5a6eca6aa207",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "dynamic-009768",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-009769",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-009788",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "src/report/enduser-index.mjs",
+      "recordFile": "step-05-records/generators-enduser-index.jsonl",
+      "beforeSha256": "771776ea550427ff047d8fc00b194c7ab58878bcb649e6f631f8987005cdbd87",
+      "afterSha256": "0db5a894d19134ed2ba9932e0ab7e57c9c6ebce3decee66cabf41d2e99c28213",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "dynamic-009791",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": ".agents/skills/_shared/executor-dispatch-fallback.md",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "a7df6f7ddcec0ae3d283c0608da5f1b9faed99091d0f1c985f4e0c86b23ba240",
+      "afterSha256": "bdb2b974eb47c0bf010d7347bf8c0b32914bfc724d5605a1197e93990f6fecbd",
+      "dispositionChanged": false,
+      "changes": []
+    },
+    {
+      "file": ".agents/skills/fgos-clarifying/SKILL.md",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "d1b0146bb6f985f2d6aae5b6d26e61cc8f015a66bc55a95dcebf244d62ba8a7d",
+      "afterSha256": "a8fc82ccc5bd6029b067ae35a302fe3f7bbb2ad6a31d7123f794f42f659a3f1c",
+      "dispositionChanged": false,
+      "changes": []
+    },
+    {
+      "file": ".agents/skills/fgos-coding-knowledge/SKILL.md",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "df0adcfda0b6f8129be15ea0105286f1a259776b42a3474ac5c1e73864c872d6",
+      "afterSha256": "912980d238b4e707ae7a9c9a371e4ca8274b99216c6343f9c636ddd744241d9e",
+      "dispositionChanged": false,
+      "changes": []
+    },
+    {
+      "file": "docs/backlog.md",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "e9230472c42025ecd4938dff4d267954e4d5861e1b253d5d6b68afbdada5c487",
+      "afterSha256": "31b81f4f936e836c7338101b6e6b8ea502b7fe28a39497a7bf9a3e68e00ff05b",
+      "dispositionChanged": false,
+      "changes": []
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "59298776cc48b2ba554b97848887a59bdb3c5f6e05f15a478edab33f56660be8",
+      "afterSha256": "e95489e8375335ae90440566579b6d11f46ac250d67a5d954344c11f6e4b850f",
+      "dispositionChanged": false,
+      "changes": []
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-clarifying/SKILL.md",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "54ba45adbf6d7bb8444a0006608a2efdea8f6b1ff37163ffee1aae5a5e94e87f",
+      "afterSha256": "05f5caa6fcd9ccfc66921112541766d26385b18b40c0697afd2c28668e800dcb",
+      "dispositionChanged": false,
+      "changes": []
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "f3c4d5b56ad14662a64ca73331d14f7ac2a0951083f458c245a9795c2ad6e54d",
+      "afterSha256": "94b959444e6a8ca4ee634f79aba842fd2d053f9695b5b67db50764df9ddade97",
+      "dispositionChanged": false,
+      "changes": []
+    },
+    {
+      "file": "plugins/fgOS/skills/terminal/SKILL.md",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "23ce10e0e8bf9dd9836c1d9c09ec772e9fe08455734d83e88eadc151eb536414",
+      "afterSha256": "8ec8b163e1ff67cf09f6d7c2bbb954d47de409b911dfa3eef985967432fac747",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-002424",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "scripts/backfill-status-category.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "b508e83f018b6aca9dfa0aa72d361bf29db10c4f917c7e6f17c09b5257a01471",
+      "afterSha256": "309e4f469eb73ab4444d15d0bc17e7d00df8aa9888f4ee5174b8de4139bfaf7e",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-002429",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "scripts/check-decision-supersession.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "afc6d17b593c53b31ef93600d70f8035b7db0b7a3f74a76039b4474c4476ecb1",
+      "afterSha256": "257f40a812c7079d23ad8590297fb7f22ae5099514a99e910322f2d2210d7c7b",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-002479",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "scripts/check-doc-candidate-status.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "69dde22726a3d35980af356a69f6bc43519717e4e3f73e6caba8623de71f8525",
+      "afterSha256": "c1540d344ca0f2402eff7e249fdb50bcd1650b5c4b50fd1df04ad2f11f6f4bb2",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-002481",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "94cce7e8e275e4a6cf81f94169f5f0fdd98ef10a051c08137fb76c3cf4ab89ad",
+      "afterSha256": "539c5278864688c78568e28d66d72357a0e1a70751267fb272ecd4cc65f17270",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-002482",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-002483",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-002484",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-002485",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-006599",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-006602",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-006642",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "e7e03cc8efc9142467e93dd7d2469fd34702478616d4959c4cb02b198e8510b0",
+      "afterSha256": "4536a475a5e58cfc986ba127bd4d281c5cb69ca98834cfb8d3454030510b1bc2",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-002489",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "197e7e0848e56726cb43e3fc4ac7975104ea8ceb9cc86f4c48c1b9c50b04e93d",
+      "afterSha256": "61a0554e272d6a7f80dd5e67f08991c778eabcba83ccc642346817bf92e72329",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-003580",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003581",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003587",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003591",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003592",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003595",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003596",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003598",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003599",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003600",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "scripts/herdr-cockpit.sh",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "9dad8c6471653ce2f4b239ab963af851252c71733c55f8c915e6c14e077d1f1b",
+      "afterSha256": "85b3ad4dbcff648b2a35ce0cb178902d7951c075afa97a0eea507ab309c2ea16",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-003605",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "scripts/install-git-hooks.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "26452d21a86045802307b32f46744d41b53b91bbd4a9dab04b6911fa02f016bc",
+      "afterSha256": "eda304a17bf6b660a08b719c571e4cb9982b3649f1951dd49c4f36be2e26de43",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-003607",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "19fdd19acdfc0aa6896710c856d6a8a4448b89c4c90c75e7a0c6b04ae1b565e2",
+      "afterSha256": "4347c357b9776aa659f1752a5dd1f55ff40c4f88fdf50cbe1a17e7a17d308239",
+      "dispositionChanged": false,
+      "changes": []
+    },
+    {
+      "file": "scripts/next-doc-id.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "cded6adb6c27598ef0c4b4a044a3b9b445d6f09e39116694524418d8869d0625",
+      "afterSha256": "4d1ae408d968b9e6dc2e9977b16539d9f70ce80544a949d006cce8ebea96ca53",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-003620",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "e62f1fbe66bf36b66751e2e0cf67ec68f6764989c446ec6c7dfde2829c3bf3f0",
+      "afterSha256": "40d311754558d966babc798bd9687a0faf7be912cc30ab818bbeb54f2686cd03",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-003624",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003628",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003631",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+      "beforeSha256": "4db4cc25693121ff268ea6d5b11765d4f880cf7ff77052bc60a349cf1e6e74c8",
+      "afterSha256": "919c0817ce4126988a7b5462a519d35e9260e7df71c88fe737c4616e566c7a61",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-003798",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003799",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003800",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-013969",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-013983",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-013984",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-013985",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014002",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014034",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014035",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+      "beforeSha256": "6fdbe59f9ddf8b1c60db901a563e40c46a6d08e5c79f905dd009dd21957dfe40",
+      "afterSha256": "f17ef1f8352dc3071b217ca93e6d2d49b009789d7424e6fcf364bd6914aa3f7a",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-003804",
+          "beforeDisposition": "patch",
+          "afterDisposition": "patch",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003806",
+          "beforeDisposition": "patch",
+          "afterDisposition": "patch",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003811",
+          "beforeDisposition": "patch",
+          "afterDisposition": "patch",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003814",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003815",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003816",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003818",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003826",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003845",
+          "beforeDisposition": "patch",
+          "afterDisposition": "patch",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003850",
+          "beforeDisposition": "patch",
+          "afterDisposition": "patch",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003854",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "patch",
+          "admissionChanged": true
+        },
+        {
+          "id": "dynamic-014207",
+          "beforeDisposition": "patch",
+          "afterDisposition": "patch",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014307",
+          "beforeDisposition": "patch",
+          "afterDisposition": "patch",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014334",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014335",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014336",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014337",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014907",
+          "beforeDisposition": "patch",
+          "afterDisposition": "patch",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s4-fix2-a8e9503a9eafcad1",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    }
+  ]
 }

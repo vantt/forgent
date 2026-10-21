@@ -139,7 +139,7 @@ def check(rs,context=None):
    if e.get('disposition')=='parked':
     def blocker(e=e):
      b=e.get('blockedReason') or ''
-     return bool(b and f in b and len(blocks[normalise_blocker(b)])==1 and not re.search(r'depends on supplied roots|no bounded artifact/export supplied|preserve gate bytes|exact source slot / source-data parity must own',b,re.I))
+     return bool(b and f in b and (len(blocks[normalise_blocker(b)])==1 or r26_joined(r,e)) and not re.search(r'depends on supplied roots|no bounded artifact/export supplied|preserve gate bytes|exact source slot / source-data parity must own',b,re.I))
     test('b-real-blocker',loc,blocker)
    if r.get('generated') and r.get('sourceRenderProvenance',{}).get('sourceFile'):
     def render(e=e):
@@ -199,3 +199,8 @@ def review_obligations(rs,index,test,rule,sha,read):
    if listed[r['file']]['itemsChanged'] and not r.get('generated'):assert r['file'] in listing['sourceRecords']
    assert listing['reviewStatus']=='pending Lead repack and independent semantic review'
   test(rule,'current re-review obligation '+r['file'],bind)
+
+@functools.lru_cache(None)
+def r26_module():
+ s=importlib.util.spec_from_file_location('r26shared',P/'step-05-proposed-move-rules.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m);return m
+def r26_joined(r,e):return r26_module().joined(r,e)

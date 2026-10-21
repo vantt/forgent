@@ -5,7 +5,8 @@
     "-B",
     "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py"
   ],
-  "startedAtNs": 1792545161940739404,
+  "environment": "CLAUDE_CODE_SESSION_ID unset; PYTHONDONTWRITEBYTECODE=1; TMPDIR=/tmp/fgos-work",
+  "startedAtNs": 1792550164587409577,
   "exit": 0,
   "resultFresh": true,
   "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py",
@@ -13,7 +14,7 @@
   "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-proof-pilot.log",
   "logSha256": "ed5a4641a73331a1c84a2cdcfc76a1f7bc1170db25a5ff214213f49b7cd12c57",
   "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-probes-result.json",
-  "resultSha256": "1c657c27239de46a4712a71565346ea6bf19d8c642900f0867b34eb166ebb63b",
+  "resultSha256": "f308498b5c95d848a554f3f8fe62cfedc6a46369e8284fb5df43f6fd6a60cc3e",
   "counts": {
     "passed": 44,
     "total": 44,

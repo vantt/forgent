@@ -1,0 +1,20 @@
+✔ C1: a bypass home carries all five provisioning items (5.051332ms)
+✔ C1/C5: an ask-mode home does NOT get the bypass acceptance -- never grant more than was declared (1.7775ms)
+✔ B1 still applies through this door: an untrusted repo root refuses, and writes no home (3.149529ms)
+✔ a source home with no credential refuses by name -- a home without auth cannot do the work (1.151257ms)
+✔ the credential is COPIED, not linked, and keeps owner-only permissions (2.248763ms)
+✔ each Run gets its own home, and removeWorkerHome takes it away entirely (3.127155ms)
+✔ removeWorkerHome stops a process still running inside the home, and leaves every other process alone (1548.069086ms)
+✔ removeWorkerHome refuses a path it did not create -- teardown must never delete an arbitrary directory (0.464088ms)
+✔ the created home contains nothing beyond what was provisioned (0.736373ms)
+✔ a home kept for forensics keeps its settings and loses its credential (0.986558ms)
+✔ redact refuses a directory this module did not create (0.384132ms)
+✔ nested assignment run ids reach worker-home through the normalized herdr agent name (1.232978ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1723.160036

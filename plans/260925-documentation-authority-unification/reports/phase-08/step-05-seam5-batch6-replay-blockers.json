@@ -235,8 +235,110 @@
         }
       ],
       "resolution": "Lead must provide an execution contract explicitly permitting disposable test git/state/CLI fixtures, or own the required replay in a separate run."
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+      "requiredProof": "R22 current/candidate full owning test replay",
+      "status": "blocked",
+      "reason": "Records-only contract forbids .fgos access and state fixture creation. The full owning enduser-index tests import withDocsIndexStateFixture which seeds a real store writer under .fgos in scratch; no exemption is inferred.",
+      "sourceEvidence": [
+        {
+          "line": 12,
+          "text": "import { makeDocsIndexStateFixture, REAL_DEMO_OUTCOME_ID, REAL_DEMO_DOC_PATH } from './helpers/docs-index-state-fixture.mjs';"
+        },
+        {
+          "line": 23,
+          "text": "// each spawn folded this repo's own large, real `.fgos/state.json`"
+        },
+        {
+          "line": 35,
+          "text": "  docsIndexFixtureCwd ??= makeDocsIndexStateFixture();"
+        },
+        {
+          "line": 41,
+          "text": "// worktree (no `.fgos/`, ADR0020) the outcomes view it folds is empty, so"
+        },
+        {
+          "line": 175,
+          "text": "  // depends on whether the invoking checkout's own ambient `.fgos/`"
+        },
+        {
+          "line": 177,
+          "text": "  // worktree's `.fgos/` never does)."
+        },
+        {
+          "line": 223,
+          "text": "// plain, git-free temp dir works as both repoRoot and .fgos root) ----------"
+        },
+        {
+          "line": 237,
+          "text": "  fs.mkdirSync(path.join(cwd, '.fgos'));"
+        },
+        {
+          "line": 238,
+          "text": "  fs.writeFileSync(path.join(cwd, '.fgos', 'main-checkout.lock'), '');"
+        },
+        {
+          "line": 267,
+          "text": "  fs.mkdirSync(path.join(cwd, '.fgos'));"
+        },
+        {
+          "line": 268,
+          "text": "  fs.writeFileSync(path.join(cwd, '.fgos', 'main-checkout.lock'), '');"
+        },
+        {
+          "line": 281,
+          "text": "  fs.mkdirSync(path.join(cwd, '.fgos'));"
+        },
+        {
+          "line": 282,
+          "text": "  fs.writeFileSync(path.join(cwd, '.fgos', 'main-checkout.lock'), '');"
+        }
+      ],
+      "resolution": "Phase 9 owns full current/candidate replay with the state fixture and complete index alias co-cut."
+    },
+    {
+      "file": "test/runner/dispatch-executor-profile.test.mjs",
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "sourceSha256": "0471818d68f8cac62abbfb9a2aa0997d05c0123c1098c7bb9950ef73213e4e93",
+      "requiredProof": "R22 current/candidate full owning replay",
+      "status": "blocked",
+      "reason": "Full owning cases call loadRunnerConfigFromDir on the repo root, which reads .fgos/config.json. That input is forbidden by this records-only contract; no state/config fixture is fabricated.",
+      "sourceEvidence": [
+        {
+          "line": 7,
+          "text": "import { loadRunnerConfig, loadRunnerConfigFromDir, RunnerConfigError, normalizeLegacyConfinement, REASONING_EFFORT_VALUES } from '../../src/runner/dispatch/config.mjs';"
+        },
+        {
+          "line": 187,
+          "text": "  // under a `runner` key, which is what loadRunnerConfigFromDir unwraps."
+        },
+        {
+          "line": 188,
+          "text": "  const cfg = loadRunnerConfigFromDir(process.cwd());"
+        },
+        {
+          "line": 321,
+          "text": "  const cfg = loadRunnerConfigFromDir(process.cwd());"
+        },
+        {
+          "line": 387,
+          "text": "  const cfg = loadRunnerConfigFromDir(process.cwd());"
+        }
+      ],
+      "resolution": "R25 exact deferred replay in Phase 9 with authorized config input; initial scratch failure log remains visible."
     }
   ],
-  "testsInvoked": false,
-  "safety": "No product edits, builds, service starts, CLI invocations, git writes, live state or secrets reads."
+  "testsInvoked": [
+    {
+      "file": "test/runner/dispatch-executor-profile.test.mjs",
+      "side": "current",
+      "status": "failed",
+      "reason": "Scratch lacks forbidden .fgos/config.json; no config copied or invented."
+    }
+  ],
+  "safety": "No product edits, builds, service starts, CLI invocations, git writes, live state or secrets reads.",
+  "executionClarification": "The initial four blockers remain exact historical obligations; current-only scratch attempt of the new profile patch is retained honestly. Worker-home replay is pure scratch and separately passes."
 }

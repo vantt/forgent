@@ -1,6 +1,6 @@
 {
-  "passed": 102,
-  "total": 102,
+  "passed": 106,
+  "total": 106,
   "positiveStructuralDeferrals": [
     "test/runner/merge.test.mjs",
     "test/runner/worktree.test.mjs",
@@ -619,6 +619,58 @@
       "file": "test/intake/plan.test.mjs",
       "rejected": true,
       "reason": "AssertionError"
+    },
+    {
+      "mutation": "forge removed occurrence text",
+      "file": "test/holder-lock/fences-v1-tombstone.test.mjs",
+      "rejected": true,
+      "reason": [
+        {
+          "rule": "j4-coverage",
+          "where": "test/holder-lock/fences-v1-tombstone.test.mjs",
+          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 44, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 71, in coverage\n    removed=h['removedOccurrence'];assert removed['text']==opbody.splitlines()[removed['line']-1] and sha(removed['text'])==removed['sha256'] and removed['text'] not in body.splitlines() and '-'+removed['text'] in h['diff'].splitlines()\nAssertionError\n"
+        }
+      ]
+    },
+    {
+      "mutation": "forge removed occurrence sha256",
+      "file": "test/holder-lock/fences-v1-tombstone.test.mjs",
+      "rejected": true,
+      "reason": [
+        {
+          "rule": "j4-coverage",
+          "where": "test/holder-lock/fences-v1-tombstone.test.mjs",
+          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 44, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 71, in coverage\n    removed=h['removedOccurrence'];assert removed['text']==opbody.splitlines()[removed['line']-1] and sha(removed['text'])==removed['sha256'] and removed['text'] not in body.splitlines() and '-'+removed['text'] in h['diff'].splitlines()\nAssertionError\n"
+        }
+      ]
+    },
+    {
+      "mutation": "forge removed occurrence line",
+      "file": "test/holder-lock/fences-v1-tombstone.test.mjs",
+      "rejected": true,
+      "reason": [
+        {
+          "rule": "j4-coverage",
+          "where": "test/holder-lock/fences-v1-tombstone.test.mjs",
+          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 44, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 71, in coverage\n    removed=h['removedOccurrence'];assert removed['text']==opbody.splitlines()[removed['line']-1] and sha(removed['text'])==removed['sha256'] and removed['text'] not in body.splitlines() and '-'+removed['text'] in h['diff'].splitlines()\nAssertionError\n"
+        }
+      ]
+    },
+    {
+      "mutation": "bind repeated scalar to wrong current occurrence",
+      "file": "test/holder-lock/fences-v1-tombstone.test.mjs",
+      "rejected": true,
+      "reason": [
+        {
+          "file": "test/holder-lock/fences-v1-tombstone.test.mjs",
+          "id": "dynamic-020450",
+          "originalLine": 166,
+          "recordedCurrentLine": 166,
+          "expectedCurrentLine": 178,
+          "originalText": "  const second = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });",
+          "expectedText": "  const second = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });"
+        }
+      ]
     }
   ],
   "failures": [],

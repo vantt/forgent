@@ -49,14 +49,14 @@ def sweep(rs=None,listing=None):
  def delta():
   closure=m.read('step-05-seam5-batch5-review-closure.json');latest=m.read('step-05-seam5-batch6-review-closure.json');changed={e['file']:e for e in latest['changedRecords']}
   for e in closure['changedRecords']:
-   r=by[e['file']];expected=changed[e['file']]['beforeSha256'] if e['file'] in changed else m.sha(json.dumps(r,ensure_ascii=False,separators=(',',':')));assert e['afterSha256']==expected
+   r=by[e['file']];expected=changed[e['file']]['beforeSha256'] if e['file'] in changed else m.admission.r26_module().before_current(r['file'],m.sha(json.dumps(r,ensure_ascii=False,separators=(',',':'))));assert e['afterSha256']==expected
   prior=listing if listing['closedBatch']==6 else listing['previousReviewDeltas']['6']
   assert len(prior['addedThisTurn'])==100
   expected={e['file'] for e in latest['changedRecords'] if e['dispositionChanged']}|{e['file'] for e in prior['addedThisTurn']};assert set(prior['reviewThisTurn'])==expected
   if listing['closedBatch']!=6:
    assert listing['closedBatch']==7
    selection=m.read('step-05-seam5-batch7-selection.json');assert [e['file'] for e in listing['addedThisTurn']]==selection['files'] and len(listing['addedThisTurn'])==selection['fileCount']
-   assert listing['changedThisTurn']=={'dispositionChanged':[],'labelOnly':[]} and set(listing['reviewThisTurn'])==set(selection['files'])
+   assert m.admission.r26_module().review_delta(listing)
  test('j5-review-delta','review changed or added sources only',delta)
  return {'files':len(rs),'rules':RULES,'checks':counts,'failureCount':len(errors),'failures':errors,'sourceSweepEvidence':evidence}
 def check(rs=None,receipts=None,listing=None,run_sweep=True):

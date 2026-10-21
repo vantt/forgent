@@ -832,6 +832,11 @@
   "batch6Closure": "R25 supersedes the four blocked R22 replays with exact replay-deferred-phase9 obligations; original blocked evidence remains preserved.",
   "deferredReplayFiles": [
     {
+      "file": "test/report/enduser-index.test.mjs",
+      "status": "replay-deferred-phase9",
+      "obligationFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-deferred-replays.json"
+    },
+    {
       "file": "test/cli/fgos-merge.test.mjs",
       "status": "replay-deferred-phase9",
       "obligationFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-deferred-replays.json"
@@ -843,6 +848,11 @@
     },
     {
       "file": "test/runner/merge.test.mjs",
+      "status": "replay-deferred-phase9",
+      "obligationFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-deferred-replays.json"
+    },
+    {
+      "file": "test/runner/dispatch-executor-profile.test.mjs",
       "status": "replay-deferred-phase9",
       "obligationFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-deferred-replays.json"
     },

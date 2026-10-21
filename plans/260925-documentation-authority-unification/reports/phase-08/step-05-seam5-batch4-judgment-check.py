@@ -9,6 +9,7 @@ s=importlib.util.spec_from_file_location('j',P/'step-05-seam5-judgment-check.py'
 m=j.m;sha=j.sha
 RULES={'j4-coverage':'All 30 selected files, all original census ids, exact current/historical witnesses and whole-file lexical closure.','j4-pins':'Immutable complete source mode/hash/bytes; no patch claimed for preserve/park.','j4-ownership':'Every declaration and assertion stays pinned; R22 full-suite parity remains pending.','j4-receipts':'One receipt per complete file, exact input metadata and explicit pending full-suite obligation.','j4-search':'Park dependencies retain exact pinned searches, proposed aliases, and P7-DOC-GAP-05.','j4-review':'Every admitted and judgment reject is independently reviewable.'}
 def assert_patch(r,receipt,body):
+ if m.admission.r26_module().patch_spec(r['file']):return m.admission.r26_module().assert_patch(r,receipt,body)
  extra=P/'step-05-seam5-batch6-cutover-specs.json'
  if extra.exists() and any(s['file']==r['file'] for s in json.loads(extra.read_text())['patches']):
   sp=importlib.util.spec_from_file_location('j6patch',P/'step-05-seam5-batch6-check.py');g=importlib.util.module_from_spec(sp);sp.loader.exec_module(g);return g.assert_patch(r,receipt,body)
@@ -118,7 +119,7 @@ def check(rs=None,receipts=None,listing=None,selection=None,batch=4):
      w=e['searchWitness'];assert w['assessment']==e['blockedReason'] and w['pin']==r['authorInputCommit'] and w['roots']==search['roots'] and w['evidenceSha256']==sha((ROOT/w['evidenceFile']).read_bytes())
   dead=by['test/runner/dead-vocabulary-guard.test.mjs'];assert dead['carryJoins']==[e for e in m.rows('step-05-dynamic-carries.jsonl') if e['file']==dead['file']]
   byid={e['id']:e for e in dead['dynamicTraces']};assert byid['dynamic-023895']['disposition']=='parked' and 'P7-DOC-GAP-05' in byid['dynamic-023895']['blockedReason']
-  arch=by['test/architecture.test.mjs'];assert next(e for e in arch['dynamicTraces'] if e['id']=='dynamic-016778')['disposition']=='preserve' and arch['protectedPins']['docs/architecture-manifest.json']==sha(m.pinned(arch['authorInputCommit'],'docs/architecture-manifest.json'))
+  arch=by['test/architecture.test.mjs'];assert m.admission.r26_joined(arch,next(e for e in arch['dynamicTraces'] if e['id']=='dynamic-016778')) and arch['protectedPins']['docs/architecture-manifest.json']==sha(m.pinned(arch['authorInputCommit'],'docs/architecture-manifest.json'))
  if batch==4:test('j4-search','exact park evidence and priority-reader custody',searchcheck)
  else:
   def batch5search():

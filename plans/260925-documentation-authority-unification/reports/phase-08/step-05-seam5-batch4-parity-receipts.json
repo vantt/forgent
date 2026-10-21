@@ -1176,14 +1176,19 @@
           "reason": "R22: no Phase 9 patch in this file; Phase 9 full suite owns preserve/park parity."
         }
       ],
-      "blockedBy": [],
+      "blockedBy": [
+        "test/architecture.test.mjs: This pinned real-document-reader operation depends on the exact docs/architecture-manifest.json input/default destination; decide retention or content-carrying move together with every listed caller and proof."
+      ],
       "cutoverSpecifications": [],
       "readiness": "pending independent window review and Phase 9 full suite; record closure only",
       "review": {
         "status": "pending",
         "reviewer": null,
         "report": null
-      }
+      },
+      "proposedMoveUnits": [
+        "docs/architecture-manifest.json"
+      ]
     },
     {
       "id": "real-file-tests-goldens-batch4-App",
@@ -1347,7 +1352,8 @@
         "status": "pending",
         "reviewer": null,
         "report": null
-      }
+      },
+      "proposedMoveUnits": []
     },
     {
       "id": "real-file-tests-goldens-batch4-doc-global-closure",
@@ -1739,7 +1745,8 @@
         "status": "pending",
         "reviewer": null,
         "report": null
-      }
+      },
+      "proposedMoveUnits": []
     },
     {
       "id": "real-file-tests-goldens-batch4-doc-decision-conservation",
@@ -6503,7 +6510,8 @@
         "status": "pending",
         "reviewer": null,
         "report": null
-      }
+      },
+      "proposedMoveUnits": []
     },
     {
       "id": "real-file-tests-goldens-batch4-working-tree-clean-unified",

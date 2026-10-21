@@ -504,7 +504,7 @@
       "caught": [
         {
           "rule": "b-real-blocker",
-          "where": "src/setup/instruction-registry.mjs:dynamic-014034",
+          "where": "apps/fgos-gateway/src/gateway.rs:dynamic-000664",
           "error": "condition false"
         }
       ]

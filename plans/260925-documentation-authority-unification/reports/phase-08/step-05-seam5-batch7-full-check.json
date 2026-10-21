@@ -88,39 +88,42 @@
     "j5-fixtures": "In-memory fixtures and proven temporary-root joins reject uniformly.",
     "j5-successors": "Every preserved retired decision basename has a verified successor note.",
     "j5-review-closure": "L12-80 disposition changes and the retained ui-spec witness are exact.",
-    "j5-review-delta": "Only changed/added judgment files are listed as this-turn review obligations."
+    "j5-review-delta": "Only changed/added judgment files are listed as this-turn review obligations.",
+    "r26-unit": "Proposed move readers form one pin-bound unit and park on the exact retention-or-move decision.",
+    "r26-membership": "Every R26 park is explicitly listed once.",
+    "r26-coverage": "Every nondeleted Phase 6 proposed path stays visible, including zero-reader paths."
   },
   "checks": {
     "coverage": 2206,
     "source-pins": 37,
     "passage-outcome": 33,
     "inherited-outcome": 25,
-    "receipts": 405,
+    "receipts": 406,
     "retiring-retained": 149,
     "source-spans": 2166,
-    "parks": 31,
-    "rejections": 1801,
+    "parks": 50,
+    "rejections": 1800,
     "fixture-provenance": 14,
     "pinned-passage": 2017,
     "dynamic-operand": 241,
     "patches": 37,
     "generated": 37,
-    "co-cut-grep": 17,
-    "targets": 17,
+    "co-cut-grep": 18,
+    "targets": 18,
     "missing-proof": 10,
     "gateway": 1,
-    "message-deltas": 17,
+    "message-deltas": 18,
     "setup": 1,
     "review": 78,
     "a-passage-agreement": 3467,
-    "b-real-blocker": 59,
+    "b-real-blocker": 82,
     "d-own-operand": 21105,
     "s4-coverage": 5910,
     "s4-pins": 254,
     "s4-spans": 5907,
     "s4-retiring-retained": 2330,
     "s4-inheritance": 2271,
-    "s4-parks": 1920,
+    "s4-parks": 1932,
     "s4-operand": 3637,
     "s4-outputs": 255,
     "s4-receipts": 259,
@@ -188,7 +191,11 @@
     "j7-complete-queue": 1,
     "j7-occurrence-ancestry": 1,
     "j7-neutrality-first": 1,
-    "j7-review-delta": 1
+    "j7-review-delta": 1,
+    "r26-unit": 43,
+    "r26-real-read": 29,
+    "r26-membership": 73,
+    "r26-coverage": 1
   },
   "files": 995,
   "literalReferences": 3622,
@@ -32452,10 +32459,10 @@
         {
           "id": "reference-004241",
           "pinnedSpan": {
-            "columnEndExclusive": 73,
-            "columnStart": 17,
             "line": 113,
-            "text": "docs/how-to/avoid-vacuous-pass-with-node-test-test-name-"
+            "columnStart": 1,
+            "columnEndExclusive": 73,
+            "text": "// format trap (docs/how-to/avoid-vacuous-pass-with-node-test-test-name-"
           },
           "headMatchingLines": [
             114
@@ -32464,10 +32471,10 @@
         {
           "id": "reference-004241",
           "pinnedSpan": {
-            "columnEndExclusive": 14,
-            "columnStart": 1,
             "line": 114,
-            "text": "// pattern.md"
+            "columnStart": 1,
+            "columnEndExclusive": 76,
+            "text": "// pattern.md) -- the ONE thing verify-pattern-check.mjs's mechanical check"
           },
           "headMatchingLines": [
             115
@@ -78491,7 +78498,7 @@
         "s4-spans": 5907,
         "s4-retiring-retained": 2330,
         "s4-inheritance": 2271,
-        "s4-parks": 1920,
+        "s4-parks": 1932,
         "s4-operand": 3637,
         "s4-outputs": 255,
         "s4-receipts": 259,
@@ -78500,7 +78507,7 @@
         "s4-carries": 1,
         "s4-lexical": 2275,
         "s4-review": 435,
-        "b-real-blocker": 1922,
+        "b-real-blocker": 1934,
         "d-own-operand": 3637,
         "a-passage-agreement": 410,
         "c-render-owner": 522,
@@ -92100,7 +92107,7 @@
         "j-search": 1,
         "j-review": 1,
         "a-passage-agreement": 3467,
-        "b-real-blocker": 59,
+        "b-real-blocker": 82,
         "e-retired-successor": 41,
         "r20-move-set": 1,
         "r20-coverage": 3,
@@ -92197,7 +92204,7 @@
           "j-search": 1,
           "j-review": 1,
           "a-passage-agreement": 5,
-          "b-real-blocker": 9,
+          "b-real-blocker": 13,
           "e-retired-successor": 2,
           "d-own-operand": 19
         },
@@ -92306,7 +92313,7 @@
           "j4-review": 30,
           "j4-search": 1,
           "a-passage-agreement": 59,
-          "b-real-blocker": 15,
+          "b-real-blocker": 16,
           "d-own-operand": 469,
           "r11-plans-boundary": 17,
           "e-retired-successor": 2
@@ -92830,7 +92837,7 @@
           "j5-search": 1,
           "a-passage-agreement": 638,
           "d-own-operand": 3530,
-          "b-real-blocker": 26,
+          "b-real-blocker": 35,
           "e-retired-successor": 36,
           "j5-successors": 40,
           "j5-uniform-history": 43,
@@ -98783,10 +98790,10 @@
               {
                 "id": "reference-004241",
                 "pinnedSpan": {
-                  "columnEndExclusive": 73,
-                  "columnStart": 17,
                   "line": 113,
-                  "text": "docs/how-to/avoid-vacuous-pass-with-node-test-test-name-"
+                  "columnStart": 1,
+                  "columnEndExclusive": 73,
+                  "text": "// format trap (docs/how-to/avoid-vacuous-pass-with-node-test-test-name-"
                 },
                 "headMatchingLines": [
                   114
@@ -98795,10 +98802,10 @@
               {
                 "id": "reference-004241",
                 "pinnedSpan": {
-                  "columnEndExclusive": 14,
-                  "columnStart": 1,
                   "line": 114,
-                  "text": "// pattern.md"
+                  "columnStart": 1,
+                  "columnEndExclusive": 76,
+                  "text": "// pattern.md) -- the ONE thing verify-pattern-check.mjs's mechanical check"
                 },
                 "headMatchingLines": [
                   115
@@ -113642,8 +113649,8 @@
           "j5-search": 1,
           "a-passage-agreement": 1388,
           "d-own-operand": 6550,
+          "b-real-blocker": 17,
           "r11-plans-boundary": 136,
-          "b-real-blocker": 8,
           "e-retired-successor": 1,
           "j6-review-delta": 1,
           "j6-review-closure": 1,
@@ -171429,10 +171436,10 @@
             {
               "id": "reference-004241",
               "pinnedSpan": {
-                "columnEndExclusive": 73,
-                "columnStart": 17,
                 "line": 113,
-                "text": "docs/how-to/avoid-vacuous-pass-with-node-test-test-name-"
+                "columnStart": 1,
+                "columnEndExclusive": 73,
+                "text": "// format trap (docs/how-to/avoid-vacuous-pass-with-node-test-test-name-"
               },
               "headMatchingLines": [
                 114
@@ -171441,10 +171448,10 @@
             {
               "id": "reference-004241",
               "pinnedSpan": {
-                "columnEndExclusive": 14,
-                "columnStart": 1,
                 "line": 114,
-                "text": "// pattern.md"
+                "columnStart": 1,
+                "columnEndExclusive": 76,
+                "text": "// pattern.md) -- the ONE thing verify-pattern-check.mjs's mechanical check"
               },
               "headMatchingLines": [
                 115
@@ -217433,6 +217440,21 @@
           "failing": false
         }
       ]
+    },
+    "proposed-move-read-units": {
+      "rules": {
+        "r26-unit": "Proposed move readers form one pin-bound unit and park on the exact retention-or-move decision.",
+        "r26-membership": "Every R26 park is explicitly listed once.",
+        "r26-coverage": "Every nondeleted Phase 6 proposed path stays visible, including zero-reader paths."
+      },
+      "checks": {
+        "r26-unit": 43,
+        "r26-real-read": 29,
+        "r26-membership": 73,
+        "r26-coverage": 1
+      },
+      "failureCount": 0,
+      "failures": []
     }
   }
 }

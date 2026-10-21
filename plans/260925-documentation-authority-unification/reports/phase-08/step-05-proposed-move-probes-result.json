@@ -1,0 +1,121 @@
+{
+  "baselineFailures": 0,
+  "passed": 8,
+  "total": 8,
+  "probes": [
+    {
+      "name": "real governance copy cannot use retained preserve witness",
+      "rejected": true,
+      "caught": [
+        {
+          "rule": "r26-unit",
+          "where": "docs/doc-governance.md",
+          "error": "condition false"
+        },
+        {
+          "rule": "r26-real-read",
+          "where": "test/scripts/check-doc-candidate-status.test.mjs:dynamic-031770",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "park must name exact retention-or-move decision",
+      "rejected": true,
+      "caught": [
+        {
+          "rule": "r26-unit",
+          "where": "docs/doc-governance.md",
+          "error": "condition false"
+        },
+        {
+          "rule": "r26-real-read",
+          "where": "test/scripts/check-doc-candidate-status.test.mjs:dynamic-031770",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "unit cannot silently omit an enumerated reader",
+      "rejected": true,
+      "caught": [
+        {
+          "rule": "r26-real-read",
+          "where": "test/scripts/check-doc-candidate-status.test.mjs:dynamic-031770",
+          "error": "condition false"
+        },
+        {
+          "rule": "r26-membership",
+          "where": "test/scripts/check-doc-candidate-status.test.mjs:dynamic-031770",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "clearing both marker and member cannot hide a real read",
+      "rejected": true,
+      "caught": [
+        {
+          "rule": "r26-real-read",
+          "where": "test/scripts/check-doc-candidate-status.test.mjs:dynamic-031770",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "unit cannot omit the gate from its co-cut",
+      "rejected": true,
+      "caught": [
+        {
+          "rule": "r26-unit",
+          "where": "docs/doc-governance.md",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "proposal cannot invent a decided retention outcome",
+      "rejected": true,
+      "caught": [
+        {
+          "rule": "r26-unit",
+          "where": "docs/architecture-map.md",
+          "error": "condition false"
+        },
+        {
+          "rule": "r26-membership",
+          "where": "test/docs/decisions-corpus-retired.test.mjs:reference-004035",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "reader provenance must retain exact pin hash",
+      "rejected": true,
+      "caught": [
+        {
+          "rule": "r26-unit",
+          "where": "docs/doc-governance.md",
+          "error": "condition false"
+        },
+        {
+          "rule": "r26-membership",
+          "where": "scripts/check-doc-constitution.mjs:reference-002482",
+          "error": "condition false"
+        }
+      ]
+    },
+    {
+      "name": "proposed path with no reader cannot disappear from sweep",
+      "rejected": true,
+      "caught": [
+        {
+          "rule": "r26-coverage",
+          "where": "all proposed-move paths plus coupled enduser manifest",
+          "error": "condition false"
+        }
+      ]
+    }
+  ],
+  "failures": []
+}

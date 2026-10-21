@@ -15,6 +15,8 @@ def idof(e):return e.get('referenceId',e.get('id'))
 def expr(e):return e.get('matchedExpression',e.get('originalTuple',[None]*5)[4])
 def patch_spec(f):return next((s for s in read('step-05-seam5-batch6-cutover-specs.json')['patches'] if s['file']==f),None)
 def assert_patch(r,receipt,body):
+ shared=module('r26patch6','step-05-proposed-move-rules.py')
+ if shared.patch_spec(r['file']):return shared.assert_patch(r,receipt,body)
  m=module('pilot6','step-05-check.py');s4=module('s46','step-05-seam4-check.py');spec=patch_spec(r['file']);assert spec
  assert all(k in spec for k in read('step-05-parity-receipt-template.json')['cutoverPatch'])
  assert spec['inputCommit']==r['authorInputCommit'] and spec['sourceSha256']==r['sourceSha256']==sha(body) and spec['oldText']==body and spec['mode']==r['sourceMode']
@@ -45,7 +47,7 @@ def check():
   nonlocal ix
   if ix['closedBatch']!=6:ix=ix['previousReviewDeltas']['6']
   changed=closure['changedRecords'];disp={e['file'] for e in changed if e['dispositionChanged']};label={e['file'] for e in changed if not e['dispositionChanged']};added={r['file'] for r in rs};assert set(ix['reviewThisTurn'])==disp|added and {e['file'] for e in ix['changedThisTurn']['dispositionChanged']}==disp and {e['file'] for e in ix['changedThisTurn']['labelOnly']}==label
-  for e in changed:assert e['afterSha256']==sha(json.dumps(by[e['file']],ensure_ascii=False,separators=(',',':')))
+  for e in changed:assert e['afterSha256']==module('r26history6','step-05-proposed-move-rules.py').before_current(e['file'],sha(json.dumps(by[e['file']],ensure_ascii=False,separators=(',',':'))))
   return True
  test('j6-review-delta','R24 changed/add split',review_delta)
  def explicit():
@@ -53,7 +55,7 @@ def check():
   for id in ['dynamic-021547','dynamic-021548','dynamic-021549','reference-004308','reference-004343','dynamic-021550','dynamic-021551','reference-004332']:assert ids[id][1]['disposition']=='parked'
   for id in ['reference-004421','reference-004460','reference-004241','reference-003965','dynamic-018740','dynamic-018744']:assert ids[id][1]['admission']=='ADMIT' and ids[id][1]['disposition']=='patch'
   assert ids['author-s5-b6-loop-split-786'][1]['resolverWitness']['treeRetires']
-  for id in ['reference-004312','reference-004321','reference-004346','reference-004372']:assert ids[id][1]['disposition']=='preserve' and ids[id][1]['coCutDependency']['itemIds']
+  for id in ['reference-004312','reference-004321','reference-004346','reference-004372']:assert ids[id][1]['disposition']==('patch' if id=='reference-004312' else 'preserve') and ids[id][1]['coCutDependency']['itemIds']
   assert '0026--native-first' in ids['reference-004381'][1]['successorNote']
   return True
  test('j6-review-closure','all explicit Lead outcomes',explicit)

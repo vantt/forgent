@@ -1,0 +1,89 @@
+fgos: executor "sample" declares no "providerModel"/"provider" and its command ("agy") is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare "providerModel" explicitly.
+fgos: executor "sample" declares no "providerModel"/"provider" and its command ("c") is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare "providerModel" explicitly.
+fgos: executor "sample" declares no "providerModel"/"provider" and its command ("c") is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare "providerModel" explicitly.
+fgos: executor "sample" declares no "providerModel"/"provider" and its command ("agy") is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare "providerModel" explicitly.
+✔ A3: an executor declaring none of the new fields still loads unchanged (2.295884ms)
+✔ A1: the declared profile survives the load intact (0.800709ms)
+✔ C5: bypass without any confinement is refused at load, by name (0.607216ms)
+✔ C5: bypass with a PARTIAL confinement is refused -- two of three is not confinement (0.473564ms)
+✔ C5: bypass with full confinement loads (0.243237ms)
+✔ C5: ask mode needs no confinement -- the invariant constrains bypass only (0.236317ms)
+✔ A1: an unknown permissionMode is refused rather than passed through (0.235241ms)
+✔ A1: confinement flags must be booleans, not truthy strings (0.246776ms)
+✔ A1: an unknown promptDelivery value is refused, and a removed field is named rather than ignored (0.362444ms)
+✔ A1: trustStore is declared where it is read, and only there (0.828209ms)
+✔ A1: the profile reaches the resolver without resolve.mjs being changed for it (0.605299ms)
+✖ the real repository config still loads -- every existing executor stays valid (0.219318ms)
+✔ Phase C: an executor declaring neither identity nor supports still loads unchanged (regression guard) (0.254742ms)
+✔ Phase C: a full identity + supports block survives the load intact (0.500892ms)
+✔ Phase C: identity is all-or-nothing -- each of the four fields is refused by name when missing (0.511334ms)
+✔ Phase C: identity fields must be non-empty strings, not just present (0.31591ms)
+✔ Phase C: supports fields are each independently optional -- a partial declaration loads (0.189407ms)
+✔ Phase C: supports.reasoningEffort must be entries from REASONING_EFFORT_VALUES, not free strings (0.322913ms)
+✔ Phase C: supports.providerFamilies must be a non-empty array of non-empty strings (0.289635ms)
+✔ Phase C: supports.systemPrompt must be a boolean, not a truthy string (0.168541ms)
+✔ supports.skills is a non-empty array of skill names, kept as declared (0.539823ms)
+✔ Phase C: supports.toolGating must be a non-empty string (0.172274ms)
+✖ Phase C: the real repository config declares identity/supports on "claude" and it survives resolveExecutorAndOverrides end to end (0.094678ms)
+✔ Phase D: the retired top-level "readOnlyExecutorRedirects" field is refused at load, by name (0.238774ms)
+✔ Phase D correction: declaring readOnlyRedirect ON an executor entry is refused at load, by name (0.215306ms)
+✔ Phase D: a config declaring no placementPolicy at all still loads unchanged (regression guard) (0.268768ms)
+✖ Phase D: placementPolicy and readOnlyRedirects are retired and rejected at load (0.268009ms)
+✔ Step 2.1: an invocation "id" must be a non-empty string when present (0.493226ms)
+✔ Step 2.1: two invocations on the same executor cannot declare the same "id" (0.205467ms)
+✔ Step 2.1: invocations without an "id" still load fine (id is optional) (0.189542ms)
+✔ Step 2.1: resolveExecutorConfig defaults to the first "via:cli" invocation when no invocationId is passed -- byte-identical to before this field existed (0.254832ms)
+✔ Step 2.1: resolveExecutorConfig selects the named invocation when invocationId is passed (0.196098ms)
+✔ Step 2.1: resolveExecutorConfig throws by name when invocationId names an invocation that does not exist (0.224134ms)
+ℹ tests 33
+ℹ suites 0
+ℹ pass 30
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 93.593972
+
+✖ failing tests:
+
+test at test/runner/dispatch-executor-profile.test.mjs:184:1
+✖ the real repository config still loads -- every existing executor stays valid (0.219318ms)
+  Error [RunnerConfigError]: cannot read runner config at "/tmp/fgos-work/s5-review-replay-aa0q9bs2/.fgos/config.json": no such file
+      at loadRunnerConfigFromDir (file:///tmp/fgos-work/s5-review-replay-aa0q9bs2/src/runner/dispatch/config.mjs:349:11)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/s5-review-replay-aa0q9bs2/test/runner/dispatch-executor-profile.test.mjs:188:15)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    category: 'validation'
+  }
+
+test at test/runner/dispatch-executor-profile.test.mjs:317:1
+✖ Phase C: the real repository config declares identity/supports on "claude" and it survives resolveExecutorAndOverrides end to end (0.094678ms)
+  Error [RunnerConfigError]: cannot read runner config at "/tmp/fgos-work/s5-review-replay-aa0q9bs2/.fgos/config.json": no such file
+      at loadRunnerConfigFromDir (file:///tmp/fgos-work/s5-review-replay-aa0q9bs2/src/runner/dispatch/config.mjs:349:11)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/s5-review-replay-aa0q9bs2/test/runner/dispatch-executor-profile.test.mjs:321:15)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    category: 'validation'
+  }
+
+test at test/runner/dispatch-executor-profile.test.mjs:377:1
+✖ Phase D: placementPolicy and readOnlyRedirects are retired and rejected at load (0.268009ms)
+  Error [RunnerConfigError]: cannot read runner config at "/tmp/fgos-work/s5-review-replay-aa0q9bs2/.fgos/config.json": no such file
+      at loadRunnerConfigFromDir (file:///tmp/fgos-work/s5-review-replay-aa0q9bs2/src/runner/dispatch/config.mjs:349:11)
+      at TestContext.<anonymous> (file:///tmp/fgos-work/s5-review-replay-aa0q9bs2/test/runner/dispatch-executor-profile.test.mjs:387:15)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    category: 'validation'
+  }

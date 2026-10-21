@@ -1,0 +1,3734 @@
+{
+  "ruling": "L12-83",
+  "reports": [
+    "review-a38-step-05-s5-b6-p01.md",
+    "review-a38-step-05-s5-b6-p02.md",
+    "review-a38-step-05-s5-b6-p03.md",
+    "review-a38-step-05-s5-b6-p04.md",
+    "review-a38-step-05-s5-b6-p05.md",
+    "review-a38-step-05-s5-b6-p06.md",
+    "review-a38-step-05-s5-b6-p07.md",
+    "review-a38-step-05-s5-b6-p08.md",
+    "review-a38-step-05-s5-b6-p09.md",
+    "review-a38-step-05-s5-b6-p10.md",
+    "review-a38-step-05-s5-b6-p11.md",
+    "review-a38-step-05-s5-b6-p12.md",
+    "review-a38-step-05-s5-b6-p13.md",
+    "review-a38-step-05-s5-b6-p14.md",
+    "review-a38-step-05-s5-b6-p15.md",
+    "review-a38-step-05-s5-b6-p16.md"
+  ],
+  "changedRecords": [
+    {
+      "file": "src/cli/command-registry.mjs",
+      "recordFile": "step-05-records/cli-help-messages.jsonl",
+      "beforeSha256": "5885924ffb34ff669619bb0bc43070af37bbd7e738377275199056b55a09544b",
+      "afterSha256": "ac5c7da56782495eebdf320560802aaa3ba64e9df6efa36498459cf7e939c104",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-003646",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003651",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003657",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s4-fix2-284fae1afd0a9579",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "recordFile": "step-05-records/gateway-contract.jsonl",
+      "beforeSha256": "43f9f19c35a95765e4de2f6de90575508f305f37059faf27eed423ee35c3f9eb",
+      "afterSha256": "4b56dbf86662de114f880f4329d4c43180b5638626b0c01f4e66f49042e0c5bd",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-000162",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000163",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000164",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000173",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000177",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000178",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000183",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000187",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-000664",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-000665",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-000694",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/src/mcp.rs",
+      "recordFile": "step-05-records/gateway-contract.jsonl",
+      "beforeSha256": "63fb73e85dce382b8293e13d621340d6fc2caa53a8a5729d9e09782409c444fb",
+      "afterSha256": "6d5a454ae94c51440b55372f4e9e6e8ce5d06940fabcc479033cab4c6135f09b",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-000193",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000194",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000195",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000196",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000200",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-000767",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-000768",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-000778",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-000783",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-000788",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "docs/decisions/index.md",
+      "recordFile": "step-05-records/generators-decision-index.jsonl",
+      "beforeSha256": "a14e6f2fe1671b7be42b68bfbe3ff35e1a745fb49cbb48295ef71730b372ba6a",
+      "afterSha256": "554ccbefc42e3db80231ea22ab5448bafe8e09492a513b6490a98d658d40201b",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-000317",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000318",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000330",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000386",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "src/report/decision-index.mjs",
+      "recordFile": "step-05-records/generators-decision-index.jsonl",
+      "beforeSha256": "e3b6ef565fb47ee0d126de8b2dc3995e40b906811482ed609528171e457323f3",
+      "afterSha256": "87c0b66b4773f0d21a7b97b0e9b32475f0826af0316151ce0d0c1dd411dff252",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-003693",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003694",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003695",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-009758",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-009761",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-009767",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "docs/doc-registry.json",
+      "recordFile": "step-05-records/generators-doc-registry.jsonl",
+      "beforeSha256": "5a975f23e9575b5679310183555b4d6e9de0c968e09e1ce6b5487e96dea28b93",
+      "afterSha256": "f11d2282574ba4e08ac4f9f0a0ec93b8a65b8f25949fe1d5a81c025fb6ce11a8",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-000507",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000509",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-000510",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "docs/doc-registry.md",
+      "recordFile": "step-05-records/generators-doc-registry.jsonl",
+      "beforeSha256": "9cebf9b68b40f4d49a22d571173ef0cef3e2fd6ba8710d73e75e914654b1dcb3",
+      "afterSha256": "fe4197b59a30f00362a30a763fa126f637bfa433c0c5c97c8ff0cfae8e0fb0f0",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-001349",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-001360",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "docs/enduser-docs-index.json",
+      "recordFile": "step-05-records/generators-enduser-index.jsonl",
+      "beforeSha256": "8088d960122a7c8bae3c5029210737d867e64eae5be89bb0072e34ab478625a9",
+      "afterSha256": "ad8129901f8bc1b8a29cc225b0577b2f418138c6c6c2acd85390b85910159393",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-001759",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-001760",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-001762",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "recordFile": "step-05-records/generators-enduser-index.jsonl",
+      "beforeSha256": "5aa9e332f790dc7f73b3e2cf133c69c2b55f177d80230ae125b37a2ec76b1282",
+      "afterSha256": "9cae6c0a965abfd7aa01018abc903410e3cf648e8ba9a7fec6cc5a6eca6aa207",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "dynamic-009768",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-009769",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-009788",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "src/report/enduser-index.mjs",
+      "recordFile": "step-05-records/generators-enduser-index.jsonl",
+      "beforeSha256": "771776ea550427ff047d8fc00b194c7ab58878bcb649e6f631f8987005cdbd87",
+      "afterSha256": "0db5a894d19134ed2ba9932e0ab7e57c9c6ebce3decee66cabf41d2e99c28213",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "dynamic-009791",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": ".agents/skills/_shared/executor-dispatch-fallback.md",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "a7df6f7ddcec0ae3d283c0608da5f1b9faed99091d0f1c985f4e0c86b23ba240",
+      "afterSha256": "bdb2b974eb47c0bf010d7347bf8c0b32914bfc724d5605a1197e93990f6fecbd",
+      "dispositionChanged": false,
+      "changes": []
+    },
+    {
+      "file": ".agents/skills/fgos-clarifying/SKILL.md",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "d1b0146bb6f985f2d6aae5b6d26e61cc8f015a66bc55a95dcebf244d62ba8a7d",
+      "afterSha256": "a8fc82ccc5bd6029b067ae35a302fe3f7bbb2ad6a31d7123f794f42f659a3f1c",
+      "dispositionChanged": false,
+      "changes": []
+    },
+    {
+      "file": ".agents/skills/fgos-coding-knowledge/SKILL.md",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "df0adcfda0b6f8129be15ea0105286f1a259776b42a3474ac5c1e73864c872d6",
+      "afterSha256": "912980d238b4e707ae7a9c9a371e4ca8274b99216c6343f9c636ddd744241d9e",
+      "dispositionChanged": false,
+      "changes": []
+    },
+    {
+      "file": "docs/backlog.md",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "e9230472c42025ecd4938dff4d267954e4d5861e1b253d5d6b68afbdada5c487",
+      "afterSha256": "31b81f4f936e836c7338101b6e6b8ea502b7fe28a39497a7bf9a3e68e00ff05b",
+      "dispositionChanged": false,
+      "changes": []
+    },
+    {
+      "file": "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "59298776cc48b2ba554b97848887a59bdb3c5f6e05f15a478edab33f56660be8",
+      "afterSha256": "e95489e8375335ae90440566579b6d11f46ac250d67a5d954344c11f6e4b850f",
+      "dispositionChanged": false,
+      "changes": []
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-clarifying/SKILL.md",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "54ba45adbf6d7bb8444a0006608a2efdea8f6b1ff37163ffee1aae5a5e94e87f",
+      "afterSha256": "05f5caa6fcd9ccfc66921112541766d26385b18b40c0697afd2c28668e800dcb",
+      "dispositionChanged": false,
+      "changes": []
+    },
+    {
+      "file": "plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "f3c4d5b56ad14662a64ca73331d14f7ac2a0951083f458c245a9795c2ad6e54d",
+      "afterSha256": "94b959444e6a8ca4ee634f79aba842fd2d053f9695b5b67db50764df9ddade97",
+      "dispositionChanged": false,
+      "changes": []
+    },
+    {
+      "file": "plugins/fgOS/skills/terminal/SKILL.md",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "23ce10e0e8bf9dd9836c1d9c09ec772e9fe08455734d83e88eadc151eb536414",
+      "afterSha256": "8ec8b163e1ff67cf09f6d7c2bbb954d47de409b911dfa3eef985967432fac747",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-002424",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "scripts/backfill-status-category.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "b508e83f018b6aca9dfa0aa72d361bf29db10c4f917c7e6f17c09b5257a01471",
+      "afterSha256": "309e4f469eb73ab4444d15d0bc17e7d00df8aa9888f4ee5174b8de4139bfaf7e",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-002429",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "scripts/check-decision-supersession.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "afc6d17b593c53b31ef93600d70f8035b7db0b7a3f74a76039b4474c4476ecb1",
+      "afterSha256": "257f40a812c7079d23ad8590297fb7f22ae5099514a99e910322f2d2210d7c7b",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-002479",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "scripts/check-doc-candidate-status.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "69dde22726a3d35980af356a69f6bc43519717e4e3f73e6caba8623de71f8525",
+      "afterSha256": "c1540d344ca0f2402eff7e249fdb50bcd1650b5c4b50fd1df04ad2f11f6f4bb2",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-002481",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "scripts/check-doc-constitution.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "94cce7e8e275e4a6cf81f94169f5f0fdd98ef10a051c08137fb76c3cf4ab89ad",
+      "afterSha256": "539c5278864688c78568e28d66d72357a0e1a70751267fb272ecd4cc65f17270",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-002482",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-002483",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-002484",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-002485",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-006599",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-006602",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-006642",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "scripts/check-doc-retirement.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "e7e03cc8efc9142467e93dd7d2469fd34702478616d4959c4cb02b198e8510b0",
+      "afterSha256": "4536a475a5e58cfc986ba127bd4d281c5cb69ca98834cfb8d3454030510b1bc2",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-002489",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "scripts/generate-shipped-path-inventory.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "197e7e0848e56726cb43e3fc4ac7975104ea8ceb9cc86f4c48c1b9c50b04e93d",
+      "afterSha256": "61a0554e272d6a7f80dd5e67f08991c778eabcba83ccc642346817bf92e72329",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-003580",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003581",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003587",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003591",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003592",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003595",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003596",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003598",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003599",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003600",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "scripts/herdr-cockpit.sh",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "9dad8c6471653ce2f4b239ab963af851252c71733c55f8c915e6c14e077d1f1b",
+      "afterSha256": "85b3ad4dbcff648b2a35ce0cb178902d7951c075afa97a0eea507ab309c2ea16",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-003605",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "scripts/install-git-hooks.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "26452d21a86045802307b32f46744d41b53b91bbd4a9dab04b6911fa02f016bc",
+      "afterSha256": "eda304a17bf6b660a08b719c571e4cb9982b3649f1951dd49c4f36be2e26de43",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-003607",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "19fdd19acdfc0aa6896710c856d6a8a4448b89c4c90c75e7a0c6b04ae1b565e2",
+      "afterSha256": "4347c357b9776aa659f1752a5dd1f55ff40c4f88fdf50cbe1a17e7a17d308239",
+      "dispositionChanged": false,
+      "changes": []
+    },
+    {
+      "file": "scripts/next-doc-id.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "cded6adb6c27598ef0c4b4a044a3b9b445d6f09e39116694524418d8869d0625",
+      "afterSha256": "4d1ae408d968b9e6dc2e9977b16539d9f70ce80544a949d006cce8ebea96ca53",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-003620",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "scripts/propose-doc-decisions.mjs",
+      "recordFile": "step-05-records/generators-skills-and-support.jsonl",
+      "beforeSha256": "e62f1fbe66bf36b66751e2e0cf67ec68f6764989c446ec6c7dfde2829c3bf3f0",
+      "afterSha256": "40d311754558d966babc798bd9687a0faf7be912cc30ab818bbeb54f2686cd03",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-003624",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003628",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003631",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "src/setup/instruction-registry.mjs",
+      "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+      "beforeSha256": "4db4cc25693121ff268ea6d5b11765d4f880cf7ff77052bc60a349cf1e6e74c8",
+      "afterSha256": "919c0817ce4126988a7b5462a519d35e9260e7df71c88fe737c4616e566c7a61",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-003798",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003799",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003800",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-013969",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-013983",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-013984",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-013985",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014002",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014034",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014035",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "recordFile": "step-05-records/setup-doctor-roots.jsonl",
+      "beforeSha256": "6fdbe59f9ddf8b1c60db901a563e40c46a6d08e5c79f905dd009dd21957dfe40",
+      "afterSha256": "f17ef1f8352dc3071b217ca93e6d2d49b009789d7424e6fcf364bd6914aa3f7a",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-003804",
+          "beforeDisposition": "patch",
+          "afterDisposition": "patch",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003806",
+          "beforeDisposition": "patch",
+          "afterDisposition": "patch",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003811",
+          "beforeDisposition": "patch",
+          "afterDisposition": "patch",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003814",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003815",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003816",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003818",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003826",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003845",
+          "beforeDisposition": "patch",
+          "afterDisposition": "patch",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003850",
+          "beforeDisposition": "patch",
+          "afterDisposition": "patch",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-003854",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "patch",
+          "admissionChanged": true
+        },
+        {
+          "id": "dynamic-014207",
+          "beforeDisposition": "patch",
+          "afterDisposition": "patch",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014307",
+          "beforeDisposition": "patch",
+          "afterDisposition": "patch",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014334",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014335",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014336",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014337",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-014907",
+          "beforeDisposition": "patch",
+          "afterDisposition": "patch",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s4-fix2-a8e9503a9eafcad1",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/architecture.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch4.jsonl",
+      "beforeSha256": "a436407dbff1c0f18f3b6ac6c6d81def199606563fe44d5e73f0b774057f1a39",
+      "afterSha256": "04c4abf6bc6f836376a73c45a92214c07af07f8371a254b809212417e7ae308f",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-003949",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-016778",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "apps/fgos-gateway/web/src/App.test.tsx",
+      "recordFile": "step-05-records/tests-judgment-batch4.jsonl",
+      "beforeSha256": "7b55723914262f4d82a20a0d59cc4415877ec40c7ae61d58fe86fd896c34843e",
+      "afterSha256": "99d60cfcf403822a1020441c507a56f3a2a0ac48e80b7f754ba3c4d0950d360e",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-000201",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/scripts/doc-corpus-decisions.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch4.jsonl",
+      "beforeSha256": "0d1faffe72b673e32460856ce585cd01836f79f3593030e51b6fb0d2a9567845",
+      "afterSha256": "048a0484715354f9f0d576eeb6194c784511cbe0dbd9c7e8e380a0bc4f08c366",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-004932",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b4-doc-corpus-decisions-122-7",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/state/status-category.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch4.jsonl",
+      "beforeSha256": "cf2952c627c77b2010a24aa629eee381b093873fd3b8d54162099e6bd9c686e4",
+      "afterSha256": "062189d7f10b0c4a38e5b5dc6e8d24d02f6908384f9b647dc6ea2a1ca509d39c",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-005291",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-005293",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+      "beforeSha256": "d6451a59ac79d7842ba7363cf1afabe4f068baa75904be9f55fc4d4682f9050a",
+      "afterSha256": "e8a4b886e4bfcebed696ad6193ecd18332ccf7cb5086c5ec0797e24d84b67d0a",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-004305",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004306",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004307",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004308",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004309",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004310",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004312",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "patch",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004313",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004314",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004315",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004316",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004317",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004318",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004322",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004323",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004325",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004326",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004327",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004328",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004331",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004333",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004334",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004335",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004337",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004338",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004339",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004340",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004341",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004342",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004343",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004349",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021500",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021501",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021502",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021503",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021504",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021505",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021506",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021508",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021509",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021514",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021515",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021521",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021522",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021523",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021524",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021525",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021526",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021527",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021528",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021529",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021530",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021531",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021532",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021533",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021534",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021535",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021536",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021537",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021538",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021539",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021540",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021542",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021545",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021547",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021548",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021549",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021550",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021551",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021552",
+          "beforeDisposition": "parked",
+          "afterDisposition": "patch",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021568",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021569",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021570",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021571",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b5-enduser-index-154-35",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/cli/fgos-merge.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+      "beforeSha256": "9982abbd6d8f19b63c58b92adc02a2785d780c3aa9af7cb13b139e716d2a7144",
+      "afterSha256": "8bad93095a7a7f016b958238cb6a6a3106d2e589ac84a4ce8be6970d72cf4e28",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-003965",
+          "beforeDisposition": "patch",
+          "afterDisposition": "patch",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/cli/fgos-post-merge.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+      "beforeSha256": "bf7772d039e4e9f572a5e3a2e124acfa9503ca16ed1f9120a2eef8ad2bbf6370",
+      "afterSha256": "a9bb9ef2b3f9e72144a6da278470003db82a21004595d8f78520b3d08176f23e",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "author-s5-b6-closure-manifest-reader-187",
+          "beforeDisposition": null,
+          "afterDisposition": "parked",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b6-closure-manifest-reader-188",
+          "beforeDisposition": null,
+          "afterDisposition": "parked",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b6-closure-manifest-reader-198",
+          "beforeDisposition": null,
+          "afterDisposition": "parked",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b6-closure-manifest-reader-201",
+          "beforeDisposition": null,
+          "afterDisposition": "parked",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b6-closure-manifest-reader-212",
+          "beforeDisposition": null,
+          "afterDisposition": "parked",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b6-closure-manifest-reader-216",
+          "beforeDisposition": null,
+          "afterDisposition": "parked",
+          "admissionChanged": true
+        }
+      ]
+    },
+    {
+      "file": "test/intake/plan.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+      "beforeSha256": "6d1ecfd97bc6cd4ee905ee77bd5895caaa180904ca6daea4609b76381646c2c5",
+      "afterSha256": "67a9eed83c4913fdc81e18241b7327d047bc3da12f4ea24f85705426d50dcf5d",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-004241",
+          "beforeDisposition": "patch",
+          "afterDisposition": "patch",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/report/decision-index.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+      "beforeSha256": "d95d667a7631e5a41d6b61549d5ed990249ccc86a9a13c2b2f3eb5affd81b0b3",
+      "afterSha256": "8b8b598d21ba32681b26b3a0f1ad27bb1f01ac80d86b6729eae0f611602b7402",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-004302",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004303",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021479",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021480",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021481",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021482",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021483",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/runner/loop.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+      "beforeSha256": "b9ee29f3e74477287f5ec246cc6cd6f943fc1f9d53b33753e287a663b0a1d45a",
+      "afterSha256": "4c7e699d8f1ca0835dec18b34474f995b2b87c9689a31bb41ab669f98e0b2fca",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-004413",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004414",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004415",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b5-loop-786-67",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/runner/merge.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch5.jsonl",
+      "beforeSha256": "db30a38bffaabe9e24b9fc8724764b60635f545c9ab3c9ea1c985c66119569f0",
+      "afterSha256": "e09fab0746d25e1352bf831bc4769b7d4eb7b709864035fa05eaf48b7ab6e17e",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-004443",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004447",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004448",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004450",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004456",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/cli/helpers/fgos-cli-harness.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+      "beforeSha256": "ccbdd3ee685c250b90a4d7fcec5fa61f74383d0708c0c6834b3723e959600451",
+      "afterSha256": "6a60096b7aa095e04689580a85f5c626711016eec1d8f9e50d82a0328a4a01bb",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "dynamic-017973",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": true
+        },
+        {
+          "id": "author-s5-b6-fgos-cli-harness.mjs-363-47",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b6-fgos-cli-harness.mjs-525-65",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/fixtures/run-outcome/legacy-derivation.json",
+      "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+      "beforeSha256": "e997492c415053a9e250f6d2d8c78d751958562056372c44dec23bdc869c8747",
+      "afterSha256": "1c9f7349c2c759135b7c18ee7e78b71549ec0cd289941fdb6a954c80c3fa5ae4",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "author-s5-b6-legacy-derivation.json-4246-12",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b6-legacy-derivation.json-4262-22",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/fixtures/run-result/real-shapes/15-v2-completed-not-applicable-failed.json",
+      "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+      "beforeSha256": "888c98ef943b72136cc33e8ebfb7c40c0dd0ac78ac82923a0147d54f9b3943a2",
+      "afterSha256": "b7fa6de49743f3d4f623cf784df3d2afda9a97b25732ce864a5eecf4863af02f",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "author-s5-b6-15-v2-completed-not-applicable-failed.json-220-8",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b6-15-v2-completed-not-applicable-failed.json-236-18",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/report/helpers/docs-index-state-fixture.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+      "beforeSha256": "42b2f86d741e082886dc037e19099038b90fc5391a846e85455519fdc1b24004",
+      "afterSha256": "c120ee8638561bac8c32e6e4cbda052ec7edfc934e0f9fb6f90b56ce1e245a62",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-004352",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021578",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-021584",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b6-docs-index-state-fixture.mjs-4-10",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b6-docs-index-state-fixture.mjs-9-9",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b6-docs-index-state-fixture.mjs-38-34",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/runner/dispatch-confinement-p04.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+      "beforeSha256": "43394a4ca0d6d907eb2e20517916c31f01aab0ca463ee44e7c11600a0dc73217",
+      "afterSha256": "f757d0e1687aa43c54043813e6fa685f849042699be9ef03bffaf1deea637af5",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-004376",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/runner/dispatch-confinement-p05.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+      "beforeSha256": "ee202e34ded8efc6de2fd8ca664b29b907f4e0b9ac5d15366709dd4bdb2993a8",
+      "afterSha256": "33ee5c69d7c1368d376123a1d977d443b2929ebf102559027e96c6f9c808754e",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-004377",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/runner/dispatch-executor-profile.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+      "beforeSha256": "40afcead66dba57b47395e3075b4f3f5dd1fda8d003fc727edde42487c04be5a",
+      "afterSha256": "9998e34a6c42bb2e900746ad0fea395b463b5a18752fbc796a38cd1d3b398b75",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-004378",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "patch",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/runner/dispatch-worker-home.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+      "beforeSha256": "5f8c25dca21cfa66135d8aeb6d8b3c6c29ba1ea928dc808c45daf102d89c8308",
+      "afterSha256": "52679a7ffb51ec86f7e061430fe65379803a587b0ba56424a762561204cf1694",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-004379",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "patch",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/scripts/check-doc-candidate-status.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+      "beforeSha256": "b92f9324b17dd3b3d9ad491d0ba6a24378e711b0283a5a0e6737042f57ed1d1b",
+      "afterSha256": "bf697242fa0b27d98373e4add958f4d01f6d28903ae76255ca28b7ae9a3fc7ad",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-004586",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004587",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004588",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004589",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-031762",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-031763",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-031770",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-031771",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/scripts/check-doc-conservation.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+      "beforeSha256": "c6525233bb1b6de838d5c4a6e3347abd52905e8cd900b2f688a39a5c4fe3daa4",
+      "afterSha256": "5962d7b972943a334358f2f4c5115a1f8a8d6de464318c9332cc8d81b0394e2a",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-004590",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004631",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004646",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004647",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-031909",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/scripts/check-doc-constitution.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+      "beforeSha256": "862df17fea826f8538e05fdbeed3db267a058c7eec11f55d45380722484d614f",
+      "afterSha256": "d900733ba882fcb329a6f8322f49ac3b9c9b91630d20b934719e5febd77d2d32",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-004651",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004659",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-032029",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-032030",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/scripts/check-doc-retirement.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+      "beforeSha256": "1240584dee30b2c14022c13855b1c5882c22b969b9cb811096ce9638a4edabc6",
+      "afterSha256": "9710b7bd8c4502f2f8e7bad2696b978b110448ec7a2bc12f596bf66ee8f825cb",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-004671",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004672",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004675",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004686",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004691",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004692",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004694",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004695",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004698",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004702",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004705",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-032087",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-032089",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-032091",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-032098",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-032099",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-032100",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-032103",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-032108",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b6-check-doc-retirement-235-46",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/scripts/generate-doc-inventory.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+      "beforeSha256": "4e5b6ebaf2e991cc17aab942fac4699b8a8c0433a91373817b10759b324908e8",
+      "afterSha256": "9ba5a84a18917d93d2d67159f6d3c228506a1ea10dd34f818ccc1aa9046993b5",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-004977",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004978",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004987",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-005010",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-005017",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-005020",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-033130",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-033134",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b6-generate-doc-inventory-54-13",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b6-generate-doc-inventory-127-17",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b6-generate-doc-inventory-473-35",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+      "beforeSha256": "28626234e712c6c34523628a5a4447b254d88a55f6a8968dc95ecf79ce067870",
+      "afterSha256": "dab5e6c9566231419aaae36d7adfd83074cc8ef65a728189cd98982461092ead",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-005063",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-005065",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/scripts/knowledge-migration.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+      "beforeSha256": "a0d10a13eaf11f2c055c891578873b4b5be07fb801f79d76cf1bf389dc7eb22e",
+      "afterSha256": "85dc927fd9b9726c972dafe7826d51f34a5f089caf84461abedfed8cf8b926ad",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-005101",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b6-knowledge-migration-388-9",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b6-knowledge-migration-455-34",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/setup/checks.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+      "beforeSha256": "2b576dcfe32d3548ab9794e6f03b508563f52ba81338e514e690b85ae278d8c4",
+      "afterSha256": "8e61c58b8e1bd693a3af7de2616ea5c7f9cbcd4c51973fd92243e95e10f78ab3",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-005173",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-005174",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-035204",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-035208",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-035209",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-035216",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-035217",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-035224",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-035225",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-035227",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-035237",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-035238",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b6-checks-647-44",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/setup/helpers/setup-checks-harness.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+      "beforeSha256": "0cb37fa5943f07f5b4c4d2aff1c91af06d15f0ab0447a02af1f84aaba9f53a1c",
+      "afterSha256": "a771c82e6b0c9aa194f08acbf512b0638a5ee5d1deabbd625eec9bfe1a63f9fa",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-005193",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-035720",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/setup/instruction-registry.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+      "beforeSha256": "598ff3f147bfdc8196254006c4ee8dc81eae92b20c9628092f0a05ad3a42ee58",
+      "afterSha256": "eba37b3aefe3a894af2063138c1c30eeb57fab390593612008c16ccae47af138",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-005196",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-035970",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-035993",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-035994",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-035996",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-035997",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-036001",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-036002",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-036014",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-036020",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-036023",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-036026",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-036038",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/setup/knowledge-doctor.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+      "beforeSha256": "37839260f04e93c682f29a8d066e5451b3eebf25cb5e45a6e215522c052cd2eb",
+      "afterSha256": "8586d6f7a253cd29d7a944c839ac3dca3fa40c2c2cd23f2a68f93e07a6dcc775",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "author-s5-b6-knowledge-doctor-202-21",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/setup/registrations.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+      "beforeSha256": "652e47d56e58f3acc1e3cda915d7aae3411fdac735527de50a7a745f5b7d591f",
+      "afterSha256": "9891d9a72b9a9d17f4d6d942be08fe25c2c76c659b3373b4244208f42a509fe8",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "dynamic-036304",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-036305",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/setup/skill-wrappers.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+      "beforeSha256": "9240af45790523037eacec396ad30ddfd3d1633bf18732e44e03188afada650a",
+      "afterSha256": "f5547b6107a3df76c8f0d746a8fb890a56011f1956b8745c71edcd261865b575",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-005203",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/skills/fgos-mirror.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+      "beforeSha256": "830de91e0c099afe3165c4cd34487838a427d7b6e7c5ecfee90fe1d2f17b4bcb",
+      "afterSha256": "3c3bcea4f63b6357e4e61d14936a3ae4b83a691b7a08cdc20b405800e2dd9083",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "author-s5-b6-fgos-mirror-199-26",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/state/decision-relation.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch6.jsonl",
+      "beforeSha256": "fd9869f99849b3dd86e26a38bf4abf88abcf883766bacc684fd53dc697021d8e",
+      "afterSha256": "ad994daa75c7c8bcdc4f73cc2c6b3735acb9414cb387c5b9909ae591487de10e",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "reference-005222",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "author-s5-b6-decision-relation-5-4",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/scripts/doc-rationale.test.mjs",
+      "recordFile": "step-05-records/tests-judgment-batch7.jsonl",
+      "beforeSha256": "674535c249823a1f1e92d4c52bd97b12c4f23b92d1b176b408a49d0c979345ce",
+      "afterSha256": "dd6cd869f9eb54c65c53d472b06946198d74456f2e48b6166a9ae1cac1c52241",
+      "dispositionChanged": false,
+      "changes": [
+        {
+          "id": "author-s5-b7-doc-rationale-67-64",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        }
+      ]
+    },
+    {
+      "file": "test/docs/decisions-corpus-retired.test.mjs",
+      "recordFile": "step-05-records/tests-real-file.jsonl",
+      "beforeSha256": "ce391309cda7f4ef7e29d81b885b46dd90a0e692831def4d3915e43bcb30e2f7",
+      "afterSha256": "78156c4b6d7cc92d84f3183cd9e4f31f6ae271ae643d99d77e047e99177c1f5f",
+      "dispositionChanged": true,
+      "changes": [
+        {
+          "id": "reference-004028",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004034",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004035",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004036",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "preserve",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004039",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004041",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "reference-004047",
+          "beforeDisposition": "parked",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-018734",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        },
+        {
+          "id": "dynamic-018735",
+          "beforeDisposition": "preserve",
+          "afterDisposition": "parked",
+          "admissionChanged": false
+        }
+      ]
+    }
+  ],
+  "retiringCommentSweep": [
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "reference-000161",
+      "oldPath": "docs/specs/distribution.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "parked",
+      "dispositionAfter": "parked"
+    },
+    {
+      "file": "apps/fgos-gateway/src/gateway.rs",
+      "id": "reference-000182",
+      "oldPath": "docs/specs/distribution.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "parked",
+      "dispositionAfter": "parked"
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "id": "reference-003697",
+      "oldPath": "docs/specs/enduser-docs-index.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "src/report/enduser-index-generate.mjs",
+      "id": "reference-003698",
+      "oldPath": "docs/specs/enduser-docs-index.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "src/report/knowledge-resolver.mjs",
+      "id": "reference-003702",
+      "oldPath": "docs/architect/knowledge-registry-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "reference-003611",
+      "oldPath": "docs/architect/knowledge-registry-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "reference-003612",
+      "oldPath": "docs/architect/knowledge-registry-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "scripts/knowledge-migration.mjs",
+      "id": "reference-003616",
+      "oldPath": "docs/architect/knowledge-registry-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "src/setup/git-hooks.mjs",
+      "id": "reference-003796",
+      "oldPath": "docs/specs/distribution.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "patch",
+      "dispositionAfter": "patch"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003819",
+      "oldPath": "docs/architect/knowledge-registry-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003820",
+      "oldPath": "docs/architect/knowledge-registry-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003821",
+      "oldPath": "docs/architect/knowledge-registry-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003854",
+      "oldPath": "docs/architect/agent-coordination/contracts/flow-definition.md",
+      "eligibleHolders": [
+        "docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md"
+      ],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "patch"
+    },
+    {
+      "file": "src/setup/registrations.mjs",
+      "id": "reference-003855",
+      "oldPath": "docs/specs/confinement-authority.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/cli/fgos-intake-4.test.mjs",
+      "id": "reference-003959",
+      "oldPath": "docs/architect/doing-coordination-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/cli/fgos-intake-4.test.mjs",
+      "id": "reference-003960",
+      "oldPath": "docs/architect/doing-coordination-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/state/compound-learn-done-gate.test.mjs",
+      "id": "reference-005220",
+      "oldPath": "docs/architect/doing-coordination-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/state/status-category.test.mjs",
+      "id": "reference-005292",
+      "oldPath": "docs/architect/doing-coordination-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/state/fsm.test.mjs",
+      "id": "reference-005239",
+      "oldPath": "docs/architect/doing-coordination-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/state/fsm.test.mjs",
+      "id": "reference-005240",
+      "oldPath": "docs/architect/doing-coordination-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/state/fsm.test.mjs",
+      "id": "reference-005241",
+      "oldPath": "docs/architect/doing-coordination-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/cli/fgos-handoff.test.mjs",
+      "id": "reference-003955",
+      "oldPath": "docs/architect/doing-coordination-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/e2e/rebuild-determinism.test.mjs",
+      "id": "reference-004061",
+      "oldPath": "docs/architect/doing-coordination-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/report/knowledge-resolver.test.mjs",
+      "id": "reference-004354",
+      "oldPath": "docs/architect/knowledge-registry-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/runner/loop.test.mjs",
+      "id": "reference-004411",
+      "oldPath": "docs/architect/doing-coordination-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/runner/loop.test.mjs",
+      "id": "reference-004412",
+      "oldPath": "docs/architect/doing-coordination-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/runner/loop.test.mjs",
+      "id": "author-s5-b6-loop-split-786",
+      "oldPath": "docs/architect/doing-coordination-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/cli/helpers/fgos-cli-harness.mjs",
+      "id": "reference-004009",
+      "oldPath": "docs/architect/doing-coordination-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/cli/helpers/fgos-cli-harness.mjs",
+      "id": "reference-004010",
+      "oldPath": "docs/architect/doing-coordination-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/runner/dispatch-confinement-p04.test.mjs",
+      "id": "reference-004376",
+      "oldPath": "docs/specs/confinement-authority.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/runner/dispatch-confinement-p05.test.mjs",
+      "id": "reference-004377",
+      "oldPath": "docs/specs/confinement-authority.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/runner/dispatch-executor-profile.test.mjs",
+      "id": "reference-004378",
+      "oldPath": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/permission-posture-findings.md",
+      "eligibleHolders": [
+        "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/permission-posture-findings.md"
+      ],
+      "dispositionBefore": "patch",
+      "dispositionAfter": "patch"
+    },
+    {
+      "file": "test/runner/dispatch-worker-home.test.mjs",
+      "id": "reference-004379",
+      "oldPath": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/agent-in-session-findings.md",
+      "eligibleHolders": [
+        "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/agent-in-session-findings.md"
+      ],
+      "dispositionBefore": "patch",
+      "dispositionAfter": "patch"
+    },
+    {
+      "file": "test/state/awaiting.test.mjs",
+      "id": "reference-005209",
+      "oldPath": "docs/architect/doing-coordination-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/state/awaiting.test.mjs",
+      "id": "reference-005210",
+      "oldPath": "docs/architect/doing-coordination-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/state/awaiting.test.mjs",
+      "id": "reference-005211",
+      "oldPath": "docs/architect/doing-coordination-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/state/knowledge-registry.test.mjs",
+      "id": "reference-005270",
+      "oldPath": "docs/architect/knowledge-registry-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/state/knowledge-registry.test.mjs",
+      "id": "reference-005271",
+      "oldPath": "docs/architect/knowledge-registry-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/state/runtime-coordination.test.mjs",
+      "id": "reference-005288",
+      "oldPath": "docs/architect/doing-coordination-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/state/runtime-coordination.test.mjs",
+      "id": "reference-005289",
+      "oldPath": "docs/architect/doing-coordination-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/state/store.test.mjs",
+      "id": "reference-005297",
+      "oldPath": "docs/architect/doing-coordination-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/state/store.test.mjs",
+      "id": "reference-005298",
+      "oldPath": "docs/architect/doing-coordination-redesign.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/docs/decisions-corpus-retired.test.mjs",
+      "id": "reference-004029",
+      "oldPath": "docs/specs/*.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    },
+    {
+      "file": "test/docs/decisions-corpus-retired.test.mjs",
+      "id": "reference-004043",
+      "oldPath": "docs/specs/<area>.md",
+      "eligibleHolders": [],
+      "dispositionBefore": "preserve",
+      "dispositionAfter": "preserve"
+    }
+  ],
+  "resolvedPlaceholderReasons": [
+    {
+      "file": "test/cli/helpers/fgos-cli-harness.mjs",
+      "id": "author-s5-b6-fgos-cli-harness.mjs-363-47",
+      "line": 363,
+      "source": "// silently scan and write the WORKTREE's own docs/ tree instead of the",
+      "resolution": "L12-83: pinned comment describes the existing corpus or root directory, not a unique movable document holder; preserve dated context."
+    },
+    {
+      "file": "test/cli/helpers/fgos-cli-harness.mjs",
+      "id": "author-s5-b6-fgos-cli-harness.mjs-525-65",
+      "line": 525,
+      "source": "// Each row below used to be its own hand-written test (see D1, docs/",
+      "resolution": "L12-83: pinned comment describes the existing corpus or root directory, not a unique movable document holder; preserve dated context."
+    },
+    {
+      "file": "test/report/helpers/docs-index-state-fixture.mjs",
+      "id": "dynamic-021578",
+      "line": 38,
+      "source": " * Builds a fresh fixture root: `docs/` symlinked to this repo's own real",
+      "resolution": "L12-83: pinned comment describes the existing corpus or root directory, not a unique movable document holder; preserve dated context."
+    },
+    {
+      "file": "test/report/helpers/docs-index-state-fixture.mjs",
+      "id": "author-s5-b6-docs-index-state-fixture.mjs-4-10",
+      "line": 4,
+      "source": "// real `docs/<quadrant>/` tree (never a copy or a temp mirror) -- `dir`",
+      "resolution": "L12-83: pinned comment describes the existing corpus or root directory, not a unique movable document holder; preserve dated context."
+    },
+    {
+      "file": "test/report/helpers/docs-index-state-fixture.mjs",
+      "id": "author-s5-b6-docs-index-state-fixture.mjs-9-9",
+      "line": 9,
+      "source": "// own `docs/` instead of a copy, so every real on-disk `.md` file, alias",
+      "resolution": "L12-83: pinned comment describes the existing corpus or root directory, not a unique movable document holder; preserve dated context."
+    },
+    {
+      "file": "test/report/helpers/docs-index-state-fixture.mjs",
+      "id": "author-s5-b6-docs-index-state-fixture.mjs-38-34",
+      "line": 38,
+      "source": " * Builds a fresh fixture root: `docs/` symlinked to this repo's own real",
+      "resolution": "L12-83: pinned comment describes the existing corpus or root directory, not a unique movable document holder; preserve dated context."
+    },
+    {
+      "file": "test/scripts/generate-doc-inventory.test.mjs",
+      "id": "reference-005010",
+      "line": 127,
+      "source": "  // the entire docs/knowledge/** and docs/how-to/** corpora.",
+      "resolution": "L12-83: pinned comment describes the existing corpus or root directory, not a unique movable document holder; preserve dated context."
+    },
+    {
+      "file": "test/scripts/generate-doc-inventory.test.mjs",
+      "id": "author-s5-b6-generate-doc-inventory-54-13",
+      "line": 54,
+      "source": "// promoted docs/platform/** portal, a glob-route retained legacy area, and",
+      "resolution": "L12-83: pinned comment describes the existing corpus or root directory, not a unique movable document holder; preserve dated context."
+    },
+    {
+      "file": "test/scripts/generate-doc-inventory.test.mjs",
+      "id": "author-s5-b6-generate-doc-inventory-127-17",
+      "line": 127,
+      "source": "  // the entire docs/knowledge/** and docs/how-to/** corpora.",
+      "resolution": "L12-83: pinned comment describes the existing corpus or root directory, not a unique movable document holder; preserve dated context."
+    },
+    {
+      "file": "test/scripts/knowledge-migration.test.mjs",
+      "id": "reference-005101",
+      "line": 151,
+      "source": "    // Deliberately never create docs/how-to/reclaim.md on disk.",
+      "resolution": "L12-83: pinned comment describes the fixture path/constant used by this test; preserve until its owning fixture co-cut changes."
+    },
+    {
+      "file": "test/scripts/knowledge-migration.test.mjs",
+      "id": "author-s5-b6-knowledge-migration-388-9",
+      "line": 388,
+      "source": "    // (docs/knowledge/worktree-reclaim/guide.md) -- the OLD code's `sourcePath ===",
+      "resolution": "L12-83: pinned comment describes the existing corpus or root directory, not a unique movable document holder; preserve dated context."
+    },
+    {
+      "file": "test/scripts/knowledge-migration.test.mjs",
+      "id": "author-s5-b6-knowledge-migration-455-34",
+      "line": 455,
+      "source": "    // Deliberately never create docs/knowledge/worktree-reclaim/guide.md on disk --",
+      "resolution": "L12-83: pinned comment describes the existing corpus or root directory, not a unique movable document holder; preserve dated context."
+    },
+    {
+      "file": "test/setup/helpers/setup-checks-harness.mjs",
+      "id": "reference-005193",
+      "line": 68,
+      "source": "// QUADRANT_DIR_ALIASES (docs/decisions -> explanation) honored.",
+      "resolution": "L12-83: pinned comment describes the existing corpus or root directory, not a unique movable document holder; preserve dated context."
+    },
+    {
+      "file": "test/setup/knowledge-doctor.test.mjs",
+      "id": "author-s5-b6-knowledge-doctor-202-21",
+      "line": 202,
+      "source": "    // Never commit docs/test/guide-old.md at HEAD, and never leave it",
+      "resolution": "L12-83: pinned comment describes the existing corpus or root directory, not a unique movable document holder; preserve dated context."
+    },
+    {
+      "file": "test/skills/fgos-mirror.test.mjs",
+      "id": "author-s5-b6-fgos-mirror-199-26",
+      "line": 199,
+      "source": "// docs, code.claude.com/docs/en/skills.md: \"The user-invocable field only",
+      "resolution": "L12-83: pinned comment describes the existing corpus or root directory, not a unique movable document holder; preserve dated context."
+    },
+    {
+      "file": "test/state/decision-relation.test.mjs",
+      "id": "reference-005222",
+      "line": 6,
+      "source": "// docs/specs/*.md-only scope) so a dangling old-id citation is surfaced,",
+      "resolution": "L12-83/R8: dated scope/proposal provenance; docs/specs or docs/architect tree retires. No eligible same-passage canonical live holder was found in the complete pinned holder sweep."
+    },
+    {
+      "file": "test/state/decision-relation.test.mjs",
+      "id": "author-s5-b6-decision-relation-5-4",
+      "line": 5,
+      "source": "// docs/**+src/**+plugins/** (widened from the pre-existing backlog.md+",
+      "resolution": "L12-83: pinned comment describes the existing corpus or root directory, not a unique movable document holder; preserve dated context."
+    }
+  ],
+  "fixtureGeneratorCoChanges": [
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004306",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004309",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004310",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004313",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004314",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004315",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004316",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004317",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004318",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004322",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004323",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004325",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004326",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004327",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004328",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004333",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004334",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004335",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004337",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004338",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004339",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004340",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004341",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "reference-004342",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021500",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021501",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021502",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021503",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021504",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021505",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021506",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021508",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021509",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021521",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021522",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021523",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021524",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021525",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021526",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021527",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021528",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021529",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021530",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021531",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021532",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021533",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021534",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021535",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021536",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021537",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021538",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021539",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021568",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021569",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021570",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    },
+    {
+      "file": "test/report/enduser-index.test.mjs",
+      "id": "dynamic-021571",
+      "dependency": {
+        "file": "src/report/enduser-index-generate.mjs",
+        "itemIds": [
+          "dynamic-009788",
+          "dynamic-009791"
+        ],
+        "rule": "Fixture quadrant names and manifest output co-change with alias scan-set; R21 rejection stays."
+      }
+    }
+  ],
+  "counts": {
+    "changedRecords": 67,
+    "dispositionChanged": 19,
+    "labelOnly": 48,
+    "newPatchFiles": 6,
+    "retiringCommentOccurrences": 44,
+    "sweepNewPatches": 1,
+    "placeholderReasonsResolved": 17
+  },
+  "independentReview": "pending Lead; author correction is not acceptance",
+  "inputCommit": "37d2edbfd166378b987a55e340c1c0e41ecbddcb"
+}

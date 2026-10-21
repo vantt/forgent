@@ -1182,3 +1182,24 @@ Applying Lead R25 to the four blocked replays with exact Phase 9 obligations and
 ## Seam 5 batch 7 — verification running (2026-10-21)
 
 All 264 queued files are authored; continuation is empty. Fresh post-ancestry integrated baseline passes: 995 records / 3,622 references / 30,661 tuples / zero failures. Pilot negative probes reject 44/44. Sequential generator, prompt and remaining batch probes are still running; no final round-completion claim yet. Original record shards remain unchanged. R25 carries four exact deferred replays; parks and Phase 9 composition remain open.
+
+
+## Review closure and R26 sweep — started (2026-10-21)
+
+Reading pinned sources and batch-6 review windows; applying R26 across all Step 5 records, then refreshing checker and every probe family. Records only; no CLI or git writes.
+
+
+## L12-83 closure — final verification in progress (2026-10-21)
+
+All requested author corrections and the all-seam R26 sweep are recorded. 43 units (42 proposed paths + explicitly coupled enduser output), six with readers; 73 reader/default/output slots across 16 files. Seam 5: 704 files / 1,203 refs / 25,007 tuples / 1,117 supplemental slots; 82 parks / 23 patch items / 11 patch files; six deferred replays. Worker-home current/candidate 12/12 each, equal. Profile current-only scratch failure on absent forbidden config is preserved, no full replay claimed.
+
+Initial full baseline: 0. First recheck: eight structural failures; second recheck: two (direct-read/title replacement was too broad, plus duplicate receipt blocker entries). Both are repaired without weakening checks: candidate now changes exactly L385/L386, leaving the three manifest/capture occurrences parked. Current batch-5 owning checker: 0. Earlier diagnostic probe runs: pilot 44/44, generator 34/34, batch2 18/18. New R26 family owns eight unit mutations; exact replay/patch mutations stay with their existing R22/R25 proof owners.
+
+Final input bytes are frozen in step-05-seam5-b6-review-frozen-inputs.json (71 files). Final integrated checker command is captured in step-05-seam5-b6-review-baseline-command.json; its output will replace step-05-seam5-b6-closure-clean-check.json (older two-failure result is preserved as step-05-seam5-b6-closure-second-check.json). Raw final checker log: step-05-seam5-batch7-proof-full-check.log. Once that fresh run exits 0, run step-05-seam5-b6-review-verify.py for every probe family. It writes step-05-seam5-b6-review-probe-proof.json with individual source/log/result hashes and exits. Final aggregate verification JSON and handback verification paragraph still need sealing; no final passing claim yet.
+
+Canonical review list has the 264 previous-turn batch-7 files as addedThisTurn; changedThisTurn separates 11 seam-5 disposition/diff files and 25 label-only files. Journal contains 67 all-seam changed records (19 disposition/diff, 48 label/dependency-only). Lead packer must include authorAddedReferences. Handback draft: step-05-seam5-batch7-handback.md. No consumer edits, fgOS CLI, git writes, live-state/secrets reads, or independent acceptance.
+
+
+## L12-83 closure — completed author handback (2026-10-21)
+
+Closed requested review rework and all-seam R26 sweep as records only. R26: 43 units, six active reader units, 73 reader/default/output slots across 16 files. Seam 5 authoring remains complete at 704 files / 1,203 refs / 25,007 tuples, 1,117 supplemental slots, 82 parks, 23 patch items in 11 files; six exact R25 deferred replays. Fresh full checker: 995 records / 3,622 refs / 30,661 tuples / zero failures. Every probe family passes: 310/310 negative mutants reject; required positives pass. Final source/log/result hashes and 71 frozen input hashes verified. All actual changes remain in the authorized report directory; syntax and git diff --check pass. No product source/docs/test/skill/baseline edit, fgOS CLI, git write, live-state/secrets read or semantic acceptance claimed. Initial failures remain visible. Runner owns the commit; Lead owns independent windows (including authorAddedReferences), park decisions, Step 7 composition and Phase 9 full-suite/replay proof. See step-05-seam5-batch7-handback.md and verification.json; needsWrites [].

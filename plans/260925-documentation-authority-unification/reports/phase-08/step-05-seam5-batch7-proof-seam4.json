@@ -1,0 +1,24 @@
+{
+  "label": "seam4",
+  "command": [
+    "/usr/bin/python3",
+    "-B",
+    "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes.py"
+  ],
+  "environment": "CLAUDE_CODE_SESSION_ID unset; PYTHONDONTWRITEBYTECODE=1; TMPDIR=/tmp/fgos-work",
+  "startedAtNs": 1792550164587973263,
+  "exit": 0,
+  "resultFresh": true,
+  "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes.py",
+  "sourceSha256": "a19c43384269bb457a4de2ad2f9629d42eab2cec4f849fa0e832056fd0b9c5f5",
+  "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-proof-seam4.log",
+  "logSha256": "be6baada3498e9392aed50f2a1eae7c314e3baf667ac54ad2bbdaec53886bace",
+  "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes-result.json",
+  "resultSha256": "079f8336d8931ef7c4b08388fea47808ce35723043191d9f5e0c3cb86e7a3662",
+  "counts": {
+    "passed": 34,
+    "total": 34,
+    "baselineFailures": 0
+  },
+  "ok": true
+}

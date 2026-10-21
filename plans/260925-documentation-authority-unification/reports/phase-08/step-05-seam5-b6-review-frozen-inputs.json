@@ -1,0 +1,361 @@
+{
+  "capturedAtNs": 1792549827968092102,
+  "files": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-admission-rules.py",
+      "sha256": "8276cb5d5270440acebad028142e9168595150cafd1fae6b69a4b5a8e1324a31",
+      "bytes": 12963
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+      "sha256": "bcdfbb91308d4dee34655c3c94619b08cbaa424fd6a3f04035ee78887e3d1b06",
+      "bytes": 30052
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-cutover-specs.json",
+      "sha256": "835e82c8357c2566cb1dee09e19c494450a8b93d19362178eb61efa2b010e5f7",
+      "bytes": 1463103
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-pilot-parity-receipts.json",
+      "sha256": "7be423ba30950df0e64284dbae4129c088d2095a377b2d852e674b7fca744570",
+      "bytes": 1852419
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py",
+      "sha256": "a59d36f661d03d96cc8d168ec8dd316b79161904145d04d3e8a50e0b63df7cf5",
+      "bytes": 10345
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-probes.py",
+      "sha256": "354891b56926139bedbb7bb0df4d8f916ea8a519e8ea06d4d0b0f5e0e028c950",
+      "bytes": 3177
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-read-units.json",
+      "sha256": "626410dffaad729f687626d3f9a2f1606102135755251cced7559d229f1c4851",
+      "bytes": 332988
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-rules.py",
+      "sha256": "b0983308cb32a32048ee24e4c1e1d2070bc2fde38ebae2002b8dfeace84c9809",
+      "bytes": 9442
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+      "sha256": "a50f40e7d3570ff312d282172357c1fc2e56a3a336995796cb2a3b37fd111387",
+      "bytes": 410835
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/gateway-contract.jsonl",
+      "sha256": "0206e0d7a8c92d3d08a5f79468fcd453cd75ed478b05b61fe21180b119c8edd8",
+      "bytes": 446881
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-decision-index.jsonl",
+      "sha256": "27711c47e1d809e0d0eb17ecf421431972363764989383fe87b387e3690da346",
+      "bytes": 1313329
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-doc-registry.jsonl",
+      "sha256": "2e4bb12660f2e26482ce8ac6de652930a09458676dc7af58412179a987d7d1e4",
+      "bytes": 15200473
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-enduser-index.jsonl",
+      "sha256": "7e426e28f6e09f6bde091658f6098a8ab94d30686f0f17d5ba423c7d928814d1",
+      "bytes": 5702201
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-instructions.jsonl",
+      "sha256": "7b581f7649fcaeb9d895cf6771a83c006566800191e8a2ae6e2bbf49d8195cb6",
+      "bytes": 274513
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/generators-skills-and-support.jsonl",
+      "sha256": "7d97317c2ac03a17b8f4f28fcc93f7123b61d3bdf518849d51173d9f7edf577e",
+      "bytes": 17115323
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/setup-doctor-roots.jsonl",
+      "sha256": "c5112f8986549daec54f932446a128b3c16b1914569b723e13b4a05ded842ddb",
+      "bytes": 4033855
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-cutover-neutral.jsonl",
+      "sha256": "9f3dbb93e32401ffee73df61fb16c6dc4ad97a0313a875ef0e88121930cfbad4",
+      "bytes": 2453296
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch4.jsonl",
+      "sha256": "95c872b59bee4a2deb48e68f45262a723b664c7fc8fe7a2150d778e33c456d2c",
+      "bytes": 1515266
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch5.jsonl",
+      "sha256": "fbdf1c745c5298d11eb65bf4c8450ca5d8d6097cba863e33999f3aea3a9ba00c",
+      "bytes": 9256323
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch6.jsonl",
+      "sha256": "9cc74e2be1364556092e69d4be4e757ac1d575bf7791d04fa119da8d75c4032f",
+      "bytes": 103860671
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-judgment-batch7.jsonl",
+      "sha256": "89299071c682452349da12f96aa7693153c489d386a0e0dc5bed9f8087a1ae86",
+      "bytes": 29718076
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-mechanical.jsonl",
+      "sha256": "7ece1cb25d2b5a48c70ad1431672d96c415428291f76a01bb1291e3b519e9a92",
+      "bytes": 139178
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-prompt-goldens.jsonl",
+      "sha256": "6f7aaa44bc6da3619bd9bbb1ba32e6faa9f66691bb04e8fa06738214c78cf423",
+      "bytes": 99765
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file-batch3.jsonl",
+      "sha256": "56f682625f9cbf357e4edd1a06ea290f461325a7828b00bbfc6477d383d6faf9",
+      "bytes": 16305
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-real-file.jsonl",
+      "sha256": "6460e796c235ab04ece28faade39c52e06f5a7c8c49f5c496d83b76301b76413",
+      "bytes": 174943
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/tests-root-neutral.jsonl",
+      "sha256": "2706ac0823a05e8e066648ddcc0f736c5b888ddd08f4560777e7750c5c59f3b2",
+      "bytes": 889241
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-check.py",
+      "sha256": "50d9337f7e921017b2f72b66b7010b6f1a6fb49b6b20ea7988fddfbb59d0fecb",
+      "bytes": 16989
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-cutover-specs.json",
+      "sha256": "c42d30379157f80ecca7f328d4fb083ff7bfb2554a46389d2e73889d4234c145",
+      "bytes": 3106362
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-parity-receipts.json",
+      "sha256": "ba4faca921e97190aaa34b87de44fd089f91f6233d0883d4a6baf5c70bba1024",
+      "bytes": 2107037
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes.py",
+      "sha256": "a19c43384269bb457a4de2ad2f9629d42eab2cec4f849fa0e832056fd0b9c5f5",
+      "bytes": 9310
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-rereview-list.json",
+      "sha256": "fa7e956fbdb9f44b96ef563cbe76fd6eb08940994a2db891d5c4aaddf785c69b",
+      "bytes": 3241979
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-b6-review-closure.json",
+      "sha256": "e98191ccf63155560d276bff0c815c2dbc1aec14d033da64957df3c060752e9e",
+      "bytes": 124463
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-b6-review-cutover-specs.json",
+      "sha256": "5f3df747a168a53deaf7f40f1846f7004b28c045ef81f028c3ae34158d57f794",
+      "bytes": 2182046
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-cutover-specs.json",
+      "sha256": "872f54939c5cc1371ea05c8166b5bbb77adf08d90650f3ba84f80e8ec261fa35",
+      "bytes": 369874
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-judgment-receipts.json",
+      "sha256": "92c7d058ef6194b10a0964e6a854bfbffea83bbfa4c4acaf0da91a7f4f17eb75",
+      "bytes": 747376
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-probes.py",
+      "sha256": "a41e9243dd18de7029d909f8e1a009d626eff4c6dab8ebe4c5b87cd4e7abc79e",
+      "bytes": 6052
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-judgment-check.py",
+      "sha256": "31c46cd05ab95fd706b7ac528b776f95f3176647a624829c1635cd0bd98e5895",
+      "bytes": 7925
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-judgment-receipt.json",
+      "sha256": "bf400f268367795bcba8b5bddd4e233f11f293438df4a35d8dc2914b264a6e29",
+      "bytes": 7384
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-probes.py",
+      "sha256": "eaed7aa4684604d7c5ed16eec9278b6477cd6ef8addabfb9580484bc9b070138",
+      "bytes": 6469
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-cutover-specs.json",
+      "sha256": "0394d1471f06ffa64204049e4463cd7154aef7dd6ba5ebea9d2900b3cab1b7d0",
+      "bytes": 19301
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py",
+      "sha256": "ec07e5925fd8a62d2d914101bb999e4f50c4a65d336f475fb07e2d648d218936",
+      "bytes": 16508
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-parity-receipts.json",
+      "sha256": "bb430424a65f9b79d9845da1c0ee5f2002cb042dde3c602d7657854fb863d02c",
+      "bytes": 340452
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-probes.py",
+      "sha256": "58fbece70a1dcc940b3f277a50382d018b575d467b5ea5c996bc93bedcfea412",
+      "bytes": 7885
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-cutover-specs.json",
+      "sha256": "d8fef87f7b44ba19d1796e244e9ccf899ee8f38a481cf04343664c4c80563438",
+      "bytes": 133
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py",
+      "sha256": "349c6669953ef46f24d31d23dd04dbc1f4741fa85cfe1285f04224ec24fc3276",
+      "bytes": 7744
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-parity-receipts.json",
+      "sha256": "be187f3f7edd76aa9cb6a7067cf6fa26378e48995522151a99738489acec7f5a",
+      "bytes": 2313892
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-probes.py",
+      "sha256": "26e8efb19b0d1a6e9385cb065cda8295a83c363b6c2a7378ea2115a37542704e",
+      "bytes": 6019
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-review-cutover-specs.json",
+      "sha256": "0394d1471f06ffa64204049e4463cd7154aef7dd6ba5ebea9d2900b3cab1b7d0",
+      "bytes": 19301
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-check.py",
+      "sha256": "a6a5f8e30484523ea3c08253a8d6a92a5e8e01541252b8e5048ac6e18ae48b53",
+      "bytes": 7286
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-cutover-specs.json",
+      "sha256": "9315792c5760d52c1cc03d86159110cb80307c0cc857726d817ca02e1c20556f",
+      "bytes": 1080335
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-parity-receipts.json",
+      "sha256": "b5b51fedad6694bb1e680ce7e866988aed71547947f061b7f75239a9747f599b",
+      "bytes": 2437741
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-probes.py",
+      "sha256": "6065aace9078a2a65a9c391bb46837775c8388491016628870da9ee75dac5f56",
+      "bytes": 1759
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-replay-blockers.json",
+      "sha256": "68720a006ec9e0af30d84ff96903ea09c0ea8d52c43c64d8f0071005fa8c8321",
+      "bytes": 13974
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-run-probes.py",
+      "sha256": "21e417250ea8962e9fe492b8e4dcc189756292abe3869483a28d0d8dc0d88764",
+      "bytes": 1958
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-check.py",
+      "sha256": "f849175473e743ff89d09cf876367a9c03a5e48778146b2dbf772d69c1bd0385",
+      "bytes": 3399
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-cutover-specs.json",
+      "sha256": "d8fef87f7b44ba19d1796e244e9ccf899ee8f38a481cf04343664c4c80563438",
+      "bytes": 133
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-deferred-replays.json",
+      "sha256": "d614fa88fc7f78e39a2f6bbcf11ffdac3a740a78901b2d58b930bc239eb8a7b2",
+      "bytes": 47901
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-deferred.py",
+      "sha256": "9091b960402c4a99cfc6a1ec9b0f78917f7d4ade832dc86275ffaf8b7724af85",
+      "bytes": 4795
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-parity-receipts.json",
+      "sha256": "6239932291675cc226d47a63029eb415916c2911f3ad7d55b5cd5f23a17e5636",
+      "bytes": 3249284
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-probes.py",
+      "sha256": "77d42fa47e5728d143e3b079301ced642fc5bc3691ac72066aa64f40def5c5e8",
+      "bytes": 4437
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-relocation-audit.py",
+      "sha256": "43482917c49a0629b35f5577fd459c4855e87552679c78514c128fcbf64710cb",
+      "bytes": 2283
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-bulk-rules.py",
+      "sha256": "b10e106669fb9147fb21e5b90c7ff000511fe18d17b603af32b30343ce93ad04",
+      "bytes": 9813
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-check.py",
+      "sha256": "7bf82a23b82e0e513f0632dcf18e6dcbe6d18f5407adb8a2eb2c10962b7e8c88",
+      "bytes": 20705
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-continuation.json",
+      "sha256": "96782e44c737df350e28e9c29683ff450cb3702f0297014eccfb283b15049ce4",
+      "bytes": 43569
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-cutover-specs.json",
+      "sha256": "58e3a380c587d08304b76f8f2a3c74befc003f26a7fa569b604d771da768c35d",
+      "bytes": 83367
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-judgment-check.py",
+      "sha256": "ff3ade91c03d6103209f48b40a5b9d6f60ecf44aedb74cd394edcbeba6f5ae7b",
+      "bytes": 13370
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-neutral-rules.py",
+      "sha256": "d7c96a9fd7307206fe4098249a29b781d44158beafda88f83113c0fe3f12e5da",
+      "bytes": 14094
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-parity-receipts.json",
+      "sha256": "53a83643e8608ee239fbd9bd48d05c0eb9e5d3a696fb50007a0b1cf4d8a721b1",
+      "bytes": 106768
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-probes.py",
+      "sha256": "cf5e6fa04562cb2aa35aef2eac7890def60e4790bba7b0a0ef62d864fa4bfc61",
+      "bytes": 3970
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-review-list.json",
+      "sha256": "5d9f2c78036259cd09d72130468aebeef735afba4a4e94200b9c5855a2673b49",
+      "bytes": 2685735
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-root-rules.py",
+      "sha256": "4caf280e5d667bad7b312a5e85bffc27184713b354c9c50f72f1e3b3b18bd8b9",
+      "bytes": 13969
+    }
+  ],
+  "meaning": "Canonical records, receipt/spec/review projections and all checker/probe sources remain fixed for the final baseline and every final probe family."
+}

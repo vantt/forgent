@@ -57558,7 +57558,8 @@
         "status": "pending",
         "reviewer": null,
         "report": null
-      }
+      },
+      "proposedMoveUnits": []
     },
     {
       "id": "real-file-tests-goldens-batch7-test-scripts-doc-runner-liveness.test.mjs",

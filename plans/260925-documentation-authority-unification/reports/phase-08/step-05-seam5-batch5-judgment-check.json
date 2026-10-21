@@ -30,7 +30,7 @@
     "j5-search": 1,
     "a-passage-agreement": 638,
     "d-own-operand": 3530,
-    "b-real-blocker": 26,
+    "b-real-blocker": 35,
     "e-retired-successor": 36,
     "j5-successors": 40,
     "j5-uniform-history": 43,
@@ -5983,10 +5983,10 @@
         {
           "id": "reference-004241",
           "pinnedSpan": {
-            "columnEndExclusive": 73,
-            "columnStart": 17,
             "line": 113,
-            "text": "docs/how-to/avoid-vacuous-pass-with-node-test-test-name-"
+            "columnStart": 1,
+            "columnEndExclusive": 73,
+            "text": "// format trap (docs/how-to/avoid-vacuous-pass-with-node-test-test-name-"
           },
           "headMatchingLines": [
             114
@@ -5995,10 +5995,10 @@
         {
           "id": "reference-004241",
           "pinnedSpan": {
-            "columnEndExclusive": 14,
-            "columnStart": 1,
             "line": 114,
-            "text": "// pattern.md"
+            "columnStart": 1,
+            "columnEndExclusive": 76,
+            "text": "// pattern.md) -- the ONE thing verify-pattern-check.mjs's mechanical check"
           },
           "headMatchingLines": [
             115

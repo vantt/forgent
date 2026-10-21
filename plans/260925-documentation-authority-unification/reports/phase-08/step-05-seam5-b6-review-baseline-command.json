@@ -1,0 +1,19 @@
+{
+  "pid": 60163,
+  "command": [
+    "python3",
+    "-B",
+    "plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+    "--output",
+    "step-05-seam5-b6-closure-clean-check.json"
+  ],
+  "startedAtNs": 1792549655966549388,
+  "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+  "sourceSha256": "bcdfbb91308d4dee34655c3c94619b08cbaa424fd6a3f04035ee78887e3d1b06",
+  "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-proof-full-check.log",
+  "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-b6-closure-clean-check.json",
+  "environment": "CLAUDE_CODE_SESSION_ID unset; PYTHONDONTWRITEBYTECODE=1",
+  "exit": 0,
+  "exitObservation": "Parent tool session 32021 returned exit_code 0",
+  "completedObservedAtNs": 1792550164286252024
+}

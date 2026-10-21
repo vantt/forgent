@@ -18,7 +18,7 @@ def check():
   assert s['files']==[x['file'] for x in q['remainingFilesInOrder']]==[r['file'] for r in rs] and s['fileCount']==264
   assert sum(len(r['dynamicTraces']) for r in rs)==10529
   c=read('step-05-seam5-continuation.json');assert c['remainingFilesInOrder']==[] and c['remainingFileCount']==c['remainingReferences']==c['remainingDynamicTuples']==0 and c['dynamicCarries']==q['dynamicCarries']
-  assert c['pendingReplayFiles']==[] and len(c['deferredReplayFiles'])==4
+  assert c['pendingReplayFiles']==[] and {e['file'] for e in c['deferredReplayFiles']}=={e['file'] for e in read('step-05-seam5-batch7-deferred-replays.json')['deferredReplays']} and len(c['deferredReplayFiles'])>=4
   return True
  test('j7-complete-queue','264 source files / 10529 tuples',population)
  def neutrality():
@@ -32,8 +32,8 @@ def check():
  test('j7-occurrence-ancestry','every original tuple binds its original occurrence',lambda:mod('ancestry7','step-05-seam5-batch7-relocation-audit.py').check()['differenceCount']==0)
  test('j7-neutrality-first','R21/R20 same-pin whole-file proof',neutrality)
  def review():
-  ix=read('step-05-seam5-review-list.json');assert ix['closedBatch']==7 and ix['changedThisTurn']=={'dispositionChanged':[],'labelOnly':[]}
-  assert [x['file'] for x in ix['addedThisTurn']]==[r['file'] for r in rs] and ix['reviewThisTurn']==[r['file'] for r in rs]
+  ix=read('step-05-seam5-review-list.json');assert ix['closedBatch']==7 and j.m.admission.r26_module().review_delta(ix)
+  assert [x['file'] for x in ix['addedThisTurn']]==[r['file'] for r in rs]
   assert len(ix['deferredReplayChangedThisTurn'])==4
   return True
  test('j7-review-delta','new records separate from replay-only receipt changes',review)

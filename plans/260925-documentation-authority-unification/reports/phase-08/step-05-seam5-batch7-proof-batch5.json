@@ -1,0 +1,24 @@
+{
+  "label": "batch5",
+  "command": [
+    "/usr/bin/python3",
+    "-B",
+    "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-probes.py"
+  ],
+  "environment": "CLAUDE_CODE_SESSION_ID unset; PYTHONDONTWRITEBYTECODE=1; TMPDIR=/tmp/fgos-work",
+  "startedAtNs": 1792550872916391103,
+  "exit": 0,
+  "resultFresh": true,
+  "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-probes.py",
+  "sourceSha256": "26e8efb19b0d1a6e9385cb065cda8295a83c363b6c2a7378ea2115a37542704e",
+  "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-proof-batch5.log",
+  "logSha256": "3cf340dcf111cd63cdcd924d7df1a52287575f070474ffa2d7ad58ff2b3220d6",
+  "resultPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-probes-result.json",
+  "resultSha256": "2b3fc0e23a17e3efdae80e70a12a2a4e75783c76a951ba0ad2d2aba05c181e94",
+  "counts": {
+    "passed": 19,
+    "total": 19,
+    "baselineFailures": 0
+  },
+  "ok": true
+}

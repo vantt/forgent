@@ -17,7 +17,7 @@
       ]
     },
     {
-      "name": "An unfinished file cannot disappear",
+      "name": "Remaining queue must equal original population minus all closed files",
       "owningRule": "s5-coverage",
       "pass": true,
       "caught": [

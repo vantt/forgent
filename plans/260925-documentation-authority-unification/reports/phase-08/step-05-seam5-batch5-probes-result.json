@@ -10,7 +10,7 @@
         {
           "rule": "j4-coverage",
           "where": "test/report/capability-plan-lint.test.mjs",
-          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 43, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 62, in coverage\n    assert len(r['references'])==len(refs[f]) and len(r['dynamicTraces'])==len(dyn[f])\nAssertionError\n"
+          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 44, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 63, in coverage\n    assert len(r['references'])==len(refs[f]) and len(r['dynamicTraces'])==len(dyn[f])\nAssertionError\n"
         }
       ]
     },
@@ -21,7 +21,7 @@
         {
           "rule": "j4-pins",
           "where": "test/report/enduser-index.test.mjs",
-          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 43, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 52, in pins\n    assert sha(body)==r['sourceSha256']\nAssertionError\n"
+          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 44, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 53, in pins\n    assert sha(body)==r['sourceSha256']\nAssertionError\n"
         }
       ]
     },
@@ -32,7 +32,7 @@
         {
           "rule": "j4-ownership",
           "where": "test/report/enduser-index.test.mjs",
-          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 43, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 84, in ownership\n    assert t['assertions']==[{'line':i,'text':ls[i-1]} for i in range(a,z+1) if re.search(pattern,ls[i-1])]\nAssertionError\n"
+          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 44, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 88, in ownership\n    assert t['assertions']==[{'line':i,'text':ls[i-1]} for i in range(a,z+1) if re.search(pattern,ls[i-1])]\nAssertionError\n"
         }
       ]
     },
@@ -43,7 +43,7 @@
         {
           "rule": "j4-receipts",
           "where": "test/cli/fgos-approve-3.test.mjs",
-          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 43, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 91, in receiptcheck\n    if r['diff'] is None:assert receipt['currentInputs']==receipt['candidateInputs'] and receipt['cutoverSpecifications']==[] and receipt['comparison']['currentOutputSet']==receipt['comparison']['candidateOutputSet']==[] and receipt['comparison']['intentionalDeltas']==[]\nAssertionError\n"
+          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 44, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 95, in receiptcheck\n    if r['diff'] is None:assert receipt['currentInputs']==receipt['candidateInputs'] and receipt['cutoverSpecifications']==[] and receipt['comparison']['currentOutputSet']==receipt['comparison']['candidateOutputSet']==[] and receipt['comparison']['intentionalDeltas']==[]\nAssertionError\n"
         }
       ]
     },
@@ -54,7 +54,7 @@
         {
           "rule": "j4-receipts",
           "where": "test/report/enduser-index.test.mjs",
-          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 43, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 98, in receiptcheck\n    if r['diff'] is None:assert all(p['status']=='not-run' and p['exit'] is None and p['logPath'] is None and p['logSha256'] is None and 'R22' in p['reason'] for p in receipt['proofs'])\nAssertionError\n"
+          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 44, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 96, in receiptcheck\n    else:assert_patch(r,receipt,body)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 12, in assert_patch\n    if m.admission.r26_module().patch_spec(r['file']):return m.admission.r26_module().assert_patch(r,receipt,body)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-rules.py\", line 57, in assert_patch\n    assert module('r26deferred','step-05-seam5-batch7-deferred.py').validate(spec,r,receipt,body)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-deferred.py\", line 32, in validate\n    assert receipt['proofs']==[{'command':d['owningTestCommand'],'owningBehavior':d['assertionEffect'],'status':'replay-deferred-phase9','exit':None,'logPath':None,'logSha256':None,'reason':'Lead R25; exact deferredReplay obligation binds pinned bytes and full co-cut unit.'}]\nAssertionError\n"
         }
       ]
     },
@@ -65,7 +65,7 @@
         {
           "rule": "j4-receipts",
           "where": "test/report/enduser-index.test.mjs",
-          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 43, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 99, in receiptcheck\n    assert r['parked']==[{'id':m.admission.idof(e),'blockedReason':e['blockedReason'],'dependency':e['dependency']} for e in m.admission.allitems(r) if e['disposition']=='parked']\nAssertionError\n"
+          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 44, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 103, in receiptcheck\n    assert r['parked']==[{'id':m.admission.idof(e),'blockedReason':e['blockedReason'],'dependency':e['dependency']} for e in m.admission.allitems(r) if e['disposition']=='parked']\nAssertionError\n"
         }
       ]
     },
@@ -76,7 +76,7 @@
         {
           "rule": "j5-search",
           "where": "exact all-root searches and alias lookups",
-          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 43, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 130, in batch5search\n    w=e['searchWitness'];assert w['pin']==r['authorInputCommit'] and w['roots']==search['roots'] and w['assessment']==e['blockedReason'] and w['evidenceSha256']==sha((ROOT/w['evidenceFile']).read_bytes())\nAssertionError\n"
+          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 44, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 134, in batch5search\n    w=e['searchWitness'];assert w['pin']==r['authorInputCommit'] and w['roots']==search['roots'] and w['assessment']==e['blockedReason'] and w['evidenceSha256']==sha((ROOT/w['evidenceFile']).read_bytes())\nAssertionError\n"
         }
       ]
     },
@@ -87,7 +87,7 @@
         {
           "rule": "j4-pins",
           "where": "test/report/enduser-index.test.mjs",
-          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 43, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 58, in pins\n    else:assert_patch(r,receipt,body)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 15, in assert_patch\n    spec=next(s for s in m.read('step-05-seam5-batch5-review-cutover-specs.json')['patches'] if s['file']==r['file'])\nStopIteration\n"
+          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 44, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 59, in pins\n    else:assert_patch(r,receipt,body)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 12, in assert_patch\n    if m.admission.r26_module().patch_spec(r['file']):return m.admission.r26_module().assert_patch(r,receipt,body)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-rules.py\", line 38, in assert_patch\n    assert spec['diff']==r['diff']==m.m.make_diff(r['file'],body,spec['newText'])\nAssertionError\n"
         }
       ]
     },
@@ -202,7 +202,7 @@
         {
           "rule": "j5-review-delta",
           "where": "review changed or added sources only",
-          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 19, in test\n    result=fn();assert result is None or bool(result)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 54, in delta\n    expected={e['file'] for e in latest['changedRecords'] if e['dispositionChanged']}|{e['file'] for e in listing['addedThisTurn']};assert set(listing['reviewThisTurn'])==expected\nAssertionError\n"
+          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 19, in test\n    result=fn();assert result is None or bool(result)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-judgment-check.py\", line 59, in delta\n    assert m.admission.r26_module().review_delta(listing)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-rules.py\", line 69, in review_delta\n    assert set(ix['reviewThisTurn'])==set(added)|disp\nAssertionError\n"
         }
       ]
     },
@@ -213,7 +213,7 @@
         {
           "rule": "j4-pins",
           "where": "test/runner/dispatch-worker-session.test.mjs",
-          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 43, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 58, in pins\n    else:assert_patch(r,receipt,body)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 20, in assert_patch\n    assert spec['rollbackDiff']==r['rollbackDiff']==m.m.make_diff(r['file'],after,body) and j.s4.apply(r['file'],after.encode(),r['rollbackDiff'])==body.encode()\nAssertionError\n"
+          "error": "Traceback (most recent call last):\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 44, in test\n    try:ret=fn();assert ret is None or bool(ret)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 59, in pins\n    else:assert_patch(r,receipt,body)\n  File \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-judgment-check.py\", line 21, in assert_patch\n    assert spec['rollbackDiff']==r['rollbackDiff']==m.m.make_diff(r['file'],after,body) and j.s4.apply(r['file'],after.encode(),r['rollbackDiff'])==body.encode()\nAssertionError\n"
         }
       ]
     }

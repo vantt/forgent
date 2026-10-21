@@ -139,9 +139,7 @@
           "logSha256": null
         }
       ],
-      "blockedBy": [
-        "Independent semantic review and Phase 9 candidate owning-test execution remain pending."
-      ],
+      "blockedBy": [],
       "readiness": "pending independent review and Phase 9 execution",
       "review": {
         "status": "pending",

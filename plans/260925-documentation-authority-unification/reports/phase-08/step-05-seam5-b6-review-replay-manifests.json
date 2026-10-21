@@ -1,0 +1,151 @@
+{
+  "replays": [
+    {
+      "file": "test/runner/dispatch-worker-home.test.mjs",
+      "equalOutcomes": true,
+      "manifests": [
+        {
+          "side": "current",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "files": [
+            {
+              "path": "src/runner/dispatch/proof-helpers.mjs",
+              "sha256": "3a55905afa70300caa94eae077d46399b65ea2a172544c9fd96c80d4011c66fc",
+              "bytes": 8082,
+              "mode": "100644"
+            },
+            {
+              "path": "src/runner/dispatch/stop-processes-inside.mjs",
+              "sha256": "b5d585654968879ec2f65d33e8677fe9d1bc25383c361f556e7dee1455bea92e",
+              "bytes": 3192,
+              "mode": "100644"
+            },
+            {
+              "path": "src/runner/dispatch/trust-store.mjs",
+              "sha256": "349ae77849e4f842da05c496b57d95f6ab5ab7cc7da125c90c859ffbbd9d2b10",
+              "bytes": 30730,
+              "mode": "100644"
+            },
+            {
+              "path": "src/runner/dispatch/worker-home.mjs",
+              "sha256": "88c48ce8a3d68f126ebaf6e98ef696e7a365e07f4a0b2b9b62ed0cf94b479b5a",
+              "bytes": 10447,
+              "mode": "100644"
+            },
+            {
+              "path": "src/util/unique-tmp-tag.mjs",
+              "sha256": "712eb59d8753224dc3197af5739a3a01fa4188f0b60e6e8ed22a1854d8b68dde",
+              "bytes": 724,
+              "mode": "100644"
+            },
+            {
+              "path": "test/helpers/process-tmp-root.mjs",
+              "sha256": "c3045ffb679fa83174048d2fb14ee62336bd4f3bada5510fb4a5c9f206ef952a",
+              "bytes": 2600,
+              "mode": "100644"
+            },
+            {
+              "path": "test/runner/dispatch-worker-home.test.mjs",
+              "sha256": "af466a08f94b3daca86d4fce1e18d47b9973cc20ad10be78e9dea677df91d2e5",
+              "bytes": 12737,
+              "mode": "100644"
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "side": "candidate",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "files": [
+            {
+              "path": "src/runner/dispatch/proof-helpers.mjs",
+              "sha256": "3a55905afa70300caa94eae077d46399b65ea2a172544c9fd96c80d4011c66fc",
+              "bytes": 8082,
+              "mode": "100644"
+            },
+            {
+              "path": "src/runner/dispatch/stop-processes-inside.mjs",
+              "sha256": "b5d585654968879ec2f65d33e8677fe9d1bc25383c361f556e7dee1455bea92e",
+              "bytes": 3192,
+              "mode": "100644"
+            },
+            {
+              "path": "src/runner/dispatch/trust-store.mjs",
+              "sha256": "349ae77849e4f842da05c496b57d95f6ab5ab7cc7da125c90c859ffbbd9d2b10",
+              "bytes": 30730,
+              "mode": "100644"
+            },
+            {
+              "path": "src/runner/dispatch/worker-home.mjs",
+              "sha256": "88c48ce8a3d68f126ebaf6e98ef696e7a365e07f4a0b2b9b62ed0cf94b479b5a",
+              "bytes": 10447,
+              "mode": "100644"
+            },
+            {
+              "path": "src/util/unique-tmp-tag.mjs",
+              "sha256": "712eb59d8753224dc3197af5739a3a01fa4188f0b60e6e8ed22a1854d8b68dde",
+              "bytes": 724,
+              "mode": "100644"
+            },
+            {
+              "path": "test/helpers/process-tmp-root.mjs",
+              "sha256": "c3045ffb679fa83174048d2fb14ee62336bd4f3bada5510fb4a5c9f206ef952a",
+              "bytes": 2600,
+              "mode": "100644"
+            },
+            {
+              "path": "test/runner/dispatch-worker-home.test.mjs",
+              "sha256": "e30afca410e50ee0cee2f4fc78c1cf8b818a43a6820a0895f959432ad8aced0c",
+              "bytes": 12736,
+              "mode": "100644"
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "proofs": [
+        {
+          "side": "current",
+          "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/runner/dispatch-worker-home.test.mjs",
+          "cwd": "disposable pinned scratch",
+          "status": "pass",
+          "exit": 0,
+          "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-b6-review-dispatch-worker-home.test-current.log",
+          "logSha256": "ab598819dc4e8ec6f5bbbb7ae1a87b375892e93968f5a40020ff6508f8db4b56",
+          "owningBehavior": "All original assertions; only navigation comments change."
+        },
+        {
+          "side": "candidate",
+          "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/runner/dispatch-worker-home.test.mjs",
+          "cwd": "disposable pinned scratch",
+          "status": "pass",
+          "exit": 0,
+          "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-b6-review-dispatch-worker-home.test-candidate.log",
+          "logSha256": "23ec6850a093f16488a5ff8400e76a96e1ad8934031211fef45592625e144790",
+          "owningBehavior": "All original assertions; only navigation comments change."
+        }
+      ],
+      "outcomes": [
+        "✔ C1: a bypass home carries all five provisioning items",
+        "✔ C1/C5: an ask-mode home does NOT get the bypass acceptance -- never grant more than was declared",
+        "✔ B1 still applies through this door: an untrusted repo root refuses, and writes no home",
+        "✔ a source home with no credential refuses by name -- a home without auth cannot do the work",
+        "✔ the credential is COPIED, not linked, and keeps owner-only permissions",
+        "✔ each Run gets its own home, and removeWorkerHome takes it away entirely",
+        "✔ removeWorkerHome stops a process still running inside the home, and leaves every other process alone",
+        "✔ removeWorkerHome refuses a path it did not create -- teardown must never delete an arbitrary directory",
+        "✔ the created home contains nothing beyond what was provisioned",
+        "✔ a home kept for forensics keeps its settings and loses its credential",
+        "✔ redact refuses a directory this module did not create",
+        "✔ nested assignment run ids reach worker-home through the normalized herdr agent name",
+        "ℹ tests 12",
+        "ℹ pass 12",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0",
+        "ℹ todo 0"
+      ]
+    }
+  ],
+  "scope": "Pure scratch current/candidate full owning tests; no CLI, git fixture, .fgos state, service or secrets read."
+}

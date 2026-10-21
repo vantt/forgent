@@ -19,7 +19,7 @@ def rows(n):return [json.loads(l) for l in (P/n).read_text().splitlines()]
 def load():return [r for s in SEAMS for r in rows('step-05-records/'+s+'.jsonl')]
 def candidate(r):
  before=pinned(r['authorInputCommit'],r['file']);edits={}
- for e in r['references']:
+ for e in r['references']+[d for d in r['dynamicTraces'] if d.get('sourceSpanReplacements')]:
   if e['disposition']!='patch':continue
   bounds=m.bounds(before,e['sourceSpans'])
   replacements=e.get('sourceSpanReplacements',[e['proposedReplacement']])
@@ -222,7 +222,8 @@ def check(rs,receipts=None,index=None,check_packets=True):
     for old in prior_edges(pr['recordFile'],f):
      if not old.get('edgeId') or old['edgeId'] not in ids:continue
      def inherited(e=e,old=old,pr=pr):
-      if e['disposition']==old['disposition']:return True
+      if e['disposition']==old['disposition'] or admission.r26_joined(r,e):return True
+      if e.get('rulingOverride')=='L12-83 R8' and admission.r26_module().live_holder_joined(r,e):return True
       o=e.get('inheritedOverride',{})
       assert o['priorSlotKey']==old['slotKey'] and o['recordFile']==pr['recordFile'] and o['recordSha256']==pr['recordSha256']
       assert o['from']==old['disposition'] and o['to']==e['disposition'] and o['ruling']=='L12-69'
@@ -342,7 +343,7 @@ def check(rs,receipts=None,index=None,check_packets=True):
    def gateway(x=x):
     c=x['comparison'];assert c['fileParityReceipt']['recheck']['completeParsedEqual'] and c['fileParityReceipt']['recheck']['rawBytesEqual']
     assert sha((ROOT/c['fileParityReceipt']['path']).read_bytes())==c['fileParityReceipt']['sha256']
-    assert c['currentOutputSet']==c['candidateOutputSet'] and c['pathDecision'].startswith('preserve both')
+    assert c['currentOutputSet']==c['candidateOutputSet'] and (c['pathDecision'].startswith('preserve both') if not x.get('proposedMoveUnits') else c['pathDecision'].startswith('pending retention-or-move'))
     assert c['currentOutputSet'][0]['failure']=={'status':500,'contentType':'application/json','category':'unexpected','exitCode':None,'messageTemplate':'could not read the OpenAPI contract at {root}/docs/contracts/fgos-gateway-api-v1.yaml: {err}'}
     assert any(p['status']=='missing' and 'HTTP body' in p['owningBehavior'] for p in x['proofs'])
     assert c['conditionalMovedReadDelta']['httpMissingReadErrorOld']!=c['conditionalMovedReadDelta']['httpMissingReadErrorNew']
@@ -371,5 +372,6 @@ if __name__=='__main__':
   s5=ext.check();out.setdefault('extensions',{})['real-file-tests-goldens']=s5
   for key in ['files','literalReferences','dynamicTuples']:out[key]+=s5[key]
   out['failures']+=s5['failures'];out['failureCount']=len(out['failures']);out['checks'].update(s5['checks']);out['rules'].update(s5['rules']);out['headDrift']+=s5['headDrift']
+ r26=admission.r26_module().check();out['extensions']['proposed-move-read-units']=r26;out['failures']+=r26['failures'];out['failureCount']=len(out['failures']);out['checks'].update(r26['checks']);out['rules'].update(r26['rules'])
  (P/'step-05-head-drift.json').write_text(json.dumps({'kind':'Non-failing HEAD drift for Step 7 assembly; records remain at their own pins','headCommit':m.git('rev-parse','HEAD').decode().strip(),'entries':out['headDrift']},ensure_ascii=False,indent=2)+'\n')
  (P/args.output).write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n');print(json.dumps(out,ensure_ascii=False));sys.exit(bool(out['failures']))

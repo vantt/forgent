@@ -1,0 +1,40 @@
+[
+  {
+    "pid": 28975,
+    "label": "full-check",
+    "script": "step-05-check.py",
+    "command": [
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+      "--output",
+      "step-05-seam5-b6-closure-clean-check.json"
+    ],
+    "startedAtNs": 1792548710436546392,
+    "environment": "CLAUDE_CODE_SESSION_ID unset; PYTHONDONTWRITEBYTECODE=1"
+  },
+  {
+    "pid": 29889,
+    "label": "seam4",
+    "script": "step-05-seam4-probes.py",
+    "command": [
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes.py"
+    ],
+    "startedAtNs": 1792548760176552757,
+    "environment": "CLAUDE_CODE_SESSION_ID unset; PYTHONDONTWRITEBYTECODE=1"
+  },
+  {
+    "pid": 47530,
+    "label": "batch2",
+    "script": "step-05-seam5-batch2-probes.py",
+    "command": [
+      "python3",
+      "-B",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-probes.py"
+    ],
+    "startedAtNs": 1792549382916552766,
+    "environment": "CLAUDE_CODE_SESSION_ID unset; PYTHONDONTWRITEBYTECODE=1"
+  }
+]

@@ -1,7 +1,130 @@
 {
-  "rule": "R25 / L12-82",
-  "count": 4,
+  "rule": "R25 / L12-82 and L12-83",
+  "count": 6,
   "deferredReplays": [
+    {
+      "status": "replay-deferred-phase9",
+      "file": "test/report/enduser-index.test.mjs",
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+      "owningTestCommand": "env -u CLAUDE_CODE_SESSION_ID node --test test/report/enduser-index.test.mjs",
+      "owningTests": [
+        {
+          "declarationLine": 385,
+          "declaration": "test(\"docs/how-to/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto\", () => {",
+          "assertions": [
+            {
+              "line": 388,
+              "text": "  assert.ok(meta.type && meta.type.length > 0);"
+            },
+            {
+              "line": 389,
+              "text": "  assert.equal(meta.type, 'how-to');"
+            },
+            {
+              "line": 390,
+              "text": "  assert.ok(Array.isArray(meta.source_capture_ids));"
+            },
+            {
+              "line": 391,
+              "text": "  assert.ok(meta.source_capture_ids.includes('doc-fgos-rollup-howto'));"
+            }
+          ]
+        }
+      ],
+      "assertedLines": [
+        {
+          "beforeStartLine": 385,
+          "beforeEndLine": 386,
+          "afterStartLine": 385,
+          "afterEndLine": 386,
+          "before": "test(\"docs/how-to/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto\", () => {\n  const content = fs.readFileSync(path.join(REPO_ROOT, 'docs', 'how-to', 'check-rollup-progress.md'), 'utf8');",
+          "after": "test(\"docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto\", () => {\n  const content = fs.readFileSync(path.join(REPO_ROOT, 'docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'), 'utf8');"
+        }
+      ],
+      "assertionEffect": "Direct rollup frontmatter read and L385 title rebind to the verified holder; assertion semantics and every case remain. Retain every original assertion; the full owning replay remains Phase 9.",
+      "expectedStrings": [
+        {
+          "beforeStartLine": 385,
+          "beforeEndLine": 386,
+          "afterStartLine": 385,
+          "afterEndLine": 386,
+          "before": "test(\"docs/how-to/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto\", () => {\n  const content = fs.readFileSync(path.join(REPO_ROOT, 'docs', 'how-to', 'check-rollup-progress.md'), 'utf8');",
+          "after": "test(\"docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto\", () => {\n  const content = fs.readFileSync(path.join(REPO_ROOT, 'docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'), 'utf8');"
+        }
+      ],
+      "diff": "--- a/test/report/enduser-index.test.mjs\n+++ b/test/report/enduser-index.test.mjs\n@@ -382,8 +382,8 @@\n   }\n });\n \n-test(\"docs/how-to/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto\", () => {\n-  const content = fs.readFileSync(path.join(REPO_ROOT, 'docs', 'how-to', 'check-rollup-progress.md'), 'utf8');\n+test(\"docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto\", () => {\n+  const content = fs.readFileSync(path.join(REPO_ROOT, 'docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'), 'utf8');\n   const { meta } = parseFrontmatter(content);\n   assert.ok(meta.type && meta.type.length > 0);\n   assert.equal(meta.type, 'how-to');\n",
+      "rollbackDiff": "--- a/test/report/enduser-index.test.mjs\n+++ b/test/report/enduser-index.test.mjs\n@@ -382,8 +382,8 @@\n   }\n });\n \n-test(\"docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto\", () => {\n-  const content = fs.readFileSync(path.join(REPO_ROOT, 'docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'), 'utf8');\n+test(\"docs/how-to/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto\", () => {\n+  const content = fs.readFileSync(path.join(REPO_ROOT, 'docs', 'how-to', 'check-rollup-progress.md'), 'utf8');\n   const { meta } = parseFrontmatter(content);\n   assert.ok(meta.type && meta.type.length > 0);\n   assert.equal(meta.type, 'how-to');\n",
+      "coCutPaths": [
+        "CHANGELOG.md",
+        "test/report/enduser-index.test.mjs",
+        "test/report/helpers/docs-index-state-fixture.mjs"
+      ],
+      "blockerEvidence": {
+        "file": "test/report/enduser-index.test.mjs",
+        "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "sourceSha256": "0a45ed5e8a2cebd8f0bdc13e0db7e9d2a5bd5bd8f22f67fea58855499089a027",
+        "requiredProof": "R22 current/candidate full owning test replay",
+        "status": "blocked",
+        "reason": "Records-only contract forbids .fgos access and state fixture creation. The full owning enduser-index tests import withDocsIndexStateFixture which seeds a real store writer under .fgos in scratch; no exemption is inferred.",
+        "sourceEvidence": [
+          {
+            "line": 12,
+            "text": "import { makeDocsIndexStateFixture, REAL_DEMO_OUTCOME_ID, REAL_DEMO_DOC_PATH } from './helpers/docs-index-state-fixture.mjs';"
+          },
+          {
+            "line": 23,
+            "text": "// each spawn folded this repo's own large, real `.fgos/state.json`"
+          },
+          {
+            "line": 35,
+            "text": "  docsIndexFixtureCwd ??= makeDocsIndexStateFixture();"
+          },
+          {
+            "line": 41,
+            "text": "// worktree (no `.fgos/`, ADR0020) the outcomes view it folds is empty, so"
+          },
+          {
+            "line": 175,
+            "text": "  // depends on whether the invoking checkout's own ambient `.fgos/`"
+          },
+          {
+            "line": 177,
+            "text": "  // worktree's `.fgos/` never does)."
+          },
+          {
+            "line": 223,
+            "text": "// plain, git-free temp dir works as both repoRoot and .fgos root) ----------"
+          },
+          {
+            "line": 237,
+            "text": "  fs.mkdirSync(path.join(cwd, '.fgos'));"
+          },
+          {
+            "line": 238,
+            "text": "  fs.writeFileSync(path.join(cwd, '.fgos', 'main-checkout.lock'), '');"
+          },
+          {
+            "line": 267,
+            "text": "  fs.mkdirSync(path.join(cwd, '.fgos'));"
+          },
+          {
+            "line": 268,
+            "text": "  fs.writeFileSync(path.join(cwd, '.fgos', 'main-checkout.lock'), '');"
+          },
+          {
+            "line": 281,
+            "text": "  fs.mkdirSync(path.join(cwd, '.fgos'));"
+          },
+          {
+            "line": 282,
+            "text": "  fs.writeFileSync(path.join(cwd, '.fgos', 'main-checkout.lock'), '');"
+          }
+        ],
+        "resolution": "Phase 9 owns full current/candidate replay with the state fixture and complete index alias co-cut."
+      },
+      "phase9Obligation": "Replay full owning command on pinned current and composed Phase 9 candidate with complete co-cut set; compare all original assertions, permitting only the exact recorded navigation deltas. No replay or passing outcome is claimed now."
+    },
     {
       "status": "replay-deferred-phase9",
       "file": "test/cli/fgos-merge.test.mjs",
@@ -49,13 +172,12 @@
           "afterStartLine": 925,
           "afterEndLine": 926,
           "before": "  // sandbox pitfall documented in docs/how-to/add-a-read-only-fgos-verb-\n  // and-plugin-skill.md.",
-          "after": "  // sandbox pitfall documented in docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md\n  // ."
+          "after": "  // sandbox pitfall documented in docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md.\n"
         }
       ],
-      "diff": "--- a/test/cli/fgos-merge.test.mjs\n+++ b/test/cli/fgos-merge.test.mjs\n@@ -922,8 +922,8 @@\n test('merge next merges the single ready item by recursing into approve, item reaches done', () => {\n   const cwd = tmpCwdFast();\n   // Explicit --verify true (not addOk's 'npm test' default) -- same\n-  // sandbox pitfall documented in docs/how-to/add-a-read-only-fgos-verb-\n-  // and-plugin-skill.md.\n+  // sandbox pitfall documented in docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md\n+  // .\n   assert.equal(run(cwd, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--description', 'tsk-535 fixture description.']).status, 0);\n   // tsk-40m: no real claim needed (no branch) -- straight todo -> awaiting-approval.\n   assert.equal(run(cwd, ['move', 'solo', '--to', 'awaiting-approval']).status, 0);\n",
-      "rollbackDiff": "--- a/test/cli/fgos-merge.test.mjs\n+++ b/test/cli/fgos-merge.test.mjs\n@@ -922,8 +922,8 @@\n test('merge next merges the single ready item by recursing into approve, item reaches done', () => {\n   const cwd = tmpCwdFast();\n   // Explicit --verify true (not addOk's 'npm test' default) -- same\n-  // sandbox pitfall documented in docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md\n-  // .\n+  // sandbox pitfall documented in docs/how-to/add-a-read-only-fgos-verb-\n+  // and-plugin-skill.md.\n   assert.equal(run(cwd, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--description', 'tsk-535 fixture description.']).status, 0);\n   // tsk-40m: no real claim needed (no branch) -- straight todo -> awaiting-approval.\n   assert.equal(run(cwd, ['move', 'solo', '--to', 'awaiting-approval']).status, 0);\n",
+      "diff": "--- a/test/cli/fgos-merge.test.mjs\n+++ b/test/cli/fgos-merge.test.mjs\n@@ -922,8 +922,8 @@\n test('merge next merges the single ready item by recursing into approve, item reaches done', () => {\n   const cwd = tmpCwdFast();\n   // Explicit --verify true (not addOk's 'npm test' default) -- same\n-  // sandbox pitfall documented in docs/how-to/add-a-read-only-fgos-verb-\n-  // and-plugin-skill.md.\n+  // sandbox pitfall documented in docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md.\n+\n   assert.equal(run(cwd, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--description', 'tsk-535 fixture description.']).status, 0);\n   // tsk-40m: no real claim needed (no branch) -- straight todo -> awaiting-approval.\n   assert.equal(run(cwd, ['move', 'solo', '--to', 'awaiting-approval']).status, 0);\n",
+      "rollbackDiff": "--- a/test/cli/fgos-merge.test.mjs\n+++ b/test/cli/fgos-merge.test.mjs\n@@ -922,8 +922,8 @@\n test('merge next merges the single ready item by recursing into approve, item reaches done', () => {\n   const cwd = tmpCwdFast();\n   // Explicit --verify true (not addOk's 'npm test' default) -- same\n-  // sandbox pitfall documented in docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md.\n-\n+  // sandbox pitfall documented in docs/how-to/add-a-read-only-fgos-verb-\n+  // and-plugin-skill.md.\n   assert.equal(run(cwd, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--description', 'tsk-535 fixture description.']).status, 0);\n   // tsk-40m: no real claim needed (no branch) -- straight todo -> awaiting-approval.\n   assert.equal(run(cwd, ['move', 'solo', '--to', 'awaiting-approval']).status, 0);\n",
       "coCutPaths": [
-        "CHANGELOG.md",
         "test/cli/fgos-merge.test.mjs"
       ],
       "blockerEvidence": {
@@ -135,13 +257,12 @@
           "afterStartLine": 113,
           "afterEndLine": 114,
           "before": "// format trap (docs/how-to/avoid-vacuous-pass-with-node-test-test-name-\n// pattern.md) -- the ONE thing verify-pattern-check.mjs's mechanical check",
-          "after": "// format trap (docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md\n// ) -- the ONE thing verify-pattern-check.mjs's mechanical check"
+          "after": "// format trap (docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md)\n// -- the ONE thing verify-pattern-check.mjs's mechanical check"
         }
       ],
-      "diff": "--- a/test/intake/plan.test.mjs\n+++ b/test/intake/plan.test.mjs\n@@ -110,8 +110,8 @@\n const cfg = {};\n \n // tsk-12t: the documented `node --test`/`--test-name-pattern` reporter-\n-// format trap (docs/how-to/avoid-vacuous-pass-with-node-test-test-name-\n-// pattern.md) -- the ONE thing verify-pattern-check.mjs's mechanical check\n+// format trap (docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md\n+// ) -- the ONE thing verify-pattern-check.mjs's mechanical check\n // still catches, reused here to produce a real, reachable disputed-child\n // outcome without any executor.\n const KNOWN_BAD_VERIFY = 'node --test --test-name-pattern=\"x\" test/foo.test.mjs | grep \"^# pass\"';\n",
-      "rollbackDiff": "--- a/test/intake/plan.test.mjs\n+++ b/test/intake/plan.test.mjs\n@@ -110,8 +110,8 @@\n const cfg = {};\n \n // tsk-12t: the documented `node --test`/`--test-name-pattern` reporter-\n-// format trap (docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md\n-// ) -- the ONE thing verify-pattern-check.mjs's mechanical check\n+// format trap (docs/how-to/avoid-vacuous-pass-with-node-test-test-name-\n+// pattern.md) -- the ONE thing verify-pattern-check.mjs's mechanical check\n // still catches, reused here to produce a real, reachable disputed-child\n // outcome without any executor.\n const KNOWN_BAD_VERIFY = 'node --test --test-name-pattern=\"x\" test/foo.test.mjs | grep \"^# pass\"';\n",
+      "diff": "--- a/test/intake/plan.test.mjs\n+++ b/test/intake/plan.test.mjs\n@@ -110,8 +110,8 @@\n const cfg = {};\n \n // tsk-12t: the documented `node --test`/`--test-name-pattern` reporter-\n-// format trap (docs/how-to/avoid-vacuous-pass-with-node-test-test-name-\n-// pattern.md) -- the ONE thing verify-pattern-check.mjs's mechanical check\n+// format trap (docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md)\n+// -- the ONE thing verify-pattern-check.mjs's mechanical check\n // still catches, reused here to produce a real, reachable disputed-child\n // outcome without any executor.\n const KNOWN_BAD_VERIFY = 'node --test --test-name-pattern=\"x\" test/foo.test.mjs | grep \"^# pass\"';\n",
+      "rollbackDiff": "--- a/test/intake/plan.test.mjs\n+++ b/test/intake/plan.test.mjs\n@@ -110,8 +110,8 @@\n const cfg = {};\n \n // tsk-12t: the documented `node --test`/`--test-name-pattern` reporter-\n-// format trap (docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md)\n-// -- the ONE thing verify-pattern-check.mjs's mechanical check\n+// format trap (docs/how-to/avoid-vacuous-pass-with-node-test-test-name-\n+// pattern.md) -- the ONE thing verify-pattern-check.mjs's mechanical check\n // still catches, reused here to produce a real, reachable disputed-child\n // outcome without any executor.\n const KNOWN_BAD_VERIFY = 'node --test --test-name-pattern=\"x\" test/foo.test.mjs | grep \"^# pass\"';\n",
       "coCutPaths": [
-        "CHANGELOG.md",
         "test/intake/plan.test.mjs"
       ],
       "blockerEvidence": {
@@ -331,7 +452,7 @@
           "after": "  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));"
         }
       ],
-      "assertionEffect": "Changed expected assertion literals/regex must follow the source diagnostic patch; retain every assertion.",
+      "assertionEffect": "Only approved navigation pointers and byte-exact asserted path output change; no assertion weakening. Retain every original assertion; the full owning replay remains Phase 9.",
       "expectedStrings": [
         {
           "beforeStartLine": 443,
@@ -445,6 +566,63 @@
     },
     {
       "status": "replay-deferred-phase9",
+      "file": "test/runner/dispatch-executor-profile.test.mjs",
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "sourceSha256": "0471818d68f8cac62abbfb9a2aa0997d05c0123c1098c7bb9950ef73213e4e93",
+      "owningTestCommand": "env -u CLAUDE_CODE_SESSION_ID node --test test/runner/dispatch-executor-profile.test.mjs",
+      "owningTests": [],
+      "assertedLines": [],
+      "assertionEffect": "Comment-only pointer patch: no assertion output changes; owning assertion lines remain identical. Full owning replay is still owed in Phase 9.",
+      "expectedStrings": [
+        {
+          "beforeStartLine": 19,
+          "beforeEndLine": 19,
+          "afterStartLine": 19,
+          "afterEndLine": 19,
+          "before": "// docs/architect/agent-coordination/verification/visibility-herdr/proofs/",
+          "after": "// docs/platform/agent-coordination/verification/visibility-herdr/proofs/"
+        }
+      ],
+      "diff": "--- a/test/runner/dispatch-executor-profile.test.mjs\n+++ b/test/runner/dispatch-executor-profile.test.mjs\n@@ -16,7 +16,7 @@\n // and a settings key suppressing its acceptance screen. An executor may therefore\n // declare `bypass`, but only alongside the confinement that makes it defensible,\n // and the refusal has to happen at load rather than in review. Evidence:\n-// docs/architect/agent-coordination/verification/visibility-herdr/proofs/\n+// docs/platform/agent-coordination/verification/visibility-herdr/proofs/\n //   2026-09-06-isolation/permission-posture-findings.md\n \n function loadWith(executorEntry) {\n",
+      "rollbackDiff": "--- a/test/runner/dispatch-executor-profile.test.mjs\n+++ b/test/runner/dispatch-executor-profile.test.mjs\n@@ -16,7 +16,7 @@\n // and a settings key suppressing its acceptance screen. An executor may therefore\n // declare `bypass`, but only alongside the confinement that makes it defensible,\n // and the refusal has to happen at load rather than in review. Evidence:\n-// docs/platform/agent-coordination/verification/visibility-herdr/proofs/\n+// docs/architect/agent-coordination/verification/visibility-herdr/proofs/\n //   2026-09-06-isolation/permission-posture-findings.md\n \n function loadWith(executorEntry) {\n",
+      "coCutPaths": [
+        "test/runner/dispatch-executor-profile.test.mjs"
+      ],
+      "blockerEvidence": {
+        "file": "test/runner/dispatch-executor-profile.test.mjs",
+        "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "sourceSha256": "0471818d68f8cac62abbfb9a2aa0997d05c0123c1098c7bb9950ef73213e4e93",
+        "requiredProof": "R22 current/candidate full owning replay",
+        "status": "blocked",
+        "reason": "Full owning cases call loadRunnerConfigFromDir on the repo root, which reads .fgos/config.json. That input is forbidden by this records-only contract; no state/config fixture is fabricated.",
+        "sourceEvidence": [
+          {
+            "line": 7,
+            "text": "import { loadRunnerConfig, loadRunnerConfigFromDir, RunnerConfigError, normalizeLegacyConfinement, REASONING_EFFORT_VALUES } from '../../src/runner/dispatch/config.mjs';"
+          },
+          {
+            "line": 187,
+            "text": "  // under a `runner` key, which is what loadRunnerConfigFromDir unwraps."
+          },
+          {
+            "line": 188,
+            "text": "  const cfg = loadRunnerConfigFromDir(process.cwd());"
+          },
+          {
+            "line": 321,
+            "text": "  const cfg = loadRunnerConfigFromDir(process.cwd());"
+          },
+          {
+            "line": 387,
+            "text": "  const cfg = loadRunnerConfigFromDir(process.cwd());"
+          }
+        ],
+        "resolution": "R25 exact deferred replay in Phase 9 with authorized config input; initial scratch failure log remains visible."
+      },
+      "phase9Obligation": "Replay full owning command on pinned current and composed Phase 9 candidate with complete co-cut set; compare all original assertions, permitting only the exact recorded navigation deltas. No replay or passing outcome is claimed now."
+    },
+    {
+      "status": "replay-deferred-phase9",
       "file": "test/runner/worktree.test.mjs",
       "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
       "sourceSha256": "d9201ace6ecc4367af642dc2c1c438e18dd2a91b9e5f9afd56af64e9b6e92ce7",
@@ -475,7 +653,7 @@
           "after": "    /docs\\/knowledge\\/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,"
         }
       ],
-      "assertionEffect": "Changed expected assertion literals/regex must follow the source diagnostic patch; retain every assertion.",
+      "assertionEffect": "Only approved navigation pointers and byte-exact asserted path output change; no assertion weakening. Retain every original assertion; the full owning replay remains Phase 9.",
       "expectedStrings": [
         {
           "beforeStartLine": 768,
@@ -555,5 +733,11 @@
       "phase9Obligation": "Replay full owning command on pinned current and composed Phase 9 candidate with complete co-cut set; compare all original assertions, permitting only the exact recorded navigation deltas. No replay or passing outcome is claimed now."
     }
   ],
-  "actualTestsInvoked": false
+  "actualTestsInvoked": true,
+  "fullReplayCompleted": false,
+  "initialScratchAttempt": {
+    "file": "test/runner/dispatch-executor-profile.test.mjs",
+    "outcome": "failed without .fgos/config.json; no candidate replay claimed",
+    "logPath": "step-05-seam5-b6-review-dispatch-executor-profile.test-current.log"
+  }
 }

@@ -80,7 +80,7 @@ def check(rs=None,receipts=None,specs=None,index=None,check_packets=True):
    if w.get('prior'):
     def inherited(e=e,w=w):
      pr=w['prior'];old=prior(pr['recordFile'],pr['recordLine']);slot=next(x for x in old['edges'] if x.get('slotKey')==w.get('slotKey') and x['edgeId']==w['edgeId'])
-     assert e['disposition']==slot['disposition'] or e['disposition']=='parked' and not e['sourceSpans'] or (e.get('sourceOwner') and e.get('rulingOverride')=='L12-72 R2' and admission.owner(e['sourceOwner'],{r['file']:r for r in rs})['disposition']=='parked')
+     assert admission.r26_joined(r,e) or e['disposition']==slot['disposition'] or e['disposition']=='parked' and not e['sourceSpans'] or (e.get('sourceOwner') and e.get('rulingOverride')=='L12-72 R2' and admission.owner(e['sourceOwner'],{r['file']:r for r in rs})['disposition']=='parked')
      if e['disposition']=='render-join':
       sr=w['sourceRecord'];ss=next(x for x in prior(sr['recordFile'],sr['recordLine'])['edges'] if x.get('slotKey')==w['sourceSlotKey']);assert ss['matchedExpression']==w['sourceExpression'] and ss['disposition']==w['sourceDisposition']
     test('s4-inheritance',loc,inherited)
@@ -88,7 +88,7 @@ def check(rs=None,receipts=None,specs=None,index=None,check_packets=True):
     def physical_join(join=join,e=e):
      old=prior(join['recordFile'],join['recordLine']);slot=next(x for x in old['edges'] if x['edgeId']==join['edgeId'] and x.get('slotKey')==join['slotKey'] and x['sourceSpans']==join['sourceSpans'] and x.get('consumerFile',old['file'])==f);assert slot['sourceSpans']==join['sourceSpans'] and slot['disposition']==join['disposition'];assert sha((ROOT/join['recordFile']).read_bytes())==join['recordSha256'];m.m.spans_text(m.pinned(join['inputCommit'],f),join['sourceSpans']);assert any(a['text'] in b['text'] or b['text'] in a['text'] for a in join['sourceSpans'] for b in e['sourceSpans'])
     test('s4-inheritance',loc+':physical-original-id',physical_join)
-   if e['disposition']=='parked':test('s4-parks',loc,lambda e=e:e['blockedReason'] and e['dependency'] and e['blockedCategory']==e['dependencyCategory'] and e['timing']=='phase9' and e['diffHunk'] is None and e['target'] is None)
+   if e['disposition']=='parked':test('s4-parks',loc,lambda e=e:e['blockedReason'] and e['dependency'] and (e['blockedCategory']==e['dependencyCategory'] or admission.r26_joined(r,e)) and e['timing']=='phase9' and e['diffHunk'] is None and e['target'] is None)
    if e['disposition']=='patch':test('s4-patches',loc,lambda e=e:e['diffHunk']==r['diff'] and e['target'] and not r['generated'])
   for d in r['dynamicTraces']:
    loc=f+':'+d['id'];orig=popdyn[d['id']]
@@ -109,7 +109,7 @@ def check(rs=None,receipts=None,specs=None,index=None,check_packets=True):
     if f=='src/report/knowledge-resolver.mjs':assert d['admission']=='ADMIT' and d['role']=='document-identity-lookup'
     if d['admission']=='REJECT':assert d['disposition']=='preserve' and d['rejectedAsUnrelatedReason'] and repr(x) in d['reason']
    test('s4-operand',loc,operand)
-   if d['disposition']=='parked':test('s4-parks',loc,lambda d=d:d['blockedReason'] and d['stateExportDependency'] and d['blockedSeams']==['generators'])
+   if d['disposition']=='parked':test('s4-parks',loc,lambda d=d:d['blockedReason'] and d['stateExportDependency'] and (d['blockedSeams']==['generators'] or admission.r26_joined(r,d)))
   for e in r['authorAddedReferences']:test('s4-retiring-retained',f+':'+e['id'],lambda e=e:retiring_retained(e))
   test('s4-outputs',f,lambda:r['diff'] is None if r['generated'] else True)
   test('s4-receipts',f,lambda:len(r['receiptIds'])==1 and r['receiptIds'][0] in receiptby)
