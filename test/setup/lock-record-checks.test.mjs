@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { checkLockRecordUnreadable, UNKNOWN_JUDGE_GRACE_MS } from '../../src/setup/lock-record-checks.mjs';
-import { getBootId, getPidNs, getProcessStartTime } from '../../src/runner/dispatch/process-identity.mjs';
+import { selfRecord } from '../../src/runner/dispatch/process-identity.mjs';
 
 let root;
 let locks;
@@ -29,7 +29,7 @@ test('no record: passes', () => {
 
 test('a record of a live process with its full tuple passes', () => {
   fs.writeFileSync(recordPath('state'), JSON.stringify({
-    v: 1, pid: process.pid, startTime: getProcessStartTime(process.pid), bootId: getBootId(), pidNs: getPidNs(),
+    v: 1, pid: process.pid, startTime: selfRecord().startTime, bootId: selfRecord().bootId, pidNs: selfRecord().pidNs,
   }));
   assert.match(checkLockRecordUnreadable(root).message, /absent or judgeable/);
 });
@@ -52,7 +52,7 @@ test('a record without a pid is unreadable', () => {
 test('a record naming a live pid in a foreign namespace warns only after the grace', () => {
   // The recorded namespace differs from ours, so the judge cannot place the live pid.
   fs.writeFileSync(recordPath('state'), JSON.stringify({
-    v: 1, pid: process.pid, startTime: getProcessStartTime(process.pid), bootId: getBootId(), pidNs: 'pid:[0]',
+    v: 1, pid: process.pid, startTime: selfRecord().startTime, bootId: selfRecord().bootId, pidNs: 'pid:[0]',
   }));
   const young = checkLockRecordUnreadable(root);
   const old = checkLockRecordUnreadable(root, { now: Date.now() + UNKNOWN_JUDGE_GRACE_MS + 60_000 });

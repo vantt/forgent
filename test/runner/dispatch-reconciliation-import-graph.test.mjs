@@ -140,18 +140,11 @@ const BANNED_CALLS = [
   ['process.kill taken as a value', /\bprocess\s*(?:\?\.|\.)\s*kill\b(?!\s*\()/],
   ['kill destructured from process', /\{[^}]*\bkill\b[^}]*\}\s*=\s*(?:globalThis\s*\.\s*)?process\b/],
 ];
-// `process.kill(pid, 0)` delivers no signal: it only asks whether a pid exists
-// (provider-capacity.mjs's isPidAlive lease probe, and the planner's
-// `process.kill.call(process, pid, 0)`). It is liveness evidence, not process
-// control, so it is the one kill form allowed in this graph.
-const SIGNAL_ZERO_PROBE = /\bprocess\s*\.\s*kill\s*(?:\.\s*call\s*\(\s*process\s*,|\()\s*[A-Za-z_$][\w$.]*\s*,\s*0\s*\)/g;
-
 /** Banned-call findings in one source text: [label, matched text]. */
 export function bannedCalls(source) {
   const { code } = lexSource(source);
-  const scanned = code.replace(SIGNAL_ZERO_PROBE, (probe) => ' '.repeat(probe.length));
   return BANNED_CALLS.flatMap(([label, pattern]) => {
-    const m = pattern.exec(scanned);
+    const m = pattern.exec(code);
     return m ? [[label, m[0]]] : [];
   });
 }
@@ -326,8 +319,11 @@ test('banned-call scan sees code around inline comments and every spelling of a 
   assert.deepEqual(caught('child.kill()'), ['signal sent through .kill(...)']);
   assert.deepEqual(caught('process.kill(pid, 0); process.kill(pid, 9);'), ['signal sent through .kill(...)']);
   assert.deepEqual(caught('process.kill.call(process, pid, 9);'), ['process.kill taken as a value']);
-  // The liveness probe, prose in comments, and an unrelated `kill` word are not calls.
-  assert.deepEqual(caught('const alive = process.kill(pid, 0) && process.kill.call(process, other.pid, 0);\n// process.kill(pid, 9) is never sent\n/* spawn(x) */\nconst killSwitch = 1;'), []);
+  // A signal-0 liveness probe is caught like any signal: liveness is the process door's. Prose in comments and
+  // an unrelated `kill` word are not calls.
+  assert.deepEqual(caught('const alive = process.kill(pid, 0);'), ['signal sent through .kill(...)']);
+  assert.deepEqual(caught('process.kill.call(process, other.pid, 0);'), ['process.kill taken as a value']);
+  assert.deepEqual(caught('// process.kill(pid, 9) is never sent\n/* spawn(x) */\nconst killSwitch = 1;'), []);
 });
 
 test('boundary test: src/runner/dispatch/** does not reference pick/return verbs or appendEvent (R1 / M10)', () => {

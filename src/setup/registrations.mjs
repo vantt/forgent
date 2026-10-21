@@ -1,4 +1,5 @@
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
+import { resolveHolderLiveness } from '../runner/dispatch/process-identity.mjs';
 import { checkGit, checkMutationOneDoor, gitFloor, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories, fixLandRecovery, checkLandRetainedCandidates } from './git-checks.mjs';
 import { checkWorkflowCaseBindingSentinel, checkWorkflowCaseBindings, fixWorkflowCaseBindings } from './workflow-case-checks.mjs';
 // registrations.mjs — the doctor-check / config-default registry (CONTEXT.md
@@ -5506,9 +5507,7 @@ function deadOwnedConfinementDirs(roots) {
         if (!marker) continue;
         // A home held for its unstaged login is never removed; credential-copies-retained reports it.
         if ((marker.credentialKept?.attempts ?? 0) >= CREDENTIAL_KEEP_MAX_ATTEMPTS) continue;
-        const alive = Number.isInteger(marker.pid) && marker.pid > 0 && (() => {
-          try { process.kill(marker.pid, 0); return true; } catch (err) { return err.code === 'EPERM'; }
-        })();
+        const alive = Number.isInteger(marker.pid) && marker.pid > 0 && resolveHolderLiveness({ pid: marker.pid }) !== 'dead';
         if (!alive) found.push({ dir: cand, dispatchId: marker.dispatchId });
       }
     }

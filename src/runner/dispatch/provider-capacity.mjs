@@ -8,7 +8,7 @@ import path from 'node:path';
 import { normalizeProviderFamily } from './provider-adapter.mjs';
 import { deriveLegacyInventory } from './llm-accounts.mjs';
 import { AUTH_FAILURE_TAIL_LINES, matchAuthFailureLine, matchQuotaLimitLine } from './provider-auth-failure.mjs';
-import { getProcessStartTime, pidExists, resolveHolderLiveness } from './process-identity.mjs';
+import { resolveHolderLiveness, selfRecord } from './process-identity.mjs';
 import { acquire, acquireSync, createLockScope, lockHolders, resolveLock, resolveLockRoot, runBorrowed } from '../../holder-lock/index.mjs';
 
 export const PROVIDER_CAPACITY_STATE_CONTRACT = 'provider-capacity-state.v1';
@@ -576,7 +576,7 @@ function reclaimDeadLeases(providerState, { runIsDead = () => false, isRunWorker
   for (const [accountId, acct] of Object.entries(providerState.accounts ?? {})) {
     for (const [runId, lease] of Object.entries(acct.leases ?? {})) {
       const pidDead = lease.pid !== undefined
-        && resolveHolderLiveness({ pid: lease.pid, processStartTime: lease.processStartTime }, pidExists(lease.pid)) === 'dead';
+        && resolveHolderLiveness(lease.record ?? { pid: lease.pid, processStartTime: lease.processStartTime }) === 'dead';
       const provenDead = (pidDead && !isRunWorkerAlive(runId, lease)) || runIsDead(runId, lease);
       if (provenDead) {
         delete acct.leases[runId];
@@ -636,11 +636,13 @@ export function acquireProviderAccountLease({
     const acct = accountState(providerState, accountId);
     const selectedAt = now.toISOString();
     acct.lastSelectedAt = selectedAt;
+    const self = selfRecord();
     acct.leases[runId] = {
       runId,
       assignmentId: assignmentId ?? null,
       pid: process.pid,
-      processStartTime: getProcessStartTime(process.pid),
+      processStartTime: self.startTime,
+      record: self,
       acquiredAt: selectedAt,
     };
     if (assignmentId) state.assignments[`${provider}:${assignmentId}`] = { accountId, selectedAt };

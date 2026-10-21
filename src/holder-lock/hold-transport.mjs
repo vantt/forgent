@@ -13,8 +13,8 @@
 // its output goes to files the facade reads or tails, `cancel` ends its job.
 //
 // Release is TerminateProcess on the helper: the kernel frees the lock at
-// once. `process.kill(pid, 0)` then tells when the helper is gone; the pid
-// cannot be reused while libuv still holds the unreaped child handle.
+// once. The process door then tells when the helper is gone (a helper that exited but is not yet reaped
+// observes as a zombie); the pid cannot be reused while libuv still holds the unreaped child handle.
 
 import fs from 'node:fs';
 import os from 'node:os';
@@ -24,6 +24,7 @@ import { Readable } from 'node:stream';
 import { spawn } from 'node:child_process';
 import { HolderLockError, PROTOCOL, parseRouteLine } from './protocol.mjs';
 import { routeLineOrThrow } from './driver.mjs';
+import { observe, resolveHolderLiveness } from '../runner/dispatch/process-identity.mjs';
 
 const WORK_PREFIX = 'fgos-lock-hold-';
 const READY_POLL_MS = 2;
@@ -47,16 +48,6 @@ export function sleepSync(ms) {
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
 }
 
-/** Is `pid` a live process (or one this user may not signal)? */
-function pidAlive(pid) {
-  try {
-    process.kill(pid, 0);
-    return true;
-  } catch (err) {
-    return err.code === 'EPERM';
-  }
-}
-
 /** Delete work directories an interrupted acquire left behind: older than an
  * hour, and not owned by a live process (the owner's pid is in the name; a
  * long-held lock keeps its directory, which ages without changing). At most
@@ -75,7 +66,7 @@ export function sweepStaleWorkDirs({ tmpdir = os.tmpdir(), now = Date.now() } = 
     try {
       if (now - fs.statSync(dir).mtimeMs < STALE_WORK_AGE_MS) continue;
       const ownerPid = Number(/^fgos-lock-hold-(\d+)-/.exec(name)?.[1]);
-      if (Number.isInteger(ownerPid) && ownerPid > 0 && pidAlive(ownerPid)) continue;
+      if (Number.isInteger(ownerPid) && ownerPid > 0 && resolveHolderLiveness({ pid: ownerPid }) !== 'dead') continue;
       fs.rmSync(dir, { recursive: true, force: true });
       removed += 1;
     } catch {
@@ -141,7 +132,7 @@ export function readyBoundMs(wait, killWaitMs, slackMs) {
 }
 
 /** libuv sets these exactly when it has reaped the child and freed its
- * handle; from then on the pid may belong to someone else, so `pidAlive`
+ * handle; from then on the pid may belong to someone else, so a pid observation
  * must not be asked about it. */
 function reaped(child) {
   return child.exitCode !== null || child.signalCode !== null;
@@ -149,7 +140,7 @@ function reaped(child) {
 
 /** Is the helper process still running? */
 function helperAlive(hold) {
-  return !reaped(hold.child) && pidAlive(hold.pid);
+  return !reaped(hold.child) && observe(hold.pid).kind === 'live';
 }
 
 /** One look at the helper: its answer, or null while it is still working.

@@ -378,7 +378,7 @@ function lockErrorToStoreError(err, verbName) {
 // Asks on the terminal before `lock fence` signals anything. Without a
 // terminal there is nobody to ask, so the answer is no (pass --yes).
 async function confirmFence(name, holders) {
-  const list = holders.map((h) => `  pid ${h.pid} (started ${h.startTime}): ${h.cmdline || '(no command line)'}`).join('\n');
+  const list = holders.map((h) => `  pid ${h.pid} (started ${h.startTime})`).join('\n');
   process.stderr.write(`fgos: lock ${name} is held by:\n${list}\n`);
   if (!process.stdin.isTTY || !process.stderr.isTTY) return false;
   const rl = readline.createInterface({ input: process.stdin, output: process.stderr });

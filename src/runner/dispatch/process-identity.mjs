@@ -25,11 +25,3 @@ export const signalByIdentity = (record, signal) => facts().signalByIdentity(rec
 export const scan = (filter) => facts().scan(filter);
 /** 'dead' only when the judge proves it; alive and unknown are both 'held' (a record this observer cannot disprove is never reclaimed). */
 export const resolveHolderLiveness = (record) => (judge(record) === 'dead' ? 'dead' : 'held');
-
-// Legacy names, forwarders until their last importer moves to the exports above.
-export const getBootId = () => selfRecord().bootId ?? 'unknown-boot';
-export const getProcessStartTime = (pid) => { const seen = observe(pid); return seen.kind === 'live' ? seen.startTime : null; };
-export const getPidNs = () => selfRecord().pidNs;
-export const pidExists = (pid) => observe(pid).kind !== 'absent';
-export const localObserver = selfRecord;
-export const observeProcess = (pid) => observe(pid);

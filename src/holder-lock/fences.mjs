@@ -27,6 +27,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { listAssignmentRuns } from '../runner/dispatch/assignment-layout.mjs';
+import { resolveHolderLiveness } from '../runner/dispatch/process-identity.mjs';
 import { resolveHostBin } from '../util/host-bin.mjs';
 import { resolveStateRoot } from './state-root.mjs';
 
@@ -95,13 +96,7 @@ function isDirectory(dir) {
 }
 
 function isPidAlive(pid) {
-  if (!Number.isInteger(pid) || pid <= 0) return false;
-  try {
-    process.kill(pid, 0);
-    return true;
-  } catch (err) {
-    return err.code === 'EPERM';
-  }
+  return Number.isInteger(pid) && pid > 0 && resolveHolderLiveness({ pid }) !== 'dead';
 }
 
 // ---------------------------------------------------------------------
