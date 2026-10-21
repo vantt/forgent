@@ -75,13 +75,17 @@ The T1 council may still run while SEAT is landing. Phase 02 only closes once SE
 Every step follows proposal §4.2 (loop), §4.3 (Rust move), §4.6 (verify) and §4.7 (dead code, tests, Rust priority). Below are only the outputs that HARDEN adds to that loop. Phases 01–06 list the inputs specific to their layer.
 
 1. **Measure the layer's own baseline on current main** when its council opens (proposal §4.2 step 1). Measure the routes the layer owns (p50/p95, cold/warm), its tests and their wall time, LOC for Rust, Node and test, its open backlog rows, and its doctor rows and setup steps. Record the main SHA. Each layer measures its own; phase 00 measures T0 only.
-2. **Council** (four lenses, axes A–G). Every seat returns its findings plus these HARDEN outputs:
+2. **Council, two parts in one run** (owner 2026-10-21 12:05: a council settles each component at a high level).
+   - **Part A — target shape per component (decide first):** for every component of the layer, the council proposes and the owner settles: what it is the authority for; its contract and ports; the Rust/Node boundary and the Node budget; the delete list; the doctor rows it keeps; its size target. The settled shape is written into the component's spec so the next review starts from it.
+   - **Part B — review against that shape** (four lenses, axes A–G).
+   - **Own council** for large components: Git, Event Store, Run Supervisor, Execution Core + Dispatch. Small components share the layer council (e.g. `canonical-json`, `host-runtime`).
+   Every seat returns its findings plus these HARDEN outputs:
    - **migration table:** Node part | what it decides | move or not | reason | order | Node budget after the move (lines/exports, written into the spec; review R2);
    - **delete list:** mechanisms, checks, tests, doctor rows, setup steps, and instruction text that can go (review R5). A finding that asks to add something must name what it replaces, or say why nothing can go;
    - **doctor table:** each fail/warn condition of the layer's rows, and which surviving row keeps it. Rows may merge, but no condition may be lost silently (gate 8);
    - **tests table:** the owning proof per behaviour, Node↔Rust duplicates (reusing the TEST lane labels where they exist), time-based waits, and tests that should move down a layer;
    - each seat reads every line of the layer's crates and Node facade (proposal §4.7b). The red-team seat hunts for what the other seats missed.
-3. **Arbitration** by the big lead, with a source for every accept or reject. **Owner ask 1** batches the Critical items, the "proposed additions" and the **landing time slot** of this layer, so the land does not wait for a second round trip. Owner ask 2 exists only if ask 1 left the slot open (proposal §4.5).
+3. **Arbitration** by the big lead, with a source for every accept or reject. **Owner ask 1** batches the Part A target shapes of every component of the layer, the Critical items, the "proposed additions" and the **landing time slot** of this layer, so the land does not wait for a second round trip. Owner ask 2 exists only if ask 1 left the slot open (proposal §4.5).
 4. **Detailed sub-plan** with `ak-plan --hard`, including red-team and validate, at a `fgos convention path` plan directory linked from the layer phase. Every sub-phase lists Create / Modify / **Delete** / **Tests to retire** and a net-size line. Every retired test names the test that now owns its behaviour.
 5. **Implement:** one Sonnet lead per worktree. Each brief carries the delete list, the rule "find the owning test before writing a new one", and a Δ-lines report.
 6. **Verify independently** (proposal §4.6).
@@ -167,14 +171,13 @@ Per layer:
 - **Doctor:** the doctor rows of T0–T5 do not grow in number. Duplicate and orphan rows go to zero. Every fail/warn condition still has a row.
 - **Reports:** each layer has a closing report with its before/after table. Phase 07 hands T6–T9 off with their inputs.
 
-## Unresolved questions
+## Owner decisions
 
-1. **Compatibility policy (review R4):** stop-everything landing, one read path for old data, fences live for one release. It is still an owner decision. It decides whether T1 can delete `src/holder-lock/fences.mjs` and the legacy readers, and whether T4 can delete `src/run-supervisor/legacy-sweep.mjs`.
-2. **How Node reaches the T0 door without spawning under a hot lock** (phase 01 Q1). This goes to the owner in T0 ask 1, with the council's numbers. Every option departs from some earlier text:
-   - the proposal's "route" wording;
-   - Git's ownership of the addon;
-   - the "zero Node deciding logic" goal.
-3. **Whether the state store's hot mutex stays in Node until WORK lands** (T1 ask 1).
+2026-10-21 12:05, owner: "đồng ý theo khuyến nghị".
+1. **Compatibility policy (review R4):** stop-everything landing on every workspace and both machines at once; old data needs one read path only; fences and drains live for one release, then go. So T1 may delete `src/holder-lock/fences.mjs` and the legacy readers once their release has passed, and T4 may delete `src/run-supervisor/legacy-sweep.mjs`.
+2. **How Node reaches the T0 door:** an **in-process binding** (N-API) with T0's own loader; Rust decides, nothing spawns on hot paths. Cost accepted: ship the addon for every supported target and for the npm channel. The cold paths may keep the route. Coordinate the addon ownership with the Git lane (combined addon in `packages/git/node-addon`).
+3. **The state store's hot mutex stays in Node until WORK lands** (it belongs to the Work layer, T7, out of scope).
+4. **Council per component** (new): each layer council settles a target shape per component (Part A) before reviewing (Part B); large components get their own council (see the per-layer loop, step 2).
 
 ## Red Team Review
 
