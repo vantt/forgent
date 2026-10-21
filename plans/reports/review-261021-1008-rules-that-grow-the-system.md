@@ -2,6 +2,57 @@
 
 Soát của `forgentx-95`, 2026-10-21 10:08. Owner hỏi lúc 10:06: "xem lại coi luật lệ của chúng ta có gì bất ổn không mà hệ thống lại phình". Báo cáo này chỉ phân tích và đề xuất. Mọi thay đổi luật đều là quyết định của owner: luật đã khoá thì phải supersede, không sửa tại chỗ.
 
+## 0. Đính chính và kiểm kê nơi ghi luật (10:20, owner 10:14)
+
+**Đính chính R1 và R6.** Luật bắt bớt **đã có**:
+- Nguyên tắc thiết kế 8 và câu 5 của L5 trong `AGENTS.md`, thêm vào lúc 10-20 17:50 (`fb8c6e4ae`, luồng TEST): mỗi hành vi có đúng một bằng chứng chủ; xoá hoặc thay cơ chế thì gỡ test của nó trong cùng thay đổi; tìm test chủ để mở rộng trước khi thêm test.
+- Lần tổ chức lại luật gần nhất:
+  - 10-17: `AGENTS.md` thành file instruction duy nhất (`40c667c83`); L1–L10 và nguyên tắc thiết kế được chiếu tới chỗ agent đọc (`f9ea9c219`);
+  - 10-18: RUL104 (`69c04f179`, `1641e4dab`);
+  - 10-20: luật One proof.
+
+Vậy vấn đề không phải thiếu luật, mà là **luật không tới được nơi agent thực sự làm việc**, và **chưa có máy kiểm** để buộc làm theo.
+
+### 0.1 Mười bốn nơi đang ghi luật
+
+| Nơi | Số file | Dung lượng | Ai đọc, khi nào |
+|---|---|---|---|
+| `AGENTS.md` (gồm phần "fgOS Effective Instructions" render từ `core/instructions`) | 1 | 29,8 KB | mọi agent CLI, mỗi lượt |
+| `core/instructions/*.md` (nguồn của phần render) | 3 | 5,8 KB | qua `AGENTS.md` |
+| `.claude/rules/*.md` (project) | 8 | 16,7 KB | Claude Code, mỗi lượt |
+| `~/.claude/rules/*.md` (global, của ck/ak) | 6 | 9,3 KB | Claude Code, mỗi lượt, mọi project |
+| `docs/platform-foundations.md` (L1–L10) | 1 | 16,9 KB | khi agent tự mở |
+| `docs/specs/platform-foundations.md` (RUL, lịch sử quyết định) | 1 | 43,8 KB | khi agent tự mở |
+| `docs/specs/*.md` (RUL theo area) | 16 | 1,5 MB | khi chạm area đó |
+| `docs/platform/*/spec.md` | 14 | 957 KB | khi chạm component đó |
+| `docs/decisions/index.md` (sinh tự động) | 1 | 36 KB | hiếm |
+| `domains/*/AGENTS.md` | 2 | 8,4 KB | skill routing đọc khi cần |
+| `core/skills/_shared/*.md` (worker contract, dispatch fallback…) | 12 | 86,6 KB | worker và skill fgOS |
+| `core/skills/*/SKILL.md` | 13 | 116 KB | khi skill được gọi |
+| `docs/how-to/*.md` | 15 | 168 KB | khi agent tự mở |
+| memory của big lead | 97 | 275 KB | chỉ phiên của em |
+
+Mỗi lượt, một agent Claude Code nạp khoảng 56 KB luật: `AGENTS.md`, `.claude/rules` và `~/.claude/rules`.
+
+### 0.2 Luật trùng và lệch nhau
+
+- **"Dùng lại trước khi thêm" / "một cửa"** nằm ở 8 nơi: `AGENTS.md`, `design-principles`, `primary-workflow`, `process-management`, `skill-workflow-routing`, `coding-worker-contract`, `executor-dispatch-fallback`, `private-cell-worktree`.
+- **"Chạy test hẹp nhất trước"** nằm ở 4 nơi (`.claude/rules` và `~/.claude/rules`, mỗi nơi 2 file). Cả 4 đều nói chạy test, không nơi nào nói gỡ test.
+- **"Một bằng chứng / gỡ test theo cơ chế"** chỉ có ở `AGENTS.md`, `design-principles`, `platform-foundations` và 2 file `_shared`.
+- **`ak-cook` và `ak-plan` không có dòng nào** về luật này. Đây chính là hai skill các lead dùng để lập plan và làm việc. Mẫu phase của `ak-plan` chỉ có mục "Tests" và "Create/Modify/Delete" cho file code, không có mục gỡ test. Hai skill này là dự án của người khác (ak), mình không sửa được.
+
+### 0.3 Vì sao không hiệu quả
+
+1. **Luật không tới nơi làm việc.** Lead làm theo phase file (sinh từ mẫu `ak-plan`), brief của big lead, và `ak-cook`. Cả ba không mang luật "gỡ test", "kích thước ròng" hay "Node co lại". Brief của em còn ghi "viết test mà phase file liệt kê". SEAT lập plan lúc 10-20 21:32, sau khi luật One proof ra đời, mà test vẫn tăng khoảng 4 800 dòng ròng.
+2. **Luật không có máy kiểm.** Máy kiểm hiện có chỉ bắt test sao chép y nguyên (`suite:` + `test/suite-baseline.json`) và import sai tầng (`test/architecture.test.mjs`). Không gì đo kích thước ròng, ngân sách Node của mỗi foundation, hay số test so với số cơ chế bị xoá.
+3. **Phần cơ chế của luồng INS chưa làm.** Luồng này (board: "luật phải tới đúng agent") mới xong phần làm tay ngày 10-17. Phần cơ chế, nhóm A, ở trạng thái `not-planned` vì đang chờ D6 (Q4–Q7).
+4. **Luật rải và trùng ở 14 nơi.** Luật đọc nhiều token, dễ lệch nhau (như R4), và người viết luật mới không biết nên đặt vào đâu.
+
+**Đề xuất thay R1/R6:** không cần thêm luật mới. Cần ba việc:
+- (a) đưa luật đã có tới đúng nơi làm việc: mẫu brief của big lead, và một lớp "fgOS plan addendum" mình sở hữu, đặt cạnh `ak-plan`/`ak-cook`;
+- (b) thêm máy kiểm: cổng kích thước ròng trong `npm test` hoặc `fgos doctor`, và ngân sách Node cho mỗi foundation;
+- (c) gom 14 nơi về ít nơi hơn, mỗi luật chỉ có một nhà. Việc này nên làm cùng luồng INS và quyết định D6.
+
 ## 1. Số liệu
 
 Lấy từ `git log --numstat --no-merges`, không tính commit merge.
