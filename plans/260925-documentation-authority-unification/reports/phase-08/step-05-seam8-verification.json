@@ -1,0 +1,540 @@
+{
+  "status": "pass",
+  "proofs": [
+    {
+      "label": "seam8",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-p8-seam8/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+        "--output",
+        "/tmp/fgos-work/seam8-verification/seam8/seam8-check.json"
+      ],
+      "exit": 0,
+      "resultFresh": true,
+      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+      "sourceSha256": "8529916dfb6545c33b08aad3ca762a1f16f750830a63561ada0a22b21931adb8",
+      "driverPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+      "driverSha256": "8529916dfb6545c33b08aad3ca762a1f16f750830a63561ada0a22b21931adb8",
+      "logPath": "/tmp/fgos-work/seam8-verification/seam8/stdout.log",
+      "logSha256": "5757534ecc05d815c8a58b21e09668501bf9d94d3fedbcd80594b881211abaa2",
+      "resultPath": "/tmp/fgos-work/seam8-verification/seam8/seam8-check.json",
+      "resultSha256": "356c0fbf5f199586ee0cc3ac3b57c07943c7dc249aa296dac165e074b179b337",
+      "counts": {
+        "files": 451,
+        "literalReferences": 2288,
+        "dynamicTuples": 8366,
+        "failureCount": 0
+      },
+      "ok": true
+    },
+    {
+      "label": "seam8-probes",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-p8-seam8/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+        "--output",
+        "/tmp/fgos-work/seam8-verification/seam8-probes/seam8-probes.json",
+        "--probes"
+      ],
+      "exit": 0,
+      "resultFresh": true,
+      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+      "sourceSha256": "8529916dfb6545c33b08aad3ca762a1f16f750830a63561ada0a22b21931adb8",
+      "driverPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+      "driverSha256": "8529916dfb6545c33b08aad3ca762a1f16f750830a63561ada0a22b21931adb8",
+      "logPath": "/tmp/fgos-work/seam8-verification/seam8-probes/stdout.log",
+      "logSha256": "3c4f00a74863306e3b1e0f54a24bd120b19ad80fb12a4912e2716ea27ff1dc37",
+      "resultPath": "/tmp/fgos-work/seam8-verification/seam8-probes/seam8-probes.json",
+      "resultSha256": "8322238f835d0422829dac62d14863bfcd06ea6daf68fa44151a2be60661210a",
+      "counts": {
+        "baselineFailures": 0,
+        "passed": 33,
+        "total": 33
+      },
+      "ok": true
+    },
+    {
+      "label": "full",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-p8-seam8/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+        "--output",
+        "/tmp/fgos-work/seam8-verification/full/full-check.json",
+        "--run-existing",
+        "step-05-check.py"
+      ],
+      "exit": 0,
+      "resultFresh": true,
+      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-check.py",
+      "sourceSha256": "bcdfbb91308d4dee34655c3c94619b08cbaa424fd6a3f04035ee78887e3d1b06",
+      "driverPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+      "driverSha256": "8529916dfb6545c33b08aad3ca762a1f16f750830a63561ada0a22b21931adb8",
+      "logPath": "/tmp/fgos-work/seam8-verification/full/stdout.log",
+      "logSha256": "3df01dfcacba8ce58ea97a2beb508610c69b9e2cd48621e52eaa4aa5eba15026",
+      "resultPath": "/tmp/fgos-work/seam8-verification/full/full-check.json",
+      "resultSha256": "050e97a0cc7462c23b68f209873a6d3a50e1ad27a1ba3e6e7e782ebe5f4139fe",
+      "counts": {
+        "files": 995,
+        "literalReferences": 3622,
+        "dynamicTuples": 30661,
+        "failureCount": 0
+      },
+      "ok": true
+    },
+    {
+      "label": "pilot",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-p8-seam8/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+        "--output",
+        "/tmp/fgos-work/seam8-verification/pilot/step-05-pilot-probes-result.json",
+        "--run-existing",
+        "step-05-probes.py"
+      ],
+      "exit": 0,
+      "resultFresh": true,
+      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-probes.py",
+      "sourceSha256": "a59d36f661d03d96cc8d168ec8dd316b79161904145d04d3e8a50e0b63df7cf5",
+      "driverPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+      "driverSha256": "8529916dfb6545c33b08aad3ca762a1f16f750830a63561ada0a22b21931adb8",
+      "logPath": "/tmp/fgos-work/seam8-verification/pilot/stdout.log",
+      "logSha256": "ed5a4641a73331a1c84a2cdcfc76a1f7bc1170db25a5ff214213f49b7cd12c57",
+      "resultPath": "/tmp/fgos-work/seam8-verification/pilot/step-05-pilot-probes-result.json",
+      "resultSha256": "f308498b5c95d848a554f3f8fe62cfedc6a46369e8284fb5df43f6fd6a60cc3e",
+      "counts": {
+        "baselineFailures": 0,
+        "passed": 44,
+        "total": 44
+      },
+      "ok": true
+    },
+    {
+      "label": "seam4",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-p8-seam8/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+        "--output",
+        "/tmp/fgos-work/seam8-verification/seam4/step-05-seam4-probes-result.json",
+        "--run-existing",
+        "step-05-seam4-probes.py"
+      ],
+      "exit": 0,
+      "resultFresh": true,
+      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam4-probes.py",
+      "sourceSha256": "a19c43384269bb457a4de2ad2f9629d42eab2cec4f849fa0e832056fd0b9c5f5",
+      "driverPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+      "driverSha256": "8529916dfb6545c33b08aad3ca762a1f16f750830a63561ada0a22b21931adb8",
+      "logPath": "/tmp/fgos-work/seam8-verification/seam4/stdout.log",
+      "logSha256": "be6baada3498e9392aed50f2a1eae7c314e3baf667ac54ad2bbdaec53886bace",
+      "resultPath": "/tmp/fgos-work/seam8-verification/seam4/step-05-seam4-probes-result.json",
+      "resultSha256": "fb520cec250e0bc05694fffda2e4e107ba7b5656c233686772365960944d2a7a",
+      "counts": {
+        "baselineFailures": 0,
+        "passed": 34,
+        "total": 34
+      },
+      "ok": true
+    },
+    {
+      "label": "prompt",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-p8-seam8/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+        "--output",
+        "/tmp/fgos-work/seam8-verification/prompt/step-05-seam5-probes-result.json",
+        "--run-existing",
+        "step-05-seam5-probes.py"
+      ],
+      "exit": 0,
+      "resultFresh": true,
+      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-probes.py",
+      "sourceSha256": "cf5e6fa04562cb2aa35aef2eac7890def60e4790bba7b0a0ef62d864fa4bfc61",
+      "driverPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+      "driverSha256": "8529916dfb6545c33b08aad3ca762a1f16f750830a63561ada0a22b21931adb8",
+      "logPath": "/tmp/fgos-work/seam8-verification/prompt/stdout.log",
+      "logSha256": "00ea355b1902af878116cadc730b7776679c1712caebb92ab938cfb8d78b7f5c",
+      "resultPath": "/tmp/fgos-work/seam8-verification/prompt/step-05-seam5-probes-result.json",
+      "resultSha256": "45d235bb0e28a8b776f3503d418347d6a182e629b6d10bc32dda821fc44c68e8",
+      "counts": {
+        "baselineFailures": 0,
+        "passed": 13,
+        "total": 13
+      },
+      "ok": true
+    },
+    {
+      "label": "batch2",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-p8-seam8/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+        "--output",
+        "/tmp/fgos-work/seam8-verification/batch2/step-05-seam5-batch2-probes-result.json",
+        "--run-existing",
+        "step-05-seam5-batch2-probes.py"
+      ],
+      "exit": 0,
+      "resultFresh": true,
+      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch2-probes.py",
+      "sourceSha256": "a41e9243dd18de7029d909f8e1a009d626eff4c6dab8ebe4c5b87cd4e7abc79e",
+      "driverPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+      "driverSha256": "8529916dfb6545c33b08aad3ca762a1f16f750830a63561ada0a22b21931adb8",
+      "logPath": "/tmp/fgos-work/seam8-verification/batch2/stdout.log",
+      "logSha256": "6e23e43fa065043d297532dfacae577b973caee59b1e111131b6d7ca626b1d79",
+      "resultPath": "/tmp/fgos-work/seam8-verification/batch2/step-05-seam5-batch2-probes-result.json",
+      "resultSha256": "eda386a899c7af10acc888cfb895eebb7386be99c9173f7f6d3f018c0666fc4c",
+      "counts": {
+        "baselineFailures": 0,
+        "passed": 18,
+        "total": 18
+      },
+      "ok": true
+    },
+    {
+      "label": "batch3",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-p8-seam8/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+        "--output",
+        "/tmp/fgos-work/seam8-verification/batch3/step-05-seam5-batch3-probes-result.json",
+        "--run-existing",
+        "step-05-seam5-batch3-probes.py"
+      ],
+      "exit": 0,
+      "resultFresh": true,
+      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch3-probes.py",
+      "sourceSha256": "eaed7aa4684604d7c5ed16eec9278b6477cd6ef8addabfb9580484bc9b070138",
+      "driverPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+      "driverSha256": "8529916dfb6545c33b08aad3ca762a1f16f750830a63561ada0a22b21931adb8",
+      "logPath": "/tmp/fgos-work/seam8-verification/batch3/stdout.log",
+      "logSha256": "5d2603d8e219a93aadee79ed6945da5f41a999e014654d78a62902827adae8b1",
+      "resultPath": "/tmp/fgos-work/seam8-verification/batch3/step-05-seam5-batch3-probes-result.json",
+      "resultSha256": "2e192488be537d058fad959b4e9071ae54268c8fc1aafd089009780026cecac1",
+      "counts": {
+        "baselineFailures": 0,
+        "passed": 19,
+        "total": 19
+      },
+      "ok": true
+    },
+    {
+      "label": "batch4",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-p8-seam8/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+        "--output",
+        "/tmp/fgos-work/seam8-verification/batch4/step-05-seam5-batch4-probes-result.json",
+        "--run-existing",
+        "step-05-seam5-batch4-probes.py"
+      ],
+      "exit": 0,
+      "resultFresh": true,
+      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch4-probes.py",
+      "sourceSha256": "58fbece70a1dcc940b3f277a50382d018b575d467b5ea5c996bc93bedcfea412",
+      "driverPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+      "driverSha256": "8529916dfb6545c33b08aad3ca762a1f16f750830a63561ada0a22b21931adb8",
+      "logPath": "/tmp/fgos-work/seam8-verification/batch4/stdout.log",
+      "logSha256": "dccc15d40aa1c7781314fb22c5bfd637bffb36a020d9bcc6b0010bcb28a21e3a",
+      "resultPath": "/tmp/fgos-work/seam8-verification/batch4/step-05-seam5-batch4-probes-result.json",
+      "resultSha256": "0b7f8f5aede3a29acfc58201aaf4c2faf7be5bc2c27d2faccbdf13d2810aac35",
+      "counts": {
+        "passed": 29,
+        "total": 29,
+        "positivePassed": 15,
+        "positiveTotal": 15
+      },
+      "ok": true
+    },
+    {
+      "label": "batch5",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-p8-seam8/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+        "--output",
+        "/tmp/fgos-work/seam8-verification/batch5/step-05-seam5-batch5-probes-result.json",
+        "--run-existing",
+        "step-05-seam5-batch5-probes.py"
+      ],
+      "exit": 0,
+      "resultFresh": true,
+      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch5-probes.py",
+      "sourceSha256": "26e8efb19b0d1a6e9385cb065cda8295a83c363b6c2a7378ea2115a37542704e",
+      "driverPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+      "driverSha256": "8529916dfb6545c33b08aad3ca762a1f16f750830a63561ada0a22b21931adb8",
+      "logPath": "/tmp/fgos-work/seam8-verification/batch5/stdout.log",
+      "logSha256": "822ce59af38b7c1dc945465fc37cfe4e4bd92d54291d6d375630ae4dd39ea814",
+      "resultPath": "/tmp/fgos-work/seam8-verification/batch5/step-05-seam5-batch5-probes-result.json",
+      "resultSha256": "081b23420d7e30b544838d4db0048c046a772f1f2f59b3e2a08befaf8b74fb3e",
+      "counts": {
+        "baselineFailures": 0,
+        "passed": 19,
+        "total": 19
+      },
+      "ok": true
+    },
+    {
+      "label": "batch6",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-p8-seam8/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+        "--output",
+        "/tmp/fgos-work/seam8-verification/batch6/step-05-seam5-batch6-probes-result.json",
+        "--run-existing",
+        "step-05-seam5-batch6-probes.py"
+      ],
+      "exit": 0,
+      "resultFresh": true,
+      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch6-probes.py",
+      "sourceSha256": "6065aace9078a2a65a9c391bb46837775c8388491016628870da9ee75dac5f56",
+      "driverPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+      "driverSha256": "8529916dfb6545c33b08aad3ca762a1f16f750830a63561ada0a22b21931adb8",
+      "logPath": "/tmp/fgos-work/seam8-verification/batch6/stdout.log",
+      "logSha256": "5b58b4b19fd6c7386adb4584b0f441f2b9322ac6bd6af3490452c16d0211a731",
+      "resultPath": "/tmp/fgos-work/seam8-verification/batch6/step-05-seam5-batch6-probes-result.json",
+      "resultSha256": "1df941de548f7b62aacb98095c68f66bc3ae89ec4b5badbe9becdea25c237569",
+      "counts": {
+        "passed": 20,
+        "total": 20
+      },
+      "ok": true
+    },
+    {
+      "label": "batch7",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-p8-seam8/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+        "--output",
+        "/tmp/fgos-work/seam8-verification/batch7/step-05-seam5-batch7-probes-result.json",
+        "--run-existing",
+        "step-05-seam5-batch7-probes.py"
+      ],
+      "exit": 0,
+      "resultFresh": true,
+      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-probes.py",
+      "sourceSha256": "77d42fa47e5728d143e3b079301ced642fc5bc3691ac72066aa64f40def5c5e8",
+      "driverPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+      "driverSha256": "8529916dfb6545c33b08aad3ca762a1f16f750830a63561ada0a22b21931adb8",
+      "logPath": "/tmp/fgos-work/seam8-verification/batch7/stdout.log",
+      "logSha256": "65246da64d6a110efd60b769c8738d176c4713626d36bbc58f5a4104b724e399",
+      "resultPath": "/tmp/fgos-work/seam8-verification/batch7/step-05-seam5-batch7-probes-result.json",
+      "resultSha256": "c1cec0bf761ca036c13b7e4c519f9902883f079ca38dbf990e554d2296b9ae4b",
+      "counts": {
+        "passed": 106,
+        "total": 106
+      },
+      "ok": true
+    },
+    {
+      "label": "r26",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "/usr/bin/python3",
+        "-B",
+        "/home/vantt/projects/forgentX-p8-seam8/plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+        "--output",
+        "/tmp/fgos-work/seam8-verification/r26/step-05-proposed-move-probes-result.json",
+        "--run-existing",
+        "step-05-proposed-move-probes.py"
+      ],
+      "exit": 0,
+      "resultFresh": true,
+      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-proposed-move-probes.py",
+      "sourceSha256": "354891b56926139bedbb7bb0df4d8f916ea8a519e8ea06d4d0b0f5e0e028c950",
+      "driverPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+      "driverSha256": "8529916dfb6545c33b08aad3ca762a1f16f750830a63561ada0a22b21931adb8",
+      "logPath": "/tmp/fgos-work/seam8-verification/r26/stdout.log",
+      "logSha256": "947d722a86c1084e7e508e793bed22b0f6f5c7022dd013690e6b1ade1c485ae2",
+      "resultPath": "/tmp/fgos-work/seam8-verification/r26/step-05-proposed-move-probes-result.json",
+      "resultSha256": "1d7b0985a939b5bfd7789a5673166e9a18fd6eae4e950ced11f26ac2df094ac3",
+      "counts": {
+        "baselineFailures": 0,
+        "passed": 8,
+        "total": 8
+      },
+      "ok": true
+    }
+  ],
+  "negativeProbesPassed": 343,
+  "negativeProbesTotal": 343,
+  "scope": "Records-only source/pin/probe verification. No runtime current/candidate parity, full npm/cargo, semantic review or cutover approval.",
+  "fullExistingChecker": {
+    "files": 995,
+    "literalReferences": 3622,
+    "dynamicTuples": 30661,
+    "failureCount": 0
+  },
+  "seam8Extension": {
+    "files": 451,
+    "literalReferences": 2288,
+    "dynamicTuples": 8366,
+    "failureCount": 0
+  },
+  "recordArtifacts": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-external-parks.jsonl",
+      "sha256": "4e208b1b3c88a4bcafe3fa43bc37d48439e2624b22fcaa05f7d0e2ae55f338c8",
+      "bytes": 3827
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl",
+      "sha256": "b2d35cd99083790355f1cd5e35c294ac15d70557eb0bd16ecf35d2dd3f19e875",
+      "bytes": 6651135
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-23.jsonl",
+      "sha256": "2006394b0637129b15cf2f351ca2993f04841cc35955d607c0b0f47fdf4c3e64",
+      "bytes": 3037391
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-24.jsonl",
+      "sha256": "0d9be9f983dd546ff6b9062f950728e9cb456faf2dfa7d8a0eb4232409beee67",
+      "bytes": 2373660
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-25.jsonl",
+      "sha256": "44d885fa5ad173de36b7b6f33c57addcd0da5ab06fe8b3bacb7d4e4e53236f08",
+      "bytes": 1727657
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl",
+      "sha256": "bba0d39cd84b461ed061c4fa6891f16239abf581c47057a908d2d47e0e7fefcc",
+      "bytes": 7212105
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl",
+      "sha256": "026b13645eda028f5ebf9064f113b13513a440253f0c9ecd3774de62a7f1532a",
+      "bytes": 15847641
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-28.jsonl",
+      "sha256": "7e62bac350f876f5ea4b032baadbc35dacb65a5efe7956ee8addf2362ecf2aed",
+      "bytes": 6844024
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-29.jsonl",
+      "sha256": "9d2a0ea95669f9771c292ec9f13207bc2942ba5de82a071a7e8c8bd50ea61e13",
+      "bytes": 16390257
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r19.jsonl",
+      "sha256": "4518f5cd5b9d7c7bcb2ea7011b2ec4cb713b2904a5705077d372ad97a4e08a5e",
+      "bytes": 11229
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+      "sha256": "41f0e5025fb09dab8bb604ceeb142db1d6e7b3f40c9f0aeefac21571e57f4a9f",
+      "bytes": 790630
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r21.jsonl",
+      "sha256": "ecb5b2fde3ce6ea7bc6d0e8106015ed41357beca2642328f484349ae94cae396",
+      "bytes": 45659
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-retired-source.jsonl",
+      "sha256": "c5a1162fe25a719fcd8b7fb7a34fba48dcd93800f0f35c04337a740dd92ff604",
+      "bytes": 37043
+    }
+  ],
+  "recordSetSha256": "563f8adf5f00f91d7d6220871c2959cd918029424b6023dcd84f3850263d27cf",
+  "normalCheckerRulesChanged": false,
+  "canonicalOutputsRedirectedToScratch": true,
+  "scopeAudit": {
+    "trackedChanges": [],
+    "changedOrUntrackedPaths": [
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-external-parks.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-23.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-24.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-25.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-28.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-29.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r19.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r20.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-r21.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-retired-source.jsonl",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-carry-joins.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check-result.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-check.py",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-closure.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-continuation.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-cross-seam-carries.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-head-drift.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-inherited-patches.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-occurrence-ancestry.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-parity-receipts.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-probe-results.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-progress.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-proposed-move-read-units.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-review-list.json",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-rulings.md",
+      "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam8-verification.json"
+    ],
+    "sourceState": "Only new permitted runtime/seam8 artifacts; no existing tracked file changed.",
+    "gitIndexWrites": false
+  }
+}

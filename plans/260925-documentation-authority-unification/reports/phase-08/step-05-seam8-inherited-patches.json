@@ -1,0 +1,310 @@
+{
+  "units": [
+    {
+      "file": "AGENTS.md",
+      "ownerRecord": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+        "recordLine": 1,
+        "recordSha256": "312030bb7345c15553065787f1fcfe6bf8c53bfac883dcffc87b5ca324a56c86",
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45"
+      },
+      "sourceSha256": "7100231ae81a24ba491542a5564d8413d778208772d2a756a42e3e91725578cf",
+      "expectedAfterSha256": "d7f25e9421e11d7683a06f483fa4d091d4a8027dfbba93c770a820cad9938175",
+      "mode": "100644",
+      "diff": "--- a/AGENTS.md\n+++ b/AGENTS.md\n@@ -6,15 +6,15 @@\n \n - README.md — product description + documentation index\n - docs/platform-foundations.md — L1-L10 locked design laws; L5 is this repo's definition of done (six questions, below)\n-- docs/specs/system-overview.md — area map, shared entities, cross-area flows\n-- docs/specs/reading-map.md — where every doc and source path in this repo lives\n+- docs/platform/system-overview/spec.md — area map, shared entities, cross-area flows\n+- docs/reading-map.md — where every doc and source path in this repo lives\n - docs/backlog.md — product backlog (PBI rows: proposed / in-flight / done)\n - plans/261017-1313-fgos-platform-program-board/plan.md — which platform plans are running or held, what each waits for, which shared files collide; read it before starting lock/git/state/config/runner work, and update your own lane's row when you start, finish, block or land\n - docs/routing-handoff-contract.md — agent-to-agent handoff contract + trust boundary\n - docs/decisions/index.md — generated projection of platform/repo-wide decisions (`fgos decision-index`); narrative lives in docs/specs/<area>.md's own \"Lịch sử quyết định\" sections (tsk-1lv-4)\n - domains/<domain>/AGENTS.md — domain-specific doctrine (e.g. domains/coding/AGENTS.md for fgos-coding-* workflows), read dynamically by fgos-routing\n \n-## Product priority order (D-ADR0030, docs/specs/runner.md)\n+## Product priority order (D-ADR0030, docs/platform/runner/decisions/h-36d872fbb0e5.md#0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm)\n \n 1. **Ship Faster** — giao nhanh hơn, không đoán mò, giảm friction/better-dev-ux, ít chờ đợi.\n 2. **Release con người** — giải phóng con người khỏi việc ngồi canh chờ trả lời. Hệ thống tự phán đoán, tự vận hành ở mức cao nhất có thể; chỉ hỏi người khi thật sự cần, và khi hỏi thì gom thành bộ để mỗi lần người quay lại trả lời được nhiều nhất rồi đi tiếp; mỗi câu theo mẫu câu hỏi quyết định (`core/skills/_shared/decision-question.md`). Tự quyết trong khung đã duyệt (phạm vi + ngân sách ghi lúc duyệt); sắp vượt khung thì dừng và hỏi theo mẫu. Một câu hỏi treo không được nghẽn phần việc khác của cùng item còn tiến được — stage/skill vì vậy phải chia nhỏ, mịn, mỗi mảnh park/tiến độc lập.\n@@ -24,7 +24,7 @@\n \n Tốc độ ở mục 1 là tốc độ ship của **project đang DÙNG fgOS** (fgOS không loại trừ khi tự dogfood) — không phải tốc độ tự thân team fgOS build một tính năng của chính fgOS. Đừng chọn phương án rẻ để fgOS tự triển khai nếu nó làm project dùng fgOS chậm hơn.\n \n-Thứ tự cố định — bậc dưới không ghi đè bậc trên. Chi tiết: docs/specs/runner.md's \"Lịch sử quyết định\" § D-ADR0030 (mở rộng D-ADR0025; narrative đầy đủ, docs/decisions/*.md corpus đã retired tsk-1lv-4).\n+Thứ tự cố định — bậc dưới không ghi đè bậc trên. Chi tiết: docs/platform/runner/decisions/h-36d872fbb0e5.md#0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm's \"Lịch sử quyết định\" § D-ADR0030 (mở rộng D-ADR0025; narrative đầy đủ, docs/decisions/*.md corpus đã retired tsk-1lv-4).\n \n ## Ranh giới sứ mệnh (D-ADR0035, docs/specs/platform-foundations.md)\n \n@@ -37,7 +37,7 @@\n \n ## Before touching code\n \n-Read `docs/specs/reading-map.md`, then the area spec under `docs/specs/` for whatever\n+Read `docs/reading-map.md`, then the area spec under `docs/specs/` for whatever\n you're about to change. Specs are the state layer — BA-grade, tech-agnostic — read\n the spec before the code.\n \n@@ -54,7 +54,7 @@\n \n A stranger agent with no chat history should be able to answer, for any change:\n \n-1. **What to read first?** `docs/specs/reading-map.md`, then the relevant area spec.\n+1. **What to read first?** `docs/reading-map.md`, then the relevant area spec.\n 2. **What kind of work is this?** Check it against the area's spec and\n    `docs/backlog.md`; a new product area gets a spec before it gets code.\n 3. **What contract does it touch?** `docs/routing-handoff-contract.md` for\n@@ -131,7 +131,7 @@\n   project) is active — per the vision doc, project config always\n   overwrites global, and fgOS stays aware of both without conflict.\n - If the change touches how fgOS gets installed, upgraded, or diagnosed at\n-  all, read `docs/distribution-vision.md` and `docs/specs/distribution.md`\n+  all, read `docs/distribution-vision.md` and `docs/platform/packaging-distribution/spec.md`\n   first — a new module gets a spec/config-registry entry before it gets\n   code, same bar as a new product area (question 2 above).\n - Does this change something a user of fgOS would see? If yes, add a line\n",
+      "rollbackDiff": "--- a/AGENTS.md\n+++ b/AGENTS.md\n@@ -6,15 +6,15 @@\n \n - README.md — product description + documentation index\n - docs/platform-foundations.md — L1-L10 locked design laws; L5 is this repo's definition of done (six questions, below)\n-- docs/platform/system-overview/spec.md — area map, shared entities, cross-area flows\n-- docs/reading-map.md — where every doc and source path in this repo lives\n+- docs/specs/system-overview.md — area map, shared entities, cross-area flows\n+- docs/specs/reading-map.md — where every doc and source path in this repo lives\n - docs/backlog.md — product backlog (PBI rows: proposed / in-flight / done)\n - plans/261017-1313-fgos-platform-program-board/plan.md — which platform plans are running or held, what each waits for, which shared files collide; read it before starting lock/git/state/config/runner work, and update your own lane's row when you start, finish, block or land\n - docs/routing-handoff-contract.md — agent-to-agent handoff contract + trust boundary\n - docs/decisions/index.md — generated projection of platform/repo-wide decisions (`fgos decision-index`); narrative lives in docs/specs/<area>.md's own \"Lịch sử quyết định\" sections (tsk-1lv-4)\n - domains/<domain>/AGENTS.md — domain-specific doctrine (e.g. domains/coding/AGENTS.md for fgos-coding-* workflows), read dynamically by fgos-routing\n \n-## Product priority order (D-ADR0030, docs/platform/runner/decisions/h-36d872fbb0e5.md#0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm)\n+## Product priority order (D-ADR0030, docs/specs/runner.md)\n \n 1. **Ship Faster** — giao nhanh hơn, không đoán mò, giảm friction/better-dev-ux, ít chờ đợi.\n 2. **Release con người** — giải phóng con người khỏi việc ngồi canh chờ trả lời. Hệ thống tự phán đoán, tự vận hành ở mức cao nhất có thể; chỉ hỏi người khi thật sự cần, và khi hỏi thì gom thành bộ để mỗi lần người quay lại trả lời được nhiều nhất rồi đi tiếp; mỗi câu theo mẫu câu hỏi quyết định (`core/skills/_shared/decision-question.md`). Tự quyết trong khung đã duyệt (phạm vi + ngân sách ghi lúc duyệt); sắp vượt khung thì dừng và hỏi theo mẫu. Một câu hỏi treo không được nghẽn phần việc khác của cùng item còn tiến được — stage/skill vì vậy phải chia nhỏ, mịn, mỗi mảnh park/tiến độc lập.\n@@ -24,7 +24,7 @@\n \n Tốc độ ở mục 1 là tốc độ ship của **project đang DÙNG fgOS** (fgOS không loại trừ khi tự dogfood) — không phải tốc độ tự thân team fgOS build một tính năng của chính fgOS. Đừng chọn phương án rẻ để fgOS tự triển khai nếu nó làm project dùng fgOS chậm hơn.\n \n-Thứ tự cố định — bậc dưới không ghi đè bậc trên. Chi tiết: docs/platform/runner/decisions/h-36d872fbb0e5.md#0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm's \"Lịch sử quyết định\" § D-ADR0030 (mở rộng D-ADR0025; narrative đầy đủ, docs/decisions/*.md corpus đã retired tsk-1lv-4).\n+Thứ tự cố định — bậc dưới không ghi đè bậc trên. Chi tiết: docs/specs/runner.md's \"Lịch sử quyết định\" § D-ADR0030 (mở rộng D-ADR0025; narrative đầy đủ, docs/decisions/*.md corpus đã retired tsk-1lv-4).\n \n ## Ranh giới sứ mệnh (D-ADR0035, docs/specs/platform-foundations.md)\n \n@@ -37,7 +37,7 @@\n \n ## Before touching code\n \n-Read `docs/reading-map.md`, then the area spec under `docs/specs/` for whatever\n+Read `docs/specs/reading-map.md`, then the area spec under `docs/specs/` for whatever\n you're about to change. Specs are the state layer — BA-grade, tech-agnostic — read\n the spec before the code.\n \n@@ -54,7 +54,7 @@\n \n A stranger agent with no chat history should be able to answer, for any change:\n \n-1. **What to read first?** `docs/reading-map.md`, then the relevant area spec.\n+1. **What to read first?** `docs/specs/reading-map.md`, then the relevant area spec.\n 2. **What kind of work is this?** Check it against the area's spec and\n    `docs/backlog.md`; a new product area gets a spec before it gets code.\n 3. **What contract does it touch?** `docs/routing-handoff-contract.md` for\n@@ -131,7 +131,7 @@\n   project) is active — per the vision doc, project config always\n   overwrites global, and fgOS stays aware of both without conflict.\n - If the change touches how fgOS gets installed, upgraded, or diagnosed at\n-  all, read `docs/distribution-vision.md` and `docs/platform/packaging-distribution/spec.md`\n+  all, read `docs/distribution-vision.md` and `docs/specs/distribution.md`\n   first — a new module gets a spec/config-registry entry before it gets\n   code, same bar as a new product area (question 2 above).\n - Does this change something a user of fgOS would see? If yes, add a line\n",
+      "status": "forward and inverse apply exactly to the inherited owner pin in scratch; no source edit, rebind, runtime replay or semantic acceptance",
+      "coCutCustody": "Use the canonical owner record and receipt for the complete co-cut; Step 7 composes with other source units and Phase 9 executes."
+    },
+    {
+      "file": "apps/fgos-gateway/web/src/api/errors.ts",
+      "ownerRecord": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-012.jsonl",
+        "recordLine": 8,
+        "recordSha256": "c8468df6da937424f3fccfeeca89d280fd4dd93d30add5c07b16d27527daab8e",
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45"
+      },
+      "sourceSha256": "177282665dd0ed07aeaa6242bd7bfb9b8e0561fd57e9971aba736517d6be65b5",
+      "expectedAfterSha256": "2bce4025f4d9af4f0d544d4ff192380359101969ca4980aa4e7d7abc6dd5a3cd",
+      "mode": "100644",
+      "diff": "--- a/apps/fgos-gateway/web/src/api/errors.ts\n+++ b/apps/fgos-gateway/web/src/api/errors.ts\n@@ -1,6 +1,6 @@\n import type { ErrorEnvelope } from './types'\n \n-// Area spec Edge Cases Settled (docs/specs/herdr-web-dashboard.md:259-260):\n+// Area spec Edge Cases Settled (docs/platform/herdr-web-dashboard/spec.md#edge-cases-settled):\n // \"The gateway is unreachable. The client says so plainly and offers to\n // retry; it never presents stale data as current.\" A network-level fetch\n // failure (bad host, connection refused, DNS failure, offline) throws\n",
+      "rollbackDiff": "--- a/apps/fgos-gateway/web/src/api/errors.ts\n+++ b/apps/fgos-gateway/web/src/api/errors.ts\n@@ -1,6 +1,6 @@\n import type { ErrorEnvelope } from './types'\n \n-// Area spec Edge Cases Settled (docs/platform/herdr-web-dashboard/spec.md#edge-cases-settled):\n+// Area spec Edge Cases Settled (docs/specs/herdr-web-dashboard.md:259-260):\n // \"The gateway is unreachable. The client says so plainly and offers to\n // retry; it never presents stale data as current.\" A network-level fetch\n // failure (bad host, connection refused, DNS failure, offline) throws\n",
+      "status": "forward and inverse apply exactly to the inherited owner pin in scratch; no source edit, rebind, runtime replay or semantic acceptance",
+      "coCutCustody": "Use the canonical owner record and receipt for the complete co-cut; Step 7 composes with other source units and Phase 9 executes."
+    },
+    {
+      "file": "bin/fgos.mjs",
+      "ownerRecord": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-010.jsonl",
+        "recordLine": 1,
+        "recordSha256": "2d7a0008dd9a9f167ef8fbe43119674ceabbc8be09332ffc9f360af4038f73ec",
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45"
+      },
+      "sourceSha256": "64ace4da89dbc1222c6d3c0d634272c9b043d1c268a257ed2e2e09385a5eb198",
+      "expectedAfterSha256": "103771eef0dc91d8aa833aff77a9b1cd79f527b515b3a0455220dd90e7537061",
+      "mode": "100755",
+      "diff": "--- a/bin/fgos.mjs\n+++ b/bin/fgos.mjs\n@@ -1054,8 +1054,8 @@\n       // (src/intake/classify.mjs) to derive a collision-free \"tsk-<hash>\"\n       // id from --title, instead of forcing the caller to invent one by\n       // hand. This closes the gap that let `add` accept an arbitrarily\n-      // long slugified-title id in the first place (docs/explanation/\n-      // long-work-item-ids-max-length-guard.md) — generateId is now the\n+      // long slugified-title id in the first place (docs/knowledge/\n+      // why-fgos-add-now-caps-a-work-item-s-id-at-30-characters/long-work-item-ids-max-length-guard.md#why-add-had-this-gap-and-submit-didnt) — generateId is now the\n       // path of least resistance, not a manually-typed guess.\n       const idFlag = optionalField(positional[0] ?? flags.id, 'add --id requires a non-empty value; omit --id entirely to auto-generate one from --title.');\n       if (flags.tier !== undefined) {\n@@ -4212,7 +4212,7 @@\n       };\n     }\n \n-    // Diagnostic by default (D2, docs/specs/distribution.md RUL9): runs every\n+    // Diagnostic by default (D2, docs/platform/packaging-distribution/spec.md#business-rules RUL9): runs every\n     // DOCTOR_CHECKS entry against the current cwd, writing nothing — no rc\n     // file insertion, no config write — unless `--fix` is given.\n     //\n",
+      "rollbackDiff": "--- a/bin/fgos.mjs\n+++ b/bin/fgos.mjs\n@@ -1054,8 +1054,8 @@\n       // (src/intake/classify.mjs) to derive a collision-free \"tsk-<hash>\"\n       // id from --title, instead of forcing the caller to invent one by\n       // hand. This closes the gap that let `add` accept an arbitrarily\n-      // long slugified-title id in the first place (docs/knowledge/\n-      // why-fgos-add-now-caps-a-work-item-s-id-at-30-characters/long-work-item-ids-max-length-guard.md#why-add-had-this-gap-and-submit-didnt) — generateId is now the\n+      // long slugified-title id in the first place (docs/explanation/\n+      // long-work-item-ids-max-length-guard.md) — generateId is now the\n       // path of least resistance, not a manually-typed guess.\n       const idFlag = optionalField(positional[0] ?? flags.id, 'add --id requires a non-empty value; omit --id entirely to auto-generate one from --title.');\n       if (flags.tier !== undefined) {\n@@ -4212,7 +4212,7 @@\n       };\n     }\n \n-    // Diagnostic by default (D2, docs/platform/packaging-distribution/spec.md#business-rules RUL9): runs every\n+    // Diagnostic by default (D2, docs/specs/distribution.md RUL9): runs every\n     // DOCTOR_CHECKS entry against the current cwd, writing nothing — no rc\n     // file insertion, no config write — unless `--fix` is given.\n     //\n",
+      "status": "forward and inverse apply exactly to the inherited owner pin in scratch; no source edit, rebind, runtime replay or semantic acceptance",
+      "coCutCustody": "Use the canonical owner record and receipt for the complete co-cut; Step 7 composes with other source units and Phase 9 executes."
+    },
+    {
+      "file": "packages/distribution/rust/src/manifest.rs",
+      "ownerRecord": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-019.jsonl",
+        "recordLine": 3,
+        "recordSha256": "ab2c310c1b9a3a782f38708ca5f0f97adb7e18ec09687d9984e356b3c2ca56df",
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45"
+      },
+      "sourceSha256": "cc45d293313bf2de2b912293a52dc1f76214eb4c06b56b28f90ab52d640d274a",
+      "expectedAfterSha256": "fda86403e01f1488db764d7282ff87e49f5c0915fcd638543e520ff2b3dd1a8c",
+      "mode": "100644",
+      "diff": "--- a/packages/distribution/rust/src/manifest.rs\n+++ b/packages/distribution/rust/src/manifest.rs\n@@ -1,7 +1,7 @@\n //! Manifest types for fgOS release distributions.\n //!\n-//! Matches `docs/platform/packaging-distribution/contracts/release-manifest.md`\n-//! and `docs/architect/packaging-distribution/runtime-identity-and-activation.md` §5.\n+//! Frozen release manifest types and field invariants.\n+//! See `docs/platform/packaging-distribution/contracts/release-manifest.md#2-frozen-schema-v1-shape`.\n //!\n //! # Frozen Schema V1 Invariants\n //! - `schemaVersion` is frozen at 1.\n",
+      "rollbackDiff": "--- a/packages/distribution/rust/src/manifest.rs\n+++ b/packages/distribution/rust/src/manifest.rs\n@@ -1,7 +1,7 @@\n //! Manifest types for fgOS release distributions.\n //!\n-//! Frozen release manifest types and field invariants.\n-//! See `docs/platform/packaging-distribution/contracts/release-manifest.md#2-frozen-schema-v1-shape`.\n+//! Matches `docs/platform/packaging-distribution/contracts/release-manifest.md`\n+//! and `docs/architect/packaging-distribution/runtime-identity-and-activation.md` §5.\n //!\n //! # Frozen Schema V1 Invariants\n //! - `schemaVersion` is frozen at 1.\n",
+      "status": "forward and inverse apply exactly to the inherited owner pin in scratch; no source edit, rebind, runtime replay or semantic acceptance",
+      "coCutCustody": "Use the canonical owner record and receipt for the complete co-cut; Step 7 composes with other source units and Phase 9 executes."
+    },
+    {
+      "file": "packages/herdr-fgos-common/rust/src/fgos.rs",
+      "ownerRecord": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-020.jsonl",
+        "recordLine": 1,
+        "recordSha256": "634d48697b13d07a54f997ad70efb6cddd1ed15aa84684bc55c911215efdbd83",
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45"
+      },
+      "sourceSha256": "fcaaaa8f0beabf43e8d9e312da0dac0d2392d7bd52c38d5eaa8ee4a37bc286a9",
+      "expectedAfterSha256": "233355b48ff5aad41451083cf18c05eb79713c90eea3a6d06cba478d345b3557",
+      "mode": "100644",
+      "diff": "--- a/packages/herdr-fgos-common/rust/src/fgos.rs\n+++ b/packages/herdr-fgos-common/rust/src/fgos.rs\n@@ -22,7 +22,7 @@\n     pub stage: String,\n     /// tsk-64z D1: the Work Items panel's Status column and tab filter\n     /// (TODO/DOING/REVIEW/DONE) both key off this raw literal\n-    /// (`docs/reference/triage-table-columns.md`'s own \"rendered as-is\").\n+    /// (`docs/knowledge/fgos-triage-table-columns/triage-table-columns.md#fgostriage-table-columns`'s own \"rendered as-is\").\n     pub status: String,\n     /// tsk-64z D1: \"Blocked By\" column — ids of OTHER still-open items\n     /// this row directly waits on (`rankImpact`'s own `blockedBy`,\n@@ -239,7 +239,7 @@\n /// pinned for the CLI's own `--all`-less order, just no longer what this\n /// function returns). An absent `priority` (`None` — an item that never\n /// had `computePriority` run, e.g. still at `todo`) sorts LAST, same\n-/// absent-sorts-last convention `docs/reference/triage-table-columns.md`\n+/// absent-sorts-last convention `docs/knowledge/fgos-triage-table-columns/triage-table-columns.md`\n /// already documents for `goalTier`.\n pub fn parse_triage(json: &str) -> Result<Vec<TriageRow>, serde_json::Error> {\n     let envelope: TriageEnvelope = serde_json::from_str(json)?;\n",
+      "rollbackDiff": "--- a/packages/herdr-fgos-common/rust/src/fgos.rs\n+++ b/packages/herdr-fgos-common/rust/src/fgos.rs\n@@ -22,7 +22,7 @@\n     pub stage: String,\n     /// tsk-64z D1: the Work Items panel's Status column and tab filter\n     /// (TODO/DOING/REVIEW/DONE) both key off this raw literal\n-    /// (`docs/knowledge/fgos-triage-table-columns/triage-table-columns.md#fgostriage-table-columns`'s own \"rendered as-is\").\n+    /// (`docs/reference/triage-table-columns.md`'s own \"rendered as-is\").\n     pub status: String,\n     /// tsk-64z D1: \"Blocked By\" column — ids of OTHER still-open items\n     /// this row directly waits on (`rankImpact`'s own `blockedBy`,\n@@ -239,7 +239,7 @@\n /// pinned for the CLI's own `--all`-less order, just no longer what this\n /// function returns). An absent `priority` (`None` — an item that never\n /// had `computePriority` run, e.g. still at `todo`) sorts LAST, same\n-/// absent-sorts-last convention `docs/knowledge/fgos-triage-table-columns/triage-table-columns.md`\n+/// absent-sorts-last convention `docs/reference/triage-table-columns.md`\n /// already documents for `goalTier`.\n pub fn parse_triage(json: &str) -> Result<Vec<TriageRow>, serde_json::Error> {\n     let envelope: TriageEnvelope = serde_json::from_str(json)?;\n",
+      "status": "forward and inverse apply exactly to the inherited owner pin in scratch; no source edit, rebind, runtime replay or semantic acceptance",
+      "coCutCustody": "Use the canonical owner record and receipt for the complete co-cut; Step 7 composes with other source units and Phase 9 executes."
+    },
+    {
+      "file": "src/intake/discovery.mjs",
+      "ownerRecord": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-015.jsonl",
+        "recordLine": 1,
+        "recordSha256": "4701448ad13afa58dacf2beb73f382ef65e97b8b961d4eef83ae355f5eb8a40d",
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45"
+      },
+      "sourceSha256": "6da596afa6d305cd8431a7f79659c04449bfe7ecd793bc5600fd11cd2cff9c1b",
+      "expectedAfterSha256": "9a56d70dc35f4dadfbe83f2eaa89ddc693396f830b8a3dcba6d37fb9a322cd08",
+      "mode": "100644",
+      "diff": "--- a/src/intake/discovery.mjs\n+++ b/src/intake/discovery.mjs\n@@ -433,7 +433,7 @@\n         // exact disagreement can force past it explicitly -- never silent:\n         // always logged with the disagreement reason it overrode, per the\n         // \"never silently overridden\" stance\n-        // docs/explanation/judge-verdict-second-pass-semantic-check.md\n+        // docs/knowledge/why-judgediscovery-judgedecompose-run-a-second-independent-j/judge-verdict-second-pass-semantic-check.md#why-disagreement-parks-instead-of-retrying\n         // already states for this exact two-judge-disagreement path.\n         //\n         // tsk-12t D6: EXCEPT when `secondPass.mechanical` is true -- that\n",
+      "rollbackDiff": "--- a/src/intake/discovery.mjs\n+++ b/src/intake/discovery.mjs\n@@ -433,7 +433,7 @@\n         // exact disagreement can force past it explicitly -- never silent:\n         // always logged with the disagreement reason it overrode, per the\n         // \"never silently overridden\" stance\n-        // docs/knowledge/why-judgediscovery-judgedecompose-run-a-second-independent-j/judge-verdict-second-pass-semantic-check.md#why-disagreement-parks-instead-of-retrying\n+        // docs/explanation/judge-verdict-second-pass-semantic-check.md\n         // already states for this exact two-judge-disagreement path.\n         //\n         // tsk-12t D6: EXCEPT when `secondPass.mechanical` is true -- that\n",
+      "status": "forward and inverse apply exactly to the inherited owner pin in scratch; no source edit, rebind, runtime replay or semantic acceptance",
+      "coCutCustody": "Use the canonical owner record and receipt for the complete co-cut; Step 7 composes with other source units and Phase 9 executes."
+    },
+    {
+      "file": "src/intake/verify-pattern-check.mjs",
+      "ownerRecord": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-015.jsonl",
+        "recordLine": 4,
+        "recordSha256": "4701448ad13afa58dacf2beb73f382ef65e97b8b961d4eef83ae355f5eb8a40d",
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45"
+      },
+      "sourceSha256": "1cfe3feb6375b999c4b851f6e9ef8fce7b1fb1209a81c29dd0a043939cb69e0c",
+      "expectedAfterSha256": "8a004846080abfff59268cef4c0a7e92f5069460ebd1a8a481e4ddbb59dca562",
+      "mode": "100644",
+      "diff": "--- a/src/intake/verify-pattern-check.mjs\n+++ b/src/intake/verify-pattern-check.mjs\n@@ -18,7 +18,7 @@\n \n // tsk-12t D1/D2/D4: mechanical pre-check for the documented `node --test`/\n // `--test-name-pattern` reporter-format trap\n-// (docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md) --\n+// (docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md#the-trap) --\n // Node's default reporter never prints a TAP-style `# pass`/`# fail` line,\n // so a verify grepping for that shape can never correctly detect pass/fail\n // regardless of what the tested code does. Gated on BOTH the wrong-reporter\n",
+      "rollbackDiff": "--- a/src/intake/verify-pattern-check.mjs\n+++ b/src/intake/verify-pattern-check.mjs\n@@ -18,7 +18,7 @@\n \n // tsk-12t D1/D2/D4: mechanical pre-check for the documented `node --test`/\n // `--test-name-pattern` reporter-format trap\n-// (docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md#the-trap) --\n+// (docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md) --\n // Node's default reporter never prints a TAP-style `# pass`/`# fail` line,\n // so a verify grepping for that shape can never correctly detect pass/fail\n // regardless of what the tested code does. Gated on BOTH the wrong-reporter\n",
+      "status": "forward and inverse apply exactly to the inherited owner pin in scratch; no source edit, rebind, runtime replay or semantic acceptance",
+      "coCutCustody": "Use the canonical owner record and receipt for the complete co-cut; Step 7 composes with other source units and Phase 9 executes."
+    },
+    {
+      "file": "src/runner/dispatch/confinement/authority.mjs",
+      "ownerRecord": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-023.jsonl",
+        "recordLine": 2,
+        "recordSha256": "b1a138ae8f52fe9a0722f9bddc60bae7fdad4c3532fda03352234e5d36c5610f",
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45"
+      },
+      "sourceSha256": "e618d5997f85e200c50f6459c43f08f31852bbd6cefb6c27c128c4e845c78709",
+      "expectedAfterSha256": "acaecdaefaf9726185e4281ef8b356acbd45f14cd7fa7ea01459f4a2dd858389",
+      "mode": "100644",
+      "diff": "--- a/src/runner/dispatch/confinement/authority.mjs\n+++ b/src/runner/dispatch/confinement/authority.mjs\n@@ -1,5 +1,5 @@\n // authority.mjs — Agent Confinement Authority runtime execution door\n-// (Phase 02 R1-R7, docs/specs/confinement-authority.md §1, §5.2, §6.6, §6.9).\n+// (Phase 02 R1-R7, docs/platform/agent-confinement/spec.md §1, §5.2; docs/platform/agent-confinement/contracts/confinement-authority-v1.md#6-canonical-contracts §6.6, §6.9).\n \n import crypto from \"node:crypto\";\n import path from \"node:path\";\n",
+      "rollbackDiff": "--- a/src/runner/dispatch/confinement/authority.mjs\n+++ b/src/runner/dispatch/confinement/authority.mjs\n@@ -1,5 +1,5 @@\n // authority.mjs — Agent Confinement Authority runtime execution door\n-// (Phase 02 R1-R7, docs/platform/agent-confinement/spec.md §1, §5.2; docs/platform/agent-confinement/contracts/confinement-authority-v1.md#6-canonical-contracts §6.6, §6.9).\n+// (Phase 02 R1-R7, docs/specs/confinement-authority.md §1, §5.2, §6.6, §6.9).\n \n import crypto from \"node:crypto\";\n import path from \"node:path\";\n",
+      "status": "forward and inverse apply exactly to the inherited owner pin in scratch; no source edit, rebind, runtime replay or semantic acceptance",
+      "coCutCustody": "Use the canonical owner record and receipt for the complete co-cut; Step 7 composes with other source units and Phase 9 executes."
+    },
+    {
+      "file": "src/runner/dispatch/confinement/backend-registry.mjs",
+      "ownerRecord": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-023.jsonl",
+        "recordLine": 3,
+        "recordSha256": "b1a138ae8f52fe9a0722f9bddc60bae7fdad4c3532fda03352234e5d36c5610f",
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45"
+      },
+      "sourceSha256": "8c07146b675d4ad1086c88685de4a521c7004bc00de39e20d2dbb99d96bfa1ff",
+      "expectedAfterSha256": "91e15d2902b8fa8fcf0087b69de714b6651f906713ebf2969b18e0644993d7cd",
+      "mode": "100644",
+      "diff": "--- a/src/runner/dispatch/confinement/backend-registry.mjs\n+++ b/src/runner/dispatch/confinement/backend-registry.mjs\n@@ -1,5 +1,5 @@\n // backend-registry.mjs — machine backend registry loader and schema validator\n-// for confinement-backend-registry.v1 (Phase 01 R5, docs/specs/confinement-authority.md §6.2-§6.2.1).\n+// for confinement-backend-registry.v1 (Phase 01 R5, docs/platform/agent-confinement/contracts/confinement-authority-v1.md#62-nơi-đặt-policy §6.2-§6.2.1).\n //\n // Machine backend instances represent deployment configurations on this machine.\n // Project-local configs are forbidden from defining or overriding `confinementBackends`\n",
+      "rollbackDiff": "--- a/src/runner/dispatch/confinement/backend-registry.mjs\n+++ b/src/runner/dispatch/confinement/backend-registry.mjs\n@@ -1,5 +1,5 @@\n // backend-registry.mjs — machine backend registry loader and schema validator\n-// for confinement-backend-registry.v1 (Phase 01 R5, docs/platform/agent-confinement/contracts/confinement-authority-v1.md#62-nơi-đặt-policy §6.2-§6.2.1).\n+// for confinement-backend-registry.v1 (Phase 01 R5, docs/specs/confinement-authority.md §6.2-§6.2.1).\n //\n // Machine backend instances represent deployment configurations on this machine.\n // Project-local configs are forbidden from defining or overriding `confinementBackends`\n",
+      "status": "forward and inverse apply exactly to the inherited owner pin in scratch; no source edit, rebind, runtime replay or semantic acceptance",
+      "coCutCustody": "Use the canonical owner record and receipt for the complete co-cut; Step 7 composes with other source units and Phase 9 executes."
+    },
+    {
+      "file": "src/runner/dispatch/confinement/policies.mjs",
+      "ownerRecord": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-023.jsonl",
+        "recordLine": 4,
+        "recordSha256": "b1a138ae8f52fe9a0722f9bddc60bae7fdad4c3532fda03352234e5d36c5610f",
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45"
+      },
+      "sourceSha256": "cc531111c8fc233ca9557d5ba89ab119ad3c4870145dc9ffcc865fcd87599d1f",
+      "expectedAfterSha256": "2833a67f2057b5aaa9629f12b68ec9064095a31745e43d669ece01532d58bb23",
+      "mode": "100644",
+      "diff": "--- a/src/runner/dispatch/confinement/policies.mjs\n+++ b/src/runner/dispatch/confinement/policies.mjs\n@@ -1,5 +1,5 @@\n // policies.mjs — canonical confinement policy vocabulary, built-ins,\n-// validation, and legacy normalization (Phase 01 R1-R4, docs/specs/confinement-authority.md §6.1-§6.2).\n+// validation, and legacy normalization (Phase 01 R1-R4, docs/platform/agent-confinement/contracts/confinement-authority-v1.md#6-canonical-contracts §6.1-§6.2).\n //\n // Spec is the single source of truth for shapes; this module implements:\n //   - BUILTIN_POLICIES: immutable definitions for `host-write-denied` and `workspace-write`\n",
+      "rollbackDiff": "--- a/src/runner/dispatch/confinement/policies.mjs\n+++ b/src/runner/dispatch/confinement/policies.mjs\n@@ -1,5 +1,5 @@\n // policies.mjs — canonical confinement policy vocabulary, built-ins,\n-// validation, and legacy normalization (Phase 01 R1-R4, docs/platform/agent-confinement/contracts/confinement-authority-v1.md#6-canonical-contracts §6.1-§6.2).\n+// validation, and legacy normalization (Phase 01 R1-R4, docs/specs/confinement-authority.md §6.1-§6.2).\n //\n // Spec is the single source of truth for shapes; this module implements:\n //   - BUILTIN_POLICIES: immutable definitions for `host-write-denied` and `workspace-write`\n",
+      "status": "forward and inverse apply exactly to the inherited owner pin in scratch; no source edit, rebind, runtime replay or semantic acceptance",
+      "coCutCustody": "Use the canonical owner record and receipt for the complete co-cut; Step 7 composes with other source units and Phase 9 executes."
+    },
+    {
+      "file": "src/runner/dispatch/confinement/request.mjs",
+      "ownerRecord": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-023.jsonl",
+        "recordLine": 5,
+        "recordSha256": "b1a138ae8f52fe9a0722f9bddc60bae7fdad4c3532fda03352234e5d36c5610f",
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45"
+      },
+      "sourceSha256": "aba50726b489db9763742539c462cf269461943576472c71e84d2d7fe248f185",
+      "expectedAfterSha256": "bc482597e942044773334ccd6233db827f342fb77750a8d8229e04b8d3ab9964",
+      "mode": "100644",
+      "diff": "--- a/src/runner/dispatch/confinement/request.mjs\n+++ b/src/runner/dispatch/confinement/request.mjs\n@@ -1,5 +1,5 @@\n // request.mjs — Confinement Authority request construction and validation\n-// (Phase 02 R1-R2, docs/specs/confinement-authority.md §6.4, §6.10).\n+// (Phase 02 R1-R2, docs/platform/agent-confinement/contracts/confinement-authority-v1.md#6-canonical-contracts §6.4, §6.10).\n \n import fs from \"node:fs\";\n import path from \"node:path\";\n",
+      "rollbackDiff": "--- a/src/runner/dispatch/confinement/request.mjs\n+++ b/src/runner/dispatch/confinement/request.mjs\n@@ -1,5 +1,5 @@\n // request.mjs — Confinement Authority request construction and validation\n-// (Phase 02 R1-R2, docs/platform/agent-confinement/contracts/confinement-authority-v1.md#6-canonical-contracts §6.4, §6.10).\n+// (Phase 02 R1-R2, docs/specs/confinement-authority.md §6.4, §6.10).\n \n import fs from \"node:fs\";\n import path from \"node:path\";\n",
+      "status": "forward and inverse apply exactly to the inherited owner pin in scratch; no source edit, rebind, runtime replay or semantic acceptance",
+      "coCutCustody": "Use the canonical owner record and receipt for the complete co-cut; Step 7 composes with other source units and Phase 9 executes."
+    },
+    {
+      "file": "src/runner/dispatch/herdr-round.mjs",
+      "ownerRecord": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-023.jsonl",
+        "recordLine": 7,
+        "recordSha256": "b1a138ae8f52fe9a0722f9bddc60bae7fdad4c3532fda03352234e5d36c5610f",
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45"
+      },
+      "sourceSha256": "d964dcab21c72000fa01f4c37bc0a70f0124cc0812e4a94742f355f5b2fb0a20",
+      "expectedAfterSha256": "1276a8f95036f26ce42aecc65fde3b97d14ebace750a8bc196fb7228daffecfa",
+      "mode": "100644",
+      "diff": "--- a/src/runner/dispatch/herdr-round.mjs\n+++ b/src/runner/dispatch/herdr-round.mjs\n@@ -5,7 +5,7 @@\n // terminal-control port allocates for the attempt's key) and hands the attempt over; everything after the\n // handover -- starting the agent in the pane, waiting for its prompt, typing the brief, watching the\n // outbox, the deadlines, ending the agent, settling and releasing the pane -- belongs to the supervisor\n-// and the gate, which keep going when this process is gone (docs/specs/runner.md).\n+// and the gate, which keep going when this process is gone (docs/platform/run-supervisor/spec.md).\n //\n // Three refusals shaped what stays here, each because doing the opposite failed in measured production:\n //\n",
+      "rollbackDiff": "--- a/src/runner/dispatch/herdr-round.mjs\n+++ b/src/runner/dispatch/herdr-round.mjs\n@@ -5,7 +5,7 @@\n // terminal-control port allocates for the attempt's key) and hands the attempt over; everything after the\n // handover -- starting the agent in the pane, waiting for its prompt, typing the brief, watching the\n // outbox, the deadlines, ending the agent, settling and releasing the pane -- belongs to the supervisor\n-// and the gate, which keep going when this process is gone (docs/platform/run-supervisor/spec.md).\n+// and the gate, which keep going when this process is gone (docs/specs/runner.md).\n //\n // Three refusals shaped what stays here, each because doing the opposite failed in measured production:\n //\n",
+      "status": "forward and inverse apply exactly to the inherited owner pin in scratch; no source edit, rebind, runtime replay or semantic acceptance",
+      "coCutCustody": "Use the canonical owner record and receipt for the complete co-cut; Step 7 composes with other source units and Phase 9 executes."
+    },
+    {
+      "file": "src/runner/dispatch/run-lock.mjs",
+      "ownerRecord": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-024.jsonl",
+        "recordLine": 2,
+        "recordSha256": "f2019c8c639cb0bd084ceff6818331585d707a905bad6290d8e5e59fb79318ae",
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45"
+      },
+      "sourceSha256": "4fe905899159baa52755203570a56efd376deb5262cbd6d0ee0a88cfd1c287e6",
+      "expectedAfterSha256": "9d8a3cf2640e775be07bcb3ca988d7289caff00c1a1cb06e2600759cf0552375",
+      "mode": "100644",
+      "diff": "--- a/src/runner/dispatch/run-lock.mjs\n+++ b/src/runner/dispatch/run-lock.mjs\n@@ -2,7 +2,7 @@\n // primitive this cell introduces, per\n // plans/260911-2305-runtime-recovery/phase-designs/run-admission-and-fencing.md\n // (\"Lock Protocol\") and\n-// docs/architect/agent-coordination/architecture/runtime-recovery-design.md\n+// docs/platform/agent-coordination/architecture/runtime-recovery-design.md#6-local-concurrency-and-durability\n // section 6 (\"Local Concurrency And Durability\").\n //\n // Shared by three callers: Assignment/Run admission (assignment-runner.mjs),\n",
+      "rollbackDiff": "--- a/src/runner/dispatch/run-lock.mjs\n+++ b/src/runner/dispatch/run-lock.mjs\n@@ -2,7 +2,7 @@\n // primitive this cell introduces, per\n // plans/260911-2305-runtime-recovery/phase-designs/run-admission-and-fencing.md\n // (\"Lock Protocol\") and\n-// docs/platform/agent-coordination/architecture/runtime-recovery-design.md#6-local-concurrency-and-durability\n+// docs/architect/agent-coordination/architecture/runtime-recovery-design.md\n // section 6 (\"Local Concurrency And Durability\").\n //\n // Shared by three callers: Assignment/Run admission (assignment-runner.mjs),\n",
+      "status": "forward and inverse apply exactly to the inherited owner pin in scratch; no source edit, rebind, runtime replay or semantic acceptance",
+      "coCutCustody": "Use the canonical owner record and receipt for the complete co-cut; Step 7 composes with other source units and Phase 9 executes."
+    },
+    {
+      "file": "src/runner/dispatch/transport.mjs",
+      "ownerRecord": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-024.jsonl",
+        "recordLine": 3,
+        "recordSha256": "f2019c8c639cb0bd084ceff6818331585d707a905bad6290d8e5e59fb79318ae",
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45"
+      },
+      "sourceSha256": "cc3af74ca5969fb9089c26c602d0c22bcac4ea73073c7b2986f81230b2f68b71",
+      "expectedAfterSha256": "21c4fe5a48bb48290f3993e82e4386a28262c671a8fe5010a33b7ea70ca134dc",
+      "mode": "100644",
+      "diff": "--- a/src/runner/dispatch/transport.mjs\n+++ b/src/runner/dispatch/transport.mjs\n@@ -633,7 +633,7 @@\n  * confinement authority know what a herdr seat is (a pane a person can watch, a prepared exact\n  * invocation, a receipt), but it is never run through `execute`: an interactive agent runs as a\n  * `terminal` attempt of the run supervisor (`executeAssignment`, which prepares the brief, the pane\n- * and the folder-trust entry and hands the attempt over; docs/specs/runner.md). A caller that reaches\n+ * and the folder-trust entry and hands the attempt over; docs/platform/run-supervisor/spec.md). A caller that reaches\n  * this function directly has no attempt to hand over and is refused by name.\n  */\n /**\n",
+      "rollbackDiff": "--- a/src/runner/dispatch/transport.mjs\n+++ b/src/runner/dispatch/transport.mjs\n@@ -633,7 +633,7 @@\n  * confinement authority know what a herdr seat is (a pane a person can watch, a prepared exact\n  * invocation, a receipt), but it is never run through `execute`: an interactive agent runs as a\n  * `terminal` attempt of the run supervisor (`executeAssignment`, which prepares the brief, the pane\n- * and the folder-trust entry and hands the attempt over; docs/platform/run-supervisor/spec.md). A caller that reaches\n+ * and the folder-trust entry and hands the attempt over; docs/specs/runner.md). A caller that reaches\n  * this function directly has no attempt to hand over and is refused by name.\n  */\n /**\n",
+      "status": "forward and inverse apply exactly to the inherited owner pin in scratch; no source edit, rebind, runtime replay or semantic acceptance",
+      "coCutCustody": "Use the canonical owner record and receipt for the complete co-cut; Step 7 composes with other source units and Phase 9 executes."
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "ownerRecord": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-025.jsonl",
+        "recordLine": 1,
+        "recordSha256": "164be32089036bab3177b993ab38db740650653c18d9c3137a740c37798e7fb0",
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45"
+      },
+      "sourceSha256": "8ccdb5441f10f806a1753d47394b4c74c655d02c5c7a03f7a1af56ce08024eb4",
+      "expectedAfterSha256": "2eba6340fabda426a41a52199b51266af607cdba40ffc137a1a643ad0a0c4ca1",
+      "mode": "100644",
+      "diff": "--- a/src/runner/merge.mjs\n+++ b/src/runner/merge.mjs\n@@ -390,7 +390,7 @@\n \n // DECISION-ID COLLISION AUTO-RESOLVE (tsk-3mv-1, CONTEXT.md D1a): a\n // content-agnostic conflict shape, proven real on `tsk-66l`\n-// (docs/how-to/resolve-a-decision-id-collision-merge-conflict-on-approve.md)\n+// (docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md#before-you-start)\n // -- two branches independently pick the same \"next free\" decision-record\n // id and both insert a row for it into `docs/decisions/0000-index.md` at\n // the same position. `classifyDecisionIndexCollision` below only ever\n@@ -673,8 +673,8 @@\n // reading `.fgos/events.jsonl`, which a worktree never carries in the\n // first place (ADR0020) -- so no branch can produce a *meaningful*\n // regenerated version to collide over via `mergeRunnerItem` for a normal,\n-// well-formed regenerate. Cross-checked against `docs/how-to/fix-fgos-\n-// write-rejected-merge-block.md`'s own documented precedent (tsk-n4i-1/\n+// well-formed regenerate. Cross-checked against `docs/knowledge/how-\n+// to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md`'s own documented precedent (tsk-n4i-1/\n // tsk-5vf/tsk-4eu/tsk-5ge/tsk-28o/tsk-3v2 -- six independent real\n // occurrences of the SAME `.fgos/`-staged wall, a different scenario from\n // this one).\n@@ -924,7 +924,7 @@\n   // dozen lines below — ADR0020 guarantees a worker branch can NEVER\n   // legitimately reflect main's live .fgos/ content, union-declared or\n   // not, so a branch-side .fgos/ diff (e.g. the documented recovery in\n-  // docs/how-to/fix-fgos-write-rejected-merge-block.md: restoring .fgos/\n+  // docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md#example-tsk-3v2-the-block-triggers-from-merging-main-in-not-from-your-own-commit: restoring .fgos/\n   // paths to the branch's own frozen pre-merge versions) is never real\n   // discarded content, just an expected, permanent divergence from HEAD.\n   // Rename detection stays on here (a rename names only its new path): a branch that renamed\n@@ -1363,7 +1363,7 @@\n     //\n     // tsk-3tp (fix, review r1): `.fgos` only ever exists under `lockRoot`\n     // (ADR0020 strips it from every ephemeral worktree — see\n-    // `docs/explanation/why-mergerunneritem-takes-a-separate-lockroot-param.md`),\n+    // `docs/knowledge/why-mergerunneritem-takes-a-separate-lockroot-param/why-mergerunneritem-takes-a-separate-lockroot-param.md#the-fix-a-separate-lockroot-parameter`),\n     // so both the pathspec base AND the git-command cwd below must be\n     // `lockRoot`, not `repoRoot` — mirroring the checkpoint at the start of\n     // `mergeRunnerItem`, which already got this right. Resolving/running against `repoRoot` instead made this block\n",
+      "rollbackDiff": "--- a/src/runner/merge.mjs\n+++ b/src/runner/merge.mjs\n@@ -390,7 +390,7 @@\n \n // DECISION-ID COLLISION AUTO-RESOLVE (tsk-3mv-1, CONTEXT.md D1a): a\n // content-agnostic conflict shape, proven real on `tsk-66l`\n-// (docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md#before-you-start)\n+// (docs/how-to/resolve-a-decision-id-collision-merge-conflict-on-approve.md)\n // -- two branches independently pick the same \"next free\" decision-record\n // id and both insert a row for it into `docs/decisions/0000-index.md` at\n // the same position. `classifyDecisionIndexCollision` below only ever\n@@ -673,8 +673,8 @@\n // reading `.fgos/events.jsonl`, which a worktree never carries in the\n // first place (ADR0020) -- so no branch can produce a *meaningful*\n // regenerated version to collide over via `mergeRunnerItem` for a normal,\n-// well-formed regenerate. Cross-checked against `docs/knowledge/how-\n-// to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md`'s own documented precedent (tsk-n4i-1/\n+// well-formed regenerate. Cross-checked against `docs/how-to/fix-fgos-\n+// write-rejected-merge-block.md`'s own documented precedent (tsk-n4i-1/\n // tsk-5vf/tsk-4eu/tsk-5ge/tsk-28o/tsk-3v2 -- six independent real\n // occurrences of the SAME `.fgos/`-staged wall, a different scenario from\n // this one).\n@@ -924,7 +924,7 @@\n   // dozen lines below — ADR0020 guarantees a worker branch can NEVER\n   // legitimately reflect main's live .fgos/ content, union-declared or\n   // not, so a branch-side .fgos/ diff (e.g. the documented recovery in\n-  // docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md#example-tsk-3v2-the-block-triggers-from-merging-main-in-not-from-your-own-commit: restoring .fgos/\n+  // docs/how-to/fix-fgos-write-rejected-merge-block.md: restoring .fgos/\n   // paths to the branch's own frozen pre-merge versions) is never real\n   // discarded content, just an expected, permanent divergence from HEAD.\n   // Rename detection stays on here (a rename names only its new path): a branch that renamed\n@@ -1363,7 +1363,7 @@\n     //\n     // tsk-3tp (fix, review r1): `.fgos` only ever exists under `lockRoot`\n     // (ADR0020 strips it from every ephemeral worktree — see\n-    // `docs/knowledge/why-mergerunneritem-takes-a-separate-lockroot-param/why-mergerunneritem-takes-a-separate-lockroot-param.md#the-fix-a-separate-lockroot-parameter`),\n+    // `docs/explanation/why-mergerunneritem-takes-a-separate-lockroot-param.md`),\n     // so both the pathspec base AND the git-command cwd below must be\n     // `lockRoot`, not `repoRoot` — mirroring the checkpoint at the start of\n     // `mergeRunnerItem`, which already got this right. Resolving/running against `repoRoot` instead made this block\n",
+      "status": "forward and inverse apply exactly to the inherited owner pin in scratch; no source edit, rebind, runtime replay or semantic acceptance",
+      "coCutCustody": "Use the canonical owner record and receipt for the complete co-cut; Step 7 composes with other source units and Phase 9 executes."
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "ownerRecord": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-025.jsonl",
+        "recordLine": 6,
+        "recordSha256": "164be32089036bab3177b993ab38db740650653c18d9c3137a740c37798e7fb0",
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45"
+      },
+      "sourceSha256": "c99b08a8ba3c0b597223b28d2aeaa4616d533f59da9fefed512815d81f58848d",
+      "expectedAfterSha256": "0b8ad00f07b14665007e119c3c9e1f1e630e5385f0eb1058465d00b0a3801b4f",
+      "mode": "100644",
+      "diff": "--- a/src/runner/worktree.mjs\n+++ b/src/runner/worktree.mjs\n@@ -753,7 +753,7 @@\n  * `opts.baseRef` (default: `detectTrunk(repoRoot)`, tsk-386 — no longer a\n  * literal `'main'`; a host project whose trunk is `master` would otherwise\n  * fail `git branch fgw/<id> main` outright on this fallback, per\n- * `docs/distribution-vision.md`'s \"installed into other repos\" story).\n+ * `docs/platform/git/spec.md#7-hardened-git-backend-parsers-and-hook-contract`'s \"No hardcoded trunk\" contract).\n  * Idempotent: if `fgw/<id>` already exists, this is a no-op — it does NOT\n  * move the branch to `baseRef`, mirroring the RETRY-WITHOUT-SELF-COLLISION\n  * discipline above (a retried root-dispatch must not disturb a branch that\n@@ -1048,7 +1048,7 @@\n  * current tip (`git merge-base --is-ancestor` — no commit would be lost),\n  * and the worktree has no real uncommitted changes relative to that same\n  * last-synced commit. Refuses loudly otherwise — never resets blind, the\n- * same discipline `docs/how-to/safely-reset-the-main-checkout.md` already\n+ * same discipline `docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md#before-you-start` already\n  * documents for the main checkout, applied here to a claim worktree\n  * instead (a different protected target — this stays its own guard, not a\n  * reuse of `main-checkout-reset-guard.mjs`). A worktree already at its\n",
+      "rollbackDiff": "--- a/src/runner/worktree.mjs\n+++ b/src/runner/worktree.mjs\n@@ -753,7 +753,7 @@\n  * `opts.baseRef` (default: `detectTrunk(repoRoot)`, tsk-386 — no longer a\n  * literal `'main'`; a host project whose trunk is `master` would otherwise\n  * fail `git branch fgw/<id> main` outright on this fallback, per\n- * `docs/platform/git/spec.md#7-hardened-git-backend-parsers-and-hook-contract`'s \"No hardcoded trunk\" contract).\n+ * `docs/distribution-vision.md`'s \"installed into other repos\" story).\n  * Idempotent: if `fgw/<id>` already exists, this is a no-op — it does NOT\n  * move the branch to `baseRef`, mirroring the RETRY-WITHOUT-SELF-COLLISION\n  * discipline above (a retried root-dispatch must not disturb a branch that\n@@ -1048,7 +1048,7 @@\n  * current tip (`git merge-base --is-ancestor` — no commit would be lost),\n  * and the worktree has no real uncommitted changes relative to that same\n  * last-synced commit. Refuses loudly otherwise — never resets blind, the\n- * same discipline `docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md#before-you-start` already\n+ * same discipline `docs/how-to/safely-reset-the-main-checkout.md` already\n  * documents for the main checkout, applied here to a claim worktree\n  * instead (a different protected target — this stays its own guard, not a\n  * reuse of `main-checkout-reset-guard.mjs`). A worktree already at its\n",
+      "status": "forward and inverse apply exactly to the inherited owner pin in scratch; no source edit, rebind, runtime replay or semantic acceptance",
+      "coCutCustody": "Use the canonical owner record and receipt for the complete co-cut; Step 7 composes with other source units and Phase 9 executes."
+    },
+    {
+      "file": "src/state/gate-bypass.mjs",
+      "ownerRecord": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
+        "recordLine": 8,
+        "recordSha256": "c1256c92c1e0cd9ffb5b45c132257e973180c8046369eb53a28d49feda3b0dbf",
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45"
+      },
+      "sourceSha256": "723e40beb662fb094a4ee832fa0755cfc554d01c7623cf411eeda1092e9247b8",
+      "expectedAfterSha256": "ef1631612d349cc5ff25ad10523a84585580905a0b24e2d59f356a480cce5280",
+      "mode": "100644",
+      "diff": "--- a/src/state/gate-bypass.mjs\n+++ b/src/state/gate-bypass.mjs\n@@ -165,7 +165,7 @@\n   // - Negated prose (\"no auth/audit risk applies here\") still hard-gates —\n   //   accepted, because teaching the floor to parse negation would turn it\n   //   from mechanical/lexical into an interpretive read, exactly what its own\n-  //   design principle (docs/explanation/gate-bypass-design.md) exists to prevent.\n+  //   design principle (docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md#why-the-skip-criterion-is-mechanical-not-a-confidence-read) exists to prevent.\n   const hardGateHit = HEAVY_KEYWORDS.some((keyword) => matchesKeyword(haystack, keyword));\n   if (hardGateHit) return false;\n \n",
+      "rollbackDiff": "--- a/src/state/gate-bypass.mjs\n+++ b/src/state/gate-bypass.mjs\n@@ -165,7 +165,7 @@\n   // - Negated prose (\"no auth/audit risk applies here\") still hard-gates —\n   //   accepted, because teaching the floor to parse negation would turn it\n   //   from mechanical/lexical into an interpretive read, exactly what its own\n-  //   design principle (docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md#why-the-skip-criterion-is-mechanical-not-a-confidence-read) exists to prevent.\n+  //   design principle (docs/explanation/gate-bypass-design.md) exists to prevent.\n   const hardGateHit = HEAVY_KEYWORDS.some((keyword) => matchesKeyword(haystack, keyword));\n   if (hardGateHit) return false;\n \n",
+      "status": "forward and inverse apply exactly to the inherited owner pin in scratch; no source edit, rebind, runtime replay or semantic acceptance",
+      "coCutCustody": "Use the canonical owner record and receipt for the complete co-cut; Step 7 composes with other source units and Phase 9 executes."
+    },
+    {
+      "file": "src/state/priority-formula.mjs",
+      "ownerRecord": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
+        "recordLine": 13,
+        "recordSha256": "c1256c92c1e0cd9ffb5b45c132257e973180c8046369eb53a28d49feda3b0dbf",
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45"
+      },
+      "sourceSha256": "5a1767b93f0155567472eb059899aa993a147ecc0e0aaf75dafe8e93da72d6fe",
+      "expectedAfterSha256": "5ad341b4675045cf7872c796da7ba2b5fc8b3fa68382d7c021509c29619c38b7",
+      "mode": "100644",
+      "diff": "--- a/src/state/priority-formula.mjs\n+++ b/src/state/priority-formula.mjs\n@@ -36,7 +36,7 @@\n   return RISK_DISCOUNTS[risk] ?? RISK_DISCOUNTS.standard;\n }\n \n-// tsk-4hb: `risk` is free text (Data Dictionary #6, docs/specs/work-state.md),\n+// tsk-4hb: `risk` is free text (Data Dictionary #6, docs/platform/work-state/spec.md#3-work-item-data-dictionary),\n // so a value outside RISK_DISCOUNTS is spec-legal, not a data error --\n // discountForRisk's own `?? standard` fallback cannot tell \"absent\" (a\n // legitimate default) apart from \"present but unrecognized\" (silently\n",
+      "rollbackDiff": "--- a/src/state/priority-formula.mjs\n+++ b/src/state/priority-formula.mjs\n@@ -36,7 +36,7 @@\n   return RISK_DISCOUNTS[risk] ?? RISK_DISCOUNTS.standard;\n }\n \n-// tsk-4hb: `risk` is free text (Data Dictionary #6, docs/platform/work-state/spec.md#3-work-item-data-dictionary),\n+// tsk-4hb: `risk` is free text (Data Dictionary #6, docs/specs/work-state.md),\n // so a value outside RISK_DISCOUNTS is spec-legal, not a data error --\n // discountForRisk's own `?? standard` fallback cannot tell \"absent\" (a\n // legitimate default) apart from \"present but unrecognized\" (silently\n",
+      "status": "forward and inverse apply exactly to the inherited owner pin in scratch; no source edit, rebind, runtime replay or semantic acceptance",
+      "coCutCustody": "Use the canonical owner record and receipt for the complete co-cut; Step 7 composes with other source units and Phase 9 executes."
+    },
+    {
+      "file": "src/state/replay.mjs",
+      "ownerRecord": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-026.jsonl",
+        "recordLine": 14,
+        "recordSha256": "c1256c92c1e0cd9ffb5b45c132257e973180c8046369eb53a28d49feda3b0dbf",
+        "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45"
+      },
+      "sourceSha256": "6fbdd0bd9867118cf3ce086ed45a6e3e9a6c61bcc5f99a086d86440be4f0d673",
+      "expectedAfterSha256": "d707a4628ead59ebaa779790fb30a8772853fc20e759616d05b3f3467718d547",
+      "mode": "100644",
+      "diff": "--- a/src/state/replay.mjs\n+++ b/src/state/replay.mjs\n@@ -502,7 +502,7 @@\n       // this stays a plain forward fold over data the log ALREADY carries.\n       //\n       // Deliberately not `to !== 'exploring'`: that reads the arrival edge,\n-      // which RUL27 (`docs/specs/work-state.md`) locks against precisely so\n+      // which RUL27 (`docs/platform/work-state/spec.md#11-business-rules`) locks against precisely so\n       // inserting a stage in the middle cannot silence an existing\n       // settlement — and it would retroactively silence every real\n       // `discovery -> exploring` settlement in this repo's own live log (all\n",
+      "rollbackDiff": "--- a/src/state/replay.mjs\n+++ b/src/state/replay.mjs\n@@ -502,7 +502,7 @@\n       // this stays a plain forward fold over data the log ALREADY carries.\n       //\n       // Deliberately not `to !== 'exploring'`: that reads the arrival edge,\n-      // which RUL27 (`docs/platform/work-state/spec.md#11-business-rules`) locks against precisely so\n+      // which RUL27 (`docs/specs/work-state.md`) locks against precisely so\n       // inserting a stage in the middle cannot silence an existing\n       // settlement — and it would retroactively silence every real\n       // `discovery -> exploring` settlement in this repo's own live log (all\n",
+      "status": "forward and inverse apply exactly to the inherited owner pin in scratch; no source edit, rebind, runtime replay or semantic acceptance",
+      "coCutCustody": "Use the canonical owner record and receipt for the complete co-cut; Step 7 composes with other source units and Phase 9 executes."
+    }
+  ],
+  "newPhysicalPatchFiles": 0,
+  "status": "Inherited owner-pin integrity only; source/test replays and final-pin composition remain pending."
+}

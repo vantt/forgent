@@ -1,0 +1,859 @@
+{
+  "count": 25,
+  "carries": [
+    {
+      "original": {
+        "inventory": "step-02-dynamic-unresolved.json",
+        "file": ".fgos/**; ignored/external instructions",
+        "carry": {
+          "id": "external-state",
+          "path": ".fgos/**; ignored/external instructions",
+          "expression": "live writer/read destinations",
+          "status": "unresolved / remaining class",
+          "reason": "Not read; separately authorized read-only export required",
+          "owner": "Lead / next bounded census slice"
+        },
+        "seam": "runtime-defaults-dynamic"
+      },
+      "currentSourceDispositions": [
+        {
+          "file": ".fgos/**; ignored/external instructions",
+          "disposition": "parked",
+          "dependency": "Authorized redacted consumer-edge export of ignored/external instruction files, preserving origin and document-path construction without reading live .fgos state."
+        }
+      ],
+      "replacementSourceSlot": null,
+      "interpretation": "Immutable carry snapshot retained. Current R5/R16/source-owner disposition governs this exact site; an old unresolved question never supersedes a later settled owner or admits an alias writer."
+    },
+    {
+      "original": {
+        "inventory": "step-02b-dynamic-unresolved.json",
+        "file": "AGENTS.md",
+        "carry": {
+          "edgeId": "instructions-007",
+          "consumerPath": "AGENTS.md",
+          "line": 14,
+          "matchedExpression": "docs/specs/<area>.md",
+          "reason": "Generic docs/specs authoring scope needs a reviewed whole-sentence cutover patch against the explicit area-owner map; no universal docs/platform/<area>/spec.md substitution. Concrete future writer population not enumerated.",
+          "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+          "preCutoverAction": "preserve"
+        },
+        "seam": "runtime-defaults-dynamic"
+      },
+      "currentSourceDispositions": [
+        {
+          "file": "AGENTS.md",
+          "id": "reference-000123",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "ownerJoin": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+            "recordLine": 1,
+            "recordSha256": "312030bb7345c15553065787f1fcfe6bf8c53bfac883dcffc87b5ca324a56c86",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "edgeId": "instructions-007",
+            "slotKey": "{\"edgeId\":\"instructions-007\",\"file\":\"AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-007\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":14}]}",
+            "disposition": "parked",
+            "sourceSha256": "7100231ae81a24ba491542a5564d8413d778208772d2a756a42e3e91725578cf",
+            "sourceSpans": [
+              {
+                "line": 14,
+                "columnStart": 126,
+                "columnEndExclusive": 146,
+                "text": "docs/specs/<area>.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "historicalOnly": false
+        }
+      ],
+      "replacementSourceSlot": null,
+      "interpretation": "Immutable carry snapshot retained. Current R5/R16/source-owner disposition governs this exact site; an old unresolved question never supersedes a later settled owner or admits an alias writer."
+    },
+    {
+      "original": {
+        "inventory": "step-02b-dynamic-unresolved.json",
+        "file": "AGENTS.md",
+        "carry": {
+          "edgeId": "instructions-008",
+          "consumerPath": "AGENTS.md",
+          "line": 17,
+          "matchedExpression": "docs/specs/runner.md",
+          "reason": "Current reference names decision history. Proposed candidate law/runner document has no demonstrated matching D-ADR0030/0035/0054/0062 narrative at this census. Lead Step 3 must assign the actual conserved claim owner after A47; path alias alone cannot prove correspondence.",
+          "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+          "preCutoverAction": "preserve"
+        },
+        "seam": "runtime-defaults-dynamic"
+      },
+      "currentSourceDispositions": [
+        {
+          "file": "AGENTS.md",
+          "id": "reference-000128",
+          "admission": "ADMIT",
+          "disposition": "patch",
+          "ownerJoin": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+            "recordLine": 1,
+            "recordSha256": "312030bb7345c15553065787f1fcfe6bf8c53bfac883dcffc87b5ca324a56c86",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "edgeId": "instructions-008",
+            "slotKey": "{\"edgeId\":\"instructions-008\",\"file\":\"AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-008\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":17}]}",
+            "disposition": "patch",
+            "sourceSha256": "7100231ae81a24ba491542a5564d8413d778208772d2a756a42e3e91725578cf",
+            "sourceSpans": [
+              {
+                "line": 17,
+                "columnStart": 39,
+                "columnEndExclusive": 59,
+                "text": "docs/specs/runner.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "historicalOnly": false
+        }
+      ],
+      "replacementSourceSlot": null,
+      "interpretation": "Immutable carry snapshot retained. Current R5/R16/source-owner disposition governs this exact site; an old unresolved question never supersedes a later settled owner or admits an alias writer."
+    },
+    {
+      "original": {
+        "inventory": "step-02b-dynamic-unresolved.json",
+        "file": "AGENTS.md",
+        "carry": {
+          "edgeId": "instructions-009",
+          "consumerPath": "AGENTS.md",
+          "line": 27,
+          "matchedExpression": "docs/specs/runner.md",
+          "reason": "Current reference names decision history. Proposed candidate law/runner document has no demonstrated matching D-ADR0030/0035/0054/0062 narrative at this census. Lead Step 3 must assign the actual conserved claim owner after A47; path alias alone cannot prove correspondence.",
+          "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+          "preCutoverAction": "preserve"
+        },
+        "seam": "runtime-defaults-dynamic"
+      },
+      "currentSourceDispositions": [
+        {
+          "file": "AGENTS.md",
+          "id": "reference-000129",
+          "admission": "ADMIT",
+          "disposition": "patch",
+          "ownerJoin": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+            "recordLine": 1,
+            "recordSha256": "312030bb7345c15553065787f1fcfe6bf8c53bfac883dcffc87b5ca324a56c86",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "edgeId": "instructions-009",
+            "slotKey": "{\"edgeId\":\"instructions-009\",\"file\":\"AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-009\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":27}]}",
+            "disposition": "patch",
+            "sourceSha256": "7100231ae81a24ba491542a5564d8413d778208772d2a756a42e3e91725578cf",
+            "sourceSpans": [
+              {
+                "line": 27,
+                "columnStart": 60,
+                "columnEndExclusive": 80,
+                "text": "docs/specs/runner.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "historicalOnly": false
+        }
+      ],
+      "replacementSourceSlot": null,
+      "interpretation": "Immutable carry snapshot retained. Current R5/R16/source-owner disposition governs this exact site; an old unresolved question never supersedes a later settled owner or admits an alias writer."
+    },
+    {
+      "original": {
+        "inventory": "step-02b-dynamic-unresolved.json",
+        "file": "AGENTS.md",
+        "carry": {
+          "edgeId": "instructions-010",
+          "consumerPath": "AGENTS.md",
+          "line": 29,
+          "matchedExpression": "docs/specs/platform-foundations.md",
+          "reason": "Current reference names decision history. Proposed candidate law/runner document has no demonstrated matching D-ADR0030/0035/0054/0062 narrative at this census. Lead Step 3 must assign the actual conserved claim owner after A47; path alias alone cannot prove correspondence.",
+          "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+          "preCutoverAction": "preserve"
+        },
+        "seam": "runtime-defaults-dynamic"
+      },
+      "currentSourceDispositions": [
+        {
+          "file": "AGENTS.md",
+          "id": "reference-000130",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "ownerJoin": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+            "recordLine": 1,
+            "recordSha256": "312030bb7345c15553065787f1fcfe6bf8c53bfac883dcffc87b5ca324a56c86",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "edgeId": "instructions-010",
+            "slotKey": "{\"edgeId\":\"instructions-010\",\"file\":\"AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-010\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":29}]}",
+            "disposition": "parked",
+            "sourceSha256": "7100231ae81a24ba491542a5564d8413d778208772d2a756a42e3e91725578cf",
+            "sourceSpans": [
+              {
+                "line": 29,
+                "columnStart": 34,
+                "columnEndExclusive": 68,
+                "text": "docs/specs/platform-foundations.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "historicalOnly": false
+        }
+      ],
+      "replacementSourceSlot": null,
+      "interpretation": "Immutable carry snapshot retained. Current R5/R16/source-owner disposition governs this exact site; an old unresolved question never supersedes a later settled owner or admits an alias writer."
+    },
+    {
+      "original": {
+        "inventory": "step-02b-dynamic-unresolved.json",
+        "file": "AGENTS.md",
+        "carry": {
+          "edgeId": "instructions-011",
+          "consumerPath": "AGENTS.md",
+          "line": 35,
+          "matchedExpression": "docs/specs/platform-foundations.md",
+          "reason": "Current reference names decision history. Proposed candidate law/runner document has no demonstrated matching D-ADR0030/0035/0054/0062 narrative at this census. Lead Step 3 must assign the actual conserved claim owner after A47; path alias alone cannot prove correspondence.",
+          "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+          "preCutoverAction": "preserve"
+        },
+        "seam": "runtime-defaults-dynamic"
+      },
+      "currentSourceDispositions": [
+        {
+          "file": "AGENTS.md",
+          "id": "reference-000135",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "ownerJoin": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+            "recordLine": 1,
+            "recordSha256": "312030bb7345c15553065787f1fcfe6bf8c53bfac883dcffc87b5ca324a56c86",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "edgeId": "instructions-011",
+            "slotKey": "{\"edgeId\":\"instructions-011\",\"file\":\"AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-011\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":35}]}",
+            "disposition": "parked",
+            "sourceSha256": "7100231ae81a24ba491542a5564d8413d778208772d2a756a42e3e91725578cf",
+            "sourceSpans": [
+              {
+                "line": 35,
+                "columnStart": 556,
+                "columnEndExclusive": 590,
+                "text": "docs/specs/platform-foundations.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "historicalOnly": false
+        }
+      ],
+      "replacementSourceSlot": null,
+      "interpretation": "Immutable carry snapshot retained. Current R5/R16/source-owner disposition governs this exact site; an old unresolved question never supersedes a later settled owner or admits an alias writer."
+    },
+    {
+      "original": {
+        "inventory": "step-02b-dynamic-unresolved.json",
+        "file": "AGENTS.md",
+        "carry": {
+          "edgeId": "instructions-013",
+          "consumerPath": "AGENTS.md",
+          "line": 40,
+          "matchedExpression": "docs/specs/",
+          "reason": "Generic docs/specs authoring scope needs a reviewed whole-sentence cutover patch against the explicit area-owner map; no universal docs/platform/<area>/spec.md substitution. Concrete future writer population not enumerated.",
+          "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+          "preCutoverAction": "preserve"
+        },
+        "seam": "runtime-defaults-dynamic"
+      },
+      "currentSourceDispositions": [
+        {
+          "file": "AGENTS.md",
+          "id": "reference-000145",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "ownerJoin": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+            "recordLine": 1,
+            "recordSha256": "312030bb7345c15553065787f1fcfe6bf8c53bfac883dcffc87b5ca324a56c86",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "edgeId": "instructions-013",
+            "slotKey": "{\"edgeId\":\"instructions-013\",\"file\":\"AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-013\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":40}]}",
+            "disposition": "parked",
+            "sourceSha256": "7100231ae81a24ba491542a5564d8413d778208772d2a756a42e3e91725578cf",
+            "sourceSpans": [
+              {
+                "line": 40,
+                "columnStart": 61,
+                "columnEndExclusive": 72,
+                "text": "docs/specs/"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "historicalOnly": false
+        }
+      ],
+      "replacementSourceSlot": null,
+      "interpretation": "Immutable carry snapshot retained. Current R5/R16/source-owner disposition governs this exact site; an old unresolved question never supersedes a later settled owner or admits an alias writer."
+    },
+    {
+      "original": {
+        "inventory": "step-02b-dynamic-unresolved.json",
+        "file": "AGENTS.md",
+        "carry": {
+          "edgeId": "instructions-018",
+          "consumerPath": "AGENTS.md",
+          "line": 71,
+          "matchedExpression": "docs/specs/<area>.md",
+          "reason": "Generic docs/specs authoring scope needs a reviewed whole-sentence cutover patch against the explicit area-owner map; no universal docs/platform/<area>/spec.md substitution. Concrete future writer population not enumerated.",
+          "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+          "preCutoverAction": "preserve"
+        },
+        "seam": "runtime-defaults-dynamic"
+      },
+      "currentSourceDispositions": [
+        {
+          "file": "AGENTS.md",
+          "id": "reference-000151",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "ownerJoin": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+            "recordLine": 1,
+            "recordSha256": "312030bb7345c15553065787f1fcfe6bf8c53bfac883dcffc87b5ca324a56c86",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "edgeId": "instructions-018",
+            "slotKey": "{\"edgeId\":\"instructions-018\",\"file\":\"AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-018\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":71}]}",
+            "disposition": "parked",
+            "sourceSha256": "7100231ae81a24ba491542a5564d8413d778208772d2a756a42e3e91725578cf",
+            "sourceSpans": [
+              {
+                "line": 75,
+                "columnStart": 5,
+                "columnEndExclusive": 25,
+                "text": "docs/specs/<area>.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "historicalOnly": false
+        }
+      ],
+      "replacementSourceSlot": null,
+      "interpretation": "Immutable carry snapshot retained. Current R5/R16/source-owner disposition governs this exact site; an old unresolved question never supersedes a later settled owner or admits an alias writer."
+    },
+    {
+      "original": {
+        "inventory": "step-02b-dynamic-unresolved.json",
+        "file": "AGENTS.md",
+        "carry": {
+          "edgeId": "instructions-023",
+          "consumerPath": "AGENTS.md",
+          "line": 139,
+          "matchedExpression": "docs/specs/platform-foundations.md",
+          "reason": "Current reference names decision history. Proposed candidate law/runner document has no demonstrated matching D-ADR0030/0035/0054/0062 narrative at this census. Lead Step 3 must assign the actual conserved claim owner after A47; path alias alone cannot prove correspondence.",
+          "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+          "preCutoverAction": "preserve"
+        },
+        "seam": "runtime-defaults-dynamic"
+      },
+      "currentSourceDispositions": [
+        {
+          "file": "AGENTS.md",
+          "id": "reference-000126",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "ownerJoin": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+            "recordLine": 1,
+            "recordSha256": "312030bb7345c15553065787f1fcfe6bf8c53bfac883dcffc87b5ca324a56c86",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "edgeId": "instructions-023",
+            "slotKey": "{\"edgeId\":\"instructions-023\",\"file\":\"AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-023\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":139}]}",
+            "disposition": "parked",
+            "sourceSha256": "7100231ae81a24ba491542a5564d8413d778208772d2a756a42e3e91725578cf",
+            "sourceSpans": [
+              {
+                "line": 145,
+                "columnStart": 71,
+                "columnEndExclusive": 105,
+                "text": "docs/specs/platform-foundations.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "historicalOnly": false
+        }
+      ],
+      "replacementSourceSlot": null,
+      "interpretation": "Immutable carry snapshot retained. Current R5/R16/source-owner disposition governs this exact site; an old unresolved question never supersedes a later settled owner or admits an alias writer."
+    },
+    {
+      "original": {
+        "inventory": "step-02b-dynamic-unresolved.json",
+        "file": "AGENTS.md",
+        "carry": {
+          "edgeId": "instructions-024",
+          "consumerPath": "AGENTS.md",
+          "line": 151,
+          "matchedExpression": "docs/specs/platform-foundations.md",
+          "reason": "Current reference names decision history. Proposed candidate law/runner document has no demonstrated matching D-ADR0030/0035/0054/0062 narrative at this census. Lead Step 3 must assign the actual conserved claim owner after A47; path alias alone cannot prove correspondence.",
+          "owner": "Lead / Step 3 semantic mapping or separately authorized live/export parity batch",
+          "preCutoverAction": "preserve"
+        },
+        "seam": "runtime-defaults-dynamic"
+      },
+      "currentSourceDispositions": [
+        {
+          "file": "AGENTS.md",
+          "id": "reference-000127",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "ownerJoin": {
+            "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-04-records/step04-009.jsonl",
+            "recordLine": 1,
+            "recordSha256": "312030bb7345c15553065787f1fcfe6bf8c53bfac883dcffc87b5ca324a56c86",
+            "inputCommit": "dc24ce64527fbffd23e1643f35a7ddf808fd7b45",
+            "edgeId": "instructions-024",
+            "slotKey": "{\"edgeId\":\"instructions-024\",\"file\":\"AGENTS.md\",\"inventoryRefs\":[{\"edgeId\":\"instructions-024\",\"inputCommit\":\"0689b862e8468014f0a08c8b5749ab5aabfc3421\",\"inventory\":\"step-02-census-instructions.json\",\"originalLine\":151}]}",
+            "disposition": "parked",
+            "sourceSha256": "7100231ae81a24ba491542a5564d8413d778208772d2a756a42e3e91725578cf",
+            "sourceSpans": [
+              {
+                "line": 157,
+                "columnStart": 69,
+                "columnEndExclusive": 103,
+                "text": "docs/specs/platform-foundations.md"
+              }
+            ],
+            "reason": "Join the exact prior operation, without rebasing its source or carrying semantic acceptance across digests. Step 7 owns final-pin composition."
+          },
+          "historicalOnly": false
+        }
+      ],
+      "replacementSourceSlot": null,
+      "interpretation": "Immutable carry snapshot retained. Current R5/R16/source-owner disposition governs this exact site; an old unresolved question never supersedes a later settled owner or admits an alias writer."
+    },
+    {
+      "original": {
+        "inventory": "step-02-dynamic-unresolved.json",
+        "file": "bin/fgos.mjs",
+        "carry": {
+          "id": "cli-015",
+          "path": "bin/fgos.mjs",
+          "line": 1530,
+          "expression": "const currentPath = requireField(positional[3] ?? flags['doc-path']",
+          "status": "call site traced; concrete target population unresolved",
+          "reason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+          "owner": "Lead bounded read-only export / Step 5 parity"
+        },
+        "seam": "runtime-defaults-dynamic"
+      },
+      "currentSourceDispositions": [
+        {
+          "file": "bin/fgos.mjs",
+          "id": "reference-000260",
+          "admission": "REJECT",
+          "disposition": "preserve",
+          "ownerJoin": null,
+          "historicalOnly": false
+        }
+      ],
+      "replacementSourceSlot": null,
+      "interpretation": "Immutable carry snapshot retained. Current R5/R16/source-owner disposition governs this exact site; an old unresolved question never supersedes a later settled owner or admits an alias writer."
+    },
+    {
+      "original": {
+        "inventory": "step-02-dynamic-unresolved.json",
+        "file": "bin/fgos.mjs",
+        "carry": {
+          "id": "cli-016",
+          "path": "bin/fgos.mjs",
+          "line": 1604,
+          "expression": "if (docPath && targetDoc.currentPath !== docPath",
+          "status": "call site traced; concrete target population unresolved",
+          "reason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+          "owner": "Lead bounded read-only export / Step 5 parity"
+        },
+        "seam": "runtime-defaults-dynamic"
+      },
+      "currentSourceDispositions": [
+        {
+          "file": "bin/fgos.mjs",
+          "id": "reference-000263",
+          "admission": "REJECT",
+          "disposition": "preserve",
+          "ownerJoin": null,
+          "historicalOnly": false
+        }
+      ],
+      "replacementSourceSlot": null,
+      "interpretation": "Immutable carry snapshot retained. Current R5/R16/source-owner disposition governs this exact site; an old unresolved question never supersedes a later settled owner or admits an alias writer."
+    },
+    {
+      "original": {
+        "inventory": "step-02-dynamic-unresolved.json",
+        "file": "bin/fgos.mjs",
+        "carry": {
+          "id": "cli-017",
+          "path": "bin/fgos.mjs",
+          "line": 1624,
+          "expression": "execFileSync('git', ['cat-file', '-e', `HEAD:${targetDoc.currentPath}`]",
+          "status": "call site traced; concrete target population unresolved",
+          "reason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+          "owner": "Lead bounded read-only export / Step 5 parity"
+        },
+        "seam": "runtime-defaults-dynamic"
+      },
+      "currentSourceDispositions": [
+        {
+          "file": "bin/fgos.mjs",
+          "id": "reference-000264",
+          "admission": "REJECT",
+          "disposition": "preserve",
+          "ownerJoin": null,
+          "historicalOnly": true
+        }
+      ],
+      "replacementSourceSlot": "author-seam8-bin-head-doc-probe",
+      "interpretation": "Immutable carry snapshot retained. Current R5/R16/source-owner disposition governs this exact site; an old unresolved question never supersedes a later settled owner or admits an alias writer."
+    },
+    {
+      "original": {
+        "inventory": "step-02-dynamic-unresolved.json",
+        "file": "bin/fgos.mjs",
+        "carry": {
+          "id": "cli-018",
+          "path": "bin/fgos.mjs",
+          "line": 1576,
+          "expression": "const resolved = resolveDocPath(view, docPath)",
+          "status": "call site traced; concrete target population unresolved",
+          "reason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+          "owner": "Lead bounded read-only export / Step 5 parity"
+        },
+        "seam": "runtime-defaults-dynamic"
+      },
+      "currentSourceDispositions": [
+        {
+          "file": "bin/fgos.mjs",
+          "id": "reference-000262",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "ownerJoin": null,
+          "historicalOnly": false
+        }
+      ],
+      "replacementSourceSlot": null,
+      "interpretation": "Immutable carry snapshot retained. Current R5/R16/source-owner disposition governs this exact site; an old unresolved question never supersedes a later settled owner or admits an alias writer."
+    },
+    {
+      "original": {
+        "inventory": "step-02-dynamic-unresolved.json",
+        "file": "bin/fgos.mjs",
+        "carry": {
+          "id": "cli-019",
+          "path": "bin/fgos.mjs",
+          "line": 1723,
+          "expression": "if (resolved.currentPath !== docPath)",
+          "status": "call site traced; concrete target population unresolved",
+          "reason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+          "owner": "Lead bounded read-only export / Step 5 parity"
+        },
+        "seam": "runtime-defaults-dynamic"
+      },
+      "currentSourceDispositions": [
+        {
+          "file": "bin/fgos.mjs",
+          "id": "reference-000265",
+          "admission": "REJECT",
+          "disposition": "preserve",
+          "ownerJoin": null,
+          "historicalOnly": false
+        }
+      ],
+      "replacementSourceSlot": null,
+      "interpretation": "Immutable carry snapshot retained. Current R5/R16/source-owner disposition governs this exact site; an old unresolved question never supersedes a later settled owner or admits an alias writer."
+    },
+    {
+      "original": {
+        "inventory": "step-02-dynamic-unresolved.json",
+        "file": "bin/fgos.mjs",
+        "carry": {
+          "id": "cli-020",
+          "path": "bin/fgos.mjs",
+          "line": 1819,
+          "expression": "if (match.currentPath !== docPath)",
+          "status": "call site traced; concrete target population unresolved",
+          "reason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+          "owner": "Lead bounded read-only export / Step 5 parity"
+        },
+        "seam": "runtime-defaults-dynamic"
+      },
+      "currentSourceDispositions": [
+        {
+          "file": "bin/fgos.mjs",
+          "id": "reference-000270",
+          "admission": "REJECT",
+          "disposition": "preserve",
+          "ownerJoin": null,
+          "historicalOnly": false
+        }
+      ],
+      "replacementSourceSlot": null,
+      "interpretation": "Immutable carry snapshot retained. Current R5/R16/source-owner disposition governs this exact site; an old unresolved question never supersedes a later settled owner or admits an alias writer."
+    },
+    {
+      "original": {
+        "inventory": "step-02-dynamic-unresolved.json",
+        "file": "bin/fgos.mjs",
+        "carry": {
+          "id": "cli-021",
+          "path": "bin/fgos.mjs",
+          "line": 2099,
+          "expression": "fs.readFileSync(contextPath, 'utf8')",
+          "status": "call site traced; concrete target population unresolved",
+          "reason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+          "owner": "Lead bounded read-only export / Step 5 parity"
+        },
+        "seam": "runtime-defaults-dynamic"
+      },
+      "currentSourceDispositions": [
+        {
+          "file": "bin/fgos.mjs",
+          "id": "reference-000271",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "ownerJoin": null,
+          "historicalOnly": false
+        }
+      ],
+      "replacementSourceSlot": null,
+      "interpretation": "Immutable carry snapshot retained. Current R5/R16/source-owner disposition governs this exact site; an old unresolved question never supersedes a later settled owner or admits an alias writer."
+    },
+    {
+      "original": {
+        "inventory": "step-02-dynamic-unresolved.json",
+        "file": "bin/fgos.mjs",
+        "carry": {
+          "id": "cli-022",
+          "path": "bin/fgos.mjs",
+          "line": 2146,
+          "expression": "fs.writeFileSync(contextPath, after, 'utf8')",
+          "status": "call site traced; concrete target population unresolved",
+          "reason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+          "owner": "Lead bounded read-only export / Step 5 parity"
+        },
+        "seam": "runtime-defaults-dynamic"
+      },
+      "currentSourceDispositions": [
+        {
+          "file": "bin/fgos.mjs",
+          "id": "reference-000272",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "ownerJoin": null,
+          "historicalOnly": false
+        }
+      ],
+      "replacementSourceSlot": null,
+      "interpretation": "Immutable carry snapshot retained. Current R5/R16/source-owner disposition governs this exact site; an old unresolved question never supersedes a later settled owner or admits an alias writer."
+    },
+    {
+      "original": {
+        "inventory": "step-02-dynamic-unresolved.json",
+        "file": "bin/fgos.mjs",
+        "carry": {
+          "id": "cli-023",
+          "path": "bin/fgos.mjs",
+          "line": 2376,
+          "expression": "fs.readFileSync(artifactPath, 'utf8')",
+          "status": "call site traced; concrete target population unresolved",
+          "reason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+          "owner": "Lead bounded read-only export / Step 5 parity"
+        },
+        "seam": "runtime-defaults-dynamic"
+      },
+      "currentSourceDispositions": [
+        {
+          "file": "bin/fgos.mjs",
+          "id": "reference-000273",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "ownerJoin": null,
+          "historicalOnly": false
+        }
+      ],
+      "replacementSourceSlot": null,
+      "interpretation": "Immutable carry snapshot retained. Current R5/R16/source-owner disposition governs this exact site; an old unresolved question never supersedes a later settled owner or admits an alias writer."
+    },
+    {
+      "original": {
+        "inventory": "step-02-dynamic-unresolved.json",
+        "file": "bin/fgos.mjs",
+        "carry": {
+          "id": "cli-024",
+          "path": "bin/fgos.mjs",
+          "line": 2381,
+          "expression": "fs.readFileSync(planPath, 'utf8')",
+          "status": "call site traced; concrete target population unresolved",
+          "reason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+          "owner": "Lead bounded read-only export / Step 5 parity"
+        },
+        "seam": "runtime-defaults-dynamic"
+      },
+      "currentSourceDispositions": [
+        {
+          "file": "bin/fgos.mjs",
+          "id": "reference-000274",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "ownerJoin": null,
+          "historicalOnly": false
+        }
+      ],
+      "replacementSourceSlot": null,
+      "interpretation": "Immutable carry snapshot retained. Current R5/R16/source-owner disposition governs this exact site; an old unresolved question never supersedes a later settled owner or admits an alias writer."
+    },
+    {
+      "original": {
+        "inventory": "step-02-dynamic-unresolved.json",
+        "file": "bin/fgos.mjs",
+        "carry": {
+          "id": "cli-025",
+          "path": "bin/fgos.mjs",
+          "line": 2553,
+          "expression": "fs.readFileSync(targetPath, 'utf8')",
+          "status": "call site traced; concrete target population unresolved",
+          "reason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+          "owner": "Lead bounded read-only export / Step 5 parity"
+        },
+        "seam": "runtime-defaults-dynamic"
+      },
+      "currentSourceDispositions": [
+        {
+          "file": "bin/fgos.mjs",
+          "id": "reference-000275",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "ownerJoin": null,
+          "historicalOnly": false
+        }
+      ],
+      "replacementSourceSlot": null,
+      "interpretation": "Immutable carry snapshot retained. Current R5/R16/source-owner disposition governs this exact site; an old unresolved question never supersedes a later settled owner or admits an alias writer."
+    },
+    {
+      "original": {
+        "inventory": "step-02-dynamic-unresolved.json",
+        "file": "bin/fgos.mjs",
+        "carry": {
+          "id": "cli-026",
+          "path": "bin/fgos.mjs",
+          "line": 3048,
+          "expression": "fs.readFileSync(path.join(absQuadrantDir, entry.name), 'utf8')",
+          "status": "call site traced; concrete target population unresolved",
+          "reason": "Caller/state-derived path set is unproven; require bounded read-only export and parity, preserve current-path refusal on mutation.",
+          "owner": "Lead bounded read-only export / Step 5 parity"
+        },
+        "seam": "runtime-defaults-dynamic"
+      },
+      "currentSourceDispositions": [
+        {
+          "file": "bin/fgos.mjs",
+          "id": "reference-000278",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "ownerJoin": null,
+          "historicalOnly": false
+        }
+      ],
+      "replacementSourceSlot": null,
+      "interpretation": "Immutable carry snapshot retained. Current R5/R16/source-owner disposition governs this exact site; an old unresolved question never supersedes a later settled owner or admits an alias writer."
+    },
+    {
+      "original": {
+        "inventory": "step-02-dynamic-unresolved.json",
+        "file": "bin/fgos.mjs",
+        "carry": {
+          "id": "cli-027",
+          "path": "bin/fgos.mjs",
+          "line": 1542,
+          "expression": "const currentPath = requireField(positional[3] ?? flags['doc-path']",
+          "status": "call site traced; concrete target population unresolved",
+          "reason": "Concrete caller destinations unproven; require bounded export; no alias destination adopted.",
+          "owner": "Lead bounded read-only export / Step 5 parity"
+        },
+        "seam": "runtime-defaults-dynamic"
+      },
+      "currentSourceDispositions": [
+        {
+          "file": "bin/fgos.mjs",
+          "id": "reference-000261",
+          "admission": "REJECT",
+          "disposition": "preserve",
+          "ownerJoin": null,
+          "historicalOnly": false
+        }
+      ],
+      "replacementSourceSlot": null,
+      "interpretation": "Immutable carry snapshot retained. Current R5/R16/source-owner disposition governs this exact site; an old unresolved question never supersedes a later settled owner or admits an alias writer."
+    },
+    {
+      "original": {
+        "inventory": "step-02-dynamic-unresolved.json",
+        "file": "bin/fgos.mjs",
+        "carry": {
+          "id": "cli-028",
+          "path": "bin/fgos.mjs",
+          "line": 2560,
+          "expression": "fs.readFileSync(targetPath, 'utf8')",
+          "status": "call site traced; concrete target population unresolved",
+          "reason": "Concrete caller file targets unproven; require bounded export.",
+          "owner": "Lead bounded read-only export / Step 5 parity"
+        },
+        "seam": "runtime-defaults-dynamic"
+      },
+      "currentSourceDispositions": [
+        {
+          "file": "bin/fgos.mjs",
+          "id": "reference-000276",
+          "admission": "ADMIT",
+          "disposition": "parked",
+          "ownerJoin": null,
+          "historicalOnly": false
+        }
+      ],
+      "replacementSourceSlot": null,
+      "interpretation": "Immutable carry snapshot retained. Current R5/R16/source-owner disposition governs this exact site; an old unresolved question never supersedes a later settled owner or admits an alias writer."
+    },
+    {
+      "original": {
+        "inventory": "step-02-dynamic-unresolved.json",
+        "file": "plans/260925-documentation-authority-unification/reports/doc-inventory.json",
+        "carry": {
+          "id": "inventory-dynamic",
+          "path": "plans/260925-documentation-authority-unification/reports/doc-inventory.json",
+          "expression": "loadInventory -> loadShardedJsonArtifact",
+          "status": "unresolved / remaining class",
+          "reason": "Manifest declares 2,610,715,988 bytes / 125 parts. Full existing API load/regeneration exceeds light-only slice; Lead must supply bounded consumerEdges export or authorize separate serial workload",
+          "owner": "Lead / next bounded census slice"
+        },
+        "seam": "runtime-defaults-dynamic"
+      },
+      "currentSourceDispositions": [
+        {
+          "file": "plans/260925-documentation-authority-unification/reports/doc-inventory.json",
+          "disposition": "parked",
+          "dependency": "Authorized bounded consumer-edge export through the existing inventory loader; source inventory is the recorded 2.61 GB/125-part population, not a file to load wholesale."
+        }
+      ],
+      "replacementSourceSlot": null,
+      "interpretation": "Immutable carry snapshot retained. Current R5/R16/source-owner disposition governs this exact site; an old unresolved question never supersedes a later settled owner or admits an alias writer."
+    }
+  ]
+}

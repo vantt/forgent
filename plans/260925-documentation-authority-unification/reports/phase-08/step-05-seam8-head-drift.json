@@ -1,0 +1,119 @@
+{
+  "kind": "Non-failing historical-source retirement supplement for Step 7",
+  "entries": [
+    {
+      "file": "src/workflow/integrate.mjs",
+      "recordFile": "step-05-records/runtime-retired-source.jsonl",
+      "recordLine": 1,
+      "inputCommit": "42edba2b08d26ab8dcabe4859a301e1589fa8e6b",
+      "pinnedHash": "62218e241e1f75e9aa4c00c807457a222a9b0ab58ce19760241b8ecc861af207",
+      "headCommit": "97c9694a4b801d152e0deccfa0c58a11213c781f",
+      "headHash": null,
+      "failing": false,
+      "status": "Entire original source removed before author input; historical record already conserves the deletion. Do not revive the removed mechanism.",
+      "deletionDiff": "diff --git a/src/workflow/integrate.mjs b/src/workflow/integrate.mjs\ndeleted file mode 100644\nindex dd62c0657..000000000\n--- a/src/workflow/integrate.mjs\n+++ /dev/null\n@@ -1,174 +0,0 @@\n-// src/workflow/integrate.mjs — Pure git worktree and merge integration helpers for Workflow runner\n-// Architecture guard: MUST NOT import src/state/** or src/runner/coordination/** (A4 boundary)\n-\n-import fs from 'node:fs';\n-import path from 'node:path';\n-import os from 'node:os';\n-import { execFileSync } from 'node:child_process';\n-import { RunnerConfigError } from '../runner/dispatch/config.mjs';\n-import { createLockScope } from '../holder-lock/index.mjs';\n-import { addWorktreeSync } from '../runner/repo-locks.mjs';\n-\n-function git(cwd, args) {\n-  try {\n-    return execFileSync('git', args, {\n-      cwd,\n-      encoding: 'utf8',\n-      stdio: ['ignore', 'pipe', 'pipe'],\n-    }).trim();\n-  } catch (err) {\n-    const stderr = err.stderr ? err.stderr.trim() : err.message;\n-    throw new RunnerConfigError(`git ${args[0]} failed in ${cwd}: ${stderr}`);\n-  }\n-}\n-\n-/**\n- * Create a dedicated git worktree for a workflow unit or step.\n- *\n- * @param {object} params\n- * @param {string} params.repoRoot\n- * @param {string} params.branch\n- * @param {string} [params.baseRef]\n- * @param {string} [params.worktreeDir]\n- * @param {object} [params.scope] lock scope of the caller; a fresh one when absent\n- * @returns {{ worktreePath: string, branch: string }}\n- */\n-export function createWorkflowWorktree({ repoRoot, branch, baseRef = 'HEAD', worktreeDir, scope = createLockScope('workflow-worktree') }) {\n-  if (!repoRoot || !branch) {\n-    throw new RunnerConfigError('createWorkflowWorktree requires repoRoot and branch');\n-  }\n-\n-  const base = worktreeDir ?? fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wf-wt-'));\n-  const worktreePath = path.resolve(base);\n-\n-  // Check if branch already exists\n-  let branchExists = false;\n-  try {\n-    execFileSync('git', ['rev-parse', '--verify', '--quiet', `refs/heads/${branch}`], {\n-      cwd: repoRoot,\n-      stdio: 'ignore',\n-    });\n-    branchExists = true;\n-  } catch {\n-    branchExists = false;\n-  }\n-\n-  if (branchExists) {\n-    addWorktreeSync(scope, repoRoot, [worktreePath, branch]);\n-  } else {\n-    addWorktreeSync(scope, repoRoot, ['-b', branch, worktreePath, baseRef]);\n-  }\n-\n-  return {\n-    worktreePath: fs.realpathSync(worktreePath),\n-    branch,\n-  };\n-}\n-\n-/**\n- * The branch a Workflow's units are integrated into: the `target` an\n- * integrate step declares; otherwise the remote's default branch\n- * (`origin/HEAD`); otherwise the branch the main checkout is on. No branch\n- * name is assumed, so a repository whose trunk is `master` or `trunk` works.\n- *\n- * @param {object} params\n- * @param {string} params.repoRoot main checkout\n- * @param {object} [params.workflow] validated Workflow definition\n- * @returns {string}\n- */\n-export function resolveIntegrationTarget({ repoRoot, workflow } = {}) {\n-  const declared = workflow?.steps?.find((s) => s.kind === 'integrate' && s.target)?.target;\n-  if (declared) return declared;\n-  try {\n-    const ref = git(repoRoot, ['symbolic-ref', '--short', 'refs/remotes/origin/HEAD']);\n-    if (ref) return ref.replace(/^origin\\//, '');\n-  } catch {\n-    // no remote default: fall through to the checkout's own branch\n-  }\n-  return git(repoRoot, ['symbolic-ref', '--short', 'HEAD']);\n-}\n-\n-/**\n- * Merge a source branch into a target branch cleanly using pure git.\n- *\n- * @param {object} params\n- * @param {string} params.repoRoot\n- * @param {string} params.sourceBranch\n- * @param {string} params.targetBranch Target branch (the repository trunk or an integration branch)\n- * @param {string} [params.commitMessage]\n- * @param {boolean} [params.squash]\n- * @returns {{ merged: boolean, sourceBranch: string, targetBranch: string }}\n- */\n-export function mergeWorkflowBranch({ repoRoot, sourceBranch, targetBranch, commitMessage, squash = false, scope = createLockScope('workflow-merge') }) {\n-  if (!repoRoot || !sourceBranch || !targetBranch) {\n-    throw new RunnerConfigError('mergeWorkflowBranch requires repoRoot, sourceBranch and targetBranch');\n-  }\n-\n-  const msg = commitMessage || `merge: integrate workflow branch ${sourceBranch} into ${targetBranch}`;\n-  const mergeArgs = ['merge', '--no-ff', sourceBranch, '-m', msg];\n-  if (squash) {\n-    mergeArgs.splice(1, 1, '--squash');\n-  }\n-\n-  // Perform merge in a temporary merge worktree or repoRoot if checked out\n-  const currentBranch = git(repoRoot, ['symbolic-ref', '--short', 'HEAD']);\n-  if (currentBranch === targetBranch) {\n-    git(repoRoot, mergeArgs);\n-  } else {\n-    // Perform in temporary worktree on targetBranch\n-    const tempWt = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wf-merge-'));\n-    try {\n-      addWorktreeSync(scope, repoRoot, [tempWt, targetBranch]);\n-      git(tempWt, mergeArgs);\n-    } finally {\n-      try {\n-        git(repoRoot, ['worktree', 'remove', '--force', tempWt]);\n-      } catch {\n-        // ignore\n-      }\n-    }\n-  }\n-\n-  return {\n-    merged: true,\n-    sourceBranch,\n-    targetBranch,\n-  };\n-}\n-\n-/**\n- * Remove a workflow worktree and optionally delete its branch.\n- *\n- * @param {object} params\n- * @param {string} params.repoRoot\n- * @param {string} params.worktreePath\n- * @param {string} [params.branch]\n- * @param {boolean} [params.deleteBranch]\n- */\n-export function cleanupWorkflowWorktree({ repoRoot, worktreePath, branch, deleteBranch = true }) {\n-  if (!repoRoot || !worktreePath) {\n-    throw new RunnerConfigError('cleanupWorkflowWorktree requires repoRoot and worktreePath');\n-  }\n-\n-  try {\n-    git(repoRoot, ['worktree', 'remove', '--force', worktreePath]);\n-  } catch {\n-    // If worktree removal failed, try fs removal\n-    if (fs.existsSync(worktreePath)) {\n-      try {\n-        fs.rmSync(worktreePath, { recursive: true, force: true });\n-        git(repoRoot, ['worktree', 'prune']);\n-      } catch {\n-        // ignore\n-      }\n-    }\n-  }\n-\n-  if (deleteBranch && branch) {\n-    try {\n-      git(repoRoot, ['branch', '-D', branch]);\n-    } catch {\n-      // ignore\n-    }\n-  }\n-}\n",
+      "dependency": "Step 7 final-pin custody; R17, source retirement is explicit rather than rebound to unrelated current text."
+    }
+  ],
+  "fullCheckerHeadDrift": {
+    "path": "/tmp/fgos-work/seam8-verification/full/step-05-head-drift.json",
+    "sha256": "47b04e3df9cf2dd2e2c583d4631467a2973f38c2317ed1bb4372491fa699026c"
+  },
+  "canonicalOwnerLocatorCorrections": [
+    {
+      "file": "bin/fgos.mjs",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "pinnedHash": "64ace4da89dbc1222c6d3c0d634272c9b043d1c268a257ed2e2e09385a5eb198",
+      "fullCheckerLocator": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-22.jsonl",
+        "recordLine": 13
+      },
+      "canonicalOwner": {
+        "file": "bin/fgos.mjs",
+        "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+        "sourceSha256": "64ace4da89dbc1222c6d3c0d634272c9b043d1c268a257ed2e2e09385a5eb198",
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+        "recordLine": 2,
+        "recordFileSha256": "a50f40e7d3570ff312d282172357c1fc2e56a3a336995796cb2a3b37fd111387",
+        "recordSha256": "1c06f74e0c2b0299e1144547b7140c6f737c48c17f840d7ffbd3704f11b0ccf6"
+      },
+      "status": "Non-failing Step 7 locator correction by exact source pin/hash; no rebind or approval transfer."
+    },
+    {
+      "file": "src/runner/claim-port.mjs",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "pinnedHash": "6e510ae19478f1ba71a2ab900f024d98b0150dd20da9fd255afdd407ae9c50c7",
+      "fullCheckerLocator": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-26.jsonl",
+        "recordLine": 21
+      },
+      "canonicalOwner": {
+        "file": "src/runner/claim-port.mjs",
+        "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+        "sourceSha256": "6e510ae19478f1ba71a2ab900f024d98b0150dd20da9fd255afdd407ae9c50c7",
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+        "recordLine": 6,
+        "recordFileSha256": "a50f40e7d3570ff312d282172357c1fc2e56a3a336995796cb2a3b37fd111387",
+        "recordSha256": "fb0a8379269961ab575fd2aaffe2b914ddc1c42b67ef4cdc2b8c5557e3911f53"
+      },
+      "status": "Non-failing Step 7 locator correction by exact source pin/hash; no rebind or approval transfer."
+    },
+    {
+      "file": "src/runner/merge.mjs",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "pinnedHash": "8ccdb5441f10f806a1753d47394b4c74c655d02c5c7a03f7a1af56ce08024eb4",
+      "fullCheckerLocator": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-27.jsonl",
+        "recordLine": 38
+      },
+      "canonicalOwner": {
+        "file": "src/runner/merge.mjs",
+        "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+        "sourceSha256": "8ccdb5441f10f806a1753d47394b4c74c655d02c5c7a03f7a1af56ce08024eb4",
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+        "recordLine": 7,
+        "recordFileSha256": "a50f40e7d3570ff312d282172357c1fc2e56a3a336995796cb2a3b37fd111387",
+        "recordSha256": "f853ff512c689547cf8fc009b37edcddb88d8fc0aa9e29bd519f30dc7114329c"
+      },
+      "status": "Non-failing Step 7 locator correction by exact source pin/hash; no rebind or approval transfer."
+    },
+    {
+      "file": "src/runner/worktree.mjs",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "pinnedHash": "c99b08a8ba3c0b597223b28d2aeaa4616d533f59da9fefed512815d81f58848d",
+      "fullCheckerLocator": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-28.jsonl",
+        "recordLine": 8
+      },
+      "canonicalOwner": {
+        "file": "src/runner/worktree.mjs",
+        "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+        "sourceSha256": "c99b08a8ba3c0b597223b28d2aeaa4616d533f59da9fefed512815d81f58848d",
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+        "recordLine": 8,
+        "recordFileSha256": "a50f40e7d3570ff312d282172357c1fc2e56a3a336995796cb2a3b37fd111387",
+        "recordSha256": "718eb1fae957a37fac90cace75bd294294fd682c38ce2bca0f9b4dc7eb7fb8fa"
+      },
+      "status": "Non-failing Step 7 locator correction by exact source pin/hash; no rebind or approval transfer."
+    },
+    {
+      "file": "src/state/events-jsonl-truncation-guard.mjs",
+      "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+      "pinnedHash": "b4dd68558622a872395138a790bc63926ebdf60323b880c6f69b23ca3d7ee0ab",
+      "fullCheckerLocator": {
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/runtime-judgment-part-28.jsonl",
+        "recordLine": 15
+      },
+      "canonicalOwner": {
+        "file": "src/state/events-jsonl-truncation-guard.mjs",
+        "inputCommit": "aa8d343746a292d2cb476ab76e6489411fd59a62",
+        "sourceSha256": "b4dd68558622a872395138a790bc63926ebdf60323b880c6f69b23ca3d7ee0ab",
+        "recordFile": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/cli-help-messages.jsonl",
+        "recordLine": 9,
+        "recordFileSha256": "a50f40e7d3570ff312d282172357c1fc2e56a3a336995796cb2a3b37fd111387",
+        "recordSha256": "60f620648eb3835095f4f742b880ab58d88b8a6ede46fdef110aa85a7dd0d4bc"
+      },
+      "status": "Non-failing Step 7 locator correction by exact source pin/hash; no rebind or approval transfer."
+    }
+  ]
+}
