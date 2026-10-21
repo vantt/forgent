@@ -267,22 +267,25 @@ test('fast path: uncontended acquire and release is not more than 10% slower tha
     resolveWriterIdentity(f.fgosDir); // prime the identity cache once, outside the timings
 
     const p50 = (samples) => samples.sort((a, b) => a - b)[Math.floor(samples.length / 2)];
-    const measure = (run, n) => {
-      const samples = [];
+    const time = (run) => {
+      const t0 = process.hrtime.bigint();
+      run();
+      return Number(process.hrtime.bigint() - t0);
+    };
+    const runOld = () => withOldLock(logPath, () => {}, f.fgosDir);
+    const runNow = () => withStateTx(f.fgosDir, () => {});
+    // The two locks alternate call by call, each going first half the time, so a burst of
+    // machine load lands on both sides instead of on whichever block it happened to hit.
+    const measure = (n) => {
+      const old = [];
+      const now = [];
       for (let i = 0; i < n; i += 1) {
-        const t0 = process.hrtime.bigint();
-        run();
-        samples.push(Number(process.hrtime.bigint() - t0));
+        if (i % 2 === 0) { old.push(time(runOld)); now.push(time(runNow)); } else { now.push(time(runNow)); old.push(time(runOld)); }
       }
-      return p50(samples);
+      return { old: p50(old), now: p50(now) };
     };
     const rounds = [];
-    for (let r = 0; r < 5; r += 1) {
-      rounds.push({
-        old: measure(() => withOldLock(logPath, () => {}, f.fgosDir), 400),
-        now: measure(() => withStateTx(f.fgosDir, () => {}), 400),
-      });
-    }
+    for (let r = 0; r < 5; r += 1) rounds.push(measure(400));
     const median = (key) => rounds.map((round) => round[key]).sort((a, b) => a - b)[2];
     const ratio = median('now') / median('old');
     t.diagnostic(`p50 old ${median('old')}ns, new ${median('now')}ns, ratio ${ratio.toFixed(3)}`);
