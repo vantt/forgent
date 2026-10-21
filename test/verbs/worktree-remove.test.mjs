@@ -35,6 +35,10 @@ test('worktree remove deletes a clean worktree whose tip is delivered and binds 
     // An object id is accepted as the delivery target too.
     const second = worker('by-oid');
     assert.equal(removeWorktreeUseCase(ctx, { path: second, deliveredTo: f.tip }, f.loader).deliveredToRef, null);
+    // The delivery name uses the same grammar as `worktree create --base`: a short remote-tracking name is accepted.
+    f.git('update-ref', 'refs/remotes/origin/main', f.tip);
+    const third = worker('by-remote');
+    assert.equal(removeWorktreeUseCase(ctx, { path: third, deliveredTo: 'origin/main' }, f.loader).deliveredToRef, 'refs/remotes/origin/main');
   } finally { f.cleanup(); }
 });
 

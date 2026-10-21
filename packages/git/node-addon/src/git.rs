@@ -256,10 +256,23 @@ pub fn inspect_git(
     let mut native_locks = ["config.lock", "packed-refs.lock", "shallow.lock"]
         .iter()
         .filter(|name| std::fs::symlink_metadata(repo.common_dir().join(name)).is_ok())
+        .map(|name| (*name).to_owned())
         .collect::<Vec<_>>();
     if std::fs::symlink_metadata(repo.git_dir().join("index.lock")).is_ok() {
-        native_locks.push(&"index.lock");
+        native_locks.push("index.lock".to_owned());
     }
+    // A crash inside a pin delete leaves Git's own `<pin>.lock` beside the
+    // operation's reachability pin; report it like the other native locks.
+    let pins = std::path::Path::new("refs/fgos/git-operations");
+    if let Ok(operations) = std::fs::read_dir(repo.common_dir().join(pins)) {
+        for operation in operations.flatten() {
+            let lock = pins.join(operation.file_name()).join("candidate.lock");
+            if std::fs::symlink_metadata(repo.common_dir().join(&lock)).is_ok() {
+                native_locks.push(lock.to_string_lossy().replace('\\', "/"));
+            }
+        }
+    }
+    native_locks.sort();
     Ok(
         json!({"floor":floor,"commonDir":repo.common_dir(),"layout":format!("{:?}",repo.layout()),"journal":journal,"nativeLocks":native_locks,"untrustedTransportConfig":driver.untrusted_transport_config(&repo).map_err(operation)?,"reservedLegacyRefs":reserved_legacy_refs,"obsoleteFetchMapping":mappings.iter().any(|f| f.value == obsolete.as_bytes()),"fetchRefspecs":mappings.into_iter().map(|f| String::from_utf8_lossy(&f.value).into_owned()).collect::<Vec<_>>(),"durability":"process-crash; file and parent sync; stable media not certified"}),
     )

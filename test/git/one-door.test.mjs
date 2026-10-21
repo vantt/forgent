@@ -9,6 +9,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { sandboxNamedPaths } from '../../scripts/lib/git-spawn-match.mjs';
 import { scan, census, verifyCensus, MUTATION_CENSUS_PATH } from '../../scripts/git-one-door-scan.mjs';
 import { productFrame } from '../helpers/git-spawn-spy.mjs';
 
@@ -106,6 +107,7 @@ test('doctor refuses a census that lists a site, or whose files do not match the
     fs.writeFileSync(path.join(root, MUTATION_CENSUS_PATH), JSON.stringify(doc));
   };
   const built = census(scan({ root }));
+  assert.equal('outsideProduct' in built, false, 'the persisted census records the product only');
   assert.equal(verifyCensus(built, root).passed, false, 'a listed site fails the check');
   assert.match(verifyCensus(built, root).message, /bin\/status\.mjs:\d+ \(spawn\)/);
 
@@ -131,4 +133,14 @@ test('the spawn spy charges a command run through runBorrowed to the code that c
   assert.equal(productFrame(stack('src/runner/goal-check.mjs')), 'src/runner/goal-check.mjs:7');
   const direct = ['Error', `    at spawnSync (file://${root}/src/holder-lock/index.mjs:300:9)`].join('\n');
   assert.equal(productFrame(direct), 'src/holder-lock/index.mjs:300', 'holder-lock spawning git itself stays a site');
+});
+
+test('a sandbox Git call is judged by every repository path it names, in separate and = forms', () => {
+  const cwd = '/sandbox/repo';
+  assert.deepEqual(sandboxNamedPaths(['status'], cwd), [cwd]);
+  assert.deepEqual(sandboxNamedPaths(['-C', 'sub', 'status'], cwd), [cwd, '/sandbox/repo/sub']);
+  assert.deepEqual(sandboxNamedPaths(['--git-dir=/elsewhere/.git', 'status'], cwd), [cwd, '/elsewhere/.git']);
+  assert.deepEqual(sandboxNamedPaths(['--work-tree', '../out', 'status'], cwd), [cwd, '/sandbox/out']);
+  assert.deepEqual(sandboxNamedPaths(['--work-tree=../out', 'status'], cwd), [cwd, '/sandbox/out']);
+  assert.deepEqual(sandboxNamedPaths(['status'], undefined).length, 0, 'no cwd and no path names nothing');
 });

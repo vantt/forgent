@@ -11,7 +11,9 @@
 #   FAKE_HERDR_GARBLE     set: every command answers text that is not JSON
 #   FAKE_HERDR_FDS        file that receives the list of open fds of this process
 #   FAKE_HERDR_FOREGROUND  `shell`: `pane process-info` reports only the shell in the
-#                         foreground (default: a foreign `sleep 300`)
+#                         foreground (default: a foreign `sleep 300`), and text typed at the
+#                         pane (`pane send-text`, `agent prompt`) is run by a shell, as the
+#                         pane's shell would run it
 dir=$(dirname "$0")
 if [ -n "$FAKE_HERDR_LOG" ]; then
   { printf '%s\t' "$@"; printf '\n'; } >> "$FAKE_HERDR_LOG"
@@ -30,6 +32,9 @@ if [ -n "$FAKE_HERDR_AGENT_NOT_FOUND" ] && [ "$1 $2" = "agent get" ]; then
 fi
 if [ -n "$FAKE_HERDR_NO_WORKSPACE" ] && [ "$1 $2" = "tab create" ]; then
   echo '{"error":{"code":"workspace_not_found","message":"no active workspace"},"id":"cli:tab:create"}' >&2; exit 1
+fi
+if [ "$FAKE_HERDR_FOREGROUND" = shell ]; then
+  case "$1 $2" in "pane send-text"|"agent prompt") printf '%s\n' "$4" | sh >/dev/null 2>&1 ;; esac
 fi
 case "$1 $2" in
   "workspace create") cat "$dir/tab-create.json" ;;

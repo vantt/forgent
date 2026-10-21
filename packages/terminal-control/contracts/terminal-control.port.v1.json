@@ -55,8 +55,8 @@
     },
     "send": {
       "input": { "key": "key", "text": "optional string", "keys": "optional string[]", "submit": "optional boolean" },
-      "results": ["ok", "unsupported", "unknown"],
-      "rule": "exactly one of text or keys"
+      "results": ["ok", "foreground-not-agent", "unsupported", "unknown"],
+      "rule": "exactly one of text or keys; nothing is typed unless a process other than the pane's shell (or the launched command that exec-replaced it) holds the foreground, also through the prompt door (submit)"
     },
     "read": {
       "input": { "key": "key", "lines": "optional integer >= 1", "source": { "enum": ["visible", "recent", "recent-unwrapped", "detection"], "default": "recent" } },
@@ -100,6 +100,7 @@
     "launched": { "result": "launched", "identity": "identity" },
     "not-started": { "result": "not-started", "reason": "string" },
     "ok": { "result": "ok" },
+    "foreground-not-agent": { "result": "foreground-not-agent", "reason": "string; nothing was typed: the pane's shell is in the foreground, or its foreground could not be read or identified" },
     "screen": { "result": "screen", "screen": "string" },
     "inspection": {
       "result": "inspection",

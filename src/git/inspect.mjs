@@ -12,7 +12,7 @@ export function createGitInspect(options, loaderOptions) {
   const native = loadNativeAddon(loaderOptions);
   const port = new native.GitInspect(options.stateRoot, options.repoPath, options.trustedMain);
   const facade = {};
-  for (const method of ['lastPathCommitTime', 'mergeTree', 'listTree', 'attributes', 'firstAncestryMerge', 'compareCommits', 'listBranches', 'checkoutFacts', 'remoteTracking', 'resolveCommit', 'resolveRepo', 'resolveRef', 'resolveTrunk', 'status', 'diff', 'diffText', 'ancestry', 'readObjects', 'pathsAtRevision', 'listWorktrees', 'compareContent', 'snapshotWrites', 'commitTime', 'countCommits', 'unmatchedCommitCount', 'trackedPaths', 'remoteUrl']) {
+  for (const method of ['lastPathCommitTime', 'mergeTree', 'listTree', 'attributes', 'firstAncestryMerge', 'compareCommits', 'listBranches', 'checkoutFacts', 'remoteTracking', 'resolveCommit', 'resolveRepo', 'resolveRef', 'resolveLiteralRef', 'resolveTrunk', 'status', 'diff', 'diffText', 'ancestry', 'readObjects', 'pathsAtRevision', 'listWorktrees', 'compareContent', 'snapshotWrites', 'commitTime', 'countCommits', 'unmatchedCommitCount', 'trackedPaths', 'remoteUrl']) {
     facade[method] = (args = {}) => { outsideGate(); return port.call(method, args); };
   }
   return Object.freeze(facade);
