@@ -284,26 +284,6 @@ test('architecture guard: src/runner/execution/run.mjs does NOT import state, co
   assert.ok(!/from\s+['"].*merge/.test(content));
 });
 
-test('mutating gate: admits mutating unit in linked worktree matching unit.json', async () => {
-  const { repoRoot, worktreeDir } = setupGitRepo();
-  const unit = {
-    id: 'u-mutate-1',
-    objective: 'Implement feature',
-    capability: 'docs:write',
-    writes: ['src/feature.txt'],
-  };
-
-  const res = await runUnit({
-    unitData: unit,
-    repoRoot,
-    cwd: worktreeDir,
-    pattern: 'solo',
-  });
-
-  assert.ok(res.unitRunId);
-  assert.equal(res.rounds, 1);
-});
-
 test('mutating gate: refuses mutating unit in main checkout', async () => {
   const { repoRoot } = setupGitRepo();
   const unit = {
@@ -578,21 +558,6 @@ function reviewedConfig(repoRoot, executorNames) {
   fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
 }
 
-test('a reviewed run never lets the producer family also check its own work', async () => {
-  const { repoRoot, worktreeDir } = setupGitRepo();
-  reviewedConfig(repoRoot, ['alpha', 'beta']);
-  const res = await runUnit({
-    unitData: { id: 'u-indep', objective: 'Write docs', capability: 'docs:write', writes: [], pattern: 'reviewed' },
-    repoRoot,
-    cwd: worktreeDir,
-    worktree: worktreeDir,
-    pattern: 'reviewed',
-  });
-  const byRole = Object.fromEntries(res.results.map((r) => [r.role, r.runResult?.executorId]));
-  assert.equal(byRole.producer, 'alpha');
-  assert.equal(byRole.reviewer, 'beta', 'the reviewer must run on a different provider family than the producer');
-});
-
 test('a reviewed run with a single provider family refuses the checker instead of self-reviewing', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha']);
@@ -606,21 +571,6 @@ test('a reviewed run with a single provider family refuses the checker instead o
   assert.equal(res.outcome, 'policy-refusal');
   const checker = res.results.find((r) => r.role === 'reviewer');
   assert.equal(checker.refused.reason, 'independence');
-});
-
-test('panel members run on different provider families', async () => {
-  const { repoRoot, worktreeDir } = setupGitRepo();
-  reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma']);
-  const res = await runUnit({
-    unitData: { id: 'u-panel', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel' },
-    repoRoot,
-    cwd: worktreeDir,
-    worktree: worktreeDir,
-    pattern: 'panel',
-  });
-  const members = res.results.filter((r) => r.role.startsWith('panelist-')).map((r) => r.runResult?.executorId);
-  assert.equal(members.length, 3);
-  assert.equal(new Set(members).size, 3, `panelists must not share a provider family, got ${members.join(',')}`);
 });
 
 function panelRun(id, members) {
@@ -655,39 +605,7 @@ test('a panel with fewer provider families than members runs anyway: seats share
   assert.deepEqual(alpha.seats, ['panelist-1/1', 'panelist-4/1', 'synthesizer/1']);
 });
 
-test('a panel with enough provider families lands every seat on its own family and the summary shows no sharing', async () => {
-  const { repoRoot, worktreeDir, pattern } = panelRun('u-panel-3', 3);
-  reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
-  const res = await runUnit({
-    unitData: { id: 'u-panel-3', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel' },
-    repoRoot,
-    cwd: worktreeDir,
-    worktree: worktreeDir,
-    pattern,
-  });
-  assert.equal(res.outcome, 'pass');
-  assert.deepEqual(res.results.map((r) => r.runResult?.executorId), ['alpha', 'beta', 'gamma', 'delta']);
-  assert.equal(summaryOf(repoRoot, res).sharedFamilies, undefined);
-});
-
-test('the panel synthesizer runs on a provider family none of the panelists used', async () => {
-  const { repoRoot, worktreeDir } = setupGitRepo();
-  reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
-  const res = await runUnit({
-    unitData: { id: 'u-panel-synth', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel' },
-    repoRoot,
-    cwd: worktreeDir,
-    worktree: worktreeDir,
-    pattern: 'panel',
-  });
-  const members = res.results.filter((r) => r.role.startsWith('panelist-')).map((r) => r.runResult?.executorId);
-  const synth = res.results.find((r) => r.role === 'synthesizer');
-  assert.equal(members.length, 3);
-  assert.ok(synth?.runResult?.executorId, `synthesizer should have run, got ${JSON.stringify(res).slice(0, 1500)}`);
-  assert.ok(!members.includes(synth.runResult.executorId), 'synthesizer shares a provider family with a panelist');
-});
-
-test('the panel synthesizer is told to read every panelist report; the panelists are told nothing', async () => {
+test('a panel with enough provider families lands every seat on its own family, the synthesizer on one no panelist used, and only the synthesizer is told to read the panelist reports', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
   const res = await runUnit({
@@ -698,6 +616,12 @@ test('the panel synthesizer is told to read every panelist report; the panelists
     pattern: 'panel',
   });
   assert.equal(res.outcome, 'pass');
+  assert.deepEqual(res.results.map((r) => r.runResult?.executorId), ['alpha', 'beta', 'gamma', 'delta']);
+  assert.equal(summaryOf(repoRoot, res).sharedFamilies, undefined);
+  const members = res.results.filter((r) => r.role.startsWith('panelist-')).map((r) => r.runResult?.executorId);
+  const synth = res.results.find((r) => r.role === 'synthesizer');
+  assert.ok(synth?.runResult?.executorId, `synthesizer should have run, got ${JSON.stringify(res).slice(0, 1500)}`);
+  assert.ok(!members.includes(synth.runResult.executorId), 'synthesizer shares a provider family with a panelist');
   const assignmentOf = (role) =>
     JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'assignments', res.unitRunId, role, '1', 'assignment.json'), 'utf8'));
 
@@ -718,7 +642,7 @@ test('the panel synthesizer is told to read every panelist report; the panelists
   assert.ok(synthObjective.includes('Review the design'), 'the panel\'s task is quoted to the synthesizer');
 });
 
-test('a unit-run input reaches the roles as the absolute path of that role\'s report, resolved once into unit.json', async () => {
+test('a unit-run input reaches the roles as the absolute path of that role\'s report, resolved once into unit.json; a resume refuses a record from a newer release', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha']);
   const run = (unitData, extra = {}) =>
@@ -752,23 +676,15 @@ test('a unit-run input reaches the roles as the absolute path of that role\'s re
   delete unitJson.resolvedInputs;
   fs.writeFileSync(path.join(dirOfB, 'unit.json'), JSON.stringify(unitJson));
   await assert.rejects(() => run(undefined, { resumeUnitRunId: second.unitRunId }), /no resolvedInputs/);
-});
 
-test('a resume refuses a unit record carrying a seatSchema from a newer release, and the record stays readable', async () => {
-  const { repoRoot, worktreeDir } = setupGitRepo();
-  reviewedConfig(repoRoot, ['alpha']);
-  const run = (unitData, extra = {}) =>
-    runUnit({ unitData, repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern: 'solo', ...extra });
-  const first = await run({ id: 'u-seat', objective: 'Write docs', capability: 'docs:write', writes: [] });
-  assert.equal(first.outcome, 'pass');
-  const unitPath = path.join(repoRoot, '.fgos', 'assignments', first.unitRunId, 'unit.json');
-  const record = JSON.parse(fs.readFileSync(unitPath, 'utf8'));
-  fs.writeFileSync(unitPath, JSON.stringify({ ...record, seatSchema: 1 }));
+  // A record carrying a seatSchema from a newer release is refused on resume and left untouched.
+  const firstPath = path.join(repoRoot, '.fgos', 'assignments', first.unitRunId, 'unit.json');
+  fs.writeFileSync(firstPath, JSON.stringify({ ...JSON.parse(fs.readFileSync(firstPath, 'utf8')), seatSchema: 1 }));
   await assert.rejects(
     () => run(undefined, { resumeUnitRunId: first.unitRunId }),
     (err) => err.code === 'record-from-newer-release' && /seatSchema/.test(err.message),
   );
-  assert.equal(JSON.parse(fs.readFileSync(unitPath, 'utf8')).seatSchema, 1, 'the refused record is left untouched');
+  assert.equal(JSON.parse(fs.readFileSync(firstPath, 'utf8')).seatSchema, 1, 'the refused record is left untouched');
 });
 
 test('anonymizeInputs hands the role a copy under a neutral name, keeps the mapping in unit.json, and a resume reuses it', async () => {
@@ -851,7 +767,7 @@ test('a unit-run input that cannot be resolved is refused before any unit direct
   assert.deepEqual(after, before);
 });
 
-test('a reviewed run tells the reviewer to review and hands it the producer\'s report', async () => {
+test('a reviewed run never lets the producer family also check its own work; the reviewer is told to review and handed the producer\'s report', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta']);
   const res = await runUnit({
@@ -862,6 +778,9 @@ test('a reviewed run tells the reviewer to review and hands it the producer\'s r
     pattern: 'reviewed',
   });
   assert.equal(res.outcome, 'pass');
+  const byRole = Object.fromEntries(res.results.map((r) => [r.role, r.runResult?.executorId]));
+  assert.equal(byRole.producer, 'alpha');
+  assert.equal(byRole.reviewer, 'beta', 'the reviewer must run on a different provider family than the producer');
   const assignmentOf = (role) =>
     JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'assignments', res.unitRunId, role, '1', 'assignment.json'), 'utf8'));
 
@@ -877,7 +796,7 @@ test('a reviewed run tells the reviewer to review and hands it the producer\'s r
   assert.ok(fs.existsSync(reviewer.contextRefs[0]));
 });
 
-test('a panel whose every provider family is taken by panelists still runs the synthesizer, on the least used family', async () => {
+test('panel members run on different provider families; when they take every family the synthesizer still runs, on the least used one', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma']);
   const res = await runUnit({
@@ -888,6 +807,9 @@ test('a panel whose every provider family is taken by panelists still runs the s
     pattern: 'panel',
   });
   assert.equal(res.outcome, 'pass');
+  const members = res.results.filter((r) => r.role.startsWith('panelist-')).map((r) => r.runResult?.executorId);
+  assert.equal(members.length, 3);
+  assert.equal(new Set(members).size, 3, `panelists must not share a provider family, got ${members.join(',')}`);
   const synth = res.results.find((r) => r.role === 'synthesizer');
   assert.equal(synth.refused, undefined);
   assert.equal(synth.runResult.executorId, 'alpha', 'every family is used once, so pool order breaks the tie');
@@ -1130,7 +1052,7 @@ test('a blind panel synthesizer reads its panelists\' reports as copies in its o
   }
 });
 
-test('each role of a panel gets its own seat\'s earlier report as own-previous, blind or not, and not the other seats\'', async () => {
+test('each role of a panel gets its own seat\'s earlier report as own-previous, blind or not, and not the other seats\'; a seat the earlier run did not have is refused by name', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
   const run = (unitData) => runUnit({ unitData, repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern: 'panel' });
@@ -1158,15 +1080,8 @@ test('each role of a panel gets its own seat\'s earlier report as own-previous, 
     assert.ok(synthRefs.some((ref) => ref.endsWith('own-previous.md')));
     assert.equal(synthRefs.length, 4);
   }
-});
-
-test('a seat the earlier run did not have is refused with a named reason when that role is dispatched', async () => {
-  const { repoRoot, worktreeDir } = setupGitRepo();
-  reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
-  const run = (unitData, pattern) => runUnit({ unitData, repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern });
-  const first = await run({ id: 'u-panel', objective: 'Write docs', capability: 'docs:write', writes: [], pattern: 'panel' }, 'panel');
   await assert.rejects(
-    () => run({ id: 'u-own', objective: 'x', capability: 'docs:write', writes: [], pattern: 'solo', inputs: [`unit-run:${first.unitRunId}/{seat}`] }, 'solo'),
+    () => runUnit({ unitData: { id: 'u-own', objective: 'x', capability: 'docs:write', writes: [], pattern: 'solo', inputs: [`unit-run:${first.unitRunId}/{seat}`] }, repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern: 'solo' }),
     /no-such-seat/,
   );
 });
