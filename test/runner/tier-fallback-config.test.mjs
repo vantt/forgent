@@ -20,7 +20,7 @@ function load(tierFallback, globalRunner) {
     executor: { command: 'claude', args: ['{prompt}'] },
     timeoutMs: 5000,
     modelPolicies: { claude: { advanced: 'sonnet' }, gemini: { advanced: 'gemini-flash' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
   };
   if (tierFallback !== undefined) runner.tierFallback = tierFallback;
   fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({ runner }));
@@ -85,7 +85,7 @@ function runnerWith(patch = {}) {
     executor: { command: 'claude', args: ['{prompt}'] },
     timeoutMs: 5000,
     modelPolicies: { claude: { advanced: 'sonnet', flagship: 'opus' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     executors: Object.fromEntries(['claude', 'other'].map((id) => [id, { kind: 'agent', providerModel: id, command: id, args: ['{prompt}'], invocations: [{ id: `${id}-cli`, via: 'cli', adapter: 'cli-spawn', command: id, args: ['{prompt}'], confinement: { backend: 'bwrap' } }] }])),
     ...patch,
   };
@@ -178,7 +178,7 @@ test('the schema marker is {schema: 1} inside patterns and nothing else', () => 
   refusedLoad(runnerWith({ patterns: { seatBinding: {} } }), /seatBinding\.schema.*must be 1/);
   refusedLoad(runnerWith({ patterns: { seatBinding: { schema: 1, extra: true } } }), /seatBinding.*unknown key "extra"/);
   refusedLoad(runnerWith({ patterns: { seatBinding: 1 } }), /seatBinding.*must be an object/);
-  refusedLoad(runnerWith({ patterns: { somethingElse: {} } }), /patterns.*unknown key "somethingElse"/);
+  refusedLoad(runnerWith({ patterns: { seatBinding: { schema: 1 }, somethingElse: {} } }), /patterns.*unknown key "somethingElse"/);
 });
 
 test('a key of the new schema in the global layer is refused and the message names the project config', () => {
@@ -195,13 +195,15 @@ test('a key of the new schema in the global layer is refused and the message nam
   }
 });
 
-test('the global layer keeps the keys it has always carried: maxTier, tierFallback, capability rigor and prefer, rigorToTier', () => {
+test('the global layer keeps the keys it has always carried: maxTier, tierFallback, capability rigor and prefer; rigorToTier is dropped', () => {
   const { cfg } = loadRunner(runnerWith(), {
     maxTier: 'flagship',
     tierFallback: { advanced: ['claude'] },
+    // A machine that has not re-run setup still carries it; the loader drops it from the global layer.
     rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     capabilities: { review: { rigor: 'high', confinement: { mode: 'required', policy: 'host-write-denied' } } },
   });
+  assert.equal('rigorToTier' in cfg, false);
   assert.equal(cfg.maxTier, 'flagship');
   assert.equal(cfg.capabilities.review.rigor, 'high');
 });

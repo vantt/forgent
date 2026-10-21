@@ -59,7 +59,7 @@ function setup({ mainFiles = { 'base.txt': 'from main\n' }, branchFiles = { 'min
   fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify({
     runner: {
       defaultExecutor: 'alpha',
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+      defaults: { tier: 'standard' },
       modelPolicies: { alpha: { standard: 'alpha-std' } },
       executors: {
         alpha: {
@@ -68,7 +68,7 @@ function setup({ mainFiles = { 'base.txt': 'from main\n' }, branchFiles = { 'min
         },
       },
       capabilities: { 'docs:write': { prefer: [{ executor: 'alpha' }], rigor: 'standard' } },
-      patterns: { defaultRule: { mutatingMinRigor: 'standard' } },
+      patterns: { seatBinding: { schema: 1 }, defaultRule: { mutatingMinRigor: 'standard' } },
     },
   }, null, 2));
   return { repoRoot, worktree, script };

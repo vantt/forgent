@@ -378,7 +378,7 @@ function recordWalkedSeat(cwd, { secondExecutor }) {
     }],
   });
   const runner = {
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     modelPolicies: { alpha: { standard: 'alpha-m' }, beta: { standard: 'beta-m' } },
     capabilities: { 'docs:write': { prefer: [{ executor: 'alpha' }, { executor: 'beta' }] } },
     executors: { alpha: family('alpha'), beta: family('beta') },

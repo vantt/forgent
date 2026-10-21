@@ -160,7 +160,7 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
       fs.writeFileSync(path.join(configDir, 'config.json'), JSON.stringify({
         runner: {
           defaultExecutor: executorIds[0],
-          rigorToTier: { standard: 'standard' },
+          defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
           timeoutMs: 60_000,
           executors: Object.fromEntries(executorIds.map((id) => [id, {
             kind: 'agent',

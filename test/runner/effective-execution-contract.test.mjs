@@ -432,7 +432,7 @@ test('PRODUCTION-DOOR FIXTURE: executeAssignment persists effective-execution-co
   const runnerCfg = {
     timeoutMs: 30000,
     modelPolicies: { claude: { standard: 'test-model' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     executor: {
       command: 'mock-cli',
       adapter: 'cli-spawn',

@@ -93,7 +93,7 @@ function loadWith(projectPolicies, globalPolicies) {
   fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
   fs.writeFileSync(
     path.join(dir, '.fgos', 'config.json'),
-    JSON.stringify({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 5000, modelPolicies: projectPolicies, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' } } }),
+    JSON.stringify({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 5000, modelPolicies: projectPolicies, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } } } }),
   );
   if (globalPolicies) fs.writeFileSync(path.join(home, '.fgos', 'config.json'), JSON.stringify({ runner: { modelPolicies: globalPolicies } }));
   const prevHome = process.env.HOME;
@@ -140,7 +140,7 @@ test('the global config keeps plain strings but drops list and model@pool cells,
 function bindConfig(cell) {
   return {
     modelPolicies: { f: { standard: cell } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     capabilities: { work: { prefer: [{ executor: 'fam' }] } },
     executors: {
       fam: { kind: 'agent', providerModel: 'f', command: 'fam', invocations: [{ id: 'fam-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' } }] },

@@ -70,7 +70,7 @@ function fixtureRepo(makeExecutor = () => HERDR_EXECUTOR) {
     runner: {
       executor: { command: 'agy', providerModel: 'agy', args: ['-i', '{prompt}'] },
       modelPolicies: { agy: { standard: 'sonnet' }, claude: { standard: 'sonnet' } },
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
       timeoutMs: 20000,
       executors: { 'herdr-worker': makeExecutor(root) },
       capabilities: { [IMPLEMENT_CAPABILITY]: { prefer: 'herdr-worker' } },

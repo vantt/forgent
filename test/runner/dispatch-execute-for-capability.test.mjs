@@ -39,7 +39,7 @@ function fixtureRepo({ workerEnv, executorPatch = {}, capabilitiesPatch = {} } =
   const invocation = (id) => ({ id, via: 'cli', adapter: 'cli-spawn', command: process.execPath, args: [script, id, '{prompt}'] });
   const runner = {
     modelPolicies: { fake: { standard: 'fake-standard', flagship: 'fake-flagship' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 20000,
     executors: {
       fake: {
@@ -84,9 +84,11 @@ test('a "for" left on an agent executor is inert: the dispatch still runs under 
   assert.ok(warnings.some((w) => w.id === 'executor.fake.agent-for-inert'), JSON.stringify(warnings));
 });
 
-test('execute <agent> --for <capability without confinement> runs unconfined on the first cli invocation', async () => {
-  const { root } = fixtureRepo();
-  const result = await executeExecutorCli('fake', { sharedCwd: true, for: 'execute', prompt: 'hello', tier: 'flagship', cwd: root, repoRoot: root });
+test('execute <agent> --for <capability without confinement> runs unconfined on the first cli invocation, at the tier the capability declares', async () => {
+  const { root } = fixtureRepo({
+    capabilitiesPatch: { execute: { description: 'changes files', serves: { outputKind: 'change', mutates: true }, tier: 'flagship' } },
+  });
+  const result = await executeExecutorCli('fake', { sharedCwd: true, for: 'execute', prompt: 'hello', cwd: root, repoRoot: root });
   assert.equal(result.status, 0, result.stderr);
   assert.equal(result.model, 'fake-flagship');
   assert.equal(written(root), 'first:hello');

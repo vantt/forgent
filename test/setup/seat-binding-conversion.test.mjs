@@ -12,7 +12,6 @@ import path from 'node:path';
 
 import { convertRunnerConfig } from '../../src/setup/seat-binding-conversion.mjs';
 import { MODEL_POLICY_TIERS, ensureRunnerConfigForDir, loadRunnerConfigFromDir } from '../../src/runner/dispatch/config.mjs';
-import { bind } from '../../src/runner/execution/bind.mjs';
 import { discoverWorkflows } from '../../src/workflow/loader.mjs';
 
 const readFixture = (name) => JSON.parse(fs.readFileSync(new URL(`../fixtures/seat-binding-config/${name}.json`, import.meta.url), 'utf8')).runner;
@@ -164,16 +163,14 @@ test('the conversion runs again when rigorToTier reappears, and then only remove
   assert.deepEqual(again.runner, converted);
 });
 
-test('the real fill-missing writer puts rigorToTier back into a converted file, and converting the file again removes it', () => {
+test('the real fill-missing writer never puts rigorToTier back into a converted file, so the conversion has nothing left to do', () => {
   const converted = convert(forgentx()).runner;
   const dir = writeProject(converted);
   withHome(globalRunner(), () => ensureRunnerConfigForDir(dir));
   const rewritten = JSON.parse(fs.readFileSync(path.join(dir, '.fgos', 'config.json'), 'utf8')).runner;
-  assert.notEqual(rewritten.rigorToTier, undefined);
-  const again = convert(rewritten);
-  assert.deepEqual(changedPaths(again), ['runner.rigorToTier']);
-  assert.equal(again.runner.defaults.tier, 'standard');
-  assert.equal(again.runner.patterns.seatBinding.schema, 1);
+  assert.equal(rewritten.rigorToTier, undefined);
+  assert.equal(rewritten.patterns.seatBinding.schema, 1);
+  assert.deepEqual(changedPaths(convert(rewritten)), [], 'converting what the writer left is a no-op');
 });
 
 test('the marker alone does not make a config converted, and a config without the marker is converted even with no rigorToTier', () => {
@@ -285,23 +282,21 @@ test('the converted minimal project loads through the real loader too', () => {
 
 // ---- the converted tier equals what the seat ran at before --------------------------------------
 
-// Today's seat tier comes out of bind(). Every capability of the forgentX config is bound to one native
-// agent executor that has a cell at every tier, so the only thing that can move the tier is the rigor
-// and ceiling machinery under test. The converted side is the declared tier: the capability's tier, else
-// the default, under the capability's ceiling, else the global one.
-function tierToday(runner, capability) {
-  const config = {
-    ...structuredClone(runner),
-    executors: { probe: { agentType: 'probe', providerModel: 'probe' } },
-    modelPolicies: { probe: Object.fromEntries(MODEL_POLICY_TIERS.map((tier) => [tier, `model-${tier}`])) },
-    capabilities: { [capability]: { prefer: [{ executor: 'probe' }], ...(runner.capabilities[capability].rigor ? { rigor: runner.capabilities[capability].rigor } : {}) } },
-  };
-  const result = bind(
-    { unit: { id: 'u', capability, writes: [], rigor: 'standard' }, role: 'producer', independentOf: [] },
-    { runnerConfig: config, session: { headless: true } },
-  );
-  assert.ok(!result.refused, `${capability}: ${JSON.stringify(result.refused)}`);
-  return { tier: result.tier, ceiling: result.provenance.tier.ceiling?.value };
+// What the seat ran at before the rigor table was retired, as a reference oracle: the tier of the stronger
+// of the unit rigor (standard here) and the capability's own rigor, under the global ceiling, which the
+// capability's own rigor tier raises when that tier is higher. The converted side is the declared tier:
+// the capability's tier, else the default, under the capability's ceiling, else the global one.
+const TABLE = { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' };
+const RIGOR_ORDER = ['low', 'standard', 'high', 'critical'];
+function tierBefore(runner, capability) {
+  const table = { ...TABLE, ...runner.rigorToTier };
+  const capRigor = runner.capabilities[capability].rigor;
+  const rigor = capRigor && RIGOR_ORDER.indexOf(capRigor) > RIGOR_ORDER.indexOf('standard') ? capRigor : 'standard';
+  const tier = table[rigor];
+  const capTier = capRigor ? table[capRigor] : undefined;
+  const above = (a, b) => MODEL_POLICY_TIERS.indexOf(a) > MODEL_POLICY_TIERS.indexOf(b);
+  const ceiling = runner.maxTier && capTier && above(capTier, runner.maxTier) ? capTier : runner.maxTier;
+  return { tier: ceiling && above(tier, ceiling) ? ceiling : tier, ceiling };
 }
 
 function tierConverted(runner, capability) {
@@ -311,14 +306,14 @@ function tierConverted(runner, capability) {
   return { tier: ceiling && MODEL_POLICY_TIERS.indexOf(tier) > MODEL_POLICY_TIERS.indexOf(ceiling) ? ceiling : tier, ceiling };
 }
 
-test('for every capability of the forgentX config the converted tier and ceiling equal today\'s seat tier at a unit rigor of standard', () => {
+test('for every capability of the forgentX config the converted tier and ceiling equal the seat tier the rigor table gave at a unit rigor of standard', () => {
   const original = forgentx();
   const converted = convert(original).runner;
   const names = Object.keys(original.capabilities);
   assert.ok(names.length >= 30);
   for (const name of names) {
-    const today = tierToday(original, name);
+    const before = tierBefore(original, name);
     const after = tierConverted(converted, name);
-    assert.deepEqual(after, today, `${name}: today ${JSON.stringify(today)}, converted ${JSON.stringify(after)}`);
+    assert.deepEqual(after, before, `${name}: before ${JSON.stringify(before)}, converted ${JSON.stringify(after)}`);
   }
 });

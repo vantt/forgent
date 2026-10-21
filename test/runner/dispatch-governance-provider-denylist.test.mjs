@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
-import { resolveAssignmentDispatchPolicy } from '../../src/runner/dispatch/assignment-policy.mjs';
+import { effectiveDispatchPolicy } from '../../src/runner/dispatch/plan.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import {
@@ -117,7 +117,7 @@ test('direct dispatch gate enforces canonical provider matching for OpenAI famil
 
   // 1. deny 'openai' blocks declared 'openai'
   assert.throws(
-    () => resolveAssignmentDispatchPolicy({
+    () => effectiveDispatchPolicy({
       assignment: assignmentOpenAI,
       runnerConfig,
       options: { disallowedProviders: ['openai'] },
@@ -127,7 +127,7 @@ test('direct dispatch gate enforces canonical provider matching for OpenAI famil
 
   // 2. deny 'openai-codex' blocks declared 'openai'
   assert.throws(
-    () => resolveAssignmentDispatchPolicy({
+    () => effectiveDispatchPolicy({
       assignment: assignmentOpenAI,
       runnerConfig,
       options: { disallowedProviders: ['openai-codex'] },
@@ -137,7 +137,7 @@ test('direct dispatch gate enforces canonical provider matching for OpenAI famil
 
   // 3. deny 'codex' blocks declared 'openai-codex'
   assert.throws(
-    () => resolveAssignmentDispatchPolicy({
+    () => effectiveDispatchPolicy({
       assignment: assignmentCodex,
       runnerConfig,
       options: { disallowedProviders: ['codex'] },
@@ -254,7 +254,7 @@ test('governance gates enforce canonical provider matching for Z-AI family alias
     policy: { preferExecutor: 'target-zai' },
   });
   assert.throws(
-    () => resolveAssignmentDispatchPolicy({
+    () => effectiveDispatchPolicy({
       assignment: asgnDirectZai,
       runnerConfig,
       options: { disallowedProviders: ['glm'] },
@@ -272,7 +272,7 @@ test('governance gates enforce canonical provider matching for Z-AI family alias
     policy: { preferExecutor: 'target-glm' },
   });
   assert.throws(
-    () => resolveAssignmentDispatchPolicy({
+    () => effectiveDispatchPolicy({
       assignment: asgnDirectGlm,
       runnerConfig,
       options: { disallowedProviders: ['z-ai'] },
@@ -331,7 +331,7 @@ test('governance gates enforce canonical provider matching for Gemini family ali
     policy: { preferExecutor: 'target-gemini' },
   });
   assert.throws(
-    () => resolveAssignmentDispatchPolicy({
+    () => effectiveDispatchPolicy({
       assignment: asgnDirectGemini,
       runnerConfig,
       options: { disallowedProviders: ['agy'] },
@@ -349,7 +349,7 @@ test('governance gates enforce canonical provider matching for Gemini family ali
     policy: { preferExecutor: 'target-agy' },
   });
   assert.throws(
-    () => resolveAssignmentDispatchPolicy({
+    () => effectiveDispatchPolicy({
       assignment: asgnDirectAgy,
       runnerConfig,
       options: { disallowedProviders: ['gemini'] },

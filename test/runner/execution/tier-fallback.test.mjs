@@ -31,13 +31,13 @@ const executor = (family) => ({
 });
 const cells = (family, cell) => ({ nano: cell ?? `${family}-s`, standard: cell ?? `${family}-m`, advanced: cell ?? `${family}-m`, flagship: cell ?? `${family}-l`, frontier: cell ?? `${family}-l` });
 
-function config({ prefer = FAMILIES, tierFallback, modelPolicies = {}, llmAccounts, extra = {} } = {}) {
+function config({ prefer = FAMILIES, tier, tierFallback, modelPolicies = {}, llmAccounts, extra = {} } = {}) {
   return {
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     modelPolicies: { ...Object.fromEntries(FAMILIES.map((family) => [family, cells(family)])), ...modelPolicies },
     ...(tierFallback ? { tierFallback } : {}),
     ...(llmAccounts ? { llmAccounts } : {}),
-    capabilities: { 'docs:write': { prefer: prefer.map((name) => ({ executor: name })) } },
+    capabilities: { 'docs:write': { prefer: prefer.map((name) => ({ executor: name })), ...(tier ? { tier } : {}) } },
     executors: Object.fromEntries(FAMILIES.map((family) => [family, executor(family)])),
     ...extra,
   };
@@ -67,7 +67,8 @@ test('with no tier list the walk is the prefer order after the failed candidate'
 });
 
 test('the walk never leaves the tier it started at', () => {
-  const cfg = config({ tierFallback: { flagship: ['delta', 'gamma'] } });
+  // The capability declares its tier; a unit's rigor says how careful it is and never moves the tier.
+  const cfg = config({ tier: 'flagship', tierFallback: { flagship: ['delta', 'gamma'] } });
   const high = { ...ask, unit: { ...ask.unit, rigor: 'high' } };
   const walk = walkBindings(high, ctx(cfg));
   assert.deepEqual(families(walk), ['alpha', 'delta', 'gamma']);
@@ -188,19 +189,18 @@ test('a committed-config walk stays in its tier and keeps each family to its own
   const committed = JSON.parse(fs.readFileSync(path.join(root, '.fgos', 'config.json'), 'utf8')).runner;
   const DOER = ['gemini', 'deepseek', 'z-ai', 'claude', 'openai'];
   const PREMIUM = ['claude', 'openai', 'gemini', 'xai'];
-  const runnerConfig = {
+  const withTier = (tier) => ({
     ...committed,
     governance: undefined,
     maxTier: undefined,
     tierFallback: { nano: DOER, standard: DOER, advanced: DOER, flagship: PREMIUM, frontier: PREMIUM },
-  };
-  const familyOf = (id) => runnerConfig.executors[id].providerModel ?? runnerConfig.executors[id].provider;
+    // The tier is declared by the config, per capability, the way a project declares it.
+    capabilities: { ...committed.capabilities, 'marketing:research': { ...committed.capabilities['marketing:research'], tier } },
+  });
+  const familyOf = (id) => committed.executors[id].providerModel ?? committed.executors[id].provider;
   for (const [tier, order] of [['nano', DOER], ['standard', DOER], ['advanced', DOER], ['flagship', PREMIUM], ['frontier', PREMIUM]]) {
-    const tierAsk = {
-      unit: { id: 'u', capability: 'marketing:research', writes: [], ...(tier === 'nano' ? { rigor: 'low' } : {}) },
-      role: 'reviewer',
-      overrides: tier === 'nano' ? [] : [{ origin: 'human-cli', tier }],
-    };
+    const runnerConfig = withTier(tier);
+    const tierAsk = { unit: { id: 'u', capability: 'marketing:research', writes: [] }, role: 'reviewer' };
     const walk = walkBindings(tierAsk, { runnerConfig, session: { headless: true } });
     assert.ok(walk.length > 1, `${tier}: a chain exists`);
     assert.ok(walk.every((b) => b.tier === tier), `${tier}: the chain stays in the tier`);

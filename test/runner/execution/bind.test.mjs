@@ -37,12 +37,6 @@ function createMockRunnerConfig() {
         frontier: 'gemini-2.0-pro',
       },
     },
-    rigorToTier: {
-      low: 'nano',
-      standard: 'standard',
-      high: 'flagship',
-      critical: 'frontier',
-    },
     capabilities: {
       'code:implement': {
         description: 'Implement code changes',
@@ -251,46 +245,31 @@ test('bind: independence filter selects candidate of different provider family',
   assert.equal(result.model, 'gpt-4o');
 });
 
-test('bind: independence violation refuses unless human-cli override has acceptDependence', () => {
+test('bind: independence violation refuses, and accepting the dependence needs an authorized door', () => {
   const runnerConfig = createMockRunnerConfig();
   const unit = {
     id: 'u1',
     capability: 'code:implement',
     writes: [],
   };
-
-  // Agent override violating independence
-  const askAgentOverride = {
+  const accepting = (origin) => ({
     unit,
     ...CHECKER,
     readOnly: true,
     independentOf: ['claude'],
-    overrides: [{
-      scope: { role: 'reviewer' },
-      origin: 'agent',
-      executor: 'claude',
-      acceptDependence: true,
-    }],
-  };
-  const resAgent = bind(askAgentOverride, { runnerConfig, session: {} });
-  assert.ok(resAgent.refused);
-  assert.equal(resAgent.refused.reason, 'independence');
+    overrides: [{ scope: { role: 'reviewer' }, ...(origin ? { origin } : {}), executor: 'claude', acceptDependence: true }],
+  });
 
-  // Human CLI override with acceptDependence: true
-  const askHumanOverride = {
-    unit,
-    ...CHECKER,
-    readOnly: true,
-    independentOf: ['claude'],
-    overrides: [{
-      scope: { role: 'reviewer' },
-      origin: 'human-cli',
-      executor: 'claude',
-      acceptDependence: true,
-    }],
-  };
-  const resHuman = bind(askHumanOverride, { runnerConfig, session: {} });
-  assert.equal(resHuman.executor, 'claude');
+  // An override that accepts the dependence is ignored whatever origin it claims: the door is not authorized.
+  for (const origin of ['agent', 'human-cli', undefined]) {
+    const refused = bind(accepting(origin), { runnerConfig, session: {} });
+    assert.ok(refused.refused, `origin ${origin}`);
+    assert.equal(refused.refused.reason, 'independence');
+  }
+
+  // A door that was authorized may accept it.
+  const accepted = bind({ ...accepting(), raiseAuthorized: true }, { runnerConfig, session: {} });
+  assert.equal(accepted.executor, 'claude');
 });
 
 test('bind: governance rejects disallowed provider', () => {
@@ -482,7 +461,7 @@ test('nextCandidate: walks the prefer pool in order, never revisits a candidate,
 
 function twoInvocationConfig(extraCapabilities = {}) {
   return {
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     modelPolicies: { claude: { nano: 'duo-s', standard: 'duo-m', advanced: 'duo-m', flagship: 'duo-l', frontier: 'duo-l' } },
     capabilities: { 'docs:write': { prefer: [{ executor: 'duo' }] }, ...extraCapabilities },
     executors: {
@@ -544,24 +523,29 @@ test('bind: a candidate with no invocation able to carry the posture is refused 
   assert.equal(result.refused.reason, 'posture-unavailable');
 });
 
-test('bind: a description-only exact entry does not hide a bare-verb entry that has a prefer pool', () => {
+test('bind: the bare verb of a capability is not a lookup key, so a description-only exact entry supplies no pool', () => {
   const config = twoInvocationConfig({
     'docs:plan': { description: 'slot with no prefer' },
     plan: { prefer: [{ executor: 'duo' }] },
   });
   const ask = { unit: { id: 'u1', capability: 'docs:plan', writes: [] }, role: 'producer' };
   const result = bind(ask, { runnerConfig: config, session: { headless: true } });
-  assert.equal(result.executor, 'duo');
-  assert.equal(result.provenance.executor.source, 'capability:plan');
+  assert.equal(result.refused.reason, 'headless-no-executor');
 });
 
-test('bind: an exact entry with a prefer pool still wins over the bare verb', () => {
+test('bind: an exact entry with a prefer pool wins over its prefix entry, and the prefix entry serves a capability with no pool of its own', () => {
   const config = twoInvocationConfig({
     'docs:plan': { prefer: [{ executor: 'duo' }] },
-    plan: { prefer: [{ executor: 'missing' }] },
+    'docs:*': { prefer: [{ executor: 'missing' }] },
+    'docs:outline': { description: 'slot with no prefer' },
   });
-  const ask = { unit: { id: 'u1', capability: 'docs:plan', writes: [] }, role: 'producer' };
-  assert.equal(bind(ask, { runnerConfig: config, session: { headless: true } }).provenance.executor.source, 'capability:docs:plan');
+  const ask = (capability) => ({ unit: { id: 'u1', capability, writes: [] }, role: 'producer' });
+  const exact = bind(ask('docs:plan'), { runnerConfig: config, session: { headless: true } });
+  assert.equal(exact.provenance.executor.source, 'capabilities."docs:plan".prefer');
+  config.capabilities['docs:*'] = { prefer: [{ executor: 'duo' }] };
+  const viaPrefix = bind(ask('docs:outline'), { runnerConfig: config, session: { headless: true } });
+  assert.equal(viaPrefix.executor, 'duo');
+  assert.equal(viaPrefix.provenance.executor.source, 'capabilities."docs:*".prefer');
 });
 
 test('bind: with no prefer pool anywhere a headless unit is refused and its description-only entry still supplies rigor', () => {
@@ -627,11 +611,12 @@ test('bind spread: never overrides the hard independence filter', () => {
   assert.equal(hardOnly.provenance.familySpread, undefined, 'no spread asked: nothing recorded');
 });
 
-test('bind spread: a human-cli acceptDependence override still applies and is unaffected by spread', () => {
+test('bind spread: an acceptDependence override from an authorized door still applies and is unaffected by spread', () => {
   const ctx = { runnerConfig: createMockRunnerConfig(), session: {} };
   const res = bind(spreadAsk([seatOn('member-1', 'claude')], {
     independentOf: ['claude'],
-    overrides: [{ scope: { seat: 'member-9' }, origin: 'human-cli', executor: 'claude', acceptDependence: true }],
+    raiseAuthorized: true,
+    overrides: [{ scope: { seat: 'member-9' }, executor: 'claude', acceptDependence: true }],
   }), ctx);
   assert.equal(res.executor, 'claude');
 });
@@ -671,7 +656,7 @@ test('bind prefer: a filtered unit candidate falls to the capability pool, whose
   runnerConfig.governance = { disallowedProviders: ['gemini'] };
   const result = bind(preferAsk({ prefer: ['gemini-cli'] }), { runnerConfig, session: {} });
   assert.equal(result.executor, 'claude');
-  assert.equal(result.provenance.executor.source, 'capability:code:implement');
+  assert.equal(result.provenance.executor.source, 'capabilities."code:implement".prefer');
 });
 
 test('bind prefer: independence filters a unit-preferred executor of the same family', () => {
@@ -680,7 +665,7 @@ test('bind prefer: independence filters a unit-preferred executor of the same fa
     { runnerConfig: createMockRunnerConfig(), session: {} },
   );
   assert.equal(result.executor, 'claude');
-  assert.equal(result.provenance.executor.source, 'capability:code:implement');
+  assert.equal(result.provenance.executor.source, 'capabilities."code:implement".prefer');
 });
 
 test('bind prefer: a unit-preferred executor with no invocation able to carry the posture is skipped', () => {
@@ -729,8 +714,8 @@ test('bind prefer: duplicates of a unit candidate are dropped from the capabilit
   }
   assert.deepEqual(walked, [
     ['codex', 'unit-prefer'],
-    ['claude', 'capability:code:implement'],
-    ['gemini-cli', 'capability:code:implement'],
+    ['claude', 'capabilities."code:implement".prefer'],
+    ['gemini-cli', 'capabilities."code:implement".prefer'],
   ]);
 });
 
@@ -741,7 +726,7 @@ test('bind prefer: nextCandidate after a unit-preferred executor walks into the 
   assert.equal(first.executor, 'gemini-cli');
   const second = nextCandidate(first, ask, ctx);
   assert.equal(second.executor, 'claude');
-  assert.equal(second.provenance.executor.source, 'capability:code:implement');
+  assert.equal(second.provenance.executor.source, 'capabilities."code:implement".prefer');
   assert.equal(second.provenance.fallbackFrom.executor, 'gemini-cli');
 });
 
@@ -753,8 +738,8 @@ test('bind prefer: a unit without prefer binds exactly as before', () => {
   assert.deepEqual(bind(withEmpty, ctx), result);
   assert.equal(result.executor, 'claude');
   assert.equal(result.pool, 'claude');
-  assert.deepEqual(result.provenance.executor, { value: 'claude', source: 'capability:code:implement' });
-  assert.deepEqual(result.provenance.invocation, { value: 'claude-herdr', source: 'capability:code:implement' });
+  assert.deepEqual(result.provenance.executor, { value: 'claude', source: 'capabilities."code:implement".prefer' });
+  assert.deepEqual(result.provenance.invocation, { value: 'claude-herdr', source: 'capabilities."code:implement".prefer' });
 });
 
 test('bind persona: the unit persona beats the capability persona and is recorded as the unit', () => {
@@ -843,95 +828,105 @@ test('bind: a bare executor in a unit prefer takes the herdr transport even when
   assert.equal(pinned.transport, 'cli');
 });
 
-test('bind: a unit rigor of low selects the nano tier when the capability declares no rigor floor', () => {
+test('bind: a unit rigor never selects a tier: a low rigor binds the default tier', () => {
   const result = bind(
     { unit: { id: 'u1', capability: 'docs:write', writes: ['docs/a.md'], rigor: 'low' }, role: 'producer', independentOf: [] },
     { runnerConfig: createMockRunnerConfig(), session: { herdrPresent: false, headless: true } },
   );
-  assert.equal(result.tier, 'nano');
-  assert.equal(result.model, 'gpt-4o-mini');
+  assert.equal(result.tier, 'standard');
+  assert.equal(result.model, 'gpt-4o');
+  assert.equal(result.provenance.tier.source, 'defaults.tier');
 });
 
-test('bind: a capability rigor floor still raises a lower unit rigor, and no rigor at all falls back to standard', () => {
-  const floored = bind(
+test('bind: a capability rigor never selects a tier either: the seat binds the tier the config declares, else the default', () => {
+  const rigorOnly = bind(
     { unit: { id: 'u1', capability: 'code:implement', writes: ['src/foo.js'], rigor: 'low' }, role: 'producer', independentOf: [] },
     { runnerConfig: createMockRunnerConfig(), session: { herdrPresent: false, headless: true } },
   );
-  assert.equal(floored.tier, 'standard');
-  const unset = bind(
-    { unit: { id: 'u1', capability: 'docs:write', writes: ['docs/a.md'] }, role: 'producer', independentOf: [] },
-    { runnerConfig: createMockRunnerConfig(), session: { herdrPresent: false, headless: true } },
+  assert.equal(rigorOnly.tier, 'standard');
+  const config = createMockRunnerConfig();
+  config.capabilities['code:implement'].tier = 'flagship';
+  const declared = bind(
+    { unit: { id: 'u1', capability: 'code:implement', writes: ['src/foo.js'], rigor: 'low' }, role: 'producer', independentOf: [] },
+    { runnerConfig: config, session: { herdrPresent: false, headless: true } },
   );
-  assert.equal(unset.tier, 'standard');
+  assert.equal(declared.tier, 'flagship');
+  assert.equal(declared.provenance.tier.source, 'capabilities."code:implement".tier');
 });
 
-// runner.maxTier caps every seat, but a capability that declares its own rigor in the config raises
-// the cap for itself to the tier of that rigor. A unit's rigor and a human override stay capped.
+// runner.maxTier caps every seat and a lowering is never silent: the tier source becomes the maxTier line
+// and the binding names the tier it was lowered from. A capability may declare its own maxTier, above or
+// below the global one. Rigor and overrides never raise a tier.
 function ceilingConfig() {
   const config = createMockRunnerConfig();
   config.maxTier = 'advanced';
-  config.capabilities.synthesize = { prefer: [{ executor: 'claude', invocation: 'claude-cli' }], rigor: 'critical' };
-  config.capabilities.frame = { prefer: [{ executor: 'claude', invocation: 'claude-cli' }], rigor: 'high' };
+  config.capabilities.synthesize = { prefer: [{ executor: 'claude', invocation: 'claude-cli' }], tier: 'frontier', maxTier: 'frontier' };
+  config.capabilities.frame = { prefer: [{ executor: 'claude', invocation: 'claude-cli' }], tier: 'flagship', maxTier: 'flagship' };
+  config.capabilities.lavish = { prefer: [{ executor: 'claude', invocation: 'claude-cli' }], tier: 'frontier' };
   return config;
 }
 const ceilingCtx = () => ({ runnerConfig: ceilingConfig(), session: { headless: true } });
 const ceilingAsk = (capability, extra = {}) => ({ unit: { id: 'u', capability, writes: [], ...extra }, role: 'producer', independentOf: [] });
 
-test('bind: with no capability rigor the global maxTier caps the tier as before', () => {
-  const result = bind(ceilingAsk('implement', { rigor: 'high' }), ceilingCtx());
+test('bind: a tier above the global maxTier is lowered to it, and the lowering names its source (max-tier-cap)', () => {
+  const result = bind(ceilingAsk('lavish'), ceilingCtx());
   assert.equal(result.tier, 'advanced');
   assert.equal(result.model, 'claude-3-5-sonnet');
-  assert.equal(result.provenance.tier.source, 'clamped:maxTier(advanced, global)');
-  assert.deepEqual(result.provenance.tier.ceiling, { value: 'advanced', source: 'global' });
+  assert.equal(result.provenance.tier.source, 'maxTier');
+  assert.deepEqual(result.provenance.tier.loweredFrom, { from: 'frontier', fromSource: 'capabilities."lavish".tier', reason: 'max-tier-cap' });
+  assert.deepEqual(result.provenance.tier.maxTier, { value: 'advanced', source: 'maxTier', applied: true });
 });
 
-test('bind: a capability declaring rigor critical runs at frontier above a global advanced cap, others stay capped', () => {
+test('bind: a capability maxTier above the global one lets that capability keep its tier, others stay capped', () => {
   const synth = bind(ceilingAsk('synthesize'), ceilingCtx());
   assert.equal(synth.tier, 'frontier');
   assert.equal(synth.model, 'claude-3-opus');
-  assert.equal(synth.provenance.tier.source, 'rigor:critical');
-  assert.deepEqual(synth.provenance.tier.ceiling, { value: 'frontier', source: 'capability-rigor(synthesize, critical)' });
+  assert.equal(synth.provenance.tier.source, 'capabilities."synthesize".tier');
+  assert.deepEqual(synth.provenance.tier.maxTier, { value: 'frontier', source: 'capabilities."synthesize".maxTier', applied: false });
+  assert.equal(synth.provenance.tier.loweredFrom, undefined);
 
-  const other = bind(ceilingAsk('implement', { rigor: 'critical' }), ceilingCtx());
+  const other = bind(ceilingAsk('lavish'), ceilingCtx());
   assert.equal(other.tier, 'advanced');
 });
 
-test('bind: a unit asking rigor critical on a capability without rigor stays at the global cap', () => {
+test('bind: a unit rigor never lifts a seat to a tier: rigor critical on a capability with no tier binds the default', () => {
   const result = bind(ceilingAsk('implement', { rigor: 'critical' }), ceilingCtx());
-  assert.equal(result.tier, 'advanced');
-  assert.equal(result.provenance.tier.source, 'clamped:maxTier(advanced, global)');
+  assert.equal(result.tier, 'standard');
+  assert.equal(result.provenance.tier.source, 'defaults.tier');
 });
 
-test('bind: a frontier override on a capability without rigor stays at the global cap', () => {
-  const ask = { ...ceilingAsk('implement'), overrides: [{ origin: 'human-cli', tier: 'frontier' }] };
-  const result = bind(ask, ceilingCtx());
-  assert.equal(result.tier, 'advanced');
-  assert.equal(result.provenance.tier.source, 'clamped:maxTier(advanced, global)');
+test('bind: a tier override above the resolved tier is refused (tier-escalation-unauthorized), at the capability maxTier or not', () => {
+  const ask = { ...ceilingAsk('implement'), overrides: [{ tier: 'frontier' }] };
+  const refused = bind(ask, ceilingCtx());
+  assert.equal(refused.refused.reason, 'tier-escalation-unauthorized');
+  assert.match(refused.refused.detail, /frontier/);
+  const framed = bind({ ...ceilingAsk('frame'), overrides: [{ tier: 'frontier' }] }, ceilingCtx());
+  assert.equal(framed.refused.reason, 'tier-escalation-unauthorized');
 });
 
-test('bind: a frontier override on a capability with rigor high stops at that rigor\'s tier', () => {
-  const ask = { ...ceilingAsk('frame'), overrides: [{ origin: 'human-cli', tier: 'frontier' }] };
-  const result = bind(ask, ceilingCtx());
-  assert.equal(result.tier, 'flagship');
-  assert.equal(result.provenance.tier.source, 'clamped:maxTier(flagship, capability-rigor(frame, high))');
-  assert.deepEqual(result.provenance.tier.ceiling, { value: 'flagship', source: 'capability-rigor(frame, high)' });
+test('bind: a tier override at or below the resolved tier is taken and says so', () => {
+  const result = bind({ ...ceilingAsk('frame'), overrides: [{ tier: 'nano' }] }, ceilingCtx());
+  assert.equal(result.tier, 'nano');
+  assert.equal(result.provenance.tier.source, 'override');
+  assert.equal(result.model, 'claude-3-haiku');
 });
 
 test('bind: without runner.maxTier there is no ceiling at all', () => {
   const config = ceilingConfig();
   delete config.maxTier;
-  const result = bind(ceilingAsk('implement', { rigor: 'critical' }), { runnerConfig: config, session: { headless: true } });
+  const result = bind(ceilingAsk('lavish'), { runnerConfig: config, session: { headless: true } });
   assert.equal(result.tier, 'frontier');
-  assert.equal(result.provenance.tier.ceiling, undefined);
+  assert.equal(result.provenance.tier.maxTier, undefined);
+  assert.equal(result.provenance.tier.loweredFrom, undefined);
 });
 
-test('bind: a capability rigor below the global cap leaves the global cap in force', () => {
+test('bind: a capability maxTier below the global cap lowers its seats further, naming its own line', () => {
   const config = ceilingConfig();
-  config.capabilities.implement.rigor = 'low';
-  const ask = { ...ceilingAsk('implement'), overrides: [{ origin: 'human-cli', tier: 'frontier' }] };
-  const result = bind(ask, { runnerConfig: config, session: { headless: true } });
-  assert.equal(result.tier, 'advanced');
-  assert.deepEqual(result.provenance.tier.ceiling, { value: 'advanced', source: 'global' });
+  config.capabilities.implement = { prefer: [{ executor: 'claude', invocation: 'claude-cli' }], tier: 'advanced', maxTier: 'standard' };
+  const result = bind(ceilingAsk('implement'), { runnerConfig: config, session: { headless: true } });
+  assert.equal(result.tier, 'standard');
+  assert.equal(result.provenance.tier.source, 'capabilities."implement".maxTier');
+  assert.deepEqual(result.provenance.tier.maxTier, { value: 'standard', source: 'capabilities."implement".maxTier', applied: true });
 });
 
 function skillsConfig() {

@@ -29,7 +29,8 @@ export function setupWorkflowFixtureRepo({
   gitName,
   capabilities,
   workerBody,
-  modelPolicies = { node: { standard: 'node-std' } },
+  // A cell for every tier a seat of a shipped workflow may recommend (a panel judge asks for flagship, one design seat for frontier).
+  modelPolicies = { node: { standard: 'node-std', flagship: 'node-high', frontier: 'node-top' } },
   reviewed = { maxRounds: 1, checkersByRigor: { standard: ['reviewer'] } },
 }) {
   const tmp = makeFixtureDir(prefix);
@@ -63,7 +64,7 @@ export function setupWorkflowFixtureRepo({
   const cfg = {
     runner: {
       defaultExecutor: 'test-node',
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+      defaults: { tier: 'standard' },
       modelPolicies,
       executors: {
         'test-node': {
@@ -77,7 +78,7 @@ export function setupWorkflowFixtureRepo({
         },
       },
       capabilities: Object.fromEntries(capabilities.map((name) => [name, { prefer: [{ executor: 'test-node' }], rigor: 'standard' }])),
-      patterns: {
+      patterns: { seatBinding: { schema: 1 },
         defaultRule: { mutatingMinRigor: 'standard' },
         reviewed,
       },

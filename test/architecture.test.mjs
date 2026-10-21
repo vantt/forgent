@@ -966,7 +966,7 @@ const WORK_SHAPED_LITERAL = /(['"`])(work|workItem|docsRef)\1/g;
 // A string that is exactly one of those names is allowed only where pinned here, one by one.
 const WORK_SHAPED_LITERAL_ALLOWLIST = {
   'src/runner/dispatch/plan.mjs': { reason: "the `--work` selector's type name in the DispatchPlan output", literals: ["'work'"] },
-  'src/runner/dispatch/assignment-policy.mjs': { reason: 'the option names refuseWorkItemInput refuses', literals: ["'work'", "'workItem'"] },
+  'src/runner/dispatch/work-item-input.mjs': { reason: 'the option names refuseWorkItemInput refuses', literals: ["'work'", "'workItem'"] },
 };
 
 /**

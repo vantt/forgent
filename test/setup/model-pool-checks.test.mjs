@@ -5,8 +5,6 @@ import '../helpers/process-tmp-root.mjs';
 import { assert, checkById, fs, mkTemp, path, withHome } from './helpers/setup-checks-harness.mjs';
 import { test } from 'node:test';
 
-const RIGOR_TO_TIER = { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' };
-
 function agent(providerModel, command = providerModel) {
   return { kind: 'agent', providerModel, command, args: ['{prompt}'], invocations: [{ id: `${command}-cli`, via: 'cli', adapter: 'cli-spawn', command, args: ['{prompt}'] }] };
 }
@@ -21,7 +19,8 @@ function runCheck(id, runner, globalRunner, setup) {
       runner: {
         executor: { command: 'claude', args: ['{prompt}'] },
         timeoutMs: 5000,
-        rigorToTier: RIGOR_TO_TIER,
+        defaults: { tier: 'standard' },
+        patterns: { seatBinding: { schema: 1 } },
         modelPolicies: { claude: { standard: 'sonnet' } },
         ...runner,
       },
@@ -131,28 +130,6 @@ test('global-model-policies-portable fails on a list, model@pool or object cell 
   const extended = runCheck('global-model-policies-portable', {}, { modelPolicies: { claude: { advanced: ['opus@vertex', 'opus'] }, deepseek: { standard: 'deepseek-v4@openrouter' }, gemini: { flagship: { model: 'gemini-pro', effort: 'high' } } } });
   assert.equal(extended.passed, false);
   assert.match(extended.message, /claude\.advanced, deepseek\.standard, gemini\.flagship/);
-});
-
-test('capability-rigor-ceiling names a capability whose rigor lifts it above runner.maxTier, with its model', () => {
-  const runner = {
-    maxTier: 'advanced',
-    executors: { claude: agent('claude') },
-    modelPolicies: { claude: { standard: 'sonnet', advanced: 'sonnet', flagship: 'opus', frontier: 'fable' } },
-    capabilities: {
-      synthesize: { prefer: ['claude'], rigor: 'critical' },
-      implement: { prefer: ['claude'], rigor: 'standard' },
-    },
-  };
-  const lifted = runCheck('capability-rigor-ceiling', runner);
-  assert.equal(lifted.passed, true);
-  assert.match(lifted.message, /synthesize \(rigor critical\) runs at frontier: claude fable/);
-  assert.doesNotMatch(lifted.message, /implement/);
-
-  const none = runCheck('capability-rigor-ceiling', { ...runner, maxTier: 'frontier' });
-  assert.match(none.message, /no capability rigor lifts a seat above runner\.maxTier frontier/);
-
-  const unset = runCheck('capability-rigor-ceiling', { ...runner, maxTier: undefined });
-  assert.match(unset.message, /runner\.maxTier not set/);
 });
 
 test('tier-fallback is quiet without a list, passes a served list and warns about a family the walk would skip', () => {

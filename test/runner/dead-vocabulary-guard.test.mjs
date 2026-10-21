@@ -170,7 +170,7 @@ test('dead vocabulary guard: loadRunnerConfig rejects dead keys with actionable 
   const base = {
     executor: { command: 'claude', args: ['{prompt}'] },
     modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', advanced: 'sonnet', flagship: 'sonnet', frontier: 'opus' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 1000,
   };
 
@@ -279,16 +279,16 @@ test('resolveTierModel: resolves tier to model via modelPolicies[provider][tier]
     (err) => err instanceof RunnerConfigError && /no model configured for tier "standard" under provider "custom"/.test(err.message),
   );
 });
-import { resolveAssignmentDispatchPolicy } from '../../src/runner/dispatch/assignment-policy.mjs';
+import { effectiveDispatchPolicy } from '../../src/runner/dispatch/plan.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 
-test('dead vocabulary guard: capabilities.<cap>.rigor floor elevates tier and capabilities.*.overrides is rejected (D19)', () => {
+test('dead vocabulary guard: capabilities.<cap>.rigor is a demand that moves no tier, and capabilities.*.overrides is rejected (D19)', () => {
   const baseConfig = {
     executor: { command: 'claude', args: ['{prompt}'] },
     modelPolicies: {
       claude: { nano: 'haiku', standard: 'sonnet', advanced: 'sonnet-adv', flagship: 'opus', frontier: 'fable' },
     },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 1000,
   };
 
@@ -304,7 +304,7 @@ test('dead vocabulary guard: capabilities.<cap>.rigor floor elevates tier and ca
     (err) => err instanceof RunnerConfigError && /capabilities\.code:review\.overrides was removed; use "capabilities\.code:review\.rigor"/.test(err.message),
   );
 
-  // 2. capabilities.<cap>.rigor floor elevates tier
+  // 2. capabilities.<cap>.rigor is a demand: it raises the effective rigor and never the tier
   const runnerConfig = {
     ...baseConfig,
     capabilities: {
@@ -317,12 +317,20 @@ test('dead vocabulary guard: capabilities.<cap>.rigor floor elevates tier and ca
     policy: { capability: 'code:review', rigor: 'standard' },
   });
 
-  const effective = resolveAssignmentDispatchPolicy({ assignment, runnerConfig });
-  assert.equal(effective.rigor, 'high', 'capability floor high should win over step standard');
-  assert.equal(effective.tier, 'flagship', 'high rigor maps to flagship tier');
-  assert.equal(effective.model, 'opus');
+  const effective = effectiveDispatchPolicy({ assignment, runnerConfig });
+  assert.equal(effective.rigor, 'high', 'capability rigor high should win over step standard');
+  assert.equal(effective.tier, 'standard', 'high rigor does not map to a tier: the config declares it');
+  assert.equal(effective.model, 'sonnet');
   assert.equal(effective.provenance.rigor.source.scope, 'capability');
   assert.equal(effective.provenance.rigor.source.id, 'code:review');
+
+  // The tier a capability runs at is declared next to its rigor.
+  const declared = effectiveDispatchPolicy({
+    assignment,
+    runnerConfig: { ...runnerConfig, capabilities: { 'code:review': { rigor: 'high', tier: 'flagship' } } },
+  });
+  assert.equal(declared.tier, 'flagship');
+  assert.equal(declared.model, 'opus');
 });
 
 import * as workModule from '../../src/state/work.mjs';

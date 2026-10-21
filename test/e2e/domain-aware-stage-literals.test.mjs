@@ -106,12 +106,12 @@ function writeRunnerConfig(repoRoot, executorScript) {
     path.join(repoRoot, '.fgos', 'config.json'),
     JSON.stringify({
       runner: confinedRunnerConfig({
-        // The fixture domains' execute step resolves to the generic `execute` capability;
-        // a Unit binds only from a pool the config names.
-        capabilities: { execute: { prefer: [{ executor: 'fgos-coding-implement' }] } },
+        // The fixture domains' execute step resolves to `<domain>:execute`; a Unit binds only from a pool the
+        // config names, on the capability's own entry or its `<domain>:*` entry (the bare verb is no key).
+        capabilities: { execute: { prefer: [{ executor: 'fgos-coding-implement' }] }, 'triage:*': { prefer: [{ executor: 'fgos-coding-implement' }] } },
         executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
         modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
-        rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+        defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
         timeoutMs: 15000,
         parallel: { maxRoots: 4, maxLeavesPerRoot: 4 },
       }),
@@ -363,7 +363,7 @@ test('domain-aware discovered-from addWork inherits parent domain+stage', () => 
   assert.equal(first.status, 0, `--once failed: ${first.stderr}`);
 
   const after = stateView(repoRoot).work;
-  assert.equal(after[triageItem.id].status, 'awaiting-approval', 'the triage item was actually dispatched by the real runner');
+  assert.equal(after[triageItem.id].status, 'awaiting-approval', `the triage item was actually dispatched by the real runner: ${first.stdout}${first.stderr}`);
 
   const discovered = Object.values(after).find((w) => w.discoveredFrom === triageItem.id);
   assert.ok(discovered, 'runner captured the fgos-discovered block into a new work item');

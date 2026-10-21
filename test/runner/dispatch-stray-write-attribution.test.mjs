@@ -72,7 +72,7 @@ function fixture() {
   const runner = {
     executor: { command: process.execPath, args: [script, '{prompt}'], allowCrossProvider: true },
     modelPolicies: { fake: { standard: 'fake-standard' }, claude: { standard: 'fake-standard' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 20000,
     executors: {
       fake: {
@@ -189,7 +189,7 @@ process.stdout.write('reviewed\\n');
     const runnerConfig = {
       executor: { allowCrossProvider: true, command: process.execPath, args: [script, '{prompt}'] },
       modelPolicies: { claude: { standard: 'test-model' } },
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
       timeoutMs: 20000,
     };
     const assignment = buildAssignment({ workId: 'tsk-stray-commit', stage: 'planning', operation: 'validate-plan' });
@@ -265,7 +265,7 @@ process.stdout.write('reviewed\\n');
     const runnerConfig = {
       executor: { allowCrossProvider: true, command: process.execPath, args: [script, '{prompt}'] },
       modelPolicies: { claude: { standard: 'test-model' } },
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
       timeoutMs: 20000,
     };
     const assignment = buildAssignment({ workId: 'tsk-stray-asgn', stage: 'planning', operation: 'validate-plan' });

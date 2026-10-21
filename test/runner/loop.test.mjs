@@ -654,14 +654,14 @@ test('runOnce clarify+decompose sweeps never touch a synthetic-domain item with 
   // from a pool the config names, never a guessed global executor.
   const config = {
     ...configFor(writeCommittingExecutor(scriptDir, counterFile)),
-    capabilities: { assembling: { prefer: [{ executor: 'fgos-coding-implement' }] } },
+    capabilities: { 'synthetic:assembling': { prefer: [{ executor: 'fgos-coding-implement' }] } },
   };
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   assert.equal(result.outcome, 'drained', 'the synthetic item must dispatch, never halt on a bogus stage conflict');
   assert.equal(result.dispatched.length, 1);
-  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval', JSON.stringify(result));
   assert.equal(result.dispatched[0].id, 'item-synthetic');
   assert.equal(listWork(dir).work['item-synthetic'].status, 'awaiting-approval');
   // no work.discovery / work.step event was ever written — the sweeps
@@ -1569,7 +1569,7 @@ test('dry-run: prints the plan (tier -> model, branch) and writes no event, no b
 
   const result = await runOnce({ repoRoot, config, worktreeDir, dryRun: true, log: noLog });
 
-  assert.equal(result.outcome, 'dry-run');
+  assert.equal(result.outcome, 'dry-run', JSON.stringify(result));
   assert.equal(result.plan.dispatch, 'item-plan');
   assert.equal(result.plan.tier, 'standard');
   assert.equal(result.plan.model, 'sonnet');

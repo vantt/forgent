@@ -795,7 +795,7 @@ test('I04-REV-01 regression: executeAssignment retry uses pinned template snapsh
       allowCrossProvider: true,
       command: process.execPath,
       args: [executorScript, '{prompt}'],
-    }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+    }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
     const assignment = {
       assignmentId: 'asgn_rev01_runner',

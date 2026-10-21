@@ -51,13 +51,13 @@ test('a checker name that is not a checker seat is refused', () => {
   assert.throws(() => checkerSeatsOf(unit, {}, { minCheckers: ['planner'] }), /not a checker seat/);
 });
 
-test('effective rigor is the stronger of the unit and the capability, the capability read by exact key, then prefix, then verb', () => {
+test('effective rigor is the stronger of the unit and the capability, the capability read by exact key, then prefix; the bare verb is no key', () => {
   const cfg = { capabilities: { 'docs:write': { rigor: 'high' }, 'code:*': { rigor: 'critical' }, review: { rigor: 'standard' } } };
   assert.equal(effectiveRigorOf({ capability: 'docs:write', rigor: 'low' }, cfg), 'high');
   assert.equal(effectiveRigorOf({ capability: 'docs:write', rigor: 'critical' }, cfg), 'critical');
   assert.equal(effectiveRigorOf({ capability: 'code:implement' }, cfg), 'critical', 'the prefix entry covers a capability with no entry of its own');
   assert.equal(capabilityRigorOf(cfg, 'docs:other'), undefined);
-  assert.equal(capabilityRigorOf(cfg, 'x:review'), 'standard', 'the bare verb is the last resort');
+  assert.equal(capabilityRigorOf(cfg, 'x:review'), undefined, 'the bare verb of a capability is not consulted');
   assert.equal(effectiveRigorOf({ capability: 'none:none' }, cfg), undefined);
   assert.equal(effectiveRigorOf({ capability: 'none:none' }, cfg, { fallback: 'standard' }), 'standard');
   assert.equal(requiresDistinctFamilies({ capability: 'docs:write' }, cfg), true);

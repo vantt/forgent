@@ -81,7 +81,7 @@ function setupTestRepo() {
   const cfg = {
     runner: {
       defaultExecutor: 'test-node',
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+      defaults: { tier: 'standard' },
       modelPolicies: { node: { standard: 'node-std' } },
       executors: {
         'test-node': {
@@ -98,7 +98,7 @@ function setupTestRepo() {
         'docs:write': { prefer: [{ executor: 'test-node' }], rigor: 'standard' },
         'code:implement': { prefer: [{ executor: 'test-node' }], rigor: 'standard' },
       },
-      patterns: {
+      patterns: { seatBinding: { schema: 1 },
         defaultRule: { mutatingMinRigor: 'standard' },
         reviewed: { maxRounds: 2, checkersByRigor: { standard: ['reviewer'] } },
       },

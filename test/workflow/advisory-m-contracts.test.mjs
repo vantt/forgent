@@ -69,8 +69,8 @@ function fixture(t, mode) {
   ]) capabilities[name] = { prefer: [{ executor: 'test-node' }], rigor: 'standard' };
   const cfg = withProviderFamilies({ runner: {
     defaultExecutor: 'test-node',
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
-    modelPolicies: { node: { standard: 'node-std', flagship: 'node-high' } },
+    defaults: { tier: 'standard' },
+    modelPolicies: { node: { standard: 'node-std', flagship: 'node-high', frontier: 'node-top' } },
     executors: { 'test-node': {
       kind: 'agent', allowCrossProvider: true, command: process.execPath,
       args: [worker, '{prompt}'], providerModel: 'node',
@@ -78,7 +78,7 @@ function fixture(t, mode) {
         confinement: { backend: 'bwrap' }, command: process.execPath, args: [worker, '{prompt}'] }],
     } },
     capabilities,
-    patterns: {
+    patterns: { seatBinding: { schema: 1 },
       defaultRule: { mutatingMinRigor: 'standard' },
       reviewed: { maxRounds: 2, checkersByRigor: {
         standard: ['reviewer'], high: ['reviewer'],

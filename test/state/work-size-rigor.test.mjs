@@ -14,7 +14,7 @@ import { RIGOR_VALUES } from '../../src/runner/rigor.mjs';
 import { foldEvents, rebuildView, rebuildViewFromDir } from '../../src/state/replay.mjs';
 import { initStore, addWork, editWork, currentEffectiveView } from '../../src/state/store.mjs';
 import { parseEditFlags } from '../../src/verbs/state/edit.mjs';
-import { resolveAssignmentDispatchPolicy } from '../../src/runner/dispatch/assignment-policy.mjs';
+import { effectiveDispatchPolicy } from '../../src/runner/dispatch/plan.mjs';
 import { workRigorFor } from '../../src/runner/work-dispatch.mjs';
 
 function mkTempDir() {
@@ -130,14 +130,8 @@ test('--tier bị từ chối kèm hướng dẫn trên parseEditFlags', () => {
   );
 });
 
-test('Work dispatch: rigor: high -> tier flagship (qua rigorToTier)', () => {
+test('Work dispatch: rigor: high is recorded as the demand and the tier stays the config\'s (rigor no longer maps to a tier)', () => {
   const runnerConfig = {
-    rigorToTier: {
-      low: 'nano',
-      standard: 'standard',
-      high: 'flagship',
-      critical: 'frontier',
-    },
     modelPolicies: {
       claude: {
         nano: 'haiku',
@@ -163,26 +157,20 @@ test('Work dispatch: rigor: high -> tier flagship (qua rigorToTier)', () => {
     ...(rigor !== undefined ? { rigor } : {}),
   };
 
-  const policy = resolveAssignmentDispatchPolicy({
+  const policy = effectiveDispatchPolicy({
     assignment,
     runnerConfig,
     cliOverride: {},
   });
 
-  assert.equal(policy.tier, 'flagship');
-  assert.equal(policy.model, 'opus');
+  assert.equal(policy.tier, 'standard');
+  assert.equal(policy.model, 'sonnet');
   assert.equal(policy.provenance.rigor.value, 'high');
-  assert.equal(policy.provenance.tier.value, 'flagship');
+  assert.equal(policy.provenance.tier.value, 'standard');
 });
 
 test('Work dispatch: không có rigor -> standard, size: heavy không ảnh hưởng model', () => {
   const runnerConfig = {
-    rigorToTier: {
-      low: 'nano',
-      standard: 'standard',
-      high: 'flagship',
-      critical: 'frontier',
-    },
     modelPolicies: {
       claude: {
         nano: 'haiku',
@@ -208,7 +196,7 @@ test('Work dispatch: không có rigor -> standard, size: heavy không ảnh hư�
     ...(rigor !== undefined ? { rigor } : {}),
   };
 
-  const policy = resolveAssignmentDispatchPolicy({
+  const policy = effectiveDispatchPolicy({
     assignment,
     runnerConfig,
     cliOverride: {},

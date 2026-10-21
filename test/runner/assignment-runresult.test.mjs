@@ -162,7 +162,7 @@ test('executeAssignment produces status: done and confidence: reported when work
     allowCrossProvider: true,
     command: process.execPath,
     args: [executorScript, '{prompt}'],
-  }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const assignment = buildAssignment({
     workId: 'tsk-store-test',
@@ -237,7 +237,7 @@ test('executeAssignment backfills mutation for its own effectiveAssignment re-re
     allowCrossProvider: true,
     command: process.execPath,
     args: [executorScript, '{prompt}'],
-  }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   // A genuinely read-only, no-Work-attached assignment (correctly stamped
   // mutation: 'read-only' by buildAssignment/the normalizer).
@@ -294,7 +294,7 @@ test('executeAssignment produces status: no-evidence when executor exits zero wi
     allowCrossProvider: true,
     command: process.execPath,
     args: [executorScript, '{prompt}'],
-  }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const assignment = buildAssignment({
     workId: 'tsk-no-ev-test',
@@ -331,7 +331,7 @@ test('failure still writes all storage files including exit.json, evidence.json,
     allowCrossProvider: true,
     command: process.execPath,
     args: [executorScript, '{prompt}'],
-  }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const assignment = buildAssignment({
     workId: 'tsk-store-fail-test',
@@ -428,7 +428,7 @@ test('executeAssignment allocates next run attempt monotonically when gaps exist
     allowCrossProvider: true,
     command: process.execPath,
     args: [executorScript, '{prompt}'],
-  }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const assignment = buildAssignment({
     workId: 'tsk-gap-test',
@@ -463,7 +463,7 @@ test('executeAssignment reads and respects persisted assignment.json as immutabl
     allowCrossProvider: true,
     command: process.execPath,
     args: [executorScript, '{prompt}'],
-  }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const assignment = buildAssignment({
     workId: 'tsk-persist-truth',
@@ -547,7 +547,7 @@ test('executeAssignment fails closed on malformed agent-result.json (Step 04 §5
     `,
   );
 
-  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const assignment = buildAssignment({
     workId: 'tsk-malformed-claim',
@@ -592,7 +592,7 @@ test('executeAssignment fails closed on invalid agent-result.json schema (Step 0
     `,
   );
 
-  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const assignment = buildAssignment({
     workId: 'tsk-invalid-schema',
@@ -622,7 +622,7 @@ test('executeAssignment does not count pre-existing dirty files as run evidence 
   const executorScript = path.join(tempDir, 'noop-executor.mjs');
   fs.writeFileSync(executorScript, 'process.exit(0);');
 
-  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const assignment = buildAssignment({ workId: 'tsk-dirty-before', stage: 'planning', operation: 'validate-plan' });
 
@@ -666,7 +666,7 @@ test('executeAssignment persists mutatedDirtyBeforeFiles (in both evidence.json 
     `,
   );
 
-  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const assignment = buildAssignment({ workId: 'tsk-dirty-mutated', stage: 'planning', operation: 'validate-plan' });
 
@@ -825,7 +825,7 @@ test('executeAssignment counts only new dirty files as run evidence (Step 04 §5
     `,
   );
 
-  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const assignment = buildAssignment({ workId: 'tsk-new-dirty', stage: 'executing', operation: 'implement-item' });
 
@@ -843,7 +843,7 @@ test('executeAssignment evidence.json contains dirtyBefore, dirtyAfter, changedF
   const executorScript = path.join(tempDir, 'echo-exit.mjs');
   fs.writeFileSync(executorScript, 'process.exit(0);');
 
-  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const assignment = buildAssignment({ workId: 'tsk-evidence-shape', stage: 'planning', operation: 'validate-plan' });
 
@@ -993,7 +993,7 @@ test('executeAssignment with no-op executor and pre-existing dirty file must pro
   const noopScript = path.join(tempDir, 'noop.mjs');
   fs.writeFileSync(noopScript, 'process.exit(0);');
 
-  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [noopScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [noopScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const assignment = buildAssignment({ workId: 'tsk-noop-preexisting', stage: 'executing', operation: 'implement-item' });
 
@@ -1015,7 +1015,7 @@ test('executeAssignment with corrupt persisted assignment.json must throw Runner
   const noopScript = path.join(tempDir, 'noop.mjs');
   fs.writeFileSync(noopScript, 'process.exit(0);');
 
-  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [noopScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [noopScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const assignment = buildAssignment({ workId: 'tsk-corrupt-json', stage: 'planning', operation: 'validate-plan' });
 
@@ -1059,7 +1059,7 @@ test('executeAssignment with bare agent-result.json (no evidenceRefs, no compani
     `,
   );
 
-  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const assignment = buildAssignment({ workId: 'tsk-bare-claim', stage: 'planning', operation: 'validate-plan' });
 
@@ -1096,7 +1096,7 @@ test('executeAssignment with malformed evidenceRefs: [""] fails closed with stat
     `,
   );
 
-  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const assignment = buildAssignment({ workId: 'tsk-bad-refs', stage: 'planning', operation: 'validate-plan' });
 
@@ -1132,7 +1132,7 @@ test('executeAssignment with placeholder report text (TODO/N/A/keyword-only) pro
     `,
   );
 
-  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const assignment = buildAssignment({ workId: 'tsk-todo-report', stage: 'planning', operation: 'validate-plan' });
   const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
@@ -1166,7 +1166,7 @@ test('executeAssignment with placeholder evidenceRefs (TODO/N/A/fabricated path)
     `,
   );
 
-  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const assignment = buildAssignment({ workId: 'tsk-placeholder-ref', stage: 'planning', operation: 'validate-plan' });
   const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
@@ -1200,7 +1200,7 @@ test('executeAssignment with real substantive report text produces confidence: r
     `,
   );
 
-  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const assignment = buildAssignment({ workId: 'tsk-real-report', stage: 'planning', operation: 'validate-plan' });
   const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
@@ -1419,7 +1419,7 @@ test('executeAssignment persists effective-execution-contract.json pre-launch an
     allowCrossProvider: true,
     command: process.execPath,
     args: [executorScript, '{prompt}'],
-  }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 15000 };
+  }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 15000 };
 
   const assignment = buildAssignment({
     workId: 'tsk-contract-test',
@@ -1486,7 +1486,7 @@ test('executeAssignment writes RunResult v3 with contract version 3, valid class
     allowCrossProvider: true,
     command: process.execPath,
     args: [executorScript, '{prompt}'],
-  }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const assignment = buildAssignment({
     workId: 'tsk-v2-exec-test',
@@ -1563,7 +1563,7 @@ test('executeAssignment for reviewer findings produces execution.completed with 
     allowCrossProvider: true,
     command: process.execPath,
     args: [executorScript, '{prompt}'],
-  }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const assignment = buildAssignment({
     workId: 'tsk-v2-review-findings',
@@ -1630,7 +1630,7 @@ test('done findings survive both settlement branches; verified mutating work sti
       runnerConfig: {
         executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
         modelPolicies: { claude: { standard: 'test-model' } },
-        rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+        defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
         timeoutMs: 5000,
       },
     });

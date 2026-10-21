@@ -195,7 +195,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'runner-coordination-orgPolicy-shape',
       'runner-patterns-config',
       'runner-generated-paths',
-      'runner-rigor-config',
       'mutating-assignment-binding-snapshot',
       'shadow-binder-divergence',
       'tier-vocabulary-dead-keys',
@@ -207,7 +206,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'llm-accounts-shape',
       'llm-accounts-vs-legacy',
       'global-model-policies-portable',
-      'capability-rigor-ceiling',
       'coordination-protocol-dead-vocabulary',
     ].sort(),
   );
@@ -875,6 +873,8 @@ function declareExecutor(cwd, id, fields) {
   cfg.runner ??= {};
   cfg.runner.executors ??= {};
   cfg.runner.executors[id] = fields;
+  // A project config in the seat-binding schema: the loader refuses one that has no marker.
+  cfg.runner.patterns = { ...cfg.runner.patterns, seatBinding: { schema: 1 } };
   // tsk-45f D11 (tsk-34n retired the "capability" singular fallback --
   // "for" is the only field read now): "for" is catalog-validated against
   // cfg.runner.capabilities -- declare each entry here so this raw fixture

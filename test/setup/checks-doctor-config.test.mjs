@@ -51,6 +51,8 @@ function declareExecutor(cwd, id, fields) {
   cfg.runner ??= {};
   cfg.runner.executors ??= {};
   cfg.runner.executors[id] = fields;
+  // A project config in the seat-binding schema: the loader refuses one that has no marker.
+  cfg.runner.patterns = { ...cfg.runner.patterns, seatBinding: { schema: 1 } };
   // tsk-45f D11 (tsk-34n retired the "capability" singular fallback --
   // "for" is the only field read now): "for" is catalog-validated against
   // cfg.runner.capabilities -- declare each entry here so this raw fixture
@@ -474,16 +476,18 @@ test('workflow-capabilities-configured names a capability a Workflow uses that c
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-test('workflow-capabilities-configured accepts a bare-verb entry the way bind() resolves it', () => {
+test('workflow-capabilities-configured accepts a prefix entry, and a bare-verb entry no longer covers a capability', () => {
   const cwd = mkTemp('doctor-workflow-caps-verb-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
   const { 'architecture:critique': _omitted, ...rest } = DEFAULT_CAPABILITY_SLOTS;
-  fs.writeFileSync(
+  const write = (entries) => fs.writeFileSync(
     path.join(cwd, '.fgos', 'config.json'),
-    JSON.stringify({ runner: { capabilities: { ...rest, critique: { description: 'verb entry', prefer: [{ executor: 'x' }] } } } }),
+    JSON.stringify({ runner: { capabilities: { ...rest, ...entries } } }),
   );
-  const { message } = checkById('workflow-capabilities-configured').check(cwd);
-  assert.doesNotMatch(message, /architecture:critique/);
+  write({ 'architecture:*': { description: 'prefix entry', prefer: [{ executor: 'x' }] } });
+  assert.doesNotMatch(checkById('workflow-capabilities-configured').check(cwd).message, /architecture:critique/);
+  write({ critique: { description: 'verb entry', prefer: [{ executor: 'x' }] } });
+  assert.match(checkById('workflow-capabilities-configured').check(cwd).message, /no entry for Workflow capabilities: .*architecture:critique/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
@@ -499,7 +503,7 @@ test('workflow-capabilities-configured warns, naming each Workflow capability wi
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-test('workflow-capabilities-configured is clean when each capability resolves to a prefer pool, exact or bare verb', () => {
+test('workflow-capabilities-configured is clean when each capability resolves to a prefer pool, on its exact entry or its prefix entry', () => {
   const cwd = mkTemp('doctor-workflow-caps-pool-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
   const capabilities = {};
@@ -508,10 +512,10 @@ test('workflow-capabilities-configured is clean when each capability resolves to
   }
   for (const name of Object.keys(DEFAULT_CAPABILITY_SLOTS)) {
     if (!name.includes(':')) continue;
-    const [domain, verb] = name.split(':');
-    // half by exact name, half by bare verb
+    const [domain] = name.split(':');
+    // half by exact name, half by the prefix entry
     if (domain.length % 2 === 0) capabilities[name] = { ...capabilities[name], prefer: [{ executor: 'x' }] };
-    else capabilities[verb] = { ...(capabilities[verb] ?? {}), prefer: [{ executor: 'x' }] };
+    else capabilities[`${domain}:*`] = { ...(capabilities[`${domain}:*`] ?? {}), prefer: [{ executor: 'x' }] };
   }
   fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities } }));
   const { passed, message } = checkById('workflow-capabilities-configured').check(cwd);
@@ -1057,7 +1061,7 @@ test('tier-vocabulary-dead-keys check passes on clean config', () => {
     fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
     fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({
       runner: {
-        rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+        defaults: { tier: 'standard' },
         modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', flagship: 'opus', frontier: 'opus' } },
       },
     }));
@@ -1092,6 +1096,29 @@ test('tier-vocabulary-dead-keys check fails when retired keys are present', () =
   }
 });
 
+test('tier-vocabulary-dead-keys names a project rigorToTier as retired, and leaves the global one to the loader', () => {
+  const dir = mkTemp('checks-tier-dead-rigor-');
+  const fakeHome = mkTemp('fake-home-');
+  try {
+    fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+    fs.mkdirSync(path.join(fakeHome, '.fgos'), { recursive: true });
+    const rigorToTier = { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' };
+    fs.writeFileSync(path.join(fakeHome, '.fgos', 'config.json'), JSON.stringify({ runner: { rigorToTier } }));
+    withHome(fakeHome, () => {
+      fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({ runner: { defaults: { tier: 'standard' } } }));
+      assert.equal(checkById('tier-vocabulary-dead-keys').check(dir).passed, true, 'a global file that has not re-run setup is not an error');
+      fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({ runner: { rigorToTier } }));
+      const { passed, message } = checkById('tier-vocabulary-dead-keys').check(dir);
+      assert.equal(passed, false);
+      assert.match(message, /project config contains retired key "runner\.rigorToTier".*fgos setup/);
+      assert.doesNotMatch(message, /global/);
+    });
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+    fs.rmSync(fakeHome, { recursive: true, force: true });
+  }
+});
+
 test('model-policy-tier-coverage check passes when all needed tiers are covered', () => {
   const dir = mkTemp('checks-model-coverage-pass-');
   const fakeHome = mkTemp('fake-home-');
@@ -1099,7 +1126,7 @@ test('model-policy-tier-coverage check passes when all needed tiers are covered'
     fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
     fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({
       runner: {
-        rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+        defaults: { tier: 'standard' },
         executors: {
           claude: { command: 'claude', providerModel: 'claude' },
         },
@@ -1111,7 +1138,7 @@ test('model-policy-tier-coverage check passes when all needed tiers are covered'
     withHome(fakeHome, () => {
       const { passed, message } = checkById('model-policy-tier-coverage').check(dir);
       assert.equal(passed, true);
-      assert.match(message, /modelPolicies covers all tiers/);
+      assert.match(message, /modelPolicies covers the default tier/);
     });
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
@@ -1119,14 +1146,14 @@ test('model-policy-tier-coverage check passes when all needed tiers are covered'
   }
 });
 
-test('model-policy-tier-coverage check fails when an executor provider lacks tier coverage', () => {
+test('model-policy-tier-coverage check fails when an executor provider lacks a cell for the default tier', () => {
   const dir = mkTemp('checks-model-coverage-fail-');
   const fakeHome = mkTemp('fake-home-');
   try {
     fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
     fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({
       runner: {
-        rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+        defaults: { tier: 'standard' },
         executors: {
           claude: { command: 'claude', providerModel: 'claude' },
           openai: { command: 'codex', providerModel: 'openai' },

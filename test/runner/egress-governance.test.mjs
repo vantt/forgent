@@ -19,7 +19,7 @@ test('declared egress: glm executor keeping command "claude" but setting ANTHROP
       },
     },
     modelPolicies: { claude: { standard: 'sonnet' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
   };
 
   assert.throws(
@@ -47,7 +47,7 @@ test('declared egress: glm executor with ANTHROPIC_BASE_URL and allowCrossProvid
       },
     },
     modelPolicies: { claude: { standard: 'sonnet' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
   };
 
   const res = resolveExecutorConfig(cfg, 'standard', 'glm');
@@ -79,7 +79,7 @@ test('declared egress: a crafted ANTHROPIC_BASE_URL merely CONTAINING "api.anthr
       },
     },
     modelPolicies: { claude: { standard: 'sonnet' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
   };
 
   assert.throws(
@@ -106,7 +106,7 @@ test('declared egress: an unparseable ANTHROPIC_BASE_URL value fails closed (tre
       },
     },
     modelPolicies: { claude: { standard: 'sonnet' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
   };
 
   assert.throws(
@@ -126,7 +126,7 @@ test('declared egress: native claude executor resolves same-provider governance 
       },
     },
     modelPolicies: { claude: { standard: 'sonnet' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
   };
 
   const res = resolveExecutorConfig(cfg, 'standard', 'claude');
@@ -155,7 +155,7 @@ test('declared egress: non-Claude command (agy) with allowCrossProvider: true re
       },
     },
     modelPolicies: { claude: { standard: 'sonnet' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
   };
 
   const res = resolveExecutorConfig(cfg, 'standard', 'agy', undefined, 'user-text');

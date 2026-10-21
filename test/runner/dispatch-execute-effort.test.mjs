@@ -92,7 +92,7 @@ function fixtureRepo({ commandName = 'codex', executorPatch = {} } = {}) {
   fs.chmodSync(cli, 0o755);
   const runner = {
     modelPolicies: { fake: { standard: 'fake-standard', flagship: 'fake-flagship' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 20000,
     executors: {
       fake: {
@@ -233,7 +233,7 @@ console.log('All good');
 
 const bindConfig = () => ({
   modelPolicies: { openai: { standard: 'gpt-std' }, claude: { standard: 'sonnet' } },
-  rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+  defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
   capabilities: { 'docs:write': { prefer: [{ executor: 'codex' }], rigor: 'standard' } },
   executors: {
     codex: { kind: 'agent', providerModel: 'openai', allowCrossProvider: true, invocations: [{ id: 'codex-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: 'codex', args: ['exec', '{prompt}'] }] },
@@ -279,7 +279,7 @@ test('fgos run with an effort override renders it into the CLI the bound executo
   fs.writeFileSync(cli, `#!${process.execPath}\nprocess.stdout.write('ARGV' + JSON.stringify(process.argv.slice(2)) + '\\n');\n`);
   fs.chmodSync(cli, 0o755);
   const runner = {
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     modelPolicies: { openai: { standard: 'gpt-std' } },
     executors: { codex: { kind: 'agent', providerModel: 'openai', allowCrossProvider: true, invocations: [{ id: 'codex-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: cli, args: ['exec', '--model', '{model}', '{prompt}'] }] } },
     capabilities: { 'docs:write': { prefer: [{ executor: 'codex' }], rigor: 'standard' } },
@@ -311,7 +311,7 @@ test('fgos run --effort reaches bind() as an override, and a level the executor 
   execFileSync('git', ['add', '.'], { cwd: repo });
   execFileSync('git', ['commit', '-q', '-m', 'initial'], { cwd: repo });
   const runner = {
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     modelPolicies: { claude: { standard: 'sonnet' } },
     executors: { claude: { kind: 'agent', supports: { reasoningEffort: ['low', 'medium', 'high'] }, invocations: [{ id: 'c', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: 'claude', args: ['-p', '{prompt}'] }] } },
     capabilities: { 'docs:write': { prefer: [{ executor: 'claude' }], rigor: 'standard' } },
@@ -340,7 +340,7 @@ test('fgos run --effort still reaches a role that a scoped --override does not n
   // No real CLI is ever launched: the effort check refuses before spawn, and the
   // command does not exist if it were reached.
   const runner = {
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     modelPolicies: { claude: { standard: 'sonnet' } },
     executors: { claude: { kind: 'agent', providerModel: 'claude', supports: { reasoningEffort: ['low', 'medium', 'high'] }, invocations: [{ id: 'c', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: 'fgos-test-no-such-cli', args: ['-p', '{prompt}'] }] } },
     capabilities: { 'docs:write': { prefer: [{ executor: 'claude' }], rigor: 'standard' } },

@@ -81,6 +81,7 @@ test('governance-blocked versus unregistered result shape across public CLI and 
     path.join(fgosDir, 'config.json'),
     JSON.stringify({
       runner: {
+        patterns: { seatBinding: { schema: 1 } },
         governance: {
           disallowedExecutors: ['blocked-worker'],
         },
@@ -137,7 +138,7 @@ test('cross-provider executor without explicit opt-in fails closed BEFORE worker
       },
     },
     modelPolicies: { claude: { standard: 'test-model' }, 'openai-codex': { standard: 'test-model' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
   };
 
   const work = { id: 'tsk-xprovider-probe', status: 'todo', stage: 'planning', domain: 'coding' };
@@ -207,7 +208,7 @@ test('an opted-in cross-provider executor runs and records executor + provider i
       claude: { standard: 'claude-3-5-sonnet' },
       'openai-codex': { standard: 'gpt-4o' },
     },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
   };
 
   const work = { id: 'tsk-provenance-probe', status: 'todo', stage: 'planning', domain: 'coding' };
@@ -349,7 +350,7 @@ test('provider-family warning suppresses for all-non-CLI and warns for bare unve
     fs.writeFileSync(cfgA, JSON.stringify({
       executor: baseExecutor,
       modelPolicies: { claude: { standard: 'test-model' } },
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
       timeoutMs: 5000,
       executors: {
         'mcp-executor': {
@@ -366,7 +367,7 @@ test('provider-family warning suppresses for all-non-CLI and warns for bare unve
     fs.writeFileSync(cfgB, JSON.stringify({
       executor: baseExecutor,
       modelPolicies: { claude: { standard: 'test-model' } },
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
       timeoutMs: 5000,
       executors: {
         'unrecognized-cli-executor': {
@@ -387,7 +388,7 @@ test('provider-family warning suppresses for all-non-CLI and warns for bare unve
     fs.writeFileSync(cfgC, JSON.stringify({
       executor: baseExecutor,
       modelPolicies: { claude: { standard: 'test-model' }, 'custom-provider': { standard: 'test-model' } },
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
       timeoutMs: 5000,
       executors: {
         'explicit-executor': {

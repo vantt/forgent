@@ -42,12 +42,7 @@ function setupGitRepo() {
   const runnerConfig = {
     runner: {
       defaultExecutor: 'test-node',
-      rigorToTier: {
-        low: 'nano',
-        standard: 'standard',
-        high: 'flagship',
-        critical: 'frontier',
-      },
+      defaults: { tier: 'standard' },
       modelPolicies: {
         node: {
           standard: 'node-std',
@@ -85,7 +80,7 @@ function setupGitRepo() {
           rigor: 'standard',
         },
       },
-      patterns: {
+      patterns: { seatBinding: { schema: 1 },
         defaultRule: { mutatingMinRigor: 'standard' },
         reviewed: {
           maxRounds: 2,

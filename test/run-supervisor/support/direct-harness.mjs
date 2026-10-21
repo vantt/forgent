@@ -63,7 +63,7 @@ export function createProject({ agent = {}, runner = {}, dispatch = null, timeou
   fs.writeFileSync(path.join(repoDir, '.fgos', 'config.json'), JSON.stringify({
     runner: {
       defaultExecutor: 'noisy',
-      rigorToTier: { standard: 'standard' },
+      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
       modelPolicies: { noisy: { standard: 'noisy-model' } },
       timeoutMs,
       executors: {
@@ -82,7 +82,7 @@ export function createProject({ agent = {}, runner = {}, dispatch = null, timeou
     },
     ...(dispatch ? { dispatch } : {}),
   }, null, 2));
-  const env = { ...process.env, XDG_STATE_HOME: stateDir, HOME: repoDir, TMPDIR: tmpDir };
+  const env = { ...process.env, XDG_STATE_HOME: stateDir, HOME: stateDir, TMPDIR: tmpDir };
   delete env.CLAUDE_CODE_SESSION_ID;
   delete env.CODEX_THREAD_ID;
   delete env.FGOS_SESSION_ID;

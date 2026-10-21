@@ -130,7 +130,7 @@ test('an unsupervised mutating executor is refused before its process starts', {
     executors: { fake: { kind: 'agent', command: process.execPath, args: ['-e', `require('fs').writeFileSync(${JSON.stringify(marker)}, 'started')`], allowCrossProvider: true, providerModel: 'fake' } },
     capabilities: { execute: { serves: { outputKind: 'change', mutates: true } } },
     modelPolicies: { fake: { standard: 'fake-standard' } },
-    rigorToTier: { standard: 'standard' }, timeoutMs: 5000,
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000,
   };
   await assert.rejects(() => executeExecutorCli('fake', { cwd: f.cwd, repoRoot: f.cwd, runnerConfig, for: 'execute' }), (err) => {
     assert.equal(err.code, 'custody-domain-required');

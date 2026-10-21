@@ -92,7 +92,7 @@ function tempConfigPath(capabilities) {
       executor: { command: 'claude', args: ['{prompt}'] },
       capabilities,
       modelPolicies: { claude: { standard: 'sonnet' } },
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
       timeoutMs: 1000,
     }),
   );

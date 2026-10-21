@@ -208,7 +208,7 @@ test('the declared account order survives the merge of the global config into a 
       mike: { credentialStore: { pi: '/srv/pi/mike' } },
     },
   });
-  fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({ runner: { ...projectRunner, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' } } }));
+  fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({ runner: { ...projectRunner, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } } } }));
   fs.writeFileSync(path.join(home, '.fgos', 'config.json'), JSON.stringify({ runner: { llmAccounts } }));
   const prev = process.env.HOME;
   process.env.HOME = home;
@@ -227,7 +227,7 @@ test('doctor warns about a store no invocation declares files for, and stays qui
     fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
     fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
     const { llmAccounts, ...projectRunner } = runner;
-    fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({ runner: { ...projectRunner, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' } } }));
+    fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({ runner: { ...projectRunner, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } } } }));
     fs.writeFileSync(path.join(home, '.fgos', 'config.json'), JSON.stringify({ runner: { llmAccounts } }));
     const prev = process.env.HOME;
     process.env.HOME = home;

@@ -37,7 +37,7 @@ function fixture() {
   const cfg = confinedRunnerConfig({
     executor: { command: process.execPath, args: [script, '{prompt}'], providerModel: 'node' },
     modelPolicies: { node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 20000,
   });
   persistRunnerConfig(repoRoot, cfg);

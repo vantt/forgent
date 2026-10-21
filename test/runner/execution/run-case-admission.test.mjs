@@ -78,11 +78,11 @@ function setup(families = ['okay']) {
     runner: {
       defaultExecutor: families[0],
       timeoutMs: 40000,
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+      defaults: { tier: 'standard' },
       modelPolicies: Object.fromEntries(families.map((f) => [f, { nano: 'fake', mini: 'fake', standard: 'fake', advanced: 'fake', flagship: 'fake', frontier: 'fake' }])),
       executors,
       capabilities: { 'docs:write': { prefer, rigor: 'standard' } },
-      patterns: { defaultRule: { mutatingMinRigor: 'standard' }, reviewed: { maxRounds: 2, checkersByRigor: { standard: ['reviewer'] } } },
+      patterns: { seatBinding: { schema: 1 }, defaultRule: { mutatingMinRigor: 'standard' }, reviewed: { maxRounds: 2, checkersByRigor: { standard: ['reviewer'] } } },
     },
   }, null, 2));
   return { repoRoot, worktreeDir };

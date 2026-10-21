@@ -55,7 +55,7 @@ function setupTestRepo() {
   const cfg = {
     runner: {
       defaultExecutor: 'test-node',
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+      defaults: { tier: 'standard' },
       modelPolicies: { node: { nano: 'node-nano', standard: 'node-std', advanced: 'node-adv', flagship: 'node-flagship', frontier: 'node-frontier' } },
       executors: {
         'test-node': {
@@ -71,7 +71,7 @@ function setupTestRepo() {
       capabilities: {
         'docs:write': { prefer: [{ executor: 'test-node' }], rigor: 'standard' },
       },
-      patterns: {
+      patterns: { seatBinding: { schema: 1 },
         defaultRule: { mutatingMinRigor: 'standard' },
         reviewed: { maxRounds: 2, checkersByRigor: { standard: ['reviewer'] } },
       },
@@ -253,7 +253,7 @@ test('fgos run "<prompt>" --effort reaches the override bind() reads', () => {
   failCli(['Check it', '--capability', 'docs:write', '--effort', 'high', '--dir', tmp], tmp);
   const [unitRunId] = unitRunsOf(tmp);
   const record = JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', unitRunId, 'unit.json'), 'utf8'));
-  assert.deepEqual(record.overrides, [{ origin: 'human-cli', reasoningEffort: 'high' }]);
+  assert.deepEqual(record.overrides, [{ reasoningEffort: 'high' }], 'the door names no origin that claims a person typed it');
   assert.equal(record.unit.objective, 'Check it');
 });
 
@@ -263,10 +263,10 @@ test('fgos run "<prompt>" --timeout gives the run its own time, kept in unit.jso
   assert.ok(stdout.includes('"outcome": "pass"'), stdout);
   const unitRunId = /"unitRunId": "([^"]+)"/.exec(stdout)[1];
   const record = unitRecordOf(tmp, stdout);
-  assert.deepEqual(record.overrides, [{ origin: 'human-cli', timeoutMs: 5400000 }]);
+  assert.deepEqual(record.overrides, [{ timeoutMs: 5400000 }]);
   const binding = record.bindings['producer/1'][0].binding;
   assert.equal(binding.timeoutMs, 5400000);
-  assert.deepEqual(binding.provenance.timeoutMs, { value: 5400000, source: 'override:human-cli' });
+  assert.deepEqual(binding.provenance.timeoutMs, { value: 5400000, source: 'override' });
   const runJsons = [];
   const walk = (d) => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name); if (e.isDirectory()) walk(p); else if (e.name === 'run.json') runJsons.push(p); } };
   walk(path.join(tmp, '.fgos', 'assignments', unitRunId));
@@ -417,4 +417,79 @@ test('fgos run help names --input and --verify', () => {
   const out = execFileSync(process.execPath, [BIN_FGOS, 'run', '--help'], { encoding: 'utf8' });
   assert.ok(out.includes('--input'), out);
   assert.ok(out.includes('--verify'), out);
+});
+
+// The raise doors: no door of this release can attest a person, so `fgos run` raises nothing. A tier above the
+// one a seat resolves to, a persona or capability the person typed that resolves above it, and an accepted
+// dependence are refused by name before any unit run exists; at or below the resolved tier everything works.
+const setRunnerConfig = (tmp, patch) => {
+  const file = path.join(tmp, '.fgos', 'config.json');
+  const cfg = JSON.parse(fs.readFileSync(file, 'utf8'));
+  fs.writeFileSync(file, JSON.stringify({ ...cfg, runner: patch(cfg.runner) }, null, 2));
+};
+
+test('fgos run --override with a tier above the resolved tier is refused by name, and no unit run is left behind', () => {
+  const tmp = setupTestRepo();
+  const out = failCli(['Check it', '--capability', 'docs:write', '--override', '{"tier":"frontier"}', '--dir', tmp], tmp);
+  assert.match(out, /tier-escalation-unauthorized/);
+  assert.match(out, /frontier/);
+  assert.deepEqual(unitRunsOf(tmp), []);
+});
+
+test('fgos run --override with a tier at or below the resolved tier still runs, at that tier', () => {
+  const tmp = setupTestRepo();
+  const stdout = runCli(['Check it', '--capability', 'docs:write', '--override', '{"tier":"nano"}', '--dir', tmp], tmp);
+  assert.ok(stdout.includes('"outcome": "pass"'), stdout);
+  const record = unitRecordOf(tmp, stdout);
+  assert.equal(record.bindings['producer/1'][0].binding.tier, 'nano');
+  assert.equal(record.bindings['producer/1'][0].binding.provenance.tier.source, 'override');
+});
+
+test('fgos run --persona whose seat tier is above what the seat resolves to without it is refused by name', () => {
+  const tmp = setupTestRepo();
+  fs.mkdirSync(path.join(tmp, 'fgos', 'agents'), { recursive: true });
+  fs.writeFileSync(path.join(tmp, 'fgos', 'agents', 'test-voice.yaml'), 'name: test-voice\ndescription: A test voice\n');
+  setRunnerConfig(tmp, (runner) => ({
+    ...runner,
+    capabilities: { ...runner.capabilities, 'docs:write': { ...runner.capabilities['docs:write'], personas: { 'test-voice': { tier: 'flagship' } } } },
+  }));
+  const refused = failCli(['Check it', '--capability', 'docs:write', '--persona', 'test-voice', '--dir', tmp], tmp);
+  assert.match(refused, /tier-escalation-unauthorized/);
+  assert.match(refused, /persona/);
+  assert.deepEqual(unitRunsOf(tmp), []);
+  // The same persona the person did not choose at the door (a unit file) is the project's own taste.
+  const unitFile = path.join(tmp, 'persona-unit.yaml');
+  fs.writeFileSync(unitFile, 'id: u-persona\nobjective: Test\ncapability: docs:write\npersona: test-voice\nwrites: []\n');
+  const own = execFileSync(process.execPath, [BIN_FGOS, 'run', '--unit', unitFile, '--dir', tmp], { cwd: tmp, encoding: 'utf8' });
+  assert.equal(unitRecordOf(tmp, own).bindings['producer/1'][0].binding.tier, 'flagship');
+});
+
+test('fgos run --capability whose tier is above the one the door would have run is refused by name', () => {
+  const tmp = setupTestRepo();
+  setRunnerConfig(tmp, (runner) => ({
+    ...runner,
+    capabilities: { ...runner.capabilities, 'docs:write': { ...runner.capabilities['docs:write'], tier: 'flagship' } },
+  }));
+  const refused = failCli(['Check it', '--capability', 'docs:write', '--dir', tmp], tmp);
+  assert.match(refused, /tier-escalation-unauthorized/);
+  assert.match(refused, /capability/);
+  assert.deepEqual(unitRunsOf(tmp), []);
+});
+
+test('fgos run --override that accepts a dependence is refused at the door, whatever origin it names', () => {
+  const tmp = setupTestRepo();
+  for (const origin of ['human-cli', 'agent']) {
+    const out = failCli(['Check it', '--capability', 'docs:write', '--override', JSON.stringify({ origin, acceptDependence: true }), '--dir', tmp], tmp);
+    assert.match(out, /dependence-acceptance-unauthorized/, origin);
+  }
+  assert.deepEqual(unitRunsOf(tmp), []);
+});
+
+test('fgos run keeps --timeout: it raises no tier', () => {
+  const tmp = setupTestRepo();
+  const stdout = runCli(['Check it', '--capability', 'docs:write', '--timeout', '5m', '--dir', tmp], tmp);
+  assert.ok(stdout.includes('"outcome": "pass"'), stdout);
+  const binding = unitRecordOf(tmp, stdout).bindings['producer/1'][0].binding;
+  assert.equal(binding.timeoutMs, 300000);
+  assert.equal(binding.tier, 'standard');
 });

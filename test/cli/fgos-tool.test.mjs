@@ -68,6 +68,8 @@ function declareExecutor(cwd, id, fields) {
   const configPath = path.join(cwd, '.fgos', 'config.json');
   const cfg = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
   cfg.runner ??= {};
+  // A project config in the seat-binding schema: the loader refuses one that has no marker.
+  cfg.runner.patterns = { ...cfg.runner.patterns, seatBinding: { schema: 1 } };
   cfg.runner.executors ??= {};
   cfg.runner.executors[id] = fields;
   // tsk-45f D11 (tsk-34n retired the "capability" singular fallback --

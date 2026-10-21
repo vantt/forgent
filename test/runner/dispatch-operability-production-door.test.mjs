@@ -48,7 +48,7 @@ function runnerConfig(executorScript, extra = {}) {
       ...(extra.executor ?? {}),
     },
     modelPolicies: { claude: { standard: 'test-model', advanced: 'test-analytical-model' }, [process.execPath]: { standard: 'test-model', advanced: 'test-analytical-model' } },
-    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: extra.timeoutMs ?? 5000,
     ...(extra.config ?? {}),
   };

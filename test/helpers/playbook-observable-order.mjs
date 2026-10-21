@@ -58,7 +58,7 @@ function fixtureRepo() {
     readme: '# Playbook order guard',
     gitName: 'Order Guard',
     capabilities: CAPABILITIES,
-    modelPolicies: { node: { standard: 'node-std', flagship: 'node-high' } },
+    modelPolicies: { node: { standard: 'node-std', flagship: 'node-high', frontier: 'node-top' } },
     reviewed: { maxRounds: 1, checkersByRigor: { standard: ['reviewer'], high: ['reviewer', 'red-team'] } },
     workerBody: WORKER_BODY,
   });

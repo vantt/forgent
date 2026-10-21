@@ -262,7 +262,7 @@ test('validate-plan no-evidence does not move Work', async () => {
     allowCrossProvider: true,
     command: process.execPath,
     args: [executorScript, '{prompt}'],
-  }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const work = { id: 'tsk-no-ev', status: 'doing', workflowStep: 'planning', domain: 'coding' };
   const choice = chooseStageOperation({
@@ -298,7 +298,7 @@ test('validate-plan failed does not move Work', async () => {
     allowCrossProvider: true,
     command: process.execPath,
     args: [executorScript, '{prompt}'],
-  }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const work = { id: 'tsk-fail-op', status: 'doing', workflowStep: 'planning', domain: 'coding' };
   const choice = chooseStageOperation({
@@ -333,7 +333,7 @@ test('reported READY allows existing planning edge path', async () => {
     allowCrossProvider: true,
     command: process.execPath,
     args: [executorScript, '{prompt}'],
-  }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
+  }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
 
   const work = { id: 'tsk-ready-op', status: 'doing', workflowStep: 'planning', domain: 'coding' };
   const choice = chooseStageOperation({

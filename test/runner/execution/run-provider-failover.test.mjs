@@ -139,7 +139,7 @@ function setup(providers, { prefer = Object.keys(providers), recentlyUsed = {}, 
     runner: {
       defaultExecutor: prefer[0],
       timeoutMs: 40000,
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+      defaults: { tier: 'standard' },
       modelPolicies: Object.fromEntries(Object.values(providers).map(({ family }) => {
         const cell = cells[family] ?? 'fake';
         return [family, { nano: cell, mini: cell, standard: cell, advanced: cell, flagship: cell, frontier: cell }];
@@ -147,7 +147,7 @@ function setup(providers, { prefer = Object.keys(providers), recentlyUsed = {}, 
       ...(tierFallback ? { tierFallback } : {}),
       executors,
       capabilities: { 'docs:write': { prefer: poolEntries, rigor: 'standard' } },
-      patterns: { defaultRule: { mutatingMinRigor: 'standard' } },
+      patterns: { seatBinding: { schema: 1 }, defaultRule: { mutatingMinRigor: 'standard' } },
     },
   };
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
@@ -417,7 +417,7 @@ test('a unit-preferred executor that hits its usage limit walks on to the capabi
   const attempts = attemptsOf(fx.repoRoot, res);
   assert.deepEqual(attempts.map((a) => [a.binding.executor, a.binding.provenance.executor.source, a.outcome]), [
     ['spent', 'unit-prefer', 'provider-limit'],
-    ['beta', 'capability:docs:write', 'pass'],
+    ['beta', 'capabilities."docs:write".prefer', 'pass'],
   ]);
   assert.equal(attempts[1].fallbackFrom.kind, 'next-candidate');
 });

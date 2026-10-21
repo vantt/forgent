@@ -25,7 +25,7 @@ const executor = (family) => ({
 });
 
 const runnerConfig = (prefer, providers = {}) => ({
-  rigorToTier: { standard: 'standard' },
+  defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
   modelPolicies: { alpha: { standard: 'm' }, beta: { standard: 'm' }, gamma: { standard: 'm' } },
   executors: { alpha: executor('alpha'), 'alpha-lite': executor('alpha'), beta: executor('beta'), gamma: executor('gamma') },
   capabilities: { 'docs:write': { prefer: prefer.map((name) => ({ executor: name })), rigor: 'standard' } },

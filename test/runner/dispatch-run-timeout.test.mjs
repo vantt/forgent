@@ -41,7 +41,7 @@ test('runner.timeoutMs is held to the same ceiling as a run timeout', async () =
     const write = (timeoutMs) => fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({
       runner: {
         timeoutMs,
-        rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+        defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
         modelPolicies: { node: { standard: 'node-std' } },
         executors: { 'test-node': { kind: 'agent', command: process.execPath, args: ['{prompt}'], providerModel: 'node' } },
       },

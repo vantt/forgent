@@ -139,7 +139,6 @@ test('executor-posture-coverage only inspects core capabilities and capabilities
       execute: { prefer: 'claude' },
       'code:implement': { prefer: 'claude' },
       'custom:no-pool': { description: 'description only without prefer' },
-      'custom:empty-pool': { prefer: [] },
       'custom:with-pool': { prefer: ['claude'] },
     },
   };
@@ -151,7 +150,6 @@ test('executor-posture-coverage only inspects core capabilities and capabilities
   assert.equal(result.passed, true, `Expected pass, got: ${result.message}`);
   assert.match(result.message, /custom:with-pool -> claude/);
   assert.doesNotMatch(result.message, /custom:no-pool/);
-  assert.doesNotMatch(result.message, /custom:empty-pool/);
 });
 
 test('executor-posture-coverage skips tool-only capabilities that do not use agent postures', async () => {
@@ -251,7 +249,7 @@ test('executor-posture-coverage warns and provides pool configuration guidance o
       },
     },
     capabilities: {
-      execute: { prefer: [] },
+      execute: { description: 'a capability with no pool (an empty prefer list is a load error)' },
       'code:implement': { prefer: 'claude' },
     },
   };
@@ -280,7 +278,7 @@ test('executor-posture-coverage groups failures by reason when both posture and 
     },
     capabilities: {
       execute: { prefer: 'unconfinedExec' },
-      'code:implement': { prefer: [] },
+      'code:implement': { description: 'a capability with no pool (an empty prefer list is a load error)' },
     },
   };
 
