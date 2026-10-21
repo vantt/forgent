@@ -4,7 +4,10 @@
 
 ## 1. Mục tiêu và phạm vi
 
-**Mục tiêu:** tìm và sửa lỗi, phát hiện vấn đề nghiêm trọng chưa ai xử lý trong các lớp tầng thấp. Đích là những lớp này ổn định hơn, nhanh hơn, nhẹ hơn, code đơn giản hơn, contract rõ hơn, nhưng **không to ra**.
+**Mục tiêu:**
+1. Tìm và sửa lỗi, tìm ra vấn đề nghiêm trọng chưa ai xử lý trong các lớp tầng thấp. Đích: ổn định hơn, nhanh hơn, nhẹ hơn, code đơn giản hơn, contract rõ hơn, nhưng **không to ra**.
+2. Đi từ tầng thấp nhất lên, mỗi tầng xong hẳn rồi mới lên tầng trên. Khi xong, mỗi component tầng thấp có đúng một authority, và authority đó nằm trong Rust.
+3. Trên đường đi, đánh giá và thực hiện việc chuyển sang Rust những phần Node còn đang quyết thay cho crate.
 
 **Phạm vi** (theo board): holder-lock, process/containment, session-identity, terminal-control, run supervisor (6.2/6.3/6.4), Git, event store, `durable-file`, `canonical-json`. Đây là các crate `packages/{holder-lock,process,session-identity,terminal-control,run-supervisor,git,event-store,durable-file,canonical-json}` cùng mặt tiền Node và route host của chúng.
 
@@ -14,7 +17,7 @@
 - Backlog đang `proposed` chạm phạm vi, đếm thô theo từ khoá: lock 7, git 9, identity 3, terminal 2, herdr 5.
 - Hai lỗi gửi brief: `p-d2dc4f2e` và `p-f97bb935` (đang sửa, lead `brief-shell-guard`).
 - Luồng TEST (test trùng giữa Rust và Node của chính các component này).
-- Bài học đêm 10-20/21, xem mục 4.4.
+- Bài học đêm 10-20/21, xem mục 4.6.
 
 ## 2. Tiêu chuẩn đánh giá: soát cái gì, coi gì là phát hiện
 
@@ -61,52 +64,80 @@ Mọi thay đổi do HARDEN đề ra phải qua cả bảy cổng sau thì mới
 6. **Spec đi cùng code:** sự thật thay đổi thì sửa spec của area trong cùng commit.
 7. **Ý tưởng thêm để riêng:** mọi đề xuất thêm tính năng gom vào một mục riêng của báo cáo. Mỗi ý ghi vấn đề thật, bằng chứng, lợi ích, và chỉ làm khi owner chọn.
 
-## 4. Phương pháp làm việc
+## 4. Phương pháp làm việc (rev 2, theo owner 09:12)
 
-### 4.1 Chia đợt
+Owner 09:12: rà soát đi theo component authority/boundary, **từ tầng thấp lên tầng cao**; giải quyết triệt để và hoàn tất tầng dưới rồi mới lên tầng trên; plan nêu **component khởi đầu và component kết thúc**; trên đường đi đánh giá **cơ hội, trình tự và cách chuyển phần Node sang Rust**.
 
-| Đợt | Component | Khi nào |
-|---|---|---|
-| **A** | holder-lock, process/containment, session-identity, terminal-control, run supervisor, `durable-file`, `canonical-json`, **Git (01–08, đã land cả hai máy từ 08:32 hôm nay)** | Mở được ngay: mọi phần đã land |
-| **B** | event store | Sau khi ES xong phần store (ES 09 phần store + ES 10 phần store) |
+### 4.1 Thứ tự tầng
 
-Đề xuất mở đợt A ngay, vì Git đã land nên đợt A giờ chiếm phần lớn phạm vi. Chờ ES chỉ phí thời gian của phần đã ổn định.
+Thứ tự lấy từ phụ thuộc crate thật (`packages/*/rust/Cargo.toml`) và [component-boundary](../../docs/platform/component-boundary.md):
 
-### 4.2 Các bước của mỗi đợt
+| Tầng | Component | Dựa trên | Node còn quanh nó (ứng viên chuyển Rust, đánh giá ở tầng đó) |
+|---|---|---|---|
+| **T0 (khởi đầu)** | **Process Facts & Control + Containment port** (L0, `fgos-process`), cùng ba crate lá `host-runtime`, `canonical-json`, `durable-file` | không gì | đánh giá liveness và danh tính tiến trình ở Node (`process-identity.mjs`; audit 09-28 C2: "liveness judged nine-plus ways"), ghi file atomic ở Node |
+| **T1** | **Holder-lock** (L1), **Session Identity**, **Convention** | process, host-runtime | `src/state/hot-lock.mjs`, `src/util/session-identity.mjs`, `src/convention` |
+| **T2** | **Git**, **Terminal-control** (L2) | holder-lock, process, durable-file | `src/git/*` (13 file), `src/terminal-control/client.mjs` |
+| **T3** | **Agent protocol** (L3), **Event Store** (khi ES xong phần store) | git, holder-lock, canonical-json | `src/state/events*.mjs`, `legacy-event-git-adapter.mjs` |
+| **T4 (kết thúc)** | **Run Supervisor + Launch gate** (L4) | mọi tầng dưới | `src/run-supervisor/*` (15 file), phần giám sát attempt trong `src/runner/dispatch` |
 
-1. **Đo baseline** (big lead, trước hội đồng), trên máy owner, lưu thành bảng:
-   - p50/p95 của từng route nội bộ trong phạm vi (`identity`, `lock-fd`, `supervise`/`gate`, các route git…);
-   - thời gian suite theo area (đang 1046 s, baseline 202 s);
-   - danh sách test chập chờn đã biết;
-   - LOC và số crate/module;
-   - backlog `proposed` theo component.
+- **Component khởi đầu:** Process Facts & Control (cùng ba crate lá).
+- **Component kết thúc:** Run Supervisor + Launch gate.
+- **Ngoài plan này** (tầng trên, có plan riêng): Observe, run-result, work-state, Seat Binding, Mailbox, Workflow, Execution Core.
 
-   Số này là "trước" cho cổng 1 và 5.
-2. **Hội đồng soát** (`fgos-architecture-panel`), mỗi đợt một hội đồng, mỗi ghế giữ một lăng kính:
-   - đúng/an toàn và khi hỏng (trục A–B);
-   - tốc độ và độ nặng (C–D);
-   - đơn giản và contract (E–F);
-   - một ghế red-team đi tìm phát hiện bị bỏ sót.
+### 4.2 Mỗi tầng là một vòng khép kín
 
-   Model chọn theo bản chất việc: soát thiết kế và tìm lỗi dùng các family mạnh (flagship), ghế red-team khác family với các ghế kia. Đầu ra là danh sách phát hiện theo mẫu mục 2, kèm giả thuyết đã bác.
-3. **Big lead phân xử:**
-   - mỗi phát hiện nhận / bác / gộp vào backlog, có lý do;
-   - phát hiện Critical/High chỉ suy luận thì cho tái hiện trước;
-   - viết plan (`ak-plan`, red-team + validate) chỉ cho phần nhận;
-   - tách mục "đề xuất thêm" để owner chọn.
-4. **Thực hiện:** một lead Sonnet cho mỗi component (hoặc mỗi nhóm file tách rời), trong worktree riêng, chạy song song khi file không giao nhau, theo `ak-cook`.
-5. **Verify độc lập** (mục 4.4): big lead chạy, không tin số lead tự báo.
-6. **Land theo đợt:** main → release → ba workspace → doctor → smoke, rồi đo lại baseline và ghi bảng trước/sau vào báo cáo land.
+1. **Đo baseline của tầng:** p50/p95 các route, test, LOC Rust và Node, backlog còn mở của tầng.
+2. **Hội đồng soát tầng.** Bốn lăng kính:
+   - đúng/an toàn và khi hỏng;
+   - tốc độ và độ nặng;
+   - đơn giản và contract;
+   - red-team, khác family với các ghế kia.
 
-### 4.3 Câu hỏi thì gom thành bộ
+   Hội đồng soát theo sáu trục ở mục 2 và đánh giá chuyển Rust theo mục 4.3.
+3. **Big lead phân xử và viết plan của tầng** (`ak-plan`, có red-team và validate). Các đề xuất thêm tính năng để riêng cho owner chọn.
+4. **Thực hiện:** mỗi lead Sonnet một worktree; chạy song song khi các lead sửa file khác nhau.
+5. **Verify độc lập** theo 4.5, rồi merge vào main.
+6. **Đóng tầng.** Một tầng đóng khi đủ cả bốn điều kiện:
+   - mọi phát hiện đã nhận đều đã sửa, hoặc có ghi lý do bác;
+   - backlog trong phạm vi của tầng không còn mục mở;
+   - đã đo lại và có bảng trước/sau;
+   - spec đã cập nhật.
+
+   **Tầng dưới chưa đóng thì không mở hội đồng của tầng trên.**
+
+**Land.** Mỗi tầng lên main ngay khi đóng. Việc activate ba workspace thì đề xuất gộp theo mốc (sau T1, sau T3, sau T4), để không phải dừng toàn bộ năm lần.
+
+### 4.3 Đánh giá chuyển Node sang Rust ở mỗi tầng
+
+- **Tiêu chí chuyển** (nguyên tắc thiết kế 4 và 7). Chuyển phần Node khi nó rơi vào một trong ba trường hợp:
+  - Node đang **quyết** một việc mà crate của tầng là authority. Hai nơi cùng quyết thì chuyển sang Rust và xoá bản Node.
+  - Nó nằm trên đường nóng hoặc đường an toàn.
+  - Nó là primitive dùng chung cho cả hệ thống.
+
+  **Không chuyển** phần Node chỉ là adapter mỏng (gọi route, định dạng output), hay là logic của tầng trên.
+- **Trình tự:** chỉ chuyển trong tầng đang soát, và chỉ sau khi đã sửa xong lỗi của tầng đó. Tầng trên chỉ dựa vào tầng dưới sau khi tầng dưới đã chuyển xong.
+- **Cách làm**, theo mẫu đã chạy được ở identity, convention và seat-binding:
+  - Rust giữ quyết định.
+  - Node thành client mỏng gọi route `fgos internal …`, fail closed, không có fallback JS.
+  - Rust và Node dùng chung một bộ golden vector.
+  - Đo exec budget trước khi chuyển caller (p95 ≤ 2× identity).
+  - Chuyển **mọi** caller và xoá đường Node trong cùng đợt (L10).
+- **Đầu ra mỗi tầng:** một bảng gồm các cột phần Node | quyết việc gì | chuyển hay không | lý do | thứ tự.
+
+### 4.4 Song song với các luồng khác
+
+- **SEAT** (đang ở phase 06–11) chạm `run-supervisor` và `terminal-control` ở phía caller. HARDEN T0–T2 không đụng file của SEAT. Tới T4 thì xếp lượt qua board.
+- **ES** đang làm phần store. T3 chỉ mở khi ES xong. Nếu tới lúc đó ES chưa xong thì T3 tách đôi: Agent protocol làm trước, Event Store làm sau, nhưng vẫn trước T4.
+
+### 4.5 Câu hỏi thì gom thành bộ
 
 Theo D-ADR0030 điều 2: mỗi đợt chỉ hỏi owner tối đa hai lần.
-- Lần 1, sau phân xử: nhận/bác các mục Critical, cùng mục "đề xuất thêm".
+- Lần 1, sau phân xử của mỗi tầng: nhận/bác các mục Critical, cùng mục "đề xuất thêm".
 - Lần 2: chọn giờ land.
 
 Còn lại big lead tự quyết trong khung đã duyệt rồi báo.
 
-### 4.4 Verify: bài học đêm 10-20/21, giữ làm luật của luồng
+### 4.6 Verify: bài học đêm 10-20/21, giữ làm luật của luồng
 
 - Lead phase 02 tự báo "mọi vùng chạm đều xanh", nhưng big lead đo ra khoảng 25 file hỏng thật. Lead phase 06 chạy test theo nhóm và bỏ sót `test/report`. Vì vậy:
   - big lead luôn tự chạy toàn suite trên chính host build từ cây;
@@ -117,7 +148,7 @@ Còn lại big lead tự quyết trong khung đã duyệt rồi báo.
 
 ## 5. Owner quyết
 
-1. Mở **đợt A ngay** (gồm cả Git, vì đã land), còn ES để đợt B? Em khuyên: có.
-2. Sáu trục, thang mức độ, bảy cổng ở trên: duyệt, sửa hay thêm?
-3. Hội đồng: bốn ghế như mục 4.2 bước 2 có ổn không, hay anh muốn thêm/bớt lăng kính? Có giới hạn ngân sách model cho đợt này không?
-4. Thứ tự với SEAT: chạy HARDEN đợt A **song song** với SEAT 07–11 (file khác nhau, trừ chỗ chạm `run-supervisor`/`terminal-control`, lúc đó điều phối qua board), hay chờ SEAT land? Em khuyên: song song, phần chạm nhau sẽ xếp lượt.
+1. Thứ tự tầng T0 → T4: khởi đầu ở **Process Facts & Control**, kết thúc ở **Run Supervisor + Launch gate**. Đặt Git cùng Terminal-control ở T2, Event Store ở T3: anh duyệt hay sửa?
+2. Sáu trục, thang mức độ, bảy cổng (mục 2–3) và tiêu chí chuyển Rust (mục 4.3): duyệt, sửa hay thêm?
+3. Land gộp theo mốc (sau T1, sau T3, sau T4), hay land sau từng tầng?
+4. Hội đồng bốn ghế: có giới hạn ngân sách model không?
