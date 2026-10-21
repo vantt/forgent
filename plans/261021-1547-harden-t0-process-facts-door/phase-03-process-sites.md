@@ -23,6 +23,10 @@ net_size: "Node −133 / Rust 0 / tests +55 (estimate)"
 - `src/state/hot-lock.mjs`: only `:24-25`, `:38`, `:57-135`, `:177-189` change (the range was widened after red-team review, see the file row). The staging and transaction region below `:189` is WORK's and is not touched; the lane is told.
 - No `process.kill(pid, 0)` remains in the reconcile closure: remove `SIGNAL_ZERO_PROBE` (`test/runner/dispatch-reconciliation-import-graph.test.mjs:142-151`) in this phase, deliberately, after `provider-capacity.mjs:579` and `process-identity.mjs` are clean.
 
+## Phase 1 result that changes this phase (big lead, 2026-10-21 18:05)
+
+Phase 1 is merged into `harden/t0-process-facts-door` (`f23c091a8`; [lead report](../reports/phase-lead-261021-1750-harden-t0-p01-red-tests.md), verified independently by the big lead: same red/green set). RT-M3 (`lock-fence` `null === null`) could **not** be reproduced from outside: the defect needs the holder to die between the judge and the identity read. Its committed test is a green pin. This phase must prove the fix through the production code path, by giving `fenceHotRecord` the record's own tuple and the door's `signalByIdentity` (so a vanished holder yields `NotFound`/`IdentityMismatch` without any second `/proc` read), and by a case that feeds a record whose pid is already dead: the fence must return at once and never signal. No test-only branch in production code.
+
 ## Files
 
 **Modify (per site: file:line → after → policy → owning proof)**
