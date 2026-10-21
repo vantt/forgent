@@ -210,6 +210,7 @@ A row closes only when the receiving lane has written the item into its own plan
 
 | # | Item | From | Recorded in | Status |
 |---|---|---|---|---|
+| R2 | Contained git is the main cost of a worktree add: every Rust git-port command runs under `bwrap --unshare-pid --as-pid-1`; strace of 10 `addWorktreeSync` calls = 218 bwrap + 249 git execs, ≈ 0.5 s per add vs ≈ 20 ms plain `git worktree add`. Users pay it on every worktree add; it dominates `test/runner/worktree-admin-multiprocess` (71–90 s), `worktree`, `merge`, `spawn-worker`. Same root as H6 (per-CLI-call bwrap probe + git in a pid namespace), with stronger numbers | TEST (`forgent-f8`) runner lead, 10-21 23:10; evidence `plans/reports/phase-lead-261021-2137-test-governance-p3-runner.md` §4 | [phase 03 (T2)](phase-03-t2-git-terminal-control.md) "Received from other lanes"; joins the OPC design input (H6) | open: T2 Git council, with the GIT lane's OPC design |
 | R1 | HL-N8 / HL-N9: the two bytes-equal checks in `hot-lock.mjs` (`unlinkRecordIfUnchanged`, `reclaimDeadHolder`) cover for each other; no single test pins either | TEST (`forgent-f8`), owner decision ~20:50 10-21; [report](../reports/phase-lead-261021-1845-test-governance-p2-holder-lock.md) §4, §7 | [phase 02 (T1)](phase-02-t1-holder-lock-identity-convention.md) "Received from other lanes" | open, T1 |
 
 ## Red Team Review
