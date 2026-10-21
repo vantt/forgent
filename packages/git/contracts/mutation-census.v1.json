@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "595f0ec357597502b211cc83a182e1270ba2edc16a8130dab57d5de2612a5942",
+  "payloadDigest": "5d4cb1c2c59a5944675ea944c765041c331802a482dc952245c3280bcb7b1af9",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "89e0e521aa8fcd5d374a1330d87061644c071ec8eeb58d8ac8e14dcf4e84b28b",
@@ -565,7 +565,7 @@
     "scripts/git-addon.mjs": "67532c2006d74a97cbc40814e82882da1de5d48b5d072670444489e2ed963d71",
     "scripts/git/e1-power-cut.mjs": "58e093cefe327fc2d7c2dd791185a02c68ee596925d0adb3b9a544abe5d18458",
     "scripts/git/e1-power-cut.sh": "be0500b7f99580694cf1ca7418c17ddf6bd70583f3a06686aaab923118e2d1fa",
-    "scripts/git/e3-bench.mjs": "324b205b6ac185b7d1f1d5e1c10070de9d6261714bb5c4ae334a35307d68e003",
+    "scripts/git/e3-bench.mjs": "c1fc958e747bf67fa4004936aa1c2a7ecc12651459d8d19e4fc39a7bd45446a2",
     "scripts/git/p-release-checks.sh": "08bb9b3c32e7915b27f645f7aa68d42cba0dbddd2a7dc9adc45d43a75b4d0056",
     "scripts/git/p-space-resource.mjs": "31e12327e2782a769a341cb6819f7e1e24d63e78de732c1ad210e430433aad06",
     "scripts/git/p-space.sh": "ab11ec0d8fc8c5a0c32f0dcc1aa08d26c39356db710a4e395513f87af78decd3",
@@ -2315,85 +2315,92 @@
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 461,
+      "line": 491,
       "spawn": "checkoutInspect -> scripts/git/e3-bench.mjs:48",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 463,
+      "line": 493,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 465,
+      "line": 495,
       "spawn": "typedOperationRows -> scripts/git/e3-bench.mjs:298",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 479,
+      "line": 509,
       "spawn": "createGitPublication -> src/git/index.mjs:9",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 496,
+      "line": 526,
       "spawn": "createGitScopedCommit -> src/git/scoped-commit.mjs:7",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 600,
+      "line": 630,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 666,
+      "line": 669,
       "spawn": "loadNativeAddon -> src/git/native.mjs:16",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 679,
+      "line": 682,
       "spawn": "loadNativeAddon -> src/git/native.mjs:16",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 697,
-      "spawn": "rollback -> scripts/git/e3-bench.mjs:770",
+      "line": 700,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:773",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 697,
-      "spawn": "rollback -> scripts/git/e3-bench.mjs:740",
+      "line": 700,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:743",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 795,
-      "spawn": "rollback -> scripts/git/e3-bench.mjs:770",
+      "line": 798,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:773",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 803,
-      "spawn": "rollbackOnly -> scripts/git/e3-bench.mjs:795",
+      "line": 813,
+      "spawn": "createGitPublication -> src/git/index.mjs:9",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/git/e3-bench.mjs",
+      "line": 828,
+      "spawn": "rollbackOnly -> scripts/git/e3-bench.mjs:798",
       "binary": "(command-line arguments)",
       "class": "configured-binary"
     },
@@ -2440,7 +2447,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        "scripts/git/e3-bench.mjs:442"
+        "scripts/git/e3-bench.mjs:443"
       ],
       "class": "sandbox-door"
     },
