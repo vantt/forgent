@@ -1,0 +1,45 @@
+current
+✔ docs/decisions/ contains no hand-authored NNNN-slug.md ADR files (1.92567ms)
+✔ docs/decisions/0000-index.md (the old hand-written index) no longer exists (0.185ms)
+✔ docs/decisions/ still exists as a directory (D5: "docs/decisions/ giữ lại là thư mục") (0.14173ms)
+✔ every one of the 34 retired ADR ids has its narrative present in a docs/specs/<area>.md or docs/architecture-map.md "Lịch sử quyết định" section (15.833044ms)
+✔ the real 0032 numbering collision migrated as two distinct sections (both topics preserved, neither silently dropped) (7.564668ms)
+✔ each target spec file carries the "Lịch sử quyết định retired" section heading exactly once (7.406655ms)
+✔ AGENTS.md no longer cites a deleted docs/decisions/NNNN-*.md path for the product priority order (0.36391ms)
+✔ AGENTS.md (doctrine layer, loaded every turn) contains the RUL11 anchor phrase on one unwrapped line (4.850776ms)
+✔ docs/specs/platform-foundations.md Business Rules carries a **RUL11.** line (0.89168ms)
+✔ the RUL11 line matches the locked law text word-for-word (0.723623ms)
+✔ the RUL11 decision narrative (D-ADR0036) is present in the "Lịch sử quyết định" section (0.627109ms)
+✔ AGENTS.md carries the decision-question template law and points at its shared fragment (0.389444ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 83.59805
+
+candidate
+✔ docs/decisions/ contains no hand-authored NNNN-slug.md ADR files (2.012161ms)
+✔ docs/decisions/0000-index.md (the old hand-written index) no longer exists (0.193998ms)
+✔ docs/decisions/ still exists as a directory (D5: "docs/decisions/ giữ lại là thư mục") (0.157448ms)
+✔ every one of the 34 retired ADR ids has its narrative present in a docs/specs/<area>.md or docs/architecture-map.md "Lịch sử quyết định" section (10.141905ms)
+✔ the real 0032 numbering collision migrated as two distinct sections (both topics preserved, neither silently dropped) (3.976705ms)
+✔ each target spec file carries the "Lịch sử quyết định retired" section heading exactly once (5.326155ms)
+✔ AGENTS.md no longer cites a deleted docs/decisions/NNNN-*.md path for the product priority order (0.39042ms)
+✔ AGENTS.md (doctrine layer, loaded every turn) contains the RUL11 anchor phrase on one unwrapped line (1.721765ms)
+✔ docs/specs/platform-foundations.md Business Rules carries a **RUL11.** line (0.619618ms)
+✔ the RUL11 line matches the locked law text word-for-word (0.521927ms)
+✔ the RUL11 decision narrative (D-ADR0036) is present in the "Lịch sử quyết định" section (0.488681ms)
+✔ AGENTS.md carries the decision-question template law and points at its shared fragment (0.267982ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 72.602308
+
+{"scope": "same immutable readset; parked legacy readers retained; no post-retirement claim", "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129", "equalOutcomes": true, "results": [{"side": "current", "exit": 0, "outcomes": ["✔ docs/decisions/ contains no hand-authored NNNN-slug.md ADR files", "✔ docs/decisions/0000-index.md (the old hand-written index) no longer exists", "✔ docs/decisions/ still exists as a directory (D5: \"docs/decisions/ giữ lại là thư mục\")", "✔ every one of the 34 retired ADR ids has its narrative present in a docs/specs/<area>.md or docs/architecture-map.md \"Lịch sử quyết định\" section", "✔ the real 0032 numbering collision migrated as two distinct sections (both topics preserved, neither silently dropped)", "✔ each target spec file carries the \"Lịch sử quyết định retired\" section heading exactly once", "✔ AGENTS.md no longer cites a deleted docs/decisions/NNNN-*.md path for the product priority order", "✔ AGENTS.md (doctrine layer, loaded every turn) contains the RUL11 anchor phrase on one unwrapped line", "✔ docs/specs/platform-foundations.md Business Rules carries a **RUL11.** line", "✔ the RUL11 line matches the locked law text word-for-word", "✔ the RUL11 decision narrative (D-ADR0036) is present in the \"Lịch sử quyết định\" section", "✔ AGENTS.md carries the decision-question template law and points at its shared fragment", "ℹ tests 12", "ℹ pass 12", "ℹ fail 0", "ℹ cancelled 0", "ℹ skipped 0", "ℹ todo 0"], "rawSha256": "29db9960edd46de1e2b737a4e2cf75793eb64ecba17d57e9e4430a7a25df6247"}, {"side": "candidate", "exit": 0, "outcomes": ["✔ docs/decisions/ contains no hand-authored NNNN-slug.md ADR files", "✔ docs/decisions/0000-index.md (the old hand-written index) no longer exists", "✔ docs/decisions/ still exists as a directory (D5: \"docs/decisions/ giữ lại là thư mục\")", "✔ every one of the 34 retired ADR ids has its narrative present in a docs/specs/<area>.md or docs/architecture-map.md \"Lịch sử quyết định\" section", "✔ the real 0032 numbering collision migrated as two distinct sections (both topics preserved, neither silently dropped)", "✔ each target spec file carries the \"Lịch sử quyết định retired\" section heading exactly once", "✔ AGENTS.md no longer cites a deleted docs/decisions/NNNN-*.md path for the product priority order", "✔ AGENTS.md (doctrine layer, loaded every turn) contains the RUL11 anchor phrase on one unwrapped line", "✔ docs/specs/platform-foundations.md Business Rules carries a **RUL11.** line", "✔ the RUL11 line matches the locked law text word-for-word", "✔ the RUL11 decision narrative (D-ADR0036) is present in the \"Lịch sử quyết định\" section", "✔ AGENTS.md carries the decision-question template law and points at its shared fragment", "ℹ tests 12", "ℹ pass 12", "ℹ fail 0", "ℹ cancelled 0", "ℹ skipped 0", "ℹ todo 0"], "rawSha256": "c18a3b0141aa186174e1387150dd680e839737985dd249db854941106a3ab5f6"}]}

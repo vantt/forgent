@@ -1,0 +1,109 @@
+{
+  "scope": "All 10529 original tuple occurrences; identical scalar text elsewhere is never an ancestry witness",
+  "counts": {
+    "equal-line-ancestry": 10500,
+    "changed-or-removed-line": 29
+  },
+  "differences": [
+    {
+      "file": "test/holder-lock/fences-v1-tombstone.test.mjs",
+      "id": "dynamic-020450",
+      "originalLine": 166,
+      "recordedCurrentLine": 166,
+      "expectedCurrentLine": 178,
+      "originalText": "  const second = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });",
+      "expectedText": "  const second = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });"
+    },
+    {
+      "file": "test/holder-lock/fences-v1-tombstone.test.mjs",
+      "id": "dynamic-020451",
+      "originalLine": 166,
+      "recordedCurrentLine": 166,
+      "expectedCurrentLine": 178,
+      "originalText": "  const second = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });",
+      "expectedText": "  const second = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });"
+    },
+    {
+      "file": "test/holder-lock/fences-v1-tombstone.test.mjs",
+      "id": "dynamic-020452",
+      "originalLine": 166,
+      "recordedCurrentLine": 166,
+      "expectedCurrentLine": 178,
+      "originalText": "  const second = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });",
+      "expectedText": "  const second = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });"
+    },
+    {
+      "file": "test/holder-lock/fences-v1-tombstone.test.mjs",
+      "id": "dynamic-020453",
+      "originalLine": 166,
+      "recordedCurrentLine": 166,
+      "expectedCurrentLine": 178,
+      "originalText": "  const second = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });",
+      "expectedText": "  const second = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });"
+    },
+    {
+      "file": "test/runner/execution/run.test.mjs",
+      "id": "dynamic-026763",
+      "originalLine": 1260,
+      "recordedCurrentLine": 1260,
+      "expectedCurrentLine": 1281,
+      "originalText": "  const runDir = path.join(fixture.unitDir, 'producer', '1', 'runs', '01');",
+      "expectedText": "  const runDir = path.join(fixture.unitDir, 'producer', '1', 'runs', '01');"
+    },
+    {
+      "file": "test/runner/execution/run.test.mjs",
+      "id": "dynamic-026764",
+      "originalLine": 1260,
+      "recordedCurrentLine": 1260,
+      "expectedCurrentLine": 1281,
+      "originalText": "  const runDir = path.join(fixture.unitDir, 'producer', '1', 'runs', '01');",
+      "expectedText": "  const runDir = path.join(fixture.unitDir, 'producer', '1', 'runs', '01');"
+    },
+    {
+      "file": "test/runner/execution/run.test.mjs",
+      "id": "dynamic-026765",
+      "originalLine": 1262,
+      "recordedCurrentLine": 1262,
+      "expectedCurrentLine": 1283,
+      "originalText": "  fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({",
+      "expectedText": "  fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({"
+    },
+    {
+      "file": "test/runner/execution/run.test.mjs",
+      "id": "dynamic-026774",
+      "originalLine": 1322,
+      "recordedCurrentLine": 1322,
+      "expectedCurrentLine": 1343,
+      "originalText": "  fs.mkdirSync(path.join(fixture.unitDir, 'unit-summary.json'));",
+      "expectedText": "  fs.mkdirSync(path.join(fixture.unitDir, 'unit-summary.json'));"
+    },
+    {
+      "file": "test/setup/observe-doctor-checks.test.mjs",
+      "id": "dynamic-036141",
+      "originalLine": 296,
+      "recordedCurrentLine": 296,
+      "expectedCurrentLine": 300,
+      "originalText": "    fs.utimesSync(path.join(runDir, 'result.json'), 1, 1);",
+      "expectedText": "    fs.utimesSync(path.join(runDir, 'result.json'), 1, 1);"
+    },
+    {
+      "file": "test/setup/run-supervisor-checks.test.mjs",
+      "id": "dynamic-036405",
+      "originalLine": 248,
+      "recordedCurrentLine": 248,
+      "expectedCurrentLine": 250,
+      "originalText": "  assert.equal(readGateKillGraceMs({ projectRoot: root }), 3000);",
+      "expectedText": "  assert.equal(readGateKillGraceMs({ projectRoot: root }), 3000);"
+    },
+    {
+      "file": "test/setup/run-supervisor-checks.test.mjs",
+      "id": "dynamic-036406",
+      "originalLine": 249,
+      "recordedCurrentLine": 249,
+      "expectedCurrentLine": 251,
+      "originalText": "  writeConfig(path.join(root, '.fgos', 'config.json'), { dispatch: { gateKillGraceMs: 10 } });",
+      "expectedText": "  writeConfig(path.join(root, '.fgos', 'config.json'), { dispatch: { gateKillGraceMs: 10 } });"
+    }
+  ],
+  "differenceCount": 11
+}

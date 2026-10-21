@@ -8542,28 +8542,17 @@
           "mode": "100644",
           "provenance": "immutable git object; source bytes only, no test execution or authority promotion"
         },
-        "candidateScope": "Exact unexecuted patch specification only; R22 current/candidate replay blocked. No passing output or post-retirement readiness claim."
+        "candidateScope": "Exact unexecuted patch; replay-deferred-phase9 under R25. Empty output sets represent no execution."
       },
       "proofs": [
         {
-          "side": "current",
           "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/runner/worktree.test.mjs",
-          "owningBehavior": "Complete existing owning test declarations/assertions; no case selection or bypass.",
-          "status": "missing",
+          "owningBehavior": "Changed expected assertion literals/regex must follow the source diagnostic patch; retain every assertion.",
+          "status": "replay-deferred-phase9",
           "exit": null,
           "logPath": null,
           "logSha256": null,
-          "reason": "R22 replay blocked by records-only contract: full owning tests create disposable git/state fixtures and/or invoke the fgOS CLI. No exemption inferred and no pass claimed."
-        },
-        {
-          "side": "candidate",
-          "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/runner/worktree.test.mjs",
-          "owningBehavior": "Complete existing owning test declarations/assertions; no case selection or bypass.",
-          "status": "missing",
-          "exit": null,
-          "logPath": null,
-          "logSha256": null,
-          "reason": "R22 replay blocked by records-only contract: full owning tests create disposable git/state fixtures and/or invoke the fgOS CLI. No exemption inferred and no pass claimed."
+          "reason": "Lead R25; exact deferredReplay obligation binds pinned bytes and full co-cut unit."
         }
       ],
       "blockedBy": [],
@@ -8640,7 +8629,118 @@
         "src/runner/worktree.mjs",
         "test/runner/worktree.test.mjs"
       ],
-      "coCutTestGreps": []
+      "coCutTestGreps": [],
+      "deferredReplay": {
+        "status": "replay-deferred-phase9",
+        "file": "test/runner/worktree.test.mjs",
+        "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "sourceSha256": "d9201ace6ecc4367af642dc2c1c438e18dd2a91b9e5f9afd56af64e9b6e92ce7",
+        "owningTestCommand": "env -u CLAUDE_CODE_SESSION_ID node --test test/runner/worktree.test.mjs",
+        "owningTests": [
+          {
+            "declarationLine": 749,
+            "declaration": "test('createClaimWorktree\\'s dirty-and-behind refusal points at the stale-vs-real diagnostic recipe', () => {",
+            "assertions": [
+              {
+                "line": 765,
+                "text": "  assert.ok(caught instanceof WorktreeError);"
+              },
+              {
+                "line": 766,
+                "text": "  assert.match("
+              }
+            ]
+          }
+        ],
+        "assertedLines": [
+          {
+            "beforeStartLine": 768,
+            "beforeEndLine": 768,
+            "afterStartLine": 768,
+            "afterEndLine": 768,
+            "before": "    /docs\\/how-to\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,",
+            "after": "    /docs\\/knowledge\\/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,"
+          }
+        ],
+        "assertionEffect": "Changed expected assertion literals/regex must follow the source diagnostic patch; retain every assertion.",
+        "expectedStrings": [
+          {
+            "beforeStartLine": 768,
+            "beforeEndLine": 768,
+            "afterStartLine": 768,
+            "afterEndLine": 768,
+            "before": "    /docs\\/how-to\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,",
+            "after": "    /docs\\/knowledge\\/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,"
+          }
+        ],
+        "diff": "--- a/test/runner/worktree.test.mjs\n+++ b/test/runner/worktree.test.mjs\n@@ -765,7 +765,7 @@\n   assert.ok(caught instanceof WorktreeError);\n   assert.match(\n     caught.message,\n-    /docs\\/how-to\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,\n+    /docs\\/knowledge\\/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,\n   );\n \n   removeWorktree(repoRoot, first.path, { force: true });\n",
+        "rollbackDiff": "--- a/test/runner/worktree.test.mjs\n+++ b/test/runner/worktree.test.mjs\n@@ -765,7 +765,7 @@\n   assert.ok(caught instanceof WorktreeError);\n   assert.match(\n     caught.message,\n-    /docs\\/knowledge\\/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,\n+    /docs\\/how-to\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,\n   );\n \n   removeWorktree(repoRoot, first.path, { force: true });\n",
+        "coCutPaths": [
+          "CHANGELOG.md",
+          "src/runner/worktree.mjs",
+          "test/runner/worktree.test.mjs"
+        ],
+        "blockerEvidence": {
+          "file": "test/runner/worktree.test.mjs",
+          "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+          "sourceSha256": "d9201ace6ecc4367af642dc2c1c438e18dd2a91b9e5f9afd56af64e9b6e92ce7",
+          "requiredProof": "R22 current/candidate owning test replay",
+          "status": "blocked",
+          "reason": "The records-only brief forbids git writes, fgOS CLI and .fgos access. Full owning tests create disposable git/state fixtures and/or invoke the CLI; this turn does not infer an exemption. No test-only bypass, altered fixture, fake pass or narrower run is used to claim full replay.",
+          "sourceEvidence": [
+            {
+              "line": 36,
+              "text": "  execFileSync('git', ['init', '-q'], { cwd: repoRoot });"
+            },
+            {
+              "line": 40,
+              "text": "  execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });"
+            },
+            {
+              "line": 41,
+              "text": "  execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: repoRoot });"
+            },
+            {
+              "line": 51,
+              "text": "  execFileSync('git', ['add', filename], { cwd: worktreePath });"
+            },
+            {
+              "line": 52,
+              "text": "  execFileSync('git', ['commit', '-q', '-m', `worker: ${filename}`], { cwd: worktreePath });"
+            },
+            {
+              "line": 68,
+              "text": "  execFileSync('git', ['add', filename], { cwd: detachedPath });"
+            },
+            {
+              "line": 69,
+              "text": "  execFileSync('git', ['commit', '-q', '-m', `external advance: ${filename}`], { cwd: detachedPath });"
+            },
+            {
+              "line": 292,
+              "text": "test('reclaimOrphanedCheckout still reclaims normally when the only \"change\" is the .fgos removal createWorktree itself performs', () => {"
+            },
+            {
+              "line": 294,
+              "text": "  fs.mkdirSync(path.join(repoRoot, '.fgos'));"
+            },
+            {
+              "line": 295,
+              "text": "  fs.writeFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '');"
+            },
+            {
+              "line": 296,
+              "text": "  execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: repoRoot });"
+            },
+            {
+              "line": 297,
+              "text": "  execFileSync('git', ['commit', '-q', '-m', 'track .fgos'], { cwd: repoRoot });"
+            }
+          ],
+          "resolution": "Lead must provide an execution contract explicitly permitting disposable test git/state/CLI fixtures, or own the required replay in a separate run."
+        },
+        "phase9Obligation": "Replay full owning command on pinned current and composed Phase 9 candidate with complete co-cut set; compare all original assertions, permitting only the exact recorded navigation deltas. No replay or passing outcome is claimed now."
+      }
     },
     {
       "id": "real-file-tests-goldens-batch6-test-scripts-check-doc-candidate-status.test.mjs",

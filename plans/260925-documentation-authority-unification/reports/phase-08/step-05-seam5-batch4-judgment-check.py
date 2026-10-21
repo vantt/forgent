@@ -42,7 +42,7 @@ def check(rs=None,receipts=None,listing=None,selection=None,batch=4):
   counts[rule]+=1
   try:ret=fn();assert ret is None or bool(ret)
   except Exception as ex:errors.append({'rule':rule,'where':where,'error':str(ex) or traceback.format_exc()})
- test('j4-coverage',f'batch {batch} unique judgment files',lambda:len(rs)==len(by)==(30 if batch==4 else 40 if batch==5 else 100) and set(by)==set(selection['files']) and len(receipts)==len(rs) and (batch!=4 or rs[0]['file']=='test/runner/dead-vocabulary-guard.test.mjs' and rs[1]['file']=='test/architecture.test.mjs'))
+ test('j4-coverage',f'batch {batch} unique judgment files',lambda:len(rs)==len(by)==(30 if batch==4 else 40 if batch==5 else 100 if batch==6 else selection['fileCount']) and set(by)==set(selection['files']) and len(receipts)==len(rs) and (batch!=4 or rs[0]['file']=='test/runner/dead-vocabulary-guard.test.mjs' and rs[1]['file']=='test/architecture.test.mjs'))
  refs=collections.defaultdict(list);dyn=collections.defaultdict(list)
  for e in m.rows('step-05-population-references.jsonl'):refs[e['file']].append(e)
  for e in m.rows('step-05-population-dynamic.jsonl'):dyn[e['file']].append(e)
@@ -65,7 +65,10 @@ def check(rs=None,receipts=None,listing=None,selection=None,batch=4):
    for e,o in zip(r['dynamicTraces'],dyn[f]):
     assert e['id']==o['id'] and e['originalTuple']==o['callSite'] and e['inventoryOrigins']==o['inventories'];opbody=body
     if e.get('historicalOnly'):
-     h=e['historicalOnly'];assert h['inputCommit']==m.read(e['inventoryOrigins'][0])['inputCommit'];opbody=m.pinned(h['inputCommit'],f);assert sha(opbody)==h['sourceSha256'] and o['callSite'][4] not in body and e['admission']=='REJECT' and e['disposition']=='preserve'
+     h=e['historicalOnly'];assert h['inputCommit']==m.read(e['inventoryOrigins'][0])['inputCommit'];opbody=m.pinned(h['inputCommit'],f);assert sha(opbody)==h['sourceSha256'] and e['admission']=='REJECT' and e['disposition']=='preserve'
+     if h.get('removedOccurrence'):
+      removed=h['removedOccurrence'];assert removed['text']==opbody.splitlines()[removed['line']-1] and sha(removed['text'])==removed['sha256'] and removed['text'] not in body.splitlines() and '-'+removed['text'] in h['diff'].splitlines()
+     else:assert o['callSite'][4] not in body
      assert h['diffCommand']==['git','diff',h['inputCommit'],pin,'--',f] and h['diff']==m.m.git('diff',h['inputCommit'],pin,'--',f).decode()
     ols=opbody.splitlines();w=e['operationWitness'];assert ols[w['line']-1][w['columnStart']-1:w['columnEndExclusive']-1]==w['text']==o['callSite'][4].split('\n')[0];p=e['currentPassage'];assert p['text']=='\n'.join(ols[p['startLine']-1:p['endLine']]) and e['caller']=={'line':p['startLine'],'declaration':ols[p['startLine']-1]}
    for line,text in enumerate(ls,1):
@@ -75,14 +78,14 @@ def check(rs=None,receipts=None,listing=None,selection=None,batch=4):
   test('j4-coverage',f,coverage)
   def ownership():
    starts=[i for i,t in enumerate(ls,1) if re.match(r'\s*(?:test|it)\s*(?:\.\w+)?\(',t)];own=r['owningProofs'];assert own
-   if not starts and batch==6:
+   if not starts and batch>=6:
     starts=[i for i,t in enumerate(ls,1) if re.match(r'\s*(?:pub(?:\([^)]*\))?\s+)?(?:async\s+)?fn\s+',t)] or [1]
    assert [t['declarationLine'] for t in own]==starts
    for k,t in enumerate(own):
     a=t['declarationLine'];z=starts[k+1]-1 if k+1<len(starts) else len(ls);assert t['declaration']==ls[a-1]
-    pattern=r'\bassert(?:_\w+)?!|\bassert\.\w+\(|\bexpect\(' if batch==6 and not re.search(r'\b(?:test|it)\(',t['declaration']) else r'\bassert\.\w+\(|\bexpect\('
+    pattern=r'\bassert(?:_\w+)?!|\bassert\.\w+\(|\bexpect\(' if batch>=6 and not re.search(r'\b(?:test|it)\(',t['declaration']) else r'\bassert\.\w+\(|\bexpect\('
     assert t['assertions']==[{'line':i,'text':ls[i-1]} for i in range(a,z+1) if re.search(pattern,ls[i-1])]
-   assert any(t['assertions'] for t in own) or batch==6 and bool(r.get('importingProofWitness') or r.get('proofOwnerKind'))
+   assert any(t['assertions'] for t in own) or batch>=6 and bool(r.get('importingProofWitness') or r.get('proofOwnerKind'))
    assert receipt['comparison']['assertionOwnership']==own
    for e in m.admission.allitems(r):assert e['disposition'] in ['preserve','parked','patch'] and e['parityObligation'] and e['proofCommand'] and e['receiptId']==receipt['id'] and (e['diffHunk']==r['diff'] if e['disposition']=='patch' else e['diffHunk'] is None)
   test('j4-ownership',f,ownership)

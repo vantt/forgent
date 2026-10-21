@@ -1,0 +1,9 @@
+{
+  "scope": "All 10529 original tuple occurrences; identical scalar text elsewhere is never an ancestry witness",
+  "counts": {
+    "equal-line-ancestry": 10500,
+    "changed-or-removed-line": 29
+  },
+  "differences": [],
+  "differenceCount": 0
+}

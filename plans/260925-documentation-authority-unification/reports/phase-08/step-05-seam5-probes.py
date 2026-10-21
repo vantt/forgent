@@ -9,7 +9,7 @@ baseline=m.check();assert baseline['failureCount']==0,baseline['failures'];probe
 def run(name,rule,fn):
  rs,rc,ss,ix,q=copy.deepcopy([BASE,RC,SS,IX,Q]);fn(rs,rc,ss,ix,q);out=m.check(rs,rc,ss,ix,q);caught=[f for f in out['failures'] if f['rule']==rule];probes.append({'name':name,'owningRule':rule,'pass':bool(caught),'caught':caught[:2]})
 run('A closed reference cannot disappear','s5-coverage',lambda rs,rc,ss,ix,q:rs[0]['references'].pop())
-run('An unfinished file cannot disappear','s5-coverage',lambda rs,rc,ss,ix,q:q['remainingFilesInOrder'].pop())
+run('Remaining queue must equal original population minus all closed files','s5-coverage',lambda rs,rc,ss,ix,q:q['remainingFilesInOrder'].pop() if q['remainingFilesInOrder'] else q['remainingFilesInOrder'].append(next(e for e in m.m.rows('step-05-population-files.jsonl') if e['seam']=='real-file-tests-goldens')))
 run('Whole-file docs-root coverage cannot lose a physical span','s5-lexical',lambda rs,rc,ss,ix,q:rs[0]['references'][0].__setitem__('sourceSpans',[]))
 run('Pinned bytes cannot borrow HEAD digest','s5-pins',lambda rs,rc,ss,ix,q:rs[0].__setitem__('sourceSha256','0'*64))
 run('Passage text must match its pin','s5-spans',lambda rs,rc,ss,ix,q:rs[0]['references'][0].__setitem__('passage','invented'))

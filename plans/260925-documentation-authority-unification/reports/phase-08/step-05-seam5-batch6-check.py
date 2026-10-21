@@ -42,6 +42,8 @@ def check():
   except Exception as e:errors.append({'rule':rule,'where':where,'error':str(e) or 'condition false'})
  allrs=[r for fn in ['tests-real-file.jsonl','tests-real-file-batch3.jsonl','tests-judgment-batch4.jsonl','tests-judgment-batch5.jsonl','tests-judgment-batch6.jsonl'] for r in j.m.rows('step-05-records/'+fn)];by={r['file']:r for r in allrs};ids={idof(e):(r,e) for r in allrs for e in allitems(r)}
  def review_delta():
+  nonlocal ix
+  if ix['closedBatch']!=6:ix=ix['previousReviewDeltas']['6']
   changed=closure['changedRecords'];disp={e['file'] for e in changed if e['dispositionChanged']};label={e['file'] for e in changed if not e['dispositionChanged']};added={r['file'] for r in rs};assert set(ix['reviewThisTurn'])==disp|added and {e['file'] for e in ix['changedThisTurn']['dispositionChanged']}==disp and {e['file'] for e in ix['changedThisTurn']['labelOnly']}==label
   for e in changed:assert e['afterSha256']==sha(json.dumps(by[e['file']],ensure_ascii=False,separators=(',',':')))
   return True
@@ -60,6 +62,8 @@ def check():
  for spec in read('step-05-seam5-batch6-cutover-specs.json')['patches']:
   r=by[spec['file']];rcfile=next(fn for fn in ['step-05-seam5-batch4-parity-receipts.json','step-05-seam5-batch5-parity-receipts.json','step-05-seam5-batch6-parity-receipts.json'] if any(x['id']==spec['receiptId'] for x in read(fn)['receipts']));receipt=next(x for x in read(rcfile)['receipts'] if x['id']==spec['receiptId']);test('j6-exact-patch',spec['file'],lambda r=r,receipt=receipt:assert_patch(r,receipt,blob(r['authorInputCommit'],r['file'])))
   def replay(receipt=receipt,spec=spec):
+   if 'deferredReplay' in receipt:
+    return module('r25','step-05-seam5-batch7-deferred.py').validate(spec,by[spec['file']],receipt,blob(spec['inputCommit'],spec['file']))
    proofs=receipt['proofs'];assert len(proofs)>=2 and {p.get('side') for p in proofs}=={'current','candidate'} and all(p['status']=='pass' and p['exit']==0 for p in proofs),'R22 requires actual current/candidate owning test replay; no pending/blocked proof counts as pass'
    for p in proofs:assert sha((ROOT/p['logPath']).read_bytes())==p['logSha256']
    assert receipt['comparison']['currentOutputSet']==receipt['comparison']['candidateOutputSet'] and receipt['comparison']['currentOutputSet']

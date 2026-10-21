@@ -1,0 +1,559 @@
+{
+  "rule": "R25 / L12-82",
+  "count": 4,
+  "deferredReplays": [
+    {
+      "status": "replay-deferred-phase9",
+      "file": "test/cli/fgos-merge.test.mjs",
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "sourceSha256": "c146fc58884efcf7c83de274beadcb3f65c7c7bb7adac0bd21f1b68bfb2ba4d9",
+      "owningTestCommand": "env -u CLAUDE_CODE_SESSION_ID node --test test/cli/fgos-merge.test.mjs",
+      "owningTests": [
+        {
+          "declarationLine": 922,
+          "declaration": "test('merge next merges the single ready item by recursing into approve, item reaches done', () => {",
+          "assertions": [
+            {
+              "line": 927,
+              "text": "  assert.equal(run(cwd, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--description', 'tsk-535 fixture description.']).status, 0);"
+            },
+            {
+              "line": 929,
+              "text": "  assert.equal(run(cwd, ['move', 'solo', '--to', 'awaiting-approval']).status, 0);"
+            },
+            {
+              "line": 932,
+              "text": "  assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);"
+            },
+            {
+              "line": 934,
+              "text": "  assert.equal(data.picked, 'solo');"
+            },
+            {
+              "line": 935,
+              "text": "  assert.equal(data.approve.to, 'delivered', `expected the picked item to reach delivered: ${JSON.stringify(data)}`);"
+            },
+            {
+              "line": 936,
+              "text": "  assert.equal(stateView(cwd).work.solo.status, 'delivered');"
+            }
+          ]
+        }
+      ],
+      "assertedLines": [],
+      "assertionEffect": "Comment-only pointer patch: no assertion output changes; owning assertion lines remain identical. Full owning replay is still owed in Phase 9.",
+      "expectedStrings": [
+        {
+          "beforeStartLine": 925,
+          "beforeEndLine": 926,
+          "afterStartLine": 925,
+          "afterEndLine": 926,
+          "before": "  // sandbox pitfall documented in docs/how-to/add-a-read-only-fgos-verb-\n  // and-plugin-skill.md.",
+          "after": "  // sandbox pitfall documented in docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md\n  // ."
+        }
+      ],
+      "diff": "--- a/test/cli/fgos-merge.test.mjs\n+++ b/test/cli/fgos-merge.test.mjs\n@@ -922,8 +922,8 @@\n test('merge next merges the single ready item by recursing into approve, item reaches done', () => {\n   const cwd = tmpCwdFast();\n   // Explicit --verify true (not addOk's 'npm test' default) -- same\n-  // sandbox pitfall documented in docs/how-to/add-a-read-only-fgos-verb-\n-  // and-plugin-skill.md.\n+  // sandbox pitfall documented in docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md\n+  // .\n   assert.equal(run(cwd, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--description', 'tsk-535 fixture description.']).status, 0);\n   // tsk-40m: no real claim needed (no branch) -- straight todo -> awaiting-approval.\n   assert.equal(run(cwd, ['move', 'solo', '--to', 'awaiting-approval']).status, 0);\n",
+      "rollbackDiff": "--- a/test/cli/fgos-merge.test.mjs\n+++ b/test/cli/fgos-merge.test.mjs\n@@ -922,8 +922,8 @@\n test('merge next merges the single ready item by recursing into approve, item reaches done', () => {\n   const cwd = tmpCwdFast();\n   // Explicit --verify true (not addOk's 'npm test' default) -- same\n-  // sandbox pitfall documented in docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md\n-  // .\n+  // sandbox pitfall documented in docs/how-to/add-a-read-only-fgos-verb-\n+  // and-plugin-skill.md.\n   assert.equal(run(cwd, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--description', 'tsk-535 fixture description.']).status, 0);\n   // tsk-40m: no real claim needed (no branch) -- straight todo -> awaiting-approval.\n   assert.equal(run(cwd, ['move', 'solo', '--to', 'awaiting-approval']).status, 0);\n",
+      "coCutPaths": [
+        "CHANGELOG.md",
+        "test/cli/fgos-merge.test.mjs"
+      ],
+      "blockerEvidence": {
+        "file": "test/cli/fgos-merge.test.mjs",
+        "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "sourceSha256": "c146fc58884efcf7c83de274beadcb3f65c7c7bb7adac0bd21f1b68bfb2ba4d9",
+        "requiredProof": "R22 current/candidate owning test replay",
+        "status": "blocked",
+        "reason": "The records-only brief forbids git writes, fgOS CLI and .fgos access. Full owning tests create disposable git/state fixtures and/or invoke the CLI; this turn does not infer an exemption. No test-only bypass, altered fixture, fake pass or narrower run is used to claim full replay.",
+        "sourceEvidence": [
+          {
+            "line": 100,
+            "text": "  assert.ok(fs.existsSync(path.join(cwd, '.fgos')), 'fixture must create .fgos/');"
+          },
+          {
+            "line": 105,
+            "text": "  assert.equal(manifest.territory.data, '.fgos/');"
+          },
+          {
+            "line": 107,
+            "text": "  const result = run(cwd, ['list']);"
+          },
+          {
+            "line": 125,
+            "text": "  const result = run(cwd, ['review', 'ghost']);"
+          },
+          {
+            "line": 133,
+            "text": "  const result = run(cwd, ['review', 'not-proposed-review']);"
+          },
+          {
+            "line": 142,
+            "text": "  const result = run(cwd, ['review', 'review-runner-item']);"
+          },
+          {
+            "line": 155,
+            "text": "  run(cwd, ['take', '--id', 'review-pull-item']);"
+          },
+          {
+            "line": 157,
+            "text": "  run(cwd, ['return', 'review-pull-item']);"
+          },
+          {
+            "line": 159,
+            "text": "  const result = run(cwd, ['review', 'review-pull-item']);"
+          },
+          {
+            "line": 171,
+            "text": "  run(cwd, ['move', 'review-legacy-item', '--to', 'doing']);"
+          },
+          {
+            "line": 172,
+            "text": "  run(cwd, ['move', 'review-legacy-item', '--to', 'awaiting-approval', '--skip-return-guard', \"test fixture setup, not exercising return's own guard\"]);"
+          },
+          {
+            "line": 174,
+            "text": "  const result = run(cwd, ['review', 'review-legacy-item']);"
+          }
+        ],
+        "resolution": "Lead must provide an execution contract explicitly permitting disposable test git/state/CLI fixtures, or own the required replay in a separate run."
+      },
+      "phase9Obligation": "Replay full owning command on pinned current and composed Phase 9 candidate with complete co-cut set; compare all original assertions, permitting only the exact recorded navigation deltas. No replay or passing outcome is claimed now."
+    },
+    {
+      "status": "replay-deferred-phase9",
+      "file": "test/intake/plan.test.mjs",
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "sourceSha256": "924bc6f16c5ad86a3cb1c8c3f1f8bbd9acc8683651d5f401e1c6681cb8cdfee5",
+      "owningTestCommand": "env -u CLAUDE_CODE_SESSION_ID node --test test/intake/plan.test.mjs",
+      "owningTests": [],
+      "assertedLines": [],
+      "assertionEffect": "Comment-only pointer patch: no assertion output changes; owning assertion lines remain identical. Full owning replay is still owed in Phase 9.",
+      "expectedStrings": [
+        {
+          "beforeStartLine": 113,
+          "beforeEndLine": 114,
+          "afterStartLine": 113,
+          "afterEndLine": 114,
+          "before": "// format trap (docs/how-to/avoid-vacuous-pass-with-node-test-test-name-\n// pattern.md) -- the ONE thing verify-pattern-check.mjs's mechanical check",
+          "after": "// format trap (docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md\n// ) -- the ONE thing verify-pattern-check.mjs's mechanical check"
+        }
+      ],
+      "diff": "--- a/test/intake/plan.test.mjs\n+++ b/test/intake/plan.test.mjs\n@@ -110,8 +110,8 @@\n const cfg = {};\n \n // tsk-12t: the documented `node --test`/`--test-name-pattern` reporter-\n-// format trap (docs/how-to/avoid-vacuous-pass-with-node-test-test-name-\n-// pattern.md) -- the ONE thing verify-pattern-check.mjs's mechanical check\n+// format trap (docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md\n+// ) -- the ONE thing verify-pattern-check.mjs's mechanical check\n // still catches, reused here to produce a real, reachable disputed-child\n // outcome without any executor.\n const KNOWN_BAD_VERIFY = 'node --test --test-name-pattern=\"x\" test/foo.test.mjs | grep \"^# pass\"';\n",
+      "rollbackDiff": "--- a/test/intake/plan.test.mjs\n+++ b/test/intake/plan.test.mjs\n@@ -110,8 +110,8 @@\n const cfg = {};\n \n // tsk-12t: the documented `node --test`/`--test-name-pattern` reporter-\n-// format trap (docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md\n-// ) -- the ONE thing verify-pattern-check.mjs's mechanical check\n+// format trap (docs/how-to/avoid-vacuous-pass-with-node-test-test-name-\n+// pattern.md) -- the ONE thing verify-pattern-check.mjs's mechanical check\n // still catches, reused here to produce a real, reachable disputed-child\n // outcome without any executor.\n const KNOWN_BAD_VERIFY = 'node --test --test-name-pattern=\"x\" test/foo.test.mjs | grep \"^# pass\"';\n",
+      "coCutPaths": [
+        "CHANGELOG.md",
+        "test/intake/plan.test.mjs"
+      ],
+      "blockerEvidence": {
+        "file": "test/intake/plan.test.mjs",
+        "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "sourceSha256": "924bc6f16c5ad86a3cb1c8c3f1f8bbd9acc8683651d5f401e1c6681cb8cdfee5",
+        "requiredProof": "R22 current/candidate owning test replay",
+        "status": "blocked",
+        "reason": "The records-only brief forbids git writes, fgOS CLI and .fgos access. Full owning tests create disposable git/state fixtures and/or invoke the CLI; this turn does not infer an exemption. No test-only bypass, altered fixture, fake pass or narrower run is used to claim full replay.",
+        "sourceEvidence": [
+          {
+            "line": 49,
+            "text": "//    `--blast-radius` flag (`bin/fgos.mjs`'s `parseDecomposeCallerVerdict`),"
+          },
+          {
+            "line": 1214,
+            "text": "  const repoRoot = path.basename(storeDir) === '.fgos' ? path.dirname(storeDir) : storeDir;"
+          },
+          {
+            "line": 1222,
+            "text": "  const repoRoot = path.basename(storeDir) === '.fgos' ? path.dirname(storeDir) : storeDir;"
+          },
+          {
+            "line": 1295,
+            "text": "  execFileSync('git', ['init', '-q'], { cwd: repoRoot });"
+          },
+          {
+            "line": 1299,
+            "text": "  execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });"
+          },
+          {
+            "line": 1300,
+            "text": "  execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: repoRoot });"
+          },
+          {
+            "line": 1301,
+            "text": "  const storeDir = path.join(repoRoot, '.fgos');"
+          },
+          {
+            "line": 1357,
+            "text": "  execFileSync('git', ['add', 'feature'], { cwd: worktreePath });"
+          },
+          {
+            "line": 1358,
+            "text": "  execFileSync('git', ['commit', '-q', '-m', 'plan: item-x'], { cwd: worktreePath });"
+          },
+          {
+            "line": 1381,
+            "text": "  execFileSync('git', ['add', 'feature'], { cwd: worktreePath });"
+          },
+          {
+            "line": 1382,
+            "text": "  execFileSync('git', ['commit', '-q', '-m', 'plan: item-x'], { cwd: worktreePath });"
+          },
+          {
+            "line": 1554,
+            "text": "  fs.writeFileSync(path.join(repoRoot, '.fgos-runner.json'), '{}\\n');"
+          }
+        ],
+        "resolution": "Lead must provide an execution contract explicitly permitting disposable test git/state/CLI fixtures, or own the required replay in a separate run."
+      },
+      "phase9Obligation": "Replay full owning command on pinned current and composed Phase 9 candidate with complete co-cut set; compare all original assertions, permitting only the exact recorded navigation deltas. No replay or passing outcome is claimed now."
+    },
+    {
+      "status": "replay-deferred-phase9",
+      "file": "test/runner/merge.test.mjs",
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb",
+      "owningTestCommand": "env -u CLAUDE_CODE_SESSION_ID node --test test/runner/merge.test.mjs",
+      "owningTests": [
+        {
+          "declarationLine": 400,
+          "declaration": "test('mergeRunnerItem sweeps a dirty untracked .fgos/events/ shard file into its own merge commit', async () => {",
+          "assertions": [
+            {
+              "line": 411,
+              "text": "  assert.equal(result.outcome, 'merged');"
+            },
+            {
+              "line": 418,
+              "text": "  assert.match("
+            },
+            {
+              "line": 423,
+              "text": "  assert.equal(isWorkingTreeClean(repoRoot), true, 'nothing should be left dirty after the sweep');"
+            },
+            {
+              "line": 424,
+              "text": "  assert.notEqual(headOf(repoRoot), headBefore);"
+            },
+            {
+              "line": 437,
+              "text": "  assert.equal(newCommitSubjects.length, 1, 'the sweep must ride the merge commit, never add a commit of its own');"
+            },
+            {
+              "line": 438,
+              "text": "  assert.doesNotMatch(newCommitSubjects[0], /periodic events\\.jsonl checkpoint|fallback events checkpoint/);"
+            }
+          ]
+        },
+        {
+          "declarationLine": 547,
+          "declaration": "test('mergeRunnerItem reports \"merge-blocked-other-item\" (not \"conflict\") and never touches a pre-existing MERGE_HEAD from a different branch', async () => {",
+          "assertions": [
+            {
+              "line": 556,
+              "text": "  assert.doesNotThrow("
+            },
+            {
+              "line": 563,
+              "text": "  assert.equal(result.outcome, 'merge-blocked-other-item');"
+            },
+            {
+              "line": 564,
+              "text": "  assert.equal(result.branch, 'fgw/demo-item');"
+            },
+            {
+              "line": 568,
+              "text": "  assert.doesNotThrow("
+            },
+            {
+              "line": 572,
+              "text": "  assert.match(git(repoRoot, ['diff', '--name-only', '--cached']).trim(), /other\\.txt/);"
+            },
+            {
+              "line": 573,
+              "text": "  assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged');"
+            },
+            {
+              "line": 574,
+              "text": "  assert.equal(fs.existsSync(path.join(repoRoot, 'newfile.txt')), false, 'demo-item\\'s own merge must never have been attempted');"
+            }
+          ]
+        },
+        {
+          "declarationLine": 1259,
+          "declaration": "test('formatFgosWriteRejectedDetail includes playbook recovery doc path', () => {",
+          "assertions": [
+            {
+              "line": 1261,
+              "text": "  assert.equal("
+            },
+            {
+              "line": 1265,
+              "text": "  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));"
+            }
+          ]
+        },
+        {
+          "declarationLine": 1466,
+          "declaration": "test('mergeRunnerItem merges cleanly when a non-union .fgos/ path auto-merges to a value differing from HEAD, but the branch\\'s own field is unchanged since branchHeadAtTake (tsk-4s6)', async () => {",
+          "assertions": [
+            {
+              "line": 1520,
+              "text": "  assert.equal(result.outcome, 'merged');"
+            },
+            {
+              "line": 1521,
+              "text": "  assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')), 'the worker\\'s real (non-.fgos) work must still land');"
+            },
+            {
+              "line": 1524,
+              "text": "  assert.equal(finalContent.replaceAll('\\r\\n', '\\n'), mainOwnContent.replaceAll('\\r\\n', '\\n'), 'target .fgos/ state must be exactly its own pre-merge version, unaffected by the branch\\'s stale revert');"
+            },
+            {
+              "line": 1525,
+              "text": "  assert.equal(isWorkingTreeClean(repoRoot), true);"
+            }
+          ]
+        }
+      ],
+      "assertedLines": [
+        {
+          "beforeStartLine": 1263,
+          "beforeEndLine": 1263,
+          "afterStartLine": 1263,
+          "afterEndLine": 1263,
+          "before": "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',",
+          "after": "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',"
+        },
+        {
+          "beforeStartLine": 1265,
+          "beforeEndLine": 1265,
+          "afterStartLine": 1265,
+          "afterEndLine": 1265,
+          "before": "  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));",
+          "after": "  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));"
+        }
+      ],
+      "assertionEffect": "Changed expected assertion literals/regex must follow the source diagnostic patch; retain every assertion.",
+      "expectedStrings": [
+        {
+          "beforeStartLine": 443,
+          "beforeEndLine": 443,
+          "afterStartLine": 443,
+          "afterEndLine": 443,
+          "before": "// `docs/explanation/why-mergerunneritem-takes-a-separate-lockroot-param.md`),",
+          "after": "// `docs/knowledge/why-mergerunneritem-takes-a-separate-lockroot-param/why-mergerunneritem-takes-a-separate-lockroot-param.md`),"
+        },
+        {
+          "beforeStartLine": 579,
+          "beforeEndLine": 579,
+          "afterStartLine": 579,
+          "afterEndLine": 579,
+          "before": "// docs/how-to/resolve-a-decision-id-collision-merge-conflict-on-approve.md):",
+          "after": "// docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md):"
+        },
+        {
+          "beforeStartLine": 1263,
+          "beforeEndLine": 1263,
+          "afterStartLine": 1263,
+          "afterEndLine": 1263,
+          "before": "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',",
+          "after": "    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',"
+        },
+        {
+          "beforeStartLine": 1265,
+          "beforeEndLine": 1265,
+          "afterStartLine": 1265,
+          "afterEndLine": 1265,
+          "before": "  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));",
+          "after": "  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));"
+        },
+        {
+          "beforeStartLine": 1497,
+          "beforeEndLine": 1497,
+          "afterStartLine": 1497,
+          "afterEndLine": 1497,
+          "before": "  // (docs/how-to/fix-fgos-write-rejected-merge-block.md step 3-4). Field",
+          "after": "  // (docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md step 3-4). Field"
+        }
+      ],
+      "diff": "--- a/test/runner/merge.test.mjs\n+++ b/test/runner/merge.test.mjs\n@@ -440,7 +440,7 @@\n \n // tsk-3tp (fix, review r1): `.fgos` only ever exists under `lockRoot` — it is\n // stripped from every ephemeral worktree per ADR0020 (see\n-// `docs/explanation/why-mergerunneritem-takes-a-separate-lockroot-param.md`),\n+// `docs/knowledge/why-mergerunneritem-takes-a-separate-lockroot-param/why-mergerunneritem-takes-a-separate-lockroot-param.md`),\n // exactly the shape a leaf->parent approve or promote-engine merge passes in\n // (`lockRoot` set explicitly, distinct from the ephemeral `repoRoot` used as\n // the git-op cwd). Before this fix the sweep computed its pathspecs relative\n@@ -576,7 +576,7 @@\n \n // --- mergeRunnerItem: decision-ID collision auto-resolve (tsk-3mv-1 D1a) ---\n // Mirrors the real occurrence (tsk-66l,\n-// docs/how-to/resolve-a-decision-id-collision-merge-conflict-on-approve.md):\n+// docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md):\n // two branches independently pick the same \"next free\" decision id and each\n // insert their own row for it into docs/decisions/0000-index.md at the same\n // position, while adding two DIFFERENT decision files under that id.\n@@ -1260,9 +1260,9 @@\n   const detail = formatFgosWriteRejectedDetail('fgw/demo-item', ['.fgos/events.jsonl'], 'main');\n   assert.equal(\n     detail,\n-    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n+    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n   );\n-  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));\n+  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));\n });\n \n test('mergeRunnerItem merges normally when the branch touches ordinary files alongside an untouched .fgos/', async () => {\n@@ -1494,7 +1494,7 @@\n   // The branch catches up (merges main in, adopting a:2), then reverts\n   // JUST field `a` back to its own pre-merge (branchHeadAtTake) value and\n   // commits that -- the real ADR0020 pre-commit-hook-driven pattern\n-  // (docs/how-to/fix-fgos-write-rejected-merge-block.md step 3-4). Field\n+  // (docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md step 3-4). Field\n   // `b` is left as main's round-1 merge brought it in, untouched by this\n   // revert -- the branch's own net content is now byte-identical to its\n   // branchHeadAtTake commit (both `{a:1, b:1}`), even though its commit\n",
+      "rollbackDiff": "--- a/test/runner/merge.test.mjs\n+++ b/test/runner/merge.test.mjs\n@@ -440,7 +440,7 @@\n \n // tsk-3tp (fix, review r1): `.fgos` only ever exists under `lockRoot` — it is\n // stripped from every ephemeral worktree per ADR0020 (see\n-// `docs/knowledge/why-mergerunneritem-takes-a-separate-lockroot-param/why-mergerunneritem-takes-a-separate-lockroot-param.md`),\n+// `docs/explanation/why-mergerunneritem-takes-a-separate-lockroot-param.md`),\n // exactly the shape a leaf->parent approve or promote-engine merge passes in\n // (`lockRoot` set explicitly, distinct from the ephemeral `repoRoot` used as\n // the git-op cwd). Before this fix the sweep computed its pathspecs relative\n@@ -576,7 +576,7 @@\n \n // --- mergeRunnerItem: decision-ID collision auto-resolve (tsk-3mv-1 D1a) ---\n // Mirrors the real occurrence (tsk-66l,\n-// docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md):\n+// docs/how-to/resolve-a-decision-id-collision-merge-conflict-on-approve.md):\n // two branches independently pick the same \"next free\" decision id and each\n // insert their own row for it into docs/decisions/0000-index.md at the same\n // position, while adding two DIFFERENT decision files under that id.\n@@ -1260,9 +1260,9 @@\n   const detail = formatFgosWriteRejectedDetail('fgw/demo-item', ['.fgos/events.jsonl'], 'main');\n   assert.equal(\n     detail,\n-    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n+    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',\n   );\n-  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));\n+  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));\n });\n \n test('mergeRunnerItem merges normally when the branch touches ordinary files alongside an untouched .fgos/', async () => {\n@@ -1494,7 +1494,7 @@\n   // The branch catches up (merges main in, adopting a:2), then reverts\n   // JUST field `a` back to its own pre-merge (branchHeadAtTake) value and\n   // commits that -- the real ADR0020 pre-commit-hook-driven pattern\n-  // (docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md step 3-4). Field\n+  // (docs/how-to/fix-fgos-write-rejected-merge-block.md step 3-4). Field\n   // `b` is left as main's round-1 merge brought it in, untouched by this\n   // revert -- the branch's own net content is now byte-identical to its\n   // branchHeadAtTake commit (both `{a:1, b:1}`), even though its commit\n",
+      "coCutPaths": [
+        ".githooks/pre-commit",
+        "CHANGELOG.md",
+        "src/runner/merge.mjs",
+        "test/runner/merge.test.mjs"
+      ],
+      "blockerEvidence": {
+        "file": "test/runner/merge.test.mjs",
+        "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "sourceSha256": "7dd38f308fe9215e58be3eef0c9fb5926bae7a91e722d0e4030435c8b18bedbb",
+        "requiredProof": "R22 current/candidate owning test replay",
+        "status": "blocked",
+        "reason": "The records-only brief forbids git writes, fgOS CLI and .fgos access. Full owning tests create disposable git/state fixtures and/or invoke the CLI; this turn does not infer an exemption. No test-only bypass, altered fixture, fake pass or narrower run is used to claim full replay.",
+        "sourceEvidence": [
+          {
+            "line": 43,
+            "text": "  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });"
+          },
+          {
+            "line": 47,
+            "text": "  execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });"
+          },
+          {
+            "line": 48,
+            "text": "  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: repoRoot });"
+          },
+          {
+            "line": 63,
+            "text": "  git(repoRoot, ['add', filename]);"
+          },
+          {
+            "line": 64,
+            "text": "  git(repoRoot, ['commit', '-q', '-m', `on ${branch}`]);"
+          },
+          {
+            "line": 137,
+            "text": "  git(repoRoot, ['add', 'proof.txt']);"
+          },
+          {
+            "line": 138,
+            "text": "  git(repoRoot, ['commit', '-q', '-m', 'return commit']);"
+          },
+          {
+            "line": 151,
+            "text": "  git(repoRoot, ['add', 'other.txt']);"
+          },
+          {
+            "line": 152,
+            "text": "  git(repoRoot, ['commit', '-q', '-m', 'interleaved commit from another session']);"
+          },
+          {
+            "line": 154,
+            "text": "  git(repoRoot, ['add', 'proof.txt']);"
+          },
+          {
+            "line": 155,
+            "text": "  git(repoRoot, ['commit', '-q', '-m', 'return commit']);"
+          },
+          {
+            "line": 217,
+            "text": "  git(repoRoot, ['add', '-A']);"
+          }
+        ],
+        "resolution": "Lead must provide an execution contract explicitly permitting disposable test git/state/CLI fixtures, or own the required replay in a separate run."
+      },
+      "phase9Obligation": "Replay full owning command on pinned current and composed Phase 9 candidate with complete co-cut set; compare all original assertions, permitting only the exact recorded navigation deltas. No replay or passing outcome is claimed now."
+    },
+    {
+      "status": "replay-deferred-phase9",
+      "file": "test/runner/worktree.test.mjs",
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "sourceSha256": "d9201ace6ecc4367af642dc2c1c438e18dd2a91b9e5f9afd56af64e9b6e92ce7",
+      "owningTestCommand": "env -u CLAUDE_CODE_SESSION_ID node --test test/runner/worktree.test.mjs",
+      "owningTests": [
+        {
+          "declarationLine": 749,
+          "declaration": "test('createClaimWorktree\\'s dirty-and-behind refusal points at the stale-vs-real diagnostic recipe', () => {",
+          "assertions": [
+            {
+              "line": 765,
+              "text": "  assert.ok(caught instanceof WorktreeError);"
+            },
+            {
+              "line": 766,
+              "text": "  assert.match("
+            }
+          ]
+        }
+      ],
+      "assertedLines": [
+        {
+          "beforeStartLine": 768,
+          "beforeEndLine": 768,
+          "afterStartLine": 768,
+          "afterEndLine": 768,
+          "before": "    /docs\\/how-to\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,",
+          "after": "    /docs\\/knowledge\\/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,"
+        }
+      ],
+      "assertionEffect": "Changed expected assertion literals/regex must follow the source diagnostic patch; retain every assertion.",
+      "expectedStrings": [
+        {
+          "beforeStartLine": 768,
+          "beforeEndLine": 768,
+          "afterStartLine": 768,
+          "afterEndLine": 768,
+          "before": "    /docs\\/how-to\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,",
+          "after": "    /docs\\/knowledge\\/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,"
+        }
+      ],
+      "diff": "--- a/test/runner/worktree.test.mjs\n+++ b/test/runner/worktree.test.mjs\n@@ -765,7 +765,7 @@\n   assert.ok(caught instanceof WorktreeError);\n   assert.match(\n     caught.message,\n-    /docs\\/how-to\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,\n+    /docs\\/knowledge\\/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,\n   );\n \n   removeWorktree(repoRoot, first.path, { force: true });\n",
+      "rollbackDiff": "--- a/test/runner/worktree.test.mjs\n+++ b/test/runner/worktree.test.mjs\n@@ -765,7 +765,7 @@\n   assert.ok(caught instanceof WorktreeError);\n   assert.match(\n     caught.message,\n-    /docs\\/knowledge\\/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,\n+    /docs\\/how-to\\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\\.md/,\n   );\n \n   removeWorktree(repoRoot, first.path, { force: true });\n",
+      "coCutPaths": [
+        "CHANGELOG.md",
+        "src/runner/worktree.mjs",
+        "test/runner/worktree.test.mjs"
+      ],
+      "blockerEvidence": {
+        "file": "test/runner/worktree.test.mjs",
+        "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+        "sourceSha256": "d9201ace6ecc4367af642dc2c1c438e18dd2a91b9e5f9afd56af64e9b6e92ce7",
+        "requiredProof": "R22 current/candidate owning test replay",
+        "status": "blocked",
+        "reason": "The records-only brief forbids git writes, fgOS CLI and .fgos access. Full owning tests create disposable git/state fixtures and/or invoke the CLI; this turn does not infer an exemption. No test-only bypass, altered fixture, fake pass or narrower run is used to claim full replay.",
+        "sourceEvidence": [
+          {
+            "line": 36,
+            "text": "  execFileSync('git', ['init', '-q'], { cwd: repoRoot });"
+          },
+          {
+            "line": 40,
+            "text": "  execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });"
+          },
+          {
+            "line": 41,
+            "text": "  execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: repoRoot });"
+          },
+          {
+            "line": 51,
+            "text": "  execFileSync('git', ['add', filename], { cwd: worktreePath });"
+          },
+          {
+            "line": 52,
+            "text": "  execFileSync('git', ['commit', '-q', '-m', `worker: ${filename}`], { cwd: worktreePath });"
+          },
+          {
+            "line": 68,
+            "text": "  execFileSync('git', ['add', filename], { cwd: detachedPath });"
+          },
+          {
+            "line": 69,
+            "text": "  execFileSync('git', ['commit', '-q', '-m', `external advance: ${filename}`], { cwd: detachedPath });"
+          },
+          {
+            "line": 292,
+            "text": "test('reclaimOrphanedCheckout still reclaims normally when the only \"change\" is the .fgos removal createWorktree itself performs', () => {"
+          },
+          {
+            "line": 294,
+            "text": "  fs.mkdirSync(path.join(repoRoot, '.fgos'));"
+          },
+          {
+            "line": 295,
+            "text": "  fs.writeFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '');"
+          },
+          {
+            "line": 296,
+            "text": "  execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: repoRoot });"
+          },
+          {
+            "line": 297,
+            "text": "  execFileSync('git', ['commit', '-q', '-m', 'track .fgos'], { cwd: repoRoot });"
+          }
+        ],
+        "resolution": "Lead must provide an execution contract explicitly permitting disposable test git/state/CLI fixtures, or own the required replay in a separate run."
+      },
+      "phase9Obligation": "Replay full owning command on pinned current and composed Phase 9 candidate with complete co-cut set; compare all original assertions, permitting only the exact recorded navigation deltas. No replay or passing outcome is claimed now."
+    }
+  ],
+  "actualTestsInvoked": false
+}

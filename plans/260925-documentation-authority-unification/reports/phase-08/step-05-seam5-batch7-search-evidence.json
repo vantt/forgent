@@ -1,0 +1,12 @@
+{
+  "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+  "roots": [
+    "docs/platform",
+    "docs/knowledge",
+    "docs/reference",
+    "docs/tutorials"
+  ],
+  "queries": [],
+  "aliasLookups": [],
+  "assessment": "No selected passage needs a park or replacement holder. All unresolved root proofs receive explicit judgment; no neutrality is inferred."
+}

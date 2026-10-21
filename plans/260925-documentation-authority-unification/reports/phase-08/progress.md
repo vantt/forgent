@@ -1174,3 +1174,11 @@ L12-81 reconciles six reviews: 13 changed old files (six disposition/new-slot, s
 100 next-in-order judgment files are authored: 760 references / 6,550 tuples / 736 supplemental slots / 2,978,583 pinned bytes. Zero new neutral closures. Ninety-nine new files need no replay under R22; one new and three changed old patch files still require it, so this is not a completed 100-file batch. Remaining authoring: 264 files / zero references / 10,529 tuples; replay obligations are separate.
 
 Final checker: 731 records / 3,622 references / 20,132 tuples / **four R22 replay failures**, zero other structural failures; exit 1. Executed negative probes reject 183/183; root-positive 15/15 and HEAD-only drift pass. Thirteen prompt mutations did not start because their zero-failure baseline gate refused this incomplete state; stale old results are not counted. R22 is blocked by the explicit prohibition on git/state/CLI operations required by owning tests. No exemption or test bypass is invented. Scope/conservation/syntax/diff checks pass; product files and live state untouched; runner owns commits; needsWrites []. See batch6 handback, verification and replay-blocker evidence.
+
+## Seam 5 batch 7 — started (2026-10-21)
+
+Applying Lead R25 to the four blocked replays with exact Phase 9 obligations and rejecting probes; then R21/R20-first triage of all 264 remaining files. Records only; no product edits, fgOS CLI, git writes or live-state/secrets access.
+
+## Seam 5 batch 7 — verification running (2026-10-21)
+
+All 264 queued files are authored; continuation is empty. Fresh post-ancestry integrated baseline passes: 995 records / 3,622 references / 30,661 tuples / zero failures. Pilot negative probes reject 44/44. Sequential generator, prompt and remaining batch probes are still running; no final round-completion claim yet. Original record shards remain unchanged. R25 carries four exact deferred replays; parks and Phase 9 composition remain open.

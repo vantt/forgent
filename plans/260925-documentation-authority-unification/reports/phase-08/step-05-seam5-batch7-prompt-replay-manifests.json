@@ -1,0 +1,236 @@
+{
+  "equalOutcomes": true,
+  "manifests": [
+    {
+      "side": "current",
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/runner/prompt-templates.test.mjs",
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "exit": 0,
+      "status": "pass",
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-prompt-current-tests.log",
+      "logSha256": "f88b22ae79670f773b7b2602ef76a0476fa920f96ede134f58200f821c8f2ae4",
+      "files": [
+        {
+          "path": "domains/coding/compiled.json",
+          "sha256": "462f9d0c675f3ed459bd46f97cfa2da136355d2355c5001eb151252f12c82c9b",
+          "bytes": 15766,
+          "mode": "100644"
+        },
+        {
+          "path": "src/runner/dispatch/run-timeout.mjs",
+          "sha256": "9d0bb5adca999cf689b8a0c6dce0cfc28f122de1393785fcb620f6f669086d40",
+          "bytes": 1419,
+          "mode": "100644"
+        },
+        {
+          "path": "src/runner/dispatch/write-scope.mjs",
+          "sha256": "b926332413077cfb8246da969373de205ecf003b3a263baf6c08177a27d3885a",
+          "bytes": 7342,
+          "mode": "100644"
+        },
+        {
+          "path": "src/runner/prompt-templates.mjs",
+          "sha256": "fd027de3376fbdfe654f2a2b8599a384d88f9b5383a0161b0b9df7bca9de39b9",
+          "bytes": 4611,
+          "mode": "100644"
+        },
+        {
+          "path": "src/runner/prompt-templates/judge-scout-instructions.txt",
+          "sha256": "5d9e21d2384b1e09fc6d0278d4642c14a1d6288215a778157853dd4c0410af78",
+          "bytes": 764,
+          "mode": "100644"
+        },
+        {
+          "path": "src/runner/prompt-templates/worker-prompt-default.txt",
+          "sha256": "064c9fd26b1a15ebae50ef9c687b9fcb5696bbf011d3f19a4e109eca2e50e8f9",
+          "bytes": 2496,
+          "mode": "100644"
+        },
+        {
+          "path": "src/runner/prompt-templates/worker-prompt-discovery.txt",
+          "sha256": "c343469a6d604920e84a426dc1d72872d067b8aa83b5be6f420f9d580a06b9cb",
+          "bytes": 3507,
+          "mode": "100644"
+        },
+        {
+          "path": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+          "sha256": "845861f6c8d55ab31e656fb6a54b6c3f6a51507fd02352de15146b7b08cd474a",
+          "bytes": 5196,
+          "mode": "100644"
+        },
+        {
+          "path": "src/state/domain-registry.mjs",
+          "sha256": "afbac9ca5e143a188a44648d0910e7108a1bace06d378bcd46289ccb53aede51",
+          "bytes": 11409,
+          "mode": "100644"
+        },
+        {
+          "path": "src/workflow/definition.mjs",
+          "sha256": "fb4db65eb9f655fe676433587274caeba19f3416c1979310fd59e3f41b289a9b",
+          "bytes": 22971,
+          "mode": "100644"
+        },
+        {
+          "path": "src/workflow/guide-schema.mjs",
+          "sha256": "2d0b2613f4b1dd591511d5c1eb76c9cfbb1a09acbb92c9729f8001ee20881101",
+          "bytes": 17064,
+          "mode": "100644"
+        },
+        {
+          "path": "src/workflow/steps.mjs",
+          "sha256": "8e55ec99437c9a17cbbbad01cd78605f39bc06f45251eacf39340bfce06f36ba",
+          "bytes": 3159,
+          "mode": "100644"
+        },
+        {
+          "path": "test/helpers/process-tmp-root.mjs",
+          "sha256": "c3045ffb679fa83174048d2fb14ee62336bd4f3bada5510fb4a5c9f206ef952a",
+          "bytes": 2600,
+          "mode": "100644"
+        },
+        {
+          "path": "test/runner/prompt-templates.test.mjs",
+          "sha256": "fd208d60c7d244155735ff6ab272ae7a8b00489b40a5c6ba2a042355edb14a1f",
+          "bytes": 13471,
+          "mode": "100644"
+        }
+      ],
+      "outcomes": [
+        "✔ selectTemplate resolves a coding-domain input to the skill-pointer template, for any kind/tier (mechanical table lookup, keyed on domain)",
+        "✔ selectTemplate resolves even with no arguments at all — an absent domain folds to \"coding\", which resolves to the skill-pointer template",
+        "✔ selectTemplate folds an unrecognized domain string to \"coding\" too (same fold as undefined, not a fall-back to the old default)",
+        "✔ selectTemplate still resolves a real registered non-coding domain (\"synthetic\") to the default template — the wildcard fallback survives for domains that exist but are not \"coding\"",
+        "✔ selectTemplate resolves a coding-domain, stage:\"discovery\" input to the discovery template instead of the skill-pointer one",
+        "✔ selectTemplate omitting stage entirely (every pre-tsk-5mj call site) still resolves to the skill-pointer template, byte-identical to before",
+        "✔ selectTemplate with stage:\"discovery\" on a non-coding domain still falls through to that domain's own rule (stage only narrows the coding rule)",
+        "✔ loadTemplate reads worker-prompt-default.txt from TEMPLATE_DIR and it contains the eight named placeholders",
+        "✔ renderTemplate(worker-prompt-default.txt, ...) golden output — no-feedback shape, byte-for-byte",
+        "✔ renderTemplate golden output — with-feedback shape includes the Human feedback section verbatim",
+        "✔ renderTemplate(worker-prompt-skill-pointer.txt, ...) golden output — no-feedback shape, byte-for-byte",
+        "✔ hashTemplate returns a stable 64-hex-char sha256 digest for the same template across repeated calls",
+        "ℹ tests 12",
+        "ℹ pass 12",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0",
+        "ℹ todo 0"
+      ]
+    },
+    {
+      "side": "candidate",
+      "command": "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/runner/prompt-templates.test.mjs",
+      "inputCommit": "5eb9dc609f303fc9d54377f866b5e8caf9a5d129",
+      "exit": 0,
+      "status": "pass",
+      "logPath": "plans/260925-documentation-authority-unification/reports/phase-08/step-05-seam5-batch7-prompt-candidate-tests.log",
+      "logSha256": "fcb40033b3c539f575ca3315e2728ba7f8b117e52a4b7bcf80164f21bf07f139",
+      "files": [
+        {
+          "path": "domains/coding/compiled.json",
+          "sha256": "462f9d0c675f3ed459bd46f97cfa2da136355d2355c5001eb151252f12c82c9b",
+          "bytes": 15766,
+          "mode": "100644"
+        },
+        {
+          "path": "src/runner/dispatch/run-timeout.mjs",
+          "sha256": "9d0bb5adca999cf689b8a0c6dce0cfc28f122de1393785fcb620f6f669086d40",
+          "bytes": 1419,
+          "mode": "100644"
+        },
+        {
+          "path": "src/runner/dispatch/write-scope.mjs",
+          "sha256": "b926332413077cfb8246da969373de205ecf003b3a263baf6c08177a27d3885a",
+          "bytes": 7342,
+          "mode": "100644"
+        },
+        {
+          "path": "src/runner/prompt-templates.mjs",
+          "sha256": "fd027de3376fbdfe654f2a2b8599a384d88f9b5383a0161b0b9df7bca9de39b9",
+          "bytes": 4611,
+          "mode": "100644"
+        },
+        {
+          "path": "src/runner/prompt-templates/judge-scout-instructions.txt",
+          "sha256": "5d9e21d2384b1e09fc6d0278d4642c14a1d6288215a778157853dd4c0410af78",
+          "bytes": 764,
+          "mode": "100644"
+        },
+        {
+          "path": "src/runner/prompt-templates/worker-prompt-default.txt",
+          "sha256": "064c9fd26b1a15ebae50ef9c687b9fcb5696bbf011d3f19a4e109eca2e50e8f9",
+          "bytes": 2496,
+          "mode": "100644"
+        },
+        {
+          "path": "src/runner/prompt-templates/worker-prompt-discovery.txt",
+          "sha256": "c343469a6d604920e84a426dc1d72872d067b8aa83b5be6f420f9d580a06b9cb",
+          "bytes": 3507,
+          "mode": "100644"
+        },
+        {
+          "path": "src/runner/prompt-templates/worker-prompt-skill-pointer.txt",
+          "sha256": "438fba1efc73fc1d2667bbbfb86349b1e10b7a38403a10149b6263ffa284bd40",
+          "bytes": 5322,
+          "mode": "100644"
+        },
+        {
+          "path": "src/state/domain-registry.mjs",
+          "sha256": "afbac9ca5e143a188a44648d0910e7108a1bace06d378bcd46289ccb53aede51",
+          "bytes": 11409,
+          "mode": "100644"
+        },
+        {
+          "path": "src/workflow/definition.mjs",
+          "sha256": "fb4db65eb9f655fe676433587274caeba19f3416c1979310fd59e3f41b289a9b",
+          "bytes": 22971,
+          "mode": "100644"
+        },
+        {
+          "path": "src/workflow/guide-schema.mjs",
+          "sha256": "2d0b2613f4b1dd591511d5c1eb76c9cfbb1a09acbb92c9729f8001ee20881101",
+          "bytes": 17064,
+          "mode": "100644"
+        },
+        {
+          "path": "src/workflow/steps.mjs",
+          "sha256": "8e55ec99437c9a17cbbbad01cd78605f39bc06f45251eacf39340bfce06f36ba",
+          "bytes": 3159,
+          "mode": "100644"
+        },
+        {
+          "path": "test/helpers/process-tmp-root.mjs",
+          "sha256": "c3045ffb679fa83174048d2fb14ee62336bd4f3bada5510fb4a5c9f206ef952a",
+          "bytes": 2600,
+          "mode": "100644"
+        },
+        {
+          "path": "test/runner/prompt-templates.test.mjs",
+          "sha256": "fdc6535c2608d1a8a1329f87595dcf50b50ea050d56e15a39821150f5ccb7abb",
+          "bytes": 13597,
+          "mode": "100644"
+        }
+      ],
+      "outcomes": [
+        "✔ selectTemplate resolves a coding-domain input to the skill-pointer template, for any kind/tier (mechanical table lookup, keyed on domain)",
+        "✔ selectTemplate resolves even with no arguments at all — an absent domain folds to \"coding\", which resolves to the skill-pointer template",
+        "✔ selectTemplate folds an unrecognized domain string to \"coding\" too (same fold as undefined, not a fall-back to the old default)",
+        "✔ selectTemplate still resolves a real registered non-coding domain (\"synthetic\") to the default template — the wildcard fallback survives for domains that exist but are not \"coding\"",
+        "✔ selectTemplate resolves a coding-domain, stage:\"discovery\" input to the discovery template instead of the skill-pointer one",
+        "✔ selectTemplate omitting stage entirely (every pre-tsk-5mj call site) still resolves to the skill-pointer template, byte-identical to before",
+        "✔ selectTemplate with stage:\"discovery\" on a non-coding domain still falls through to that domain's own rule (stage only narrows the coding rule)",
+        "✔ loadTemplate reads worker-prompt-default.txt from TEMPLATE_DIR and it contains the eight named placeholders",
+        "✔ renderTemplate(worker-prompt-default.txt, ...) golden output — no-feedback shape, byte-for-byte",
+        "✔ renderTemplate golden output — with-feedback shape includes the Human feedback section verbatim",
+        "✔ renderTemplate(worker-prompt-skill-pointer.txt, ...) golden output — no-feedback shape, byte-for-byte",
+        "✔ hashTemplate returns a stable 64-hex-char sha256 digest for the same template across repeated calls",
+        "ℹ tests 12",
+        "ℹ pass 12",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0",
+        "ℹ todo 0"
+      ]
+    }
+  ],
+  "scope": "Same pinned scratch readset; two exact atomic source/golden substitutions. Independent acceptance and composed Phase 9 full suite remain owed."
+}
