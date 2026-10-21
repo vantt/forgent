@@ -385,6 +385,42 @@ mod incarnation {
         assert_eq!(fake.calls().iter().filter(|c| c.starts_with("pane close")).count(), 1, "never closed a second time");
         let _ = std::fs::remove_dir_all(&dir);
     }
+
+    #[test]
+    fn a_brief_sent_to_a_pane_whose_shell_holds_the_foreground_is_not_typed_and_nothing_runs() {
+        use fgos_terminal_control::core::{Core, CoreConfig};
+        use fgos_terminal_control::policy::{measured_split::MeasuredSplit, Limits};
+        use fgos_terminal_control::port::{AllocateRequest, Display, SendOutcome};
+
+        let fake = Fake::new("shell-fg");
+        let sock = fake.dir.join("s");
+        let _listener = UnixListener::bind(&sock).unwrap();
+        // The pane's shell is its only foreground process, and this fake's shell runs what is typed at it.
+        let fake = fake_at("shell-fg2", &sock).env("FAKE_HERDR_FOREGROUND", "shell");
+        let driver = fake.driver();
+        let config = CoreConfig { state_root: fake.dir.join("state"), limits: Limits { min_cols: 1, min_rows: 1, max_panes_per_tab: 4 }, allocation_grace_ms: 60_000, launch_identify_timeout_ms: 200 };
+        let core = Core::new(&driver, &MeasuredSplit, config);
+        core.allocate(&AllocateRequest { key: "k".into(), group_key: "g".into(), display: Display { label: "shell-fg".into(), ..Default::default() }, role_hint: None, cwd: None, env: Default::default() }).unwrap();
+
+        let typed = fake.dir.join("typed");
+        let prompted = fake.dir.join("prompted");
+        let brief = |marker: &Path| format!("# Brief 1\n\nWrite it as `touch {}` first, then rename it.\n", marker.display());
+        for (marker, submit) in [(&typed, false), (&prompted, true)] {
+            match core.send("k", Some(&brief(marker)), None, submit).unwrap() {
+                SendOutcome::ForegroundNotAgent { reason } => assert!(reason.contains("shell"), "{reason}"),
+                other => panic!("a shell in the foreground must refuse the send (submit {submit}), got {other:?}"),
+            }
+        }
+        assert!(matches!(core.send("k", None, Some(&["Enter".to_string()]), false).unwrap(), SendOutcome::ForegroundNotAgent { .. }));
+        let sends: Vec<String> = fake.calls().into_iter().filter(|c| c.starts_with("pane send") || c.starts_with("agent prompt")).collect();
+        assert!(sends.is_empty(), "nothing may be typed at the shell: {sends:?}");
+        assert!(!typed.exists() && !prompted.exists(), "the backtick span ran");
+
+        // The control: the same text typed past the core reaches this pane's shell, and the span runs.
+        let control = fake.dir.join("control");
+        driver.send_text("wS:p59X", &brief(&control), false).unwrap();
+        assert!(control.exists(), "the fake's shell must run typed text, or the check above proves nothing");
+    }
 }
 
 #[test]

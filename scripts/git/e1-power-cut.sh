@@ -47,14 +47,16 @@ LW=fgos-e1-lw SNAP=fgos-e1-snap LOOPS=()
 cleanup() {
   set +e
   mountpoint -q "$MNT" && umount "$MNT"
-  dmsetup remove "$SNAP" 2>/dev/null; dmsetup remove "$LW" 2>/dev/null
+  dmsetup remove --retry "$SNAP" 2>/dev/null; dmsetup remove --retry "$LW" 2>/dev/null
   for l in "${LOOPS[@]}"; do losetup -d "$l"; done
 }
 trap cleanup EXIT
-loop() { truncate -s "$2" "$WORK/$1.img"; local l; l="$(losetup --show -f "$WORK/$1.img")"; LOOPS+=("$l"); echo "$l"; }
-[ -n "$DATA" ] || DATA="$(loop data "${SIZE_MIB}M")"
-[ -n "$LOG" ] || LOG="$(loop log "$((SIZE_MIB * 4))M")"
-REPLAY="$(loop replay "${SIZE_MIB}M")"; COW="$(loop cow "${SIZE_MIB}M")"
+# Sets LOOP_DEV in this shell (not a command substitution), so cleanup sees every loop device.
+loop() { truncate -s "$2" "$WORK/$1.img"; LOOP_DEV="$(losetup --show -f "$WORK/$1.img")"; LOOPS+=("$LOOP_DEV"); }
+[ -n "$DATA" ] || { loop data "${SIZE_MIB}M"; DATA="$LOOP_DEV"; }
+[ -n "$LOG" ] || { loop log "$((SIZE_MIB * 4))M"; LOG="$LOOP_DEV"; }
+loop replay "${SIZE_MIB}M"; REPLAY="$LOOP_DEV"
+loop cow "${SIZE_MIB}M"; COW="$LOOP_DEV"
 SECTORS="$(blockdev --getsz "$DATA")"
 # sudo leaves HOME at root's; the owner's Git state, cargo and node need the owner's own.
 RUN_HOME="$(getent passwd "$RUN_AS" | cut -d: -f6)"
@@ -71,22 +73,25 @@ dmsetup message "$LW" 0 mark mkfs
 mount "/dev/mapper/$LW" "$MNT"; mkdir "$MNT/w"; chown "$RUN_AS" "$MNT/w"
 PLAN="$OUT/plan.jsonl"; : > "$PLAN"; chown "$RUN_AS" "$PLAN"
 coproc WORKLOAD { as_user env -C "$CHECKOUT" "$NODE" scripts/git/e1-power-cut.mjs workload --root "$MNT/w" --descriptor "$DESCRIPTOR" --plan "$PLAN" --ops "$OPS" --handshake; }
+WORKLOAD_CHILD="$WORKLOAD_PID"  # bash unsets WORKLOAD_PID once the coprocess exits
 while IFS= read -r line <&"${WORKLOAD[0]}"; do
   case "$line" in ack\ *) dmsetup message "$LW" 0 mark "ack-${line#ack }"; echo ok >&"${WORKLOAD[1]}" ;; esac
 done
-wait "$WORKLOAD_PID" || die "workload failed"
+wait "$WORKLOAD_CHILD" || die "workload failed"
 umount "$MNT"
 dmsetup message "$LW" 0 mark done
-dmsetup remove "$LW"
+dmsetup remove --retry "$LW"
 
 # 2. Mark positions: ack-i is acknowledged at every replay point after its entry.
+# replay-log --find prints "<entry>@<sector>"; only the entry number is used here.
+find_entry() { local found; found="$("$REPLAY_LOG" --log "$LOG" --find "$@")" || return 1; echo "${found%%@*}"; }
 declare -a ACK_AT
-for ((i = 0; i < OPS; i++)); do ACK_AT[i]="$("$REPLAY_LOG" --log "$LOG" --find --end-mark "ack-$i")"; done
-START="$("$REPLAY_LOG" --log "$LOG" --find --end-mark mkfs)"
+for ((i = 0; i < OPS; i++)); do ACK_AT[i]="$(find_entry --end-mark "ack-$i")"; done
+START="$(find_entry --end-mark mkfs)"
 
 # 3. Replay to every FUA after mkfs and check the image through a snapshot (mount writes go to COW).
 RESULTS="$OUT/checkpoints.jsonl"; : > "$RESULTS"; FAILED=0 CHECKED=0
-cur="$("$REPLAY_LOG" --log "$LOG" --find --next-fua --start-entry "$START" || true)"
+cur="$(find_entry --next-fua --start-entry "$START" || true)"
 while [ -n "$cur" ]; do
   "$REPLAY_LOG" --log "$LOG" --replay "$REPLAY" --limit "$((cur + 1))" >/dev/null
   acked=0; for ((i = 0; i < OPS; i++)); do [ "${ACK_AT[i]}" -lt "$cur" ] && acked=$((i + 1)); done
@@ -101,11 +106,12 @@ while [ -n "$cur" ]; do
   else
     verdict="{\"acked\":$acked,\"violations\":[\"mount failed: $(tr -d '"\n' < "$OUT/mount.err")\"]}"
   fi
-  dmsetup remove "$SNAP"
+  udevadm settle 2>/dev/null || true  # udev may still be probing the new snapshot device
+  dmsetup remove --retry "$SNAP"
   echo "{\"entry\":$cur,\"verdict\":${verdict:-null}}" >> "$RESULTS"
   CHECKED=$((CHECKED + 1))
   echo "$verdict" | grep -q '"violations":\[\]' || FAILED=$((FAILED + 1))
-  cur="$("$REPLAY_LOG" --log "$LOG" --find --next-fua --start-entry "$((cur + 1))" || true)"
+  cur="$(find_entry --next-fua --start-entry "$((cur + 1))" || true)"
 done
 
 # 4. The same workload's syscall order (§10) on this disk, unprivileged.

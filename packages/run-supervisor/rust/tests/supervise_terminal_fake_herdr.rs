@@ -146,6 +146,28 @@ fn an_attempt_that_cannot_go_on_closes_the_captured_pane_and_names_why() {
 }
 
 #[test]
+fn a_brief_the_pane_refuses_because_its_shell_holds_the_foreground_ends_the_attempt_with_that_reason() {
+    let herdr = FakeHerdr::new("shellfg");
+    // Not at the prompt yet: the supervisor waits while the test takes the agent out of the foreground.
+    herdr.set_explain(Verdict::Working);
+    let mut run = terminal_run("tshellfg", &herdr, "sleep 600", 3_000);
+    let supervisor = run.start_with_env(&herdr.env());
+
+    wait_until(STEP, "the gate to report the agent", || run.json("agent-binding.json").is_some());
+    herdr.set_flag("no-process", true);
+    herdr.set_explain(Verdict::Idle);
+
+    let (code, line) = finish(supervisor, LIMIT);
+    assert_eq!(code, 0, "{}", run.log());
+    assert!(herdr.sent().is_empty(), "nothing is typed at a pane whose shell holds the foreground: {:?}", herdr.sent());
+    assert_eq!(line["outcome"], "cancelled");
+    let receipt = run.json("receipt.json").expect("receipt");
+    assert_eq!(receipt["outcome"], "cancelled");
+    assert_eq!(receipt["reason"], "terminal:foreground-not-agent");
+    assert_eq!(run.json("stop-requested.json").unwrap()["cause"], "cancel");
+}
+
+#[test]
 fn a_pane_that_disappears_is_a_lost_carrier_and_nothing_is_closed() {
     let herdr = FakeHerdr::new("gone");
     let mut run = terminal_run("tgone", &herdr, "sleep 600", 500);

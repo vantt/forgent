@@ -110,6 +110,16 @@ impl GitInspect {
                     },
                 )
             }
+            "resolveLiteralRef" => Ok(
+                match self
+                    .driver
+                    .resolve_literal_ref(&repo, text(&args, "name")?)
+                    .map_err(operation)?
+                {
+                    Some((name, oid)) => json!({"kind":"direct","ref":name,"oid":oid}),
+                    None => json!({"kind":"absent"}),
+                },
+            ),
             "resolveTrunk" => {
                 let explicit = args
                     .get("target")

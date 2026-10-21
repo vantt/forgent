@@ -500,19 +500,21 @@ fn supervise_agent(config: &Config, arrived: Arrived, secrets: BTreeMap<String, 
     Ok(())
 }
 
-/// Put the tty's foreground back on the gate's own group when the agent's group is gone. Inside a PID
-/// namespace the gate has no group there (`getpgrp` is 0) and the pane's shell takes the tty back when
-/// the sandbox exits, so a failure here is not an error.
+/// Hand the tty back once the agent's group is gone. Input typed for the agent that it never read is
+/// dropped first: the pane's shell reads the tty next, and would run that text as commands. Then the
+/// foreground goes back to the gate's own group. Inside a PID namespace the gate has no group there
+/// (`getpgrp` is 0) and the pane's shell takes the tty back when the sandbox exits, so a failure here
+/// is not an error.
 fn give_back_foreground() {
-    // SAFETY: getpgrp has no preconditions.
-    let own = unsafe { libc::getpgrp() };
-    if own <= 0 {
-        return;
-    }
-    // SAFETY: SIGTTOU is ignored for the call so a background group may change the foreground, then restored.
+    // SAFETY: SIGTTOU is ignored around the calls so a background group may flush the input and change
+    // the foreground, then restored; getpgrp has no preconditions.
     unsafe {
         let previous = libc::signal(libc::SIGTTOU, libc::SIG_IGN);
-        libc::tcsetpgrp(0, own);
+        libc::tcflush(0, libc::TCIFLUSH);
+        let own = libc::getpgrp();
+        if own > 0 {
+            libc::tcsetpgrp(0, own);
+        }
         libc::signal(libc::SIGTTOU, previous);
     }
 }

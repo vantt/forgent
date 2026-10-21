@@ -213,9 +213,17 @@ fn send_and_read_reach_the_pane_of_the_key() {
     let driver = MemDriver::new(352, 69);
     let core = core(&driver, &MeasuredSplit, state_dir("send-read"));
     let slot = core.allocate(&request("a", "g")).unwrap().slot;
-    core.send("a", Some("hello"), None, true).unwrap();
-    core.send("a", None, Some(&["Enter".to_string()]), false).unwrap();
+    let mut child = spawn_sleeper();
+    driver.set_foreground(&slot.pane_id, 900, vec![ForegroundProcess { pid: 900, argv: vec!["bash".into()] }, ForegroundProcess { pid: child.id(), argv: vec!["sleep".into(), "30".into()] }], child.id());
+    assert_eq!(core.send("a", Some("hello"), None, true).unwrap(), SendOutcome::Sent);
+    assert_eq!(core.send("a", None, Some(&["Enter".to_string()]), false).unwrap(), SendOutcome::Sent);
     assert!(core.send("a", Some("x"), Some(&["Enter".to_string()]), false).is_err());
+    assert_eq!(driver.calls("send."), vec![format!("send.text {} hello true", slot.pane_id), format!("send.keys {} Enter", slot.pane_id)]);
+    // A foreground program that is gone is no program to type at: nothing more reaches the pane.
+    child.kill().unwrap();
+    child.wait().unwrap();
+    assert!(matches!(core.send("a", Some("late"), None, false).unwrap(), SendOutcome::ForegroundNotAgent { reason } if reason.contains("no live process")));
+    assert_eq!(driver.calls("send.").len(), 2);
     assert_eq!(core.read("a", None, None).unwrap(), format!("screen of {}", slot.pane_id));
     core.label("a", &Display { label: "new".into(), ..Display::default() }, None).unwrap();
     assert_eq!(driver.calls("label.pane"), vec![format!("label.pane {} new", slot.pane_id)]);
