@@ -956,6 +956,40 @@
             }
           },
           {
+            "id": "pi-herdr",
+            "via": "cli",
+            "adapter": "herdr-spawn",
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "command": "pi",
+            "args": [
+              "--model",
+              "{model}",
+              "--thinking",
+              "medium",
+              "--tools",
+              "read,write,edit,bash,grep,find,ls",
+              "--approve"
+            ],
+            "interactiveMode": {
+              "exitCommand": "/quit",
+              "kind": "pi"
+            },
+            "credentialStore": {
+              "use": "pi",
+              "homeEnv": "PI_CODING_AGENT_DIR",
+              "files": [
+                "auth.json",
+                "models-store.json",
+                "settings.json",
+                "trust.json",
+                "bin/fd",
+                "models.json"
+              ]
+            }
+          },
+          {
             "id": "codex-herdr",
             "via": "cli",
             "adapter": "herdr-spawn",
@@ -1403,13 +1437,17 @@
         "claude",
         "openai",
         "gemini",
-        "xai"
+        "xai",
+        "deepseek",
+        "z-ai"
       ],
       "frontier": [
         "claude",
         "openai",
         "gemini",
-        "xai"
+        "xai",
+        "deepseek",
+        "z-ai"
       ]
     }
   },
