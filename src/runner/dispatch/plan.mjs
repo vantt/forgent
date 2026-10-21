@@ -124,9 +124,12 @@ export function effectiveDispatchPolicy({ assignment, runnerConfig, cliOverride 
   // the model and they are taken as given. Every other caller asks Seat Binding through `bind()`: a pinned
   // executor (the caller's, else the operation's) is an override, a tier or effort stated by the assignment
   // or the caller is one too, and with no pin the capability's pool decides.
-  // The executor the caller names reaches the crate as a pin; with none, the capability's pool decides.
+  // The executor the caller names, else the runner's default executor, reaches the crate as a pin.
   const namedExecutor = cliOverride.preferExecutor ?? opPolicy.preferExecutor;
-  const pinnedExecutor = namedExecutor;
+  const defaultExecutor = runnerConfig?.executor
+    ? (runnerConfig.executor.command ?? runnerConfig.executor.invocations?.[0]?.command ?? runnerConfig.executor.invocations?.[0]?.id ?? 'claude')
+    : undefined;
+  const pinnedExecutor = namedExecutor ?? defaultExecutor;
   const explicitTier = cliOverride.tier ?? opPolicy.tier;
   if (explicitTier !== undefined && !MODEL_POLICY_TIERS.includes(explicitTier)) {
     throw new RunnerConfigError(`invalid explicit tier "${explicitTier}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);

@@ -552,8 +552,8 @@ process.exit(0);
   assert.deepEqual(contractOnDisk.workspace.writeScope, []);
   assert.equal(contractOnDisk.limits.executorTimeoutMs, 25000);
   assert.equal(contractOnDisk.resultClaim.path, path.join(runDir, 'agent-result.json'));
-  // No executor is pinned, so Seat Binding picks one from the pool; the family the default executor serves names it.
-  assert.equal(contractOnDisk.executorId, 'claude');
+  // No executor is selected, so the configured default executor's command identifies it (it reaches Seat Binding as a pin).
+  assert.equal(contractOnDisk.executorId, updatedCfg.executor.command);
   assert.equal(contractOnDisk.adapter, 'cli-spawn');
   assert.equal(contractOnDisk.adapterFamily, 'cli-spawn');
   assert.equal(contractOnDisk.enforcementPosture, 'instructed');

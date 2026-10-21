@@ -91,10 +91,11 @@ By commit: D1 src +31/-35 tests +40; trims src +2/-7 tests +4/-781; Work path sr
 
 ### Work path divergence
 
-Decision: option A is kept (the default executor is not pinned). The Work path (`effectiveDispatchPolicy`) now differs from `fgos run` only here:
-- It binds with `session.postureAtLaunch` (posture judged at launch; an executor with no invocation counts its own command as the one invocation whose effort levels are judged); `fgos run` requires a posture-capable invocation at bind time. The ask names no writes: posture does not affect admission under `postureAtLaunch`, so the placeholder write path is gone.
+Decision: option B (the named executor, else the runner's default executor, reaches the crate as a pin). The Work path (`effectiveDispatchPolicy`) still differs from `fgos run` here:
+- It pins the runner's global default executor when nothing names one; `fgos run` lets the capability's pool choose. A capability with no `prefer` therefore works here (the pinned default serves it) and is refused by `fgos run` (`headless-no-executor`).
+- It binds with `session.postureAtLaunch` (posture judged at launch; an executor with no invocation counts its own command as the one invocation whose effort levels are judged); `fgos run` requires a posture-capable invocation at bind time. The bind ask names no writes: posture does not affect admission under `postureAtLaunch`, so there is no placeholder write path.
 - It always binds one headless producer seat (or the assignment's role) and takes no herdr or lead state from the session.
-With no pin, a capability with no pool is refused (`headless-no-executor`) exactly as `fgos run` does; the global default executor runs only when a pool names its family. Unifying the posture assumption would need about 130 tests in 22 files given posture-capable invocations, plus the confined launches those fixtures would start; left as the SEAT-TRIM unification item, no doctor row.
+Unifying these means dropping the default-executor pin and the posture assumption. Option A would have needed about 130 tests in 22 files given a pool and posture-capable invocations, plus the confined launches those fixtures would start. Left as the SEAT-TRIM unification item; no doctor row.
 
 ### One-door fix for the drain row
 
