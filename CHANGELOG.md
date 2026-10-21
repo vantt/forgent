@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `fgos worktree remove --delivered-to` takes the same names as `worktree create --base` (a short remote-tracking name such as `origin/main` was refused before); both resolve through one literal-ref resolver. Recovery of a publication whose pin release is stuck now reports that chain by id and still settles the others.
 - Event Store seals and every Git publication now survive a power cut: trees are written through the same fsynced object write as blobs and commits (git `mktree` never fsynced them), and a pin release interrupted by a crash resumes on the next release instead of staying `recovery-required`. Proven on ext4 by the Git E1 power-cut replay (1029 points, 0 violations) and the Event Store power-loss run (20/20).
 - Git (branch `git/p07-switch` fixes from the host gate):
   - A commit hook may print up to 64 MiB again (Git sends hook output to stderr); a borrowed Git run no longer fails at 64 KiB.

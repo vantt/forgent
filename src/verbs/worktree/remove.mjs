@@ -9,10 +9,9 @@ const OID = /^(?:[0-9a-f]{40}|[0-9a-f]{64})$/;
 
 function resolveDelivered(inspect, value) {
   if (OID.test(value)) return { ref: null, oid: value };
-  const ref = value.startsWith('refs/') ? value : `refs/heads/${value}`;
-  const found = inspect.resolveRef({ name: ref });
-  if (found.kind !== 'direct') throw new Error(`worktree remove: --delivered-to ${value} does not name an existing branch, full ref or object id`);
-  return { ref, oid: found.oid };
+  const found = inspect.resolveLiteralRef({ name: value });
+  if (found.kind !== 'direct') throw new Error(`worktree remove: --delivered-to ${value} does not name an existing branch, tag, remote-tracking ref, full ref or object id`);
+  return { ref: found.ref, oid: found.oid };
 }
 
 function worktreeTip(inspect, target) {
