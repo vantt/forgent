@@ -1350,3 +1350,32 @@ Closed every High, Medium and Low finding from `review-a38-step-06-evidence-veri
 `--before` now checks both trees for unlisted payloads and reproduces a committed 44-row classified consumer table from git-tracked code, tests and instruction surfaces, failing on any new/unclassified hit, changed match set, runtime reader or read error. Manifest schema, codepoint ordering, symlink refusal, filesystem/index modes and `gitBlob` are enforced. Tests pass 40/40; live `--before` passes 867 entries with zero violations; live `--after` correctly exits 1 with 907 violations (867 legacy payload files + 40 maintained references).
 
 Two readiness blockers remain honestly open outside this slice: no standing live `--before` run is registered in `npm test`, and retirement gate `evidence-digests` remains blocked until Phase 9 registers the verifier. These are not hidden as green evidence.
+
+## L12-96 — Owner accepts park-family resolutions (Owner, 2026-10-21 18:17)
+
+Owner answered the three questions in [the Lead's family analysis](step-07-park-families.md) with “đồng ý với các đề xuất” and accepted its Lead-settled handling list. Answers: **Q1 = A; Q2 = A; Q3 = A**. This records authority for future Step 7 composition and Phase 9 execution; it does not change any record disposition or assert final-pin proof.
+
+### Q1 = A — One bounded state export at the Step 7 final pin
+
+Authorize one bounded, redacted, read-only export of path-bearing state fields, taken once by the Lead at the Step 7 final pin: registry docs/topics `currentPath`, `aliases`, `purposeTitle`, `sourceCaptureIds`; `state.decisions` rows; Work `docsRef` / content-root / `item.refs`; inventory `oldPath`, aliases and move destinations through its existing loader; `outcome.docPath`; and acceptance evidence tokens. No secrets and no event bodies. This grants no write or cutover authority. Families **1–5, 9 and 20** (2,054 owning items) and the **two external locator parks** wait on that export and the corresponding final-pin parity/consumer-edge proof; authorization alone closes none of them. No export is taken in this turn.
+
+### Q2 = A — Retain the generated decision index and native Land behavior
+
+Keep `docs/decisions/index.md` as the generated projection. Family **6's 51 parks become preserve at Step 7**, with this ruling as witness; drop the duplicate candidate `docs/knowledge/decisions-index/decision-record.md` from the move set at that step. Family 3 still needs Q1's `state.decisions` export and generator parity; retaining the output path does not prove its contents.
+
+Native Land numbered-decision conflict renumbering in `src/runner/merge.mjs` stays as is: **dormant in this repo**, working for projects with a numbered corpus. Family **19's eight R29 parks become preserve at Step 7**, with that dormant-in-this-repo witness. L12-89's retired-roots guard must allow generated `docs/decisions/index.md` while refusing new numbered decision files; the Phase 9 Requirements wording is amended accordingly. The ratchet retirement and replacement guards remain one unit.
+
+### Q3 = A — Per-area convention and explicit scope mapping
+
+For families **13 and 17** (22 items), decision narratives live under `docs/platform/<area>/decisions/`; RUL ids are owned by the area's `spec.md`; the citation drift checker scans `docs/platform/**/spec.md` recursively; and a published area-to-holder table resolves `fgos decision --scope` (including renamed/split areas). Step 7 binds the exact holders, coverage and patches; the cutover writes the minimal convention text and table. The RULE lane may refine after cutover under **L12-91's one-way dependency**; cutover never waits for it.
+
+### Lead-settled handling accepted by the owner
+
+- Retain `docs/enduser-docs-index.json` (family 7); its content regeneration remains family 2's separate obligation. Retain `docs/architecture-manifest.json` (family 22) and drop its differing candidate copy from the move set at Step 7.
+- Move `docs/contracts/fgos-gateway-api-v1.yaml` to the herdr-web-dashboard contract; repoint `gateway.rs`, `mcp.rs` and tests and delete the duplicate at cutover (families 12 and 21), preserving CTR010 identity and the `gateway-yaml-*` carry obligations.
+- Move `docs/doc-governance.md` and `docs/architecture-map.md` (families 11 and 23) only after a content check against their targets. This turn does not claim those checks.
+- Carry the **44 missing claims verbatim** into live holders at Step 7 / Phase 9: families 14 (13), 15 (12), 16 (11) and 18 (8). Bind exact passages and holders at Step 7, then apply carriage and pointer patches at cutover; rendered copies follow core sources. No locked law changes.
+- Retire Decision F's ratchet script, baseline and exceptions as **one unit with the L12-89 replacement guards** (family 10; L12-86/L12-89).
+- Bind post-retirement scan sets at Step 7 composition and replay at Phase 9 (family 8); the Lead places **P7-DOC-GAP-05 `dynamic-023895`**. R13 frozen-B lifting remains a Phase 9 obligation.
+
+The [resolution plan](step-07-park-resolution-plan.json) schedules all 23 families, both external parks and the 37 R26 units without parked items. [Grouping verification](step-07-park-grouping-verification.json) reproduces **2,311 / 2,311** owning items in exactly one family each, zero unassigned or duplicate assignments, with all member sets unchanged since `eb2575b06`. Step 7 applies dispositions only against its final pin; all current dispositions remain unchanged.

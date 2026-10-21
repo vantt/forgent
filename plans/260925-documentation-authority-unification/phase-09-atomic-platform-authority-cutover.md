@@ -22,7 +22,7 @@ reviewable integration change.
 
 The Phase 9 cutover change must land these three documentation guards as the same-change replacement for the legacy-docs ratchet it retires (L10), per [L12-89](reports/phase-08/owner-answers.md#l12-89--documentation-guards-at-cutover-owner-2026-10-21-1609):
 
-1. refuse new files under the retired roots (docs/specs/**, docs/architect/**, retired decision files and index);
+1. refuse new files under the retired roots (docs/specs/**, docs/architect/** and new numbered decision files), while allowing generated docs/decisions/index.md per [L12-96](reports/phase-08/owner-answers.md#l12-96--owner-accepts-park-family-resolutions-owner-2026-10-21-1817);
 2. placement check for new documentation files against the Phase 4 minimum constitution placement rules, installed as placement-glob rows in the existing convention component (packages/convention/contracts/convention.rules.v1.json, docs/platform/convention/spec.md §3.2 reservation) with block posture for the retired roots;
 3. link and anchor check inside docs/platform/**, owned by the doc-health body checks (decision 2026-10-07: convention owns path rules, doc-health reads bodies).
 

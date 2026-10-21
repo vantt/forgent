@@ -1,0 +1,173 @@
+{
+  "status": "pass",
+  "inputCommit": "c7ad0745965e6ca56652a9b3e9233db293446fa4",
+  "extraction": "Read sorted step-05-records/*.jsonl; visit references, dynamicTraces, authorAddedReferences only (not censusJoins); select disposition == parked; flatten id = id or referenceId, file = record.file, dependency, stateExp = stateExportDependency, blockedReason, dependencyCategory, blockedCategory. Write scratch parks.json.",
+  "command": "python3 -B <absolute report directory>/step-07-park-families-classify.py (cwd /tmp/fgos-work/park-decisions)",
+  "classifierSha256": "13f370a8ac48b779de27e60a233c5869f34ed42c65dfb83e16a795d1ec647027",
+  "recordsSha256": {
+    "step-05-records/citation-ratchet-roots.jsonl": "ad6674ec8518a6a37341a4191aa023d496e09dc327774d27815dbd3f39732b2b",
+    "step-05-records/cli-help-messages.jsonl": "e87cdf03429074018e7cb4dd971cb71502dc87b28e17744d3d2c02d0d942ab67",
+    "step-05-records/gateway-contract.jsonl": "17b7c1b7dcdcb7232f6d0f6b70bd3fb8cab7dc4bd0555125cd114b5a64f1368c",
+    "step-05-records/generators-decision-index.jsonl": "b0d59066098cea866605bddc47e349ff3161b66916ae6fee538f013d08c9fe98",
+    "step-05-records/generators-doc-registry.jsonl": "67ec44c029e74d7cfb9e7f764169cc808f0442ed608c33dd5f35e4267b59b0c3",
+    "step-05-records/generators-enduser-index.jsonl": "2f4e393b752e560880c64117fcf68c7bf6db77608381a7b956160b61b4a4d3b1",
+    "step-05-records/generators-instructions.jsonl": "7b581f7649fcaeb9d895cf6771a83c006566800191e8a2ae6e2bbf49d8195cb6",
+    "step-05-records/generators-skills-and-support.jsonl": "06c83c66e1004074e539c93025da155c40967ce6c8df0892b5a8603bbc8be8e6",
+    "step-05-records/runtime-external-parks.jsonl": "4e208b1b3c88a4bcafe3fa43bc37d48439e2624b22fcaa05f7d0e2ae55f338c8",
+    "step-05-records/runtime-judgment-part-22.jsonl": "48e8568c0ed96956ae89ca3ef6e61c9f815ddd930ab417f45bda5b6b8aa19e1c",
+    "step-05-records/runtime-judgment-part-23.jsonl": "30b84c7d491da9b433d37177eb46fc72e06b4c0e87e8a83faaa5163ed14b8678",
+    "step-05-records/runtime-judgment-part-24.jsonl": "2310b97dc4717e62e892233842ddd474e3d1c190d30537eddabf7abb2ec5d711",
+    "step-05-records/runtime-judgment-part-25.jsonl": "cf13194a10a4dbbcc3e36aa5c259efb0b632a5b3010f9cff45a2e567622e6508",
+    "step-05-records/runtime-judgment-part-26.jsonl": "de25139a2e13b7c0728e7c80e8fabddf30e381c7d096075d3485980d560eaf3f",
+    "step-05-records/runtime-judgment-part-27.jsonl": "f19e1253341b1809699a851708ae8a5de23fc4af9df0496323a578d957b0812e",
+    "step-05-records/runtime-judgment-part-28.jsonl": "5dfc39c71630b882fe11d4de1f78a01d9139de7b795442d5e31ab403214f533a",
+    "step-05-records/runtime-judgment-part-29.jsonl": "16b3243ccbbb0cb6f425ec8a8e22f499324d440f70a26b00ce8dadeef08f667a",
+    "step-05-records/runtime-r19.jsonl": "4518f5cd5b9d7c7bcb2ea7011b2ec4cb713b2904a5705077d372ad97a4e08a5e",
+    "step-05-records/runtime-r20.jsonl": "41f0e5025fb09dab8bb604ceeb142db1d6e7b3f40c9f0aeefac21571e57f4a9f",
+    "step-05-records/runtime-r21.jsonl": "ecb5b2fde3ce6ea7bc6d0e8106015ed41357beca2642328f484349ae94cae396",
+    "step-05-records/runtime-retired-source.jsonl": "c5a1162fe25a719fcd8b7fb7a34fba48dcd93800f0f35c04337a740dd92ff604",
+    "step-05-records/setup-doctor-roots.jsonl": "c315bcd11d89cf8d060d37a86eae91cf2e27afe333bf630eb5a264a2a01d0130",
+    "step-05-records/tests-cutover-neutral.jsonl": "9f3dbb93e32401ffee73df61fb16c6dc4ad97a0313a875ef0e88121930cfbad4",
+    "step-05-records/tests-judgment-batch4.jsonl": "c442bfa6a392bda99211fc61157c0094517da7ba0596f4eb99593e41487c76f6",
+    "step-05-records/tests-judgment-batch5.jsonl": "09ec8fd0291f813ed77cadaa8046b6359d5ba978a2db4f8a4c6d9518cbeeb9da",
+    "step-05-records/tests-judgment-batch6.jsonl": "46a38dc8ea87a814c3ab340e160897307106fb68c3955ea1abdab3200f59ab80",
+    "step-05-records/tests-judgment-batch7.jsonl": "1d79a8e3ba873e6294c4838537ff938d951ebedd4931cb428b86a22c9023ce46",
+    "step-05-records/tests-mechanical.jsonl": "7ece1cb25d2b5a48c70ad1431672d96c415428291f76a01bb1291e3b519e9a92",
+    "step-05-records/tests-prompt-goldens.jsonl": "6f7aaa44bc6da3619bd9bbb1ba32e6faa9f66691bb04e8fa06738214c78cf423",
+    "step-05-records/tests-real-file-batch3.jsonl": "56f682625f9cbf357e4edd1a06ea290f461325a7828b00bbfc6477d383d6faf9",
+    "step-05-records/tests-real-file.jsonl": "7b927019c9136d3199ffcfd95f371ba4e12a1ddb7deaa902883040e61514b38e",
+    "step-05-records/tests-root-neutral.jsonl": "2706ac0823a05e8e066648ddcc0f736c5b888ddd08f4560777e7750c5c59f3b2",
+    "step-05-records/ui-spec-compiler.jsonl": "26a1696b517677964d62c387a54b503c8ecf2f2f4a6ec809d25fad60c8c8d6c7"
+  },
+  "coverage": {
+    "parkedOwningItems": 2311,
+    "uniqueItemFileKeys": 2311,
+    "families": 23,
+    "assigned": 2311,
+    "unassigned": 0,
+    "duplicateAssignments": 0,
+    "closureTotalsParked": 2311,
+    "allFamilyMembersMatchCommittedGrouping": true,
+    "driftSinceEb2575b06": false,
+    "externalLocatorParks": 2
+  },
+  "countsPerFamily": [
+    {
+      "id": "gen-doc-registry",
+      "items": 1318,
+      "files": 2
+    },
+    {
+      "id": "gen-enduser-index",
+      "items": 506,
+      "files": 1
+    },
+    {
+      "id": "gen-decision-index",
+      "items": 78,
+      "files": 1
+    },
+    {
+      "id": "state-registry-export",
+      "items": 58,
+      "files": 7
+    },
+    {
+      "id": "state-work-docsref",
+      "items": 56,
+      "files": 8
+    },
+    {
+      "id": "r26:docs/decisions/index.md",
+      "items": 51,
+      "files": 10
+    },
+    {
+      "id": "r26:docs/enduser-docs-index.json",
+      "items": 36,
+      "files": 7
+    },
+    {
+      "id": "readset-post-retirement-scan",
+      "items": 31,
+      "files": 5
+    },
+    {
+      "id": "state-inventory-oldpath",
+      "items": 31,
+      "files": 3
+    },
+    {
+      "id": "decision-f-ratchet-retirement",
+      "items": 18,
+      "files": 1
+    },
+    {
+      "id": "r26:docs/doc-governance.md",
+      "items": 17,
+      "files": 3
+    },
+    {
+      "id": "gateway-ctr010-contract-citations",
+      "items": 17,
+      "files": 2
+    },
+    {
+      "id": "citation-convention-and-scan",
+      "items": 14,
+      "files": 4
+    },
+    {
+      "id": "carry-foundations-and-retired-decision-narratives",
+      "items": 13,
+      "files": 4
+    },
+    {
+      "id": "carry-knowledge-registry-framework",
+      "items": 12,
+      "files": 4
+    },
+    {
+      "id": "carry-runner-workstate-doctrine",
+      "items": 11,
+      "files": 9
+    },
+    {
+      "id": "split-area-holder-mapping",
+      "items": 8,
+      "files": 4
+    },
+    {
+      "id": "carry-distribution-gateway-claims",
+      "items": 8,
+      "files": 7
+    },
+    {
+      "id": "r29-native-land-decisions-tree",
+      "items": 8,
+      "files": 1
+    },
+    {
+      "id": "state-outcome-and-evidence",
+      "items": 7,
+      "files": 4
+    },
+    {
+      "id": "r26:docs/contracts/fgos-gateway-api-v1.yaml",
+      "items": 6,
+      "files": 2
+    },
+    {
+      "id": "r26:docs/architecture-manifest.json",
+      "items": 6,
+      "files": 2
+    },
+    {
+      "id": "r26:docs/architecture-map.md",
+      "items": 1,
+      "files": 1
+    }
+  ],
+  "classifierStdout": "1318 2 gen-doc-registry\n506 1 gen-enduser-index\n78 1 gen-decision-index\n58 7 state-registry-export\n56 8 state-work-docsref\n51 10 r26:docs/decisions/index.md\n36 7 r26:docs/enduser-docs-index.json\n31 5 readset-post-retirement-scan\n31 3 state-inventory-oldpath\n18 1 decision-f-ratchet-retirement\n17 3 r26:docs/doc-governance.md\n17 2 gateway-ctr010-contract-citations\n14 4 citation-convention-and-scan\n13 4 carry-foundations-and-retired-decision-narratives\n12 4 carry-knowledge-registry-framework\n11 9 carry-runner-workstate-doctrine\n8 4 split-area-holder-mapping\n8 7 carry-distribution-gateway-claims\n8 1 r29-native-land-decisions-tree\n7 4 state-outcome-and-evidence\n6 2 r26:docs/contracts/fgos-gateway-api-v1.yaml\n6 2 r26:docs/architecture-manifest.json\n1 1 r26:docs/architecture-map.md\ntotal 2311\n",
+  "limits": "No dispositions changed; external parks are locator-level and excluded from owning-item count. No export, target-content proof, Step 7 final pin or cutover performed."
+}

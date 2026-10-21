@@ -1,3 +1,13 @@
+## Step 7 park-family decisions — records-only handback (2026-10-21)
+
+Recorded **L12-96** from the owner's 18:17 acceptance: Q1/Q2/Q3 = A and the Lead-settled handling list. The bounded state export belongs to the Lead at the Step 7 final pin; it grants no write/cutover authority. Retain the generated decision index and native Land behavior (dormant in this repo); adopt the per-area narrative/RUL convention and published scope mapping at cutover, with L12-91 remaining one-way.
+
+[Grouping replay](step-07-park-grouping-verification.json) ran `python3 -B` on the current owning records and compared every member against the committed grouping: **2,311 parks / 23 families / 2,311 unique assignments / zero unassigned / zero duplicates**, matching closure totals and every family member set since `eb2575b06`. Counts per family are in that receipt; no grouping repair was needed. The two external locator parks are separate; the 37 R26 units without parked members follow the pinned move set.
+
+[Resolution plan](step-07-park-resolution-plan.json) records each family's intended disposition, L12-96 witness and Step 7 / Phase 9 application. **No owning-record disposition changed.** Phase 9 Requirements now permit generated `docs/decisions/index.md` while refusing new numbered decision files. Step 7 still owes the final-pin export/parity, content checks, exact live holders for 44 verbatim claims, area mapping and successor scan sets (including Lead placement of P7-DOC-GAP-05 `dynamic-023895`); Phase 9 owes execution and replay. Decision F retirement and L12-89 guards remain one unit. This is author handback, not independent acceptance or cutover readiness.
+
+Only records and the authorized plan sentence changed. No fgOS CLI, git write, source/test/skill/baseline edit or live-state/secrets read. Markdown preview remains Lead custody within this records-only boundary.
+
 ## Step 6 — Evidence digest manifest and relocation verifier delivery (2026-10-21)
 
 Original input `916116b0419d04637bab19c3a16cd5aac3205229`; independent-review rework input `38bddcdd7bd6cf3cf5eaf0680fd4cf59074cddd9`. Step 6 tooling and deterministic evidence digest manifest delivered in scope; no git write or fgOS CLI used, runner owns commit.

@@ -1,0 +1,494 @@
+{
+  "ruling": "L12-96",
+  "status": "planned only; Step 7 final-pin application pending",
+  "recordDispositionsChanged": false,
+  "coverage": {
+    "parkedOwningItems": 2311,
+    "closureTotalsParked": 2311,
+    "closureParkDependencyGroups": 1998,
+    "closureParksByDependencyItemSum": 2311,
+    "assignedToFamilies": 2311,
+    "unassigned": 0,
+    "families": 23,
+    "note": "Every parked owning item (references, dynamicTraces, authorAddedReferences with disposition parked) lands in exactly one family; 2311 = closure totals.dispositions.parked = sum of parksByDependency itemCount. The brief's ~2,283 figure predates L12-90 (+27 R30 parks +2 preserve->park -1 R31). Unassigned bucket is empty. External parks are locator-level and not owning items (listed separately)."
+  },
+  "verification": "step-07-park-grouping-verification.json",
+  "applicationRules": [
+    "Authorization is not export or parity evidence. Families 1–5, 9, 20 and both external locator parks remain parked pending the one Lead export at the Step 7 final pin.",
+    "Step 7 binds exact member-level dispositions, hunks, holders and witnesses; Phase 9 applies source/content moves and generator outputs. Preserve versus patch for state-driven rows follows the actual exported operands, never a blanket path substitution.",
+    "Rendered followers join canonical core-source disposition; regeneration uses existing generators, never hand-patched output bytes.",
+    "Retirement is a physical co-cut action; Step 7 must bind owning-record closure to the accepted retirement contract rather than invent a disposition enum.",
+    "Content checks, 44 verbatim claims, dynamic-023895 placement, parity, independent acceptance and Phase 9 replays remain owed. L12-91 never makes cutover wait for RULE."
+  ],
+  "families": [
+    {
+      "familyNumber": 1,
+      "familyId": "gen-doc-registry",
+      "itemCount": 1318,
+      "fileCount": 2,
+      "targetDisposition": {
+        "changedGeneratedContent": "patch via existing generator",
+        "unchangedGeneratedContent": "preserve",
+        "untilExportAndParity": "parked"
+      },
+      "witnessRuling": "L12-96 — Q1=A",
+      "appliesAt": {
+        "recordResolution": "Step 7 final-pin composition; no disposition changed in this turn",
+        "execution": "Phase 9 atomic cutover"
+      },
+      "action": "Bind registry export and same-input parity at Step 7; regenerate both registry projections through the existing generator at Phase 9.",
+      "memberSource": {
+        "file": "step-07-park-families.json",
+        "familyId": "gen-doc-registry"
+      },
+      "carryItems": []
+    },
+    {
+      "familyNumber": 2,
+      "familyId": "gen-enduser-index",
+      "itemCount": 506,
+      "fileCount": 1,
+      "targetDisposition": {
+        "changedGeneratedContent": "patch via existing generator",
+        "unchangedGeneratedContent": "preserve",
+        "untilExportAndParity": "parked"
+      },
+      "witnessRuling": "L12-96 — Q1=A; Lead-settled retention",
+      "appliesAt": {
+        "recordResolution": "Step 7 final-pin composition; no disposition changed in this turn",
+        "execution": "Phase 9 atomic cutover"
+      },
+      "action": "Bind registry export plus final scan set at Step 7; regenerate retained enduser index at Phase 9.",
+      "memberSource": {
+        "file": "step-07-park-families.json",
+        "familyId": "gen-enduser-index"
+      },
+      "carryItems": []
+    },
+    {
+      "familyNumber": 3,
+      "familyId": "gen-decision-index",
+      "itemCount": 78,
+      "fileCount": 1,
+      "targetDisposition": {
+        "changedGeneratedContent": "patch via existing generator",
+        "unchangedGeneratedContent": "preserve",
+        "untilExportAndParity": "parked"
+      },
+      "witnessRuling": "L12-96 — Q1=A; Q2=A",
+      "appliesAt": {
+        "recordResolution": "Step 7 final-pin composition; no disposition changed in this turn",
+        "execution": "Phase 9 atomic cutover"
+      },
+      "action": "Bind state.decisions export and index union at Step 7; regenerate at retained docs/decisions/index.md at Phase 9.",
+      "memberSource": {
+        "file": "step-07-park-families.json",
+        "familyId": "gen-decision-index"
+      },
+      "carryItems": []
+    },
+    {
+      "familyNumber": 4,
+      "familyId": "state-registry-export",
+      "itemCount": 58,
+      "fileCount": 7,
+      "targetDisposition": {
+        "ifExportProvesNoChange": "preserve",
+        "ifMigrationOrReaderChangeRequired": "patch",
+        "untilFinalPinProof": "parked"
+      },
+      "witnessRuling": "L12-96 — Q1=A",
+      "appliesAt": {
+        "recordResolution": "Step 7 final-pin composition; no disposition changed in this turn",
+        "execution": "Phase 9 atomic cutover"
+      },
+      "action": "Prove registry currentPath/aliases reader behavior from the final-pin export at Step 7; apply any required reader/state migration at Phase 9.",
+      "memberSource": {
+        "file": "step-07-park-families.json",
+        "familyId": "state-registry-export"
+      },
+      "carryItems": []
+    },
+    {
+      "familyNumber": 5,
+      "familyId": "state-work-docsref",
+      "itemCount": 56,
+      "fileCount": 8,
+      "targetDisposition": {
+        "ifExportProvesNoChange": "preserve",
+        "ifMigrationOrReaderChangeRequired": "patch",
+        "untilFinalPinProof": "parked"
+      },
+      "witnessRuling": "L12-96 — Q1=A",
+      "appliesAt": {
+        "recordResolution": "Step 7 final-pin composition; no disposition changed in this turn",
+        "execution": "Phase 9 atomic cutover"
+      },
+      "action": "Bind Work.docsRef/content-root/item.refs consumer proof at Step 7; apply any required migration at Phase 9.",
+      "memberSource": {
+        "file": "step-07-park-families.json",
+        "familyId": "state-work-docsref"
+      },
+      "carryItems": []
+    },
+    {
+      "familyNumber": 6,
+      "familyId": "r26:docs/decisions/index.md",
+      "itemCount": 51,
+      "fileCount": 10,
+      "targetDisposition": "preserve",
+      "witnessRuling": "L12-96 — Q2=A",
+      "appliesAt": {
+        "recordResolution": "Step 7 final-pin composition; no disposition changed in this turn",
+        "execution": "Step 7 preservation/move-set resolution; retained paths stay at cutover"
+      },
+      "action": "Step 7: preserve 51 items with L12-96 witness; retain generated docs/decisions/index.md and drop docs/knowledge/decisions-index/decision-record.md from the move set.",
+      "memberSource": {
+        "file": "step-07-park-families.json",
+        "familyId": "r26:docs/decisions/index.md"
+      },
+      "carryItems": []
+    },
+    {
+      "familyNumber": 7,
+      "familyId": "r26:docs/enduser-docs-index.json",
+      "itemCount": 36,
+      "fileCount": 7,
+      "targetDisposition": "preserve",
+      "witnessRuling": "L12-96 — Lead-settled retention",
+      "appliesAt": {
+        "recordResolution": "Step 7 final-pin composition; no disposition changed in this turn",
+        "execution": "Step 7 preservation/move-set resolution; retained paths stay at cutover"
+      },
+      "action": "Step 7: retain docs/enduser-docs-index.json and preserve its readers; content regeneration stays with family 2.",
+      "memberSource": {
+        "file": "step-07-park-families.json",
+        "familyId": "r26:docs/enduser-docs-index.json"
+      },
+      "carryItems": []
+    },
+    {
+      "familyNumber": 8,
+      "familyId": "readset-post-retirement-scan",
+      "itemCount": 31,
+      "fileCount": 5,
+      "targetDisposition": "patch",
+      "witnessRuling": "L12-96 — Lead-settled post-retirement scans; L12-90/R13",
+      "appliesAt": {
+        "recordResolution": "Step 7 final-pin composition; no disposition changed in this turn",
+        "execution": "Phase 9 atomic cutover"
+      },
+      "action": "Step 7: bind successor scan sets, with Lead placement of P7-DOC-GAP-05 dynamic-023895; Phase 9: apply patches, lift frozen-B and replay.",
+      "memberSource": {
+        "file": "step-07-park-families.json",
+        "familyId": "readset-post-retirement-scan"
+      },
+      "carryItems": []
+    },
+    {
+      "familyNumber": 9,
+      "familyId": "state-inventory-oldpath",
+      "itemCount": 31,
+      "fileCount": 3,
+      "targetDisposition": {
+        "ifExportProvesNoChange": "preserve",
+        "ifMigrationOrReaderChangeRequired": "patch",
+        "untilFinalPinProof": "parked"
+      },
+      "witnessRuling": "L12-96 — Q1=A",
+      "appliesAt": {
+        "recordResolution": "Step 7 final-pin composition; no disposition changed in this turn",
+        "execution": "Phase 9 atomic cutover"
+      },
+      "action": "Bind inventory oldPath/aliases/move-destination export through existing loader at Step 7; apply required migration at Phase 9.",
+      "memberSource": {
+        "file": "step-07-park-families.json",
+        "familyId": "state-inventory-oldpath"
+      },
+      "carryItems": []
+    },
+    {
+      "familyNumber": 10,
+      "familyId": "decision-f-ratchet-retirement",
+      "itemCount": 18,
+      "fileCount": 1,
+      "targetDisposition": "retire as a co-cut unit (not a new owning-record disposition)",
+      "witnessRuling": "L12-96 — Lead-settled Decision F; L12-86/L12-89; Q2=A exception",
+      "appliesAt": {
+        "recordResolution": "Step 7 final-pin composition; no disposition changed in this turn",
+        "execution": "Phase 9 atomic cutover"
+      },
+      "action": "Step 7: compose one retirement unit; Phase 9: retire ratchet script, baseline and exceptions together with all three L12-89 guards, allowing the generated index.",
+      "memberSource": {
+        "file": "step-07-park-families.json",
+        "familyId": "decision-f-ratchet-retirement"
+      },
+      "carryItems": []
+    },
+    {
+      "familyNumber": 11,
+      "familyId": "r26:docs/doc-governance.md",
+      "itemCount": 17,
+      "fileCount": 3,
+      "targetDisposition": "patch",
+      "witnessRuling": "L12-96 — Lead-settled content-checked move",
+      "appliesAt": {
+        "recordResolution": "Step 7 final-pin composition; no disposition changed in this turn",
+        "execution": "Phase 9 atomic cutover"
+      },
+      "action": "Step 7: check docs/doc-governance.md content against docs/platform/governance.md and bind conservation/reader patches; Phase 9: move and apply them.",
+      "memberSource": {
+        "file": "step-07-park-families.json",
+        "familyId": "r26:docs/doc-governance.md"
+      },
+      "carryItems": []
+    },
+    {
+      "familyNumber": 12,
+      "familyId": "gateway-ctr010-contract-citations",
+      "itemCount": 17,
+      "fileCount": 2,
+      "targetDisposition": "patch",
+      "witnessRuling": "L12-96 — Lead-settled gateway contract move",
+      "appliesAt": {
+        "recordResolution": "Step 7 final-pin composition; no disposition changed in this turn",
+        "execution": "Phase 9 atomic cutover"
+      },
+      "action": "Step 7: bind herdr-web-dashboard contract holder and gateway-yaml-* carry; Phase 9: repoint citations with family 21, preserve CTR010, delete duplicate and replay tests.",
+      "memberSource": {
+        "file": "step-07-park-families.json",
+        "familyId": "gateway-ctr010-contract-citations"
+      },
+      "carryItems": [
+        "gateway-yaml-research-split",
+        "gateway-yaml-consumer-specific-parks",
+        "gateway-yaml-live-state-runner-holders"
+      ]
+    },
+    {
+      "familyNumber": 13,
+      "familyId": "citation-convention-and-scan",
+      "itemCount": 14,
+      "fileCount": 4,
+      "targetDisposition": "patch",
+      "witnessRuling": "L12-96 — Q3=A; L12-91",
+      "appliesAt": {
+        "recordResolution": "Step 7 final-pin composition; no disposition changed in this turn",
+        "execution": "Phase 9 atomic cutover"
+      },
+      "action": "Step 7: bind per-area decisions convention, RUL ownership by area spec.md and recursive docs/platform/**/spec.md scan with at least current coverage; Phase 9: write minimal convention and patch checker/core citations, regenerate renders.",
+      "memberSource": {
+        "file": "step-07-park-families.json",
+        "familyId": "citation-convention-and-scan"
+      },
+      "carryItems": []
+    },
+    {
+      "familyNumber": 14,
+      "familyId": "carry-foundations-and-retired-decision-narratives",
+      "itemCount": 13,
+      "fileCount": 4,
+      "targetDisposition": "patch",
+      "witnessRuling": "L12-96 — Lead-settled verbatim carriage; L12-62/63; L12-71(4)/R2",
+      "appliesAt": {
+        "recordResolution": "Step 7 final-pin composition; no disposition changed in this turn",
+        "execution": "Phase 9 atomic cutover"
+      },
+      "action": "Step 7: bind 13 exact missing claims and live holders for foundations/retired narratives; Phase 9: carry verbatim and patch pointers, preserving D-ADR0035/0054/0062, RUL11/RUL104 and 0032 heading layout.",
+      "memberSource": {
+        "file": "step-07-park-families.json",
+        "familyId": "carry-foundations-and-retired-decision-narratives"
+      },
+      "carryItems": []
+    },
+    {
+      "familyNumber": 15,
+      "familyId": "carry-knowledge-registry-framework",
+      "itemCount": 12,
+      "fileCount": 4,
+      "targetDisposition": "patch",
+      "witnessRuling": "L12-96 — Lead-settled verbatim carriage; L12-62/63; L12-71(4)/R2",
+      "appliesAt": {
+        "recordResolution": "Step 7 final-pin composition; no disposition changed in this turn",
+        "execution": "Phase 9 atomic cutover"
+      },
+      "action": "Step 7: bind 12 exact claims and live holders for registry framework sections 5.5, 7.2–7.4, 13.5 and 14; Phase 9: carry verbatim and patch pointers; renders follow core.",
+      "memberSource": {
+        "file": "step-07-park-families.json",
+        "familyId": "carry-knowledge-registry-framework"
+      },
+      "carryItems": [
+        "registry-source-versus-test-provenance"
+      ]
+    },
+    {
+      "familyNumber": 16,
+      "familyId": "carry-runner-workstate-doctrine",
+      "itemCount": 11,
+      "fileCount": 9,
+      "targetDisposition": "patch",
+      "witnessRuling": "L12-96 — Lead-settled verbatim carriage; L12-62/63; L12-71(4)/R2",
+      "appliesAt": {
+        "recordResolution": "Step 7 final-pin composition; no disposition changed in this turn",
+        "execution": "Phase 9 atomic cutover"
+      },
+      "action": "Step 7: bind 11 exact runner/workstate claims and live holders (Native-First, clarifying rule 2, session rule, FlowDefinition, STR70a and dead links); Phase 9: carry verbatim and patch pointers.",
+      "memberSource": {
+        "file": "step-07-park-families.json",
+        "familyId": "carry-runner-workstate-doctrine"
+      },
+      "carryItems": []
+    },
+    {
+      "familyNumber": 17,
+      "familyId": "split-area-holder-mapping",
+      "itemCount": 8,
+      "fileCount": 4,
+      "targetDisposition": "patch",
+      "witnessRuling": "L12-96 — Q3=A; L12-91",
+      "appliesAt": {
+        "recordResolution": "Step 7 final-pin composition; no disposition changed in this turn",
+        "execution": "Phase 9 atomic cutover"
+      },
+      "action": "Step 7: bind area-to-holder mapping for read-first, fact, narrative and decision uses, including split/renamed areas; Phase 9: publish minimal scope table and patch consumers for fgos decision --scope.",
+      "memberSource": {
+        "file": "step-07-park-families.json",
+        "familyId": "split-area-holder-mapping"
+      },
+      "carryItems": [
+        "store-comment-block-split"
+      ]
+    },
+    {
+      "familyNumber": 18,
+      "familyId": "carry-distribution-gateway-claims",
+      "itemCount": 8,
+      "fileCount": 7,
+      "targetDisposition": "patch",
+      "witnessRuling": "L12-96 — Lead-settled verbatim carriage; L12-62/63; L12-71(4)/R2",
+      "appliesAt": {
+        "recordResolution": "Step 7 final-pin composition; no disposition changed in this turn",
+        "execution": "Phase 9 atomic cutover"
+      },
+      "action": "Step 7: bind eight exact claims and live holders for ReleaseManifest §5, init, git-common-dir, gateway-token refusal, js-yaml and old R5; Phase 9: carry verbatim and patch pointers.",
+      "memberSource": {
+        "file": "step-07-park-families.json",
+        "familyId": "carry-distribution-gateway-claims"
+      },
+      "carryItems": [
+        "network-r5-park-to-patch"
+      ]
+    },
+    {
+      "familyNumber": 19,
+      "familyId": "r29-native-land-decisions-tree",
+      "itemCount": 8,
+      "fileCount": 1,
+      "targetDisposition": "preserve",
+      "witnessRuling": "L12-96 — Q2=A: dormant in this repo",
+      "appliesAt": {
+        "recordResolution": "Step 7 final-pin composition; no disposition changed in this turn",
+        "execution": "Step 7 preservation/move-set resolution; retained paths stay at cutover"
+      },
+      "action": "Step 7: preserve all eight R29 parks with L12-96 dormant-in-this-repo witness; leave native Land numbered-decision renumbering in src/runner/merge.mjs unchanged for projects with a numbered corpus.",
+      "memberSource": {
+        "file": "step-07-park-families.json",
+        "familyId": "r29-native-land-decisions-tree"
+      },
+      "carryItems": []
+    },
+    {
+      "familyNumber": 20,
+      "familyId": "state-outcome-and-evidence",
+      "itemCount": 7,
+      "fileCount": 4,
+      "targetDisposition": {
+        "ifExportProvesNoChange": "preserve",
+        "ifMigrationOrReaderChangeRequired": "patch",
+        "untilFinalPinProof": "parked"
+      },
+      "witnessRuling": "L12-96 — Q1=A",
+      "appliesAt": {
+        "recordResolution": "Step 7 final-pin composition; no disposition changed in this turn",
+        "execution": "Phase 9 atomic cutover"
+      },
+      "action": "Step 7: bind outcome.docPath and acceptance evidence token export and parity; Phase 9: apply any required migration.",
+      "memberSource": {
+        "file": "step-07-park-families.json",
+        "familyId": "state-outcome-and-evidence"
+      },
+      "carryItems": []
+    },
+    {
+      "familyNumber": 21,
+      "familyId": "r26:docs/contracts/fgos-gateway-api-v1.yaml",
+      "itemCount": 6,
+      "fileCount": 2,
+      "targetDisposition": "patch",
+      "witnessRuling": "L12-96 — Lead-settled gateway contract move",
+      "appliesAt": {
+        "recordResolution": "Step 7 final-pin composition; no disposition changed in this turn",
+        "execution": "Phase 9 atomic cutover"
+      },
+      "action": "Step 7: bind move to herdr-web-dashboard contract with family 12; Phase 9: repoint gateway.rs/mcp.rs and tests and delete duplicate while preserving CTR010.",
+      "memberSource": {
+        "file": "step-07-park-families.json",
+        "familyId": "r26:docs/contracts/fgos-gateway-api-v1.yaml"
+      },
+      "carryItems": []
+    },
+    {
+      "familyNumber": 22,
+      "familyId": "r26:docs/architecture-manifest.json",
+      "itemCount": 6,
+      "fileCount": 2,
+      "targetDisposition": "preserve",
+      "witnessRuling": "L12-96 — Lead-settled retention; L12-60",
+      "appliesAt": {
+        "recordResolution": "Step 7 final-pin composition; no disposition changed in this turn",
+        "execution": "Step 7 preservation/move-set resolution; retained paths stay at cutover"
+      },
+      "action": "Step 7: retain docs/architecture-manifest.json, preserve readers, drop differing candidate copy from move set.",
+      "memberSource": {
+        "file": "step-07-park-families.json",
+        "familyId": "r26:docs/architecture-manifest.json"
+      },
+      "carryItems": []
+    },
+    {
+      "familyNumber": 23,
+      "familyId": "r26:docs/architecture-map.md",
+      "itemCount": 1,
+      "fileCount": 1,
+      "targetDisposition": "patch",
+      "witnessRuling": "L12-96 — Lead-settled content-checked move",
+      "appliesAt": {
+        "recordResolution": "Step 7 final-pin composition; no disposition changed in this turn",
+        "execution": "Phase 9 atomic cutover"
+      },
+      "action": "Step 7: check docs/architecture-map.md content against its pinned move-set target and bind conservation; Phase 9: move and patch pointers.",
+      "memberSource": {
+        "file": "step-07-park-families.json",
+        "familyId": "r26:docs/architecture-map.md"
+      },
+      "carryItems": []
+    }
+  ],
+  "externalLocatorParks": {
+    "count": 2,
+    "includedInOwningItemTotal": false,
+    "locators": [
+      ".fgos/**; ignored/external instructions",
+      "plans/260925-documentation-authority-unification/reports/doc-inventory.json"
+    ],
+    "targetDisposition": "preserve or patch as established by the bounded final-pin export; parked until proof",
+    "witnessRuling": "L12-96 Q1=A",
+    "appliesAt": "Lead export and Step 7 final-pin binding; any writes only at separately authorized Phase 9 cutover"
+  },
+  "r26UnitsWithoutParkedItems": {
+    "count": 37,
+    "targetDisposition": "follow pinned move set, with comment co-changes",
+    "witnessRuling": "L12-96 accepted Lead-settled list; L12-83/L12-86",
+    "appliesAt": "Step 7 binds move set; Phase 9 patches comments with moves"
+  }
+}
