@@ -15,6 +15,7 @@ import { foldEvents, rebuildView, rebuildViewFromDir } from '../../src/state/rep
 import { initStore, addWork, editWork, currentEffectiveView } from '../../src/state/store.mjs';
 import { parseEditFlags } from '../../src/verbs/state/edit.mjs';
 import { effectiveDispatchPolicy } from '../../src/runner/dispatch/plan.mjs';
+import { bindable } from '../helpers/work-seat-config.mjs';
 import { workRigorFor } from '../../src/runner/work-dispatch.mjs';
 
 function mkTempDir() {
@@ -131,7 +132,8 @@ test('--tier bị từ chối kèm hướng dẫn trên parseEditFlags', () => {
 });
 
 test('Work dispatch: rigor: high is recorded as the demand and the tier stays the config\'s (rigor no longer maps to a tier)', () => {
-  const runnerConfig = {
+  const runnerConfig = bindable({
+    executor: { command: 'claude', args: ['{prompt}'] },
     modelPolicies: {
       claude: {
         nano: 'haiku',
@@ -140,7 +142,7 @@ test('Work dispatch: rigor: high is recorded as the demand and the tier stays th
         frontier: 'opus-next',
       },
     },
-  };
+  });
 
   const work = {
     id: 'tsk-high',
@@ -170,7 +172,8 @@ test('Work dispatch: rigor: high is recorded as the demand and the tier stays th
 });
 
 test('Work dispatch: không có rigor -> standard, size: heavy không ảnh hưởng model', () => {
-  const runnerConfig = {
+  const runnerConfig = bindable({
+    executor: { command: 'claude', args: ['{prompt}'] },
     modelPolicies: {
       claude: {
         nano: 'haiku',
@@ -179,7 +182,7 @@ test('Work dispatch: không có rigor -> standard, size: heavy không ảnh hư�
         frontier: 'opus-next',
       },
     },
-  };
+  });
 
   const work = {
     id: 'tsk-heavy-size',
