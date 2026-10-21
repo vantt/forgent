@@ -2,6 +2,11 @@ import json,glob,subprocess,os,sys
 WT='/home/vantt/projects/forgentX-s8-review'
 RD=WT+'/plans/260925-documentation-authority-unification/reports/phase-08/step-05-records/'
 OUT=sys.argv[1]
+def _cap(o):
+    if isinstance(o,str): return o if len(o)<=2000 else o[:2000]+f' …[truncated {len(o)} chars]'
+    if isinstance(o,list): return [_cap(x) for x in o]
+    if isinstance(o,dict): return {k:_cap(v) for k,v in o.items()}
+    return o
 src_cache={}
 MECH=set()
 import collections
@@ -31,7 +36,7 @@ def lines_of(x):
 KEEP_REF=['referenceId','admission','edgeId','matchedExpression','sourceSpans','passageSpan','role','disposition','reason','target','anchor','resolverWitness','timing','diffHunk','blockedCategory','blockedReason','dependency','proposedReplacement','receiptId','proofCommand','proofScope','parityObligation','physicalPriorJoins','pathOperand','nonDocumentUse','successorNote']
 KEEP_DYN=['id','admission','disposition','caller','currentLine','currentPassage','role','targetSetOrConstruction','operationChain','stateExportDependency','rejectedAsUnrelatedReason','blockedReason','blockedSeams','reason','receiptId','proofCommand','proofScope','parityObligation','pathOperand','nonDocumentUse']
 src_items=[];gen_items=[];nolines=0
-_D=json.load(open(RD+'../step-05-seam5-review-list.json')); FILT=set(x if isinstance(x,str) else x['file'] for x in _D['addedThisTurn'])|{'test/runner/dead-vocabulary-guard.test.mjs','test/runner/dispatch-worker-session.test.mjs','test/docs/decisions-corpus-retired.test.mjs','apps/fgos-gateway/web/src/App.test.tsx'}
+_D=json.load(open(RD+'../step-05-seam5-review-list.json')); _f=lambda L: set(x if isinstance(x,str) else x['file'] for x in L); FILT=_f(_D['addedThisTurn'])|_f(_D['changedThisTurn']['dispositionChanged'])
 for f in sorted(glob.glob(RD+'*.jsonl')):
     for l in open(f):
         r=json.loads(l); pin=r['authorInputCommit']
@@ -56,8 +61,8 @@ for f in sorted(glob.glob(RD+'*.jsonl')):
             a,b=max(1,n-40),min(len(src),n+40)
             if rng and a<=rng[-1][1]+1: rng[-1][1]=max(rng[-1][1],b)
             else: rng.append([a,b])
-        wins=[{'from':a,'to':b,'text':'\n'.join(f'{i}: {src[i-1]}' for i in range(a,b+1))} for a,b in rng]
-        src_items.append({'file':r['file'],'pin':pin,'subBatch':r.get('subBatch'),'diff':r.get('diff'),'rollbackDiff':r.get('rollbackDiff'),'coCutPaths':r.get('coCutPaths'),'parked':r.get('parked'),'items':items,'windows':wins})
+        wins=[{'from':a,'to':b,'text':'\n'.join(f'{i}: '+(src[i-1] if len(src[i-1])<=600 else src[i-1][:600]+f' …[line truncated, {len(src[i-1])} chars]') for i in range(a,b+1))} for a,b in rng]
+        src_items.append(_cap({'file':r['file'],'pin':pin,'subBatch':r.get('subBatch'),'diff':r.get('diff'),'rollbackDiff':r.get('rollbackDiff'),'coCutPaths':r.get('coCutPaths'),'parked':r.get('parked'),'authorAddedReferences':r.get('authorAddedReferences'),'items':items,'windows':wins}))
 # split src into parts <= 380KB
 parts=[];cur=[];size=0
 for it in src_items:
