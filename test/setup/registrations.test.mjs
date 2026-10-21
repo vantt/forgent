@@ -948,7 +948,7 @@ test('findWorkflowStageOperationProblems fails on invalid dispatch mode or human
   assert.ok(problems.some((p) => p.includes('dispatch: human-only operation must not declare executor policy')));
 });
 
-test('findWorkflowStageOperationProblems fails on invalid preferExecutor, fallbackExecutors shape/names, or visibility', () => {
+test('findWorkflowStageOperationProblems fails on invalid preferExecutor or visibility, and refuses the removed fallbackExecutors key', () => {
   const customDomains = {
     coding: {
       workflows: {
@@ -962,7 +962,6 @@ test('findWorkflowStageOperationProblems fails on invalid preferExecutor, fallba
                 skills: ['fgos-coding-planning'],
                 policy: {
                   preferExecutor: 'does-not-exist',
-                  fallbackExecutors: 'pi', // string instead of array
                   visibility: 'opaque',
                 },
               },
@@ -972,7 +971,7 @@ test('findWorkflowStageOperationProblems fails on invalid preferExecutor, fallba
                 role: 'implementer',
                 skills: ['fgos-coding-planning'],
                 policy: {
-                  fallbackExecutors: ['unrecognized-fake-executor'],
+                  fallbackExecutors: ['pi'],
                 },
               },
             ],
@@ -983,9 +982,8 @@ test('findWorkflowStageOperationProblems fails on invalid preferExecutor, fallba
   };
   const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
   assert.ok(problems.some((p) => p.includes('policy.preferExecutor "does-not-exist" is not a recognized executor')));
-  assert.ok(problems.some((p) => p.includes('policy.fallbackExecutors must be an array of strings')));
   assert.ok(problems.some((p) => p.includes('policy.visibility "opaque" must be "headless" or "visible"')));
-  assert.ok(problems.some((p) => p.includes('policy.fallbackExecutors contains unrecognized executor "unrecognized-fake-executor"')));
+  assert.ok(problems.some((p) => p.includes('policy contains disallowed key(s) [fallbackExecutors]')));
 });
 
 test('findWorkflowStageOperationProblems fails on duplicate operation id or empty id', () => {

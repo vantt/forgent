@@ -367,9 +367,6 @@ function buildDeclaredAssignment({
     if (matchedOp.policy?.model && !policy?.model) {
       combined._fromYaml = true;
     }
-    if (Array.isArray(combined.fallbackExecutors)) {
-      combined.fallbackExecutors = Object.freeze([...combined.fallbackExecutors]);
-    }
     mergedPolicy = Object.freeze(combined);
   }
 

@@ -1105,8 +1105,8 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
               problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> invalid dispatch mode "${op.dispatch}" (allowed: assignment, human-only)`);
             }
             if (op.dispatch === 'human-only') {
-              if (op.policy && (op.policy.preferExecutor || (Array.isArray(op.policy.fallbackExecutors) && op.policy.fallbackExecutors.length > 0))) {
-                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> dispatch: human-only operation must not declare executor policy (preferExecutor/fallbackExecutors)`);
+              if (op.policy?.preferExecutor) {
+                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> dispatch: human-only operation must not declare executor policy (preferExecutor)`);
               }
             }
           }
@@ -1139,17 +1139,6 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
               if (op.policy.preferExecutor) {
                 if (typeof op.policy.preferExecutor !== 'string' || (knownExecutors.size > 0 && !knownExecutors.has(op.policy.preferExecutor))) {
                   problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.preferExecutor "${op.policy.preferExecutor}" is not a recognized executor`);
-                }
-              }
-              if (op.policy.fallbackExecutors !== undefined) {
-                if (!Array.isArray(op.policy.fallbackExecutors) || op.policy.fallbackExecutors.some((e) => typeof e !== 'string')) {
-                  problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.fallbackExecutors must be an array of strings`);
-                } else {
-                  for (const fb of op.policy.fallbackExecutors) {
-                    if (knownExecutors.size > 0 && !knownExecutors.has(fb)) {
-                      problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.fallbackExecutors contains unrecognized executor "${fb}"`);
-                    }
-                  }
                 }
               }
               if (op.policy.visibility !== undefined) {

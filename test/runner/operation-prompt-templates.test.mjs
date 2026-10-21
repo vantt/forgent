@@ -1049,7 +1049,7 @@ test('I04-REV-02 negative: validateEffectiveExecutionContract refuses corrupted 
     },
     dispatchPlan: {
       mechanism: 'in-process',
-      policy: { executorPreference: ['claude'], confinement: { requirement: 'none', backend: 'none' } },
+      policy: { executorId: 'claude', confinement: { requirement: 'none', backend: 'none' } },
       invocation: { adapter: 'cli-spawn', cwd: process.cwd() },
     },
     runId: 'run_contract_val_01',

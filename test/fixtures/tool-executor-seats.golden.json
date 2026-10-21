@@ -102,9 +102,6 @@
       }
     },
     "policy": {
-      "executorPreference": [
-        "gitnexus"
-      ],
       "executorId": "gitnexus",
       "providerModel": "claude",
       "rigor": "standard",
@@ -272,9 +269,6 @@
       }
     },
     "policy": {
-      "executorPreference": [
-        "gitnexus"
-      ],
       "executorId": "gitnexus",
       "providerModel": "claude",
       "rigor": "standard",

@@ -60,7 +60,6 @@ function validDispatchPlan(overrides = {}) {
     },
     policy: {
       tier: 'standard',
-      executorPreference: ['claude'],
     },
     ...overrides,
   };

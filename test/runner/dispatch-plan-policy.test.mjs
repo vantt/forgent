@@ -48,14 +48,13 @@ test('the dispatch policy resolves validate-plan defaults: reviewer/code-reviewe
 
   assert.equal(effective.role, 'reviewer');
   assert.equal(effective.persona, 'code-reviewer');
-  assert.deepEqual(effective.executorPreference, ['claude']);
+  assert.equal(effective.executorId, 'claude');
   assert.equal(effective.providerModel, 'claude');
   assert.equal(effective.tier, 'standard');
   assert.equal(effective.model, 'claude-3-7-sonnet-20250219');
   assert.equal(effective.visibility, 'headless');
   assert.deepEqual(effective.constraints.requiresSkills, ['fgos-coding-validating']);
   assert.ok(Object.isFrozen(effective));
-  assert.ok(Object.isFrozen(effective.executorPreference));
   assert.ok(Object.isFrozen(effective.constraints));
 });
 
@@ -97,7 +96,6 @@ test('assignment explicit policy can narrow executor preference to pi over opera
     operation: 'validate-plan',
     policy: {
       preferExecutor: 'pi',
-      fallbackExecutors: ['claude'],
     },
   });
 
@@ -105,8 +103,8 @@ test('assignment explicit policy can narrow executor preference to pi over opera
     assignment,
   });
 
-  assert.equal(effective.executorPreference[0], 'pi');
-  assert.deepEqual(effective.executorPreference, ['pi', 'claude']);
+  assert.equal(effective.executorId, 'pi');
+  assert.equal(effective.executorPreference, undefined);
 });
 
 test('CLI/human explicit override wins over Assignment policy preference', () => {
@@ -131,7 +129,7 @@ test('CLI/human explicit override wins over Assignment policy preference', () =>
     cliOverride,
   });
 
-  assert.equal(effective.executorPreference[0], 'claude');
+  assert.equal(effective.executorId, 'claude');
   assert.equal(effective.tier, 'frontier');
   assert.equal(effective.persona, 'custom-reviewer');
   assert.equal(effective.visibility, 'visible');

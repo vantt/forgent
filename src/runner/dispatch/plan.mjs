@@ -147,9 +147,7 @@ export function effectiveDispatchPolicy({ assignment, runnerConfig, cliOverride 
         ? { scope: 'default', id: assignment.role }
         : { scope: 'default' };
 
-  // Executor preference list, registry validation and provider derivation.
-  const declaredFallbacks = cliOverride.fallbackExecutors ?? opPolicy.fallbackExecutors ?? [];
-  const executorList = [primaryExecutor, ...declaredFallbacks.filter((e) => e !== primaryExecutor)];
+  // Registry validation and provider derivation.
   const { resolvedProvider, registeredExecutorEntry } = resolveExecutorProvider({ runnerConfig, primaryExecutor, options });
   const providerSource = registeredExecutorEntry
     ? { scope: 'registeredExecutor', id: primaryExecutor }
@@ -247,7 +245,6 @@ export function effectiveDispatchPolicy({ assignment, runnerConfig, cliOverride 
   return Object.freeze({
     role: assignment.role,
     persona: resolvedPersona,
-    executorPreference: Object.freeze(executorList),
     executorId: primaryExecutor,
     providerModel: resolvedProvider,
     rigor: effectiveRigor,
@@ -370,7 +367,7 @@ export function compileDispatchPlan(
         cliOverride,
         options,
       });
-      executorId = policy.executorPreference[0];
+      executorId = policy.executorId;
       assignmentResolved = resolveExecutorAndOverrides(cfg, executorId);
     }
   }
@@ -657,7 +654,7 @@ export function compileDispatchPlan(
   // requiring a real Assignment object. `preferExecutor: executorId` pins
   // the synthesized resolution to the SAME executor this function already
   // chose above, so the two resolvers agree by construction; the
-  // executorPreference[0] check below still catches the case where a
+  // executorId check below still catches the case where a
   // caller-supplied cliOverride.preferExecutor disagrees anyway.
   const realAssignmentForPolicy = assignmentItem ?? (typeof assignmentArg === 'object' && assignmentArg ? assignmentArg : null);
   const syntheticPolicy = { preferExecutor: executorId };
@@ -692,8 +689,8 @@ export function compileDispatchPlan(
     if (err?.name === 'SeatBindingError') throw err;
     effectivePolicy = null;
   }
-  if (effectivePolicy && effectivePolicy.executorPreference[0] !== executorId) {
-    const message = `dispatch decide mismatch for operation "${assignmentForPolicy.operation}": decided executor "${executorId}" does not match execution policy executor "${effectivePolicy.executorPreference[0]}"`;
+  if (effectivePolicy && effectivePolicy.executorId !== executorId) {
+    const message = `dispatch decide mismatch for operation "${assignmentForPolicy.operation}": decided executor "${executorId}" does not match execution policy executor "${effectivePolicy.executorId}"`;
     if (realAssignmentForPolicy) {
       throw new RunnerConfigError(message);
     }

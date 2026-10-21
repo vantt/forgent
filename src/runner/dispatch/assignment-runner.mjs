@@ -17,7 +17,7 @@ import { recordCustodyHandoff } from './cwd-lock.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { resolveWorkerArtifactPath } from './worker-artifacts.mjs';
-import { normalizeRunResultV2, interpretRunResult, ASSESSMENT_VERDICTS, runOutcome } from './run-result.mjs';
+import { normalizeRunResultV2, interpretRunResult, ASSESSMENT_VERDICTS, runOutcome, LEASE_CONFLICT_FAILURE_CODE } from './run-result.mjs';
 import { attributeWorkspaceChanges } from './evidence-attribution.mjs';
 import {
   commitRunSettlement,
@@ -130,6 +130,7 @@ import {
   credentialStoreOf,
   defaultProviderCapacityRuntimeDir,
   hasProviderAccounts,
+  LEASE_CONFLICT_REASON,
   probeQuarantinedAccounts,
   quarantineProviderAccount,
   redactProviderCapacitySelection,
@@ -1234,11 +1235,11 @@ export async function executeAssignment(assignment, opts = {}) {
           : compiledPlan.policy.confinement)
       : { mode: 'unconfined', policyId: null, policy: null };
 
-  const defaultExecutorId = effectivePolicy.executorPreference?.[0] ?? 'claude';
+  const defaultExecutorId = effectivePolicy.executorId ?? 'claude';
   const hasExplicitInvocationPin = typeof opts.cliOverride?.preferInvocation === 'string' && opts.cliOverride.preferInvocation.trim();
   let resolvedExecutorId = defaultExecutorId;
   // Cell 6.7 Bug B: `resolvedExecutorId` can diverge from `defaultExecutorId`
-  // for a redirected read-only op (above). `policy.executorPreference[0]`
+  // for a redirected read-only op (above). `policy.executorId`
   // (persisted below, unchanged) always records the DECLARED preference
   // before that redirection, while `executorId` records what ACTUALLY ran --
   // these are two distinct, non-contradictory fields by design, not a stale
@@ -1478,7 +1479,7 @@ export async function executeAssignment(assignment, opts = {}) {
         isReadOnlyOperation: evidenceData.operationMutability === 'read-only',
         runtime: {
           exitCode: null,
-          executionError: { code: 'provider-capacity-refused', message: stderrText },
+          executionError: { code: providerCapacitySelection.reason === LEASE_CONFLICT_REASON ? LEASE_CONFLICT_FAILURE_CODE : 'provider-capacity-refused', message: stderrText },
           stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
           stderrLog: path.relative(root, path.join(runDir, 'stderr.log')),
         },
@@ -1717,7 +1718,7 @@ export async function executeAssignment(assignment, opts = {}) {
   const executorId = resolvedExecutorId;
   // ADR-006 R7 sibling bug (RT059-F1): `compiledPlan.policy` (the object
   // the dispatch policy returns -- tier/model/providerModel/
-  // confinement/executorPreference) has never carried an `adapter` field.
+  // confinement/executorId) has never carried an `adapter` field.
   // The real resolved adapter lives at `compiledPlan.invocation.adapter`
   // (plan.mjs: `invocation = { via: 'cli', adapter: resolvedForDispatch.adapter
   // ?? executor?.adapter ?? 'cli-spawn', ... }`). Reading the wrong (always

@@ -5213,7 +5213,7 @@ test('compileDispatchPlan merges tier/model/providerModel/provenance/policy for 
   assert.equal(plan.model, 'sonnet');
   assert.equal(plan.providerModel, 'agy');
   assert.equal(plan.provenance.executor.value, 'agy');
-  assert.equal(plan.policy.executorPreference[0], 'agy');
+  assert.equal(plan.policy.executorId, 'agy');
 });
 
 test('compileDispatchPlan merges the same fields for a --for capability selector and records bindingSource: capability.prefer', () => {
@@ -5227,7 +5227,7 @@ test('compileDispatchPlan merges the same fields for a --for capability selector
   assert.equal(plan.bindingSource, 'capability.prefer');
   assert.equal(plan.tier, 'standard');
   assert.equal(plan.model, 'sonnet');
-  assert.equal(plan.policy.executorPreference[0], 'agy');
+  assert.equal(plan.policy.executorId, 'agy');
 });
 
 test('compileDispatchPlan applies the capability\'s tier and rigor when synthesizing policy for a --for capability selector', () => {
