@@ -1,8 +1,8 @@
 {
   "merge": "2cf6687669b6582faa11e4bdd901f28d836099dd",
-  "method": "Both unchanged embedded reproduction extractors locate each existing targetOwner/targetAnchor in the current worktree; content/anchor correspondence is recorded without approval carry.",
+  "method": "Both unchanged embedded reproduction extractors locate each existing targetOwner/targetAnchor in the current worktree; 8 content rebinds and 23 anchor-only re-placements are recorded without approval carry.",
   "checkedBindings": 31,
-  "reboundBindings": 31,
+  "reboundBindings": 8,
   "parked": [],
   "remainingTargetDigestDrift": 0,
   "rows": [
@@ -38,81 +38,81 @@
       "collection": "registryGaps",
       "claimId": "claim_97479b13a60800e856813bfd4f0cbb78",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-154",
+      "targetAnchor": "unheaded-block-152",
       "beforeDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-      "afterDigest": "3f3e77b66c269da1de24a568c762cc92c3042b35479fc4a9a234583ecb771e44"
+      "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
       "collection": "registryGaps",
       "claimId": "claim_50dca4885019ac5125d941ea5a86f448",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-159",
+      "targetAnchor": "unheaded-block-157",
       "beforeDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-      "afterDigest": "3dc14d83a27474210e3214adf23a9bcaec37881265f02cfb706fd4539624dd76"
+      "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
       "collection": "registryGaps",
       "claimId": "claim_07ae72c4d2c93884a120cf2ca12250a8",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-171",
+      "targetAnchor": "unheaded-block-169",
       "beforeDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-      "afterDigest": "5848ff6fc9b8290ae55b6dd6a7f4d4199b3417b45e6943c82f724c190d919ea9"
+      "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
       "collection": "registryGaps",
       "claimId": "claim_211f0b98400863f2a0e9b9cdaa2259fe",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-180",
+      "targetAnchor": "unheaded-block-178",
       "beforeDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-      "afterDigest": "3a74f97680892712456227dc57286bc6dbaceb76bf8291886f99025a9636df39"
+      "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
       "collection": "registryGaps",
       "claimId": "claim_1d8baa1def0cea7595b62de99846b489",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-245",
+      "targetAnchor": "unheaded-block-243",
       "beforeDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-      "afterDigest": "36bb7f7b2b4f964fb5d106412948b44530a8691bc02acd77372167fa1e792bd9"
+      "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
       "collection": "registryGaps",
       "claimId": "claim_012bfa2639fb107eeb3baee4fb502f54",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-254",
+      "targetAnchor": "unheaded-block-252",
       "beforeDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-      "afterDigest": "f82737a42a7e9cc86a88a7f2a568b61a603248952a79c27571d5ce7f42f0ff54"
+      "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
       "collection": "registryGaps",
       "claimId": "claim_99806d8b21d05eb7a8e8744d765bea00",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-278",
+      "targetAnchor": "unheaded-block-276",
       "beforeDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-      "afterDigest": "a21dd4b6aaa3a83cbacbdf3a18581657ffeca8d202b4a2f958dfac2d69230930"
+      "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
       "collection": "registryGaps",
       "claimId": "claim_a6f43d98b3eebe97802fd01a4ac7863b",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-290",
+      "targetAnchor": "unheaded-block-288",
       "beforeDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-      "afterDigest": "30d437082142efd2345a238a8d666ca78bdc1a5339cb3aa769cc46d4fac9855d"
+      "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
       "collection": "registryGaps",
       "claimId": "claim_b91c86788522c3516bef2c7bab859093",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-82",
+      "targetAnchor": "unheaded-block-80",
       "beforeDigest": "661c9e16abe9ed411801ccbaec1066f2cabe3fbc6dc11197bda2def6cbed3df7",
-      "afterDigest": "664070226174bdf66d7b160f7863e3cda7847d270050c87088d7b5385e5be7f1"
+      "afterDigest": "661c9e16abe9ed411801ccbaec1066f2cabe3fbc6dc11197bda2def6cbed3df7"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
@@ -146,9 +146,9 @@
       "collection": "registryGaps",
       "claimId": "claim_b7876fcb567891ddc8431cdab2f2dab0",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-103",
+      "targetAnchor": "unheaded-block-101",
       "beforeDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
-      "afterDigest": "76e6bd67e685b3d987f3b6b5e6363363a6e103b8a4f5778f3b2e33b40302140f"
+      "afterDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
@@ -173,117 +173,117 @@
       "collection": "registryGaps",
       "claimId": "claim_a63132a3f76d6b8ea05461c48c818836",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-103",
+      "targetAnchor": "unheaded-block-101",
       "beforeDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
-      "afterDigest": "76e6bd67e685b3d987f3b6b5e6363363a6e103b8a4f5778f3b2e33b40302140f"
+      "afterDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
       "collection": "registryGaps",
       "claimId": "claim_f64fa4a36030f89feab71dc5943015c0",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-127",
+      "targetAnchor": "unheaded-block-125",
       "beforeDigest": "97b0e92a0ff83b4b98002158e13f563d8738446ac64f0fcaeace320234d79b7b",
-      "afterDigest": "604f27c0c0b41f7c810ab6fbdc753ca0554a9af27dbac7ef93d99156bf4cc7e9"
+      "afterDigest": "97b0e92a0ff83b4b98002158e13f563d8738446ac64f0fcaeace320234d79b7b"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
       "collection": "registryGaps",
       "claimId": "claim_f4058f068a378962aaf237ae038db5af",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-136",
+      "targetAnchor": "unheaded-block-134",
       "beforeDigest": "20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd",
-      "afterDigest": "04f51a4f5dfccd3bd32411d47268161e9a971db21e975f38699939e78a1f0c55"
+      "afterDigest": "20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
       "collection": "registryGaps",
       "claimId": "claim_77a827ba40c328bd2c4d6a8ec713df65",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-319",
+      "targetAnchor": "unheaded-block-317",
       "beforeDigest": "7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27",
-      "afterDigest": "715faf8184937613283eecfb3043d6da73c2aec15278e160e579e5d655f940a9"
+      "afterDigest": "7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
       "collection": "registryGaps",
       "claimId": "claim_3dcf1baab2b0ac4b7ab7f84e30b8ab41",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-321",
+      "targetAnchor": "unheaded-block-319",
       "beforeDigest": "715faf8184937613283eecfb3043d6da73c2aec15278e160e579e5d655f940a9",
-      "afterDigest": "657e5b15bf7f9f37215c2f5ee49bc8e3138f6c678dc74b8d68a051604c85cd71"
+      "afterDigest": "715faf8184937613283eecfb3043d6da73c2aec15278e160e579e5d655f940a9"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
       "collection": "registryGaps",
       "claimId": "claim_93d5f2d34cf452029462ea39674fd255",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-327",
+      "targetAnchor": "unheaded-block-325",
       "beforeDigest": "6adc7286a12983c2a05c64d6dce33d420d981369a2a0f7c019aa91445e84285f",
-      "afterDigest": "ede7acc66ef8ba5fd9d75af9ee37f824f703af0fe81bd8a982cad99337ffc068"
+      "afterDigest": "6adc7286a12983c2a05c64d6dce33d420d981369a2a0f7c019aa91445e84285f"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
       "collection": "registryGaps",
       "claimId": "claim_8f8191c13e179af31ad39593af9fe716",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-324",
+      "targetAnchor": "unheaded-block-322",
       "beforeDigest": "187780a987ac947043008e2cd2c7b5035b28dee6258ee03e9275cb2483f18ce3",
-      "afterDigest": "6597c805f92af65a56d56360287e9afe803302ee3f92f4cb3e4c4171455a2494"
+      "afterDigest": "187780a987ac947043008e2cd2c7b5035b28dee6258ee03e9275cb2483f18ce3"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
       "collection": "registryGaps",
       "claimId": "claim_74a47937380f03ed75fa755f0faccffb",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-72",
+      "targetAnchor": "unheaded-block-70",
       "beforeDigest": "93eab619825cf7b3dc5c716075a75cd59df757298fe89f16b42990d4155e4167",
-      "afterDigest": "19a4d868d63868afd06477aac2d7fe35a416f43cf88354a68828fa86c9b8146c"
+      "afterDigest": "93eab619825cf7b3dc5c716075a75cd59df757298fe89f16b42990d4155e4167"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
       "collection": "registryGaps",
       "claimId": "claim_072766aafbaf01714df1aa65347a1d24",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-91",
+      "targetAnchor": "unheaded-block-89",
       "beforeDigest": "8b0b585d72e6e964b858670c69a32f7c2983b02b8fd11c3fbceda65fc93daee0",
-      "afterDigest": "372be8b09ba377f713ebcbf0cb224ce126c1a066d2a4188ce414ba65daad83a9"
+      "afterDigest": "8b0b585d72e6e964b858670c69a32f7c2983b02b8fd11c3fbceda65fc93daee0"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
       "collection": "registryGaps",
       "claimId": "claim_4d5b7f73e28f18b31e0142bf48e21c3a",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-94",
+      "targetAnchor": "unheaded-block-92",
       "beforeDigest": "9029936d54618ff2f26567776f163e84f88d1811fa762e647806bcdbd89e86f8",
-      "afterDigest": "968a9e65860acfe7d1f346e7b8de178845f40688a634e6cbef5c7e3d2c2841a2"
+      "afterDigest": "9029936d54618ff2f26567776f163e84f88d1811fa762e647806bcdbd89e86f8"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
       "collection": "registryGaps",
       "claimId": "claim_d5ba1eda7530b865fec747ee0adbc102",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-94",
+      "targetAnchor": "unheaded-block-92",
       "beforeDigest": "9029936d54618ff2f26567776f163e84f88d1811fa762e647806bcdbd89e86f8",
-      "afterDigest": "968a9e65860acfe7d1f346e7b8de178845f40688a634e6cbef5c7e3d2c2841a2"
+      "afterDigest": "9029936d54618ff2f26567776f163e84f88d1811fa762e647806bcdbd89e86f8"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
       "collection": "registryGaps",
       "claimId": "claim_41571c8f42f542be1f44c9371fad823a",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-53",
+      "targetAnchor": "unheaded-block-51",
       "beforeDigest": "97ebe38b535ab15b5085bfe68ad09e70f2be7220f7858b3ff3c7217521cc2f52",
-      "afterDigest": "7081262730c5a022bfa4b1c815bc90bffe5649538cc01fee4880433cb1144a4b"
+      "afterDigest": "97ebe38b535ab15b5085bfe68ad09e70f2be7220f7858b3ff3c7217521cc2f52"
     },
     {
       "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
       "collection": "registryGaps",
       "claimId": "claim_a64fabc06da00bb0eb8dfaba5ea0c1a6",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-103",
+      "targetAnchor": "unheaded-block-101",
       "beforeDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
-      "afterDigest": "76e6bd67e685b3d987f3b6b5e6363363a6e103b8a4f5778f3b2e33b40302140f"
+      "afterDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9"
     }
   ]
 }

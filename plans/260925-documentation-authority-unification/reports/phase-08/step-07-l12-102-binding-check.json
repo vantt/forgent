@@ -1,0 +1,870 @@
+{
+  "merge": "2cf6687669b6582faa11e4bdd901f28d836099dd",
+  "checkedBindings": 31,
+  "contentRebinds": 8,
+  "anchorOnlyReplacements": 23,
+  "extractors": [
+    {
+      "extractor": "step10-round5",
+      "unitCountBefore": 519,
+      "unitCountAfter": 517,
+      "rows": [
+        {
+          "claimId": "claim_97479b13a60800e856813bfd4f0cbb78",
+          "beforeAnchor": "unheaded-block-154",
+          "targetAnchor": "unheaded-block-152",
+          "beforeDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        {
+          "claimId": "claim_50dca4885019ac5125d941ea5a86f448",
+          "beforeAnchor": "unheaded-block-159",
+          "targetAnchor": "unheaded-block-157",
+          "beforeDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0008 — Routing theo audience của từng interface",
+            "Hệ quả"
+          ]
+        },
+        {
+          "claimId": "claim_07ae72c4d2c93884a120cf2ca12250a8",
+          "beforeAnchor": "unheaded-block-171",
+          "targetAnchor": "unheaded-block-169",
+          "beforeDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+            "Hệ quả"
+          ]
+        },
+        {
+          "claimId": "claim_211f0b98400863f2a0e9b9cdaa2259fe",
+          "beforeAnchor": "unheaded-block-180",
+          "targetAnchor": "unheaded-block-178",
+          "beforeDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+            "Hệ quả"
+          ]
+        },
+        {
+          "claimId": "claim_1d8baa1def0cea7595b62de99846b489",
+          "beforeAnchor": "unheaded-block-245",
+          "targetAnchor": "unheaded-block-243",
+          "beforeDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+            "Hệ quả"
+          ]
+        },
+        {
+          "claimId": "claim_012bfa2639fb107eeb3baee4fb502f54",
+          "beforeAnchor": "unheaded-block-254",
+          "targetAnchor": "unheaded-block-252",
+          "beforeDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+            "Hệ quả"
+          ]
+        },
+        {
+          "claimId": "claim_99806d8b21d05eb7a8e8744d765bea00",
+          "beforeAnchor": "unheaded-block-278",
+          "targetAnchor": "unheaded-block-276",
+          "beforeDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+            "Hệ quả"
+          ]
+        },
+        {
+          "claimId": "claim_a6f43d98b3eebe97802fd01a4ac7863b",
+          "beforeAnchor": "unheaded-block-290",
+          "targetAnchor": "unheaded-block-288",
+          "beforeDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+            "Hệ quả"
+          ]
+        },
+        {
+          "claimId": "claim_b91c86788522c3516bef2c7bab859093",
+          "beforeAnchor": "unheaded-block-82",
+          "targetAnchor": "unheaded-block-80",
+          "beforeDigest": "661c9e16abe9ed411801ccbaec1066f2cabe3fbc6dc11197bda2def6cbed3df7",
+          "afterDigest": "661c9e16abe9ed411801ccbaec1066f2cabe3fbc6dc11197bda2def6cbed3df7",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Business Rules"
+          ]
+        },
+        {
+          "claimId": "claim_b7876fcb567891ddc8431cdab2f2dab0",
+          "beforeAnchor": "unheaded-block-103",
+          "targetAnchor": "unheaded-block-101",
+          "beforeDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+          "afterDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Pointers (implementation)"
+          ]
+        },
+        {
+          "claimId": "claim_a63132a3f76d6b8ea05461c48c818836",
+          "beforeAnchor": "unheaded-block-103",
+          "targetAnchor": "unheaded-block-101",
+          "beforeDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+          "afterDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Pointers (implementation)"
+          ]
+        },
+        {
+          "claimId": "claim_f64fa4a36030f89feab71dc5943015c0",
+          "beforeAnchor": "unheaded-block-127",
+          "targetAnchor": "unheaded-block-125",
+          "beforeDigest": "97b0e92a0ff83b4b98002158e13f563d8738446ac64f0fcaeace320234d79b7b",
+          "afterDigest": "97b0e92a0ff83b4b98002158e13f563d8738446ac64f0fcaeace320234d79b7b",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Dispatch operability implementation slice (2026-09-16)"
+          ]
+        },
+        {
+          "claimId": "claim_f4058f068a378962aaf237ae038db5af",
+          "beforeAnchor": "unheaded-block-136",
+          "targetAnchor": "unheaded-block-134",
+          "beforeDigest": "20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd",
+          "afterDigest": "20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Dispatch operability implementation slice (2026-09-16)"
+          ]
+        },
+        {
+          "claimId": "claim_77a827ba40c328bd2c4d6a8ec713df65",
+          "beforeAnchor": "unheaded-block-319",
+          "targetAnchor": "unheaded-block-317",
+          "beforeDigest": "7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27",
+          "afterDigest": "7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0047 — P1 Lõi thực thi: Unit, một bind(), một cửa chạy fgos run, 3 Pattern cộng tác, đóng 4 mối authority L5 [§1 ĐÃ BỊ THAY MỘT PHẦN bởi 0061]"
+          ]
+        },
+        {
+          "claimId": "claim_3dcf1baab2b0ac4b7ab7f84e30b8ab41",
+          "beforeAnchor": "unheaded-block-321",
+          "targetAnchor": "unheaded-block-319",
+          "beforeDigest": "715faf8184937613283eecfb3043d6da73c2aec15278e160e579e5d655f940a9",
+          "afterDigest": "715faf8184937613283eecfb3043d6da73c2aec15278e160e579e5d655f940a9",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0048 — P2 Plan chạy được: Unit cho mọi đường vào, driver mỏng fgos-run, bỏ DemandFacts/matcher"
+          ]
+        },
+        {
+          "claimId": "claim_93d5f2d34cf452029462ea39674fd255",
+          "beforeAnchor": "unheaded-block-327",
+          "targetAnchor": "unheaded-block-325",
+          "beforeDigest": "6adc7286a12983c2a05c64d6dce33d420d981369a2a0f7c019aa91445e84285f",
+          "afterDigest": "6adc7286a12983c2a05c64d6dce33d420d981369a2a0f7c019aa91445e84285f",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0053 — Một cơ chế truyền kết quả: đường dẫn report trong contextRefs, phân giải một lần"
+          ]
+        },
+        {
+          "claimId": "claim_8f8191c13e179af31ad39593af9fe716",
+          "beforeAnchor": "unheaded-block-324",
+          "targetAnchor": "unheaded-block-322",
+          "beforeDigest": "187780a987ac947043008e2cd2c7b5035b28dee6258ee03e9275cb2483f18ce3",
+          "afterDigest": "187780a987ac947043008e2cd2c7b5035b28dee6258ee03e9275cb2483f18ce3",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0050 — P6 Nối thật: herdr là transport mặc định, posture một đường, fallback quota qua pane mới"
+          ]
+        },
+        {
+          "claimId": "claim_74a47937380f03ed75fa755f0faccffb",
+          "beforeAnchor": "unheaded-block-72",
+          "targetAnchor": "unheaded-block-70",
+          "beforeDigest": "93eab619825cf7b3dc5c716075a75cd59df757298fe89f16b42990d4155e4167",
+          "afterDigest": "93eab619825cf7b3dc5c716075a75cd59df757298fe89f16b42990d4155e4167",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Business Rules"
+          ]
+        },
+        {
+          "claimId": "claim_072766aafbaf01714df1aa65347a1d24",
+          "beforeAnchor": "unheaded-block-91",
+          "targetAnchor": "unheaded-block-89",
+          "beforeDigest": "8b0b585d72e6e964b858670c69a32f7c2983b02b8fd11c3fbceda65fc93daee0",
+          "afterDigest": "8b0b585d72e6e964b858670c69a32f7c2983b02b8fd11c3fbceda65fc93daee0",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Business Rules"
+          ]
+        },
+        {
+          "claimId": "claim_4d5b7f73e28f18b31e0142bf48e21c3a",
+          "beforeAnchor": "unheaded-block-94",
+          "targetAnchor": "unheaded-block-92",
+          "beforeDigest": "9029936d54618ff2f26567776f163e84f88d1811fa762e647806bcdbd89e86f8",
+          "afterDigest": "9029936d54618ff2f26567776f163e84f88d1811fa762e647806bcdbd89e86f8",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Business Rules"
+          ]
+        },
+        {
+          "claimId": "claim_d5ba1eda7530b865fec747ee0adbc102",
+          "beforeAnchor": "unheaded-block-94",
+          "targetAnchor": "unheaded-block-92",
+          "beforeDigest": "9029936d54618ff2f26567776f163e84f88d1811fa762e647806bcdbd89e86f8",
+          "afterDigest": "9029936d54618ff2f26567776f163e84f88d1811fa762e647806bcdbd89e86f8",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Business Rules"
+          ]
+        },
+        {
+          "claimId": "claim_41571c8f42f542be1f44c9371fad823a",
+          "beforeAnchor": "unheaded-block-53",
+          "targetAnchor": "unheaded-block-51",
+          "beforeDigest": "97ebe38b535ab15b5085bfe68ad09e70f2be7220f7858b3ff3c7217521cc2f52",
+          "afterDigest": "97ebe38b535ab15b5085bfe68ad09e70f2be7220f7858b3ff3c7217521cc2f52",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Behaviors & Operations",
+            "Khóa hoạt động cây chính — chặn commit trần khi phiên khác đang hoạt động (STR65)"
+          ]
+        },
+        {
+          "claimId": "claim_a64fabc06da00bb0eb8dfaba5ea0c1a6",
+          "beforeAnchor": "unheaded-block-103",
+          "targetAnchor": "unheaded-block-101",
+          "beforeDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+          "afterDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Pointers (implementation)"
+          ]
+        }
+      ],
+      "zeroDrift": true
+    },
+    {
+      "extractor": "step10-sync4d",
+      "unitCountBefore": 519,
+      "unitCountAfter": 517,
+      "rows": [
+        {
+          "claimId": "claim_97479b13a60800e856813bfd4f0cbb78",
+          "beforeAnchor": "unheaded-block-154",
+          "targetAnchor": "unheaded-block-152",
+          "beforeDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0005 — Runner & cô lập worker",
+            "Hệ quả"
+          ]
+        },
+        {
+          "claimId": "claim_50dca4885019ac5125d941ea5a86f448",
+          "beforeAnchor": "unheaded-block-159",
+          "targetAnchor": "unheaded-block-157",
+          "beforeDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0008 — Routing theo audience của từng interface",
+            "Hệ quả"
+          ]
+        },
+        {
+          "claimId": "claim_07ae72c4d2c93884a120cf2ca12250a8",
+          "beforeAnchor": "unheaded-block-171",
+          "targetAnchor": "unheaded-block-169",
+          "beforeDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+            "Hệ quả"
+          ]
+        },
+        {
+          "claimId": "claim_211f0b98400863f2a0e9b9cdaa2259fe",
+          "beforeAnchor": "unheaded-block-180",
+          "targetAnchor": "unheaded-block-178",
+          "beforeDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+            "Hệ quả"
+          ]
+        },
+        {
+          "claimId": "claim_1d8baa1def0cea7595b62de99846b489",
+          "beforeAnchor": "unheaded-block-245",
+          "targetAnchor": "unheaded-block-243",
+          "beforeDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+            "Hệ quả"
+          ]
+        },
+        {
+          "claimId": "claim_012bfa2639fb107eeb3baee4fb502f54",
+          "beforeAnchor": "unheaded-block-254",
+          "targetAnchor": "unheaded-block-252",
+          "beforeDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+            "Hệ quả"
+          ]
+        },
+        {
+          "claimId": "claim_99806d8b21d05eb7a8e8744d765bea00",
+          "beforeAnchor": "unheaded-block-278",
+          "targetAnchor": "unheaded-block-276",
+          "beforeDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+            "Hệ quả"
+          ]
+        },
+        {
+          "claimId": "claim_a6f43d98b3eebe97802fd01a4ac7863b",
+          "beforeAnchor": "unheaded-block-290",
+          "targetAnchor": "unheaded-block-288",
+          "beforeDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "afterDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+            "Hệ quả"
+          ]
+        },
+        {
+          "claimId": "claim_b91c86788522c3516bef2c7bab859093",
+          "beforeAnchor": "unheaded-block-82",
+          "targetAnchor": "unheaded-block-80",
+          "beforeDigest": "661c9e16abe9ed411801ccbaec1066f2cabe3fbc6dc11197bda2def6cbed3df7",
+          "afterDigest": "661c9e16abe9ed411801ccbaec1066f2cabe3fbc6dc11197bda2def6cbed3df7",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Business Rules"
+          ]
+        },
+        {
+          "claimId": "claim_b7876fcb567891ddc8431cdab2f2dab0",
+          "beforeAnchor": "unheaded-block-103",
+          "targetAnchor": "unheaded-block-101",
+          "beforeDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+          "afterDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Pointers (implementation)"
+          ]
+        },
+        {
+          "claimId": "claim_a63132a3f76d6b8ea05461c48c818836",
+          "beforeAnchor": "unheaded-block-103",
+          "targetAnchor": "unheaded-block-101",
+          "beforeDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+          "afterDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Pointers (implementation)"
+          ]
+        },
+        {
+          "claimId": "claim_f64fa4a36030f89feab71dc5943015c0",
+          "beforeAnchor": "unheaded-block-127",
+          "targetAnchor": "unheaded-block-125",
+          "beforeDigest": "97b0e92a0ff83b4b98002158e13f563d8738446ac64f0fcaeace320234d79b7b",
+          "afterDigest": "97b0e92a0ff83b4b98002158e13f563d8738446ac64f0fcaeace320234d79b7b",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Dispatch operability implementation slice (2026-09-16)"
+          ]
+        },
+        {
+          "claimId": "claim_f4058f068a378962aaf237ae038db5af",
+          "beforeAnchor": "unheaded-block-136",
+          "targetAnchor": "unheaded-block-134",
+          "beforeDigest": "20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd",
+          "afterDigest": "20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Dispatch operability implementation slice (2026-09-16)"
+          ]
+        },
+        {
+          "claimId": "claim_77a827ba40c328bd2c4d6a8ec713df65",
+          "beforeAnchor": "unheaded-block-319",
+          "targetAnchor": "unheaded-block-317",
+          "beforeDigest": "7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27",
+          "afterDigest": "7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0047 — P1 Lõi thực thi: Unit, một bind(), một cửa chạy fgos run, 3 Pattern cộng tác, đóng 4 mối authority L5 [§1 ĐÃ BỊ THAY MỘT PHẦN bởi 0061]"
+          ]
+        },
+        {
+          "claimId": "claim_3dcf1baab2b0ac4b7ab7f84e30b8ab41",
+          "beforeAnchor": "unheaded-block-321",
+          "targetAnchor": "unheaded-block-319",
+          "beforeDigest": "715faf8184937613283eecfb3043d6da73c2aec15278e160e579e5d655f940a9",
+          "afterDigest": "715faf8184937613283eecfb3043d6da73c2aec15278e160e579e5d655f940a9",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0048 — P2 Plan chạy được: Unit cho mọi đường vào, driver mỏng fgos-run, bỏ DemandFacts/matcher"
+          ]
+        },
+        {
+          "claimId": "claim_93d5f2d34cf452029462ea39674fd255",
+          "beforeAnchor": "unheaded-block-327",
+          "targetAnchor": "unheaded-block-325",
+          "beforeDigest": "6adc7286a12983c2a05c64d6dce33d420d981369a2a0f7c019aa91445e84285f",
+          "afterDigest": "6adc7286a12983c2a05c64d6dce33d420d981369a2a0f7c019aa91445e84285f",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0053 — Một cơ chế truyền kết quả: đường dẫn report trong contextRefs, phân giải một lần"
+          ]
+        },
+        {
+          "claimId": "claim_8f8191c13e179af31ad39593af9fe716",
+          "beforeAnchor": "unheaded-block-324",
+          "targetAnchor": "unheaded-block-322",
+          "beforeDigest": "187780a987ac947043008e2cd2c7b5035b28dee6258ee03e9275cb2483f18ce3",
+          "afterDigest": "187780a987ac947043008e2cd2c7b5035b28dee6258ee03e9275cb2483f18ce3",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0050 — P6 Nối thật: herdr là transport mặc định, posture một đường, fallback quota qua pane mới"
+          ]
+        },
+        {
+          "claimId": "claim_74a47937380f03ed75fa755f0faccffb",
+          "beforeAnchor": "unheaded-block-72",
+          "targetAnchor": "unheaded-block-70",
+          "beforeDigest": "93eab619825cf7b3dc5c716075a75cd59df757298fe89f16b42990d4155e4167",
+          "afterDigest": "93eab619825cf7b3dc5c716075a75cd59df757298fe89f16b42990d4155e4167",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Business Rules"
+          ]
+        },
+        {
+          "claimId": "claim_072766aafbaf01714df1aa65347a1d24",
+          "beforeAnchor": "unheaded-block-91",
+          "targetAnchor": "unheaded-block-89",
+          "beforeDigest": "8b0b585d72e6e964b858670c69a32f7c2983b02b8fd11c3fbceda65fc93daee0",
+          "afterDigest": "8b0b585d72e6e964b858670c69a32f7c2983b02b8fd11c3fbceda65fc93daee0",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Business Rules"
+          ]
+        },
+        {
+          "claimId": "claim_4d5b7f73e28f18b31e0142bf48e21c3a",
+          "beforeAnchor": "unheaded-block-94",
+          "targetAnchor": "unheaded-block-92",
+          "beforeDigest": "9029936d54618ff2f26567776f163e84f88d1811fa762e647806bcdbd89e86f8",
+          "afterDigest": "9029936d54618ff2f26567776f163e84f88d1811fa762e647806bcdbd89e86f8",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Business Rules"
+          ]
+        },
+        {
+          "claimId": "claim_d5ba1eda7530b865fec747ee0adbc102",
+          "beforeAnchor": "unheaded-block-94",
+          "targetAnchor": "unheaded-block-92",
+          "beforeDigest": "9029936d54618ff2f26567776f163e84f88d1811fa762e647806bcdbd89e86f8",
+          "afterDigest": "9029936d54618ff2f26567776f163e84f88d1811fa762e647806bcdbd89e86f8",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Business Rules"
+          ]
+        },
+        {
+          "claimId": "claim_41571c8f42f542be1f44c9371fad823a",
+          "beforeAnchor": "unheaded-block-53",
+          "targetAnchor": "unheaded-block-51",
+          "beforeDigest": "97ebe38b535ab15b5085bfe68ad09e70f2be7220f7858b3ff3c7217521cc2f52",
+          "afterDigest": "97ebe38b535ab15b5085bfe68ad09e70f2be7220f7858b3ff3c7217521cc2f52",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Behaviors & Operations",
+            "Khóa hoạt động cây chính — chặn commit trần khi phiên khác đang hoạt động (STR65)"
+          ]
+        },
+        {
+          "claimId": "claim_a64fabc06da00bb0eb8dfaba5ea0c1a6",
+          "beforeAnchor": "unheaded-block-103",
+          "targetAnchor": "unheaded-block-101",
+          "beforeDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+          "afterDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
+          "checks": {
+            "passage": true,
+            "previousNeighbour": true,
+            "nextNeighbour": true,
+            "ancestry": true
+          },
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Pointers (implementation)"
+          ]
+        }
+      ],
+      "zeroDrift": true
+    }
+  ],
+  "zeroTargetDigestDrift": true,
+  "reproductionReporter": {
+    "command": "python3 -B plans/260925-documentation-authority-unification/reports/phase-08/audit-report.py",
+    "exit": 1,
+    "targetDigestDriftRows": 0,
+    "commandExits": [
+      {
+        "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+        "ownership": 0,
+        "auditOwnership": 0,
+        "checks": 1
+      },
+      {
+        "manifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+        "ownership": 0,
+        "auditOwnership": 0,
+        "checks": 1
+      }
+    ],
+    "outputSha256": "ec65370303efed57259811889c0825397c911764b11a56eeaa31309e1769900d",
+    "note": "The reporter has zero target-digest drift. Each embedded checks.mjs remains non-green only for pre-existing historical-offender accounting on uncommitted bytes."
+  }
+}

@@ -8356,10 +8356,10 @@
       "reviewStatus": "pending",
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-103",
+      "targetAnchor": "unheaded-block-101",
       "rationale": "Source: docs/specs/runner.md:1208-1256#unheaded-block-102 (historical witness at 8b4be4fcf99618be5edd86faa6080a1193d992be); unit SHA256 3f6a59c3d3764c1b978073ad68eb16ce1b0382d6bf362815f45ad79dd1625224.\nTarget: docs/specs/runner.md:1219-1269#unheaded-block-102 (current lines); unit SHA256 29fd80cd85f3529f3dcc99950563df4461655efc9d0550abe9dc52b199d07854.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 29fd80cd85f3529f3dcc99950563df4461655efc9d0550abe9dc52b199d07854 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nL10-25/main-checkout-lock: \"- `src/runner/main-checkout-lock.mjs` (STR65) — `acquireMainCheckoutLock(dir, {identity, ttlMs, now})`/`releaseMainCheckoutLock(dir)`: khóa tạo-nguyên-tử `wx` + đòi-lại-pid-chết, độc lập với ba khóa anh em (`runner.lock`/`sessions.lock`/`events.lock`, không import chung, xem lineage note ở `src/state/events.mjs`); `identity` nhận số nguyên (pid thật, kiểm sống qua tín hiệu 0) HOẶC chuỗi (danh tính phiên, không kiểm sống được); TỰ-NHẬN-DIỆN: danh tính khóa hiện có trùng đúng danh tính người gọi → luôn ACQUIRED (refresh), bất kể ttlMs/sống-chết — đây là \\\"chính phiên này tiếp tục\\\", không phải một chủ cạnh tranh; danh tính KHÁC: số nguyên giữ nguyên phép thử sống+ttl có sẵn, chuỗi chỉ xét độ mới theo `ttlMs` (không có gì để kiểm sống); nội dung khóa hỏng/không phân tích được → AMBIGUOUS (không bao giờ coi là rảnh hay đang giữ). Manifest layer: infra.\" → \"- `src/runner/main-checkout-lock.mjs` (STR65) — `acquireMainCheckoutLock(dir, {identity, ttlMs, now})`/`releaseMainCheckoutLock(dir)`: khóa tạo-nguyên-tử `wx` + đòi-lại-pid-chết, độc lập với ba khóa anh em (`runner.lock`/`sessions.lock`/`events.lock`, không import chung, xem lineage note ở `src/state/events.mjs`); `identity` nhận số nguyên (pid thật, kiểm sống qua tín hiệu 0) HOẶC chuỗi (danh tính phiên, không kiểm sống được); TỰ-NHẬN-DIỆN: danh tính khóa hiện có trùng đúng danh tính người gọi → luôn ACQUIRED (refresh), bất kể ttlMs/sống-chết — đây là \\\"chính phiên này tiếp tục\\\", không phải một chủ cạnh tranh; danh tính KHÁC: mọi writer ghi `ttlMs` của chính nó vào record và người tranh xét record theo `ttlMs` ĐÓ, không bao giờ theo `ttlMs` của mình — số nguyên: pid sống VÀ còn trong ttl; chuỗi: chỉ xét độ mới (không có gì để kiểm sống); record cũ không có `ttlMs` nhận cửa sổ của writer cũ (chuỗi phiên do hook cũ ghi: `HOOK_TTL_MS` 20 s; pid: `DEFAULT_TTL_MS` 3 phút), mọi ttl bị chặn ở trần một run (4 h); nội dung khóa hỏng/không phân tích được → AMBIGUOUS (không bao giờ coi là rảnh hay đang giữ); record có trường `v` (giao thức khóa mới hơn) hoặc marker `.fgos/runtime/locks/<tên khóa>/protocol.json` khác `{writer:1}` (một quyết định marker cho mọi cửa: acquire kiểm TRƯỚC khi ghi và kiểm lại sau acquire, `inspectMainCheckoutLock` kiểm trước nhánh \\\"không có file\\\", `forceReclaimAmbiguousLock` kiểm trước mọi sửa, hook và Rust `lock.rs` dùng cùng luật) → HELD với `reason: unsupported-protocol`; record có `v` kể cả khi mang đủ `pid`/`ts` không bao giờ bị dọn/làm mới/release (kể cả closure của một hold cũ và `releaseMainCheckoutLock`), `fgos unlock` từ chối và không bao giờ báo `cleared:true`. Writer tự acquire của checkpoint (`acquiringMainCheckoutWriter`) dùng `allowSelfRecognition: false` để không tái nhập hold của một operation khác cùng pid. Checkpoint `.fgos` (`runOpportunisticMainCheckoutChecks`) chạy trọn add → commit → reset-khi-lỗi trong mutex này: mutex thuộc tầng runner nên checkpoint (tầng kernel) nhận `mainCheckoutWriter` từ caller: caller đã giữ (claim, merge không slot) truyền `heldMainCheckoutWriter(pid)`, caller chỉ giữ merge slot truyền `acquiringMainCheckoutWriter(dir)` (acquire rồi nhả ngay, bị giữ thì bỏ lượt); không có writer thì checkpoint không commit. Manifest layer: infra.\"; evidence step10-systemic-a63132a3-witness.json; bound historical/current Pointers units.\nL10-25/pre-commit: \"- `.githooks/pre-commit` (STR65) — hook git-native (không phải verb fgOS, không phải cấu hình riêng công cụ trợ lý nào — xem \\\"Khóa hoạt động cây chính\\\" trên cho hợp đồng đầy đủ): giải thư mục gốc worktree bằng `path.resolve(__dirname, '..')` (KHÔNG gọi `git rev-parse --show-toplevel` — biến môi trường `GIT_DIR` mà git tự đặt khi hook chạy TRONG một git worktree làm lời gọi đó trả sai thư mục gốc, xác nhận thật bằng tái tạo có chủ đích trước khi vá); gọi `resolveWriterIdentity()` rồi `acquireMainCheckoutLock` với `ttlMs` mặc định 300000 (5 phút, đọc đè được qua biến môi trường `FGOS_MAIN_CHECKOUT_LOCK_TTL_MS`) — số này chọn từ bằng chứng thật (khoảng cách giữa các commit thật của 3 sự cố STR65 có SHA, ~2-3.5 phút), giảm từ mức mặc định 15 phút ban đầu qua 10 phút xuống 5 phút; HELD/AMBIGUOUS → in thông điệp bằng thời gian + trỏ `docs/how-to-parallel-lanes.md`, thoát khác 0; ACQUIRED → thoát 0 im lặng.\" → \"- `.githooks/pre-commit` (STR65) — hook git-native (không phải verb fgOS, không phải cấu hình riêng công cụ trợ lý nào — xem \\\"Khóa hoạt động cây chính\\\" trên cho hợp đồng đầy đủ): giải thư mục gốc worktree bằng `path.resolve(__dirname, '..')` (KHÔNG gọi `git rev-parse --show-toplevel` — biến môi trường `GIT_DIR` mà git tự đặt khi hook chạy TRONG một git worktree làm lời gọi đó trả sai thư mục gốc, xác nhận thật bằng tái tạo có chủ đích trước khi vá); sau các guard `.fgos`/root-file/nhánh `fgw/*`, đọc `.fgos/main-checkout.lock` MỘT lần qua `inspectMainCheckoutLock` (không acquire, không chờ — git đã giữ `index.lock` khi hook chạy): pid trong `FGOS_MAIN_LOCK_HOLDER_PID` khớp holder sống → commit của fgOS, bỏ qua đèn; holder pid số khác còn sống, giao thức khóa lạ, hoặc khóa hỏng → từ chối. Rồi `resolveWriterIdentity()` và đèn hoạt động `src/runner/main-checkout-activity.mjs` (`.fgos/runtime/main-checkout-activity.json`): writer khác trong `windowMs` → từ chối; còn lại ghi đèn cuối hook với `windowMs` = `HOOK_TTL_MS` 20 s (đè được qua `FGOS_MAIN_CHECKOUT_LOCK_TTL_MS`); từ chối → in thông điệp bằng thời gian + trỏ `docs/how-to-parallel-lanes.md`, thoát khác 0.\"; evidence step10-systemic-a63132a3-witness.json; bound historical/current Pointers units.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-102 under docs/specs/runner.md#unheaded-block-102; source context \"Spec: Runner (vòng tự hành) / Pointers (implementation)\", target context \"Spec: Runner (vòng tự hành) / Pointers (implementation)\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval. L12-44 merge 6b3335711454f638780affa907353992dcde82ba: Same named ancestry and unique full passage opening; main patch changes within this passage. Exact before/after passage in step-00-l12-44-merge-rebindings.json; current target unheaded-block-102 SHA256 443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9; source identity unchanged; no native identity assignment or approval carry. L12-66: merge fd126f0c853f320e476b648fe50ac9b4e2256d6c; complete old/current passage and actual heading ancestry checked with both unchanged extractors; main hunk accounted. Source identity unchanged; independent changed-binding review owed. L12-101 merge 2cf6687669b6582faa11e4bdd901f28d836099dd: unchanged extractor anchor correspondence resolves this existing target anchor at current digest; source identity unchanged, no approval carry; independent review pending.",
       "evidenceDigest": "ddcc63f3f14921ed816bab258b99f56ff4d776c73598149b35351a162a6f22fa",
-      "targetUnitDigest": "76e6bd67e685b3d987f3b6b5e6363363a6e103b8a4f5778f3b2e33b40302140f",
+      "targetUnitDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Pointers (implementation)"
@@ -8374,8 +8374,8 @@
       "reviewStatus": "pending",
       "disposition": "partial-carry",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-127",
-      "targetUnitDigest": "604f27c0c0b41f7c810ab6fbdc753ca0554a9af27dbac7ef93d99156bf4cc7e9",
+      "targetAnchor": "unheaded-block-125",
+      "targetUnitDigest": "97b0e92a0ff83b4b98002158e13f563d8738446ac64f0fcaeace320234d79b7b",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Dispatch operability implementation slice (2026-09-16)"
@@ -8609,8 +8609,8 @@
       "reviewStatus": "pending",
       "disposition": "partial-carry",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-136",
-      "targetUnitDigest": "04f51a4f5dfccd3bd32411d47268161e9a971db21e975f38699939e78a1f0c55",
+      "targetAnchor": "unheaded-block-134",
+      "targetUnitDigest": "20b88b9765b1528632270f740a923bdcca1df84a4a3000f87e45e1b1b177ffcd",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Dispatch operability implementation slice (2026-09-16)"
@@ -11840,8 +11840,8 @@
       "reviewStatus": "pending",
       "disposition": "partial-carry",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-319",
-      "targetUnitDigest": "715faf8184937613283eecfb3043d6da73c2aec15278e160e579e5d655f940a9",
+      "targetAnchor": "unheaded-block-317",
+      "targetUnitDigest": "7518a36eebda7c6697541c1dbcfba86b9d00018685cd6f34a0abf6d6a3c8bc27",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
@@ -11860,8 +11860,8 @@
       "reviewStatus": "pending",
       "disposition": "partial-carry",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-321",
-      "targetUnitDigest": "657e5b15bf7f9f37215c2f5ee49bc8e3138f6c678dc74b8d68a051604c85cd71",
+      "targetAnchor": "unheaded-block-319",
+      "targetUnitDigest": "715faf8184937613283eecfb3043d6da73c2aec15278e160e579e5d655f940a9",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
@@ -11880,8 +11880,8 @@
       "reviewStatus": "pending",
       "disposition": "partial-carry",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-327",
-      "targetUnitDigest": "ede7acc66ef8ba5fd9d75af9ee37f824f703af0fe81bd8a982cad99337ffc068",
+      "targetAnchor": "unheaded-block-325",
+      "targetUnitDigest": "6adc7286a12983c2a05c64d6dce33d420d981369a2a0f7c019aa91445e84285f",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
@@ -11900,8 +11900,8 @@
       "reviewStatus": "pending",
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-324",
-      "targetUnitDigest": "6597c805f92af65a56d56360287e9afe803302ee3f92f4cb3e4c4171455a2494",
+      "targetAnchor": "unheaded-block-322",
+      "targetUnitDigest": "187780a987ac947043008e2cd2c7b5035b28dee6258ee03e9275cb2483f18ce3",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
@@ -11919,8 +11919,8 @@
       "reviewStatus": "pending",
       "disposition": "partial-carry",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-72",
-      "targetUnitDigest": "19a4d868d63868afd06477aac2d7fe35a416f43cf88354a68828fa86c9b8146c",
+      "targetAnchor": "unheaded-block-70",
+      "targetUnitDigest": "93eab619825cf7b3dc5c716075a75cd59df757298fe89f16b42990d4155e4167",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Business Rules"
@@ -11959,8 +11959,8 @@
       "reviewStatus": "pending",
       "disposition": "partial-carry",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-91",
-      "targetUnitDigest": "372be8b09ba377f713ebcbf0cb224ce126c1a066d2a4188ce414ba65daad83a9",
+      "targetAnchor": "unheaded-block-89",
+      "targetUnitDigest": "8b0b585d72e6e964b858670c69a32f7c2983b02b8fd11c3fbceda65fc93daee0",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Business Rules"
@@ -11980,8 +11980,8 @@
       "reviewStatus": "pending",
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-94",
-      "targetUnitDigest": "968a9e65860acfe7d1f346e7b8de178845f40688a634e6cbef5c7e3d2c2841a2",
+      "targetAnchor": "unheaded-block-92",
+      "targetUnitDigest": "9029936d54618ff2f26567776f163e84f88d1811fa762e647806bcdbd89e86f8",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Business Rules"
@@ -11997,8 +11997,8 @@
       "reviewStatus": "pending",
       "disposition": "partial-carry",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-94",
-      "targetUnitDigest": "968a9e65860acfe7d1f346e7b8de178845f40688a634e6cbef5c7e3d2c2841a2",
+      "targetAnchor": "unheaded-block-92",
+      "targetUnitDigest": "9029936d54618ff2f26567776f163e84f88d1811fa762e647806bcdbd89e86f8",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Business Rules"
@@ -12013,8 +12013,8 @@
       "sourceUnitDigest": "1b272bfab383f72def5df026184449f797cb7723c812253713808d6aed302988",
       "disposition": "partial-carry",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-53",
-      "targetUnitDigest": "7081262730c5a022bfa4b1c815bc90bffe5649538cc01fee4880433cb1144a4b",
+      "targetAnchor": "unheaded-block-51",
+      "targetUnitDigest": "97ebe38b535ab15b5085bfe68ad09e70f2be7220f7858b3ff3c7217521cc2f52",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Behaviors & Operations",
@@ -12032,8 +12032,8 @@
       "sourceUnitDigest": "b323720a9d4e93b156af47db347755f342dd8ad9fb9720466bb161732ebef4e3",
       "disposition": "partial-carry",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-103",
-      "targetUnitDigest": "76e6bd67e685b3d987f3b6b5e6363363a6e103b8a4f5778f3b2e33b40302140f",
+      "targetAnchor": "unheaded-block-101",
+      "targetUnitDigest": "443f8e744027613c6c5cc5f46c798d6a1a3182862b16d4cdd24c0af82a6715d9",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Pointers (implementation)"
