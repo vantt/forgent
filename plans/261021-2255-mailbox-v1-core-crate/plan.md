@@ -105,7 +105,7 @@ Each is recorded in the spec on the branch in phase 8 (L5 question 6) as an agen
 
 ## Câu hỏi cho owner
 
-All three continue with the provisional default stated; the plan is executable as written.
+**Owner answered 2026-10-21 23:50 ("ok như đề nghị"): Q1 option A, Q2 option B (prune at V2), Q3 option A — each exactly as recommended below.** The provisional defaults are now decisions; record them in spec §17 on the branch in phase 8.
 
 **Q1. Three numbers the core needs have no configuration key in spec §12.**
 
@@ -117,7 +117,7 @@ All three continue with the provisional default stated; the plan is executable a
   - C. The owner gives three numbers. Gain: owner-chosen. Cost: waits for the owner.
 - **Khuyến nghị:** A.
 - **Phạm vi của câu trả lời:** A yes authorises three keys with borrowed placeholder values. It signs no value (G0 signs no number) and changes no other key.
-- **Provisional default applied:** A (phases 1, 4, 7).
+- **Decided by owner:** A (phases 1, 4, 7).
 
 **Q2. How are the bindings of dead heads retired?**
 
@@ -141,7 +141,7 @@ All three continue with the provisional default stated; the plan is executable a
   - C. Apply the caps to the shared bucket, reset when the snapshot is recreated or by an explicit owner action. Gain: a brake with a human reset. Cost: one verb or flag later (V5/V7).
 - **Khuyến nghị:** A for the first slice (no consumer sends through the runner yet, spec §16 Q3); revisit when one does.
 - **Phạm vi của câu trả lời:** A yes exempts only the shared unregistered sender from the two lifetime caps; every other policy still applies to it.
-- **Provisional default applied:** A (phases 5, 6).
+- **Decided by owner:** A (phases 5, 6).
 
 ## Risks the implementer must know
 
